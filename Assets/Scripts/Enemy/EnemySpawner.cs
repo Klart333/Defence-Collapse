@@ -13,9 +13,9 @@ public class EnemySpawner : MonoBehaviour
     private Wave[] wavesArray;
 
     private Queue<Wave> waves = new Queue<Wave>();
-    private List<Vector3> path = new List<Vector3>();
-
     private WaveFunction waveFunction;
+
+    private Vector3[] path;
 
     private bool inWave = false;
 
@@ -46,13 +46,12 @@ public class EnemySpawner : MonoBehaviour
 
     private void Wave_OnMapGenerated()
     {
-        var enemyPath = waveFunction.GetEnemyPath();
-        for (int i = 0; i < enemyPath.Count; i++)
+        var cells = waveFunction.GetEnemyPath();
+        path = new Vector3[cells.Count];
+        for (int i = 0; i < cells.Count; i++)
         {
-            path.Add(enemyPath[i].Position);
+            path[i] = cells[i].Position;
         }
-
-        //StartCoroutine(StartWave());
     }
 
     public IEnumerator StartWave()
@@ -88,7 +87,7 @@ public class EnemySpawner : MonoBehaviour
     {
         var spawnedEnemy = Instantiate(enemy, path[0], Quaternion.identity);
 
-        spawnedEnemy.SetPath(path);
+        spawnedEnemy.UpdatePath();
     }
 }
 

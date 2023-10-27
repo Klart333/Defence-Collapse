@@ -1,10 +1,9 @@
-using JetBrains.Annotations;
-using Path;
+using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class WaveFunction : MonoBehaviour
@@ -29,25 +28,26 @@ public class WaveFunction : MonoBehaviour
     [SerializeField]
     private Material[] mats;
 
+    [SerializeField]
+    private List<Mesh> singleMatMeshes = new List<Mesh>();
+
     [Header("Rules")]
     [SerializeField]
     private int[] notAllowedForBottom;
 
     [Header("Path")]
     [SerializeField]
-    private int startCord;
-
-    [SerializeField]
     private int turnWeight = 20;
 
-    [SerializeField]
-    private float minLength = 2;
-    
     [SerializeField]
     private Material pathMat;
 
     [SerializeField]
     private GameObject castle;
+
+    [Header("BottomBuildup")]
+    [SerializeField]
+    private int[] allowedBuildUp;
 
     [Header("Debug")]
     public bool Manual;
@@ -58,14 +58,15 @@ public class WaveFunction : MonoBehaviour
     private List<PrototypeData> prototypes = new List<PrototypeData>();
     private List<PrototypeData> bottomPrototypes = new List<PrototypeData>();
     private List<Cell> cells = new List<Cell>();
-    private List<Cell> cellPath = new List<Cell>(); 
+    private List<Cell> cellPath = new List<Cell>();
 
     private Stack<int> cellStack = new Stack<int>();
 
-    private GameObject spawnedCastle;
+    private Node[,] map;
 
     private PrototypeData emptyPrototype;
 
+    public GameObject SpawnedCastle { get; private set; }
     public bool Auto { get; set; }
     public int Speed { get; set; }
     public Vector3 GridSize => new Vector3(gridSizeX, gridSizeY, gridSizeZ);
@@ -76,6 +77,8 @@ public class WaveFunction : MonoBehaviour
             return !cells.Any(cell => !cell.Collapsed);
         }
     }
+    private int startCord => gridSizeZ * (gridSizeY + 1) + gridSizeZ / 2;
+    private float minLength => gridSizeZ + gridSizeZ / 3.0f;
 
     private void Start()
     {
@@ -95,6 +98,7 @@ public class WaveFunction : MonoBehaviour
         }
 
         await PredeterminePath();
+        await BottomBuildUp();
 
         while (!AllCollapsed)
         {
@@ -102,7 +106,9 @@ public class WaveFunction : MonoBehaviour
             await Task.Yield();
         }
 
-        //print("<color=green>Map Generated!</color>");
+        CombineMeshes();
+        GetMap();
+
         OnMapGenerated?.Invoke();
     }
 
@@ -122,7 +128,6 @@ public class WaveFunction : MonoBehaviour
 
     private async Task PredeterminePath() 
     {
-        // MAKE IT SO THAT IT WOULD RATHER CHOOSE THE DIRECTION IT WAS GOING IN :)
         int index = startCord;
         cellPath.Add(cells[index]);
 
@@ -145,7 +150,7 @@ public class WaveFunction : MonoBehaviour
             return;
         }
 
-        spawnedCastle = Instantiate(castle, cells[index].Position, Quaternion.identity);
+        SpawnedCastle = Instantiate(castle, cells[index].Position, Quaternion.identity);
 
         bool Move(ref int index)
         {
@@ -241,9 +246,101 @@ public class WaveFunction : MonoBehaviour
         }
     }
 
+
+    private async Task BottomBuildUp()
+    {
+        for (int x = 0; x < gridSizeX; x++)
+        {
+            for (int z = 0; z < gridSizeZ; z++)
+            {
+                if ((x == 0 || x == gridSizeX - 1) && (z == 0 || z == gridSizeZ - 1))
+                {
+                    await PlaceGround(x, z);
+                    continue;
+                }
+
+                if ((x != 0 && x != gridSizeX - 1) && (z != 0 && z != gridSizeZ - 1))
+                {
+                    continue;
+                }
+
+                if (UnityEngine.Random.value < 0.8f)
+                {
+                    continue;
+                }
+
+                await PlaceGround(x, z);
+            }
+        }
+
+        async Task PlaceGround(int x, int z)
+        {
+            int index = GetIndex(x, 0, z);
+            if (cells[index].PossiblePrototypes.Contains(prototypes[2 * 4]))
+            {
+                SetCell(index, prototypes[2 * 4]);
+
+                await Propagate();
+                await Task.Yield();
+            }
+        }
+    }
+
     public List<Cell> GetEnemyPath()
     {
         return cellPath;
+    }
+
+    public Node[,] GetMap()
+    {
+        if (map != null)
+        {
+            return map;
+        }
+
+        map = new Node[gridSizeX * 3, gridSizeZ * 3];
+        var thiccMap = new Node[gridSizeX * 3, gridSizeZ * 3];
+
+        Collider[] hits = new Collider[2];
+
+        for (int i = 0; i < cells.Count; i++)
+        {
+            Vector3Int index = GetCords(i);
+            if (index.y != 1)
+            {
+                continue;
+            }
+
+            for (int x = 0; x < 3; x++)
+            {
+                for (int z = 0; z < 3; z++)
+                {
+                    Vector3 pos = cells[i].Position + new Vector3((gridSize.x / 3.0f) * (z - 1), 0, (gridSize.z / 3.0f) * (x - 1));
+                    bool walkable = false;
+                    bool thiccWalkable = false;
+                    if (Physics.OverlapSphereNonAlloc(pos, 0.2f, hits) == 1)
+                    {
+                        if (Physics.OverlapSphereNonAlloc(pos + Vector3.up * 0.2f, 0.1f, hits) == 0)
+                        {
+                            walkable = true;
+                        }
+
+                        if (Physics.OverlapSphereNonAlloc(pos + Vector3.up * 1.1f, 1f, hits) == 0)
+                        {
+                            thiccWalkable = true;
+                        }
+                    }
+
+                    map[index.x * 3 + x, index.z * 3 + z] = new Node(walkable, pos);
+                    thiccMap[index.x * 3 + x, index.z * 3 + z] = new Node(thiccWalkable, pos);
+                }
+            }
+        }
+
+        EnemyPathFinding.Map = map;
+        EnemyPathFinding.ThiccMap = thiccMap;
+        EnemyPathFinding.FindPath(cellPath[0].Position, cellPath[cellPath.Count - 1].Position, EnemyPathFinding.ThiccMap);
+        return map;
     }
 
     public async Task Iterate()
@@ -270,7 +367,7 @@ public class WaveFunction : MonoBehaviour
 
             float possibleMeshAmount = 0;
 
-            possibleMeshAmount += (gridSizeY - GetYLevel(i)) * 100; // Add the Y level
+            possibleMeshAmount += (GetCords(i).y) * 100; // Add the Y level
             if (possibleMeshAmount > lowestEntropy)
             {
                 continue;
@@ -419,6 +516,32 @@ public class WaveFunction : MonoBehaviour
                 SetCell(index, emptyPrototype);
                 changed = false;
                 return new List<PrototypeData>() { emptyPrototype };
+            }
+        }
+
+        // Check Directly Above
+        // Rule is Below flat tile is only air
+        {
+            if (IsDirectionValid(index, Direction.Above, out int aboveIndex))
+            {
+                if (cells[aboveIndex].Collapsed)
+                {
+                    if (cells[aboveIndex].PossiblePrototypes[0].NegY == "-1s")
+                    {
+                        bool onlyAir = true;
+                        if (!string.Equals(cells[aboveIndex].PossiblePrototypes[0].PosY, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].PosX, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].NegX, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].NegZ, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].PosZ, "-1s"))
+                        {
+                            onlyAir = false;
+                        }
+
+                        if (!onlyAir)
+                        {
+                            SetCell(index, emptyPrototype);
+                            changed = false;
+                            return new List<PrototypeData>() { emptyPrototype };
+                        }
+                    }
+                }
             }
         }
 
@@ -629,24 +752,18 @@ public class WaveFunction : MonoBehaviour
         return valids;
     }
 
-    private int GetYLevel(int index)
+    private Vector3Int GetCords(int index)
     {
-        if (gridSizeY == 1)
-        {
-            return 0;
-        }
+        int x = Mathf.FloorToInt(index / (gridSizeZ * gridSizeY));
+        int y = Mathf.FloorToInt(index / gridSizeZ) % gridSizeY;
+        int z = index % gridSizeZ;
 
-        // Up
-        int thing = 1 + Mathf.FloorToInt((float)index / (float)(gridSizeX * gridSizeY));
-        for (int i = 0; i < gridSizeY; i++)
-        {
-            if (index >= (gridSizeX * gridSizeY * thing) - (gridSizeX * ((i + 1)))) // Ex. (gridSizeX * gridSizeY) * thing = 8, it should be more than 4
-            {
-                return i;
-            }
-        }
+        return new Vector3Int(x, y, z);
+    }
 
-        return 0;
+    private int GetIndex(int x, int y, int z)
+    {
+        return (x * gridSizeY * gridSizeZ) + (y * gridSizeZ) + z;
     }
 
     private bool LoadPrototypeData()
@@ -710,18 +827,20 @@ public class WaveFunction : MonoBehaviour
         gm.AddComponent<MeshFilter>().mesh = collapsedMesh.Mesh;
         if (specialMat == null)
         {
-            gm.AddComponent<MeshRenderer>().materials = mats;
+            // Check if it is flat ground
+            if (singleMatMeshes.Contains(collapsedMesh.Mesh))
+            {
+                gm.AddComponent<MeshRenderer>().material = mats[1];
+            }
+            else
+            {
+                gm.AddComponent<MeshRenderer>().materials = mats;
+            }
         }
         else
         {
             gm.AddComponent<MeshRenderer>().materials = new Material[2] { mats[0], specialMat };
         }
-
-        MeshCollider meshCollider = gm.AddComponent<MeshCollider>();
-        meshCollider.sharedMesh = collapsedMesh.Mesh;
-
-        gm.name = collapsedMesh.Mesh.name;
-        gm.layer = LayerMask.NameToLayer("Ground");
 
         gm.transform.position = position;
         gm.transform.rotation = Quaternion.Euler(0, 90 * collapsedMesh.Rot, 0);
@@ -732,9 +851,53 @@ public class WaveFunction : MonoBehaviour
         return gm;
     }
 
+    private void CombineMeshes()
+    {
+        GetComponent<MeshCombiner>().CombineMeshes();
+        return;
+
+        List<MeshFilter> meshes = new List<MeshFilter>();
+        for (int i = 0; i < spawnedMeshes.Count; i++)
+        {
+            if (spawnedMeshes[i] == null)
+            {
+                continue;
+            }
+            meshes.Add(spawnedMeshes[i].GetComponent<MeshFilter>());
+        }
+
+        CombineInstance[] combine = new CombineInstance[meshes.Count];
+        for (int i = 0; i < meshes.Count; i++)
+        {
+            combine[i].mesh = meshes[i].sharedMesh;
+            combine[i].transform = meshes[i].transform.localToWorldMatrix;
+
+            meshes[i].gameObject.SetActive(false);
+        }
+
+        Mesh mesh = new Mesh();
+        mesh.CombineMeshes(combine, false, false, false);
+        print(mesh.vertexCount);
+
+        GameObject gm = new GameObject();
+
+        gm.AddComponent<MeshFilter>().mesh = mesh;
+        gm.AddComponent<MeshRenderer>().materials = mats;
+        gm.AddComponent<MeshCollider>().sharedMesh = mesh;
+
+        gm.name = "Map";
+        gm.layer = LayerMask.NameToLayer("Ground");
+
+        //gm.transform.position = position;
+        //gm.transform.rotation = Quaternion.Euler(0, 90 * collapsedMesh.Rot, 0);
+        //gm.transform.SetParent(transform, true);
+
+        //gm.transform.localScale = gridSize;
+    }
+
     public void Clear()
     {
-        DestroyImmediate(spawnedCastle);
+        DestroyImmediate(SpawnedCastle);
         for (int i = 0; i < spawnedMeshes.Count; i++)
         {
             DestroyImmediate(spawnedMeshes[i]);
@@ -784,8 +947,20 @@ public class WaveFunction : MonoBehaviour
         spawnedPossibilites.Clear();
     }
 
-    /*private void OnDrawGizmos()
+    private void OnDrawGizmos()
     {
+        /*if (EnemyPathFinding.Map == null)
+            return;
+        for (int i = 0; i < EnemyPathFinding.Map.GetLength(0); i++)
+        {
+            for (int g = 0; g < EnemyPathFinding.Map.GetLength(1); g++)
+            {
+                Handles.Label(EnemyPathFinding.Map[i, g].Position, $"{i}, {g}");
+
+            }
+        }
+
+        
         for (int i = 0; i < cells.Count; i++)
         {
             Gizmos.color = Color.black;
@@ -799,8 +974,8 @@ public class WaveFunction : MonoBehaviour
                 Gizmos.color = Color.black;
                 Gizmos.DrawWireCube(cells[i].Position, gridSize);
             }
-        }
-    }*/
+        }*/
+    }
 }
 
 [System.Serializable]
@@ -830,6 +1005,18 @@ public struct Cell
         this.Collapsed = collapsed;
         this.Position = position;
         PossiblePrototypes = possiblePrototypes;
+    }
+}
+
+public struct Node
+{
+    public bool Walkable;
+    public Vector3 Position;
+
+    public Node(bool walkable, Vector3 position)
+    {
+        Walkable = walkable;
+        Position = position;
     }
 }
 

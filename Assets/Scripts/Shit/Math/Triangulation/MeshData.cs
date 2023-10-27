@@ -33,7 +33,7 @@ public class MeshData
         mesh.vertices = vertices;
         mesh.triangles = triangleVertices.ToArray();
         //mesh.uv = uvs;
-        mesh.RecalculateNormals();
+        //mesh.RecalculateNormals();
 
         return mesh;
     }

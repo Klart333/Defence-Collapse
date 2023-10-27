@@ -72,6 +72,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7004534312303541094}
   - component: {fileID: 7004534312303541089}
+  - component: {fileID: -3081779664184093427}
   - component: {fileID: 7004534312303541088}
   - component: {fileID: 7004534312303541091}
   m_Layer: 7
@@ -90,8 +91,8 @@ Transform:
   m_GameObject: {fileID: 7004534312303541090}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.66, y: 0.66, z: 0.66}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7403816242761427899}
   - {fileID: 7004534311403363420}
@@ -113,7 +114,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cccb0cf05693f44b930ca6a1469cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SpawnedFighters: []
+  bounceSpeed: 1
+  scaleMult: 0.75
   cost: 0
+  archerData: {fileID: 11400000, guid: 63d7b88ca2073ef4c9b83b155b57a4d4, type: 2}
+  barrackData: {fileID: 11400000, guid: c25d4176788d0324f95b23df889bf07d, type: 2}
   groundTransforms:
   - {fileID: 7004534311403363420}
   - {fileID: 4456796578424441468}
@@ -123,6 +129,19 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 64
+--- !u!114 &-3081779664184093427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7004534312303541090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d19daede777db0b479d2db98eb93b1a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 5
 --- !u!65 &7004534312303541088
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -134,8 +153,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.869309, y: 0.7613582, z: 0.7645459}
-  m_Center: {x: 0, y: 0.38, z: 0.04}
+  m_Size: {x: 0.7396061, y: 0.76135826, z: 0.5854322}
+  m_Center: {x: -0.0030881464, y: 0.38, z: 0.04000002}
 --- !u!54 &7004534312303541091
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -194,6 +213,7 @@ GameObject:
   - component: {fileID: 7403816242761427899}
   - component: {fileID: 5841300864421127198}
   - component: {fileID: 8571633744405860564}
+  - component: {fileID: 7431677558401516151}
   m_Layer: 7
   m_Name: Houses_FirstAge_1_Level1
   m_TagString: Untagged
@@ -210,7 +230,7 @@ Transform:
   m_GameObject: {fileID: 7923084130546331905}
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071067}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 100, y: 99.999985, z: 99.999985}
+  m_LocalScale: {x: 100, y: 130, z: 99.999985}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7004534312303541094}
@@ -267,6 +287,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &7431677558401516151
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7923084130546331905}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.004, y: 0.004, z: 0.004}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.004}
+  m_TimeToStationary: 0.5
 --- !u!1 &9062166705308777502
 GameObject:
   m_ObjectHideFlags: 0

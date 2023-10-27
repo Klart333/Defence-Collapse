@@ -5,16 +5,16 @@ ModelImporter:
   internalIDToNameTable:
   - first:
       74: 5424966009276265124
-    second: Armature|Slime_Attack
+    second: Slime_Attack
   - first:
       74: 4531912406860793044
-    second: Armature|Slime_Death
+    second: Slime_Death
   - first:
       74: 4749002936024538594
-    second: Armature|Slime_Idle
+    second: Slime_Idle
   - first:
       74: 6793611496562888960
-    second: Armature|Slime_Walk
+    second: Slime_Walk
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -45,7 +45,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Armature|Slime_Attack
+      name: Slime_Attack
       takeName: Armature|Slime_Attack
       internalID: 0
       firstFrame: 0
@@ -74,7 +74,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|Slime_Death
+      name: Slime_Death
       takeName: Armature|Slime_Death
       internalID: 0
       firstFrame: 0
@@ -103,7 +103,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|Slime_Idle
+      name: Slime_Idle
       takeName: Armature|Slime_Idle
       internalID: 0
       firstFrame: 0
@@ -132,7 +132,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|Slime_Walk
+      name: Slime_Walk
       takeName: Armature|Slime_Walk
       internalID: 0
       firstFrame: 0
@@ -196,8 +196,8 @@ ModelImporter:
     secondaryUVPackMargin: 4
     useFileScale: 1
   tangentSpace:
-    normalSmoothAngle: 60
-    normalImportMode: 0
+    normalSmoothAngle: 99
+    normalImportMode: 1
     tangentImportMode: 3
     normalCalculationMode: 4
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0

@@ -10,9 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 981984379766713702}
   - component: {fileID: 1123883043695969116}
+  - component: {fileID: 7310623093244330488}
   - component: {fileID: 6453331894105630265}
   - component: {fileID: 4412237676068136230}
-  m_Layer: 0
+  - component: {fileID: -4757096271214385110}
+  m_Layer: 7
   m_Name: Big House
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,8 +30,8 @@ Transform:
   m_GameObject: {fileID: 960956896376386018}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.66, y: 0.66, z: 0.66}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8771793901065449890}
   m_Father: {fileID: 0}
@@ -47,12 +49,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cccb0cf05693f44b930ca6a1469cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SpawnedFighters: []
+  bounceSpeed: 1
+  scaleMult: 0.25
   cost: 0
+  archerData: {fileID: 11400000, guid: 24cca0c760a546745a5d8eb07ca2a207, type: 2}
+  barrackData: {fileID: 0}
   groundTransforms: []
   groundDistance: 0.1
   layerMask:
     serializedVersion: 2
     m_Bits: 0
+--- !u!114 &7310623093244330488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 960956896376386018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d19daede777db0b479d2db98eb93b1a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 5
 --- !u!65 &6453331894105630265
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -64,8 +84,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.9962366, y: 1.0698001, z: 1.3553455}
-  m_Center: {x: 0.0031727552, y: 0.5298456, z: 0.0063455105}
+  m_Size: {x: 1.9074001, y: 1.0698001, z: 1.3553455}
+  m_Center: {x: -0.0031727254, y: 0.5298456, z: 0.0063455105}
 --- !u!54 &4412237676068136230
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -82,6 +102,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!208 &-4757096271214385110
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 960956896376386018}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &8282256876146649880
 GameObject:
   m_ObjectHideFlags: 0
@@ -93,7 +129,8 @@ GameObject:
   - component: {fileID: 8771793901065449890}
   - component: {fileID: 5626253255089503751}
   - component: {fileID: 7633742996414810829}
-  m_Layer: 0
+  - component: {fileID: 2866680956632578680}
+  m_Layer: 7
   m_Name: Big House
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,3 +208,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &2866680956632578680
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8282256876146649880}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.753, y: 0.634, z: 0.586}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0.63500005, z: 0.001}
+  m_TimeToStationary: 0.5

@@ -1,10 +1,5 @@
-using Cinemachine;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Windows.WebCam;
 
 public class CameraController : MonoBehaviour
 {
@@ -13,6 +8,9 @@ public class CameraController : MonoBehaviour
 
     [SerializeField]
     private float sensitivity = 1;
+
+    [SerializeField]
+    private float rotationSens = 500;
 
     private InputActions inputActions;
     private InputAction scroll;
@@ -51,7 +49,8 @@ public class CameraController : MonoBehaviour
     {
         Vector2 movee = move.ReadValue<Vector2>() * Time.deltaTime * flySpeed;
 
-        transform.position += new Vector3(movee.x, 0, movee.y);
+        transform.position += Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up) * Vector3.forward * movee.y;
+        transform.position += transform.right * movee.x;
 
         HandleScroll();
     }
@@ -60,7 +59,38 @@ public class CameraController : MonoBehaviour
     {
         float scrollDiff = scroll.ReadValue<Vector2>().y / -120.0f;
         float moveDiff = (up.ReadValue<float>() - down.ReadValue<float>()) / 20.0f;
-        transform.position += Vector3.up * scrollDiff * sensitivity * Time.deltaTime;
-        transform.position += Vector3.up * moveDiff * sensitivity * Time.deltaTime;
+
+        if (Mathf.Abs(scrollDiff) > 0.1f)
+        {
+            Vector3 mousePosition = Input.mousePosition;
+            Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hitInfo))
+            {
+                Vector3 dir = (transform.position - hitInfo.point).normalized;
+                transform.position += dir * scrollDiff * sensitivity * 0.01f;
+            }
+            else
+            {
+                transform.position += Vector3.up * scrollDiff * sensitivity * 0.01f;
+            }
+        }
+
+        if (Mathf.Abs(moveDiff) != 0)
+        {
+            Vector3 mousePosition = Input.mousePosition;
+            Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hitInfo))
+            {
+                transform.rotation = Quaternion.AngleAxis(moveDiff * rotationSens * Time.deltaTime, Vector3.up) * transform.rotation;
+
+                Vector3 dir = (transform.position - hitInfo.point);
+                Vector3 newPos = Quaternion.AngleAxis(moveDiff * rotationSens * Time.deltaTime, Vector3.up) * dir;
+                transform.position += newPos - dir;
+            }
+            else
+            {
+                transform.rotation = Quaternion.AngleAxis(moveDiff * rotationSens * Time.deltaTime, Vector3.up) * transform.rotation;
+            }
+        }
     }
 }
