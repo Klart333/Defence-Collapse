@@ -25,10 +25,7 @@ public class WaveFunction : MonoBehaviour
 
     [Header("Mesh")]
     [SerializeField]
-    private Material[] mats;
-
-    [SerializeField]
-    private List<Mesh> singleMatMeshes = new List<Mesh>();
+    private List<Material> mats;
 
     [Header("Rules")]
     [SerializeField]
@@ -37,9 +34,6 @@ public class WaveFunction : MonoBehaviour
     [Header("Path")]
     [SerializeField]
     private int turnWeight = 20;
-
-    [SerializeField]
-    private Material pathMat;
 
     [SerializeField]
     private GameObject castle;
@@ -99,10 +93,12 @@ public class WaveFunction : MonoBehaviour
         await PredeterminePath();
         await BottomBuildUp();
 
+        int i = 0;
         while (!AllCollapsed)
         {
-            await Iterate();
-            await Task.Yield();
+            await Iterate(); // Does not need to await
+           
+            if (i++ % 3 == 0) await Task.Yield();
         }
 
         CombineMeshes();
@@ -245,7 +241,6 @@ public class WaveFunction : MonoBehaviour
         }
     }
 
-
     private async Task BottomBuildUp()
     {
         for (int x = 0; x < gridSizeX; x++)
@@ -378,9 +373,13 @@ public class WaveFunction : MonoBehaviour
                 totalWeight += cells[i].PossiblePrototypes[g].Weight;
             }
 
+            float averageWeight = totalWeight / cells[i].PossiblePrototypes.Count;
             for (int g = 0; g < cells[i].PossiblePrototypes.Count; g++)
             {
-                possibleMeshAmount += 1.0f - ((cells[i].PossiblePrototypes[g].Weight - 1.0f) / totalWeight);
+                float distFromAverage = 1.0f - (cells[i].PossiblePrototypes[g].Weight / averageWeight);
+                if (distFromAverage < 1.0f) distFromAverage *= distFromAverage; // Because of using the percentage as a distance, smaller weights weigh more, so this is is to try to correct that.
+
+                possibleMeshAmount += Mathf.Lerp(0, 1, Mathf.Abs(distFromAverage));
             }
 
             if (possibleMeshAmount < lowestEntropy)
@@ -421,12 +420,12 @@ public class WaveFunction : MonoBehaviour
         return cell.PossiblePrototypes[index];
     }
 
-    private void SetCell(int index, PrototypeData chosenPrototype, Material specialMat = null)
+    private void SetCell(int index, PrototypeData chosenPrototype)
     {
         cells[index] = new Cell(true, cells[index].Position, new List<PrototypeData>() { chosenPrototype });
         cellStack.Push(index);
 
-        spawnedMeshes.Add(GenerateMesh(cells[index].Position, chosenPrototype.MeshRot, specialMat));
+        spawnedMeshes.Add(GenerateMesh(cells[index].Position, chosenPrototype));
     }
 
     public async Task Propagate()
@@ -792,7 +791,7 @@ public class WaveFunction : MonoBehaviour
 
     private void LoadCells()
     {
-        emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 20);
+        emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 20, new int[0]);
 
         for (int z = 0; z < gridSizeZ; z++)
         {
@@ -815,34 +814,19 @@ public class WaveFunction : MonoBehaviour
         }
     }
 
-    private GameObject GenerateMesh(Vector3 position, MeshWithRotation collapsedMesh, Material specialMat = null, float scale = 1)
+    private GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1)
     {
-        if (collapsedMesh.Mesh == null)
+        if (prototypeData.MeshRot.Mesh == null)
         {
             return null;
         }
 
         GameObject gm = new GameObject();
-        gm.AddComponent<MeshFilter>().mesh = collapsedMesh.Mesh;
-        if (specialMat == null)
-        {
-            // Check if it is flat ground
-            if (singleMatMeshes.Contains(collapsedMesh.Mesh))
-            {
-                gm.AddComponent<MeshRenderer>().material = mats[1];
-            }
-            else
-            {
-                gm.AddComponent<MeshRenderer>().materials = mats;
-            }
-        }
-        else
-        {
-            gm.AddComponent<MeshRenderer>().materials = new Material[2] { mats[0], specialMat };
-        }
+        gm.AddComponent<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
+        gm.AddComponent<MeshRenderer>().materials = mats.Where((x) => prototypeData.MaterialIndexes.Contains(mats.IndexOf(x))).ToArray();
 
         gm.transform.position = position;
-        gm.transform.rotation = Quaternion.Euler(0, 90 * collapsedMesh.Rot, 0);
+        gm.transform.rotation = Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0);
         gm.transform.SetParent(transform, true);
 
         gm.transform.localScale *= scale;
@@ -853,45 +837,6 @@ public class WaveFunction : MonoBehaviour
     private void CombineMeshes()
     {
         GetComponent<MeshCombiner>().CombineMeshes();
-        return;
-
-        List<MeshFilter> meshes = new List<MeshFilter>();
-        for (int i = 0; i < spawnedMeshes.Count; i++)
-        {
-            if (spawnedMeshes[i] == null)
-            {
-                continue;
-            }
-            meshes.Add(spawnedMeshes[i].GetComponent<MeshFilter>());
-        }
-
-        CombineInstance[] combine = new CombineInstance[meshes.Count];
-        for (int i = 0; i < meshes.Count; i++)
-        {
-            combine[i].mesh = meshes[i].sharedMesh;
-            combine[i].transform = meshes[i].transform.localToWorldMatrix;
-
-            meshes[i].gameObject.SetActive(false);
-        }
-
-        Mesh mesh = new Mesh();
-        mesh.CombineMeshes(combine, false, false, false);
-        print(mesh.vertexCount);
-
-        GameObject gm = new GameObject();
-
-        gm.AddComponent<MeshFilter>().mesh = mesh;
-        gm.AddComponent<MeshRenderer>().materials = mats;
-        gm.AddComponent<MeshCollider>().sharedMesh = mesh;
-
-        gm.name = "Map";
-        gm.layer = LayerMask.NameToLayer("Ground");
-
-        //gm.transform.position = position;
-        //gm.transform.rotation = Quaternion.Euler(0, 90 * collapsedMesh.Rot, 0);
-        //gm.transform.SetParent(transform, true);
-
-        //gm.transform.localScale = gridSize;
     }
 
     public void Clear()
@@ -931,7 +876,7 @@ public class WaveFunction : MonoBehaviour
                 float offset = (1.0f / cells[i].PossiblePrototypes.Count) * (((float)(g + 1 - removed) * 2) - cells[i].PossiblePrototypes.Count);
                 Vector3 pos = cells[i].Position + Vector3.right * offset;
 
-                spawnedPossibilites.Add(GenerateMesh(pos, cells[i].PossiblePrototypes[g].MeshRot, null, scale));
+                spawnedPossibilites.Add(GenerateMesh(pos, cells[i].PossiblePrototypes[g], scale));
             }
         }
     }

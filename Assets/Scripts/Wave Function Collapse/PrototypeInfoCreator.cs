@@ -13,7 +13,7 @@ public class PrototypeInfoCreator : MonoBehaviour
     [SerializeField]
     private PrototypeDisplay prefab;
 
-    [Header("Not Debug")]
+    [Header("Generated")]
     public List<PrototypeData> Prototypes = new List<PrototypeData>();
 
     [SerializeField]
@@ -25,6 +25,11 @@ public class PrototypeInfoCreator : MonoBehaviour
     [SerializeField]
     private List<int> doublePieces = new List<int>();
 
+    [Header("Material")]
+    [SerializeField]
+    private List<Material> materials = new List<Material>();
+
+    [Header("Weight")]
     [SerializeField]
     private int[] pieceWeights;
 
@@ -39,9 +44,10 @@ public class PrototypeInfoCreator : MonoBehaviour
     {
         Reset();
 
-        Mesh[] meshes = GetComponentsInChildren<MeshFilter>().ToList().Select(x => x.sharedMesh).ToArray();
+        MeshFilter[] meshes = GetComponentsInChildren<MeshFilter>();
         for (int i = 0; i < meshes.Length; i++)
         {
+            Mesh mesh = meshes[i].sharedMesh;
             List<Vector3> posXs = new List<Vector3>();
             List<Vector3> negXs = new List<Vector3>();
             List<Vector3> posYs = new List<Vector3>();
@@ -49,7 +55,7 @@ public class PrototypeInfoCreator : MonoBehaviour
             List<Vector3> posZs = new List<Vector3>();
             List<Vector3> negZs = new List<Vector3>();
 
-            Vector3[] verts = meshes[i].vertices;
+            Vector3[] verts = mesh.vertices;
             Vector3[] noDupes = verts.Distinct().ToArray();
 
             for (int g = 0; g < noDupes.Length; g++)
@@ -110,12 +116,13 @@ public class PrototypeInfoCreator : MonoBehaviour
             string[] posY = GetTopKeys(posYs);
             string[] negY = GetTopKeys(negYs);
 
+            int[] matIndexes = meshes[i].gameObject.GetComponent<MeshRenderer>().sharedMaterials.Select((x) => materials.IndexOf(x)).ToArray();
             // Add all rotations
             // Need to rotate the vertical too
-            PrototypeData prototype0 = new PrototypeData(new MeshWithRotation(meshes[i], 0), posX, negX, posY[0], negY[0], posZ, negZ, pieceWeights[i]);
-            PrototypeData prototype1 = new PrototypeData(new MeshWithRotation(meshes[i], 1), posZ, negZ, posY[1], negY[1], negX, posX, pieceWeights[i]);
-            PrototypeData prototype2 = new PrototypeData(new MeshWithRotation(meshes[i], 2), negX, posX, posY[2], negY[2], negZ, posZ, pieceWeights[i]);
-            PrototypeData prototype3 = new PrototypeData(new MeshWithRotation(meshes[i], 3), negZ, posZ, posY[3], negY[3], posX, negX, pieceWeights[i]);
+            PrototypeData prototype0 = new PrototypeData(new MeshWithRotation(mesh, 0), posX, negX, posY[0], negY[0], posZ, negZ, pieceWeights[i], matIndexes);
+            PrototypeData prototype1 = new PrototypeData(new MeshWithRotation(mesh, 1), posZ, negZ, posY[1], negY[1], negX, posX, pieceWeights[i], matIndexes);
+            PrototypeData prototype2 = new PrototypeData(new MeshWithRotation(mesh, 2), negX, posX, posY[2], negY[2], negZ, posZ, pieceWeights[i], matIndexes);
+            PrototypeData prototype3 = new PrototypeData(new MeshWithRotation(mesh, 3), negZ, posZ, posY[3], negY[3], posX, negX, pieceWeights[i], matIndexes);
 
             Prototypes.Add(prototype0);
             Prototypes.Add(prototype1);
@@ -124,10 +131,10 @@ public class PrototypeInfoCreator : MonoBehaviour
 
             if (doublePieces.Contains(i))
             {
-                PrototypeData prototype02 = new PrototypeData(new MeshWithRotation(meshes[i], 0), negX, posX, posY[0], negY[0], posZ, negZ, pieceWeights[i]);
-                PrototypeData prototype13 = new PrototypeData(new MeshWithRotation(meshes[i], 1), posZ, negZ, posY[1], negY[1], posX, negX, pieceWeights[i]);
-                PrototypeData prototype20 = new PrototypeData(new MeshWithRotation(meshes[i], 2), posX, negX, posY[2], negY[2], negZ, posZ, pieceWeights[i]);
-                PrototypeData prototype31 = new PrototypeData(new MeshWithRotation(meshes[i], 3), negZ, posZ, posY[3], negY[3], negX, posX, pieceWeights[i]);
+                PrototypeData prototype02 = new PrototypeData(new MeshWithRotation(mesh, 0), negX, posX, posY[0], negY[0], posZ, negZ, pieceWeights[i], matIndexes);
+                PrototypeData prototype13 = new PrototypeData(new MeshWithRotation(mesh, 1), posZ, negZ, posY[1], negY[1], posX, negX, pieceWeights[i], matIndexes);
+                PrototypeData prototype20 = new PrototypeData(new MeshWithRotation(mesh, 2), posX, negX, posY[2], negY[2], negZ, posZ, pieceWeights[i], matIndexes);
+                PrototypeData prototype31 = new PrototypeData(new MeshWithRotation(mesh, 3), negZ, posZ, posY[3], negY[3], negX, posX, pieceWeights[i], matIndexes);
 
                 Prototypes.Add(prototype02);
                 Prototypes.Add(prototype13);
@@ -137,7 +144,7 @@ public class PrototypeInfoCreator : MonoBehaviour
         }
 
         // Empty
-        Prototypes.Add(new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", pieceWeights[meshes.Length]));
+        Prototypes.Add(new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", pieceWeights[meshes.Length], new int[0]));
     }
 
     private string GetSideKey(List<Vector3> vertexPositions, int mainAxis, int meshIndex)
@@ -407,8 +414,11 @@ public struct PrototypeData
     public string NegY;
     public int Weight;
 
-    public PrototypeData(MeshWithRotation mesh, string posX, string negX, string posY, string negY, string posZ, string negZ, int weight)
+    public int[] MaterialIndexes;
+
+    public PrototypeData(MeshWithRotation mesh, string posX, string negX, string posY, string negY, string posZ, string negZ, int weight, int[] mats)
     {
+        MaterialIndexes = mats;
         MeshRot = mesh;
         PosX = posX;
         NegX = negX;
