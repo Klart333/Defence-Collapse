@@ -1,7 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
+﻿using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,10 +7,7 @@ public class BuildingPlacer : MonoBehaviour
     [SerializeField]
     private LayerMask layerMask;
 
-    [Header("Animation")]
-    [SerializeField]
-    private PooledMonoBehaviour particle;
-
+    private BuildingManager buildingManager;
     private Camera cam;
 
     private InputActions InputActions;
@@ -54,89 +48,8 @@ public class BuildingPlacer : MonoBehaviour
     {
         cam = Camera.main;
         Events.OnBuildingPurchased += BuildingPurchased;
-        Events.OnBuildingBuilt += AnimateBuiltBuilding;
-    }
 
-    private async void AnimateBuiltBuilding(Building building)
-    {
-        float mult = 1.0f / building.ScaleMult;
-        var part = particle.GetAtPosAndRot<PooledMonoBehaviour>(building.transform.position + Vector3.up * 0.5f, particle.transform.rotation);
-        ParticleSystem psys = part.GetComponentInChildren<ParticleSystem>();
-        var shape = psys.shape;
-        var emission = psys.emission;
-
-        shape.mesh = building.GetComponentInChildren<MeshFilter>().sharedMesh;
-        shape.radius *= mult;
-
-        ParticleSystem.Burst burst = new ParticleSystem.Burst(0, 15 * mult);
-        emission.SetBurst(0, burst);
-        await BounceBuilding(building, building.ScaleMult);
-    }
-
-    public static async Task BounceBuilding(Building building, float scaleMult)
-    {
-        float t = 0;
-
-        Vector3 targetScale = building.StartScale;
-        Vector3 startScale = targetScale * scaleMult;
-
-        while (t <= 1.0f)
-        {
-            t += Time.deltaTime * building.BounceSpeed;
-
-            try
-            {
-                building.transform.localScale = Vector3.LerpUnclamped(startScale, targetScale, Math.Elastic(t));
-            }
-            catch (Exception)
-            {
-                return;
-            }
-
-            await Task.Yield();
-        }
-
-        building.transform.localScale = targetScale;
-    }
-
-    public static async void BounceInOut(Building building)
-    {
-        float t = 0;
-
-        while (t <= .7f)
-        {
-            t += Time.deltaTime;
-
-            try
-            {
-                building.transform.localScale = building.StartScale * (1.0f + Math.Elastic(t) / 4.0f);
-            }
-            catch (Exception)
-            {
-                return;
-            }
-
-            await Task.Yield();
-        }
-        t = 1;
-
-        while (t >= 0.0f)
-        {
-            t -= Time.deltaTime;
-
-            try
-            {
-                building.transform.localScale = building.StartScale * (1.0f + Math.EasInElastic(t) / 4.0f);
-            }
-            catch (Exception)
-            {
-                return;
-            }
-
-            await Task.Yield();
-        }
-
-        building.transform.localScale = building.StartScale;
+        buildingManager = GetComponent<BuildingManager>();
     }
 
     private void BuildingPurchased(Building building)
@@ -152,14 +65,14 @@ public class BuildingPlacer : MonoBehaviour
     {
         await Task.Yield();
 
-        while ((fire.ReadValue<float>() == 0 || !CanPlace(spawnedBuilding)) && !canceled)
+        while (/*(fire.ReadValue<float>() == 0 || !CanPlace(spawnedBuilding)) &&*/ !canceled)
         {
             Vector3 mousePos = GetRayPoint();
-            if (mousePos != Vector3.zero)
+            if (mousePos != Vector3.zero && fire.WasPerformedThisFrame())
             {
-                Vector3 pos = new Vector3(Math.Round(mousePos.x, 0.666f), Math.Round(mousePos.y, 2), Math.Round(mousePos.z, 0.666f));
-                spawnedBuilding.transform.position = Vector3.Lerp(spawnedBuilding.transform.position, pos, 0.15f);
-                spawnedBuilding.transform.localScale = spawnedBuilding.PlacingScale;
+                Vector3 pos = new Vector3(Math.Round(mousePos.x + 1, 2) - 1f, Math.Round(mousePos.y, 2), Math.Round(mousePos.z + 1, 2) - 1f);
+                buildingManager.Query(pos);
+                Debug.Log("Query at: " +  pos);
             }
 
             await Task.Yield();
@@ -172,8 +85,11 @@ public class BuildingPlacer : MonoBehaviour
             return;
         }
 
+        spawnedBuilding.transform.position = spawnedBuilding.PlacedPosition;
+
         Events.OnBuildingBuilt(spawnedBuilding);
-        GameEvents.OnEnemyPathUpdated(spawnedBuilding.transform.position);
+        
+        //GameEvents.OnEnemyPathUpdated(spawnedBuilding.transform.position);
     }
 
     private bool CanPlace(Building spawnedBuilding)

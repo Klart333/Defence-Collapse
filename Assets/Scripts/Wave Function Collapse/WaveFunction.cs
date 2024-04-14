@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class WaveFunction : MonoBehaviour
 {
@@ -27,20 +29,13 @@ public class WaveFunction : MonoBehaviour
     [SerializeField]
     private List<Material> mats;
 
+    [Header("Prototypes")]
+    [SerializeField]
+    private PrototypeInfoCreator groundPrototypeInfo;
+
     [Header("Rules")]
     [SerializeField]
     private int[] notAllowedForBottom;
-
-    [Header("Path")]
-    [SerializeField]
-    private int turnWeight = 20;
-
-    [SerializeField]
-    private GameObject castle;
-
-    [Header("BottomBuildup")]
-    [SerializeField]
-    private int[] allowedBuildUp;
 
     [Header("Debug")]
     public bool Manual;
@@ -51,18 +46,16 @@ public class WaveFunction : MonoBehaviour
     private List<PrototypeData> prototypes = new List<PrototypeData>();
     private List<PrototypeData> bottomPrototypes = new List<PrototypeData>();
     private List<Cell> cells = new List<Cell>();
-    private List<Cell> cellPath = new List<Cell>();
 
     private Stack<int> cellStack = new Stack<int>();
-
-    private Node[,] map;
 
     private PrototypeData emptyPrototype;
 
     public GameObject SpawnedCastle { get; private set; }
     public bool Auto { get; set; }
     public int Speed { get; set; }
-    public Vector3 GridSize => new Vector3(gridSizeX, gridSizeY, gridSizeZ);
+    public Vector3Int GridSize => new Vector3Int(gridSizeX, gridSizeY, gridSizeZ);
+    public Vector3 GridScale => gridSize;
     private bool AllCollapsed
     {
         get
@@ -70,8 +63,6 @@ public class WaveFunction : MonoBehaviour
             return !cells.Any(cell => !cell.Collapsed);
         }
     }
-    private int startCord => gridSizeZ * (gridSizeY + 1) + gridSizeZ / 2;
-    private float minLength => gridSizeZ + gridSizeZ / 3.0f;
 
     private void Start()
     {
@@ -90,19 +81,24 @@ public class WaveFunction : MonoBehaviour
             return;
         }
 
-        await PredeterminePath();
+        //await PredeterminePath();
         await BottomBuildUp();
 
-        int i = 0;
+        Stopwatch watch = Stopwatch.StartNew();
+        int MaxMills = 5;
         while (!AllCollapsed)
         {
             await Iterate(); // Does not need to await
            
-            if (i++ % 3 == 0) await Task.Yield();
+            if (watch.ElapsedMilliseconds > MaxMills)
+            {
+                await Task.Yield();
+                watch.Restart();
+            }
         }
 
         CombineMeshes();
-        GetMap();
+        //GetMap();
 
         OnMapGenerated?.Invoke();
     }
@@ -119,126 +115,6 @@ public class WaveFunction : MonoBehaviour
 
         LoadCells();
         return true;
-    }
-
-    private async Task PredeterminePath() 
-    {
-        int index = startCord;
-        cellPath.Add(cells[index]);
-
-        do
-        {
-            SetCell(index, prototypes[2 * 4]);
-            await Propagate();
-
-            await Task.Yield();
-        } while (Move(ref index));
-
-        if (Vector3.Distance(cells[index].Position, cells[startCord].Position) < minLength)
-        {
-            if (!Load())
-            {
-                return;
-            } 
-
-            await PredeterminePath();
-            return;
-        }
-
-        SpawnedCastle = Instantiate(castle, cells[index].Position, Quaternion.identity);
-
-        bool Move(ref int index)
-        {
-            List<int> neighbours = ValidDirections(index, out List<Direction> dirs, false);
-            if (cellPath.Count > 20 && neighbours.Count < 4)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < neighbours.Count; i++)
-            {
-                if (cells[neighbours[i]].Collapsed)
-                {
-                    neighbours.RemoveAt(i--);
-                    continue;
-                }
-
-                List<int> neighboursNeighbours = ValidDirections(neighbours[i], out List<Direction> dirs1, false);
-
-                bool checksOut = true;
-                int amount = 0;
-                for (int g = 0; g < neighboursNeighbours.Count; g++)
-                {
-                    if (cells[neighboursNeighbours[g]].Collapsed)
-                    {
-                        amount++;
-                        if (amount >= 2)
-                        {
-                            checksOut = false;
-                            break;
-                        }
-                        
-                    }
-                }
-
-                if (!checksOut)
-                {
-                    neighbours.RemoveAt(i--);
-                    continue;
-                }
-            }
-
-            if (neighbours.Count <= 0)
-            {
-                return false;
-            }
-
-            if (cellPath.Count >= 2)
-            {
-                Vector3 pastDir = (cellPath[cellPath.Count - 1].Position - cellPath[cellPath.Count - 2].Position).normalized;
-                int[] weights = new int[neighbours.Count];
-                for (int i = 0; i < weights.Length; i++)
-                {
-                    if (Vector3.Dot((cells[neighbours[i]].Position - cells[index].Position).normalized, pastDir) > 0.8f)
-                    {
-                        weights[i] = 100;
-                        continue;
-                    }
-                    weights[i] = turnWeight;
-                }
-
-                int totalCount = 0;
-                for (int i = 0; i < neighbours.Count; i++)
-                {
-                    totalCount += weights[i];
-                }
-
-                int chosenIndex = 0;
-                int randomIndex = UnityEngine.Random.Range(0, totalCount);
-                for (int i = 0; i < neighbours.Count; i++)
-                {
-                    randomIndex -= weights[i];
-                    if (randomIndex <= 0)
-                    {
-                        chosenIndex = i;
-                        break;
-                    }
-                }
-
-                index = neighbours[chosenIndex];
-
-                cellPath.Add(cells[index]);
-
-                return true;
-            }           
-
-            int randIndex = UnityEngine.Random.Range(0, neighbours.Count);
-            index = neighbours[randIndex];
-
-            cellPath.Add(cells[index]);
-
-            return true;
-        }
     }
 
     private async Task BottomBuildUp()
@@ -280,63 +156,6 @@ public class WaveFunction : MonoBehaviour
         }
     }
 
-    public List<Cell> GetEnemyPath()
-    {
-        return cellPath;
-    }
-
-    public Node[,] GetMap()
-    {
-        if (map != null)
-        {
-            return map;
-        }
-
-        map = new Node[gridSizeX * 3, gridSizeZ * 3];
-        var thiccMap = new Node[gridSizeX * 3, gridSizeZ * 3];
-
-        Collider[] hits = new Collider[2];
-
-        for (int i = 0; i < cells.Count; i++)
-        {
-            Vector3Int index = GetCords(i);
-            if (index.y != 1)
-            {
-                continue;
-            }
-
-            for (int x = 0; x < 3; x++)
-            {
-                for (int z = 0; z < 3; z++)
-                {
-                    Vector3 pos = cells[i].Position + new Vector3((gridSize.x / 3.0f) * (z - 1), 0, (gridSize.z / 3.0f) * (x - 1));
-                    bool walkable = false;
-                    bool thiccWalkable = false;
-                    if (Physics.OverlapSphereNonAlloc(pos, 0.2f, hits) == 1)
-                    {
-                        if (Physics.OverlapSphereNonAlloc(pos + Vector3.up * 0.2f, 0.1f, hits) == 0)
-                        {
-                            walkable = true;
-                        }
-
-                        if (Physics.OverlapSphereNonAlloc(pos + Vector3.up * 1.1f, 1f, hits) == 0)
-                        {
-                            thiccWalkable = true;
-                        }
-                    }
-
-                    map[index.x * 3 + x, index.z * 3 + z] = new Node(walkable, pos);
-                    thiccMap[index.x * 3 + x, index.z * 3 + z] = new Node(thiccWalkable, pos);
-                }
-            }
-        }
-
-        EnemyPathFinding.Map = map;
-        EnemyPathFinding.ThiccMap = thiccMap;
-        EnemyPathFinding.FindPath(cellPath[0].Position, cellPath[cellPath.Count - 1].Position, EnemyPathFinding.ThiccMap);
-        return map;
-    }
-
     public async Task Iterate()
     {
         int index = GetLowestEntropyIndex();
@@ -349,7 +168,7 @@ public class WaveFunction : MonoBehaviour
 
     private int GetLowestEntropyIndex()
     {
-        float lowestEntropy = 1000;
+        float lowestEntropy = 10000;
         int index = 0;
 
         for (int i = 0; i < cells.Count; i++)
@@ -425,7 +244,11 @@ public class WaveFunction : MonoBehaviour
         cells[index] = new Cell(true, cells[index].Position, new List<PrototypeData>() { chosenPrototype });
         cellStack.Push(index);
 
-        spawnedMeshes.Add(GenerateMesh(cells[index].Position, chosenPrototype));
+        GameObject spawned = GenerateMesh(cells[index].Position, chosenPrototype);
+        if (spawned != null)
+        {
+            spawnedMeshes.Add(spawned);
+        }
     }
 
     public async Task Propagate()
@@ -490,7 +313,7 @@ public class WaveFunction : MonoBehaviour
             int directIndex = index;
             List<string> upKeys = new List<string>();
             bool onlyAir = true;
-            while (IsDirectionValid(directIndex, Direction.Below, out directIndex) && onlyAir)
+            while (IsDirectionValid(directIndex, Direction.Down, out directIndex) && onlyAir)
             {
                 onlyAir = true;
                 upKeys.Clear();
@@ -520,7 +343,7 @@ public class WaveFunction : MonoBehaviour
         // Check Directly Above
         // Rule is Below flat tile is only air
         {
-            if (IsDirectionValid(index, Direction.Above, out int aboveIndex))
+            if (IsDirectionValid(index, Direction.Up, out int aboveIndex))
             {
                 if (cells[aboveIndex].Collapsed)
                 {
@@ -557,11 +380,11 @@ public class WaveFunction : MonoBehaviour
                     validKeys.Add(changedCell.PossiblePrototypes[i].NegX);
                     break;
                     
-                case Direction.Above:
+                case Direction.Up:
                     validKeys.Add(changedCell.PossiblePrototypes[i].PosY);
                     break;
                     
-                case Direction.Below:
+                case Direction.Down:
                     validKeys.Add(changedCell.PossiblePrototypes[i].NegY);
                     break;
                     
@@ -590,11 +413,11 @@ public class WaveFunction : MonoBehaviour
                     shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosX, validKeys);
 
                     break;
-                case Direction.Above:
+                case Direction.Up:
                     shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegY, validKeys);
 
                     break;
-                case Direction.Below:
+                case Direction.Down:
                     shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosY, validKeys);
 
                     break;
@@ -658,7 +481,7 @@ public class WaveFunction : MonoBehaviour
                     return true;
                 }
                 break;
-            case Direction.Above:
+            case Direction.Up:
                 int thing = 1 + Mathf.FloorToInt((float)index / (float)(gridSizeX * gridSizeY));
                 if ((index + gridSizeX) < (gridSizeX * gridSizeY) * thing)
                 {
@@ -666,7 +489,7 @@ public class WaveFunction : MonoBehaviour
                     return true;
                 }
                 break;
-            case Direction.Below:
+            case Direction.Down:
                 int thing1 = 1 + Mathf.FloorToInt((float)index / (float)(gridSizeX * gridSizeY));
                 if ((index - gridSizeX) >= (gridSizeX * gridSizeY) * (thing1 - 1))
                 {
@@ -708,14 +531,14 @@ public class WaveFunction : MonoBehaviour
             if ((index + gridSizeX) < (gridSizeX * gridSizeY) * thing)
             {
                 valids.Add(index + gridSizeX);
-                directions.Add(Direction.Above);
+                directions.Add(Direction.Up);
             }
 
             // Down
             if ((index - gridSizeX) >= (gridSizeX * gridSizeY) * (thing - 1))
             {
                 valids.Add(index - gridSizeX);
-                directions.Add(Direction.Below);
+                directions.Add(Direction.Down);
             }
         }
 
@@ -766,13 +589,13 @@ public class WaveFunction : MonoBehaviour
 
     private bool LoadPrototypeData()
     {
-        PrototypeInfoCreator prototypeInfoCreator = FindObjectOfType<PrototypeInfoCreator>();
-        if (prototypeInfoCreator == null)
+        if (groundPrototypeInfo == null)
         {
+            Debug.LogError("Please enter prototype reference");
             return false;
         }
 
-        prototypes = prototypeInfoCreator.Prototypes;
+        prototypes = groundPrototypeInfo.Prototypes;
 
         bottomPrototypes.Clear();
         for (int i = 0; i < prototypes.Count; i++)
@@ -841,13 +664,11 @@ public class WaveFunction : MonoBehaviour
 
     public void Clear()
     {
-        DestroyImmediate(SpawnedCastle);
         for (int i = 0; i < spawnedMeshes.Count; i++)
         {
             DestroyImmediate(spawnedMeshes[i]);
         }
 
-        cellPath.Clear();
         spawnedMeshes.Clear();
         cells.Clear();
     }
@@ -968,8 +789,8 @@ public enum Direction
 {
     Right, 
     Left,
-    Above,
-    Below,
+    Up,
+    Down,
     Forward,
     Backward,
     None

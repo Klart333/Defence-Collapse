@@ -56,6 +56,7 @@ public class Building : MonoBehaviour
     public int BuildingLevel { get; set; }
 
     // Placing
+    public Vector3 PlacedPosition { get; set; }
     public Vector3 StartScale { get; private set; }
     public Vector3 PlacingScale => StartScale * scaleMult;
     public float ScaleMult => scaleMult;
@@ -129,7 +130,7 @@ public class Building : MonoBehaviour
 
         selected = true;
         buildingState.OnSelected();
-        BuildingPlacer.BounceInOut(this);
+        BuildingAnimator.BounceInOut(this);
     }
 
     private void OnMouseEnter()

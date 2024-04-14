@@ -1,9 +1,5 @@
-using JetBrains.Annotations;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
@@ -27,7 +23,6 @@ public class EnemySpawner : MonoBehaviour
         }
 
         waveFunction = FindObjectOfType<WaveFunction>();
-        waveFunction.OnMapGenerated += Wave_OnMapGenerated;
 
         Events.OnWaveClicked += WaveClicked;
     }
@@ -42,16 +37,6 @@ public class EnemySpawner : MonoBehaviour
         StartCoroutine(StartWave());
 
         Events.OnWaveStarted.Invoke();
-    }
-
-    private void Wave_OnMapGenerated()
-    {
-        var cells = waveFunction.GetEnemyPath();
-        path = new Vector3[cells.Count];
-        for (int i = 0; i < cells.Count; i++)
-        {
-            path[i] = cells[i].Position;
-        }
     }
 
     public IEnumerator StartWave()

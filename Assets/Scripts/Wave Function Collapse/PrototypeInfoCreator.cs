@@ -1,4 +1,4 @@
-using System;
+using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
@@ -7,13 +7,26 @@ using UnityEngine.UIElements;
 
 public class PrototypeInfoCreator : MonoBehaviour
 {
-    [Header("Debug")]
+    [Title("Debug")]
     public bool Debug;
 
     [SerializeField]
     private PrototypeDisplay prefab;
 
-    [Header("Generated")]
+    [Title("Override")]
+    [SerializeField]
+    private bool overrideVerticalPositive = false;
+
+    [SerializeField, ShowIf(nameof(overrideVerticalPositive))]
+    private string positiveKey = "-1s";
+
+    [SerializeField]
+    private bool overrideVerticalNegative = false;
+
+    [SerializeField, ShowIf(nameof(overrideVerticalNegative))]
+    private string negativeKey = "v-1_0";
+
+    [Title("Generated")]
     public List<PrototypeData> Prototypes = new List<PrototypeData>();
 
     [SerializeField]
@@ -22,14 +35,11 @@ public class PrototypeInfoCreator : MonoBehaviour
     [SerializeField]
     private List<DicData> verticalSocketList = new List<DicData>();
 
-    [SerializeField]
-    private List<int> doublePieces = new List<int>();
-
-    [Header("Material")]
+    [Title("Material")]
     [SerializeField]
     private List<Material> materials = new List<Material>();
 
-    [Header("Weight")]
+    [Title("Weight")]
     [SerializeField]
     private int[] pieceWeights;
 
@@ -40,6 +50,8 @@ public class PrototypeInfoCreator : MonoBehaviour
     private int currentSideIndex = 0;
     private int currentTopIndex = 0;
 
+    [TitleGroup("Creation", Order = -100)]
+    [Button]
     public void CreateInfo()
     {
         Reset();
@@ -93,29 +105,14 @@ public class PrototypeInfoCreator : MonoBehaviour
                 }
             }
 
-            string posX = GetSideKey(posXs, 0, i);
-            string negX = GetSideKey(negXs, 0, i);
-            string posZ = GetSideKey(posZs, 1, i);
-            string negZ = GetSideKey(negZs, 1, i);
+            string posX = GetSideKey(posXs, 0, 1);
+            string negX = GetSideKey(negXs, 0, -1);
+            string posZ = GetSideKey(posZs, 1, -1);
+            string negZ = GetSideKey(negZs, 1, 1);
 
-            // Shit
-            {
-                if (posX == negX && !posX.Contains('s'))
-                {
-                    if (posX.Contains('f'))
-                    {
-                        posX = posX.Replace("f", "");
-                    }
-                    else
-                    {
-                        negX += "f";
-                    }
-                }
-            }
-
-            string[] posY = GetTopKeys(posYs);
-            string[] negY = GetTopKeys(negYs);
-
+            string[] posY = GetTopKeys(posYs, true);
+            string[] negY = GetTopKeys(negYs, false);
+        
             int[] matIndexes = meshes[i].gameObject.GetComponent<MeshRenderer>().sharedMaterials.Select((x) => materials.IndexOf(x)).ToArray();
             // Add all rotations
             // Need to rotate the vertical too
@@ -128,26 +125,13 @@ public class PrototypeInfoCreator : MonoBehaviour
             Prototypes.Add(prototype1);
             Prototypes.Add(prototype2);
             Prototypes.Add(prototype3);
-
-            if (doublePieces.Contains(i))
-            {
-                PrototypeData prototype02 = new PrototypeData(new MeshWithRotation(mesh, 0), negX, posX, posY[0], negY[0], posZ, negZ, pieceWeights[i], matIndexes);
-                PrototypeData prototype13 = new PrototypeData(new MeshWithRotation(mesh, 1), posZ, negZ, posY[1], negY[1], posX, negX, pieceWeights[i], matIndexes);
-                PrototypeData prototype20 = new PrototypeData(new MeshWithRotation(mesh, 2), posX, negX, posY[2], negY[2], negZ, posZ, pieceWeights[i], matIndexes);
-                PrototypeData prototype31 = new PrototypeData(new MeshWithRotation(mesh, 3), negZ, posZ, posY[3], negY[3], negX, posX, pieceWeights[i], matIndexes);
-
-                Prototypes.Add(prototype02);
-                Prototypes.Add(prototype13);
-                Prototypes.Add(prototype20);
-                Prototypes.Add(prototype31);
-            }
         }
 
         // Empty
         Prototypes.Add(new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", pieceWeights[meshes.Length], new int[0]));
     }
 
-    private string GetSideKey(List<Vector3> vertexPositions, int mainAxis, int meshIndex)
+    private string GetSideKey(List<Vector3> vertexPositions, int mainAxis, int positiveDirection)
     {
         if (vertexPositions.Count == 0)
         {
@@ -160,13 +144,13 @@ public class PrototypeInfoCreator : MonoBehaviour
         {
             if (mainAxis == 0)
             {
-                Vector2 pro = new Vector2(vertexPositions[i].z, vertexPositions[i].y);
+                Vector2 pro = new Vector2(vertexPositions[i].z * positiveDirection, vertexPositions[i].y);
                 positions.Add(pro);
 
             }
             else if (mainAxis == 1)
             {
-                Vector2 pro = new Vector2(vertexPositions[i].x, vertexPositions[i].y);
+                Vector2 pro = new Vector2(vertexPositions[i].x * positiveDirection, vertexPositions[i].y);
                 positions.Add(pro);
             }
         }
@@ -215,12 +199,11 @@ public class PrototypeInfoCreator : MonoBehaviour
         return key;
     }
 
-    private string[] GetTopKeys(List<Vector3> vertexPositions)
+    private string[] GetTopKeys(List<Vector3> vertexPositions, bool positive)
     {
-        if (vertexPositions.Count == 0)
-        {
-            return new string[] { "-1s", "-1s", "-1s", "-1s" };
-        }
+        if ( positive && overrideVerticalPositive)  return new string[] { positiveKey, positiveKey, positiveKey, positiveKey };
+        if (!positive && overrideVerticalNegative)  return new string[] { negativeKey, negativeKey, negativeKey, negativeKey };
+        if ( vertexPositions.Count == 0)             return new string[] { "-1s", "-1s", "-1s", "-1s" };
 
         // Project on 2 Dimensional plane
         List<Vector2> positions = new List<Vector2>();
@@ -268,11 +251,8 @@ public class PrototypeInfoCreator : MonoBehaviour
         return keys;
     }
 
-    public void Clear()
-    {
-        Reset();
-    }
-
+    [TitleGroup("Display", Order = -50)]
+    [Button]
     public void DisplayPrototypes()
     {
         StopDisplayingPrototypes();
@@ -287,6 +267,8 @@ public class PrototypeInfoCreator : MonoBehaviour
         }
     }
 
+    [TitleGroup("Display", Order = -50)]
+    [Button]
     public void StopDisplayingPrototypes()
     {
         for (int i = 0; i < spawnedPrototypes.Count; i++)
@@ -295,6 +277,13 @@ public class PrototypeInfoCreator : MonoBehaviour
         }
 
         spawnedPrototypes.Clear();
+    }
+
+    [TitleGroup("Display", Order = -50)]
+    [Button]
+    public void Clear()
+    {
+        Reset();
     }
 
     private void Reset()
