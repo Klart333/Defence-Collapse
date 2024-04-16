@@ -833,7 +833,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 7270f1ebe2f850a418184d13fa7a07ac, type: 2}
   - {fileID: 2100000, guid: 7032e38aab614d14984ef286266d523a, type: 2}
   DebugPropagate: 0
-  Speed: 840
+  Speed: 429
 --- !u!114 &771210305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1327,7 +1327,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1021072153
 Transform:
   m_ObjectHideFlags: 0
@@ -1443,9 +1443,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 969faebd6a78df744b7f6dffaaead57c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSizeX: 12
-  gridSizeY: 4
-  gridSizeZ: 12
+  gridSizeX: 20
+  gridSizeY: 5
+  gridSizeZ: 20
   gridSize: {x: 2, y: 2, z: 2}
   mats:
   - {fileID: 2100000, guid: 16f4b84d776954947aab5daf6fa0d289, type: 2}
@@ -1820,7 +1820,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1229629332
 Transform:
   m_ObjectHideFlags: 0
@@ -2169,7 +2169,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2045039782
 Transform:
   m_ObjectHideFlags: 0
@@ -2613,7 +2613,7 @@ MonoBehaviour:
     NegZ: -1s
     PosY: -1s
     NegY: v-1_0
-    Weight: 1000
+    Weight: 10
     MaterialIndexes: 000000000100000002000000
   - MeshRot:
       Mesh: {fileID: -5221963080773851136, guid: d9a57a4a7f8b7884eb6479d63ac5bcd2,
@@ -2625,7 +2625,7 @@ MonoBehaviour:
     NegZ: -1s
     PosY: -1s
     NegY: v-1_0
-    Weight: 1000
+    Weight: 10
     MaterialIndexes: 000000000100000002000000
   - MeshRot:
       Mesh: {fileID: -5221963080773851136, guid: d9a57a4a7f8b7884eb6479d63ac5bcd2,
@@ -2637,7 +2637,7 @@ MonoBehaviour:
     NegZ: 0f
     PosY: -1s
     NegY: v-1_0
-    Weight: 1000
+    Weight: 10
     MaterialIndexes: 000000000100000002000000
   - MeshRot:
       Mesh: {fileID: -5221963080773851136, guid: d9a57a4a7f8b7884eb6479d63ac5bcd2,
@@ -2649,16 +2649,16 @@ MonoBehaviour:
     NegZ: 0
     PosY: -1s
     NegY: v-1_0
-    Weight: 1000
+    Weight: 10
     MaterialIndexes: 000000000100000002000000
   - MeshRot:
       Mesh: {fileID: -6986275237000010781, guid: d9a57a4a7f8b7884eb6479d63ac5bcd2,
         type: 3}
       Rot: 0
-    PosX: -1s
-    NegX: -1s
-    PosZ: -1s
-    NegZ: -1s
+    PosX: 1s
+    NegX: 1s
+    PosZ: 1s
+    NegZ: 1s
     PosY: -1s
     NegY: v-1_0
     Weight: 1
@@ -2667,10 +2667,10 @@ MonoBehaviour:
       Mesh: {fileID: -6986275237000010781, guid: d9a57a4a7f8b7884eb6479d63ac5bcd2,
         type: 3}
       Rot: 1
-    PosX: -1s
-    NegX: -1s
-    PosZ: -1s
-    NegZ: -1s
+    PosX: 1s
+    NegX: 1s
+    PosZ: 1s
+    NegZ: 1s
     PosY: -1s
     NegY: v-1_0
     Weight: 1
@@ -2679,10 +2679,10 @@ MonoBehaviour:
       Mesh: {fileID: -6986275237000010781, guid: d9a57a4a7f8b7884eb6479d63ac5bcd2,
         type: 3}
       Rot: 2
-    PosX: -1s
-    NegX: -1s
-    PosZ: -1s
-    NegZ: -1s
+    PosX: 1s
+    NegX: 1s
+    PosZ: 1s
+    NegZ: 1s
     PosY: -1s
     NegY: v-1_0
     Weight: 1
@@ -2691,10 +2691,10 @@ MonoBehaviour:
       Mesh: {fileID: -6986275237000010781, guid: d9a57a4a7f8b7884eb6479d63ac5bcd2,
         type: 3}
       Rot: 3
-    PosX: -1s
-    NegX: -1s
-    PosZ: -1s
-    NegZ: -1s
+    PosX: 1s
+    NegX: 1s
+    PosZ: 1s
+    NegZ: 1s
     PosY: -1s
     NegY: v-1_0
     Weight: 1
@@ -2703,10 +2703,10 @@ MonoBehaviour:
       Mesh: {fileID: -6308733327487500673, guid: d9a57a4a7f8b7884eb6479d63ac5bcd2,
         type: 3}
       Rot: 0
-    PosX: -1s
+    PosX: 1s
     NegX: 0f
     PosZ: 0
-    NegZ: -1s
+    NegZ: 1s
     PosY: -1s
     NegY: v-1_0
     Weight: 100
@@ -2716,9 +2716,9 @@ MonoBehaviour:
         type: 3}
       Rot: 1
     PosX: 0
-    NegX: -1s
+    NegX: 1s
     PosZ: 0f
-    NegZ: -1s
+    NegZ: 1s
     PosY: -1s
     NegY: v-1_0
     Weight: 100
@@ -2728,8 +2728,8 @@ MonoBehaviour:
         type: 3}
       Rot: 2
     PosX: 0f
-    NegX: -1s
-    PosZ: -1s
+    NegX: 1s
+    PosZ: 1s
     NegZ: 0
     PosY: -1s
     NegY: v-1_0
@@ -2739,9 +2739,9 @@ MonoBehaviour:
       Mesh: {fileID: -6308733327487500673, guid: d9a57a4a7f8b7884eb6479d63ac5bcd2,
         type: 3}
       Rot: 3
-    PosX: -1s
+    PosX: 1s
     NegX: 0
-    PosZ: -1s
+    PosZ: 1s
     NegZ: 0f
     PosY: -1s
     NegY: v-1_0
@@ -2800,7 +2800,7 @@ MonoBehaviour:
         type: 3}
       Rot: 0
     PosX: -1s
-    NegX: -1s
+    NegX: 1s
     PosZ: 0f
     NegZ: 0
     PosY: -1s
@@ -2813,7 +2813,7 @@ MonoBehaviour:
       Rot: 1
     PosX: 0f
     NegX: 0
-    PosZ: -1s
+    PosZ: 1s
     NegZ: -1s
     PosY: -1s
     NegY: v-1_0
@@ -2823,7 +2823,7 @@ MonoBehaviour:
       Mesh: {fileID: 6846980478796422165, guid: d9a57a4a7f8b7884eb6479d63ac5bcd2,
         type: 3}
       Rot: 2
-    PosX: -1s
+    PosX: 1s
     NegX: -1s
     PosZ: 0
     NegZ: 0f
@@ -2838,7 +2838,7 @@ MonoBehaviour:
     PosX: 0
     NegX: 0f
     PosZ: -1s
-    NegZ: -1s
+    NegZ: 1s
     PosY: -1s
     NegY: v-1_0
     Weight: 100
@@ -2867,12 +2867,21 @@ MonoBehaviour:
     - {x: -0, y: 0}
     - {x: -0.15, y: 0}
     socketname: 0
+  - positions:
+    - {x: -0.13, y: -0}
+    - {x: -0.13, y: 0.3}
+    - {x: 0.13, y: -0}
+    - {x: 0.13, y: 0.3}
+    - {x: 0.18, y: 0.28}
+    - {x: 0, y: 0.5}
+    - {x: -0.18, y: 0.28}
+    socketname: 1s
   verticalSocketList: []
   materials:
   - {fileID: 2100000, guid: 7eba66767bd9aee41b65191dff300edf, type: 2}
   - {fileID: 2100000, guid: 7270f1ebe2f850a418184d13fa7a07ac, type: 2}
   - {fileID: 2100000, guid: 7032e38aab614d14984ef286266d523a, type: 2}
-  pieceWeights: e80300000100000064000000640000006400000064000000
+  pieceWeights: 0a0000000100000064000000640000006400000064000000
 --- !u!4 &1013469615288832280
 Transform:
   m_ObjectHideFlags: 0
@@ -4344,6 +4353,150 @@ MonoBehaviour:
     Weight: 10
     MaterialIndexes: 0000000001000000
   - MeshRot:
+      Mesh: {fileID: 3284045297738311301, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 0
+    PosX: 3
+    NegX: 3f
+    PosZ: 4s
+    NegZ: 1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 2
+    MaterialIndexes: 010000000300000004000000
+  - MeshRot:
+      Mesh: {fileID: 3284045297738311301, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 1
+    PosX: 4s
+    NegX: 1s
+    PosZ: 3f
+    NegZ: 3
+    PosY: -1s
+    NegY: -1s
+    Weight: 2
+    MaterialIndexes: 010000000300000004000000
+  - MeshRot:
+      Mesh: {fileID: 3284045297738311301, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 2
+    PosX: 3f
+    NegX: 3
+    PosZ: 1s
+    NegZ: 4s
+    PosY: -1s
+    NegY: -1s
+    Weight: 2
+    MaterialIndexes: 010000000300000004000000
+  - MeshRot:
+      Mesh: {fileID: 3284045297738311301, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 3
+    PosX: 1s
+    NegX: 4s
+    PosZ: 3
+    NegZ: 3f
+    PosY: -1s
+    NegY: -1s
+    Weight: 2
+    MaterialIndexes: 010000000300000004000000
+  - MeshRot:
+      Mesh: {fileID: -5333859576041384117, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 0
+    PosX: 3f
+    NegX: 1s
+    PosZ: 1s
+    NegZ: 3
+    PosY: -1s
+    NegY: -1s
+    Weight: 3
+    MaterialIndexes: 010000000300000004000000
+  - MeshRot:
+      Mesh: {fileID: -5333859576041384117, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 1
+    PosX: 1s
+    NegX: 3
+    PosZ: 1s
+    NegZ: 3f
+    PosY: -1s
+    NegY: -1s
+    Weight: 3
+    MaterialIndexes: 010000000300000004000000
+  - MeshRot:
+      Mesh: {fileID: -5333859576041384117, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 2
+    PosX: 1s
+    NegX: 3f
+    PosZ: 3
+    NegZ: 1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 3
+    MaterialIndexes: 010000000300000004000000
+  - MeshRot:
+      Mesh: {fileID: -5333859576041384117, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 3
+    PosX: 3
+    NegX: 1s
+    PosZ: 3f
+    NegZ: 1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 3
+    MaterialIndexes: 010000000300000004000000
+  - MeshRot:
+      Mesh: {fileID: 8933730680224484651, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 0
+    PosX: 4s
+    NegX: 4s
+    PosZ: 4s
+    NegZ: 4s
+    PosY: -1s
+    NegY: -1s
+    Weight: 4
+    MaterialIndexes: 0400000003000000
+  - MeshRot:
+      Mesh: {fileID: 8933730680224484651, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 1
+    PosX: 4s
+    NegX: 4s
+    PosZ: 4s
+    NegZ: 4s
+    PosY: -1s
+    NegY: -1s
+    Weight: 4
+    MaterialIndexes: 0400000003000000
+  - MeshRot:
+      Mesh: {fileID: 8933730680224484651, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 2
+    PosX: 4s
+    NegX: 4s
+    PosZ: 4s
+    NegZ: 4s
+    PosY: -1s
+    NegY: -1s
+    Weight: 4
+    MaterialIndexes: 0400000003000000
+  - MeshRot:
+      Mesh: {fileID: 8933730680224484651, guid: 9454fd53404092c49a04245d69caedbb,
+        type: 3}
+      Rot: 3
+    PosX: 4s
+    NegX: 4s
+    PosZ: 4s
+    NegZ: 4s
+    PosY: -1s
+    NegY: -1s
+    Weight: 4
+    MaterialIndexes: 0400000003000000
+  - MeshRot:
       Mesh: {fileID: 0}
       Rot: 0
     PosX: -1s
@@ -4352,7 +4505,7 @@ MonoBehaviour:
     NegZ: -1s
     PosY: -1s
     NegY: -1s
-    Weight: 2
+    Weight: 10000
     MaterialIndexes: 
   socketList:
   - positions:
@@ -4379,6 +4532,25 @@ MonoBehaviour:
     - {x: 0, y: 0}
     - {x: 1, y: -0}
     socketname: 2
+  - positions:
+    - {x: 0.65, y: -0}
+    - {x: 1, y: -0}
+    - {x: -0.2, y: -0}
+    - {x: -1, y: -0}
+    - {x: -0.6, y: -0}
+    socketname: 3f
+  - positions:
+    - {x: -0.65, y: -0}
+    - {x: -1, y: -0}
+    - {x: 0.2, y: -0}
+    - {x: 1, y: -0}
+    - {x: 0.6, y: -0}
+    socketname: 3
+  - positions:
+    - {x: -0, y: -0.1}
+    - {x: 1, y: 0}
+    - {x: -1, y: -0}
+    socketname: 4s
   verticalSocketList:
   - positions:
     - {x: -0.2, y: 0.5}

@@ -85,7 +85,7 @@ public class WaveFunction : MonoBehaviour
         await BottomBuildUp();
 
         Stopwatch watch = Stopwatch.StartNew();
-        int MaxMills = 5;
+        int MaxMills = 4;
         while (!AllCollapsed)
         {
             await Iterate(); // Does not need to await

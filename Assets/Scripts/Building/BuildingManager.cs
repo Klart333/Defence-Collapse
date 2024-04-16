@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 using Debug = UnityEngine.Debug;
 
 public class BuildingManager : MonoBehaviour
@@ -115,7 +114,7 @@ public class BuildingManager : MonoBehaviour
         {
             Vector3Int index = cellsToCollapse[i];
             cells[index.x, index.y, index.z] = new Cell(false, cells[index.x, index.y, index.z].Position, new List<PrototypeData>(prototypes));
-            ValidDirections(index, out _).ForEach(x => cellStack.Push(x));
+            ValidDirections(index, out _, Direction.Up).ForEach(x => cellStack.Push(x));
 
             if (spawnedMeshes.TryGetValue(index, out GameObject gm))
             {
@@ -127,6 +126,11 @@ public class BuildingManager : MonoBehaviour
             {
                 SetCell(index + Vector3Int.down, groundPrototype);
             }
+            else
+            {
+                ChangeTopKey(index + Vector3Int.down, "v-1_0");
+                Debug.Log("Uh problem");
+            }
         }
         await Task.Delay(100);
         await Propagate();
@@ -136,21 +140,17 @@ public class BuildingManager : MonoBehaviour
             await Iterate();
             await Task.Delay(10);
         }
-
-        Debug.Log("Done");
     }
 
     #region Core
     public async Task Iterate()
     {
         Vector3Int index = GetLowestEntropyIndex();
-        Debug.Log("Lowest Index: " + index);
 
         PrototypeData chosenPrototype = Collapse(cells[index.x, index.y, index.z]);
         SetCell(index, chosenPrototype);
 
         await Propagate();
-        Debug.Log("Propogating");
     }
 
     private Vector3Int GetLowestEntropyIndex()
@@ -232,6 +232,15 @@ public class BuildingManager : MonoBehaviour
         }
     }
 
+    private void ChangeTopKey(Vector3Int index, string key)
+    {
+        PrototypeData prot = cells[index.x, index.y, index.z].PossiblePrototypes[0];
+        PrototypeData changedProt = new PrototypeData(new MeshWithRotation(prot.MeshRot.Mesh, prot.MeshRot.Rot), prot.PosX, prot.NegX, key, prot.NegY, prot.PosZ, prot.NegZ, prot.Weight, new int[0]);
+        cells[index.x, index.y, index.z] = new Cell(true, cells[index.x, index.y, index.z].Position, new List<PrototypeData>() { changedProt });
+        cellStack.Push(index);
+    }
+
+
     public async Task Propagate()
     {
         while (cellStack.TryPop(out Vector3Int cellIndex))
@@ -266,48 +275,48 @@ public class BuildingManager : MonoBehaviour
 
     #region Constain
 
-    private List<Vector3Int> ValidDirections(Vector3Int index, out List<Direction> directions)
+    private List<Vector3Int> ValidDirections(Vector3Int index, out List<Direction> directions, Direction exlcude = Direction.None) // Exclude should be a flag
     {
         List<Vector3Int> valids = new List<Vector3Int>();
         directions = new List<Direction>();
 
         // Right
-        if (index.x + 1 < cells.GetLength(0))
+        if (index.x + 1 < cells.GetLength(0) && Direction.Right != exlcude)
         {
             valids.Add(index + Vector3Int.right);
             directions.Add(Direction.Right);
         }
 
         // Left
-        if (index.x - 1 >= 0)
+        if (index.x - 1 >= 0 && Direction.Left != exlcude)
         {
             valids.Add(index + Vector3Int.left);
             directions.Add(Direction.Left);
         }
 
         // Up
-        if (index.y + 1 < cells.GetLength(1))
+        if (index.y + 1 < cells.GetLength(1) && Direction.Up != exlcude)
         {
             valids.Add(index + Vector3Int.up);
             directions.Add(Direction.Up);
         }
 
         // Down
-        if (index.y - 1 >= 0)
+        if (index.y - 1 >= 0 && Direction.Down != exlcude)
         {
             valids.Add(index + Vector3Int.down);
             directions.Add(Direction.Down);
         }
 
         // Forward
-        if (index.z + 1 < cells.GetLength(2))
+        if (index.z + 1 < cells.GetLength(2) && Direction.Forward != exlcude)
         {
             valids.Add(index + Vector3Int.forward);
             directions.Add(Direction.Forward);
         }
 
         // Backward
-        if (index.z - 1 >= 0)
+        if (index.z - 1 >= 0 && Direction.Backward != exlcude)
         {
             valids.Add(index + Vector3Int.back);
             directions.Add(Direction.Backward);

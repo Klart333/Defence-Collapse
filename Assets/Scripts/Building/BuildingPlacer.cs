@@ -72,7 +72,7 @@ public class BuildingPlacer : MonoBehaviour
             {
                 Vector3 pos = new Vector3(Math.Round(mousePos.x + 1, 2) - 1f, Math.Round(mousePos.y, 2), Math.Round(mousePos.z + 1, 2) - 1f);
                 buildingManager.Query(pos);
-                Debug.Log("Query at: " +  pos);
+                //Debug.Log("Query at: " +  pos);
             }
 
             await Task.Yield();
