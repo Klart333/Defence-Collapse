@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Sirenix.OdinInspector;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,6 +15,10 @@ public class BuildingPlacer : MonoBehaviour
     private InputAction fire;
     private InputAction mouse;
     private InputAction cancel;
+
+    [Title("Debug")]
+    [SerializeField]
+    private bool placingCastle = true;
 
     private bool canceled
     {
@@ -54,40 +59,43 @@ public class BuildingPlacer : MonoBehaviour
 
     private void BuildingPurchased(Building building)
     {
-        Building spawnedBuilding = Instantiate(building, GetRayPoint(), Quaternion.identity);
-        spawnedBuilding.BuildingSize = 0;
-        spawnedBuilding.BuildingLevel = 0;
+        //Building spawnedBuilding = Instantiate(building, GetRayPoint(), Quaternion.identity);
+        //spawnedBuilding.BuildingSize = 0;
+        //spawnedBuilding.BuildingLevel = 0;
 
-        PlacingTower(spawnedBuilding);
+        PlacingTower();
     }
 
-    private async void PlacingTower(Building spawnedBuilding)
+    private async void PlacingTower()
     {
-        await Task.Yield();
-
         while (/*(fire.ReadValue<float>() == 0 || !CanPlace(spawnedBuilding)) &&*/ !canceled)
         {
+            await Task.Yield();
+
             Vector3 mousePos = GetRayPoint();
-            if (mousePos != Vector3.zero && fire.WasPerformedThisFrame())
+            if (mousePos == Vector3.zero || !fire.WasPerformedThisFrame()) continue;
+
+            if (placingCastle)
             {
-                Vector3 pos = new Vector3(Math.Round(mousePos.x + 1, 2) - 1f, Math.Round(mousePos.y, 2), Math.Round(mousePos.z + 1, 2) - 1f);
-                buildingManager.Query(pos);
-                //Debug.Log("Query at: " +  pos);
+                Vector3 minPos = new Vector3(mousePos.x - 2f, mousePos.y, mousePos.z - 2f);
+                Vector3 maxPos = new Vector3(mousePos.x + 2, mousePos.y, mousePos.z + 2);
+
+                buildingManager.PlaceCastle(minPos, maxPos);
+                placingCastle = false;
+
+                continue;
             }
 
-            await Task.Yield();
+            //Vector3 pos = new Vector3(Math.Round(mousePos.x + 1, 2) - 1f, Math.Round(mousePos.y, 2), Math.Round(mousePos.z + 1, 2) - 1f);
+            buildingManager.Query(mousePos);
+            
+            //Debug.Log("Query at: " +  pos);
         }
 
         if (canceled)
         {
-            Destroy(spawnedBuilding.gameObject);
-            Events.OnBuildingCanceled(spawnedBuilding);
             return;
         }
-
-        spawnedBuilding.transform.position = spawnedBuilding.PlacedPosition;
-
-        Events.OnBuildingBuilt(spawnedBuilding);
         
         //GameEvents.OnEnemyPathUpdated(spawnedBuilding.transform.position);
     }

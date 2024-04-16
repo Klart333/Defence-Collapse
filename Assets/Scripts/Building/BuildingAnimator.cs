@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using DG.Tweening;
+using Sirenix.OdinInspector;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -8,6 +9,16 @@ public class BuildingAnimator : MonoBehaviour
     [Title("Animation")]
     [SerializeField]
     private PooledMonoBehaviour particle;
+
+    [Title("Values")]
+    [SerializeField]
+    private float scaleMultiplier = 1.4f;
+
+    [SerializeField]
+    private float duration = 0.4f;
+
+    [SerializeField]
+    private Ease ease = Ease.Linear;
 
     private void OnEnable()
     {
@@ -19,46 +30,29 @@ public class BuildingAnimator : MonoBehaviour
         Events.OnBuildingBuilt -= AnimateBuiltBuilding;
     }
 
-    private async void AnimateBuiltBuilding(Building building)
+    public void AnimateBuiltBuilding(Building building)
     {
-        float mult = 1.0f / building.ScaleMult;
+        Animate(building.gameObject);
+    }
+
+    public void Animate(GameObject building)
+    {
+        SpawnParticle(building);
+
+        building.transform.DOPunchScale(transform.lossyScale * scaleMultiplier, duration).SetEase(ease);
+    }
+
+    private void SpawnParticle(GameObject building)
+    {
         var part = particle.GetAtPosAndRot<PooledMonoBehaviour>(building.transform.position + Vector3.up * 0.5f, particle.transform.rotation);
         ParticleSystem psys = part.GetComponentInChildren<ParticleSystem>();
         var shape = psys.shape;
         var emission = psys.emission;
 
-        shape.mesh = building.GetComponentInChildren<MeshFilter>().sharedMesh;
-        shape.radius *= mult;
-
-        ParticleSystem.Burst burst = new ParticleSystem.Burst(0, 15 * mult);
+        ParticleSystem.Burst burst = new ParticleSystem.Burst(0, 15);
         emission.SetBurst(0, burst);
-        await BounceBuilding(building, building.ScaleMult);
-    }
 
-    public static async Task BounceBuilding(Building building, float scaleMult)
-    {
-        float t = 0;
-
-        Vector3 targetScale = building.StartScale;
-        Vector3 startScale = targetScale * scaleMult;
-
-        while (t <= 1.0f)
-        {
-            t += Time.deltaTime * building.BounceSpeed;
-
-            try
-            {
-                building.transform.localScale = Vector3.LerpUnclamped(startScale, targetScale, Math.Elastic(t));
-            }
-            catch (Exception)
-            {
-                return;
-            }
-
-            await Task.Yield();
-        }
-
-        building.transform.localScale = targetScale;
+        shape.mesh = building.GetComponentInChildren<MeshFilter>().sharedMesh;
     }
 
     public static async void BounceInOut(Building building)
@@ -100,6 +94,5 @@ public class BuildingAnimator : MonoBehaviour
 
         building.transform.localScale = building.StartScale;
     }
-
 
 }

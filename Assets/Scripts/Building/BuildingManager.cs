@@ -20,6 +20,10 @@ public class BuildingManager : MonoBehaviour
     [SerializeField]
     private List<Material> mats;
 
+    [Title("Castle")]
+    [SerializeField]
+    private int CastleIndex = 20;
+
     [Title("Debug")]
     [SerializeField]
     private bool DebugPropagate;
@@ -38,6 +42,7 @@ public class BuildingManager : MonoBehaviour
     private Stack<Vector3Int> cellStack = new Stack<Vector3Int>();
 
     private WaveFunction waveFunction;
+    private BuildingAnimator buildingAnimator;
 
     private PrototypeData emptyPrototype;
     private PrototypeData groundPrototype;
@@ -46,6 +51,7 @@ public class BuildingManager : MonoBehaviour
     {
         Events.OnBuildingBuilt += BuildingBuilt;
         waveFunction = FindObjectOfType<WaveFunction>();
+        buildingAnimator = GetComponent<BuildingAnimator>();
 
         waveFunction.OnMapGenerated += Load;
     }
@@ -106,10 +112,21 @@ public class BuildingManager : MonoBehaviour
 
     #endregion
 
-
     public async void Query(Vector3 queryPosition)
     {
         cellsToCollapse = GetSurroundingCells(queryPosition);
+        MakeBuildable(cellsToCollapse);
+        await Propagate();
+
+        while (!cellsToCollapse.All(x => cells[x.x, x.y, x.z].Collapsed))
+        {
+            await Iterate();
+            //await Task.Delay(10);
+        }
+    }
+
+    private void MakeBuildable(List<Vector3Int> cellsToCollapse)
+    {
         for (int i = 0; i < cellsToCollapse.Count; i++)
         {
             Vector3Int index = cellsToCollapse[i];
@@ -129,16 +146,21 @@ public class BuildingManager : MonoBehaviour
             else
             {
                 ChangeTopKey(index + Vector3Int.down, "v-1_0");
-                Debug.Log("Uh problem");
             }
         }
-        await Task.Delay(100);
-        await Propagate();
-        
+    }
+
+    public void PlaceCastle(Vector3 minQueryPosition, Vector3 maxQueryPosition)
+    {
+        cellsToCollapse = GetAllCells(minQueryPosition, maxQueryPosition);
+        MakeBuildable(cellsToCollapse);
+
+        SetCell(cellsToCollapse[4], prototypes[CastleIndex]);
+        Propagate();
+
         while (!cellsToCollapse.All(x => cells[x.x, x.y, x.z].Collapsed))
         {
-            await Iterate();
-            await Task.Delay(10);
+            Iterate();
         }
     }
 
@@ -235,6 +257,8 @@ public class BuildingManager : MonoBehaviour
     private void ChangeTopKey(Vector3Int index, string key)
     {
         PrototypeData prot = cells[index.x, index.y, index.z].PossiblePrototypes[0];
+        if (prot.PosY == key) return;
+
         PrototypeData changedProt = new PrototypeData(new MeshWithRotation(prot.MeshRot.Mesh, prot.MeshRot.Rot), prot.PosX, prot.NegX, key, prot.NegY, prot.PosZ, prot.NegZ, prot.Weight, new int[0]);
         cells[index.x, index.y, index.z] = new Cell(true, cells[index.x, index.y, index.z].Position, new List<PrototypeData>() { changedProt });
         cellStack.Push(index);
@@ -434,6 +458,22 @@ public class BuildingManager : MonoBehaviour
 
     #region Utility
 
+    private List<Vector3Int> GetAllCells(Vector3 min, Vector3 max)
+    {
+        List<Vector3Int> surrounding = new List<Vector3Int>();
+
+        for (float x = min.x; x <= max.x; x += 2)
+        {
+            for (float z = min.z; z <= max.z; z += 2)
+            {
+                Vector3Int index = GetIndex(new Vector3(x, min.y, z));
+                surrounding.Add(index);
+            }
+        }
+
+        return surrounding;
+    }
+
     private List<Vector3Int> GetSurroundingCells(Vector3 queryPosition)
     {
         List<Vector3Int> surrounding = new List<Vector3Int>();
@@ -442,7 +482,7 @@ public class BuildingManager : MonoBehaviour
         {
             for (int z = -1; z <= 1; z += 2)
             {
-                Vector3Int index = GetIndex(queryPosition + Vector3.right * x / 2.0f + Vector3.forward * z / 2.0f);
+                Vector3Int index = GetIndex(queryPosition + Vector3.right * x + Vector3.forward * z);
                 surrounding.Add(index);
             }
         }
@@ -505,13 +545,21 @@ public class BuildingManager : MonoBehaviour
 
         GameObject gm = new GameObject();
         gm.AddComponent<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
-        gm.AddComponent<MeshRenderer>().materials = mats.Where((x) => prototypeData.MaterialIndexes.Contains(mats.IndexOf(x))).ToArray();
+        
+        Material[] materials = new Material[prototypeData.MaterialIndexes.Length];
+        for (int i = 0; i < prototypeData.MaterialIndexes.Length; i++)
+        {
+            materials[i] = mats[prototypeData.MaterialIndexes[i]];
+        }
+        gm.AddComponent<MeshRenderer>().materials = materials;
 
         gm.transform.position = position;
         gm.transform.rotation = Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0);
         gm.transform.SetParent(transform, true);
 
         gm.transform.localScale *= scale;
+
+        buildingAnimator.Animate(gm);
 
         return gm;
     }
