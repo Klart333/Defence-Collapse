@@ -712,6 +712,20 @@ public class WaveFunction : MonoBehaviour
         spawnedPossibilites.Clear();
     }
 
+    #region API
+
+    public Cell GetCellAtIndex(Vector3Int index)
+    {
+        return GetCellAtIndex(index.x, index.y, index.z);
+    }
+
+    public Cell GetCellAtIndex(int x, int y, int z)
+    {
+        return cells[GetIndex(x, y, z)];
+    }
+
+    #endregion
+
     private void OnDrawGizmos()
     {
         /*if (EnemyPathFinding.Map == null)

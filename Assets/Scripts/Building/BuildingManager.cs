@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-public class BuildingManager : MonoBehaviour
+public class BuildingManager : MonoBehaviour 
 {
     [Title("Misc")]
     [SerializeField]
@@ -15,6 +15,9 @@ public class BuildingManager : MonoBehaviour
     [Title("Prototypes")]
     [SerializeField]
     private PrototypeInfoCreator townPrototypeInfo;
+
+    [SerializeField]
+    private PrototypeInfoCreator pathPrototypeInfo;
 
     [Title("Mesh")]
     [SerializeField]
@@ -46,6 +49,8 @@ public class BuildingManager : MonoBehaviour
 
     private PrototypeData emptyPrototype;
     private PrototypeData groundPrototype;
+    private PrototypeData groundPathPrototype;
+    //private PrototypeData[] portalPathPrototypes;
 
     private void OnEnable()
     {
@@ -84,18 +89,69 @@ public class BuildingManager : MonoBehaviour
         cells = new Cell[waveFunction.GridSize.x, waveFunction.GridSize.y, waveFunction.GridSize.z];
         emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 20, new int[0]);
         groundPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "v-1_0", "-1s", "-1s", "-1s", 20, new int[0]);
+        groundPathPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "v-2_0", "-1s", "-1s", "-1s", 20, new int[0]);
+        // Still here if I can't spawn the road in later because of art reasons
+        /*portalPathPrototypes = new PrototypeData[4] 
+        {
+            new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "v-2_0", "-1s", "-1s", "0s", 20, new int[0]),
+            new PrototypeData(new MeshWithRotation(null, 1), "-1s", "0s", "v-2_0", "-1s", "-1s", "-1s", 20, new int[0]),
+            new PrototypeData(new MeshWithRotation(null, 2), "-1s", "-1s", "v-2_0", "-1s", "0s", "-1s", 20, new int[0]),
+            new PrototypeData(new MeshWithRotation(null, 3), "0s", "-1s", "v-2_0", "-1s", "-1s", "-1s", 20, new int[0])
+        };*/
 
-        for (int x = 0; x < waveFunction.GridSize.x; x++)
+        for (int z = 0; z < waveFunction.GridSize.z; z++)
         {
             for (int y = 0; y < waveFunction.GridSize.y; y++)
             {
-                for (int z = 0; z < waveFunction.GridSize.z; z++)
+                for (int x = 0; x < waveFunction.GridSize.x; x++)
                 {
                     Vector3 pos = new Vector3(x * waveFunction.GridScale.x, y * waveFunction.GridScale.y, z * waveFunction.GridScale.z);
                     cells[x, y, z] = new Cell(false, pos + transform.position, new List<PrototypeData>(prototypes));
                 }
             }
         }
+
+        for (int z = 0; z < waveFunction.GridSize.z; z++)
+        {
+            for (int y = 0; y < waveFunction.GridSize.y; y++)
+            {
+                for (int x = 0; x < waveFunction.GridSize.x; x++)
+                {
+                    Cell groundCell = waveFunction.GetCellAtIndex(z, y, x);
+                    if (groundCell.PossiblePrototypes[0].MeshRot.Mesh == null) // It's air
+                    {
+
+                    }
+                    else if (groundCell.PossiblePrototypes[0].MeshRot.Mesh.name == "Ground_Portal") // yay hard coded names :))))
+                    {
+                        int index = 16 + ((groundCell.PossiblePrototypes[0].MeshRot.Rot + 1) % 4);
+                        int opIndex = 16 + ((groundCell.PossiblePrototypes[0].MeshRot.Rot + 3) % 4);
+                        SetCell(new Vector3Int(x, y, z), pathPrototypeInfo.Prototypes[index]);
+                        SetCell(new Vector3Int(x, y - 1, z), groundPathPrototype);
+                        Debug.Log(index);
+                        switch (index) // Gotta make it possible for the WFC to see a future
+                        {
+                            case 16:
+                                SetCell(new Vector3Int(x + 1, y - 1, z), groundPathPrototype);
+                                break;
+                            case 17:
+                                SetCell(new Vector3Int(x, y - 1, z - 1), groundPathPrototype);
+                                break;
+                            case 18:
+                                SetCell(new Vector3Int(x - 1, y - 1, z), groundPathPrototype);
+                                break;
+                            case 19:
+                                SetCell(new Vector3Int(x, y - 1, z + 1), groundPathPrototype);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        
     }
 
     private bool LoadPrototypeData()
@@ -107,6 +163,8 @@ public class BuildingManager : MonoBehaviour
         }
 
         prototypes = townPrototypeInfo.Prototypes;
+        prototypes.AddRange(pathPrototypeInfo.Prototypes);
+        prototypes.RemoveAt(prototypes.Count - 1);
         return prototypes.Count > 0;
     }
 
@@ -115,7 +173,7 @@ public class BuildingManager : MonoBehaviour
     public async void Query(Vector3 queryPosition)
     {
         cellsToCollapse = GetSurroundingCells(queryPosition);
-        MakeBuildable(cellsToCollapse);
+        MakeBuildable(cellsToCollapse, groundPrototype);
         await Propagate();
 
         while (!cellsToCollapse.All(x => cells[x.x, x.y, x.z].Collapsed))
@@ -125,7 +183,7 @@ public class BuildingManager : MonoBehaviour
         }
     }
 
-    private void MakeBuildable(List<Vector3Int> cellsToCollapse)
+    private void MakeBuildable(List<Vector3Int> cellsToCollapse, PrototypeData buildableProt, string key = "v-1_0") // Should only override city tiles, nothing else!!
     {
         for (int i = 0; i < cellsToCollapse.Count; i++)
         {
@@ -141,26 +199,52 @@ public class BuildingManager : MonoBehaviour
 
             if (!cells[index.x, index.y - 1, index.z].Collapsed)
             {
-                SetCell(index + Vector3Int.down, groundPrototype);
+                SetCell(index + Vector3Int.down, buildableProt);
             }
             else
             {
-                ChangeTopKey(index + Vector3Int.down, "v-1_0");
+                ChangeTopKey(index + Vector3Int.down, key);
             }
         }
     }
 
-    public void PlaceCastle(Vector3 minQueryPosition, Vector3 maxQueryPosition)
+    public async void PlaceCastle(Vector3 minQueryPosition, Vector3 maxQueryPosition)
     {
         cellsToCollapse = GetAllCells(minQueryPosition, maxQueryPosition);
-        MakeBuildable(cellsToCollapse);
+        MakeBuildable(cellsToCollapse, groundPrototype);
 
         SetCell(cellsToCollapse[4], prototypes[CastleIndex]);
-        Propagate();
+        await Propagate();
 
         while (!cellsToCollapse.All(x => cells[x.x, x.y, x.z].Collapsed))
         {
-            Iterate();
+            await Iterate();
+        }
+    }
+
+    public async void BuildPath(Vector3 mousePos)
+    {
+        cellsToCollapse = new List<Vector3Int>() { GetIndex(mousePos) };
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int z = -1; z <= 1; z++)
+            {
+                if (z != 0 || x != 0) continue;
+
+                Vector3Int index = GetIndex(mousePos + new Vector3(x * 2, 0, z * 2));
+                if (cells[index.x, index.y, index.z].Collapsed && cells[index.x, index.y, index.z].PossiblePrototypes[0].MeshRot.Mesh && cells[index.x, index.y, index.z].PossiblePrototypes[0].MeshRot.Mesh.name.Contains("Path"))
+                {
+                    cellsToCollapse.Add(index);
+                }
+            }
+        }
+
+        MakeBuildable(cellsToCollapse, groundPathPrototype, "v-2_0");
+        await Propagate();
+
+        while (!cellsToCollapse.All(x => cells[x.x, x.y, x.z].Collapsed))
+        {
+            await Iterate();
         }
     }
 
@@ -519,7 +603,7 @@ public class BuildingManager : MonoBehaviour
                 float offset = (1.0f / cell.PossiblePrototypes.Count) * (((float)(g + 1 - removed) * 2) - cell.PossiblePrototypes.Count);
                 Vector3 pos = cell.Position + Vector3.right * offset;
 
-                spawnedPossibilities.Add(GenerateMesh(pos, cell.PossiblePrototypes[g], scale));
+                spawnedPossibilities.Add(GenerateMesh(pos, cell.PossiblePrototypes[g], scale, false));
             }
         }
     }
@@ -536,7 +620,7 @@ public class BuildingManager : MonoBehaviour
     }
 
 
-    private GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1)
+    private GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1, bool animate = true)
     {
         if (prototypeData.MeshRot.Mesh == null)
         {
@@ -559,7 +643,7 @@ public class BuildingManager : MonoBehaviour
 
         gm.transform.localScale *= scale;
 
-        buildingAnimator.Animate(gm);
+        if (animate) buildingAnimator.Animate(gm);
 
         return gm;
     }

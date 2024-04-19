@@ -18,14 +18,21 @@ public class MoneyManager : MonoBehaviour
         Events.OnBuildingPurchased += TowerPurchased;
         Events.OnBuildingBuilt += CancelPurchasing;
         Events.OnBuildingCanceled += CancelPurchasing;
+
+        Events.OnPathClicked += PathClicked;
+        Events.OnPathPurchased += PathPurchased;
     }
 
     private void OnDestroy()
     {
         Events.OnBuildingClicked -= TowerClicked;
         Events.OnBuildingPurchased -= TowerPurchased;
+
         Events.OnBuildingBuilt -= CancelPurchasing;
         Events.OnBuildingCanceled -= CancelPurchasing;
+
+        Events.OnPathClicked -= PathClicked;
+        Events.OnPathPurchased -= PathPurchased;
     }
 
     private void CancelPurchasing(Building arg0)
@@ -47,4 +54,21 @@ public class MoneyManager : MonoBehaviour
 
         purchasing = true;
     }
+
+    private void PathClicked()
+    {
+        if (!purchasing /* && Has paths*/)
+        {
+            Events.OnPathPurchased.Invoke();
+        }
+    }
+
+    private void PathPurchased()
+    {
+        // Decrease path amount
+
+        purchasing = true;
+    }
+
+
 }

@@ -12,4 +12,9 @@ public class UIBuildingHandler : MonoBehaviour
     {
         Events.OnBuildingClicked.Invoke(towers[index]);
     }
+
+    public void ClickPath()
+    {
+        Events.OnPathClicked.Invoke();
+    }
 }

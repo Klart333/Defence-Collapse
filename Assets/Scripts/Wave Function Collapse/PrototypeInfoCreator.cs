@@ -274,6 +274,7 @@ public class PrototypeInfoCreator : MonoBehaviour
             Vector3 pos = new Vector3(i * 5, 0, 0);
             var prot = Instantiate(prefab, pos, Quaternion.identity);
             prot.Setup(Prototypes[i]);
+            prot.GetComponentInChildren<MeshRenderer>().materials = materials.Where(x => Prototypes[i].MaterialIndexes.Contains(materials.IndexOf(x))).ToArray();
 
             spawnedPrototypes.Add(prot.gameObject);
         }
@@ -364,7 +365,7 @@ public class PrototypeInfoCreator : MonoBehaviour
         List<Vector2> rounded = new List<Vector2>();
         for (int i = 0; i < vec.Count; i++)
         {
-            rounded.Add(new Vector2(math.round(vec[i].x * 1000.0f) / 1000.0f, math.round(vec[i].y * 1000.0f) / 1000.0f));
+            rounded.Add(new Vector2(math.round(vec[i].x * 100.0f) / 100.0f, math.round(vec[i].y * 100.0f) / 100.0f));
         }
         return rounded;
     }

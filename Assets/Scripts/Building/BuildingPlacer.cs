@@ -20,6 +20,13 @@ public class BuildingPlacer : MonoBehaviour
     [SerializeField]
     private bool placingCastle = true;
 
+    private enum BuildingType
+    {
+        Castle,
+        Building,
+        Path
+    }
+
     private bool canceled
     {
         get
@@ -53,6 +60,7 @@ public class BuildingPlacer : MonoBehaviour
     {
         cam = Camera.main;
         Events.OnBuildingPurchased += BuildingPurchased;
+        Events.OnPathPurchased += PathPurchased;
 
         buildingManager = GetComponent<BuildingManager>();
     }
@@ -63,10 +71,22 @@ public class BuildingPlacer : MonoBehaviour
         //spawnedBuilding.BuildingSize = 0;
         //spawnedBuilding.BuildingLevel = 0;
 
-        PlacingTower();
+        if (placingCastle)
+        {
+            PlacingTower(BuildingType.Building);
+        }
+        else
+        {
+            PlacingTower(BuildingType.Building);
+        }
     }
 
-    private async void PlacingTower()
+    private void PathPurchased()
+    {
+        PlacingTower(BuildingType.Path);
+    }
+
+    private async void PlacingTower(BuildingType type)
     {
         while (/*(fire.ReadValue<float>() == 0 || !CanPlace(spawnedBuilding)) &&*/ !canceled)
         {
@@ -75,21 +95,28 @@ public class BuildingPlacer : MonoBehaviour
             Vector3 mousePos = GetRayPoint();
             if (mousePos == Vector3.zero || !fire.WasPerformedThisFrame()) continue;
 
-            if (placingCastle)
+            switch (type)
             {
-                Vector3 minPos = new Vector3(mousePos.x - 2f, mousePos.y, mousePos.z - 2f);
-                Vector3 maxPos = new Vector3(mousePos.x + 2, mousePos.y, mousePos.z + 2);
+                case BuildingType.Building:
+                    buildingManager.Query(mousePos);
 
-                buildingManager.PlaceCastle(minPos, maxPos);
-                placingCastle = false;
+                    break;
+                case BuildingType.Castle:
+                    Vector3 minPos = new Vector3(mousePos.x - 2f, mousePos.y, mousePos.z - 2f);
+                    Vector3 maxPos = new Vector3(mousePos.x + 2, mousePos.y, mousePos.z + 2);
 
-                continue;
+                    buildingManager.PlaceCastle(minPos, maxPos);
+                    placingCastle = false;
+                    type = BuildingType.Building;
+                    break;
+                case BuildingType.Path:
+                    buildingManager.BuildPath(mousePos);
+
+                    break;
+                default:
+                    break;
             }
-
-            //Vector3 pos = new Vector3(Math.Round(mousePos.x + 1, 2) - 1f, Math.Round(mousePos.y, 2), Math.Round(mousePos.z + 1, 2) - 1f);
-            buildingManager.Query(mousePos);
             
-            //Debug.Log("Query at: " +  pos);
         }
 
         if (canceled)
