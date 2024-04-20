@@ -895,7 +895,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: ba8ae5a365dabb14f950bf71e9056d11, type: 2}
   CastleIndex: 20
   DebugPropagate: 0
-  Speed: 376
+  Speed: 25
 --- !u!114 &771210305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1608,9 +1608,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 969faebd6a78df744b7f6dffaaead57c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSizeX: 10
+  gridSizeX: 20
   gridSizeY: 5
-  gridSizeZ: 10
+  gridSizeZ: 20
   gridSize: {x: 2, y: 2, z: 2}
   mats:
   - {fileID: 2100000, guid: 16f4b84d776954947aab5daf6fa0d289, type: 2}
@@ -1619,6 +1619,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
   groundPrototypeInfo: {fileID: 7818375051068540878}
   notAllowedForBottom: 010000000400000006000000080000000a000000
+  notAllowedForSides: 0a000000
   Manual: 0
 --- !u!33 &1024001989
 MeshFilter:
@@ -1823,6 +1824,89 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6d7950a9da1501409fc21e0176c81d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1155738061
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1155738062}
+  - component: {fileID: 1155738064}
+  - component: {fileID: 1155738063}
+  m_Layer: 0
+  m_Name: 5. Circle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1155738062
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1155738061}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1645746829}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1155738063
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1155738061}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1155738064
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1155738061}
+  m_Mesh: {fileID: -1225687367120785639, guid: ae56ae6d994765c4ebe835cd294b6ab0, type: 3}
 --- !u!1001 &1156438177
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2264,6 +2348,7 @@ Transform:
   - {fileID: 5819346888961318903}
   - {fileID: 505850599502794257}
   - {fileID: 3338987130443537417}
+  - {fileID: 1155738062}
   m_Father: {fileID: 2112620416}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1645746830
@@ -2343,7 +2428,7 @@ MonoBehaviour:
     NegZ: 0s
     PosY: -1s
     NegY: v-2_0
-    Weight: 1
+    Weight: 10000
     MaterialIndexes: 00000000
   - MeshRot:
       Mesh: {fileID: 7209852006373966380, guid: ae56ae6d994765c4ebe835cd294b6ab0,
@@ -2355,7 +2440,7 @@ MonoBehaviour:
     NegZ: 0s
     PosY: -1s
     NegY: v-2_0
-    Weight: 1
+    Weight: 10000
     MaterialIndexes: 00000000
   - MeshRot:
       Mesh: {fileID: 7209852006373966380, guid: ae56ae6d994765c4ebe835cd294b6ab0,
@@ -2367,7 +2452,7 @@ MonoBehaviour:
     NegZ: 0s
     PosY: -1s
     NegY: v-2_0
-    Weight: 1
+    Weight: 10000
     MaterialIndexes: 00000000
   - MeshRot:
       Mesh: {fileID: 7209852006373966380, guid: ae56ae6d994765c4ebe835cd294b6ab0,
@@ -2379,7 +2464,7 @@ MonoBehaviour:
     NegZ: 0s
     PosY: -1s
     NegY: v-2_0
-    Weight: 1
+    Weight: 10000
     MaterialIndexes: 00000000
   - MeshRot:
       Mesh: {fileID: 1741998683574915564, guid: ae56ae6d994765c4ebe835cd294b6ab0,
@@ -2439,7 +2524,7 @@ MonoBehaviour:
     NegZ: 0s
     PosY: -1s
     NegY: v-2_0
-    Weight: 1
+    Weight: 100
     MaterialIndexes: 00000000
   - MeshRot:
       Mesh: {fileID: -686100837876852332, guid: ae56ae6d994765c4ebe835cd294b6ab0,
@@ -2451,7 +2536,7 @@ MonoBehaviour:
     NegZ: 0s
     PosY: -1s
     NegY: v-2_0
-    Weight: 1
+    Weight: 100
     MaterialIndexes: 00000000
   - MeshRot:
       Mesh: {fileID: -686100837876852332, guid: ae56ae6d994765c4ebe835cd294b6ab0,
@@ -2463,7 +2548,7 @@ MonoBehaviour:
     NegZ: 0s
     PosY: -1s
     NegY: v-2_0
-    Weight: 1
+    Weight: 100
     MaterialIndexes: 00000000
   - MeshRot:
       Mesh: {fileID: -686100837876852332, guid: ae56ae6d994765c4ebe835cd294b6ab0,
@@ -2475,7 +2560,7 @@ MonoBehaviour:
     NegZ: -1s
     PosY: -1s
     NegY: v-2_0
-    Weight: 1
+    Weight: 100
     MaterialIndexes: 00000000
   - MeshRot:
       Mesh: {fileID: -7651563873513367466, guid: ae56ae6d994765c4ebe835cd294b6ab0,
@@ -2534,7 +2619,7 @@ MonoBehaviour:
     NegZ: -1s
     PosY: -1s
     NegY: -1s
-    Weight: 1
+    Weight: 0
     MaterialIndexes: 
   socketList:
   - positions:
@@ -2546,7 +2631,7 @@ MonoBehaviour:
   verticalSocketList: []
   materials:
   - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
-  pieceWeights: 010000000100000001000000010000000100000001000000
+  pieceWeights: 01000000102700000100000064000000010000000000000000000000
 --- !u!1 &1784158340
 GameObject:
   m_ObjectHideFlags: 0
@@ -5779,7 +5864,7 @@ MonoBehaviour:
     NegZ: -1s
     PosY: -1s
     NegY: -1s
-    Weight: 10000
+    Weight: 3000
     MaterialIndexes: 
   socketList:
   - positions:
@@ -5899,7 +5984,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: a01118aad3fb8a2428db51d380136f69, type: 2}
   - {fileID: 2100000, guid: 4df9dcd67b2193845a2478cf4a8dfe24, type: 2}
   - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
-  pieceWeights: 640000000a0000000a000000140000000a00000064000000640000000100000001000000010000000200000010270000
+  pieceWeights: 640000000a0000000a000000140000000a000000640000006400000001000000010000000100000002000000b80b0000
 --- !u!1 &7898943115432722943
 GameObject:
   m_ObjectHideFlags: 0

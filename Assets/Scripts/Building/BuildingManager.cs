@@ -125,10 +125,8 @@ public class BuildingManager : MonoBehaviour
                     else if (groundCell.PossiblePrototypes[0].MeshRot.Mesh.name == "Ground_Portal") // yay hard coded names :))))
                     {
                         int index = 16 + ((groundCell.PossiblePrototypes[0].MeshRot.Rot + 1) % 4);
-                        int opIndex = 16 + ((groundCell.PossiblePrototypes[0].MeshRot.Rot + 3) % 4);
                         SetCell(new Vector3Int(x, y, z), pathPrototypeInfo.Prototypes[index]);
                         SetCell(new Vector3Int(x, y - 1, z), groundPathPrototype);
-                        Debug.Log(index);
                         switch (index) // Gotta make it possible for the WFC to see a future
                         {
                             case 16:
@@ -183,7 +181,7 @@ public class BuildingManager : MonoBehaviour
         }
     }
 
-    private void MakeBuildable(List<Vector3Int> cellsToCollapse, PrototypeData buildableProt, string key = "v-1_0") // Should only override city tiles, nothing else!!
+    private void MakeBuildable(List<Vector3Int> cellsToCollapse, PrototypeData buildableProt, string key = "v-1_0") // Should only override city tiles and built roads, nothing else
     {
         for (int i = 0; i < cellsToCollapse.Count; i++)
         {
@@ -229,9 +227,9 @@ public class BuildingManager : MonoBehaviour
         {
             for (int z = -1; z <= 1; z++)
             {
-                if (z != 0 || x != 0) continue;
+                if ((z != 0 && x != 0) || z == x || !cells.IsInBounds(cellsToCollapse[0].x + x, 0, cellsToCollapse[0].z + z)) continue;
 
-                Vector3Int index = GetIndex(mousePos + new Vector3(x * 2, 0, z * 2));
+                Vector3Int index = cellsToCollapse[0] + new Vector3Int(x, 0, z);
                 if (cells[index.x, index.y, index.z].Collapsed && cells[index.x, index.y, index.z].PossiblePrototypes[0].MeshRot.Mesh && cells[index.x, index.y, index.z].PossiblePrototypes[0].MeshRot.Mesh.name.Contains("Path"))
                 {
                     cellsToCollapse.Add(index);
@@ -285,7 +283,7 @@ public class BuildingManager : MonoBehaviour
                 float distFromAverage = 1.0f - (cell.PossiblePrototypes[g].Weight / averageWeight);
                 if (distFromAverage < 1.0f) distFromAverage *= distFromAverage; // Because of using the percentage as a distance, smaller weights weigh more, so this is is to try to correct that.
 
-                possibleMeshAmount += Mathf.Lerp(0, 1, Mathf.Abs(distFromAverage));
+                possibleMeshAmount += Mathf.Lerp(1, 0, Mathf.Abs(distFromAverage));
             }
 
             if (possibleMeshAmount < lowestEntropy)
@@ -311,8 +309,8 @@ public class BuildingManager : MonoBehaviour
             totalCount += cell.PossiblePrototypes[i].Weight;
         }
 
-        int index = 0;
         int randomIndex = UnityEngine.Random.Range(0, totalCount);
+        int index = randomIndex;
         for (int i = 0; i < cell.PossiblePrototypes.Count; i++)
         {
             randomIndex -= cell.PossiblePrototypes[i].Weight;
@@ -715,3 +713,18 @@ public class BuildingManager : MonoBehaviour
 
     #endregion
 }
+public static class ArrayHelper
+{
+    public static bool IsInBounds<T>(this T[,,] array, int x, int y, int z)
+    {
+        if (x < 0 || x >= array.GetLength(0))
+            return false;
+        if (y < 0 || y >= array.GetLength(1))
+            return false;
+        if (z < 0 || z >= array.GetLength(2))
+            return false;
+
+        return true;
+    }
+}
+

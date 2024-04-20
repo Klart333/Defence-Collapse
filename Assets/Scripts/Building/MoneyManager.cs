@@ -16,7 +16,6 @@ public class MoneyManager : MonoBehaviour
 
         Events.OnBuildingClicked += TowerClicked;
         Events.OnBuildingPurchased += TowerPurchased;
-        Events.OnBuildingBuilt += CancelPurchasing;
         Events.OnBuildingCanceled += CancelPurchasing;
 
         Events.OnPathClicked += PathClicked;
@@ -28,14 +27,13 @@ public class MoneyManager : MonoBehaviour
         Events.OnBuildingClicked -= TowerClicked;
         Events.OnBuildingPurchased -= TowerPurchased;
 
-        Events.OnBuildingBuilt -= CancelPurchasing;
         Events.OnBuildingCanceled -= CancelPurchasing;
 
         Events.OnPathClicked -= PathClicked;
         Events.OnPathPurchased -= PathPurchased;
     }
 
-    private void CancelPurchasing(Building arg0)
+    private void CancelPurchasing()
     {
         purchasing = false;
     }

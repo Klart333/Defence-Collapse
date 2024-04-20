@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 using Debug = UnityEngine.Debug;
 
 public class WaveFunction : MonoBehaviour
@@ -36,6 +38,9 @@ public class WaveFunction : MonoBehaviour
     [Header("Rules")]
     [SerializeField]
     private int[] notAllowedForBottom;
+
+    [SerializeField]
+    private int[] notAllowedForSides;
 
     [Header("Debug")]
     public bool Manual;
@@ -198,7 +203,7 @@ public class WaveFunction : MonoBehaviour
                 float distFromAverage = 1.0f - (cells[i].PossiblePrototypes[g].Weight / averageWeight);
                 if (distFromAverage < 1.0f) distFromAverage *= distFromAverage; // Because of using the percentage as a distance, smaller weights weigh more, so this is is to try to correct that.
 
-                possibleMeshAmount += Mathf.Lerp(0, 1, Mathf.Abs(distFromAverage));
+                possibleMeshAmount += Mathf.Lerp(1, 0, Mathf.Abs(distFromAverage));
             }
 
             if (possibleMeshAmount < lowestEntropy)
@@ -624,14 +629,26 @@ public class WaveFunction : MonoBehaviour
                 {
                     Vector3 pos = new Vector3(x * gridSize.x, y * gridSize.y, z * gridSize.z);
 
+                    List<PrototypeData> prots;
+
                     if (y == 0)
                     {
-                        cells.Add(new Cell(false, pos + transform.position, new List<PrototypeData>(bottomPrototypes)));
+                        prots = new List<PrototypeData>(bottomPrototypes);
                     }
                     else
                     {
-                        cells.Add(new Cell(false, pos + transform.position, new List<PrototypeData>(prototypes)));
+                        prots = new List<PrototypeData>(prototypes);
+
+                        if (x == 0 || x == gridSizeX - 1 || z == 0 || z == gridSizeZ - 1)
+                        {
+                            for (int i = 0; i < notAllowedForSides.Length; i++)
+                            {
+                                prots.RemoveRange(notAllowedForSides[i] * 4, 4);
+                            }
+                        }
                     }
+
+                    cells.Add(new Cell(false, pos + transform.position, prots));
                 }
             }
         }

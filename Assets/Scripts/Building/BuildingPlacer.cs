@@ -121,6 +121,7 @@ public class BuildingPlacer : MonoBehaviour
 
         if (canceled)
         {
+            Events.OnBuildingCanceled.Invoke();
             return;
         }
         
