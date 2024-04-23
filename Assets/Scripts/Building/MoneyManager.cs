@@ -48,7 +48,7 @@ public class MoneyManager : MonoBehaviour
 
     private void TowerPurchased(Building tower)
     {
-        moneyAmount -= tower.Cost;
+        //moneyAmount -= tower.Cost;
 
         purchasing = true;
     }

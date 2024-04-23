@@ -1,12 +1,22 @@
 ﻿using Sirenix.OdinInspector;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class BuildingPlacer : MonoBehaviour
 {
+    [Title("Placing")]
     [SerializeField]
     private LayerMask layerMask;
+
+    [SerializeField]
+    private PooledMonoBehaviour unableToPlacePrefab;
+
+    private List<PooledMonoBehaviour> spawnedPlaces = new List<PooledMonoBehaviour>();
 
     private BuildingManager buildingManager;
     private Camera cam;
@@ -19,13 +29,6 @@ public class BuildingPlacer : MonoBehaviour
     [Title("Debug")]
     [SerializeField]
     private bool placingCastle = true;
-
-    private enum BuildingType
-    {
-        Castle,
-        Building,
-        Path
-    }
 
     private bool canceled
     {
@@ -88,33 +91,57 @@ public class BuildingPlacer : MonoBehaviour
 
     private async void PlacingTower(BuildingType type)
     {
-        while (/*(fire.ReadValue<float>() == 0 || !CanPlace(spawnedBuilding)) &&*/ !canceled)
+        List<Vector3Int> indexes = new List<Vector3Int>();
+        Dictionary<Vector3Int, IBuildable> buildables = new Dictionary<Vector3Int, IBuildable>();
+        while (!canceled)
         {
             await Task.Yield();
 
             Vector3 mousePos = GetRayPoint();
-            if (mousePos == Vector3.zero || !fire.WasPerformedThisFrame()) continue;
+            if (mousePos == Vector3.zero || mousePos.x % 1 == 0 || mousePos.z % 1 == 0 || mousePos.y < 1) continue;
 
-            switch (type)
+            List<Vector3Int> newIndexes = buildingManager.GetCellsToCollapse(mousePos, type);
+            if (indexes.LooseEquals(newIndexes) || newIndexes.Count == 0)
             {
-                case BuildingType.Building:
-                    buildingManager.Query(mousePos);
+                if (buildables.Count > 0 && fire.WasPerformedThisFrame())
+                {
+                    buildingManager.Place();
+                }
+                continue;
+            }
+            else
+            {
+                DisablePlaces();
 
-                    break;
-                case BuildingType.Castle:
-                    Vector3 minPos = new Vector3(mousePos.x - 2f, mousePos.y, mousePos.z - 2f);
-                    Vector3 maxPos = new Vector3(mousePos.x + 2, mousePos.y, mousePos.z + 2);
+                buildingManager.RevertQuery();
+                await Task.Delay(100);
 
-                    buildingManager.PlaceCastle(minPos, maxPos);
-                    placingCastle = false;
-                    type = BuildingType.Building;
-                    break;
-                case BuildingType.Path:
-                    buildingManager.BuildPath(mousePos);
+                indexes = newIndexes;
+            }
 
-                    break;
-                default:
-                    break;
+            buildables = buildingManager.Query(mousePos, type);
+            Debug.Log("Buildables count: " + buildables.Count);
+
+            foreach (var item in buildables)
+            {
+                item.Value.ToggleIsBuildableVisual(true);
+            }
+            
+            if (buildables.Count == 0) 
+            {
+                ShowPlaces(indexes.Select(x => buildingManager.GetPos(x)).ToList());
+                
+                continue;
+            }
+
+            if (!fire.WasPerformedThisFrame()) continue;
+
+            buildingManager.Place();
+
+            if (placingCastle)
+            {
+                placingCastle = false;
+                type = BuildingType.Building;
             }
             
         }
@@ -128,9 +155,20 @@ public class BuildingPlacer : MonoBehaviour
         //GameEvents.OnEnemyPathUpdated(spawnedBuilding.transform.position);
     }
 
-    private bool CanPlace(Building spawnedBuilding)
+    private void ShowPlaces(List<Vector3> positions)
     {
-        return spawnedBuilding.Collsions == 0 && spawnedBuilding.IsGrounded();
+        for (int i = 0; i < positions.Count; i++)
+        {
+            spawnedPlaces.Add(unableToPlacePrefab.GetAtPosAndRot<PooledMonoBehaviour>(positions[i], Quaternion.identity));
+        }
+    }
+
+    private void DisablePlaces()
+    {
+        for (int i = 0; i < spawnedPlaces.Count; i++)
+        {
+            spawnedPlaces[i].gameObject.SetActive(false);
+        }
     }
 
     private Vector3 GetRayPoint()
@@ -143,4 +181,11 @@ public class BuildingPlacer : MonoBehaviour
 
         return Vector3.zero;
     }
+}
+
+public enum BuildingType
+{
+    Castle,
+    Building,
+    Path
 }

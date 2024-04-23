@@ -13,6 +13,9 @@ public class PrototypeInfoCreator : MonoBehaviour
     [SerializeField]
     private PrototypeDisplay prefab;
 
+    [SerializeField]
+    private float divider = 100f;
+
     [Title("Override")]
     [SerializeField]
     private bool overrideVerticalPositive = false;
@@ -72,7 +75,7 @@ public class PrototypeInfoCreator : MonoBehaviour
 
             for (int g = 0; g < noDupes.Length; g++)
             {
-                Vector3 vec = new Vector3(math.round(noDupes[g].x * 100.0f) / 100.0f, math.round(noDupes[g].y * 100.0f) / 100.0f, math.round(noDupes[g].z * 100.0f) / 100.0f);
+                Vector3 vec = new Vector3(math.round(noDupes[g].x * divider) / divider, math.round(noDupes[g].y * divider) / divider, math.round(noDupes[g].z * divider) / divider);
 
                 if (vec.x == 1f)
                 {
@@ -182,7 +185,7 @@ public class PrototypeInfoCreator : MonoBehaviour
 
         for (int i = 0; i < socketList.Count; i++)
         {
-            if (this.Equals(socketList[i].positions.ToList(), positions))
+            if (LooseEquals(socketList[i].positions.ToList(), positions))
             {
                 return socketList[i].socketname;
             }
@@ -197,7 +200,7 @@ public class PrototypeInfoCreator : MonoBehaviour
             negPositions.Add(new Vector2((2.0f - (positions[h].x + 1) - 1), positions[h].y));
         }
 
-        if (Equals(positions, negPositions))
+        if (LooseEquals(positions, negPositions))
         {
             key += 's';
         }
@@ -215,7 +218,7 @@ public class PrototypeInfoCreator : MonoBehaviour
     {
         if ( positive && overrideVerticalPositive)  return new string[] { positiveKey, positiveKey, positiveKey, positiveKey };
         if (!positive && overrideVerticalNegative)  return new string[] { negativeKey, negativeKey, negativeKey, negativeKey };
-        if ( vertexPositions.Count == 0)             return new string[] { "-1s", "-1s", "-1s", "-1s" };
+        if ( vertexPositions.Count == 0)            return new string[] { "-1s", "-1s", "-1s", "-1s" };
 
         // Project on 2 Dimensional plane
         List<Vector2> positions = new List<Vector2>();
@@ -230,7 +233,7 @@ public class PrototypeInfoCreator : MonoBehaviour
 
         for (int g = 0; g < verticalSocketList.Count; g++)
         {
-            if (this.Equals(verticalSocketList[g].positions.ToList(), poses))
+            if (LooseEquals(verticalSocketList[g].positions.ToList(), poses))
             {
                 string[] kes = new string[4];
                 kes[0] = verticalSocketList[g].socketname;
@@ -318,26 +321,6 @@ public class PrototypeInfoCreator : MonoBehaviour
         }   
     }
 
-    public bool Equals(List<Vector2> vec1, List<Vector2> vec2)
-    {
-        if (vec1.Count != vec2.Count)
-        {
-            return false;
-        }
-
-        vec1 = Rounded(vec1);
-        vec2 = Rounded(vec2);
-
-        for (int i = 0; i < vec2.Count; i++)
-        {
-            if (!vec1.Contains(vec2[i]))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     public bool StrictEquals(List<Vector2> vec1, List<Vector2> vec2)
     {
@@ -360,12 +343,33 @@ public class PrototypeInfoCreator : MonoBehaviour
         return true;
     }
 
+    public bool LooseEquals(List<Vector2> vec1, List<Vector2> vec2)
+    {
+        if (vec1.Count != vec2.Count)
+        {
+            return false;
+        }
+
+        vec1 = Rounded(vec1);
+        vec2 = Rounded(vec2);
+
+        for (int i = 0; i < vec2.Count; i++)
+        {
+            if (!vec1.Contains(vec2[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private List<Vector2> Rounded(List<Vector2> vec)
     {
         List<Vector2> rounded = new List<Vector2>();
         for (int i = 0; i < vec.Count; i++)
         {
-            rounded.Add(new Vector2(math.round(vec[i].x * 100.0f) / 100.0f, math.round(vec[i].y * 100.0f) / 100.0f));
+            rounded.Add(new Vector2(math.round(vec[i].x * divider) / divider, math.round(vec[i].y * divider) / divider));
         }
         return rounded;
     }
@@ -430,5 +434,26 @@ public struct PrototypeData
         NegZ = negZ;
 
         Weight = weight;
+    }
+}
+
+public static class ListExtensions
+{
+    public static bool LooseEquals<T>(this List<T> vec1, List<T> vec2)
+    {
+        if (vec1.Count != vec2.Count)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < vec2.Count; i++)
+        {
+            if (!vec1.Contains(vec2[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

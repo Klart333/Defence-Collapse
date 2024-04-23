@@ -82,7 +82,7 @@ public class MeshCombiner : MonoBehaviour
         Mesh finalMesh = new Mesh();
         finalMesh.CombineMeshes(finalCombiners.ToArray(), false);
         meshFilter.sharedMesh = finalMesh;
-        Debug.Log("Final mesh has " + submeshes.Count + " materials.");
+        //Debug.Log("Final mesh has " + submeshes.Count + " materials.");
 
         GetComponent<MeshCollider>().sharedMesh = finalMesh;
         GetComponent<MeshRenderer>().materials = materials.ToArray();

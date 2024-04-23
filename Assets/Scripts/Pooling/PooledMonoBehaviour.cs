@@ -44,16 +44,8 @@ public class PooledMonoBehaviour : MonoBehaviour
         return pooledObject;
     }
 
-    protected virtual void OnDisable() // When we disable the gameobject (and the script) we return it to the pool 
-    { // (It's virtual bc the sharks need to reset when disabled, not related to the pooling (...well it's kinda related but, you know))
-        if (OnReturnToPool != null)
-        {
-            OnReturnToPool(this); 
-        }
-    }
-
-    protected void ReturnToPool() // Is called instead of destroying the gameobject, implemented in Shark
+    protected virtual void OnDisable() // When we disable the gameobject we return it to the pool 
     {
-        gameObject.SetActive(false);
+        OnReturnToPool?.Invoke(this);
     }
 }

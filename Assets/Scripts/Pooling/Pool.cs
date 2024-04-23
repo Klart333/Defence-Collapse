@@ -57,6 +57,7 @@ public class Pool : MonoBehaviour
         }
 
         var pooledObject = queueObjects.Dequeue(); // returns the first element in the queue
+
         return pooledObject as T; // We return the element/object, passed as the type we specified
     }
 

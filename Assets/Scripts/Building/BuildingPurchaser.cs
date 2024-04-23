@@ -9,6 +9,6 @@
 
     public bool CanPurchaseBuilding(Building building)
     {
-        return building.Cost <= MoneyManager.MoneyAmount;
+        return true;
     }
 }

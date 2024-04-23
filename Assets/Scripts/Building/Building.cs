@@ -1,74 +1,41 @@
-﻿using System;
-using System.Collections;
+﻿using Sirenix.OdinInspector;
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Building : MonoBehaviour
+public class Building : PooledMonoBehaviour, IBuildable
 {
     public event Action<Building> OnDeath;
     public event Action<Vector3> OnEnterDefense;
 
-    [Header("Placing")]
+    [Title("Visual")]
     [SerializeField]
-    private float bounceSpeed = 1;
+    private Material transparentGreen;
 
-    [SerializeField]
-    private float scaleMult = 0.75f;
-
-    [Header("Stats")]
-    [SerializeField]
-    private float cost;
-
-    [SerializeField]
-    private ArcherData archerData;
-
-    [SerializeField]
-    private BarrackData barrackData;
-
-    [Header("Grounding")]
-    [SerializeField]
-    private Transform[] groundTransforms;
-
-    [SerializeField]
-    private float groundDistance = 0.1f;
-
-    [SerializeField]
-    private LayerMask layerMask;
+    private List<Material> transparentMaterials = new List<Material>();
 
     private BuildingState buildingState;
     private InputActions inputActions;
     private InputAction fire;
     private InputAction shift;
 
-    private int collisions = 0;
+    private bool selected = false;
+    private bool hovered = false;
 
     public Fighter[] Fighters { get; set; }
     public Building[] Towers { get; set; }
 
-    private bool selected = false;
-    private bool hovered = false;
-
-    public int Collsions => collisions;
-    public float Cost => cost;
-    public int BuildingSize { get; set; }
     public int BuildingLevel { get; set; }
 
-    // Placing
     public Vector3 PlacedPosition { get; set; }
-    public Vector3 StartScale { get; private set; }
-    public Vector3 PlacingScale => StartScale * scaleMult;
-    public float ScaleMult => scaleMult;
-    public float BounceSpeed => bounceSpeed;
+    public List<Material> Materials { get; set; }
 
     public List<Fighter> SpawnedFighters { get; set; } = new List<Fighter>();
     public List<EnemyMovement> AttackingEnemies { get; set; } = new List<EnemyMovement>();
 
     private void OnEnable()
     {
-        StartScale = transform.localScale;
-
         Events.OnWaveStarted += OnWaveStarted;
 
         inputActions = new InputActions();
@@ -79,12 +46,28 @@ public class Building : MonoBehaviour
         shift.Enable();
     }
 
-    private void OnDisable()
+    protected override void OnDisable()
     {
+        base.OnDisable();
+
+        transform.localScale = Vector3.one;
         Events.OnWaveStarted -= OnWaveStarted;
 
         fire.Disable();
         shift.Disable();
+    }
+
+    public void Setup(PrototypeData prototypeData, List<Material> materials)
+    {
+        GetComponentInChildren<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
+        GetComponentInChildren<MeshRenderer>().SetMaterials(materials);
+
+        Materials = materials;
+        transparentMaterials = new List<Material>();
+        for (int i = 0; i < materials.Count; i++)
+        {
+            transparentMaterials.Add(transparentGreen);
+        }
     }
 
     private void OnWaveStarted()
@@ -103,11 +86,11 @@ public class Building : MonoBehaviour
     {
         if (typeof(ArcherState).IsAssignableFrom(typeof(T)))
         {
-            buildingState = new ArcherState(archerData);
+
         }
         else if (typeof(BarracksState).IsAssignableFrom(typeof(T)))
         {
-            buildingState = new BarracksState(barrackData);
+
         }
 
         buildingState.OnStateEntered(this);
@@ -182,39 +165,17 @@ public class Building : MonoBehaviour
         OnEnterDefense?.Invoke(pos);
     }
 
-    #region Placing Checks
-    public bool IsGrounded()
+    public void ToggleIsBuildableVisual(bool value)
     {
-        for (int i = 0; i < groundTransforms.Length; i++)
+        MeshRenderer rend = GetComponentInChildren<MeshRenderer>();
+
+        if (value)
         {
-            if (Physics.Raycast(groundTransforms[i].position, Vector3.down, groundDistance, layerMask) == false)
-            {
-                return false;
-            }
+            rend.SetMaterials(transparentMaterials);
         }
-
-        return true;
+        else
+        {
+            rend.SetMaterials(Materials);
+        }
     }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        collisions++;
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        collisions--;
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        collisions++;
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        collisions--;
-    }
-
-    #endregion
 }

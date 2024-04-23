@@ -27,7 +27,6 @@ public class EnemyMovement : MonoBehaviour
 
     private NavMeshAgent agent;
     private BuildingManager buildingManager;
-    private Building currentTargetBuilding;
     private EnemyAttacker attacker;
     private EnemyAnimator animator;
     private EnemyHealth health;
@@ -68,11 +67,6 @@ public class EnemyMovement : MonoBehaviour
         GameEvents.OnEnemyPathUpdated -= OnPathUpdated;
         GameEvents.OnFightStarted -= OnFightStarted;
         GameEvents.OnFightEnded -= OnFightEnded;
-
-        if (currentTargetBuilding != null)
-        {
-            currentTargetBuilding.OnDeath -= Building_OnDeath;
-        }
     }
 
     private void Update()
@@ -106,7 +100,6 @@ public class EnemyMovement : MonoBehaviour
         }
     }
 
-
     private void OnFightEnded(Vector3 position)
     {
         if (Vector3.Distance(position, transform.position) < 2)
@@ -121,20 +114,6 @@ public class EnemyMovement : MonoBehaviour
         if (attacker.Attacking)
         {
             return;
-        }
-
-        if (currentTargetBuilding != null)
-        {
-            currentTargetBuilding.OnDeath -= Building_OnDeath;
-            currentTargetBuilding.DeregisterAttackingEnemy(this);
-        }
-
-        currentTarget = buildingManager.GetClosestHouse(transform.position, out currentTargetBuilding, out int buildingIndex); ;
-
-        if (currentTargetBuilding != null)
-        {
-            currentTargetBuilding.OnDeath += Building_OnDeath;
-            currentTargetBuilding.RegisterAttackingEnemy(this);
         }
 
         UpdateNavAgent();

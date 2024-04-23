@@ -1,8 +1,9 @@
+using Buildings;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -23,6 +24,12 @@ public class BuildingManager : MonoBehaviour
     [SerializeField]
     private List<Material> mats;
 
+    [SerializeField]
+    private Building buildingPrefab;
+
+    [SerializeField]
+    private Path pathPrefab;
+
     [Title("Castle")]
     [SerializeField]
     private int CastleIndex = 20;
@@ -36,9 +43,11 @@ public class BuildingManager : MonoBehaviour
 
     private Cell[,,] cells;
 
-    private Dictionary<Vector3Int, GameObject> spawnedMeshes = new Dictionary<Vector3Int, GameObject>();
-    private List<GameObject> spawnedPossibilities = new List<GameObject>();
-    private List<Building> spawnedBuildings = new List<Building>();
+    private Dictionary<Vector3Int, IBuildable> spawnedMeshes = new Dictionary<Vector3Int, IBuildable>();
+    private Dictionary<Vector3Int, IBuildable> querySpawnedBuildings = new Dictionary<Vector3Int, IBuildable>();
+    private List<(Vector3Int, Cell)> queryChangedCells = new List<(Vector3Int, Cell)>();
+
+    private List<IBuildable> spawnedPossibilities = new List<IBuildable>();
 
     private List<PrototypeData> prototypes = new List<PrototypeData>();
     private List<Vector3Int> cellsToCollapse = new List<Vector3Int>();
@@ -51,6 +60,8 @@ public class BuildingManager : MonoBehaviour
     private PrototypeData groundPrototype;
     private PrototypeData groundPathPrototype;
     //private PrototypeData[] portalPathPrototypes;
+
+    private BuildingType currentBuildingType;
 
     private void OnEnable()
     {
@@ -106,7 +117,7 @@ public class BuildingManager : MonoBehaviour
                 for (int x = 0; x < waveFunction.GridSize.x; x++)
                 {
                     Vector3 pos = new Vector3(x * waveFunction.GridScale.x, y * waveFunction.GridScale.y, z * waveFunction.GridScale.z);
-                    cells[x, y, z] = new Cell(false, pos + transform.position, new List<PrototypeData>(prototypes));
+                    cells[x, y, z] = new Cell(false, pos + transform.position, new List<PrototypeData>() { emptyPrototype });
                 }
             }
         }
@@ -125,25 +136,25 @@ public class BuildingManager : MonoBehaviour
                     else if (groundCell.PossiblePrototypes[0].MeshRot.Mesh.name == "Ground_Portal") // yay hard coded names :))))
                     {
                         int index = 16 + ((groundCell.PossiblePrototypes[0].MeshRot.Rot + 1) % 4);
-                        SetCell(new Vector3Int(x, y, z), pathPrototypeInfo.Prototypes[index]);
-                        SetCell(new Vector3Int(x, y - 1, z), groundPathPrototype);
-                        switch (index) // Gotta make it possible for the WFC to see a future
+                        SetCell(new Vector3Int(x, y, z), pathPrototypeInfo.Prototypes[index], false);
+                        SetCell(new Vector3Int(x, y - 1, z), groundPathPrototype, false);
+                        /*switch (index) // Gotta make it possible for the WFC to see a future
                         {
                             case 16:
-                                SetCell(new Vector3Int(x + 1, y - 1, z), groundPathPrototype);
+                                SetCell(new Vector3Int(x + 1, y - 1, z), groundPathPrototype, false);
                                 break;
                             case 17:
-                                SetCell(new Vector3Int(x, y - 1, z - 1), groundPathPrototype);
+                                SetCell(new Vector3Int(x, y - 1, z - 1), groundPathPrototype, false);
                                 break;
                             case 18:
-                                SetCell(new Vector3Int(x - 1, y - 1, z), groundPathPrototype);
+                                SetCell(new Vector3Int(x - 1, y - 1, z), groundPathPrototype, false);
                                 break;
                             case 19:
-                                SetCell(new Vector3Int(x, y - 1, z + 1), groundPathPrototype);
+                                SetCell(new Vector3Int(x, y - 1, z + 1), groundPathPrototype, false);
                                 break;
                             default:
                                 break;
-                        }
+                        }*/
                     }
                 }
             }
@@ -168,17 +179,84 @@ public class BuildingManager : MonoBehaviour
 
     #endregion
 
-    public async void Query(Vector3 queryPosition)
+    #region Query & Place
+
+    public void Place()
     {
-        cellsToCollapse = GetSurroundingCells(queryPosition);
-        MakeBuildable(cellsToCollapse, groundPrototype);
-        await Propagate();
+        foreach (var item in querySpawnedBuildings)
+        {
+            item.Value.ToggleIsBuildableVisual(false);
+        }
+
+        spawnedMeshes.AddRange(querySpawnedBuildings);
+        querySpawnedBuildings.Clear();
+
+        queryChangedCells.Clear();
+    }
+
+    public void RevertQuery()
+    {
+        foreach (var item in querySpawnedBuildings)
+        {
+            item.Value.gameObject.SetActive(false);
+        }
+        querySpawnedBuildings.Clear();
+
+        for (int i = 0; i < queryChangedCells.Count; i++)
+        {
+            Vector3Int index = queryChangedCells[i].Item1;
+            if (queryChangedCells[i].Item2.Collapsed)
+            {
+                SetCell(index, queryChangedCells[i].Item2.PossiblePrototypes[0], false);
+            }
+            else
+            {
+                cells[index.x, index.y, index.z] = queryChangedCells[i].Item2;
+            }
+        }
+        queryChangedCells.Clear();
+    } 
+
+    public Dictionary<Vector3Int, IBuildable> Query(Vector3 queryPosition, BuildingType buildingType)
+    {
+        if (querySpawnedBuildings.Count > 0)
+        {
+            RevertQuery();
+        }
+
+        currentBuildingType = buildingType;
+        cellsToCollapse = GetCellsToCollapse(queryPosition, buildingType);
+
+        switch (buildingType)
+        {
+            case BuildingType.Castle:
+                MakeBuildable(cellsToCollapse, groundPrototype);
+
+                if (cellsToCollapse.Count < 9)
+                {
+                    return querySpawnedBuildings;
+                }
+                SetCell(cellsToCollapse[4], prototypes[CastleIndex]);
+                break;
+
+            case BuildingType.Building:
+                MakeBuildable(cellsToCollapse, groundPrototype);
+                break;
+                
+            case BuildingType.Path:
+                MakeBuildable(cellsToCollapse, groundPathPrototype, "v-2_0");
+                break;
+            default:
+                break;
+        }
+        Propagate();
 
         while (!cellsToCollapse.All(x => cells[x.x, x.y, x.z].Collapsed))
         {
-            await Iterate();
-            //await Task.Delay(10);
+            Iterate();
         }
+
+        return querySpawnedBuildings;
     }
 
     private void MakeBuildable(List<Vector3Int> cellsToCollapse, PrototypeData buildableProt, string key = "v-1_0") // Should only override city tiles and built roads, nothing else
@@ -186,15 +264,18 @@ public class BuildingManager : MonoBehaviour
         for (int i = 0; i < cellsToCollapse.Count; i++)
         {
             Vector3Int index = cellsToCollapse[i];
+            queryChangedCells.Add((index, cells[index.x, index.y, index.z]));
+
             cells[index.x, index.y, index.z] = new Cell(false, cells[index.x, index.y, index.z].Position, new List<PrototypeData>(prototypes));
             ValidDirections(index, out _, Direction.Up).ForEach(x => cellStack.Push(x));
 
-            if (spawnedMeshes.TryGetValue(index, out GameObject gm))
+            if (spawnedMeshes.TryGetValue(index, out IBuildable buildable))
             {
-                Destroy(gm);
+                buildable.gameObject.SetActive(false);
                 spawnedMeshes.Remove(index);
             }
 
+            queryChangedCells.Add((index + Vector3Int.down, cells[index.x, index.y - 1, index.z]));
             if (!cells[index.x, index.y - 1, index.z].Collapsed)
             {
                 SetCell(index + Vector3Int.down, buildableProt);
@@ -206,55 +287,59 @@ public class BuildingManager : MonoBehaviour
         }
     }
 
-    public async void PlaceCastle(Vector3 minQueryPosition, Vector3 maxQueryPosition)
+    public List<Vector3Int> GetCellsToCollapse(Vector3 queryPos, BuildingType type)
     {
-        cellsToCollapse = GetAllCells(minQueryPosition, maxQueryPosition);
-        MakeBuildable(cellsToCollapse, groundPrototype);
+        List<Vector3Int> cellsToCollapse = new List<Vector3Int>();
 
-        SetCell(cellsToCollapse[4], prototypes[CastleIndex]);
-        await Propagate();
-
-        while (!cellsToCollapse.All(x => cells[x.x, x.y, x.z].Collapsed))
+        switch (type)
         {
-            await Iterate();
-        }
-    }
+            case BuildingType.Castle:
+                Vector3 minPos = new Vector3(queryPos.x - 2f, queryPos.y, queryPos.z - 2f);
+                Vector3 maxPos = new Vector3(queryPos.x + 2, queryPos.y, queryPos.z + 2);
+                cellsToCollapse = GetAllCells(minPos, maxPos);
+                break;
+            case BuildingType.Building:
+                cellsToCollapse = GetSurroundingCells(queryPos);
 
-    public async void BuildPath(Vector3 mousePos)
-    {
-        cellsToCollapse = new List<Vector3Int>() { GetIndex(mousePos) };
-        for (int x = -1; x <= 1; x++)
-        {
-            for (int z = -1; z <= 1; z++)
-            {
-                if ((z != 0 && x != 0) || z == x || !cells.IsInBounds(cellsToCollapse[0].x + x, 0, cellsToCollapse[0].z + z)) continue;
-
-                Vector3Int index = cellsToCollapse[0] + new Vector3Int(x, 0, z);
-                if (cells[index.x, index.y, index.z].Collapsed && cells[index.x, index.y, index.z].PossiblePrototypes[0].MeshRot.Mesh && cells[index.x, index.y, index.z].PossiblePrototypes[0].MeshRot.Mesh.name.Contains("Path"))
+                break;
+            case BuildingType.Path:
+                Vector3Int? value = GetIndex(queryPos);
+                if (!value.HasValue)
                 {
-                    cellsToCollapse.Add(index);
+                    return cellsToCollapse;
                 }
-            }
+                cellsToCollapse.Add(value.Value);
+
+                for (int x = -1; x <= 1; x++)
+                {
+                    for (int z = -1; z <= 1; z++)
+                    {
+                        if ((z != 0 && x != 0) || z == x || !cells.IsInBounds(cellsToCollapse[0].x + x, 0, cellsToCollapse[0].z + z)) continue;
+
+                        Vector3Int index = cellsToCollapse[0] + new Vector3Int(x, 0, z);
+                        if (cells[index.x, index.y, index.z].Collapsed && cells[index.x, index.y, index.z].PossiblePrototypes[0].MeshRot.Mesh && cells[index.x, index.y, index.z].PossiblePrototypes[0].MeshRot.Mesh.name.Contains("Path"))
+                        {
+                            cellsToCollapse.Add(index);
+                        }
+                    }
+                }
+                break;
         }
 
-        MakeBuildable(cellsToCollapse, groundPathPrototype, "v-2_0");
-        await Propagate();
-
-        while (!cellsToCollapse.All(x => cells[x.x, x.y, x.z].Collapsed))
-        {
-            await Iterate();
-        }
+        return cellsToCollapse;
     }
+
+    #endregion
 
     #region Core
-    public async Task Iterate()
+    public void Iterate()
     {
         Vector3Int index = GetLowestEntropyIndex();
 
         PrototypeData chosenPrototype = Collapse(cells[index.x, index.y, index.z]);
         SetCell(index, chosenPrototype);
 
-        await Propagate();
+        Propagate();
     }
 
     private Vector3Int GetLowestEntropyIndex()
@@ -324,15 +409,29 @@ public class BuildingManager : MonoBehaviour
         return cell.PossiblePrototypes[index];
     }
 
-    private void SetCell(Vector3Int index, PrototypeData chosenPrototype)
+    private void SetCell(Vector3Int index, PrototypeData chosenPrototype, bool query = true)
     {
         cells[index.x, index.y, index.z] = new Cell(true, cells[index.x, index.y, index.z].Position, new List<PrototypeData>() { chosenPrototype });
         cellStack.Push(index);
 
-        GameObject spawned = GenerateMesh(cells[index.x, index.y, index.z].Position, chosenPrototype);
+        IBuildable spawned = GenerateMesh(cells[index.x, index.y, index.z].Position, chosenPrototype);
         if (spawned != null)
         {
-            spawnedMeshes.Add(index, spawned);
+            if (query)
+            {
+                querySpawnedBuildings.Add(index, spawned);
+            }
+            else
+            {
+                if (spawnedMeshes.ContainsKey(index))
+                {
+                    spawnedMeshes[index] = spawned;
+                }
+                else
+                {
+                    spawnedMeshes.Add(index, spawned);
+                }
+            }
         }
     }
 
@@ -347,7 +446,7 @@ public class BuildingManager : MonoBehaviour
     }
 
 
-    public async Task Propagate()
+    public void Propagate()
     {
         while (cellStack.TryPop(out Vector3Int cellIndex))
         {
@@ -360,20 +459,19 @@ public class BuildingManager : MonoBehaviour
                 Cell neighbour = cells[validDirs[i].x, validDirs[i].y, validDirs[i].z];
                 Direction dir = directions[i];
 
-                var constrainedPrototypes = Constrain(changedCell, neighbour, dir, out bool changed);
+                Constrain(changedCell, neighbour, dir, out bool changed);
 
                 if (changed)
                 {
-                    cells[validDirs[i].x, validDirs[i].y, validDirs[i].z] = new Cell(neighbour.Collapsed, neighbour.Position, constrainedPrototypes);
                     cellStack.Push(validDirs[i]);
                 }
             }
 
-            if (DebugPropagate)
+            /*if (DebugPropagate)
             {
                 DisplayPossiblePrototypes();
                 await Task.Delay(Speed);
-            }
+            }*/
         }
     }
 
@@ -511,6 +609,10 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
+        if (affectedCell.PossiblePrototypes.Count == 0)
+        {
+            affectedCell.PossiblePrototypes.Add(emptyPrototype);
+        }
         changed = removed > 0;
         return affectedCell.PossiblePrototypes;
     }
@@ -548,8 +650,9 @@ public class BuildingManager : MonoBehaviour
         {
             for (float z = min.z; z <= max.z; z += 2)
             {
-                Vector3Int index = GetIndex(new Vector3(x, min.y, z));
-                surrounding.Add(index);
+                Vector3Int? index = GetIndex(new Vector3(x, min.y, z));
+                if (index.HasValue)
+                    surrounding.Add(index.Value);
             }
         }
 
@@ -564,17 +667,31 @@ public class BuildingManager : MonoBehaviour
         {
             for (int z = -1; z <= 1; z += 2)
             {
-                Vector3Int index = GetIndex(queryPosition + Vector3.right * x + Vector3.forward * z);
-                surrounding.Add(index);
+                Vector3Int? index = GetIndex(queryPosition + Vector3.right * x + Vector3.forward * z);
+                if (index.HasValue)
+                {
+                    surrounding.Add(index.Value);
+                }
             }
         }
 
         return surrounding;
     }
 
-    private Vector3Int GetIndex(Vector3 pos)
+    public Vector3Int? GetIndex(Vector3 pos)
     {
-        return new Vector3Int(Math.GetMultiple(pos.x, 2), Math.GetMultiple(pos.y, 2f), Math.GetMultiple(pos.z, 2));
+        Vector3Int index = new Vector3Int(Math.GetMultiple(pos.x, 2), Math.GetMultiple(pos.y, 2f), Math.GetMultiple(pos.z, 2));
+        if (cells.IsInBounds(index.x, index.y, index.z))
+        {
+            return index;
+        }
+        
+        return null;
+    }
+
+    public Vector3 GetPos(Vector3Int index)
+    {
+        return cells[index.x, index.y, index.z].Position + Vector3.up;
     }
 
     public void DisplayPossiblePrototypes()
@@ -606,44 +723,51 @@ public class BuildingManager : MonoBehaviour
         }
     }
 
-
     public void HidePossiblePrototypes()
     {
         for (int i = 0; i < spawnedPossibilities.Count; i++)
         {
-            DestroyImmediate(spawnedPossibilities[i]);
+            spawnedPossibilities[i].gameObject.SetActive(false);
         }
 
         spawnedPossibilities.Clear();
     }
 
 
-    private GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1, bool animate = true)
+    private IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1, bool animate = true)
     {
         if (prototypeData.MeshRot.Mesh == null)
         {
             return null;
         }
 
-        GameObject gm = new GameObject();
-        gm.AddComponent<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
-        
-        Material[] materials = new Material[prototypeData.MaterialIndexes.Length];
+        IBuildable building = null;
+        switch (currentBuildingType)
+        {
+            case BuildingType.Castle:
+                building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
+                break;
+            case BuildingType.Building:
+                building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
+                break;
+            case BuildingType.Path:
+                building = pathPrefab.GetAtPosAndRot<Path>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
+                break;
+            default:
+                break;
+        }
+        List<Material> materials = new List<Material>(prototypeData.MaterialIndexes.Length);
         for (int i = 0; i < prototypeData.MaterialIndexes.Length; i++)
         {
-            materials[i] = mats[prototypeData.MaterialIndexes[i]];
+            materials.Add(mats[prototypeData.MaterialIndexes[i]]);
         }
-        gm.AddComponent<MeshRenderer>().materials = materials;
+        building.Setup(prototypeData, materials);
 
-        gm.transform.position = position;
-        gm.transform.rotation = Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0);
-        gm.transform.SetParent(transform, true);
+        building.gameObject.transform.localScale *= scale;
 
-        gm.transform.localScale *= scale;
+        if (animate) buildingAnimator.Animate(building.gameObject);
 
-        if (animate) buildingAnimator.Animate(gm);
-
-        return gm;
+        return building;
     }
 
     #endregion
@@ -657,61 +781,6 @@ public class BuildingManager : MonoBehaviour
     {
         // Add to building cells
     }
-
-    private void Building_OnDeath(Building building)
-    {
-        spawnedBuildings.Remove(building);
-    }
-
-    #region Get Closest House
-
-    public Vector3 GetClosestHouse(Vector3 pos, out Building building, out int buildingIndex, List<int> blackList = null)
-    {
-        if (blackList == null)
-        {
-            blackList = new List<int>();
-        }
-
-        float castleDist = Vector3.Distance(pos, waveFunction.SpawnedCastle.transform.position);
-
-        if (spawnedBuildings.Count == 0)
-        {
-            buildingIndex = -1;
-            building = null;
-            return waveFunction.SpawnedCastle.transform.position;
-        }
-
-        float smallest = 2048;
-        buildingIndex = 0;
-        for (int i = 0; i < spawnedBuildings.Count; i++)
-        {
-            if (spawnedBuildings[i].transform.position.y > 2f || blackList.Contains(i))
-            {
-                continue;
-            }
-
-            var dist = Vector3.Distance(pos, spawnedBuildings[i].transform.position);
-            if (dist < smallest)
-            {
-                smallest = dist;
-                buildingIndex = i;
-            }
-        }
-
-        if (smallest < castleDist)
-        {
-            building = spawnedBuildings[buildingIndex];
-            return building.transform.position;
-        }
-        else
-        {
-            buildingIndex = -1;
-            building = null;
-            return waveFunction.SpawnedCastle.transform.position;
-        }
-    }
-
-    #endregion
 }
 public static class ArrayHelper
 {
@@ -727,4 +796,5 @@ public static class ArrayHelper
         return true;
     }
 }
+
 

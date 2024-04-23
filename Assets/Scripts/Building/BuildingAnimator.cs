@@ -39,6 +39,7 @@ public class BuildingAnimator : MonoBehaviour
     {
         SpawnParticle(building);
 
+        building.transform.DORewind();
         building.transform.DOPunchScale(transform.lossyScale * scaleMultiplier, duration).SetEase(ease);
     }
 
@@ -65,7 +66,7 @@ public class BuildingAnimator : MonoBehaviour
 
             try
             {
-                building.transform.localScale = building.StartScale * (1.0f + Math.Elastic(t) / 4.0f);
+                building.transform.localScale = Vector3.one * (1.0f + Math.Elastic(t) / 4.0f);
             }
             catch (Exception)
             {
@@ -82,7 +83,7 @@ public class BuildingAnimator : MonoBehaviour
 
             try
             {
-                building.transform.localScale = building.StartScale * (1.0f + Math.EasInElastic(t) / 4.0f);
+                building.transform.localScale = Vector3.one * (1.0f + Math.EasInElastic(t) / 4.0f);
             }
             catch (Exception)
             {
@@ -92,7 +93,7 @@ public class BuildingAnimator : MonoBehaviour
             await Task.Yield();
         }
 
-        building.transform.localScale = building.StartScale;
+        building.transform.localScale = Vector3.one;
     }
 
 }
