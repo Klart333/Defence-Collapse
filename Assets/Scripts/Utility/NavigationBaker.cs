@@ -16,7 +16,11 @@ public class NavigationBaker : MonoBehaviour
 
     private void OnDisable()
     {
-        FindObjectOfType<WaveFunction>().OnMapGenerated -= NavigationBaker_OnMapGenerated;
+        WaveFunction waveFunction = FindObjectOfType<WaveFunction>();
+        if (waveFunction)
+        {
+            waveFunction.OnMapGenerated -= NavigationBaker_OnMapGenerated;
+        }
     }
 
     private void NavigationBaker_OnMapGenerated()

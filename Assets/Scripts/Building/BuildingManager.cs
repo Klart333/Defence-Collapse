@@ -135,26 +135,9 @@ public class BuildingManager : MonoBehaviour
                     }
                     else if (groundCell.PossiblePrototypes[0].MeshRot.Mesh.name == "Ground_Portal") // yay hard coded names :))))
                     {
-                        int index = 16 + ((groundCell.PossiblePrototypes[0].MeshRot.Rot + 1) % 4);
-                        SetCell(new Vector3Int(x, y, z), pathPrototypeInfo.Prototypes[index], false);
-                        SetCell(new Vector3Int(x, y - 1, z), groundPathPrototype, false);
-                        /*switch (index) // Gotta make it possible for the WFC to see a future
-                        {
-                            case 16:
-                                SetCell(new Vector3Int(x + 1, y - 1, z), groundPathPrototype, false);
-                                break;
-                            case 17:
-                                SetCell(new Vector3Int(x, y - 1, z - 1), groundPathPrototype, false);
-                                break;
-                            case 18:
-                                SetCell(new Vector3Int(x - 1, y - 1, z), groundPathPrototype, false);
-                                break;
-                            case 19:
-                                SetCell(new Vector3Int(x, y - 1, z + 1), groundPathPrototype, false);
-                                break;
-                            default:
-                                break;
-                        }*/
+                        //int index = 0 + ((groundCell.PossiblePrototypes[0].MeshRot.Rot + 1) % 4);
+                        //SetCell(new Vector3Int(x, y, z), pathPrototypeInfo.Prototypes[index], false);
+                        //SetCell(new Vector3Int(x, y - 1, z), groundPathPrototype, false);
                     }
                 }
             }
@@ -303,7 +286,9 @@ public class BuildingManager : MonoBehaviour
 
                 break;
             case BuildingType.Path:
-                Vector3Int? value = GetIndex(queryPos);
+                cellsToCollapse = GetSurroundingCells(queryPos);
+
+                /*Vector3Int? value = GetIndex(queryPos);
                 if (!value.HasValue)
                 {
                     return cellsToCollapse;
@@ -322,7 +307,7 @@ public class BuildingManager : MonoBehaviour
                             cellsToCollapse.Add(index);
                         }
                     }
-                }
+                }*/
                 break;
         }
 
@@ -415,22 +400,22 @@ public class BuildingManager : MonoBehaviour
         cellStack.Push(index);
 
         IBuildable spawned = GenerateMesh(cells[index.x, index.y, index.z].Position, chosenPrototype);
-        if (spawned != null)
+        if (spawned == null) return;
+
+        if (query)
         {
-            if (query)
+            querySpawnedBuildings.Add(index, spawned);
+        }
+        else
+        {
+            spawned.ToggleIsBuildableVisual(false);
+            if (spawnedMeshes.ContainsKey(index))
             {
-                querySpawnedBuildings.Add(index, spawned);
+                spawnedMeshes[index] = spawned;
             }
             else
             {
-                if (spawnedMeshes.ContainsKey(index))
-                {
-                    spawnedMeshes[index] = spawned;
-                }
-                else
-                {
-                    spawnedMeshes.Add(index, spawned);
-                }
+                spawnedMeshes.Add(index, spawned);
             }
         }
     }

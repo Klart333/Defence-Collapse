@@ -392,6 +392,16 @@ public class PrototypeInfoCreator : MonoBehaviour
 
         return Rounded(rotated.ToList()).ToArray();
     }
+
+    [TitleGroup("Misc", Order = -40)]
+    [Button]
+    public void SpaceChildren()
+    {
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            transform.GetChild(i).transform.position = new Vector3(i * 2, 0, 0);
+        }
+    }
 }
 
 [System.Serializable]

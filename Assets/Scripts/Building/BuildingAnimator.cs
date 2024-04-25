@@ -1,7 +1,5 @@
 ﻿using DG.Tweening;
 using Sirenix.OdinInspector;
-using System;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class BuildingAnimator : MonoBehaviour
@@ -38,9 +36,7 @@ public class BuildingAnimator : MonoBehaviour
     public void Animate(GameObject building)
     {
         SpawnParticle(building);
-
-        building.transform.DORewind();
-        building.transform.DOPunchScale(transform.lossyScale * scaleMultiplier, duration).SetEase(ease);
+        BounceInOut(building.transform);
     }
 
     private void SpawnParticle(GameObject building)
@@ -56,44 +52,10 @@ public class BuildingAnimator : MonoBehaviour
         shape.mesh = building.GetComponentInChildren<MeshFilter>().sharedMesh;
     }
 
-    public static async void BounceInOut(Building building)
+    public void BounceInOut(Transform transform)
     {
-        float t = 0;
-
-        while (t <= .7f)
-        {
-            t += Time.deltaTime;
-
-            try
-            {
-                building.transform.localScale = Vector3.one * (1.0f + Math.Elastic(t) / 4.0f);
-            }
-            catch (Exception)
-            {
-                return;
-            }
-
-            await Task.Yield();
-        }
-        t = 1;
-
-        while (t >= 0.0f)
-        {
-            t -= Time.deltaTime;
-
-            try
-            {
-                building.transform.localScale = Vector3.one * (1.0f + Math.EasInElastic(t) / 4.0f);
-            }
-            catch (Exception)
-            {
-                return;
-            }
-
-            await Task.Yield();
-        }
-
-        building.transform.localScale = Vector3.one;
+        transform.DORewind();
+        transform.DOPunchScale(transform.lossyScale * scaleMultiplier, duration).SetEase(ease);
     }
 
 }

@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Unity.VisualScripting.FullSerializer;
+﻿using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public abstract class BuildingState
 {
-    public abstract void WaveStarted();
     public abstract void OnStateEntered(Building building);
     public abstract void Update();
     public abstract void OnSelected();
-    public abstract void OnDeSelected();
-    public abstract void OnPlaced();
+    public abstract void OnDeselected();
     public abstract void Die();
 }
 
@@ -28,11 +22,6 @@ public class ArcherState : BuildingState
     public ArcherState(ArcherData data)
     {
         this.data = data;
-    }
-
-    public override void OnPlaced()
-    {
-        
     }
 
     public override void OnStateEntered(Building building)
@@ -85,11 +74,6 @@ public class ArcherState : BuildingState
         }
     }
 
-    public override void WaveStarted()
-    {
-
-    }
-
     public override void Die()
     {
 
@@ -101,119 +85,11 @@ public class ArcherState : BuildingState
         rangeIndicator.transform.localScale = new Vector3(data.Range * 2.0f, 0.01f, data.Range * 2.0f);
     }
 
-    public override void OnDeSelected()
+    public override void OnDeselected()
     {
         if (rangeIndicator != null)
         {
             rangeIndicator.SetActive(false);
         }
-    }
-}
-
-public class BarracksState : BuildingState
-{
-    private Building building;
-    private BarrackData data;
-
-    private bool inDefense;
-    private Vector3 defensePosition;
-
-    public BarracksState(BarrackData data)
-    {
-        this.data = data;
-    }
-
-    public override void OnStateEntered(Building building)
-    {
-        this.building = building;
-    }
-
-    private void SpawnFighter()
-    {
-        Fighter fighter = building.Fighters[UnityEngine.Random.Range(0, building.Fighters.Length)];
-
-        Vector3 pos = building.transform.position + Vector3.up * 0.1f + Quaternion.AngleAxis(UnityEngine.Random.Range(0, 360), Vector3.up) * Vector3.forward;
-        var spawnedFighter = GameObject.Instantiate(fighter, pos, Quaternion.identity);
-        spawnedFighter.Building = building;
-
-        building.SpawnedFighters.Add(spawnedFighter);
-
-        spawnedFighter.GetComponentInChildren<IHealth>().OnDeath += BarracksState_OnDeath;
-    }
-
-    private void BarracksState_OnDeath(GameObject obj)
-    {
-        building.SpawnedFighters.Remove(obj.GetComponentInChildren<Fighter>());
-    }
-
-    public override void WaveStarted()
-    {
-        SpawnFighter();
-    }
-
-    public override void Die()
-    {
-        for (int i = 0; i < building.SpawnedFighters.Count; i++)
-        {
-            GameObject.Destroy(building.SpawnedFighters[i].gameObject);
-        }
-
-        building.SpawnedFighters.Clear();
-    }
-
-    public override void OnPlaced()
-    {
-        SpawnFighter();
-    }
-
-    public override void Update()
-    {
-        if (inDefense)
-        {
-            return;
-        }
-
-        if (building.AttackingEnemies.Count > 0)
-        {
-            EnemyMovement enemy = GetClosestEnemy(out float distance);
-
-            defensePosition = enemy.transform.position;
-
-            if (distance < data.AlarmRange)
-            {
-                Debug.Log("ALARM!");
-                Debug.DrawRay(defensePosition, Vector3.up, Color.red, 10);
-                inDefense = true;
-                building.EnterDefense(defensePosition);
-            }
-        }
-    }
-
-    private EnemyMovement GetClosestEnemy(out float distance)
-    {
-        distance = 2048;
-        EnemyMovement index = null;
-
-        for (int i = 0; i < building.AttackingEnemies.Count; i++)
-        {
-            float dis = Vector3.Distance(building.AttackingEnemies[i].transform.position, building.transform.position);
-            if (dis < distance)
-            {
-                distance = dis;
-                index = building.AttackingEnemies[i];
-            }
-        }
-
-        return index;
-    }
-
-    public override void OnSelected()
-    {
-
-    }
-
-    public override void OnDeSelected()
-    {
-
     }
 }

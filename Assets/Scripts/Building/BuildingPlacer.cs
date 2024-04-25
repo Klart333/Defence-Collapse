@@ -114,13 +114,12 @@ public class BuildingPlacer : MonoBehaviour
                 DisablePlaces();
 
                 buildingManager.RevertQuery();
-                await Task.Delay(100);
+                await Task.Delay(50);
 
                 indexes = newIndexes;
             }
 
             buildables = buildingManager.Query(mousePos, type);
-            Debug.Log("Buildables count: " + buildables.Count);
 
             foreach (var item in buildables)
             {
@@ -148,6 +147,9 @@ public class BuildingPlacer : MonoBehaviour
 
         if (canceled)
         {
+            DisablePlaces();
+            buildingManager.RevertQuery();
+
             Events.OnBuildingCanceled.Invoke();
             return;
         }

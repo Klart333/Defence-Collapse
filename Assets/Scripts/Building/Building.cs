@@ -9,12 +9,18 @@ public class Building : PooledMonoBehaviour, IBuildable
     public event Action<Building> OnDeath;
     public event Action<Vector3> OnEnterDefense;
 
+    [Title("State Data")]
+    [SerializeField]
+    private ArcherData archerData;
+
     [Title("Visual")]
     [SerializeField]
     private Material transparentGreen;
 
     private List<Material> transparentMaterials = new List<Material>();
 
+    private BuildingHandler buildingHandler;
+    private BuildingAnimator buildingAnimator;
     private BuildingState buildingState;
     private InputActions inputActions;
     private InputAction fire;
@@ -23,16 +29,38 @@ public class Building : PooledMonoBehaviour, IBuildable
     private bool selected = false;
     private bool hovered = false;
 
-    public Fighter[] Fighters { get; set; }
-    public Building[] Towers { get; set; }
-
+    public int BuildingGroupIndex { get; set; } = -1;
     public int BuildingLevel { get; set; }
 
-    public Vector3 PlacedPosition { get; set; }
+    public Mesh Mesh { get; set; }
     public List<Material> Materials { get; set; }
 
-    public List<Fighter> SpawnedFighters { get; set; } = new List<Fighter>();
-    public List<EnemyMovement> AttackingEnemies { get; set; } = new List<EnemyMovement>();
+    public BuildingHandler BuildingHandler
+    {
+        get
+        {
+            if (buildingHandler == null)
+            {
+                buildingHandler = FindAnyObjectByType<BuildingHandler>();
+            }
+
+            return buildingHandler;
+        }
+    }
+    public BuildingAnimator BuildingAnimator
+    {
+        get
+        {
+            if (buildingAnimator == null)
+            {
+                buildingAnimator = FindAnyObjectByType<BuildingAnimator>();
+            }
+
+            return buildingAnimator;
+        }
+    }
+
+    public BuildingState BuildingState => buildingState;
 
     private void OnEnable()
     {
@@ -50,6 +78,9 @@ public class Building : PooledMonoBehaviour, IBuildable
     {
         base.OnDisable();
 
+        if (BuildingHandler != null) BuildingHandler.RemoveBuilding(this);
+        BuildingGroupIndex = -1;
+
         transform.localScale = Vector3.one;
         Events.OnWaveStarted -= OnWaveStarted;
 
@@ -57,63 +88,14 @@ public class Building : PooledMonoBehaviour, IBuildable
         shift.Disable();
     }
 
-    public void Setup(PrototypeData prototypeData, List<Material> materials)
-    {
-        GetComponentInChildren<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
-        GetComponentInChildren<MeshRenderer>().SetMaterials(materials);
-
-        Materials = materials;
-        transparentMaterials = new List<Material>();
-        for (int i = 0; i < materials.Count; i++)
-        {
-            transparentMaterials.Add(transparentGreen);
-        }
-    }
-
-    private void OnWaveStarted()
-    {
-        buildingState.WaveStarted();
-
-        LevelUp();
-    }
-
-    private void LevelUp()
-    {
-        BuildingLevel += 1;
-    }
-
-    public void SetState<T>() where T : BuildingState
-    {
-        if (typeof(ArcherState).IsAssignableFrom(typeof(T)))
-        {
-
-        }
-        else if (typeof(BarracksState).IsAssignableFrom(typeof(T)))
-        {
-
-        }
-
-        buildingState.OnStateEntered(this);
-        buildingState.OnPlaced();
-    }
-
-    public void Die()
-    {
-        OnDeath?.Invoke(this);
-
-        buildingState.Die();
-    }
-
     private void OnMouseDown()
     {
-        if (buildingState == null || selected || !shift.IsPressed())
+        if (!shift.IsPressed())
         {
             return;
         }
 
-        selected = true;
-        buildingState.OnSelected();
-        BuildingAnimator.BounceInOut(this);
+        BuildingHandler.HighlightGroup(BuildingGroupIndex);
     }
 
     private void OnMouseEnter()
@@ -128,54 +110,88 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void Update()
     {
-        if (buildingState == null)
-        {
-            return;
-        }
+        if (buildingState == null) return;
 
         buildingState.Update();
 
         if (selected && !hovered && fire.WasPerformedThisFrame())
         {
-            buildingState.OnDeSelected();
+            buildingState.OnDeselected();
             selected = false;
         }
     }
 
-    public void RegisterAttackingEnemy(EnemyMovement enemyMovement)
+    public void Setup(PrototypeData prototypeData, List<Material> materials)
     {
-        AttackingEnemies.Add(enemyMovement);
-        enemyMovement.GetComponent<EnemyHealth>().Health.OnDeath += OnEnemyDeath;
+        Mesh = prototypeData.MeshRot.Mesh;
+
+        GetComponentInChildren<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
+        GetComponentInChildren<MeshRenderer>().SetMaterials(materials);
+
+        Materials = materials;
+        transparentMaterials = new List<Material>();
+        for (int i = 0; i < materials.Count; i++)
+        {
+            transparentMaterials.Add(transparentGreen);
+        }
     }
 
-    private void OnEnemyDeath(GameObject obj)
+    public void SetState<T>() where T : BuildingState
     {
-        obj.GetComponent<EnemyHealth>().Health.OnDeath -= OnEnemyDeath;
-        AttackingEnemies.Remove(obj.GetComponent<EnemyMovement>());
+        if (typeof(ArcherState).IsAssignableFrom(typeof(T)))
+        {
+            buildingState = new ArcherState(archerData);
+        }
+
+        buildingState.OnStateEntered(this);
     }
 
-    public void DeregisterAttackingEnemy(EnemyMovement enemyMovement)
+    private void OnWaveStarted()
     {
-        AttackingEnemies.Remove(enemyMovement);
-        enemyMovement.GetComponent<EnemyHealth>().Health.OnDeath -= OnEnemyDeath;
+
     }
 
-    public void EnterDefense(Vector3 pos)
+    private void LevelUp()
     {
-        OnEnterDefense?.Invoke(pos);
+        BuildingLevel += 1;
     }
 
-    public void ToggleIsBuildableVisual(bool value)
+    public void Die()
+    {
+        OnDeath?.Invoke(this);
+
+        buildingState.Die();
+    }
+
+    public void ToggleIsBuildableVisual(bool isQueried)
     {
         MeshRenderer rend = GetComponentInChildren<MeshRenderer>();
 
-        if (value)
+        if (isQueried)
         {
             rend.SetMaterials(transparentMaterials);
         }
         else
         {
             rend.SetMaterials(Materials);
+            Place();
+        }
+    }
+
+    private void Place()
+    {
+        BuildingHandler.AddBuilding(this);
+    }
+
+    public void Highlight()
+    {
+        Debug.Log("Highlight!");
+        selected = true;
+        BuildingAnimator.BounceInOut(transform);
+
+        if (buildingState != null)
+        {
+           buildingState.OnSelected();
         }
     }
 }
