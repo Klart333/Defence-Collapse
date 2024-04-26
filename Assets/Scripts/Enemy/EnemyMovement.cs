@@ -46,10 +46,13 @@ public class EnemyMovement : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
 
         GameEvents.OnEnemyPathUpdated += OnPathUpdated;
-        GameEvents.OnFightStarted += OnFightStarted;
-        GameEvents.OnFightEnded += OnFightEnded;
 
         agent.speed = moveSpeed;
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.OnEnemyPathUpdated -= OnPathUpdated;
     }
 
     private void Start()
@@ -60,13 +63,6 @@ public class EnemyMovement : MonoBehaviour
     private void Health_OnDeath(GameObject obj)
     {
         StopAllCoroutines();
-    }
-
-    private void OnDisable()
-    {
-        GameEvents.OnEnemyPathUpdated -= OnPathUpdated;
-        GameEvents.OnFightStarted -= OnFightStarted;
-        GameEvents.OnFightEnded -= OnFightEnded;
     }
 
     private void Update()

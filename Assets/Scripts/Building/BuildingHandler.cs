@@ -2,12 +2,9 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public enum TowerType
-{
-    Archer
-}
 
 public class BuildingHandler : SerializedMonoBehaviour 
 {
@@ -15,13 +12,16 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     [Title("Mesh Information")]
     [SerializeField]
-    private Dictionary<Mesh, TowerType> TowerMeshes = new Dictionary<Mesh, TowerType>();
+    private TowerMeshData towerMeshData;
 
     private List<Building> buildingQueue = new List<Building>();
+    private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
 
+    private int selectedGroupIndex = -1;
     private int groupIndexCounter = 0;
     private bool chilling = false;
 
+    #region Handling Groups
     public async void AddBuilding(Building building)
     {
         buildingQueue.Add(building);
@@ -95,12 +95,12 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     public void UpdateBuildingState(Building building)
     {
-        if (!TowerMeshes.TryGetValue(building.Mesh, out TowerType value))
+        if (!towerMeshData.TowerMeshes.TryGetValue(building.Mesh, out BuildingCellInformation value))
         {
             return;
         }
 
-        switch (value)
+        switch (value.TowerType)
         {
             case TowerType.Archer:
                 building.SetState<ArcherState>();
@@ -109,13 +109,82 @@ public class BuildingHandler : SerializedMonoBehaviour
                 break;
         }
     }
+    #endregion
+
+    #region Utility
+
+    public int GetHouseCount(int groupIndex)
+    {
+        int total = 0;
+        foreach (var item in BuildingGroups[groupIndex])
+        {
+            if (towerMeshData.TowerMeshes.TryGetValue(item.Mesh, out var value))
+            {
+                total += value.HouseCount;
+            }
+        }
+
+        return total;
+    }
+
+    #endregion
+
+    #region Visual
 
     public void HighlightGroup(int groupIndex)
     {
+        if (groupIndex == -1) return; 
+
+        UnSelect(); 
+        selectedGroupIndex = groupIndex;
+
         List<Building> buildings = BuildingGroups[groupIndex];
         foreach (Building building in buildings)
         {
             building.Highlight();
         }
+
+        print("House count: " + GetHouseCount(selectedGroupIndex));
     }
+
+    public void LowlightGroup(Building building)
+    { 
+        if (selectedGroupIndex == -1) return;
+
+        unSelectedBuildings.Add(building);
+
+        if (unSelectedBuildings.Count < BuildingGroups[selectedGroupIndex].Count)
+        {
+            return;
+        }
+
+        UnSelect();
+    }
+
+    private void UnSelect()
+    {
+        if (selectedGroupIndex == -1) return;
+
+        foreach (var item in BuildingGroups[selectedGroupIndex])
+        {
+            item.Lowlight();
+        }
+
+        unSelectedBuildings.Clear();
+    }
+
+    #endregion
+}
+
+[System.Serializable]
+public struct BuildingCellInformation
+{
+    public int HouseCount;
+    public TowerType TowerType;
+}
+
+public enum TowerType
+{
+    None,
+    Archer
 }

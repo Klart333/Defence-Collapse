@@ -17,17 +17,24 @@ public class Building : PooledMonoBehaviour, IBuildable
     [SerializeField]
     private Material transparentGreen;
 
+    [SerializeField]
+    private LayerMask selectedLayer;
+
     private List<Material> transparentMaterials = new List<Material>();
 
     private BuildingHandler buildingHandler;
     private BuildingAnimator buildingAnimator;
     private BuildingState buildingState;
-    private InputActions inputActions;
+    private InputActions inputActions; // FIX THIS HORRIBLE INPUT SHIT MAN WTF WAS I THINKING
+    private MeshRenderer meshRenderer;
     private InputAction fire;
     private InputAction shift;
 
+    private int originalLayer;
+    
     private bool selected = false;
     private bool hovered = false;
+    private bool purchasing = true;
 
     public int BuildingGroupIndex { get; set; } = -1;
     public int BuildingLevel { get; set; }
@@ -59,12 +66,28 @@ public class Building : PooledMonoBehaviour, IBuildable
             return buildingAnimator;
         }
     }
+    public MeshRenderer MeshRenderer
+    {
+        get
+        {
+            if (meshRenderer == null) meshRenderer = GetComponentInChildren<MeshRenderer>();
+
+            return meshRenderer;
+        }
+    }
 
     public BuildingState BuildingState => buildingState;
+
+    private void Awake()
+    {
+        originalLayer = gameObject.layer;
+    }
 
     private void OnEnable()
     {
         Events.OnWaveStarted += OnWaveStarted;
+        Events.OnBuildingClicked += OnBuildingClicked;
+        Events.OnBuildingCanceled += () => purchasing = false;
 
         inputActions = new InputActions();
         fire = inputActions.Player.Fire;
@@ -77,15 +100,30 @@ public class Building : PooledMonoBehaviour, IBuildable
     protected override void OnDisable()
     {
         base.OnDisable();
+        
+        Reset();
 
-        if (BuildingHandler != null) BuildingHandler.RemoveBuilding(this);
-        BuildingGroupIndex = -1;
-
-        transform.localScale = Vector3.one;
         Events.OnWaveStarted -= OnWaveStarted;
+        Events.OnBuildingClicked -= OnBuildingClicked;
+        Events.OnBuildingCanceled -= () => purchasing = false;
 
         fire.Disable();
         shift.Disable();
+    }
+
+    private void Reset()
+    {
+        transform.localScale = Vector3.one;
+
+        BuildingHandler?.RemoveBuilding(this);
+        BuildingGroupIndex = -1;
+
+        purchasing = true;
+        hovered = false;
+        selected = false;
+        MeshRenderer.gameObject.layer = originalLayer;
+
+        buildingState = null;
     }
 
     private void OnMouseDown()
@@ -110,15 +148,14 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void Update()
     {
+        if (selected && !hovered && fire.WasPerformedThisFrame())
+        {
+            BuildingHandler.LowlightGroup(this);
+        }
+
         if (buildingState == null) return;
 
         buildingState.Update();
-
-        if (selected && !hovered && fire.WasPerformedThisFrame())
-        {
-            buildingState.OnDeselected();
-            selected = false;
-        }
     }
 
     public void Setup(PrototypeData prototypeData, List<Material> materials)
@@ -126,7 +163,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         Mesh = prototypeData.MeshRot.Mesh;
 
         GetComponentInChildren<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
-        GetComponentInChildren<MeshRenderer>().SetMaterials(materials);
+        MeshRenderer.SetMaterials(materials);
 
         Materials = materials;
         transparentMaterials = new List<Material>();
@@ -144,6 +181,12 @@ public class Building : PooledMonoBehaviour, IBuildable
         }
 
         buildingState.OnStateEntered(this);
+    }
+
+    private void OnBuildingClicked(BuildingType arg0)
+    {
+        purchasing = true;
+        BuildingHandler.LowlightGroup(this);
     }
 
     private void OnWaveStarted()
@@ -165,15 +208,13 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void ToggleIsBuildableVisual(bool isQueried)
     {
-        MeshRenderer rend = GetComponentInChildren<MeshRenderer>();
-
         if (isQueried)
         {
-            rend.SetMaterials(transparentMaterials);
+            MeshRenderer.SetMaterials(transparentMaterials);
         }
         else
         {
-            rend.SetMaterials(Materials);
+            MeshRenderer.SetMaterials(Materials);
             Place();
         }
     }
@@ -185,13 +226,18 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void Highlight()
     {
-        Debug.Log("Highlight!");
+        if (purchasing) return;
+
         selected = true;
         BuildingAnimator.BounceInOut(transform);
+        MeshRenderer.gameObject.layer = (int)Mathf.Log(selectedLayer.value, 2); // sure ?
+        buildingState?.OnSelected();
+    }
 
-        if (buildingState != null)
-        {
-           buildingState.OnSelected();
-        }
+    public void Lowlight()
+    {
+        buildingState?.OnDeselected();
+        MeshRenderer.gameObject.layer = originalLayer;
+        selected = false;
     }
 }

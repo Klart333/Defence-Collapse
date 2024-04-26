@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6581211072198323029}
   - component: {fileID: 9181347496856605909}
   - component: {fileID: 7584265292262257173}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BuildingPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49,6 +49,9 @@ MonoBehaviour:
   initialPoolSize: 10
   archerData: {fileID: 11400000, guid: 63d7b88ca2073ef4c9b83b155b57a4d4, type: 2}
   transparentGreen: {fileID: 2100000, guid: 6dc1d4258ab1cd64e886f9315c43167e, type: 2}
+  selectedLayer:
+    serializedVersion: 2
+    m_Bits: 2048
 --- !u!65 &7584265292262257173
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -81,7 +84,7 @@ GameObject:
   - component: {fileID: 2185860225159621288}
   - component: {fileID: 8330999433224272736}
   - component: {fileID: 7085396851867273773}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

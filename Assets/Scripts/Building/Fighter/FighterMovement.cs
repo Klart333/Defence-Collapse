@@ -41,7 +41,7 @@ public class FighterMovement : MonoBehaviour
 
         Building.OnEnterDefense += Building_OnEnterDefense;
 
-        GameEvents.OnFightStarted += OnFightStarted;
+        //GameEvents.OnFightStarted += OnFightStarted;
     }
 
     private void OnFightStarted(Vector3 position)

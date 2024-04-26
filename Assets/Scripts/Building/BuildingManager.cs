@@ -65,7 +65,6 @@ public class BuildingManager : MonoBehaviour
 
     private void OnEnable()
     {
-        Events.OnBuildingBuilt += BuildingBuilt;
         waveFunction = FindObjectOfType<WaveFunction>();
         buildingAnimator = GetComponent<BuildingAnimator>();
 
@@ -75,8 +74,6 @@ public class BuildingManager : MonoBehaviour
     private void OnDisable()
     {
         waveFunction.OnMapGenerated -= Load;
-
-        Events.OnBuildingBuilt -= BuildingBuilt;
     }
 
     #region Loading
@@ -760,11 +757,6 @@ public class BuildingManager : MonoBehaviour
     public void Clear()
     {
         
-    }
-
-    private void BuildingBuilt(Building arg0)
-    {
-        // Add to building cells
     }
 }
 public static class ArrayHelper

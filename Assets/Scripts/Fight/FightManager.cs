@@ -8,7 +8,7 @@ public class FightManager : Singleton<FightManager>
     private Dictionary<Vector3, FightData> fights = new Dictionary<Vector3, FightData>();
     private Dictionary<GameObject, Vector3> fighters = new Dictionary<GameObject, Vector3>();
 
-    private void OnEnable()
+    /*private void OnEnable()
     {
         GameEvents.OnFightStarted += OnFightStarted;
         GameEvents.OnFightStarted += OnFightEnded;
@@ -19,7 +19,7 @@ public class FightManager : Singleton<FightManager>
         GameEvents.OnFightStarted -= OnFightStarted;
         GameEvents.OnFightStarted -= OnFightEnded;
     }
-
+*/
     private void OnFightStarted(Vector3 pos)
     {
         fights.Add(pos, new FightData());
@@ -82,7 +82,7 @@ public class FightManager : Singleton<FightManager>
 
         if (fights[fighters[fighter]].Fighters.Count <= 0)
         {
-            GameEvents.OnFightEnded(fighters[fighter]);
+            //GameEvents.OnFightEnded(fighters[fighter]);
         }
         
         fighters.Remove(fighter);
@@ -96,7 +96,7 @@ public class FightManager : Singleton<FightManager>
 
         if (fights[fighters[enemy]].Enemies.Count <= 0)
         {
-            GameEvents.OnFightEnded(fighters[enemy]);
+            //GameEvents.OnFightEnded(fighters[enemy]);
         }
 
         fighters.Remove(enemy);

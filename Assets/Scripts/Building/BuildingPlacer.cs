@@ -63,30 +63,20 @@ public class BuildingPlacer : MonoBehaviour
     {
         cam = Camera.main;
         Events.OnBuildingPurchased += BuildingPurchased;
-        Events.OnPathPurchased += PathPurchased;
 
         buildingManager = GetComponent<BuildingManager>();
     }
 
-    private void BuildingPurchased(Building building)
+    private void BuildingPurchased(BuildingType buildingType)
     {
-        //Building spawnedBuilding = Instantiate(building, GetRayPoint(), Quaternion.identity);
-        //spawnedBuilding.BuildingSize = 0;
-        //spawnedBuilding.BuildingLevel = 0;
-
         if (placingCastle)
         {
-            PlacingTower(BuildingType.Building);
+            PlacingTower(BuildingType.Castle);
         }
         else
         {
-            PlacingTower(BuildingType.Building);
+            PlacingTower(buildingType);
         }
-    }
-
-    private void PathPurchased()
-    {
-        PlacingTower(BuildingType.Path);
     }
 
     private async void PlacingTower(BuildingType type)
@@ -105,7 +95,7 @@ public class BuildingPlacer : MonoBehaviour
             {
                 if (buildables.Count > 0 && fire.WasPerformedThisFrame())
                 {
-                    buildingManager.Place();
+                    PlaceBuilding(ref type);
                 }
                 continue;
             }
@@ -135,14 +125,7 @@ public class BuildingPlacer : MonoBehaviour
 
             if (!fire.WasPerformedThisFrame()) continue;
 
-            buildingManager.Place();
-
-            if (placingCastle)
-            {
-                placingCastle = false;
-                type = BuildingType.Building;
-            }
-            
+            PlaceBuilding(ref type);
         }
 
         if (canceled)
@@ -156,6 +139,18 @@ public class BuildingPlacer : MonoBehaviour
         
         //GameEvents.OnEnemyPathUpdated(spawnedBuilding.transform.position);
     }
+
+    private void PlaceBuilding(ref BuildingType type)
+    {
+        buildingManager.Place();
+
+        if (placingCastle)
+        {
+            placingCastle = false;
+            type = BuildingType.Building;
+        }
+    }
+
 
     private void ShowPlaces(List<Vector3> positions)
     {

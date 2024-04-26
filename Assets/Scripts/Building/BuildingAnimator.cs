@@ -28,7 +28,7 @@ public class BuildingAnimator : MonoBehaviour
         Events.OnBuildingBuilt -= AnimateBuiltBuilding;
     }
 
-    public void AnimateBuiltBuilding(Building building)
+    public void AnimateBuiltBuilding(IBuildable building)
     {
         Animate(building.gameObject);
     }

@@ -5,16 +5,13 @@ using UnityEngine;
 
 public class UIBuildingHandler : MonoBehaviour
 {
-    [SerializeField]
-    private Building[] towers;
-
-    public void ClickBuilding(int index)
+    public void ClickBuilding()
     {
-        Events.OnBuildingClicked.Invoke(towers[index]);
+        Events.OnBuildingClicked.Invoke(BuildingType.Building);
     }
 
     public void ClickPath()
     {
-        Events.OnPathClicked.Invoke();
+        Events.OnBuildingClicked.Invoke(BuildingType.Path);
     }
 }
