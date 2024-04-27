@@ -759,6 +759,89 @@ Transform:
   - {fileID: 248058524}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &659901227
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 659901228}
+  - component: {fileID: 659901230}
+  - component: {fileID: 659901229}
+  m_Layer: 0
+  m_Name: Path_AlsoDown
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &659901228
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659901227}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 56, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450653428238845}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &659901229
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659901227}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &659901230
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659901227}
+  m_Mesh: {fileID: 7875131020691775814, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
 --- !u!1 &697735818
 GameObject:
   m_ObjectHideFlags: 0
@@ -786,11 +869,11 @@ Transform:
   m_GameObject: {fileID: 697735818}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 8, y: 0, z: 0}
+  m_LocalPosition: {x: 48, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1645746829}
+  m_Father: {fileID: 543450653428238845}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &697735820
 MeshRenderer:
@@ -841,7 +924,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 697735818}
-  m_Mesh: {fileID: 2377055020525109856, guid: d70fef1298ef4b74698b1ce1f1961554, type: 3}
+  m_Mesh: {fileID: 2377055020525109856, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
 --- !u!1 &747173339
 GameObject:
   m_ObjectHideFlags: 0
@@ -1034,7 +1117,7 @@ MonoBehaviour:
   - {fileID: 7041883359245195382, guid: cd112ea373c94594a90808f7cd5b1a2b, type: 3}
   - {fileID: 4362714054275815166, guid: 190152c3d3a896b45914e1106de9e16c, type: 3}
   townPrototypeInfo: {fileID: 919132149426885448}
-  pathPrototypeInfo: {fileID: 1645746830}
+  keyData: {fileID: 11400000, guid: 0d5537a423659514aa3f257234abfd92, type: 2}
   mats:
   - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
   - {fileID: 2100000, guid: 7270f1ebe2f850a418184d13fa7a07ac, type: 2}
@@ -2091,6 +2174,89 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1229629331}
   m_Mesh: {fileID: 3284045297738311301, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
+--- !u!1 &1261628455
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1261628456}
+  - component: {fileID: 1261628458}
+  - component: {fileID: 1261628457}
+  m_Layer: 0
+  m_Name: Path_AlsoUp
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1261628456
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1261628455}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 52, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450653428238845}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1261628457
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1261628455}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1261628458
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1261628455}
+  m_Mesh: {fileID: 4924434598959762781, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
 --- !u!1 &1309848884
 GameObject:
   m_ObjectHideFlags: 0
@@ -2190,6 +2356,89 @@ Transform:
   - {fileID: 231546245}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1417929071
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1417929072}
+  - component: {fileID: 1417929074}
+  - component: {fileID: 1417929073}
+  m_Layer: 0
+  m_Name: Path_Up
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1417929072
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417929071}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 50, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450653428238845}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1417929073
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417929071}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1417929074
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417929071}
+  m_Mesh: {fileID: 5992903784344201303, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
 --- !u!1 &1611296565
 GameObject:
   m_ObjectHideFlags: 0
@@ -2272,337 +2521,6 @@ Transform:
   - {fileID: 968201795}
   m_Father: {fileID: 920425043}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1645746828
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1645746829}
-  - component: {fileID: 1645746830}
-  m_Layer: 0
-  m_Name: Path Modules
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1645746829
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1645746828}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 8658846150412353316}
-  - {fileID: 7808458077459321494}
-  - {fileID: 6376138425707986221}
-  - {fileID: 2070394050936964307}
-  - {fileID: 697735819}
-  m_Father: {fileID: 2112620416}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1645746830
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1645746828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3253df256416cdc4eaa7d485e1f8c680, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Debug: 1
-  prefab: {fileID: 4871325552601967121, guid: 14ff2370657d66e40b14fa18d3f6de32, type: 3}
-  divider: 100
-  overrideVerticalPositive: 0
-  positiveKey: -1s
-  overrideVerticalNegative: 1
-  negativeKey: v-2_0
-  Prototypes:
-  - MeshRot:
-      Mesh: {fileID: -6231799127525388398, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 0
-    PosX: -1s
-    NegX: 0
-    PosZ: 0f
-    NegZ: -1s
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 2
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -6231799127525388398, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 1
-    PosX: 0f
-    NegX: -1s
-    PosZ: 0
-    NegZ: -1s
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 2
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -6231799127525388398, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 2
-    PosX: 0
-    NegX: -1s
-    PosZ: -1s
-    NegZ: 0f
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 2
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -6231799127525388398, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 3
-    PosX: -1s
-    NegX: 0f
-    PosZ: -1s
-    NegZ: 0
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 2
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -3888198205423994651, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 0
-    PosX: 0
-    NegX: 0
-    PosZ: 0f
-    NegZ: 0f
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -3888198205423994651, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 1
-    PosX: 0f
-    NegX: 0f
-    PosZ: 0
-    NegZ: 0
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -3888198205423994651, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 2
-    PosX: 0
-    NegX: 0
-    PosZ: 0f
-    NegZ: 0f
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -3888198205423994651, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 3
-    PosX: 0f
-    NegX: 0f
-    PosZ: 0
-    NegZ: 0
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -8140127113941725911, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 0
-    PosX: 0
-    NegX: 1s
-    PosZ: 0f
-    NegZ: 1s
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -8140127113941725911, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 1
-    PosX: 0f
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 0
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -8140127113941725911, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 2
-    PosX: 1s
-    NegX: 0
-    PosZ: 1s
-    NegZ: 0f
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -8140127113941725911, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 3
-    PosX: 1s
-    NegX: 0f
-    PosZ: 0
-    NegZ: 1s
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: 1741998683574915564, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 0
-    PosX: -1s
-    NegX: 1s
-    PosZ: 0f
-    NegZ: 0
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 10
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: 1741998683574915564, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 1
-    PosX: 0f
-    NegX: 0
-    PosZ: 1s
-    NegZ: -1s
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 10
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: 1741998683574915564, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 2
-    PosX: 1s
-    NegX: -1s
-    PosZ: 0
-    NegZ: 0f
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 10
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: 1741998683574915564, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 3
-    PosX: 0
-    NegX: 0f
-    PosZ: -1s
-    NegZ: 1s
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 10
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: 2377055020525109856, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 0
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 100
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: 2377055020525109856, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 1
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 100
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: 2377055020525109856, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 2
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 100
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: 2377055020525109856, guid: d70fef1298ef4b74698b1ce1f1961554,
-        type: 3}
-      Rot: 3
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
-    PosY: -1s
-    NegY: v-2_0
-    Weight: 100
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: 0}
-      Rot: 0
-    PosX: -1s
-    NegX: -1s
-    PosZ: -1s
-    NegZ: -1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 
-  socketList:
-  - positions:
-    - {x: 0.7, y: 0.04}
-    - {x: 0.7, y: 0}
-    - {x: 0.8, y: 0.04}
-    - {x: 0.8, y: 0}
-    socketname: 0f
-  - positions:
-    - {x: -0.7, y: 0.04}
-    - {x: -0.7, y: 0}
-    - {x: -0.8, y: 0.04}
-    - {x: -0.8, y: 0}
-    socketname: 0
-  - positions:
-    - {x: -0.05, y: 0.04}
-    - {x: 0.05, y: 0.04}
-    - {x: -0.05, y: 0}
-    - {x: 0.05, y: 0}
-    socketname: 1s
-  verticalSocketList: []
-  materials:
-  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
-  pieceWeights: 0200000001000000010000000a0000006400000001000000
 --- !u!1 &1784158340
 GameObject:
   m_ObjectHideFlags: 0
@@ -2687,6 +2605,89 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1784158340}
   m_Mesh: {fileID: 9109290199021018431, guid: 9454fd53404092c49a04245d69caedbb, type: 3}
+--- !u!1 &1807294366
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1807294367}
+  - component: {fileID: 1807294369}
+  - component: {fileID: 1807294368}
+  m_Layer: 0
+  m_Name: Path_Down
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1807294367
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807294366}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 54, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450653428238845}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1807294368
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807294366}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1807294369
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807294366}
+  m_Mesh: {fileID: 8031371179888124983, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
 --- !u!1 &1832698179
 GameObject:
   m_ObjectHideFlags: 0
@@ -3040,7 +3041,6 @@ Transform:
   m_Children:
   - {fileID: 543450653428238845}
   - {fileID: 7818375051068540877}
-  - {fileID: 1645746829}
   - {fileID: 1024001987}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3214,6 +3214,15 @@ Transform:
   - {fileID: 6446495092126971552}
   - {fileID: 2566634721262133765}
   - {fileID: 3719050116202251392}
+  - {fileID: 8658846150412353316}
+  - {fileID: 7808458077459321494}
+  - {fileID: 6376138425707986221}
+  - {fileID: 2070394050936964307}
+  - {fileID: 697735819}
+  - {fileID: 1417929072}
+  - {fileID: 1261628456}
+  - {fileID: 1807294367}
+  - {fileID: 659901228}
   m_Father: {fileID: 2112620416}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &588477733186167635
@@ -3393,9 +3402,9 @@ MonoBehaviour:
   Debug: 1
   prefab: {fileID: 4871325552601967121, guid: 14ff2370657d66e40b14fa18d3f6de32, type: 3}
   divider: 100
-  overrideVerticalPositive: 1
+  overrideVerticalPositive: 0
   positiveKey: -1s
-  overrideVerticalNegative: 1
+  overrideVerticalNegative: 0
   negativeKey: v-1_0
   Prototypes:
   - MeshRot:
@@ -3407,7 +3416,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: -1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -3419,7 +3428,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: -1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -3431,7 +3440,7 @@ MonoBehaviour:
     PosZ: -1s
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -3443,7 +3452,7 @@ MonoBehaviour:
     PosZ: -1s
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -3455,7 +3464,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: -1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000
   - MeshRot:
@@ -3467,7 +3476,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: -1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000
   - MeshRot:
@@ -3479,7 +3488,7 @@ MonoBehaviour:
     PosZ: -1s
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000
   - MeshRot:
@@ -3491,7 +3500,7 @@ MonoBehaviour:
     PosZ: -1s
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000
   - MeshRot:
@@ -3502,7 +3511,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: -1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b000000
   - MeshRot:
@@ -3513,7 +3522,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: -1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b000000
   - MeshRot:
@@ -3524,7 +3533,7 @@ MonoBehaviour:
     PosZ: -1s
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b000000
   - MeshRot:
@@ -3535,7 +3544,7 @@ MonoBehaviour:
     PosZ: -1s
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b000000
   - MeshRot:
@@ -3547,7 +3556,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3559,7 +3568,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3571,7 +3580,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3583,7 +3592,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3595,7 +3604,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
   - MeshRot:
@@ -3607,7 +3616,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
   - MeshRot:
@@ -3619,7 +3628,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
   - MeshRot:
@@ -3631,7 +3640,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
   - MeshRot:
@@ -3643,7 +3652,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d000000090000000b0000000800000003000000010000000a0000000400000002000000050000000700000006000000
   - MeshRot:
@@ -3655,7 +3664,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d000000090000000b0000000800000003000000010000000a0000000400000002000000050000000700000006000000
   - MeshRot:
@@ -3667,7 +3676,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d000000090000000b0000000800000003000000010000000a0000000400000002000000050000000700000006000000
   - MeshRot:
@@ -3679,7 +3688,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d000000090000000b0000000800000003000000010000000a0000000400000002000000050000000700000006000000
   - MeshRot:
@@ -3691,7 +3700,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3703,7 +3712,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3715,7 +3724,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3727,7 +3736,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3738,8 +3747,8 @@ MonoBehaviour:
     NegX: 1s
     PosZ: 1s
     NegZ: 1s
-    PosY: -1s
-    NegY: v-1_0
+    PosY: v0_0
+    NegY: -1s
     Weight: 2
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3750,8 +3759,8 @@ MonoBehaviour:
     NegX: 1s
     PosZ: 1s
     NegZ: 1s
-    PosY: -1s
-    NegY: v-1_0
+    PosY: v0_1
+    NegY: -1s
     Weight: 2
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3762,8 +3771,8 @@ MonoBehaviour:
     NegX: 1s
     PosZ: 1s
     NegZ: 1s
-    PosY: -1s
-    NegY: v-1_0
+    PosY: v0_2
+    NegY: -1s
     Weight: 2
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3774,8 +3783,8 @@ MonoBehaviour:
     NegX: 1s
     PosZ: 1s
     NegZ: 1s
-    PosY: -1s
-    NegY: v-1_0
+    PosY: v0_3
+    NegY: -1s
     Weight: 2
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
@@ -3787,7 +3796,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
@@ -3799,7 +3808,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
@@ -3811,7 +3820,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
@@ -3823,7 +3832,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
@@ -3835,7 +3844,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000050000000700000006000000
   - MeshRot:
@@ -3847,7 +3856,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000050000000700000006000000
   - MeshRot:
@@ -3859,7 +3868,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000050000000700000006000000
   - MeshRot:
@@ -3871,7 +3880,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000050000000700000006000000
   - MeshRot:
@@ -3883,7 +3892,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
@@ -3895,7 +3904,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
@@ -3907,7 +3916,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
@@ -3919,7 +3928,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
@@ -3931,7 +3940,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d000000090000000b0000000800000003000000010000000a000000
   - MeshRot:
@@ -3943,7 +3952,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: -1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d000000090000000b0000000800000003000000010000000a000000
   - MeshRot:
@@ -3955,7 +3964,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d000000090000000b0000000800000003000000010000000a000000
   - MeshRot:
@@ -3967,7 +3976,7 @@ MonoBehaviour:
     PosZ: -1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d000000090000000b0000000800000003000000010000000a000000
   - MeshRot:
@@ -3979,7 +3988,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -3991,7 +4000,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -4003,7 +4012,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -4015,7 +4024,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -4027,7 +4036,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
@@ -4039,7 +4048,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
@@ -4051,7 +4060,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
@@ -4063,7 +4072,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
@@ -4075,7 +4084,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
@@ -4087,7 +4096,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
@@ -4099,7 +4108,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
@@ -4111,7 +4120,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
@@ -4123,7 +4132,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a000000090000000e0000000b000000
   - MeshRot:
@@ -4135,7 +4144,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a000000090000000e0000000b000000
   - MeshRot:
@@ -4147,7 +4156,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a000000090000000e0000000b000000
   - MeshRot:
@@ -4159,7 +4168,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a000000090000000e0000000b000000
   - MeshRot:
@@ -4171,7 +4180,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000050000000700000006000000
   - MeshRot:
@@ -4183,7 +4192,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: -1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000050000000700000006000000
   - MeshRot:
@@ -4195,7 +4204,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000050000000700000006000000
   - MeshRot:
@@ -4207,7 +4216,7 @@ MonoBehaviour:
     PosZ: -1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000050000000700000006000000
   - MeshRot:
@@ -4219,7 +4228,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000500000007000000060000000a000000090000000b000000
   - MeshRot:
@@ -4231,7 +4240,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: -1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000500000007000000060000000a000000090000000b000000
   - MeshRot:
@@ -4243,7 +4252,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000500000007000000060000000a000000090000000b000000
   - MeshRot:
@@ -4255,7 +4264,7 @@ MonoBehaviour:
     PosZ: -1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000500000007000000060000000a000000090000000b000000
   - MeshRot:
@@ -4267,7 +4276,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -4279,7 +4288,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: -1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -4291,7 +4300,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -4303,7 +4312,7 @@ MonoBehaviour:
     PosZ: -1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a00000009000000
   - MeshRot:
@@ -4315,7 +4324,7 @@ MonoBehaviour:
     PosZ: 0f
     NegZ: 0
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000b000000
   - MeshRot:
@@ -4327,7 +4336,7 @@ MonoBehaviour:
     PosZ: 1s
     NegZ: -1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000b000000
   - MeshRot:
@@ -4339,7 +4348,7 @@ MonoBehaviour:
     PosZ: 0
     NegZ: 0f
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000b000000
   - MeshRot:
@@ -4351,9 +4360,441 @@ MonoBehaviour:
     PosZ: -1s
     NegZ: 1s
     PosY: -1s
-    NegY: v-1_0
+    NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000c0000000d0000000800000003000000010000000a000000090000000b000000
+  - MeshRot:
+      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 2
+    PosZ: 2f
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 2f
+    NegX: -1s
+    PosZ: 2
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: 2
+    NegX: -1s
+    PosZ: -1s
+    NegZ: 2f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: -1s
+    NegX: 2f
+    PosZ: -1s
+    NegZ: 2
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -3888198205423994651, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: 2
+    NegX: 2
+    PosZ: 2f
+    NegZ: 2f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -3888198205423994651, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 2f
+    NegX: 2f
+    PosZ: 2
+    NegZ: 2
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -3888198205423994651, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: 2
+    NegX: 2
+    PosZ: 2f
+    NegZ: 2f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -3888198205423994651, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: 2f
+    NegX: 2f
+    PosZ: 2
+    NegZ: 2
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -8140127113941725911, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: 2
+    NegX: 3s
+    PosZ: 2f
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -8140127113941725911, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 2f
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 2
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -8140127113941725911, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: 3s
+    NegX: 2
+    PosZ: 3s
+    NegZ: 2f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -8140127113941725911, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: 3s
+    NegX: 2f
+    PosZ: 2
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 1741998683574915564, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 3s
+    PosZ: 2f
+    NegZ: 2
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 1741998683574915564, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 2f
+    NegX: 2
+    PosZ: 3s
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 1741998683574915564, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: 3s
+    NegX: -1s
+    PosZ: 2
+    NegZ: 2f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 1741998683574915564, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: 2
+    NegX: 2f
+    PosZ: -1s
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 2377055020525109856, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 2377055020525109856, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 2377055020525109856, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 2377055020525109856, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 5992903784344201303, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 4
+    PosZ: 2f
+    NegZ: -1s
+    PosY: v1_0
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 5992903784344201303, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 2f
+    NegX: -1s
+    PosZ: 4
+    NegZ: -1s
+    PosY: v1_1
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 5992903784344201303, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: 4
+    NegX: -1s
+    PosZ: -1s
+    NegZ: 2f
+    PosY: v1_2
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 5992903784344201303, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: -1s
+    NegX: 2f
+    PosZ: -1s
+    NegZ: 4
+    PosY: v1_3
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 4924434598959762781, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: 4f
+    NegX: -1s
+    PosZ: 2
+    NegZ: -1s
+    PosY: v2_0
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 4924434598959762781, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 2
+    NegX: -1s
+    PosZ: -1s
+    NegZ: 4f
+    PosY: v2_1
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 4924434598959762781, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: -1s
+    NegX: 4f
+    PosZ: -1s
+    NegZ: 2
+    PosY: v2_2
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 4924434598959762781, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: -1s
+    NegX: 2
+    PosZ: 4f
+    NegZ: -1s
+    PosY: v2_3
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 8031371179888124983, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 5
+    PosZ: -1s
+    NegZ: 2
+    PosY: -1s
+    NegY: v1_0
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 8031371179888124983, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: -1s
+    NegX: 2
+    PosZ: 5
+    NegZ: -1s
+    PosY: -1s
+    NegY: v1_1
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 8031371179888124983, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: 5
+    NegX: -1s
+    PosZ: 2
+    NegZ: -1s
+    PosY: -1s
+    NegY: v1_2
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 8031371179888124983, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: 2
+    NegX: -1s
+    PosZ: -1s
+    NegZ: 5
+    PosY: -1s
+    NegY: v1_3
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 7875131020691775814, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: 5f
+    NegX: -1s
+    PosZ: -1s
+    NegZ: 2f
+    PosY: -1s
+    NegY: v2_0
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 7875131020691775814, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: -1s
+    NegX: 2f
+    PosZ: -1s
+    NegZ: 5f
+    PosY: -1s
+    NegY: v2_1
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 7875131020691775814, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: -1s
+    NegX: 5f
+    PosZ: 2f
+    NegZ: -1s
+    PosY: -1s
+    NegY: v2_2
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 7875131020691775814, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: 2f
+    NegX: -1s
+    PosZ: 5f
+    NegZ: -1s
+    PosY: -1s
+    NegY: v2_3
+    Weight: 1
+    MaterialIndexes: 00000000
   - MeshRot:
       Mesh: {fileID: 0}
       Rot: 0
@@ -4412,7 +4853,125 @@ MonoBehaviour:
     - {x: -0.05, y: 0.02}
     - {x: 0, y: 0.02}
     socketname: 1s
-  verticalSocketList: []
+  - positions:
+    - {x: 1, y: 0.04}
+    - {x: 1, y: 0}
+    - {x: 0.9, y: 0.04}
+    - {x: 0.9, y: 0}
+    socketname: 2f
+  - positions:
+    - {x: -1, y: 0.04}
+    - {x: -1, y: 0}
+    - {x: -0.9, y: 0.04}
+    - {x: -0.9, y: 0}
+    socketname: 2
+  - positions:
+    - {x: -1, y: 0}
+    - {x: -1, y: 0.04}
+    - {x: 1, y: 0.04}
+    - {x: 1, y: 0}
+    socketname: 3s
+  - positions:
+    - {x: 0.18, y: 1}
+    - {x: 1, y: 0}
+    - {x: 1, y: 0.04}
+    - {x: 0.22, y: 1}
+    socketname: 4f
+  - positions:
+    - {x: -0.18, y: 1}
+    - {x: -1, y: 0}
+    - {x: -1, y: 0.04}
+    - {x: -0.22, y: 1}
+    socketname: 4
+  - positions:
+    - {x: 0.22, y: -1}
+    - {x: -0.6, y: 0}
+    - {x: 0.18, y: -1}
+    - {x: -0.6, y: 0.04}
+    - {x: -1, y: 0}
+    - {x: -1, y: 0.04}
+    socketname: 5f
+  - positions:
+    - {x: -0.22, y: -1}
+    - {x: 0.6, y: 0}
+    - {x: -0.18, y: -1}
+    - {x: 0.6, y: 0.04}
+    - {x: 1, y: 0}
+    - {x: 1, y: 0.04}
+    socketname: 5
+  verticalSocketList:
+  - positions:
+    - {x: 0.16, y: -0.2}
+    - {x: -0.2, y: -0.08}
+    - {x: 0.02, y: 0.16}
+    - {x: -0.12, y: 0.14}
+    socketname: v0_0
+  - positions:
+    - {x: 0.2, y: 0.16}
+    - {x: 0.08, y: -0.2}
+    - {x: -0.16, y: 0.02}
+    - {x: -0.14, y: -0.12}
+    socketname: v0_1
+  - positions:
+    - {x: -0.16, y: -0.2}
+    - {x: 0.2, y: -0.08}
+    - {x: -0.02, y: 0.16}
+    - {x: 0.12, y: 0.14}
+    socketname: v0_2
+  - positions:
+    - {x: -0.2, y: -0.16}
+    - {x: -0.08, y: 0.2}
+    - {x: 0.16, y: -0.02}
+    - {x: 0.14, y: 0.12}
+    socketname: v0_3
+  - positions:
+    - {x: -0.9, y: 0.18}
+    - {x: -0.9, y: 0.22}
+    - {x: -1, y: 0.18}
+    - {x: -1, y: 0.22}
+    socketname: v1_0
+  - positions:
+    - {x: -0.18, y: -0.9}
+    - {x: -0.22, y: -0.9}
+    - {x: -0.18, y: -1}
+    - {x: -0.22, y: -1}
+    socketname: v1_1
+  - positions:
+    - {x: 0.9, y: 0.18}
+    - {x: 0.9, y: 0.22}
+    - {x: 1, y: 0.18}
+    - {x: 1, y: 0.22}
+    socketname: v1_2
+  - positions:
+    - {x: 0.18, y: 0.9}
+    - {x: 0.22, y: 0.9}
+    - {x: 0.18, y: 1}
+    - {x: 0.22, y: 1}
+    socketname: v1_3
+  - positions:
+    - {x: 1, y: 0.18}
+    - {x: 1, y: 0.22}
+    - {x: 0.8, y: 0.18}
+    - {x: 0.8, y: 0.22}
+    socketname: v2_0
+  - positions:
+    - {x: -0.18, y: 1}
+    - {x: -0.22, y: 1}
+    - {x: -0.18, y: 0.8}
+    - {x: -0.22, y: 0.8}
+    socketname: v2_1
+  - positions:
+    - {x: -1, y: 0.18}
+    - {x: -1, y: 0.22}
+    - {x: -0.8, y: 0.18}
+    - {x: -0.8, y: 0.22}
+    socketname: v2_2
+  - positions:
+    - {x: 0.18, y: -1}
+    - {x: 0.22, y: -1}
+    - {x: 0.18, y: -0.8}
+    - {x: 0.22, y: -0.8}
+    socketname: v2_3
   materials:
   - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
   - {fileID: 2100000, guid: 7270f1ebe2f850a418184d13fa7a07ac, type: 2}
@@ -4429,7 +4988,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 336fde5d73b795f4a92284b079bbb8ae, type: 2}
   - {fileID: 2100000, guid: dcf24194234791f4eb774c56fc7a116a, type: 2}
   - {fileID: 2100000, guid: 2ac9650ffee441946a8318039ca89ca3, type: 2}
-  pieceWeights: 01000000010000000100000001000000010000000100000001000000020000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  pieceWeights: 010000000100000001000000010000000100000001000000010000000200000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
 --- !u!1 &1149792426985155301
 GameObject:
   m_ObjectHideFlags: 0
@@ -4826,11 +5385,11 @@ Transform:
   m_GameObject: {fileID: 5498326487493470677}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 6, y: 0, z: 0}
+  m_LocalPosition: {x: 46, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1645746829}
+  m_Father: {fileID: 543450653428238845}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &2304807472876291895
 RectTransform:
@@ -5058,7 +5617,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5110579041277690497}
-  m_Mesh: {fileID: -3888198205423994651, guid: d70fef1298ef4b74698b1ce1f1961554, type: 3}
+  m_Mesh: {fileID: -3888198205423994651, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
 --- !u!1 &3100768676686609763
 GameObject:
   m_ObjectHideFlags: 0
@@ -5084,7 +5643,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3725346663843351700}
-  m_Mesh: {fileID: -8140127113941725911, guid: d70fef1298ef4b74698b1ce1f1961554, type: 3}
+  m_Mesh: {fileID: -8140127113941725911, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
 --- !u!1 &3184106564842087070
 GameObject:
   m_ObjectHideFlags: 0
@@ -5241,22 +5800,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7818375051068540877}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3778981458514310254
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4556080630772281044}
-  m_Layer: 0
-  m_Name: WeirdPath
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!222 &3821670260177612588
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5546,21 +6089,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 798141853156309416}
   m_Mesh: {fileID: -4245282036596823359, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
---- !u!4 &4556080630772281044
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3778981458514310254}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 155.78577, y: 0, z: -10.1720085}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4567925100317217127
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -6210,11 +6738,11 @@ Transform:
   m_GameObject: {fileID: 3725346663843351700}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 4, y: 0, z: 0}
+  m_LocalPosition: {x: 44, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1645746829}
+  m_Father: {fileID: 543450653428238845}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6417413333476782829
 GameObject:
@@ -6525,7 +7053,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5498326487493470677}
-  m_Mesh: {fileID: 1741998683574915564, guid: d70fef1298ef4b74698b1ce1f1961554, type: 3}
+  m_Mesh: {fileID: 1741998683574915564, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
 --- !u!222 &6888925248307618699
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7145,11 +7673,11 @@ Transform:
   m_GameObject: {fileID: 5110579041277690497}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 2, y: 0, z: 0}
+  m_LocalPosition: {x: 42, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1645746829}
+  m_Father: {fileID: 543450653428238845}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &7818375051068540877
 Transform:
@@ -8223,11 +8751,11 @@ Transform:
   m_GameObject: {fileID: 4166374449139838562}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 40, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1645746829}
+  m_Father: {fileID: 543450653428238845}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8793336542546015476
 GameObject:
@@ -8320,7 +8848,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4166374449139838562}
-  m_Mesh: {fileID: -6231799127525388398, guid: d70fef1298ef4b74698b1ce1f1961554, type: 3}
+  m_Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
 --- !u!23 &9109807355951397790
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -8400,4 +8928,3 @@ SceneRoots:
   - {fileID: 2112620416}
   - {fileID: 606289848}
   - {fileID: 920425043}
-  - {fileID: 4556080630772281044}

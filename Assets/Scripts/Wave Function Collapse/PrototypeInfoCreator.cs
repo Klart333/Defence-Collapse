@@ -402,6 +402,13 @@ public class PrototypeInfoCreator : MonoBehaviour
             transform.GetChild(i).transform.position = new Vector3(i * 2, 0, 0);
         }
     }
+
+    [TitleGroup("Misc", Order = -40)]
+    [Button]
+    public void PrintChildrenCount()
+    {
+        print(transform.childCount);
+    }
 }
 
 [System.Serializable]
@@ -431,6 +438,11 @@ public struct PrototypeData
     public int Weight;
 
     public int[] MaterialIndexes;
+
+    public string[] Keys => new string[6] 
+    {
+        PosX, NegX, PosY, NegY, PosZ, NegZ
+    };
 
     public PrototypeData(MeshWithRotation mesh, string posX, string negX, string posY, string negY, string posZ, string negZ, int weight, int[] mats)
     {

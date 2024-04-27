@@ -1,11 +1,12 @@
-using Buildings;
-using Sirenix.OdinInspector;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Sirenix.OdinInspector;
+using Unity.VisualScripting;
+using System.Linq;
+using UnityEngine;
+using Buildings;
+using System;
+using Sirenix.Utilities;
 
 public class BuildingManager : MonoBehaviour 
 {
@@ -17,8 +18,9 @@ public class BuildingManager : MonoBehaviour
     [SerializeField]
     private PrototypeInfoCreator townPrototypeInfo;
 
+    [Title("Keys")]
     [SerializeField]
-    private PrototypeInfoCreator pathPrototypeInfo;
+    private PrototypeKeyData keyData;
 
     [Title("Mesh")]
     [SerializeField]
@@ -57,11 +59,24 @@ public class BuildingManager : MonoBehaviour
     private BuildingAnimator buildingAnimator;
 
     private PrototypeData emptyPrototype;
-    private PrototypeData groundPrototype;
-    private PrototypeData groundPathPrototype;
-    //private PrototypeData[] portalPathPrototypes;
+    private PrototypeData unbuildablePrototype;
 
     private BuildingType currentBuildingType;
+
+    private HashSet<string> allowedKeys;
+
+    public Vector3Int[] Directions { get; private set; } = new Vector3Int[]
+    {
+        new Vector3Int(1, 0, 0), new Vector3Int(-1, 0, 0), // (right, left)
+        new Vector3Int(0, 1, 0), new Vector3Int(0, -1, 0), // (up, down)
+        new Vector3Int(0, 0, 1), new Vector3Int(0, 0, -1)  // (forward, backward)
+    };
+
+    public Vector3Int[] XYDirections { get; private set; } = new Vector3Int[]
+    {
+        new Vector3Int(1, 0, 0), new Vector3Int(-1, 0, 0), // (right, left)
+        new Vector3Int(0, 0, 1), new Vector3Int(0, 0, -1)  // (forward, backward)
+    };
 
     private void OnEnable()
     {
@@ -96,16 +111,7 @@ public class BuildingManager : MonoBehaviour
     {
         cells = new Cell[waveFunction.GridSize.x, waveFunction.GridSize.y, waveFunction.GridSize.z];
         emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 20, new int[0]);
-        groundPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "v-1_0", "-1s", "-1s", "-1s", 20, new int[0]);
-        groundPathPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "v-2_0", "-1s", "-1s", "-1s", 20, new int[0]);
-        // Still here if I can't spawn the road in later because of art reasons
-        /*portalPathPrototypes = new PrototypeData[4] 
-        {
-            new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "v-2_0", "-1s", "-1s", "0s", 20, new int[0]),
-            new PrototypeData(new MeshWithRotation(null, 1), "-1s", "0s", "v-2_0", "-1s", "-1s", "-1s", 20, new int[0]),
-            new PrototypeData(new MeshWithRotation(null, 2), "-1s", "-1s", "v-2_0", "-1s", "0s", "-1s", 20, new int[0]),
-            new PrototypeData(new MeshWithRotation(null, 3), "0s", "-1s", "v-2_0", "-1s", "-1s", "-1s", 20, new int[0])
-        };*/
+        unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "No", "-1s", "-1s", "-1s", 20, new int[0]);
 
         for (int z = 0; z < waveFunction.GridSize.z; z++)
         {
@@ -152,13 +158,11 @@ public class BuildingManager : MonoBehaviour
         }
 
         prototypes = townPrototypeInfo.Prototypes;
-        prototypes.AddRange(pathPrototypeInfo.Prototypes);
-        prototypes.RemoveAt(prototypes.Count - 1);
         return prototypes.Count > 0;
     }
 
     #endregion
-
+    
     #region Query & Place
 
     public void Place()
@@ -210,21 +214,24 @@ public class BuildingManager : MonoBehaviour
         switch (buildingType)
         {
             case BuildingType.Castle:
-                MakeBuildable(cellsToCollapse, groundPrototype);
+                MakeBuildable(cellsToCollapse);
 
                 if (cellsToCollapse.Count < 9)
                 {
                     return querySpawnedBuildings;
                 }
                 SetCell(cellsToCollapse[4], prototypes[CastleIndex]);
+                allowedKeys = keyData.BuildingKeys;
                 break;
 
             case BuildingType.Building:
-                MakeBuildable(cellsToCollapse, groundPrototype);
+                MakeBuildable(cellsToCollapse);
+                allowedKeys = keyData.BuildingKeys;
                 break;
                 
             case BuildingType.Path:
-                MakeBuildable(cellsToCollapse, groundPathPrototype, "v-2_0");
+                MakeBuildable(cellsToCollapse);
+                allowedKeys = keyData.PathKeys;
                 break;
             default:
                 break;
@@ -239,7 +246,7 @@ public class BuildingManager : MonoBehaviour
         return querySpawnedBuildings;
     }
 
-    private void MakeBuildable(List<Vector3Int> cellsToCollapse, PrototypeData buildableProt, string key = "v-1_0") // Should only override city tiles and built roads, nothing else
+    private void MakeBuildable(List<Vector3Int> cellsToCollapse) // Should only override city tiles and built roads, nothing else
     {
         for (int i = 0; i < cellsToCollapse.Count; i++)
         {
@@ -254,15 +261,20 @@ public class BuildingManager : MonoBehaviour
                 buildable.gameObject.SetActive(false);
                 spawnedMeshes.Remove(index);
             }
+        }
 
+        HashSet<Vector3Int> perimeter = GetPerimeterCells(cellsToCollapse);
+        foreach (Vector3Int index in perimeter)
+        {
+            continue;
             queryChangedCells.Add((index + Vector3Int.down, cells[index.x, index.y - 1, index.z]));
             if (!cells[index.x, index.y - 1, index.z].Collapsed)
             {
-                SetCell(index + Vector3Int.down, buildableProt);
+                SetCell(index + Vector3Int.down, unbuildablePrototype);
             }
             else
             {
-                ChangeTopKey(index + Vector3Int.down, key);
+                ChangeTopKey(index + Vector3Int.down, "No");
             }
         }
     }
@@ -284,27 +296,7 @@ public class BuildingManager : MonoBehaviour
                 break;
             case BuildingType.Path:
                 cellsToCollapse = GetSurroundingCells(queryPos);
-
-                /*Vector3Int? value = GetIndex(queryPos);
-                if (!value.HasValue)
-                {
-                    return cellsToCollapse;
-                }
-                cellsToCollapse.Add(value.Value);
-
-                for (int x = -1; x <= 1; x++)
-                {
-                    for (int z = -1; z <= 1; z++)
-                    {
-                        if ((z != 0 && x != 0) || z == x || !cells.IsInBounds(cellsToCollapse[0].x + x, 0, cellsToCollapse[0].z + z)) continue;
-
-                        Vector3Int index = cellsToCollapse[0] + new Vector3Int(x, 0, z);
-                        if (cells[index.x, index.y, index.z].Collapsed && cells[index.x, index.y, index.z].PossiblePrototypes[0].MeshRot.Mesh && cells[index.x, index.y, index.z].PossiblePrototypes[0].MeshRot.Mesh.name.Contains("Path"))
-                        {
-                            cellsToCollapse.Add(index);
-                        }
-                    }
-                }*/
+                //cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3Int.down * 2));
                 break;
         }
 
@@ -426,7 +418,6 @@ public class BuildingManager : MonoBehaviour
         cells[index.x, index.y, index.z] = new Cell(true, cells[index.x, index.y, index.z].Position, new List<PrototypeData>() { changedProt });
         cellStack.Push(index);
     }
-
 
     public void Propagate()
     {
@@ -552,34 +543,41 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
-        int removed = 0;
+        changed = false;
         for (int i = 0; i < affectedCell.PossiblePrototypes.Count; i++)
         {
+            PrototypeData prot = affectedCell.PossiblePrototypes[i];
+            if (!prot.Keys.Any(x => allowedKeys.Contains(x))) // Could be pre-calculated based on prototype
+            {
+                affectedCell.PossiblePrototypes.RemoveAt(i--);
+                continue;
+            }
+
             bool shouldRemove = false;
             switch (direction)
             {
                 case Direction.Right:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegX, validKeys);
+                    shouldRemove = !CheckValidSocket(prot.NegX, validKeys);
 
                     break;
                 case Direction.Left:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosX, validKeys);
+                    shouldRemove = !CheckValidSocket(prot.PosX, validKeys);
 
                     break;
                 case Direction.Up:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegY, validKeys);
+                    shouldRemove = !CheckValidSocket(prot.NegY, validKeys);
 
                     break;
                 case Direction.Down:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosY, validKeys);
+                    shouldRemove = !CheckValidSocket(prot.PosY, validKeys);
 
                     break;
                 case Direction.Forward:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegZ, validKeys);
+                    shouldRemove = !CheckValidSocket(prot.NegZ, validKeys);
 
                     break;
                 case Direction.Backward:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosZ, validKeys);
+                    shouldRemove = !CheckValidSocket(prot.PosZ, validKeys);
 
                     break;
             }
@@ -587,7 +585,7 @@ public class BuildingManager : MonoBehaviour
             if (shouldRemove)
             {
                 affectedCell.PossiblePrototypes.RemoveAt(i--);
-                removed++;
+                changed = true;
             }
         }
 
@@ -595,7 +593,6 @@ public class BuildingManager : MonoBehaviour
         {
             affectedCell.PossiblePrototypes.Add(emptyPrototype);
         }
-        changed = removed > 0;
         return affectedCell.PossiblePrototypes;
     }
 
@@ -659,6 +656,26 @@ public class BuildingManager : MonoBehaviour
 
         return surrounding;
     }
+
+    public HashSet<Vector3Int> GetPerimeterCells(List<Vector3Int> cells)
+    {
+        HashSet<Vector3Int> cellSet = new HashSet<Vector3Int>(cells);
+
+        foreach (var cell in cells)
+        {
+            foreach (Vector3Int dir in XYDirections)
+            {
+                Vector3Int neighbor = cell + dir;
+                if (!cells.Contains(neighbor))
+                {
+                    cellSet.Add(neighbor);
+                }
+            }
+        }
+
+        return cellSet;
+    }
+
 
     public Vector3Int? GetIndex(Vector3 pos)
     {
@@ -773,5 +790,4 @@ public static class ArrayHelper
         return true;
     }
 }
-
 
