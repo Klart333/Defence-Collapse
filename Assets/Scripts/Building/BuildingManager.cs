@@ -38,6 +38,9 @@ public class BuildingManager : MonoBehaviour
 
     [Title("Debug")]
     [SerializeField]
+    private PooledMonoBehaviour unableToPlacePrefab;
+
+    [SerializeField]
     private bool DebugPropagate;
 
     [SerializeField, ShowIf(nameof(DebugPropagate)), Range(1, 1000)]
@@ -45,9 +48,16 @@ public class BuildingManager : MonoBehaviour
 
     private Cell[,,] cells;
 
+    public Cell this[Vector3Int index]
+    {
+        get { return cells[index.x, index.y, index.z]; }
+        set { cells[index.x, index.y, index.z] = value; }
+    }
+
     private Dictionary<Vector3Int, IBuildable> spawnedMeshes = new Dictionary<Vector3Int, IBuildable>();
     private Dictionary<Vector3Int, IBuildable> querySpawnedBuildings = new Dictionary<Vector3Int, IBuildable>();
     private List<(Vector3Int, Cell)> queryChangedCells = new List<(Vector3Int, Cell)>();
+    private List<Vector3Int> queryCollapsedAir = new List<Vector3Int>();
 
     private List<IBuildable> spawnedPossibilities = new List<IBuildable>();
 
@@ -91,6 +101,18 @@ public class BuildingManager : MonoBehaviour
         waveFunction.OnMapGenerated -= Load;
     }
 
+    [Button]
+    public void ShowCollapsedTiles()
+    {
+        foreach (var item in cells)
+        {
+            if (item.Collapsed)
+            {
+                 unableToPlacePrefab.GetAtPosAndRot<PooledMonoBehaviour>(item.Position, Quaternion.identity);
+            }
+        }
+    }
+
     #region Loading
 
     private void Load()
@@ -110,8 +132,8 @@ public class BuildingManager : MonoBehaviour
     private void LoadCells()
     {
         cells = new Cell[waveFunction.GridSize.x, waveFunction.GridSize.y, waveFunction.GridSize.z];
-        emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 20, new int[0]);
-        unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "No", "-1s", "-1s", "-1s", 20, new int[0]);
+        emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 1, new int[0]);
+        unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 0, new int[0]);
 
         for (int z = 0; z < waveFunction.GridSize.z; z++)
         {
@@ -134,7 +156,7 @@ public class BuildingManager : MonoBehaviour
                     Cell groundCell = waveFunction.GetCellAtIndex(z, y, x);
                     if (groundCell.PossiblePrototypes[0].MeshRot.Mesh == null) // It's air
                     {
-
+                        cells[x, y, z] = new Cell(true, cells[x, y, z].Position, new List<PrototypeData>() { unbuildablePrototype });
                     }
                     else if (groundCell.PossiblePrototypes[0].MeshRot.Mesh.name == "Ground_Portal") // yay hard coded names :))))
                     {
@@ -171,11 +193,45 @@ public class BuildingManager : MonoBehaviour
         {
             item.Value.ToggleIsBuildableVisual(false);
         }
+        
+        UncollapseAir();
 
         spawnedMeshes.AddRange(querySpawnedBuildings);
         querySpawnedBuildings.Clear();
 
         queryChangedCells.Clear();
+    }
+
+    private void UncollapseAir()
+    {
+        for (int i = 0; i < queryCollapsedAir.Count; i++)
+        {
+            Vector3Int index = queryCollapsedAir[i];
+            bool fixedit = false;
+            for (int g = 0; g < queryChangedCells.Count; g++)
+            {
+                if (index == queryChangedCells[g].Item1)
+                {
+                    fixedit = true;
+                    Vector3Int changedIndex = queryChangedCells[g].Item1;
+                    if (queryChangedCells[g].Item2.Collapsed)
+                    {
+                        SetCell(changedIndex, queryChangedCells[g].Item2.PossiblePrototypes[0], false);
+                    }
+                    else
+                    {
+                        this[changedIndex] = queryChangedCells[g].Item2;
+                    }
+                    break;
+                }
+            }
+            
+            if (!fixedit)
+            {
+                this[index] = new Cell(false, this[index].Position, new List<PrototypeData>() { emptyPrototype });
+            }
+        }
+        queryCollapsedAir.Clear();
     }
 
     public void RevertQuery()
@@ -199,7 +255,8 @@ public class BuildingManager : MonoBehaviour
             }
         }
         queryChangedCells.Clear();
-    } 
+        queryCollapsedAir.Clear();
+    }
 
     public Dictionary<Vector3Int, IBuildable> Query(Vector3 queryPosition, BuildingType buildingType)
     {
@@ -214,24 +271,24 @@ public class BuildingManager : MonoBehaviour
         switch (buildingType)
         {
             case BuildingType.Castle:
+                allowedKeys = keyData.BuildingKeys;
                 MakeBuildable(cellsToCollapse);
-
-                if (cellsToCollapse.Count < 9)
+                Propagate();
+                if (cellsToCollapse.Count < 9 || this[cellsToCollapse[4]].PossiblePrototypes.Count == 1)
                 {
                     return querySpawnedBuildings;
                 }
                 SetCell(cellsToCollapse[4], prototypes[CastleIndex]);
-                allowedKeys = keyData.BuildingKeys;
                 break;
 
             case BuildingType.Building:
-                MakeBuildable(cellsToCollapse);
                 allowedKeys = keyData.BuildingKeys;
+                MakeBuildable(cellsToCollapse);
                 break;
                 
             case BuildingType.Path:
-                MakeBuildable(cellsToCollapse);
                 allowedKeys = keyData.PathKeys;
+                MakeBuildable(cellsToCollapse);
                 break;
             default:
                 break;
@@ -246,35 +303,25 @@ public class BuildingManager : MonoBehaviour
         return querySpawnedBuildings;
     }
 
-    private void MakeBuildable(List<Vector3Int> cellsToCollapse) // Should only override city tiles and built roads, nothing else
+    private void MakeBuildable(List<Vector3Int> cellsToCollapse) 
     {
         for (int i = 0; i < cellsToCollapse.Count; i++)
         {
             Vector3Int index = cellsToCollapse[i];
+            if (cells[index.x, index.y, index.z].Collapsed && cells[index.x, index.y, index.z].PossiblePrototypes[0] == unbuildablePrototype)
+            {
+                continue;
+            }
+
             queryChangedCells.Add((index, cells[index.x, index.y, index.z]));
 
             cells[index.x, index.y, index.z] = new Cell(false, cells[index.x, index.y, index.z].Position, new List<PrototypeData>(prototypes));
-            ValidDirections(index, out _, Direction.Up).ForEach(x => cellStack.Push(x));
+            ValidDirections(index, out _).ForEach(x => cellStack.Push(x));
 
             if (spawnedMeshes.TryGetValue(index, out IBuildable buildable))
             {
                 buildable.gameObject.SetActive(false);
                 spawnedMeshes.Remove(index);
-            }
-        }
-
-        HashSet<Vector3Int> perimeter = GetPerimeterCells(cellsToCollapse);
-        foreach (Vector3Int index in perimeter)
-        {
-            continue;
-            queryChangedCells.Add((index + Vector3Int.down, cells[index.x, index.y - 1, index.z]));
-            if (!cells[index.x, index.y - 1, index.z].Collapsed)
-            {
-                SetCell(index + Vector3Int.down, unbuildablePrototype);
-            }
-            else
-            {
-                ChangeTopKey(index + Vector3Int.down, "No");
             }
         }
     }
@@ -295,8 +342,13 @@ public class BuildingManager : MonoBehaviour
 
                 break;
             case BuildingType.Path:
+                //Vector3 minPos2 = new Vector3(queryPos.x - 2f, queryPos.y - 2f, queryPos.z - 2f);
+                //Vector3 maxPos2 = new Vector3(queryPos.x + 2, queryPos.y + 2f, queryPos.z + 2);
+                //cellsToCollapse = GetAllCells(minPos2, maxPos2);
+                //break;
                 cellsToCollapse = GetSurroundingCells(queryPos);
                 //cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3Int.down * 2));
+                cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3Int.up * 2));
                 break;
         }
 
@@ -389,7 +441,11 @@ public class BuildingManager : MonoBehaviour
         cellStack.Push(index);
 
         IBuildable spawned = GenerateMesh(cells[index.x, index.y, index.z].Position, chosenPrototype);
-        if (spawned == null) return;
+        if (spawned == null) 
+        {
+            queryCollapsedAir.Add(index);
+            return;
+        }
 
         if (query)
         {
@@ -407,16 +463,6 @@ public class BuildingManager : MonoBehaviour
                 spawnedMeshes.Add(index, spawned);
             }
         }
-    }
-
-    private void ChangeTopKey(Vector3Int index, string key)
-    {
-        PrototypeData prot = cells[index.x, index.y, index.z].PossiblePrototypes[0];
-        if (prot.PosY == key) return;
-
-        PrototypeData changedProt = new PrototypeData(new MeshWithRotation(prot.MeshRot.Mesh, prot.MeshRot.Rot), prot.PosX, prot.NegX, key, prot.NegY, prot.PosZ, prot.NegZ, prot.Weight, new int[0]);
-        cells[index.x, index.y, index.z] = new Cell(true, cells[index.x, index.y, index.z].Position, new List<PrototypeData>() { changedProt });
-        cellStack.Push(index);
     }
 
     public void Propagate()
@@ -627,11 +673,14 @@ public class BuildingManager : MonoBehaviour
 
         for (float x = min.x; x <= max.x; x += 2)
         {
-            for (float z = min.z; z <= max.z; z += 2)
+            for (float y = min.y; y <= max.y; y += 2)
             {
-                Vector3Int? index = GetIndex(new Vector3(x, min.y, z));
-                if (index.HasValue)
-                    surrounding.Add(index.Value);
+                for (float z = min.z; z <= max.z; z += 2)
+                {
+                    Vector3Int? index = GetIndex(new Vector3(x, y, z));
+                    if (index.HasValue)
+                        surrounding.Add(index.Value);
+                }
             }
         }
 

@@ -386,7 +386,7 @@ public class PrototypeInfoCreator : MonoBehaviour
         for (int i = 0; i < positions.Count; i++)
         {
             float x = positions[i].x * Mathf.Cos(angle) - positions[i].y * Mathf.Sin(angle);
-            float y = positions[i].x * Mathf.Sin(angle) - positions[i].y * Mathf.Cos(angle);
+            float y = positions[i].x * Mathf.Sin(angle) + positions[i].y * Mathf.Cos(angle);
             rotated[i] = new Vector2(x, y);
         }
 
@@ -456,6 +456,28 @@ public struct PrototypeData
         NegZ = negZ;
 
         Weight = weight;
+    }
+
+    public static bool operator ==(PrototypeData p1, PrototypeData p2)
+    {
+        return p1.Equals(p2);
+    }
+
+    public static bool operator !=(PrototypeData p1, PrototypeData p2)
+    {
+        return !p1.Equals(p2);
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is PrototypeData data &&
+               PosX == data.PosX &&
+               NegX == data.NegX &&
+               PosZ == data.PosZ &&
+               NegZ == data.NegZ &&
+               PosY == data.PosY &&
+               NegY == data.NegY &&
+               Weight == data.Weight;
     }
 }
 

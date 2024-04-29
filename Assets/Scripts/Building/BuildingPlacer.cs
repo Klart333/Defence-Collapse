@@ -151,7 +151,6 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
-
     private void ShowPlaces(List<Vector3> positions)
     {
         for (int i = 0; i < positions.Count; i++)
