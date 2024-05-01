@@ -10,6 +10,8 @@ using Sirenix.Utilities;
 
 public class BuildingManager : MonoBehaviour 
 {
+    public event Action<Vector3Int> OnCastlePlaced;
+
     [Title("Misc")]
     [SerializeField]
     private Fighter[] fighters;
@@ -75,19 +77,6 @@ public class BuildingManager : MonoBehaviour
 
     private HashSet<string> allowedKeys;
 
-    public Vector3Int[] Directions { get; private set; } = new Vector3Int[]
-    {
-        new Vector3Int(1, 0, 0), new Vector3Int(-1, 0, 0), // (right, left)
-        new Vector3Int(0, 1, 0), new Vector3Int(0, -1, 0), // (up, down)
-        new Vector3Int(0, 0, 1), new Vector3Int(0, 0, -1)  // (forward, backward)
-    };
-
-    public Vector3Int[] XYDirections { get; private set; } = new Vector3Int[]
-    {
-        new Vector3Int(1, 0, 0), new Vector3Int(-1, 0, 0), // (right, left)
-        new Vector3Int(0, 0, 1), new Vector3Int(0, 0, -1)  // (forward, backward)
-    };
-
     private void OnEnable()
     {
         waveFunction = FindObjectOfType<WaveFunction>();
@@ -131,15 +120,15 @@ public class BuildingManager : MonoBehaviour
 
     private void LoadCells()
     {
-        cells = new Cell[waveFunction.GridSize.x, waveFunction.GridSize.y, waveFunction.GridSize.z];
+        cells = new Cell[waveFunction.GridSize.x, waveFunction.GridSize.y + 1, waveFunction.GridSize.z];
         emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 1, new int[0]);
         unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 0, new int[0]);
 
-        for (int z = 0; z < waveFunction.GridSize.z; z++)
+        for (int z = 0; z < cells.GetLength(2); z++)
         {
-            for (int y = 0; y < waveFunction.GridSize.y; y++)
+            for (int y = 0; y < cells.GetLength(1); y++)
             {
-                for (int x = 0; x < waveFunction.GridSize.x; x++)
+                for (int x = 0; x < cells.GetLength(0); x++)
                 {
                     Vector3 pos = new Vector3(x * waveFunction.GridScale.x, y * waveFunction.GridScale.y, z * waveFunction.GridScale.z);
                     cells[x, y, z] = new Cell(false, pos + transform.position, new List<PrototypeData>() { emptyPrototype });
@@ -147,12 +136,18 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
-        for (int z = 0; z < waveFunction.GridSize.z; z++)
+        for (int z = 0; z < cells.GetLength(2); z++)
         {
-            for (int y = 0; y < waveFunction.GridSize.y; y++)
+            for (int y = 0; y < cells.GetLength(1); y++)
             {
-                for (int x = 0; x < waveFunction.GridSize.x; x++)
+                for (int x = 0; x < cells.GetLength(0); x++)
                 {
+                    if (y == cells.GetLength(1) - 1) // Just put air at the top
+                    {
+                        cells[x, y, z] = new Cell(true, cells[x, y, z].Position, new List<PrototypeData>() { unbuildablePrototype });
+                        continue;
+                    }
+
                     Cell groundCell = waveFunction.GetCellAtIndex(z, y, x);
                     if (groundCell.PossiblePrototypes[0].MeshRot.Mesh == null) // It's air
                     {
@@ -189,6 +184,13 @@ public class BuildingManager : MonoBehaviour
 
     public void Place()
     {
+        Events.OnBuildingBuilt?.Invoke(querySpawnedBuildings.Values);
+
+        if (currentBuildingType == BuildingType.Castle)
+        {
+            OnCastlePlaced?.Invoke(cellsToCollapse[4]);
+        }
+
         foreach (var item in querySpawnedBuildings)
         {
             item.Value.ToggleIsBuildableVisual(false);
@@ -414,14 +416,14 @@ public class BuildingManager : MonoBehaviour
             return emptyPrototype;
         }
 
-        int totalCount = 0;
+        float totalCount = 0;
         for (int i = 0; i < cell.PossiblePrototypes.Count; i++)
         {
             totalCount += cell.PossiblePrototypes[i].Weight;
         }
 
-        int randomIndex = UnityEngine.Random.Range(0, totalCount);
-        int index = randomIndex;
+        float randomIndex = UnityEngine.Random.Range(0, totalCount);
+        int index = 0;
         for (int i = 0; i < cell.PossiblePrototypes.Count; i++)
         {
             randomIndex -= cell.PossiblePrototypes[i].Weight;
@@ -712,7 +714,7 @@ public class BuildingManager : MonoBehaviour
 
         foreach (var cell in cells)
         {
-            foreach (Vector3Int dir in XYDirections)
+            foreach (Vector3Int dir in PathFinding.XYDirections)
             {
                 Vector3Int neighbor = cell + dir;
                 if (!cells.Contains(neighbor))
@@ -724,7 +726,6 @@ public class BuildingManager : MonoBehaviour
 
         return cellSet;
     }
-
 
     public Vector3Int? GetIndex(Vector3 pos)
     {
@@ -739,7 +740,7 @@ public class BuildingManager : MonoBehaviour
 
     public Vector3 GetPos(Vector3Int index)
     {
-        return cells[index.x, index.y, index.z].Position + Vector3.up;
+        return cells[index.x, index.y, index.z].Position;
     }
 
     public void DisplayPossiblePrototypes()
@@ -837,6 +838,26 @@ public static class ArrayHelper
             return false;
 
         return true;
+    }
+
+    public static bool IsInBounds<T>(this T[,,] array, Vector3Int index)
+    {
+        return array.IsInBounds(index.x, index.y, index.z);
+    }
+
+    public static bool IsInBounds<T>(this T[,] array, int x, int y)
+    {
+        if (x < 0 || x >= array.GetLength(0))
+            return false;
+        if (y < 0 || y >= array.GetLength(1))
+            return false;
+
+        return true;
+    }
+
+    public static bool IsInBounds<T>(this T[,] array, Vector2Int index)
+    {
+        return array.IsInBounds(index.x, index.y);
     }
 }
 

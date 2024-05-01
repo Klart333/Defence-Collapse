@@ -65,7 +65,7 @@ public class Pool : MonoBehaviour
     {
         for (int i = 0; i < poolPrefab.InitialPoolSize; i++) // We specify how big the pool of the prefab this script handles, and create that many disabled gameobjects, ready to be enabled whenever we want
         {
-            var pooledObject = Instantiate(poolPrefab) as PooledMonoBehaviour; 
+            var pooledObject = Instantiate(poolPrefab); 
             pooledObject.gameObject.name += " " + i; // Helps keeping track
 
             pooledObject.OnReturnToPool += AddObjectToAvailableQueue; 

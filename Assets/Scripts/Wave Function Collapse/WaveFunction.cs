@@ -223,14 +223,14 @@ public class WaveFunction : MonoBehaviour
             return emptyPrototype;
         }
 
-        int totalCount = 0;
+        float totalCount = 0;
         for (int i = 0; i < cell.PossiblePrototypes.Count; i++)
         {
             totalCount += cell.PossiblePrototypes[i].Weight;
         }
 
         int index = 0;
-        int randomIndex = UnityEngine.Random.Range(0, totalCount);
+        float randomIndex = UnityEngine.Random.Range(0, totalCount);
         for (int i = 0; i < cell.PossiblePrototypes.Count; i++)
         {
             randomIndex -= cell.PossiblePrototypes[i].Weight;

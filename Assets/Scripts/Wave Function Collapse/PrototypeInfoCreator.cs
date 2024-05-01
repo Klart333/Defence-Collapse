@@ -44,7 +44,7 @@ public class PrototypeInfoCreator : MonoBehaviour
 
     [Title("Weight")]
     [SerializeField]
-    private int[] pieceWeights;
+    private float[] pieceWeights;
 
     private List<GameObject> spawnedPrototypes = new List<GameObject>();
 
@@ -435,7 +435,7 @@ public struct PrototypeData
     public string NegZ;
     public string PosY;
     public string NegY;
-    public int Weight;
+    public float Weight;
 
     public int[] MaterialIndexes;
 
@@ -444,7 +444,7 @@ public struct PrototypeData
         PosX, NegX, PosY, NegY, PosZ, NegZ
     };
 
-    public PrototypeData(MeshWithRotation mesh, string posX, string negX, string posY, string negY, string posZ, string negZ, int weight, int[] mats)
+    public PrototypeData(MeshWithRotation mesh, string posX, string negX, string posY, string negY, string posZ, string negZ, float weight, int[] mats)
     {
         MaterialIndexes = mats;
         MeshRot = mesh;
@@ -478,6 +478,11 @@ public struct PrototypeData
                PosY == data.PosY &&
                NegY == data.NegY &&
                Weight == data.Weight;
+    }
+
+    public override int GetHashCode()
+    {
+        return System.HashCode.Combine(PosX, NegX, PosZ, NegZ, PosY, NegY, Weight);
     }
 }
 

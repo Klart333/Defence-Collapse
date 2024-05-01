@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -6,7 +7,7 @@ public static class Events
 {
     public static UnityAction<BuildingType> OnBuildingClicked;
     public static UnityAction<BuildingType> OnBuildingPurchased; 
-    public static UnityAction<IBuildable> OnBuildingBuilt = delegate { }; 
+    public static UnityAction<IEnumerable<IBuildable>> OnBuildingBuilt = delegate { }; 
     public static UnityAction OnBuildingCanceled = delegate { }; 
 
     public static UnityAction OnWaveClicked = delegate { };

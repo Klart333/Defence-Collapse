@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Archer Data", menuName = "Building/Data/Archer")]
+[CreateAssetMenu(fileName = "New Archer Data", menuName = "Building/State Data/Archer")]
 public class ArcherData : ScriptableObject
 {
     [Header("Stats")]

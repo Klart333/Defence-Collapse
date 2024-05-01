@@ -300,7 +300,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 144934298}
-  - component: {fileID: 144934299}
   m_Layer: 5
   m_Name: Path
   m_TagString: Untagged
@@ -328,18 +327,6 @@ RectTransform:
   m_AnchoredPosition: {x: -0.00024414062, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &144934299
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 144934297}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7233659faf3995438ad23c2836900e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &231546244
 GameObject:
   m_ObjectHideFlags: 0
@@ -420,6 +407,50 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1004430327}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &304523226
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 304523227}
+  - component: {fileID: 304523228}
+  m_Layer: 0
+  m_Name: PathHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &304523227
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304523226}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1411626119}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &304523228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304523226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8be824af785cbca4ab2a1bd2fc04c79f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -631,7 +662,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 407572462}
-  - component: {fileID: 407572463}
   m_Layer: 5
   m_Name: City
   m_TagString: Untagged
@@ -659,18 +689,6 @@ RectTransform:
   m_AnchoredPosition: {x: -0.00024414062, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &407572463
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 407572461}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7233659faf3995438ad23c2836900e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -884,6 +902,7 @@ GameObject:
   - component: {fileID: 527352176}
   - component: {fileID: 527352175}
   - component: {fileID: 527352174}
+  - component: {fileID: 527352178}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -948,8 +967,8 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 25
+  m_VertexColorAlwaysGammaSpace: 1
+  m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -976,6 +995,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &527352178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527352173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7233659faf3995438ad23c2836900e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &606289847
 GameObject:
   m_ObjectHideFlags: 0
@@ -2230,7 +2261,12 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 407572463}
+      objectReference: {fileID: 527352178}
+    - target: {fileID: 8285618638296190767, guid: 1efa44b3173d3934d81649ef81816d76,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ClickBuilding
+      objectReference: {fileID: 0}
     - target: {fileID: 8285618638795453120, guid: 1efa44b3173d3934d81649ef81816d76,
         type: 3}
       propertyPath: m_Pivot.x
@@ -2605,6 +2641,7 @@ Transform:
   - {fileID: 1309848886}
   - {fileID: 1036242525}
   - {fileID: 231546245}
+  - {fileID: 304523227}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1542537141
@@ -3324,6 +3361,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8658a39f2f32e3e41afa3783a3a2a6fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startingMoney: 10
+  money: 0
+  costData: {fileID: 11400000, guid: e7ff2e14ba349914883d3aeed3cecedb, type: 2}
 --- !u!4 &2114986767
 Transform:
   m_ObjectHideFlags: 0
@@ -5709,7 +5749,45 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 336fde5d73b795f4a92284b079bbb8ae, type: 2}
   - {fileID: 2100000, guid: dcf24194234791f4eb774c56fc7a116a, type: 2}
   - {fileID: 2100000, guid: 2ac9650ffee441946a8318039ca89ca3, type: 2}
-  pieceWeights: 0100000001000000010000000100000001000000010000000100000002000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000064000000640000006400000064000000640000006400000064000000640000006400000064000000640000006400000001000000
+  pieceWeights:
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 2
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 100
+  - 100
+  - 100
+  - 100
+  - 100
+  - 100
+  - 100
+  - 100
+  - 100
+  - 100
+  - 100
+  - 100
+  - 1
 --- !u!4 &993496507149202315
 Transform:
   m_ObjectHideFlags: 0
@@ -8713,7 +8791,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 144934299}
+      - m_Target: {fileID: 527352178}
         m_TargetAssemblyTypeName: UIBuildingHandler, Assembly-CSharp
         m_MethodName: ClickPath
         m_Mode: 1
@@ -9485,7 +9563,19 @@ MonoBehaviour:
   - {fileID: 2100000, guid: a01118aad3fb8a2428db51d380136f69, type: 2}
   - {fileID: 2100000, guid: 4df9dcd67b2193845a2478cf4a8dfe24, type: 2}
   - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
-  pieceWeights: 640000000a0000000a000000140000000a00000064000000640000000100000001000000010000000a000000b80b0000
+  pieceWeights:
+  - 100
+  - 10
+  - 10
+  - 20
+  - 10
+  - 100
+  - 100
+  - 1
+  - 1
+  - 1
+  - 10
+  - 3000
 --- !u!1 &7877222472292367163
 GameObject:
   m_ObjectHideFlags: 0

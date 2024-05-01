@@ -1,11 +1,9 @@
 ﻿using Sirenix.OdinInspector;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 public class BuildingPlacer : MonoBehaviour
 {
@@ -30,11 +28,12 @@ public class BuildingPlacer : MonoBehaviour
     [SerializeField]
     private bool placingCastle = true;
 
+    private bool manualCancel = false;
     private bool canceled
     {
         get
         {
-            return cancel.ReadValue<float>() > 0;
+            return cancel.ReadValue<float>() > 0 || manualCancel;
         }
     }
 
@@ -50,6 +49,8 @@ public class BuildingPlacer : MonoBehaviour
 
         mouse = InputActions.Player.Mouse;
         mouse.Enable();
+
+        Events.OnBuildingCanceled += () => manualCancel = true;
     }
 
     private void OnDisable()
@@ -57,6 +58,8 @@ public class BuildingPlacer : MonoBehaviour
         fire.Disable();
         cancel.Disable();
         mouse.Disable();
+
+        Events.OnBuildingCanceled -= () => manualCancel = false;
     }
 
     private void Start()
@@ -69,18 +72,13 @@ public class BuildingPlacer : MonoBehaviour
 
     private void BuildingPurchased(BuildingType buildingType)
     {
-        if (placingCastle)
-        {
-            PlacingTower(BuildingType.Castle);
-        }
-        else
-        {
-            PlacingTower(buildingType);
-        }
+        PlacingTower(buildingType);
     }
 
     private async void PlacingTower(BuildingType type)
     {
+        manualCancel = false;
+
         List<Vector3Int> indexes = new List<Vector3Int>();
         Dictionary<Vector3Int, IBuildable> buildables = new Dictionary<Vector3Int, IBuildable>();
         while (!canceled)
@@ -95,7 +93,7 @@ public class BuildingPlacer : MonoBehaviour
             {
                 if (buildables.Count > 0 && fire.WasPerformedThisFrame())
                 {
-                    PlaceBuilding(ref type);
+                    PlaceBuilding(type);
                 }
                 continue;
             }
@@ -118,14 +116,14 @@ public class BuildingPlacer : MonoBehaviour
             
             if (buildables.Count == 0) 
             {
-                ShowPlaces(indexes.Select(x => buildingManager.GetPos(x)).ToList());
+                ShowPlaces(indexes.Select(x => buildingManager.GetPos(x) + Vector3.up).ToList());
                 
                 continue;
             }
 
             if (!fire.WasPerformedThisFrame()) continue;
 
-            PlaceBuilding(ref type);
+            PlaceBuilding(type);
         }
 
         if (canceled)
@@ -133,21 +131,21 @@ public class BuildingPlacer : MonoBehaviour
             DisablePlaces();
             buildingManager.RevertQuery();
 
-            Events.OnBuildingCanceled.Invoke();
+            if (!manualCancel)
+            {
+                Events.OnBuildingCanceled?.Invoke();
+            }
             return;
         }
-        
-        //GameEvents.OnEnemyPathUpdated(spawnedBuilding.transform.position);
     }
 
-    private void PlaceBuilding(ref BuildingType type)
+    private void PlaceBuilding(BuildingType buildingType)
     {
         buildingManager.Place();
 
-        if (placingCastle)
+        if (buildingType == BuildingType.Castle)
         {
-            placingCastle = false;
-            type = BuildingType.Building;
+            Events.OnBuildingCanceled?.Invoke();
         }
     }
 

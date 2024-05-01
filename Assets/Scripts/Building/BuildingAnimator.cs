@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using Sirenix.OdinInspector;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BuildingAnimator : MonoBehaviour
@@ -28,9 +29,12 @@ public class BuildingAnimator : MonoBehaviour
         Events.OnBuildingBuilt -= AnimateBuiltBuilding;
     }
 
-    public void AnimateBuiltBuilding(IBuildable building)
+    public void AnimateBuiltBuilding(IEnumerable<IBuildable> buildings)
     {
-        Animate(building.gameObject);
+        foreach (var item in buildings)
+        {
+            Animate(item.gameObject);
+        }
     }
 
     public void Animate(GameObject building)

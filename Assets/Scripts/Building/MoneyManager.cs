@@ -1,28 +1,51 @@
-﻿using System;
+﻿using Sirenix.OdinInspector;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MoneyManager : MonoBehaviour
 {
-    private BuildingPurchaser towerPurchaser;
+    [Title("Money")]
+    [SerializeField]
+    private int startingMoney = 10;
 
-    private float moneyAmount = 0;
+    [ReadOnly, SerializeField]
+    private float money = 0;
+
+    [Title("Building Info")]
+    [SerializeField]
+    private BuildableCostData costData;
+
+    private Dictionary<BuildingType, int> AvailableBuildables = new Dictionary<BuildingType, int>();
+
+    private BuildingType currentBuildingType;
+
     private bool purchasing = false;
 
-    public float MoneyAmount => moneyAmount;
+    public float Money => money;
 
-    private void Start()
+    private void OnEnable()
     {
-        towerPurchaser = new BuildingPurchaser(this);
+        AvailableBuildables = new Dictionary<BuildingType, int>
+        {
+            { BuildingType.Castle, 1 },
+            { BuildingType.Building, 0 },
+            { BuildingType.Path, 0 },
+        };
+        money = startingMoney;
 
         Events.OnBuildingClicked += TowerClicked;
-        Events.OnBuildingPurchased += TowerPurchased;
+        Events.OnBuildingPurchased += StartPurchase;
+        Events.OnBuildingBuilt += BuilableBuilt;
+
         Events.OnBuildingCanceled += CancelPurchasing;
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         Events.OnBuildingClicked -= TowerClicked;
-        Events.OnBuildingPurchased -= TowerPurchased;
+        Events.OnBuildingPurchased -= StartPurchase;
+        Events.OnBuildingBuilt -= BuilableBuilt;
 
         Events.OnBuildingCanceled -= CancelPurchasing;
     }
@@ -36,17 +59,52 @@ public class MoneyManager : MonoBehaviour
     {
         if (purchasing) return;
 
-        Events.OnBuildingPurchased?.Invoke(buildingType);
-
-        //if (!purchasing && towerPurchaser.CanPurchaseBuilding(tower))
-        //{
-        //} 
+        if (CanPurchase(buildingType))
+        {
+            Events.OnBuildingPurchased?.Invoke(buildingType);
+        }
     }
 
-    private void TowerPurchased(BuildingType buildingType)
+    private bool CanPurchase(BuildingType buildingType)
     {
-        //moneyAmount -= tower.Cost;
+        if (AvailableBuildables[buildingType] > 0)
+        {
+            return true;
+        }
 
+        if (Money >= costData.GetCost(buildingType))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void StartPurchase(BuildingType buildingType)
+    {
+        currentBuildingType = buildingType;
         purchasing = true;
+    }
+
+    private void BuilableBuilt(IEnumerable<IBuildable> buildables)
+    {
+        if (AvailableBuildables[currentBuildingType] > 0)
+        {
+            AvailableBuildables[currentBuildingType] -= 1;
+        }
+        else
+        {
+            money -= costData.GetCost(currentBuildingType);
+        }
+
+        if (!CanPurchase(currentBuildingType))
+        {
+            Events.OnBuildingCanceled?.Invoke();
+        }
+    }
+
+    public void AddBuildable(BuildingType buildingType, int amount)
+    {
+        AvailableBuildables[buildingType] += amount;
     }
 }
