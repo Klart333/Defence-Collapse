@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using DataStructures;
 using DataStructures.Queue;
+using Unity.VisualScripting;
 
 public static class PathFinding
 {
@@ -26,6 +27,37 @@ public static class PathFinding
 
 
     #region 3D
+
+    public static Vector3Int? BreadthFirstSearch(Vector3 startPos, HashSet<Vector3Int> targetPositions, Node[,,] map)
+    {
+        Vector3Int start = FindClosest(startPos, map);
+        Dictionary<Vector3Int, Vector3Int> WalkedNodes = new Dictionary<Vector3Int, Vector3Int>();
+        Queue<Vector3Int> NodeQueue = new Queue<Vector3Int>();
+        NodeQueue.Enqueue(start);
+        WalkedNodes.Add(start, start);
+
+        while (NodeQueue.Count > 0)
+        {
+            Vector3Int current = NodeQueue.Dequeue();
+            if (targetPositions.Contains(current))
+            {
+                return current;
+            }
+
+            List<Vector3Int> neighbours = GetNeighbours(current, map);
+
+            for (int i = 0; i < neighbours.Count; i++)
+            {
+                if (!WalkedNodes.ContainsKey(neighbours[i]))
+                {
+                    WalkedNodes.Add(neighbours[i], current);
+                    NodeQueue.Enqueue(neighbours[i]);
+                }
+            }
+        }
+
+        return null;
+    }
 
     public static List<Node> FindPath(Vector3 startPos, Vector3 targetPos, Node[,,] map)
     {
@@ -255,6 +287,7 @@ public static class PathFinding
 
         return index;
     }
+
     #endregion
 }
 

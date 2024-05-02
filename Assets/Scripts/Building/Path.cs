@@ -11,12 +11,39 @@ namespace Buildings
         private Material transparentGreen;
 
         private List<Material> transparentMaterials = new List<Material>();
+
+        private MeshCollider meshCollider;
+        private MeshRenderer meshRenderer;
+        
+        public Mesh Mesh { get; set; }
+
+        public MeshRenderer MeshRenderer
+        {
+            get
+            {
+                if (meshRenderer == null) meshRenderer = GetComponentInChildren<MeshRenderer>();
+
+                return meshRenderer;
+            }
+        }
+        public MeshCollider MeshCollider
+        {
+            get
+            {
+                if (meshCollider == null) meshCollider = GetComponentInChildren<MeshCollider>();
+
+                return meshCollider;
+            }
+        }
+
         public List<Material> Materials { get; set; }
 
         public void Setup(PrototypeData prototypeData, List<Material> materials)
         {
+            Mesh = prototypeData.MeshRot.Mesh;
+
             GetComponentInChildren<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
-            GetComponentInChildren<MeshRenderer>().SetMaterials(materials);
+            MeshRenderer.SetMaterials(materials);
 
             Materials = materials;
             transparentMaterials = new List<Material>();
@@ -28,15 +55,14 @@ namespace Buildings
 
         public void ToggleIsBuildableVisual(bool value)
         {
-            MeshRenderer rend = GetComponentInChildren<MeshRenderer>();
-
             if (value)
             {
-                rend.SetMaterials(transparentMaterials);
+                MeshRenderer.SetMaterials(transparentMaterials);
             }
             else
             {
-                rend.SetMaterials(Materials);
+                MeshCollider.sharedMesh = Mesh;
+                MeshRenderer.SetMaterials(Materials);
             }
         }   
     }

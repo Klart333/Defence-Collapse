@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
@@ -11,16 +12,12 @@ public class NavigationBaker : MonoBehaviour
 
     private void OnEnable()
     {
-        FindObjectOfType<WaveFunction>().OnMapGenerated += NavigationBaker_OnMapGenerated;
+        Events.OnWaveStarted += NavigationBaker_OnMapGenerated;
     }
 
     private void OnDisable()
     {
-        WaveFunction waveFunction = FindObjectOfType<WaveFunction>();
-        if (waveFunction)
-        {
-            waveFunction.OnMapGenerated -= NavigationBaker_OnMapGenerated;
-        }
+        Events.OnWaveStarted -= NavigationBaker_OnMapGenerated;
     }
 
     private void NavigationBaker_OnMapGenerated()
@@ -28,7 +25,7 @@ public class NavigationBaker : MonoBehaviour
         Bake();
     }
 
-    [ContextMenu("Bake")]
+    [Button]
     public void Bake()
     {
         surface.BuildNavMesh();

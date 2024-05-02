@@ -452,18 +452,17 @@ public class BuildingManager : MonoBehaviour
         if (query)
         {
             querySpawnedBuildings.Add(index, spawned);
+            return;
+        }
+
+        spawned.ToggleIsBuildableVisual(false);
+        if (spawnedMeshes.ContainsKey(index))
+        {
+            spawnedMeshes[index] = spawned;
         }
         else
         {
-            spawned.ToggleIsBuildableVisual(false);
-            if (spawnedMeshes.ContainsKey(index))
-            {
-                spawnedMeshes[index] = spawned;
-            }
-            else
-            {
-                spawnedMeshes.Add(index, spawned);
-            }
+            spawnedMeshes.Add(index, spawned);
         }
     }
 
@@ -782,7 +781,6 @@ public class BuildingManager : MonoBehaviour
         spawnedPossibilities.Clear();
     }
 
-
     private IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1, bool animate = true)
     {
         if (prototypeData.MeshRot.Mesh == null)
@@ -790,21 +788,16 @@ public class BuildingManager : MonoBehaviour
             return null;
         }
 
-        IBuildable building = null;
-        switch (currentBuildingType)
+        IBuildable building;
+        if (prototypeData.MeshRot.Mesh.name.Contains("Path")) // Not my best work
         {
-            case BuildingType.Castle:
-                building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
-                break;
-            case BuildingType.Building:
-                building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
-                break;
-            case BuildingType.Path:
-                building = pathPrefab.GetAtPosAndRot<Path>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
-                break;
-            default:
-                break;
+            building = pathPrefab.GetAtPosAndRot<Path>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
         }
+        else
+        {
+            building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
+        }
+
         List<Material> materials = new List<Material>(prototypeData.MaterialIndexes.Length);
         for (int i = 0; i < prototypeData.MaterialIndexes.Length; i++)
         {
