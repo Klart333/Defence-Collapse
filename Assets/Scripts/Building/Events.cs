@@ -7,14 +7,15 @@ public static class Events
 {
     public static UnityAction<BuildingType> OnBuildingClicked;
     public static UnityAction<BuildingType> OnBuildingPurchased; 
-    public static UnityAction<IEnumerable<IBuildable>> OnBuildingBuilt = delegate { }; 
-    public static UnityAction OnBuildingCanceled = delegate { }; 
+    public static UnityAction<IEnumerable<IBuildable>> OnBuildingBuilt; 
+    public static UnityAction OnBuildingCanceled; 
 
-    public static UnityAction OnWaveClicked = delegate { };
-    public static UnityAction OnWaveStarted = delegate { };
-}
+    public static UnityAction OnWaveClicked;
+    public static UnityAction OnWaveStarted;
 
-public static class GameEvents
-{
-    public static UnityAction<Vector3> OnEnemyPathUpdated = delegate { };
+    public static UnityAction<Building> OnBuildingDestroyed;
+    public static UnityAction<Building> OnBuildingRepaired;
+
+    public static UnityAction<Vector3, Vector3> OnEnemyPathUpdated;
+    public static UnityAction<Vector3> OnTownDestroyed;
 }

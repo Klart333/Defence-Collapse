@@ -1,18 +1,25 @@
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
-
 
 public class BuildingHandler : SerializedMonoBehaviour 
 {
     public Dictionary<int, List<Building>> BuildingGroups = new Dictionary<int, List<Building>>();
+    public Dictionary<Vector3Int, BuildingData> BuildingData = new Dictionary<Vector3Int, BuildingData>();
 
     [Title("Mesh Information")]
     [SerializeField]
     private TowerMeshData towerMeshData;
+
+    [Title("State Data")]
+    [SerializeField]
+    private ArcherData archerData;
+
+    [SerializeField]
+    private NormalHouseData normalData;
 
     private List<Building> buildingQueue = new List<Building>();
     private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
@@ -21,22 +28,60 @@ public class BuildingHandler : SerializedMonoBehaviour
     private int groupIndexCounter = 0;
     private bool chilling = false;
 
+    public ArcherData ArcherData => archerData;
+    public NormalHouseData NormalData => normalData;
+
+    public BuildingData this[Building building]
+    {
+        get 
+        { 
+            if (BuildingData.TryGetValue(building.Index, out BuildingData data))
+            {
+                return data;
+            }
+
+            return null; 
+        }
+    }
+
     #region Handling Groups
+
     public async void AddBuilding(Building building)
     {
         buildingQueue.Add(building);
-        UpdateBuildingState(building);
         if (chilling) return;
 
         chilling = true;
         await Task.Yield();
         chilling = false;
 
+        for (int i = 0; i < buildingQueue.Count; i++)
+        {
+            if (!BuildingData.ContainsKey(building.Index))
+            {
+                BuildingData.Add(building.Index, CreateData(buildingQueue[i]));
+            }
+        }
+
         BuildingGroups.Add(++groupIndexCounter, new List<Building>(buildingQueue));
         buildingQueue.ForEach(building => building.BuildingGroupIndex = groupIndexCounter);
         buildingQueue.Clear();
 
         CheckMerge(groupIndexCounter);
+    }
+
+    private BuildingData CreateData(Building building)
+    {
+        if (!towerMeshData.TowerMeshes.TryGetValue(building.Mesh, out BuildingCellInformation cellInfo))
+        {
+            Debug.LogError("Please add all meshes to the list");
+            return null;
+        }
+
+        BuildingData data = new BuildingData(this);
+        data.SetState(cellInfo);
+
+        return data;
     }
 
     private void CheckMerge(int groupToCheck)
@@ -93,22 +138,14 @@ public class BuildingHandler : SerializedMonoBehaviour
         }
     }
 
-    public void UpdateBuildingState(Building building)
+    public void BuildingDestroyed(Vector3Int buildingIndex)
     {
-        if (!towerMeshData.TowerMeshes.TryGetValue(building.Mesh, out BuildingCellInformation value))
-        {
-            return;
-        }
+        Building building = GetBuilding(buildingIndex);
 
-        switch (value.TowerType)
-        {
-            case TowerType.Archer:
-                building.SetState<ArcherState>();
-                break;
-            default:
-                break;
-        }
+        building.DislayDeath();
+        Events.OnBuildingDestroyed?.Invoke(building);
     }
+
     #endregion
 
     #region Utility
@@ -126,6 +163,23 @@ public class BuildingHandler : SerializedMonoBehaviour
 
         return total;
     }
+
+    private Building GetBuilding(Vector3Int buildingIndex)
+    {
+        foreach (List<Building> list in BuildingGroups.Values)
+        {
+            foreach (Building building in list)
+            {
+                if (building.Index == buildingIndex)
+                {
+                    return building;
+                }
+            }
+        }
+
+        return null;
+    }
+
 
     #endregion
 
@@ -172,6 +226,12 @@ public class BuildingHandler : SerializedMonoBehaviour
 
         unSelectedBuildings.Clear();
     }
+
+    public void DislpayLevelUp(Vector3Int index)
+    {
+        GetBuilding(index).DisplayLevelUp();
+    }
+
 
     #endregion
 }

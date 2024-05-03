@@ -51,7 +51,6 @@ public class EnemyAttacker : MonoBehaviour
         Vector3 pos = transform.position + transform.forward * attackData.AttackRadius;
         Physics.OverlapSphereNonAlloc(pos, attackData.AttackRadius, hitResults, attackData.LayerMask);
 
-        int damageDones = 0;
         for (int i = 0; i < hitResults.Length; i++)
         {
             if (hitResults[i] == null)
@@ -64,21 +63,15 @@ public class EnemyAttacker : MonoBehaviour
                 continue;
             }
 
-            if (hitResults[i].TryGetComponent<IHealth>(out IHealth health))
+            if (hitResults[i].TryGetComponent(out IHealth<BuildingHealth> health))
             {
                 health.TakeDamage(attackData.Damage);
-
-                if (!attackData.Splash || ++damageDones >= attackData.MaxTargets)
-                {
-                    break;
-                }
             }
         }
     }
 
     public void StartAttacking()
     {
-        FightManager.Instance.JoinFight(this);
         Attacking = true;
     }
 

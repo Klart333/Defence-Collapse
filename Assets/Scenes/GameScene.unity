@@ -152,7 +152,7 @@ Transform:
   m_GameObject: {fileID: 83554759}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 58, y: 0, z: 0}
+  m_LocalPosition: {x: 68, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -235,7 +235,7 @@ Transform:
   m_GameObject: {fileID: 138357091}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 70, y: 0, z: 0}
+  m_LocalPosition: {x: 80, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -400,7 +400,29 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: BuildingData
+      Entry: 7
+      Data: 2|System.Collections.Generic.Dictionary`2[[UnityEngine.Vector3Int, UnityEngine.CoreModule],[BuildingData,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[UnityEngine.Vector3Int,
+        UnityEngine.CoreModule]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   towerMeshData: {fileID: 11400000, guid: 6a80373d5d2a40444a8f9391c08a93a2, type: 2}
+  archerData: {fileID: 11400000, guid: 63d7b88ca2073ef4c9b83b155b57a4d4, type: 2}
+  normalData: {fileID: 11400000, guid: 185ee242170670a449435143c8e04b14, type: 2}
 --- !u!4 &248058524 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1507636620937791777, guid: 7097ba7ba649e1f41bba232312bdcbd8,
@@ -911,7 +933,7 @@ Transform:
   m_GameObject: {fileID: 517473113}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 60, y: 0, z: 0}
+  m_LocalPosition: {x: 70, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1084,6 +1106,96 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7233659faf3995438ad23c2836900e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &595201291
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 595201292}
+  - component: {fileID: 595201294}
+  - component: {fileID: 595201293}
+  m_Layer: 0
+  m_Name: "CornerV\xE4gTv\xE5"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &595201292
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 595201291}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 44, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450653428238845}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &595201293
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 595201291}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: df6ba97d9f327ca4ebf0c2680397425d, type: 2}
+  - {fileID: 2100000, guid: 51c7bc1c690011e429fd3b01099ab4a8, type: 2}
+  - {fileID: 2100000, guid: 27531c8919c6be2449381d266549386e, type: 2}
+  - {fileID: 2100000, guid: 5f2ee328feb75004a85ad18e6d2bd52f, type: 2}
+  - {fileID: 2100000, guid: ba8ae5a365dabb14f950bf71e9056d11, type: 2}
+  - {fileID: 2100000, guid: 9ed8c7cb4790453478a3be228d9019d1, type: 2}
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &595201294
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 595201291}
+  m_Mesh: {fileID: -908205490959642342, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
 --- !u!1 &606289847
 GameObject:
   m_ObjectHideFlags: 0
@@ -1300,13 +1412,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cb744dae68ef584d9ada0845f704c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fighters:
-  - {fileID: 8457456111344188751, guid: f5f586e10ee348e46ad59a3c7948052a, type: 3}
-  - {fileID: 6663480744001697702, guid: b1f42fe4ebeb6924289bfdebe73e6cae, type: 3}
-  - {fileID: 276865681142667307, guid: 8a5d56dc92ccf0f438a28063d608d2b0, type: 3}
-  - {fileID: 5954727390434316506, guid: 06467ad6de5ce5a43973f78f6ac9487e, type: 3}
-  - {fileID: 7041883359245195382, guid: cd112ea373c94594a90808f7cd5b1a2b, type: 3}
-  - {fileID: 4362714054275815166, guid: 190152c3d3a896b45914e1106de9e16c, type: 3}
   townPrototypeInfo: {fileID: 919132149426885448}
   keyData: {fileID: 11400000, guid: 0d5537a423659514aa3f257234abfd92, type: 2}
   mats:
@@ -1329,7 +1434,7 @@ MonoBehaviour:
     type: 3}
   pathPrefab: {fileID: 4495732854823147107, guid: 484727eef20b98044ad4c2a101b87638,
     type: 3}
-  CastleIndex: 28
+  CastleIndex: 36
   unableToPlacePrefab: {fileID: -7155613184035295475, guid: 37457fca56525af4bab8884b7e239b05,
     type: 3}
   DebugPropagate: 0
@@ -1604,7 +1709,7 @@ Transform:
   m_GameObject: {fileID: 879759155}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 62, y: 0, z: 0}
+  m_LocalPosition: {x: 72, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1692,7 +1797,7 @@ Transform:
   - {fileID: 2114986767}
   - {fileID: 771210303}
   - {fileID: 2128825987}
-  - {fileID: 1043400492}
+  - {fileID: 1266994772}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &920425042
@@ -1824,7 +1929,7 @@ Transform:
   m_GameObject: {fileID: 981717081}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 64, y: 0, z: 0}
+  m_LocalPosition: {x: 74, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2112,7 +2217,7 @@ MonoBehaviour:
   gridSizeX: 20
   gridSizeY: 5
   gridSizeZ: 20
-  gridSize: {x: 2, y: 2, z: 2}
+  gridSize: {x: 2, y: 1.25, z: 2}
   mats:
   - {fileID: 2100000, guid: 16f4b84d776954947aab5daf6fa0d289, type: 2}
   - {fileID: 2100000, guid: a01118aad3fb8a2428db51d380136f69, type: 2}
@@ -2205,50 +2310,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
---- !u!1 &1043400491
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1043400492}
-  - component: {fileID: 1043400493}
-  m_Layer: 0
-  m_Name: FightManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1043400492
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1043400491}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 883032810}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1043400493
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1043400491}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6d7950a9da1501409fc21e0176c81d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1156438177
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2461,6 +2522,50 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1229629331}
   m_Mesh: {fileID: 3284045297738311301, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
+--- !u!1 &1266994771
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1266994772}
+  - component: {fileID: 1266994773}
+  m_Layer: 0
+  m_Name: InputManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1266994772
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266994771}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 883032810}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1266994773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266994771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4ae3293f935b44418e9a9f1b29abf5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1283559405
 GameObject:
   m_ObjectHideFlags: 0
@@ -2488,7 +2593,7 @@ Transform:
   m_GameObject: {fileID: 1283559405}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 68, y: 0, z: 0}
+  m_LocalPosition: {x: 78, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2603,6 +2708,101 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1411626119}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1350447462
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1350447463}
+  - component: {fileID: 1350447465}
+  - component: {fileID: 1350447464}
+  m_Layer: 0
+  m_Name: Kanon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1350447463
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1350447462}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 18, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450653428238845}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1350447464
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1350447462}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 336fde5d73b795f4a92284b079bbb8ae, type: 2}
+  - {fileID: 2100000, guid: dcf24194234791f4eb774c56fc7a116a, type: 2}
+  - {fileID: 2100000, guid: 151d92f94f810ff42bb22c65cd312911, type: 2}
+  - {fileID: 2100000, guid: fe8c0f2ef81ea264d80361a04f89d498, type: 2}
+  - {fileID: 2100000, guid: 7270f1ebe2f850a418184d13fa7a07ac, type: 2}
+  - {fileID: 2100000, guid: ba8ae5a365dabb14f950bf71e9056d11, type: 2}
+  - {fileID: 2100000, guid: 9ed8c7cb4790453478a3be228d9019d1, type: 2}
+  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: df6ba97d9f327ca4ebf0c2680397425d, type: 2}
+  - {fileID: 2100000, guid: 51c7bc1c690011e429fd3b01099ab4a8, type: 2}
+  - {fileID: 2100000, guid: 27531c8919c6be2449381d266549386e, type: 2}
+  - {fileID: 2100000, guid: 5f2ee328feb75004a85ad18e6d2bd52f, type: 2}
+  - {fileID: 2100000, guid: ee14b765a8c1c4c459072a2a8288dd19, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1350447465
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1350447462}
+  m_Mesh: {fileID: -3371431772542518902, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
 --- !u!224 &1374792773 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8285618638795453120, guid: 1efa44b3173d3934d81649ef81816d76,
@@ -2644,6 +2844,96 @@ Transform:
   - {fileID: 304523227}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1470401727
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1470401728}
+  - component: {fileID: 1470401730}
+  - component: {fileID: 1470401729}
+  m_Layer: 0
+  m_Name: "CornerV\xE4g"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1470401728
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1470401727}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 42, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450653428238845}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1470401729
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1470401727}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: df6ba97d9f327ca4ebf0c2680397425d, type: 2}
+  - {fileID: 2100000, guid: 51c7bc1c690011e429fd3b01099ab4a8, type: 2}
+  - {fileID: 2100000, guid: 27531c8919c6be2449381d266549386e, type: 2}
+  - {fileID: 2100000, guid: 5f2ee328feb75004a85ad18e6d2bd52f, type: 2}
+  - {fileID: 2100000, guid: ba8ae5a365dabb14f950bf71e9056d11, type: 2}
+  - {fileID: 2100000, guid: 9ed8c7cb4790453478a3be228d9019d1, type: 2}
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1470401730
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1470401727}
+  m_Mesh: {fileID: -1903048061135578617, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
 --- !u!1 &1542537141
 GameObject:
   m_ObjectHideFlags: 0
@@ -2671,7 +2961,7 @@ Transform:
   m_GameObject: {fileID: 1542537141}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 72, y: 0, z: 0}
+  m_LocalPosition: {x: 82, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2727,6 +3017,101 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1542537141}
   m_Mesh: {fileID: -2567829001626921295, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
+--- !u!1 &1549082596
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1549082597}
+  - component: {fileID: 1549082599}
+  - component: {fileID: 1549082598}
+  m_Layer: 0
+  m_Name: "SideV\xE4gTv\xE5"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1549082597
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1549082596}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 48, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450653428238845}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1549082598
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1549082596}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: df6ba97d9f327ca4ebf0c2680397425d, type: 2}
+  - {fileID: 2100000, guid: 2ac9650ffee441946a8318039ca89ca3, type: 2}
+  - {fileID: 2100000, guid: ee14b765a8c1c4c459072a2a8288dd19, type: 2}
+  - {fileID: 2100000, guid: 151d92f94f810ff42bb22c65cd312911, type: 2}
+  - {fileID: 2100000, guid: fe8c0f2ef81ea264d80361a04f89d498, type: 2}
+  - {fileID: 2100000, guid: 7270f1ebe2f850a418184d13fa7a07ac, type: 2}
+  - {fileID: 2100000, guid: ba8ae5a365dabb14f950bf71e9056d11, type: 2}
+  - {fileID: 2100000, guid: 9ed8c7cb4790453478a3be228d9019d1, type: 2}
+  - {fileID: 2100000, guid: 51c7bc1c690011e429fd3b01099ab4a8, type: 2}
+  - {fileID: 2100000, guid: 27531c8919c6be2449381d266549386e, type: 2}
+  - {fileID: 2100000, guid: 5f2ee328feb75004a85ad18e6d2bd52f, type: 2}
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1549082599
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1549082596}
+  m_Mesh: {fileID: 8215602897308637777, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
 --- !u!1 &1611296565
 GameObject:
   m_ObjectHideFlags: 0
@@ -2809,6 +3194,101 @@ Transform:
   - {fileID: 968201795}
   m_Father: {fileID: 920425043}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1674400924
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1674400925}
+  - component: {fileID: 1674400927}
+  - component: {fileID: 1674400926}
+  m_Layer: 0
+  m_Name: "SideV\xE4g"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1674400925
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674400924}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 46, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450653428238845}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1674400926
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674400924}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: df6ba97d9f327ca4ebf0c2680397425d, type: 2}
+  - {fileID: 2100000, guid: 2ac9650ffee441946a8318039ca89ca3, type: 2}
+  - {fileID: 2100000, guid: ee14b765a8c1c4c459072a2a8288dd19, type: 2}
+  - {fileID: 2100000, guid: 151d92f94f810ff42bb22c65cd312911, type: 2}
+  - {fileID: 2100000, guid: fe8c0f2ef81ea264d80361a04f89d498, type: 2}
+  - {fileID: 2100000, guid: 7270f1ebe2f850a418184d13fa7a07ac, type: 2}
+  - {fileID: 2100000, guid: ba8ae5a365dabb14f950bf71e9056d11, type: 2}
+  - {fileID: 2100000, guid: 9ed8c7cb4790453478a3be228d9019d1, type: 2}
+  - {fileID: 2100000, guid: 51c7bc1c690011e429fd3b01099ab4a8, type: 2}
+  - {fileID: 2100000, guid: 27531c8919c6be2449381d266549386e, type: 2}
+  - {fileID: 2100000, guid: 5f2ee328feb75004a85ad18e6d2bd52f, type: 2}
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1674400927
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674400924}
+  m_Mesh: {fileID: 7627949322272861883, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
 --- !u!1 &1784158340
 GameObject:
   m_ObjectHideFlags: 0
@@ -2910,7 +3390,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1823361146
 Transform:
   m_ObjectHideFlags: 0
@@ -3102,7 +3582,7 @@ Transform:
   m_GameObject: {fileID: 1998122477}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 66, y: 0, z: 0}
+  m_LocalPosition: {x: 76, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3530,7 +4010,7 @@ Transform:
   m_GameObject: {fileID: 7792306144668418013}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 32, y: 0, z: 0}
+  m_LocalPosition: {x: 34, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3569,7 +4049,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5496091625695386901}
-  m_Mesh: {fileID: 1267780560191349415, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
+  m_Mesh: {fileID: 5937798867116710043, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
 --- !u!4 &543450653428238845
 Transform:
   m_ObjectHideFlags: 0
@@ -3586,12 +4066,15 @@ Transform:
   - {fileID: 1800372620477582758}
   - {fileID: 4413080253675096811}
   - {fileID: 8831193892550390218}
+  - {fileID: 1470401728}
+  - {fileID: 595201292}
   - {fileID: 3644251753383448605}
   - {fileID: 2758775242036250590}
   - {fileID: 7433980463988477709}
   - {fileID: 7140357448543096769}
   - {fileID: 6242416476658786109}
   - {fileID: 1823361146}
+  - {fileID: 1350447463}
   - {fileID: 8471640077736776285}
   - {fileID: 3308589320641008296}
   - {fileID: 7271590866574509238}
@@ -3603,6 +4086,8 @@ Transform:
   - {fileID: 6446495092126971552}
   - {fileID: 2566634721262133765}
   - {fileID: 3719050116202251392}
+  - {fileID: 1674400925}
+  - {fileID: 1549082597}
   - {fileID: 1855142462621752889}
   - {fileID: 993496507149202315}
   - {fileID: 3639837840568639964}
@@ -3710,7 +4195,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5811217408946461111}
-  m_Mesh: {fileID: 588136045208603955, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
+  m_Mesh: {fileID: -647029702972141776, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
 --- !u!1 &798141853156309416
 GameObject:
   m_ObjectHideFlags: 0
@@ -3821,26 +4306,15 @@ MonoBehaviour:
   positiveKey: -1s
   overrideVerticalNegative: 0
   negativeKey: v-1_0
+  moduleScale: {x: 2, y: 2, z: 2}
   Prototypes:
   - MeshRot:
       Mesh: {fileID: -5221963080773851136, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 0
     PosX: -1s
-    NegX: -1s
-    PosZ: -1s
-    NegZ: 0
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 04000000020000000800000003000000010000000a00000009000000
-  - MeshRot:
-      Mesh: {fileID: -5221963080773851136, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
-        type: 3}
-      Rot: 1
-    PosX: -1s
     NegX: 0
-    PosZ: -1s
+    PosZ: 0f
     NegZ: -1s
     PosY: -1s
     NegY: -1s
@@ -3849,8 +4323,8 @@ MonoBehaviour:
   - MeshRot:
       Mesh: {fileID: -5221963080773851136, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
-      Rot: 2
-    PosX: -1s
+      Rot: 1
+    PosX: 0f
     NegX: -1s
     PosZ: 0
     NegZ: -1s
@@ -3861,11 +4335,23 @@ MonoBehaviour:
   - MeshRot:
       Mesh: {fileID: -5221963080773851136, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
-      Rot: 3
+      Rot: 2
     PosX: 0
     NegX: -1s
     PosZ: -1s
-    NegZ: -1s
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000800000003000000010000000a00000009000000
+  - MeshRot:
+      Mesh: {fileID: -5221963080773851136, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 3
+    PosX: -1s
+    NegX: 0f
+    PosZ: -1s
+    NegZ: 0
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -3875,20 +4361,8 @@ MonoBehaviour:
         type: 3}
       Rot: 0
     PosX: -1s
-    NegX: -1s
-    PosZ: -1s
-    NegZ: 0
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000
-  - MeshRot:
-      Mesh: {fileID: -3795498683421210227, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
-        type: 3}
-      Rot: 1
-    PosX: -1s
     NegX: 0
-    PosZ: -1s
+    PosZ: 0f
     NegZ: -1s
     PosY: -1s
     NegY: -1s
@@ -3897,8 +4371,8 @@ MonoBehaviour:
   - MeshRot:
       Mesh: {fileID: -3795498683421210227, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
-      Rot: 2
-    PosX: -1s
+      Rot: 1
+    PosX: 0f
     NegX: -1s
     PosZ: 0
     NegZ: -1s
@@ -3909,11 +4383,23 @@ MonoBehaviour:
   - MeshRot:
       Mesh: {fileID: -3795498683421210227, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
-      Rot: 3
+      Rot: 2
     PosX: 0
     NegX: -1s
     PosZ: -1s
-    NegZ: -1s
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000
+  - MeshRot:
+      Mesh: {fileID: -3795498683421210227, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 3
+    PosX: -1s
+    NegX: 0f
+    PosZ: -1s
+    NegZ: 0
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -3922,19 +4408,8 @@ MonoBehaviour:
       Mesh: {fileID: 195190278030599791, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
       Rot: 0
     PosX: -1s
-    NegX: -1s
-    PosZ: -1s
-    NegZ: 0
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 04000000020000000e0000000b000000
-  - MeshRot:
-      Mesh: {fileID: 195190278030599791, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
-      Rot: 1
-    PosX: -1s
     NegX: 0
-    PosZ: -1s
+    PosZ: 0f
     NegZ: -1s
     PosY: -1s
     NegY: -1s
@@ -3942,8 +4417,8 @@ MonoBehaviour:
     MaterialIndexes: 04000000020000000e0000000b000000
   - MeshRot:
       Mesh: {fileID: 195190278030599791, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
-      Rot: 2
-    PosX: -1s
+      Rot: 1
+    PosX: 0f
     NegX: -1s
     PosZ: 0
     NegZ: -1s
@@ -3953,23 +4428,130 @@ MonoBehaviour:
     MaterialIndexes: 04000000020000000e0000000b000000
   - MeshRot:
       Mesh: {fileID: 195190278030599791, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
-      Rot: 3
+      Rot: 2
     PosX: 0
     NegX: -1s
     PosZ: -1s
-    NegZ: -1s
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b000000
   - MeshRot:
+      Mesh: {fileID: 195190278030599791, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
+      Rot: 3
+    PosX: -1s
+    NegX: 0f
+    PosZ: -1s
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000e0000000b000000
+  - MeshRot:
+      Mesh: {fileID: -1903048061135578617, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 1
+    PosZ: 0f
+    NegZ: 2
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000500000007000000060000000a0000000900000000000000
+  - MeshRot:
+      Mesh: {fileID: -1903048061135578617, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 1
+    PosX: 0f
+    NegX: 2
+    PosZ: 1
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000500000007000000060000000a0000000900000000000000
+  - MeshRot:
+      Mesh: {fileID: -1903048061135578617, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 2
+    PosX: 1
+    NegX: -1s
+    PosZ: 2
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000500000007000000060000000a0000000900000000000000
+  - MeshRot:
+      Mesh: {fileID: -1903048061135578617, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 3
+    PosX: 2
+    NegX: 0f
+    PosZ: -1s
+    NegZ: 1
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000500000007000000060000000a0000000900000000000000
+  - MeshRot:
+      Mesh: {fileID: -908205490959642342, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 0
+    PosX: 2f
+    NegX: 0
+    PosZ: 1f
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000500000007000000060000000a0000000900000000000000
+  - MeshRot:
+      Mesh: {fileID: -908205490959642342, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 1
+    PosX: 1f
+    NegX: -1s
+    PosZ: 0
+    NegZ: 2f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000500000007000000060000000a0000000900000000000000
+  - MeshRot:
+      Mesh: {fileID: -908205490959642342, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 2
+    PosX: 0
+    NegX: 2f
+    PosZ: -1s
+    NegZ: 1f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000500000007000000060000000a0000000900000000000000
+  - MeshRot:
+      Mesh: {fileID: -908205490959642342, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 3
+    PosX: -1s
+    NegX: 1f
+    PosZ: 2f
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000500000007000000060000000a0000000900000000000000
+  - MeshRot:
       Mesh: {fileID: -6986275237000010781, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 0
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -3978,10 +4560,10 @@ MonoBehaviour:
       Mesh: {fileID: -6986275237000010781, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 1
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -3990,10 +4572,10 @@ MonoBehaviour:
       Mesh: {fileID: -6986275237000010781, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4002,10 +4584,10 @@ MonoBehaviour:
       Mesh: {fileID: -6986275237000010781, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 3
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4014,10 +4596,10 @@ MonoBehaviour:
       Mesh: {fileID: 4952218755371547725, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 0
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4026,10 +4608,10 @@ MonoBehaviour:
       Mesh: {fileID: 4952218755371547725, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 1
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4038,10 +4620,10 @@ MonoBehaviour:
       Mesh: {fileID: 4952218755371547725, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4050,10 +4632,10 @@ MonoBehaviour:
       Mesh: {fileID: 4952218755371547725, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 3
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4062,10 +4644,10 @@ MonoBehaviour:
       Mesh: {fileID: -4495056330898510065, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 0
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4074,10 +4656,10 @@ MonoBehaviour:
       Mesh: {fileID: -4495056330898510065, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 1
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4086,10 +4668,10 @@ MonoBehaviour:
       Mesh: {fileID: -4495056330898510065, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4098,10 +4680,10 @@ MonoBehaviour:
       Mesh: {fileID: -4495056330898510065, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 3
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4110,10 +4692,10 @@ MonoBehaviour:
       Mesh: {fileID: -9047360436369011024, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 0
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4122,10 +4704,10 @@ MonoBehaviour:
       Mesh: {fileID: -9047360436369011024, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 1
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4134,10 +4716,10 @@ MonoBehaviour:
       Mesh: {fileID: -9047360436369011024, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4146,166 +4728,166 @@ MonoBehaviour:
       Mesh: {fileID: -9047360436369011024, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 3
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
-      Mesh: {fileID: 1267780560191349415, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 5937798867116710043, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 0
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: v0_0
     NegY: -1s
-    Weight: 2
+    Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
-      Mesh: {fileID: 1267780560191349415, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 5937798867116710043, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 1
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: v0_1
     NegY: -1s
-    Weight: 2
+    Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
-      Mesh: {fileID: 1267780560191349415, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 5937798867116710043, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: v0_2
     NegY: -1s
-    Weight: 2
+    Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
-      Mesh: {fileID: 1267780560191349415, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 5937798867116710043, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 3
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: v0_3
     NegY: -1s
-    Weight: 2
+    Weight: 1
     MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
-      Mesh: {fileID: 9159000641327015936, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: -3371431772542518902, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 0
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: v1_0
     NegY: -1s
     Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000500000006000000070000000800000003000000010000000a000000090000000b000000050000000600000007000000
+    MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
-      Mesh: {fileID: 9159000641327015936, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: -3371431772542518902, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 1
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: v1_1
     NegY: -1s
     Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000500000006000000070000000800000003000000010000000a000000090000000b000000050000000600000007000000
+    MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
-      Mesh: {fileID: 9159000641327015936, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: -3371431772542518902, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: v1_2
     NegY: -1s
     Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000500000006000000070000000800000003000000010000000a000000090000000b000000050000000600000007000000
+    MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
-      Mesh: {fileID: 9159000641327015936, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: -3371431772542518902, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 3
-    PosX: 1s
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 1s
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
     PosY: v1_3
     NegY: -1s
     Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000500000006000000070000000800000003000000010000000a000000090000000b000000050000000600000007000000
+    MaterialIndexes: 0c0000000d0000000800000003000000010000000a0000000900000004000000020000000500000007000000060000000b000000
   - MeshRot:
       Mesh: {fileID: -2165619673777175142, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 0
-    PosX: 2
-    NegX: 1s
-    PosZ: 2f
-    NegZ: 1s
+    PosX: 3s
+    NegX: 0f
+    PosZ: 0
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
-    Weight: 1
+    Weight: 2
     MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
       Mesh: {fileID: -2165619673777175142, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 1
-    PosX: 2f
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 2
+    PosX: 0
+    NegX: 3s
+    PosZ: 0f
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
-    Weight: 1
+    Weight: 2
     MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
       Mesh: {fileID: -2165619673777175142, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: 1s
-    NegX: 2
-    PosZ: 1s
-    NegZ: 2f
+    PosX: 0f
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 0
     PosY: -1s
     NegY: -1s
-    Weight: 1
+    Weight: 2
     MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
       Mesh: {fileID: -2165619673777175142, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 3
-    PosX: 1s
-    NegX: 2f
-    PosZ: 2
-    NegZ: 1s
+    PosX: 3s
+    NegX: 0
+    PosZ: 3s
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
-    Weight: 1
+    Weight: 2
     MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
       Mesh: {fileID: -4245282036596823359, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 0
-    PosX: 2
-    NegX: 1s
-    PosZ: 2f
-    NegZ: 1s
+    PosX: 3s
+    NegX: 0f
+    PosZ: 0
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4314,10 +4896,10 @@ MonoBehaviour:
       Mesh: {fileID: -4245282036596823359, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 1
-    PosX: 2f
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 2
+    PosX: 0
+    NegX: 3s
+    PosZ: 0f
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4326,10 +4908,10 @@ MonoBehaviour:
       Mesh: {fileID: -4245282036596823359, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: 1s
-    NegX: 2
-    PosZ: 1s
-    NegZ: 2f
+    PosX: 0f
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 0
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4338,10 +4920,10 @@ MonoBehaviour:
       Mesh: {fileID: -4245282036596823359, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 3
-    PosX: 1s
-    NegX: 2f
-    PosZ: 2
-    NegZ: 1s
+    PosX: 3s
+    NegX: 0
+    PosZ: 3s
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4350,10 +4932,10 @@ MonoBehaviour:
       Mesh: {fileID: 5551488887926306514, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 0
-    PosX: 2
-    NegX: 1s
-    PosZ: 2f
-    NegZ: 1s
+    PosX: 3s
+    NegX: 0f
+    PosZ: 0
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4362,10 +4944,10 @@ MonoBehaviour:
       Mesh: {fileID: 5551488887926306514, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 1
-    PosX: 2f
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 2
+    PosX: 0
+    NegX: 3s
+    PosZ: 0f
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4374,10 +4956,10 @@ MonoBehaviour:
       Mesh: {fileID: 5551488887926306514, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: 1s
-    NegX: 2
-    PosZ: 1s
-    NegZ: 2f
+    PosX: 0f
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 0
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4386,92 +4968,80 @@ MonoBehaviour:
       Mesh: {fileID: 5551488887926306514, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 3
-    PosX: 1s
-    NegX: 2f
-    PosZ: 2
-    NegZ: 1s
+    PosX: 3s
+    NegX: 0
+    PosZ: 3s
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
     Weight: 1
     MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000500000007000000060000000e0000000b000000
   - MeshRot:
-      Mesh: {fileID: 5719883523035528992, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 7131293258096355999, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 0
-    PosX: -1s
-    NegX: -1s
-    PosZ: 0
-    NegZ: 0
+    PosX: 0
+    NegX: 0
+    PosZ: 0f
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a00000009000000
   - MeshRot:
-      Mesh: {fileID: 5719883523035528992, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 7131293258096355999, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 1
-    PosX: 0
-    NegX: 0
-    PosZ: -1s
-    NegZ: -1s
+    PosX: 0f
+    NegX: 0f
+    PosZ: 0
+    NegZ: 0
     PosY: -1s
     NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a00000009000000
   - MeshRot:
-      Mesh: {fileID: 5719883523035528992, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 7131293258096355999, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: -1s
-    NegX: -1s
-    PosZ: 0
-    NegZ: 0
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a00000009000000
-  - MeshRot:
-      Mesh: {fileID: 5719883523035528992, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
-        type: 3}
-      Rot: 3
     PosX: 0
     NegX: 0
-    PosZ: -1s
-    NegZ: -1s
+    PosZ: 0f
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a00000009000000
   - MeshRot:
-      Mesh: {fileID: 3554958999884863049, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 7131293258096355999, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
-      Rot: 0
-    PosX: -1s
-    NegX: -1s
+      Rot: 3
+    PosX: 0f
+    NegX: 0f
     PosZ: 0
     NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a00000009000000
+  - MeshRot:
+      Mesh: {fileID: -236761418977151314, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 0
+    PosX: 0
+    NegX: 0
+    PosZ: 0f
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
-      Mesh: {fileID: 3554958999884863049, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: -236761418977151314, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 1
-    PosX: 0
-    NegX: 0
-    PosZ: -1s
-    NegZ: -1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
-  - MeshRot:
-      Mesh: {fileID: 3554958999884863049, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
-        type: 3}
-      Rot: 2
-    PosX: -1s
-    NegX: -1s
+    PosX: 0f
+    NegX: 0f
     PosZ: 0
     NegZ: 0
     PosY: -1s
@@ -4479,23 +5049,23 @@ MonoBehaviour:
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
-      Mesh: {fileID: 3554958999884863049, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: -236761418977151314, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
-      Rot: 3
+      Rot: 2
     PosX: 0
     NegX: 0
-    PosZ: -1s
-    NegZ: -1s
+    PosZ: 0f
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
-      Mesh: {fileID: 7215291286705372235, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: -236761418977151314, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
-      Rot: 0
-    PosX: -1s
-    NegX: -1s
+      Rot: 3
+    PosX: 0f
+    NegX: 0f
     PosZ: 0
     NegZ: 0
     PosY: -1s
@@ -4505,11 +5075,23 @@ MonoBehaviour:
   - MeshRot:
       Mesh: {fileID: 7215291286705372235, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
-      Rot: 1
+      Rot: 0
     PosX: 0
     NegX: 0
-    PosZ: -1s
-    NegZ: -1s
+    PosZ: 0f
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
+  - MeshRot:
+      Mesh: {fileID: 7215291286705372235, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 1
+    PosX: 0f
+    NegX: 0f
+    PosZ: 0
+    NegZ: 0
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4518,10 +5100,10 @@ MonoBehaviour:
       Mesh: {fileID: 7215291286705372235, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: -1s
-    NegX: -1s
-    PosZ: 0
-    NegZ: 0
+    PosX: 0
+    NegX: 0
+    PosZ: 0f
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4530,19 +5112,32 @@ MonoBehaviour:
       Mesh: {fileID: 7215291286705372235, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 3
-    PosX: 0
-    NegX: 0
-    PosZ: -1s
-    NegZ: -1s
+    PosX: 0f
+    NegX: 0f
+    PosZ: 0
+    NegZ: 0
     PosY: -1s
     NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a00000009000000080000000300000001000000
   - MeshRot:
-      Mesh: {fileID: 588136045208603955, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
+      Mesh: {fileID: -647029702972141776, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
       Rot: 0
-    PosX: -1s
-    NegX: -1s
+    PosX: 0
+    NegX: 0
+    PosZ: 0f
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000500000007000000060000000a000000090000000e0000000b000000
+  - MeshRot:
+      Mesh: {fileID: -647029702972141776, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 1
+    PosX: 0f
+    NegX: 0f
     PosZ: 0
     NegZ: 0
     PosY: -1s
@@ -4550,21 +5145,23 @@ MonoBehaviour:
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a000000090000000e0000000b000000
   - MeshRot:
-      Mesh: {fileID: 588136045208603955, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
-      Rot: 1
+      Mesh: {fileID: -647029702972141776, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 2
     PosX: 0
     NegX: 0
-    PosZ: -1s
-    NegZ: -1s
+    PosZ: 0f
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a000000090000000e0000000b000000
   - MeshRot:
-      Mesh: {fileID: 588136045208603955, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
-      Rot: 2
-    PosX: -1s
-    NegX: -1s
+      Mesh: {fileID: -647029702972141776, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 3
+    PosX: 0f
+    NegX: 0f
     PosZ: 0
     NegZ: 0
     PosY: -1s
@@ -4572,83 +5169,72 @@ MonoBehaviour:
     Weight: 1
     MaterialIndexes: 04000000020000000500000007000000060000000a000000090000000e0000000b000000
   - MeshRot:
-      Mesh: {fileID: 588136045208603955, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
+      Mesh: {fileID: 6846980478796422165, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 3s
+    PosZ: 0f
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
+  - MeshRot:
+      Mesh: {fileID: 6846980478796422165, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 1
+    PosX: 0f
+    NegX: 0
+    PosZ: 3s
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
+  - MeshRot:
+      Mesh: {fileID: 6846980478796422165, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 2
+    PosX: 3s
+    NegX: -1s
+    PosZ: 0
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
+  - MeshRot:
+      Mesh: {fileID: 6846980478796422165, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
       Rot: 3
     PosX: 0
+    NegX: 0f
+    PosZ: -1s
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
+  - MeshRot:
+      Mesh: {fileID: 6107168434265387731, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 3s
+    PosZ: 0f
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d00000004000000020000000500000007000000060000000a000000090000000b000000
+  - MeshRot:
+      Mesh: {fileID: 6107168434265387731, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 1
+    PosX: 0f
     NegX: 0
-    PosZ: -1s
-    NegZ: -1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 04000000020000000500000007000000060000000a000000090000000e0000000b000000
-  - MeshRot:
-      Mesh: {fileID: 6846980478796422165, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
-        type: 3}
-      Rot: 0
-    PosX: -1s
-    NegX: 1s
-    PosZ: 2f
-    NegZ: 2
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
-  - MeshRot:
-      Mesh: {fileID: 6846980478796422165, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
-        type: 3}
-      Rot: 1
-    PosX: 2f
-    NegX: 2
-    PosZ: 1s
-    NegZ: -1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
-  - MeshRot:
-      Mesh: {fileID: 6846980478796422165, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
-        type: 3}
-      Rot: 2
-    PosX: 1s
-    NegX: -1s
-    PosZ: 2
-    NegZ: 2f
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
-  - MeshRot:
-      Mesh: {fileID: 6846980478796422165, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
-        type: 3}
-      Rot: 3
-    PosX: 2
-    NegX: 2f
-    PosZ: -1s
-    NegZ: 1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 0c0000000d0000000800000003000000010000000a000000090000000400000002000000050000000700000006000000
-  - MeshRot:
-      Mesh: {fileID: 6107168434265387731, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
-        type: 3}
-      Rot: 0
-    PosX: -1s
-    NegX: 1s
-    PosZ: 2f
-    NegZ: 2
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000500000007000000060000000a000000090000000b000000
-  - MeshRot:
-      Mesh: {fileID: 6107168434265387731, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
-        type: 3}
-      Rot: 1
-    PosX: 2f
-    NegX: 2
-    PosZ: 1s
+    PosZ: 3s
     NegZ: -1s
     PosY: -1s
     NegY: -1s
@@ -4658,10 +5244,10 @@ MonoBehaviour:
       Mesh: {fileID: 6107168434265387731, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 2
-    PosX: 1s
+    PosX: 3s
     NegX: -1s
-    PosZ: 2
-    NegZ: 2f
+    PosZ: 0
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4670,10 +5256,10 @@ MonoBehaviour:
       Mesh: {fileID: 6107168434265387731, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
       Rot: 3
-    PosX: 2
-    NegX: 2f
+    PosX: 0
+    NegX: 0f
     PosZ: -1s
-    NegZ: 1s
+    NegZ: 3s
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4683,165 +5269,261 @@ MonoBehaviour:
         type: 3}
       Rot: 0
     PosX: -1s
-    NegX: 1s
-    PosZ: 2f
+    NegX: 3s
+    PosZ: 0f
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a00000009000000
+  - MeshRot:
+      Mesh: {fileID: -424148634991226531, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 1
+    PosX: 0f
+    NegX: 0
+    PosZ: 3s
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a00000009000000
+  - MeshRot:
+      Mesh: {fileID: -424148634991226531, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 2
+    PosX: 3s
+    NegX: -1s
+    PosZ: 0
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a00000009000000
+  - MeshRot:
+      Mesh: {fileID: -424148634991226531, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 3
+    PosX: 0
+    NegX: 0f
+    PosZ: -1s
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a00000009000000
+  - MeshRot:
+      Mesh: {fileID: 3136731941862727371, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 3s
+    PosZ: 0f
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000b000000
+  - MeshRot:
+      Mesh: {fileID: 3136731941862727371, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 1
+    PosX: 0f
+    NegX: 0
+    PosZ: 3s
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000b000000
+  - MeshRot:
+      Mesh: {fileID: 3136731941862727371, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 2
+    PosX: 3s
+    NegX: -1s
+    PosZ: 0
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000b000000
+  - MeshRot:
+      Mesh: {fileID: 3136731941862727371, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 3
+    PosX: 0
+    NegX: 0f
+    PosZ: -1s
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000b000000
+  - MeshRot:
+      Mesh: {fileID: 7627949322272861883, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 0
+    PosX: 2
+    NegX: 3s
+    PosZ: 0f
+    NegZ: 1
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a0000000900000005000000070000000600000000000000
+  - MeshRot:
+      Mesh: {fileID: 7627949322272861883, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 1
+    PosX: 0f
+    NegX: 1
+    PosZ: 3s
     NegZ: 2
     PosY: -1s
     NegY: -1s
     Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a00000009000000
+    MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a0000000900000005000000070000000600000000000000
   - MeshRot:
-      Mesh: {fileID: -424148634991226531, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 7627949322272861883, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
-      Rot: 1
-    PosX: 2f
+      Rot: 2
+    PosX: 3s
     NegX: 2
-    PosZ: 1s
-    NegZ: -1s
+    PosZ: 1
+    NegZ: 0f
     PosY: -1s
     NegY: -1s
     Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a00000009000000
+    MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a0000000900000005000000070000000600000000000000
   - MeshRot:
-      Mesh: {fileID: -424148634991226531, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 7627949322272861883, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
-      Rot: 2
-    PosX: 1s
-    NegX: -1s
+      Rot: 3
+    PosX: 1
+    NegX: 0f
     PosZ: 2
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a0000000900000005000000070000000600000000000000
+  - MeshRot:
+      Mesh: {fileID: 8215602897308637777, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 0
+    PosX: 2f
+    NegX: 3s
+    PosZ: 1f
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a0000000900000005000000070000000600000000000000
+  - MeshRot:
+      Mesh: {fileID: 8215602897308637777, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 1
+    PosX: 1f
+    NegX: 0
+    PosZ: 3s
     NegZ: 2f
     PosY: -1s
     NegY: -1s
     Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a00000009000000
+    MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a0000000900000005000000070000000600000000000000
   - MeshRot:
-      Mesh: {fileID: -424148634991226531, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 8215602897308637777, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
         type: 3}
-      Rot: 3
-    PosX: 2
+      Rot: 2
+    PosX: 3s
     NegX: 2f
-    PosZ: -1s
-    NegZ: 1s
+    PosZ: 0
+    NegZ: 1f
     PosY: -1s
     NegY: -1s
     Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a00000009000000
+    MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a0000000900000005000000070000000600000000000000
   - MeshRot:
-      Mesh: {fileID: 3136731941862727371, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: 8215602897308637777, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+        type: 3}
+      Rot: 3
+    PosX: 0
+    NegX: 1f
+    PosZ: 2f
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 04000000020000000e0000000b0000000800000003000000010000000a0000000900000005000000070000000600000000000000
+  - MeshRot:
+      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 0
     PosX: -1s
-    NegX: 1s
+    NegX: 2
     PosZ: 2f
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 2f
+    NegX: -1s
+    PosZ: 2
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: 2
+    NegX: -1s
+    PosZ: -1s
+    NegZ: 2f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: -1s
+    NegX: 2f
+    PosZ: -1s
     NegZ: 2
     PosY: -1s
     NegY: -1s
     Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000b000000
+    MaterialIndexes: 00000000
   - MeshRot:
-      Mesh: {fileID: 3136731941862727371, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: -3888198205423994651, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
-      Rot: 1
-    PosX: 2f
+      Rot: 0
+    PosX: 2
     NegX: 2
-    PosZ: 1s
-    NegZ: -1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000b000000
-  - MeshRot:
-      Mesh: {fileID: 3136731941862727371, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
-        type: 3}
-      Rot: 2
-    PosX: 1s
-    NegX: -1s
-    PosZ: 2
+    PosZ: 2f
     NegZ: 2f
     PosY: -1s
     NegY: -1s
     Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000b000000
+    MaterialIndexes: 00000000
   - MeshRot:
-      Mesh: {fileID: 3136731941862727371, guid: 82785ea186a3cda44ad3ed0f9faf6ba9,
+      Mesh: {fileID: -3888198205423994651, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
-      Rot: 3
-    PosX: 2
+      Rot: 1
+    PosX: 2f
     NegX: 2f
-    PosZ: -1s
-    NegZ: 1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 0c0000000d00000004000000020000000800000003000000010000000a000000090000000b000000
-  - MeshRot:
-      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
-        type: 3}
-      Rot: 0
-    PosX: -1s
-    NegX: 3
-    PosZ: 3f
-    NegZ: -1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
-        type: 3}
-      Rot: 1
-    PosX: 3f
-    NegX: -1s
-    PosZ: 3
-    NegZ: -1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
-        type: 3}
-      Rot: 2
-    PosX: 3
-    NegX: -1s
-    PosZ: -1s
-    NegZ: 3f
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -6231799127525388398, guid: 5600a9201c3fe584da45b4be12bcab5c,
-        type: 3}
-      Rot: 3
-    PosX: -1s
-    NegX: 3f
-    PosZ: -1s
-    NegZ: 3
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -3888198205423994651, guid: 5600a9201c3fe584da45b4be12bcab5c,
-        type: 3}
-      Rot: 0
-    PosX: 3
-    NegX: 3
-    PosZ: 3f
-    NegZ: 3f
-    PosY: -1s
-    NegY: -1s
-    Weight: 1
-    MaterialIndexes: 00000000
-  - MeshRot:
-      Mesh: {fileID: -3888198205423994651, guid: 5600a9201c3fe584da45b4be12bcab5c,
-        type: 3}
-      Rot: 1
-    PosX: 3f
-    NegX: 3f
-    PosZ: 3
-    NegZ: 3
+    PosZ: 2
+    NegZ: 2
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4850,10 +5532,10 @@ MonoBehaviour:
       Mesh: {fileID: -3888198205423994651, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 2
-    PosX: 3
-    NegX: 3
-    PosZ: 3f
-    NegZ: 3f
+    PosX: 2
+    NegX: 2
+    PosZ: 2f
+    NegZ: 2f
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4862,10 +5544,10 @@ MonoBehaviour:
       Mesh: {fileID: -3888198205423994651, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 3
-    PosX: 3f
-    NegX: 3f
-    PosZ: 3
-    NegZ: 3
+    PosX: 2f
+    NegX: 2f
+    PosZ: 2
+    NegZ: 2
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4922,9 +5604,9 @@ MonoBehaviour:
       Mesh: {fileID: -8140127113941725911, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 0
-    PosX: 3
+    PosX: 2
     NegX: 4s
-    PosZ: 3f
+    PosZ: 2f
     NegZ: 4s
     PosY: -1s
     NegY: -1s
@@ -4934,10 +5616,10 @@ MonoBehaviour:
       Mesh: {fileID: -8140127113941725911, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 1
-    PosX: 3f
+    PosX: 2f
     NegX: 4s
     PosZ: 4s
-    NegZ: 3
+    NegZ: 2
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4947,9 +5629,9 @@ MonoBehaviour:
         type: 3}
       Rot: 2
     PosX: 4s
-    NegX: 3
+    NegX: 2
     PosZ: 4s
-    NegZ: 3f
+    NegZ: 2f
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4959,8 +5641,8 @@ MonoBehaviour:
         type: 3}
       Rot: 3
     PosX: 4s
-    NegX: 3f
-    PosZ: 3
+    NegX: 2f
+    PosZ: 2
     NegZ: 4s
     PosY: -1s
     NegY: -1s
@@ -4972,8 +5654,8 @@ MonoBehaviour:
       Rot: 0
     PosX: -1s
     NegX: 4s
-    PosZ: 3f
-    NegZ: 3
+    PosZ: 2f
+    NegZ: 2
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -4982,8 +5664,8 @@ MonoBehaviour:
       Mesh: {fileID: 1741998683574915564, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 1
-    PosX: 3f
-    NegX: 3
+    PosX: 2f
+    NegX: 2
     PosZ: 4s
     NegZ: -1s
     PosY: -1s
@@ -4996,8 +5678,8 @@ MonoBehaviour:
       Rot: 2
     PosX: 4s
     NegX: -1s
-    PosZ: 3
-    NegZ: 3f
+    PosZ: 2
+    NegZ: 2f
     PosY: -1s
     NegY: -1s
     Weight: 1
@@ -5006,8 +5688,8 @@ MonoBehaviour:
       Mesh: {fileID: 1741998683574915564, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 3
-    PosX: 3
-    NegX: 3f
+    PosX: 2
+    NegX: 2f
     PosZ: -1s
     NegZ: 4s
     PosY: -1s
@@ -5020,7 +5702,7 @@ MonoBehaviour:
       Rot: 0
     PosX: -1s
     NegX: 5
-    PosZ: 3f
+    PosZ: 2f
     NegZ: -1s
     PosY: v2_0
     NegY: -1s
@@ -5030,7 +5712,7 @@ MonoBehaviour:
       Mesh: {fileID: 5992903784344201303, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 1
-    PosX: 3f
+    PosX: 2f
     NegX: -1s
     PosZ: 5
     NegZ: -1s
@@ -5045,7 +5727,7 @@ MonoBehaviour:
     PosX: 5
     NegX: -1s
     PosZ: -1s
-    NegZ: 3f
+    NegZ: 2f
     PosY: v2_2
     NegY: -1s
     Weight: 100
@@ -5055,7 +5737,7 @@ MonoBehaviour:
         type: 3}
       Rot: 3
     PosX: -1s
-    NegX: 3f
+    NegX: 2f
     PosZ: -1s
     NegZ: 5
     PosY: v2_3
@@ -5068,7 +5750,7 @@ MonoBehaviour:
       Rot: 0
     PosX: 5f
     NegX: -1s
-    PosZ: 3
+    PosZ: 2
     NegZ: -1s
     PosY: v3_0
     NegY: -1s
@@ -5078,7 +5760,7 @@ MonoBehaviour:
       Mesh: {fileID: 4924434598959762781, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 1
-    PosX: 3
+    PosX: 2
     NegX: -1s
     PosZ: -1s
     NegZ: 5f
@@ -5093,7 +5775,7 @@ MonoBehaviour:
     PosX: -1s
     NegX: 5f
     PosZ: -1s
-    NegZ: 3
+    NegZ: 2
     PosY: v3_2
     NegY: -1s
     Weight: 100
@@ -5103,7 +5785,7 @@ MonoBehaviour:
         type: 3}
       Rot: 3
     PosX: -1s
-    NegX: 3
+    NegX: 2
     PosZ: 5f
     NegZ: -1s
     PosY: v3_3
@@ -5117,7 +5799,7 @@ MonoBehaviour:
     PosX: -1s
     NegX: 6
     PosZ: -1s
-    NegZ: 3
+    NegZ: 2
     PosY: -1s
     NegY: v2_0
     Weight: 100
@@ -5127,7 +5809,7 @@ MonoBehaviour:
         type: 3}
       Rot: 1
     PosX: -1s
-    NegX: 3
+    NegX: 2
     PosZ: 6
     NegZ: -1s
     PosY: -1s
@@ -5140,7 +5822,7 @@ MonoBehaviour:
       Rot: 2
     PosX: 6
     NegX: -1s
-    PosZ: 3
+    PosZ: 2
     NegZ: -1s
     PosY: -1s
     NegY: v2_2
@@ -5150,7 +5832,7 @@ MonoBehaviour:
       Mesh: {fileID: 8031371179888124983, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 3
-    PosX: 3
+    PosX: 2
     NegX: -1s
     PosZ: -1s
     NegZ: 6
@@ -5165,7 +5847,7 @@ MonoBehaviour:
     PosX: 6f
     NegX: -1s
     PosZ: -1s
-    NegZ: 3f
+    NegZ: 2f
     PosY: -1s
     NegY: v3_0
     Weight: 100
@@ -5175,7 +5857,7 @@ MonoBehaviour:
         type: 3}
       Rot: 1
     PosX: -1s
-    NegX: 3f
+    NegX: 2f
     PosZ: -1s
     NegZ: 6f
     PosY: -1s
@@ -5188,7 +5870,7 @@ MonoBehaviour:
       Rot: 2
     PosX: -1s
     NegX: 6f
-    PosZ: 3f
+    PosZ: 2f
     NegZ: -1s
     PosY: -1s
     NegY: v3_2
@@ -5198,7 +5880,7 @@ MonoBehaviour:
       Mesh: {fileID: 7875131020691775814, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 3
-    PosX: 3f
+    PosX: 2f
     NegX: -1s
     PosZ: 6f
     NegZ: -1s
@@ -5211,8 +5893,8 @@ MonoBehaviour:
         type: 3}
       Rot: 0
     PosX: -1s
-    NegX: 3
-    PosZ: 3f
+    NegX: 2
+    PosZ: 2f
     NegZ: -1s
     PosY: v4_0
     NegY: -1s
@@ -5222,9 +5904,9 @@ MonoBehaviour:
       Mesh: {fileID: 5140367379549752108, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 1
-    PosX: 3f
+    PosX: 2f
     NegX: -1s
-    PosZ: 3
+    PosZ: 2
     NegZ: -1s
     PosY: v4_1
     NegY: -1s
@@ -5234,10 +5916,10 @@ MonoBehaviour:
       Mesh: {fileID: 5140367379549752108, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 2
-    PosX: 3
+    PosX: 2
     NegX: -1s
     PosZ: -1s
-    NegZ: 3f
+    NegZ: 2f
     PosY: v4_2
     NegY: -1s
     Weight: 100
@@ -5247,9 +5929,9 @@ MonoBehaviour:
         type: 3}
       Rot: 3
     PosX: -1s
-    NegX: 3f
+    NegX: 2f
     PosZ: -1s
-    NegZ: 3
+    NegZ: 2
     PosY: v4_3
     NegY: -1s
     Weight: 100
@@ -5258,10 +5940,10 @@ MonoBehaviour:
       Mesh: {fileID: -8178296969733694838, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 0
-    PosX: 3
+    PosX: 2
     NegX: -1s
     PosZ: -1s
-    NegZ: 3f
+    NegZ: 2f
     PosY: -1s
     NegY: v4_0
     Weight: 100
@@ -5271,9 +5953,9 @@ MonoBehaviour:
         type: 3}
       Rot: 1
     PosX: -1s
-    NegX: 3f
+    NegX: 2f
     PosZ: -1s
-    NegZ: 3
+    NegZ: 2
     PosY: -1s
     NegY: v4_1
     Weight: 100
@@ -5283,8 +5965,8 @@ MonoBehaviour:
         type: 3}
       Rot: 2
     PosX: -1s
-    NegX: 3
-    PosZ: 3f
+    NegX: 2
+    PosZ: 2f
     NegZ: -1s
     PosY: -1s
     NegY: v4_2
@@ -5294,9 +5976,9 @@ MonoBehaviour:
       Mesh: {fileID: -8178296969733694838, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 3
-    PosX: 3f
+    PosX: 2f
     NegX: -1s
-    PosZ: 3
+    PosZ: 2
     NegZ: -1s
     PosY: -1s
     NegY: v4_3
@@ -5307,7 +5989,7 @@ MonoBehaviour:
         type: 3}
       Rot: 0
     PosX: 6f
-    NegX: 3f
+    NegX: 2f
     PosZ: -1s
     NegZ: 4s
     PosY: -1s
@@ -5320,7 +6002,7 @@ MonoBehaviour:
       Rot: 1
     PosX: -1s
     NegX: 4s
-    PosZ: 3f
+    PosZ: 2f
     NegZ: 6f
     PosY: -1s
     NegY: v3_1
@@ -5330,7 +6012,7 @@ MonoBehaviour:
       Mesh: {fileID: 5078153246882196272, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 2
-    PosX: 3f
+    PosX: 2f
     NegX: 6f
     PosZ: 4s
     NegZ: -1s
@@ -5345,7 +6027,7 @@ MonoBehaviour:
     PosX: 4s
     NegX: -1s
     PosZ: 6f
-    NegZ: 3f
+    NegZ: 2f
     PosY: -1s
     NegY: v3_3
     Weight: 100
@@ -5354,7 +6036,7 @@ MonoBehaviour:
       Mesh: {fileID: -2862933373478091343, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 0
-    PosX: 3
+    PosX: 2
     NegX: 6
     PosZ: -1s
     NegZ: 4s
@@ -5369,7 +6051,7 @@ MonoBehaviour:
     PosX: -1s
     NegX: 4s
     PosZ: 6
-    NegZ: 3
+    NegZ: 2
     PosY: -1s
     NegY: v2_1
     Weight: 100
@@ -5379,7 +6061,7 @@ MonoBehaviour:
         type: 3}
       Rot: 2
     PosX: 6
-    NegX: 3
+    NegX: 2
     PosZ: 4s
     NegZ: -1s
     PosY: -1s
@@ -5392,7 +6074,7 @@ MonoBehaviour:
       Rot: 3
     PosX: 4s
     NegX: -1s
-    PosZ: 3
+    PosZ: 2
     NegZ: 6
     PosY: -1s
     NegY: v2_3
@@ -5402,7 +6084,7 @@ MonoBehaviour:
       Mesh: {fileID: 5239906647277067853, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 0
-    PosX: 3f
+    PosX: 2f
     NegX: 5
     PosZ: 4s
     NegZ: -1s
@@ -5417,7 +6099,7 @@ MonoBehaviour:
     PosX: 4s
     NegX: -1s
     PosZ: 5
-    NegZ: 3f
+    NegZ: 2f
     PosY: v2_1
     NegY: -1s
     Weight: 100
@@ -5427,7 +6109,7 @@ MonoBehaviour:
         type: 3}
       Rot: 2
     PosX: 5
-    NegX: 3f
+    NegX: 2f
     PosZ: -1s
     NegZ: 4s
     PosY: v2_2
@@ -5440,7 +6122,7 @@ MonoBehaviour:
       Rot: 3
     PosX: -1s
     NegX: 4s
-    PosZ: 3f
+    PosZ: 2f
     NegZ: 5
     PosY: v2_3
     NegY: -1s
@@ -5451,7 +6133,7 @@ MonoBehaviour:
         type: 3}
       Rot: 0
     PosX: 5f
-    NegX: 3
+    NegX: 2
     PosZ: 4s
     NegZ: -1s
     PosY: v3_0
@@ -5464,7 +6146,7 @@ MonoBehaviour:
       Rot: 1
     PosX: 4s
     NegX: -1s
-    PosZ: 3
+    PosZ: 2
     NegZ: 5f
     PosY: v3_1
     NegY: -1s
@@ -5474,7 +6156,7 @@ MonoBehaviour:
       Mesh: {fileID: -5530698871940908937, guid: 5600a9201c3fe584da45b4be12bcab5c,
         type: 3}
       Rot: 2
-    PosX: 3
+    PosX: 2
     NegX: 5f
     PosZ: -1s
     NegZ: 4s
@@ -5489,7 +6171,7 @@ MonoBehaviour:
     PosX: -1s
     NegX: 4s
     PosZ: 5f
-    NegZ: 3
+    NegZ: 2
     PosY: v3_3
     NegY: -1s
     Weight: 100
@@ -5603,43 +6285,73 @@ MonoBehaviour:
     MaterialIndexes: 
   socketList:
   - positions:
-    - {x: -0.01, y: 0.1}
-    - {x: 0, y: 0.14}
+    - {x: -0.01, y: 0.13}
+    - {x: 0, y: 0.18}
     - {x: 0, y: -0}
-    - {x: -0.02, y: 0.2}
-    - {x: -0.02, y: 0.24}
-    - {x: 0, y: 0.27}
-    - {x: -0.01, y: 0.29}
-    - {x: 0.18, y: 0.1}
-    - {x: 0.18, y: 0.14}
-    - {x: 0.17, y: -0}
-    - {x: 0.2, y: 0.2}
-    - {x: 0.18, y: 0.27}
-    - {x: 0.19, y: 0.24}
-    - {x: 0.18, y: 0.29}
-    - {x: 0, y: 0.39}
-    - {x: 0.09, y: 0.39}
-    - {x: 0.17, y: 0.39}
+    - {x: -0.02, y: 0.29}
+    - {x: -0.02, y: 0.41}
+    - {x: 0, y: 0.48}
+    - {x: -0.01, y: 0.52}
+    - {x: 0.2, y: 0.13}
+    - {x: 0.2, y: 0.18}
+    - {x: 0.19, y: -0}
+    - {x: 0.22, y: 0.29}
+    - {x: 0.2, y: 0.48}
+    - {x: 0.21, y: 0.41}
+    - {x: 0.2, y: 0.52}
+    - {x: 0, y: 0.7}
+    - {x: 0.1, y: 0.7}
+    - {x: 0.19, y: 0.7}
     socketname: 0f
   - positions:
-    - {x: 0.01, y: 0.1}
-    - {x: 0, y: 0.14}
+    - {x: 0.01, y: 0.13}
+    - {x: 0, y: 0.18}
     - {x: -0, y: -0}
-    - {x: 0.02, y: 0.2}
-    - {x: 0.02, y: 0.24}
-    - {x: 0, y: 0.27}
-    - {x: 0.01, y: 0.29}
-    - {x: -0.18, y: 0.1}
-    - {x: -0.18, y: 0.14}
-    - {x: -0.17, y: -0}
-    - {x: -0.2, y: 0.2}
-    - {x: -0.18, y: 0.27}
-    - {x: -0.19, y: 0.24}
-    - {x: -0.18, y: 0.29}
-    - {x: 0, y: 0.39}
-    - {x: -0.09, y: 0.39}
-    - {x: -0.17, y: 0.39}
+    - {x: 0.02, y: 0.29}
+    - {x: 0.02, y: 0.41}
+    - {x: 0, y: 0.48}
+    - {x: 0.01, y: 0.52}
+    - {x: -0.2, y: 0.13}
+    - {x: -0.2, y: 0.18}
+    - {x: -0.19, y: -0}
+    - {x: -0.22, y: 0.29}
+    - {x: -0.2, y: 0.48}
+    - {x: -0.21, y: 0.41}
+    - {x: -0.2, y: 0.52}
+    - {x: 0, y: 0.7}
+    - {x: -0.1, y: 0.7}
+    - {x: -0.19, y: 0.7}
     socketname: 0
+  - positions:
+    - {x: 0, y: 0.7}
+    - {x: 0.1, y: 0.7}
+    - {x: 0.19, y: 0.7}
+    - {x: -1, y: 0}
+    - {x: 0.6, y: 0}
+    - {x: 0.5, y: 0.04}
+    - {x: -1, y: 0.04}
+    socketname: 1f
+  - positions:
+    - {x: 0, y: 0.7}
+    - {x: -0.1, y: 0.7}
+    - {x: -0.19, y: 0.7}
+    - {x: 1, y: 0}
+    - {x: -0.6, y: 0}
+    - {x: -0.5, y: 0.04}
+    - {x: 1, y: 0.04}
+    socketname: 1
+  - positions:
+    - {x: 0.9, y: 0}
+    - {x: 0.9, y: 0.04}
+    - {x: 1, y: 0}
+    - {x: 1, y: 0.04}
+    socketname: 2f
+  - positions:
+    - {x: -0.9, y: 0}
+    - {x: -0.9, y: 0.04}
+    - {x: -1, y: 0}
+    - {x: -1, y: 0.04}
+    socketname: 2
   - positions:
     - {x: 0.06, y: 0}
     - {x: 0.05, y: 0.02}
@@ -5647,57 +6359,7 @@ MonoBehaviour:
     - {x: -0.06, y: 0}
     - {x: -0.05, y: 0.02}
     - {x: 0, y: 0.02}
-    socketname: 1s
-  - positions:
-    - {x: 0.2, y: 0.13}
-    - {x: 0.2, y: 0.17}
-    - {x: 0.19, y: -0}
-    - {x: 0.22, y: 0.25}
-    - {x: 0.2, y: 0.35}
-    - {x: 0.21, y: 0.31}
-    - {x: 0.2, y: 0.37}
-    - {x: -0.01, y: 0.13}
-    - {x: 0, y: 0.17}
-    - {x: 0, y: -0}
-    - {x: -0.02, y: 0.25}
-    - {x: -0.02, y: 0.31}
-    - {x: 0, y: 0.35}
-    - {x: -0.01, y: 0.37}
-    - {x: 0.19, y: 0.5}
-    - {x: 0.1, y: 0.5}
-    - {x: 0, y: 0.5}
-    socketname: 2f
-  - positions:
-    - {x: -0.2, y: 0.13}
-    - {x: -0.2, y: 0.17}
-    - {x: -0.19, y: -0}
-    - {x: -0.22, y: 0.25}
-    - {x: -0.2, y: 0.35}
-    - {x: -0.21, y: 0.31}
-    - {x: -0.2, y: 0.37}
-    - {x: 0.01, y: 0.13}
-    - {x: 0, y: 0.17}
-    - {x: -0, y: -0}
-    - {x: 0.02, y: 0.25}
-    - {x: 0.02, y: 0.31}
-    - {x: 0, y: 0.35}
-    - {x: 0.01, y: 0.37}
-    - {x: -0.19, y: 0.5}
-    - {x: -0.1, y: 0.5}
-    - {x: 0, y: 0.5}
-    socketname: 2
-  - positions:
-    - {x: 0.9, y: 0.04}
-    - {x: 1, y: 0.04}
-    - {x: 0.9, y: 0}
-    - {x: 1, y: 0}
-    socketname: 3f
-  - positions:
-    - {x: -0.9, y: 0.04}
-    - {x: -1, y: 0.04}
-    - {x: -0.9, y: 0}
-    - {x: -1, y: 0}
-    socketname: 3
+    socketname: 3s
   - positions:
     - {x: -1, y: 0.04}
     - {x: -1, y: 0}
@@ -5734,100 +6396,48 @@ MonoBehaviour:
     socketname: 6
   verticalSocketList:
   - positions:
-    - {x: -0.2, y: -0.16}
-    - {x: -0.08, y: 0.2}
-    - {x: 0.16, y: -0.02}
-    - {x: 0.14, y: 0.12}
-    socketname: v0_0
-  - positions:
     - {x: 0.16, y: -0.2}
     - {x: -0.2, y: -0.08}
     - {x: 0.02, y: 0.16}
     - {x: -0.12, y: 0.14}
-    socketname: v0_1
+    socketname: v0_0
   - positions:
     - {x: 0.2, y: 0.16}
     - {x: 0.08, y: -0.2}
     - {x: -0.16, y: 0.02}
     - {x: -0.14, y: -0.12}
-    socketname: v0_2
+    socketname: v0_1
   - positions:
     - {x: -0.16, y: 0.2}
     - {x: 0.2, y: 0.08}
     - {x: -0.02, y: -0.16}
     - {x: 0.12, y: -0.14}
+    socketname: v0_2
+  - positions:
+    - {x: -0.2, y: -0.16}
+    - {x: -0.08, y: 0.2}
+    - {x: 0.16, y: -0.02}
+    - {x: 0.14, y: 0.12}
     socketname: v0_3
   - positions:
-    - {x: 0.15, y: 0.54}
-    - {x: -0.19, y: 0.59}
-    - {x: 0.12, y: 0.36}
-    - {x: 0.08, y: 0.1}
-    - {x: 0.12, y: 0.35}
-    - {x: 0.11, y: 0.32}
-    - {x: -0.23, y: 0.31}
-    - {x: -0.24, y: 0.26}
-    - {x: -0.23, y: 0.26}
-    - {x: 0.1, y: 0.15}
-    - {x: -0.24, y: 0.21}
-    - {x: 0.09, y: 0.1}
-    - {x: 0.09, y: 0.14}
-    - {x: 0.08, y: 0.15}
-    - {x: -0.22, y: 0.4}
-    - {x: 0.15, y: 0.49}
+    - {x: 0.31, y: 0.07}
+    - {x: -0.28, y: -0.32}
+    - {x: -0.25, y: 0.06}
     socketname: v1_0
   - positions:
-    - {x: -0.54, y: 0.15}
-    - {x: -0.59, y: -0.19}
-    - {x: -0.36, y: 0.12}
-    - {x: -0.1, y: 0.08}
-    - {x: -0.35, y: 0.12}
-    - {x: -0.32, y: 0.11}
-    - {x: -0.31, y: -0.23}
-    - {x: -0.26, y: -0.24}
-    - {x: -0.26, y: -0.23}
-    - {x: -0.15, y: 0.1}
-    - {x: -0.21, y: -0.24}
-    - {x: -0.1, y: 0.09}
-    - {x: -0.14, y: 0.09}
-    - {x: -0.15, y: 0.08}
-    - {x: -0.4, y: -0.22}
-    - {x: -0.49, y: 0.15}
+    - {x: -0.07, y: 0.31}
+    - {x: 0.32, y: -0.28}
+    - {x: -0.06, y: -0.25}
     socketname: v1_1
   - positions:
-    - {x: -0.15, y: -0.54}
-    - {x: 0.19, y: -0.59}
-    - {x: -0.12, y: -0.36}
-    - {x: -0.08, y: -0.1}
-    - {x: -0.12, y: -0.35}
-    - {x: -0.11, y: -0.32}
-    - {x: 0.23, y: -0.31}
-    - {x: 0.24, y: -0.26}
-    - {x: 0.23, y: -0.26}
-    - {x: -0.1, y: -0.15}
-    - {x: 0.24, y: -0.21}
-    - {x: -0.09, y: -0.1}
-    - {x: -0.09, y: -0.14}
-    - {x: -0.08, y: -0.15}
-    - {x: 0.22, y: -0.4}
-    - {x: -0.15, y: -0.49}
+    - {x: -0.31, y: -0.07}
+    - {x: 0.28, y: 0.32}
+    - {x: 0.25, y: -0.06}
     socketname: v1_2
   - positions:
-    - {x: 0.54, y: -0.15}
-    - {x: 0.59, y: 0.19}
-    - {x: 0.36, y: -0.12}
-    - {x: 0.1, y: -0.08}
-    - {x: 0.35, y: -0.12}
-    - {x: 0.32, y: -0.11}
-    - {x: 0.31, y: 0.23}
-    - {x: 0.26, y: 0.24}
-    - {x: 0.26, y: 0.23}
-    - {x: 0.15, y: -0.1}
-    - {x: 0.21, y: 0.24}
-    - {x: 0.1, y: -0.09}
-    - {x: 0.14, y: -0.09}
-    - {x: 0.15, y: -0.08}
-    - {x: 0.4, y: 0.22}
-    - {x: 0.49, y: -0.15}
+    - {x: 0.07, y: -0.31}
+    - {x: -0.32, y: 0.28}
+    - {x: 0.06, y: 0.25}
     socketname: v1_3
   - positions:
     - {x: -0.9, y: 0.18}
@@ -5961,6 +6571,10 @@ MonoBehaviour:
   - 1
   - 1
   - 1
+  - 1
+  - 1
+  - 1
+  - 1
   - 2
   - 1
   - 1
@@ -6001,7 +6615,7 @@ Transform:
   m_GameObject: {fileID: 2844234274065867676}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 42, y: 0, z: 0}
+  m_LocalPosition: {x: 52, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6366,7 +6980,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1731119817251509620}
-  m_Mesh: {fileID: 3554958999884863049, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
+  m_Mesh: {fileID: -236761418977151314, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
 --- !u!4 &1800372620477582758
 Transform:
   m_ObjectHideFlags: 0
@@ -6391,7 +7005,7 @@ Transform:
   m_GameObject: {fileID: 860378547511938974}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 56, y: 0, z: 0}
+  m_LocalPosition: {x: 66, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6406,7 +7020,7 @@ Transform:
   m_GameObject: {fileID: 6360564762211274623}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 40, y: 0, z: 0}
+  m_LocalPosition: {x: 50, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6605,7 +7219,7 @@ Transform:
   m_GameObject: {fileID: 1149792426985155301}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 36, y: 0, z: 0}
+  m_LocalPosition: {x: 38, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6744,7 +7358,7 @@ Transform:
   m_GameObject: {fileID: 6856852844801687837}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 54, y: 0, z: 0}
+  m_LocalPosition: {x: 64, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6891,7 +7505,7 @@ Transform:
   m_GameObject: {fileID: 798141853156309416}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 20, y: 0, z: 0}
+  m_LocalPosition: {x: 22, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6906,7 +7520,7 @@ Transform:
   m_GameObject: {fileID: 2121165645870058337}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 44, y: 0, z: 0}
+  m_LocalPosition: {x: 54, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6936,7 +7550,7 @@ Transform:
   m_GameObject: {fileID: 303265473953777382}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 38, y: 0, z: 0}
+  m_LocalPosition: {x: 40, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7119,7 +7733,7 @@ Transform:
   m_GameObject: {fileID: 5919906405306330505}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 46, y: 0, z: 0}
+  m_LocalPosition: {x: 56, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7312,7 +7926,7 @@ Transform:
   m_GameObject: {fileID: 4436973590944460763}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 50, y: 0, z: 0}
+  m_LocalPosition: {x: 60, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7405,7 +8019,7 @@ Transform:
   m_GameObject: {fileID: 1731119817251509620}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 26, y: 0, z: 0}
+  m_LocalPosition: {x: 28, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7608,7 +8222,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1759561068343361407}
-  m_Mesh: {fileID: 5719883523035528992, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
+  m_Mesh: {fileID: 7131293258096355999, guid: 82785ea186a3cda44ad3ed0f9faf6ba9, type: 3}
 --- !u!23 &5234161189818798843
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -7865,7 +8479,7 @@ Transform:
   m_GameObject: {fileID: 5811217408946461111}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 30, y: 0, z: 0}
+  m_LocalPosition: {x: 32, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8025,7 +8639,7 @@ Transform:
   m_GameObject: {fileID: 4831497802393247245}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 34, y: 0, z: 0}
+  m_LocalPosition: {x: 36, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8040,7 +8654,7 @@ Transform:
   m_GameObject: {fileID: 1759561068343361407}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 24, y: 0, z: 0}
+  m_LocalPosition: {x: 26, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8278,7 +8892,7 @@ Transform:
   m_GameObject: {fileID: 8115903527015300833}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 28, y: 0, z: 0}
+  m_LocalPosition: {x: 30, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8416,7 +9030,7 @@ Transform:
   m_GameObject: {fileID: 6314617155069730964}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 22, y: 0, z: 0}
+  m_LocalPosition: {x: 24, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9067,6 +9681,7 @@ MonoBehaviour:
   positiveKey: -1s
   overrideVerticalNegative: 0
   negativeKey: v-1_0
+  moduleScale: {x: 2, y: 2, z: 2}
   Prototypes:
   - MeshRot:
       Mesh: {fileID: 1166723375247931700, guid: 15684870f50fb434a896dfc6d2d8d2ef,
@@ -9964,7 +10579,7 @@ Transform:
   m_GameObject: {fileID: 1976511282164748720}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18, y: 0, z: 0}
+  m_LocalPosition: {x: 20, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10089,7 +10704,7 @@ Transform:
   m_GameObject: {fileID: 7877222472292367163}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 52, y: 0, z: 0}
+  m_LocalPosition: {x: 62, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10104,7 +10719,7 @@ Transform:
   m_GameObject: {fileID: 3303766635578214600}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 48, y: 0, z: 0}
+  m_LocalPosition: {x: 58, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class PathHandler : MonoBehaviour
@@ -11,11 +12,11 @@ public class PathHandler : MonoBehaviour
 
     private List<Vector3Int> portalIndexes = new List<Vector3Int>();
     private HashSet<Vector3Int> buildingPositions = new HashSet<Vector3Int>();
+    private HashSet<Vector3Int> blacklistedBuildingPositions = new HashSet<Vector3Int>();
 
     private BuildingHandler buildingHandler;
     private BuildingManager buildingManager;
     private WaveFunction waveFunction;
-    private MoneyManager moneyManager;
 
     private Vector3Int castleIndex;
 
@@ -24,15 +25,19 @@ public class PathHandler : MonoBehaviour
         buildingHandler = FindAnyObjectByType<BuildingHandler>();
         buildingManager = FindAnyObjectByType<BuildingManager>();
         waveFunction = FindAnyObjectByType<WaveFunction>();
-        moneyManager = FindAnyObjectByType<MoneyManager>();
 
         waveFunction.OnMapGenerated += WaveFunction_OnMapGenerated;
         buildingManager.OnCastlePlaced += BuildingManager_OnCastlePlaced;
+        Events.OnBuildingDestroyed += BuildingHandler_OnBuildingDestroyed;
+        Events.OnBuildingRepaired += BuildingHandler_OnBuildingRepaired;
     }
 
     private void OnDisable()
     {
+        waveFunction.OnMapGenerated -= WaveFunction_OnMapGenerated;
         buildingManager.OnCastlePlaced -= BuildingManager_OnCastlePlaced;
+        Events.OnBuildingDestroyed -= BuildingHandler_OnBuildingDestroyed;
+        Events.OnBuildingRepaired -= BuildingHandler_OnBuildingRepaired;
     }
 
     private void WaveFunction_OnMapGenerated()
@@ -70,10 +75,35 @@ public class PathHandler : MonoBehaviour
         }
     }
 
+    private void BuildingHandler_OnBuildingDestroyed(Building building)
+    {
+        blacklistedBuildingPositions.Add(building.Index);
+
+        UpdateNodeMap();
+
+        Vector3 buildingPos = building.transform.position;
+        Vector3Int? target = PathFinding.BreadthFirstSearch(buildingPos, buildingPositions, nodes);
+
+        if (target.HasValue)
+        {
+            Events.OnEnemyPathUpdated?.Invoke(buildingPos, buildingManager[target.Value].Position);
+        }
+        else
+        {
+            Debug.Log("No new house found");
+            Events.OnTownDestroyed?.Invoke(buildingPos);
+        }
+    }
+
+    private void BuildingHandler_OnBuildingRepaired(Building building)
+    {
+        blacklistedBuildingPositions.Remove(building.Index);
+    }
+
     private void BuildingManager_OnCastlePlaced(Vector3Int index)
     {
         castleIndex = index;
-        moneyManager.AddBuildable(BuildingType.Path, FindShortestPath());
+        MoneyManager.Instance.AddBuildable(BuildingType.Path, FindShortestPath());
     }
 
     private int FindShortestPath()
@@ -170,7 +200,7 @@ public class PathHandler : MonoBehaviour
         buildingPositions.Clear();
         foreach (var buildings in buildingHandler.BuildingGroups.Values)
         {
-            buildingPositions.AddRange(buildings.Select(x => buildingManager.GetIndex(x.transform.position).Value)); // Questionable
+            buildingPositions.AddRange(buildings.Select(x => x.Index).Where(x => !blacklistedBuildingPositions.Contains(x))); // Questionable
         }
     }
 }

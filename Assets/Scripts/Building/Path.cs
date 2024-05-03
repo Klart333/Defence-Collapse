@@ -1,5 +1,7 @@
 ﻿using Sirenix.OdinInspector;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Buildings
@@ -38,7 +40,21 @@ namespace Buildings
 
         public List<Material> Materials { get; set; }
 
-        public void Setup(PrototypeData prototypeData, List<Material> materials)
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+
+            Reset();
+        }
+
+        private void Reset()
+        {
+            transform.localScale = Vector3.one;
+            MeshRenderer.transform.localScale = Vector3.one;
+        }
+
+        public void Setup(PrototypeData prototypeData, List<Material> materials, Vector3 scale)
         {
             Mesh = prototypeData.MeshRot.Mesh;
 
@@ -51,6 +67,8 @@ namespace Buildings
             {
                 transparentMaterials.Add(transparentGreen);
             }
+
+            MeshRenderer.transform.localScale = scale;
         }
 
         public void ToggleIsBuildableVisual(bool value)

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoneyManager : MonoBehaviour
+public class MoneyManager : Singleton<MoneyManager>
 {
     [Title("Money")]
     [SerializeField]
@@ -103,8 +103,17 @@ public class MoneyManager : MonoBehaviour
         }
     }
 
+    #region Public
+
     public void AddBuildable(BuildingType buildingType, int amount)
     {
         AvailableBuildables[buildingType] += amount;
     }
+
+    public void AddMoney(int amount)
+    {
+        money += amount;
+    }
+
+    #endregion
 }

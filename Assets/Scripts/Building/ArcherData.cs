@@ -1,17 +1,25 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Archer Data", menuName = "Building/State Data/Archer")]
 public class ArcherData : ScriptableObject
 {
-    [Header("Stats")]
+    [Title("Economy")]
+    public int IncomePerHouse = 2;
+
+    [Title("Stats")]
     public float AttackSpeed = 1;
     public float Range = 5;
     public float Damage = 1;
 
-    [Header("Prefabs")]
+    [Title("Prefabs")]
     public Projectile Arrow;
     public PooledMonoBehaviour RangeIndicator;
 
-    [Header("Growth")]
+    [Title("Growth")]
     public float LevelMultiplier = 1;
+
+    [Title("Health")]
+    public int MaxHealth;
 }
+

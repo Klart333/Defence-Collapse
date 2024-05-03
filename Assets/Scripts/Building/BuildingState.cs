@@ -3,17 +3,17 @@ using UnityEngine;
 
 public abstract class BuildingState
 {
-    public abstract void OnStateEntered(Building building);
-    public abstract void Update();
-    public abstract void OnSelected();
+    public abstract void OnStateEntered();
+    public abstract void Update(Building building);
+    public abstract void OnSelected(Vector3 pos);
     public abstract void OnDeselected();
     public abstract void Die();
+    public abstract void OnWaveStart(int houseCount);
 }
 
 public class ArcherState : BuildingState
 {
     private ArcherData data;
-    private Building building;
 
     private GameObject rangeIndicator;
 
@@ -24,12 +24,12 @@ public class ArcherState : BuildingState
         this.data = data;
     }
 
-    public override void OnStateEntered(Building building)
+    public override void OnStateEntered()
     {
-        this.building = building;
+        
     }
 
-    public override void Update()
+    public override void Update(Building building)
     {
         if (EnemyManager.Instance.Enemies.Count <= 0)
         {
@@ -44,7 +44,7 @@ public class ArcherState : BuildingState
 
             if (Vector3.Distance(building.transform.position, closest.transform.position) <= data.Range)
             {
-                Attack(closest);
+                Attack(closest, building);
                 attackCooldownTimer = 1.0f / data.AttackSpeed;
             }
         }
@@ -54,7 +54,7 @@ public class ArcherState : BuildingState
         }
     }
 
-    private async void Attack(EnemyHealth target)
+    private async void Attack(EnemyHealth target, Building building)
     {
         Projectile arrow = data.Arrow.GetAtPosAndRot<Projectile>(building.transform.position, Quaternion.identity);
         arrow.Damage = data.Damage;
@@ -79,9 +79,9 @@ public class ArcherState : BuildingState
 
     }
 
-    public override void OnSelected()
+    public override void OnSelected(Vector3 pos)
     {
-        rangeIndicator = data.RangeIndicator.GetAtPosAndRot<PooledMonoBehaviour>(building.transform.position, Quaternion.identity).gameObject;
+        rangeIndicator = data.RangeIndicator.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.identity).gameObject;
         rangeIndicator.transform.localScale = new Vector3(data.Range * 2.0f, 0.01f, data.Range * 2.0f);
     }
 
@@ -91,5 +91,51 @@ public class ArcherState : BuildingState
         {
             rangeIndicator.SetActive(false);
         }
+    }
+
+    public override void OnWaveStart(int houseCount)
+    {
+        MoneyManager.Instance.AddMoney(houseCount * data.IncomePerHouse);
+    }
+}
+
+public class NormalState : BuildingState
+{
+    private NormalHouseData data;
+
+    public NormalState(NormalHouseData data)
+    {
+        this.data = data;
+    }
+
+    public override void OnStateEntered()
+    {
+
+    }
+
+    public override void Update(Building building)
+    {
+        
+    }
+
+    
+    public override void Die()
+    {
+
+    }
+
+    public override void OnSelected(Vector3 pos)
+    {
+        
+    }
+
+    public override void OnDeselected()
+    {
+
+    }
+
+    public override void OnWaveStart(int houseCount)
+    {
+        MoneyManager.Instance.AddMoney(houseCount * data.IncomePerHouse);
     }
 }

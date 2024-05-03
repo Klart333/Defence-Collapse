@@ -1,14 +1,16 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Data", menuName = "Enemy/Attack Data")]
 public class EnemyAttackData : ScriptableObject
 {
+    [Title("Stats")]
     public float Damage;
+
     public float AttackSpeed;
 
-    [Header("AoE")]
+    [Title("Hit Info")]
     public LayerMask LayerMask;
-    public bool Splash;
-    public float MaxTargets;
+
     public float AttackRadius;
 }

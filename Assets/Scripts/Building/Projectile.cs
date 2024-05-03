@@ -25,7 +25,7 @@ public class Projectile : PooledMonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        other.GetComponentInParent<IHealth>().TakeDamage(Damage);
+        other.GetComponentInParent<IHealth<EnemyHealth>>().TakeDamage(Damage);
 
         gameObject.SetActive(false);
     }

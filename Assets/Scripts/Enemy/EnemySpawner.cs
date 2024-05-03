@@ -46,7 +46,7 @@ public class EnemySpawner : MonoBehaviour
 
         StartWave();
 
-        Events.OnWaveStarted.Invoke();
+        Events.OnWaveStarted?.Invoke();
     }
 
     public async void StartWave()

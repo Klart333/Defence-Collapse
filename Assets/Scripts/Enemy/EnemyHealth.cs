@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyHealth : MonoBehaviour, IHealth
+public class EnemyHealth : MonoBehaviour, IHealth<EnemyHealth>
 {
-    public event Action<GameObject> OnDeath;
+    public event Action<EnemyHealth> OnDeath;
 
     [SerializeField]
     private float maxHealth;
@@ -22,7 +22,7 @@ public class EnemyHealth : MonoBehaviour, IHealth
     {
         animator = GetComponent<EnemyAnimator>();
 
-        health = new Health(maxHealth, gameObject);
+        health = new Health(maxHealth);
         health.OnDeath += Health_OnDeath;
 
         EnemyManager.Instance.RegisterEnemy(this);
@@ -33,9 +33,9 @@ public class EnemyHealth : MonoBehaviour, IHealth
         health.OnDeath -= Health_OnDeath;
     }
 
-    private void Health_OnDeath(GameObject obj)
+    private void Health_OnDeath()
     {
-        OnDeath?.Invoke(obj);
+        OnDeath?.Invoke(this);
 
         animator.Die(ActuallyDie);
     }

@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 using Debug = UnityEngine.Debug;
 
 public class WaveFunction : MonoBehaviour
@@ -742,36 +740,6 @@ public class WaveFunction : MonoBehaviour
     }
 
     #endregion
-
-    private void OnDrawGizmos()
-    {
-        /*if (EnemyPathFinding.Map == null)
-            return;
-        for (int i = 0; i < EnemyPathFinding.Map.GetLength(0); i++)
-        {
-            for (int g = 0; g < EnemyPathFinding.Map.GetLength(1); g++)
-            {
-                Handles.Label(EnemyPathFinding.Map[i, g].Position, $"{i}, {g}");
-
-            }
-        }
-
-        
-        for (int i = 0; i < cells.Count; i++)
-        {
-            Gizmos.color = Color.black;
-            if (cellStack.Count > 0 && i == cellStack.Peek())
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawWireCube(cells[i].Position + Vector3.up * 0.02f, gridSize);
-            }
-            else
-            {
-                Gizmos.color = Color.black;
-                Gizmos.DrawWireCube(cells[i].Position, gridSize);
-            }
-        }*/
-    }
 }
 
 [System.Serializable]

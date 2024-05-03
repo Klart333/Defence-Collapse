@@ -1,13 +1,14 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 using UnityEngine.AI;
 
 public class EnemyMovement : MonoBehaviour
 {
-    [Header("Stats")]
+    [Title("Stats")]
     [SerializeField]
     private float moveSpeed = 1;
 
-    [Header("Less important stats")]
+    [Title("Less important stats")]
     [SerializeField]
     private float turnSpeed = 0.05f;
 
@@ -27,19 +28,27 @@ public class EnemyMovement : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
 
         agent.speed = moveSpeed;
+
+        Events.OnEnemyPathUpdated += OnEnemyPathUpdated;
     }
 
     private void Update()
     {
-        if (agent.remainingDistance < agent.stoppingDistance)
+        if (agent.isOnNavMesh && agent.remainingDistance < agent.stoppingDistance)
         {
             StartAttacking();
         }
     }
 
-    public void FindNewTarget()
+    private void OnEnemyPathUpdated(Vector3 oldTargetPos, Vector3 newTargetPos)
     {
+        if (Vector3.Distance(oldTargetPos, currentTarget) > 1.0f)
+        {
+            return;
+        }
 
+        StopAttacking();
+        SetPathTarget(newTargetPos);
     }
 
     public void SetPathTarget(Vector3 target)
@@ -49,7 +58,11 @@ public class EnemyMovement : MonoBehaviour
             return;
         }
 
-        currentTarget = target;
+        if (!NavMesh.SamplePosition(target, out NavMeshHit hit, 1f, NavMesh.AllAreas))
+        {
+            Debug.LogError("Could not set path to target position: " + target);
+        }
+        currentTarget = hit.position;
 
         UpdateNavAgent();
     }
@@ -57,20 +70,16 @@ public class EnemyMovement : MonoBehaviour
     private void UpdateNavAgent()
     {
         animator.Move();
-        if (agent.isOnNavMesh)
-        {
-            agent.SetDestination(currentTarget);
-        }
-        else
+        if (!agent.isOnNavMesh)
         {
             Debug.LogError("Enemy not on navmesh");
+            return;
         }
-    }
 
-    private void Building_OnDeath(Building building)
-    {
-        StopAttacking();
-        FindNewTarget();
+        if (!agent.SetDestination(currentTarget))
+        {
+            Debug.LogError("Could not calculate path to target position");
+        }
     }
 
     private void StartAttacking()

@@ -1,17 +1,13 @@
 ﻿using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class Building : PooledMonoBehaviour, IBuildable
 {
-    public event Action<Building> OnDeath;
     public event Action<Vector3> OnEnterDefense;
-
-    [Title("State Data")]
-    [SerializeField]
-    private ArcherData archerData;
 
     [Title("Visual")]
     [SerializeField]
@@ -24,11 +20,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private BuildingHandler buildingHandler;
     private BuildingAnimator buildingAnimator;
-    private BuildingState buildingState;
-    private InputActions inputActions; // FIX THIS HORRIBLE INPUT SHIT MAN WTF WAS I THINKING
     private MeshRenderer meshRenderer;
-    private InputAction fire;
-    private InputAction shift;
 
     private int originalLayer;
     
@@ -37,10 +29,10 @@ public class Building : PooledMonoBehaviour, IBuildable
     private bool purchasing = true;
 
     public int BuildingGroupIndex { get; set; } = -1;
-    public int BuildingLevel { get; set; }
 
     public Mesh Mesh { get; set; }
     public List<Material> Materials { get; set; }
+    public Vector3Int Index { get; set; }
 
     public BuildingHandler BuildingHandler
     {
@@ -76,8 +68,6 @@ public class Building : PooledMonoBehaviour, IBuildable
         }
     }
 
-    public BuildingState BuildingState => buildingState;
-
     private void Awake()
     {
         originalLayer = gameObject.layer;
@@ -85,16 +75,8 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void OnEnable()
     {
-        Events.OnWaveStarted += OnWaveStarted;
         Events.OnBuildingClicked += OnBuildingClicked;
         Events.OnBuildingCanceled += () => purchasing = false;
-
-        inputActions = new InputActions();
-        fire = inputActions.Player.Fire;
-        fire.Enable();
-
-        shift = inputActions.Player.Shift;
-        shift.Enable();
     }
 
     protected override void OnDisable()
@@ -103,17 +85,14 @@ public class Building : PooledMonoBehaviour, IBuildable
         
         Reset();
 
-        Events.OnWaveStarted -= OnWaveStarted;
         Events.OnBuildingClicked -= OnBuildingClicked;
         Events.OnBuildingCanceled -= () => purchasing = false;
-
-        fire.Disable();
-        shift.Disable();
     }
 
     private void Reset()
     {
         transform.localScale = Vector3.one;
+        MeshRenderer.transform.localScale = Vector3.one;
 
         BuildingHandler?.RemoveBuilding(this);
         BuildingGroupIndex = -1;
@@ -122,13 +101,11 @@ public class Building : PooledMonoBehaviour, IBuildable
         hovered = false;
         selected = false;
         MeshRenderer.gameObject.layer = originalLayer;
-
-        buildingState = null;
     }
 
     private void OnMouseDown()
     {
-        if (!shift.IsPressed())
+        if (!InputManager.Instance.GetShift)
         {
             return;
         }
@@ -148,17 +125,15 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void Update()
     {
-        if (selected && !hovered && fire.WasPerformedThisFrame())
+        if (selected && !hovered && InputManager.Instance.Fire.WasPerformedThisFrame())
         {
             BuildingHandler.LowlightGroup(this);
         }
 
-        if (buildingState == null) return;
-
-        buildingState.Update();
+        buildingHandler[this]?.State.Update(this);
     }
 
-    public void Setup(PrototypeData prototypeData, List<Material> materials)
+    public void Setup(PrototypeData prototypeData, List<Material> materials, Vector3 scale)
     {
         Mesh = prototypeData.MeshRot.Mesh;
 
@@ -171,39 +146,14 @@ public class Building : PooledMonoBehaviour, IBuildable
         {
             transparentMaterials.Add(transparentGreen);
         }
-    }
 
-    public void SetState<T>() where T : BuildingState
-    {
-        if (typeof(ArcherState).IsAssignableFrom(typeof(T)))
-        {
-            buildingState = new ArcherState(archerData);
-        }
-
-        buildingState.OnStateEntered(this);
+        MeshRenderer.transform.localScale = scale;
     }
 
     private void OnBuildingClicked(BuildingType arg0)
     {
         purchasing = true;
         BuildingHandler.LowlightGroup(this);
-    }
-
-    private void OnWaveStarted()
-    {
-
-    }
-
-    private void LevelUp()
-    {
-        BuildingLevel += 1;
-    }
-
-    public void Die()
-    {
-        OnDeath?.Invoke(this);
-
-        buildingState.Die();
     }
 
     public void ToggleIsBuildableVisual(bool isQueried)
@@ -221,6 +171,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void Place()
     {
+        Index = FindAnyObjectByType<BuildingManager>().GetIndex(transform.position).Value;
         BuildingHandler.AddBuilding(this);
     }
 
@@ -231,13 +182,23 @@ public class Building : PooledMonoBehaviour, IBuildable
         selected = true;
         BuildingAnimator.BounceInOut(transform);
         MeshRenderer.gameObject.layer = (int)Mathf.Log(selectedLayer.value, 2); // sure ?
-        buildingState?.OnSelected();
+        buildingHandler[this].State.OnSelected(transform.position);
     }
 
     public void Lowlight()
     {
-        buildingState?.OnDeselected();
+        buildingHandler.BuildingData[Index].State.OnDeselected();
         MeshRenderer.gameObject.layer = originalLayer;
         selected = false;
+    }
+
+    public void DisplayLevelUp()
+    {
+        
+    }
+
+    public void DislayDeath()
+    {
+        ToggleIsBuildableVisual(true);
     }
 }

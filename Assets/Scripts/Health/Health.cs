@@ -1,25 +1,21 @@
+using Sirenix.OdinInspector;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Health : IHealth
+[System.Serializable]
+public class Health
 {
-    public event Action<GameObject> OnDeath;
+    public event Action OnDeath;
 
     public float MaxHealth;
     public float CurrentHealth;
 
-    private GameObject gameObject;
-
     public bool Alive => CurrentHealth > 0;
 
-    public Health(float maxHealth, GameObject gameObject)
+    public Health(float maxHealth)
     {
         MaxHealth = maxHealth;
         CurrentHealth = MaxHealth;
-        
-        this.gameObject = gameObject;
     }
 
     public void TakeDamage(float amount)
@@ -39,13 +35,13 @@ public class Health : IHealth
 
     private void Die()
     {
-        OnDeath?.Invoke(gameObject);
+        OnDeath?.Invoke();
     }
 }
 
-public interface IHealth
+public interface IHealth<T> // This "generic" interface is not generic at all >:(
 {
-    public event Action<GameObject> OnDeath;
+    public event Action<T> OnDeath;
 
     public void TakeDamage(float amount);
 }

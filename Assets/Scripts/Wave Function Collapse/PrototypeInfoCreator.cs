@@ -29,6 +29,10 @@ public class PrototypeInfoCreator : MonoBehaviour
     [SerializeField, ShowIf(nameof(overrideVerticalNegative))]
     private string negativeKey = "v-1_0";
 
+    [Title("Scale")]
+    [SerializeField]
+    private Vector3 moduleScale;
+
     [Title("Generated")]
     public List<PrototypeData> Prototypes = new List<PrototypeData>();
 
@@ -75,7 +79,7 @@ public class PrototypeInfoCreator : MonoBehaviour
 
             for (int g = 0; g < noDupes.Length; g++)
             {
-                Vector3 vec = new Vector3(math.round(noDupes[g].x * divider) / divider, math.round(noDupes[g].y * divider) / divider, math.round(noDupes[g].z * divider) / divider);
+                Vector3 vec = new Vector3(math.round(noDupes[g].x * divider * (2.0f / moduleScale.x)) / divider, math.round(noDupes[g].y * divider * (2.0f / moduleScale.y)) / divider, math.round(noDupes[g].z * divider * (2.0f / moduleScale.z)) / divider);
 
                 if (vec.x == 1f)
                 {

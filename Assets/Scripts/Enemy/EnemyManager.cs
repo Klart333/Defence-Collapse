@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,15 +11,12 @@ public class EnemyManager : Singleton<EnemyManager>
     {
         enemies.Add(enemy);
 
-        enemy.Health.OnDeath += Health_OnDeath;
+        enemy.OnDeath += Health_OnDeath;
     }
 
-    private void Health_OnDeath(GameObject obj)
+    private void Health_OnDeath(EnemyHealth health)
     {
-        if (obj.TryGetComponent<EnemyHealth>(out EnemyHealth health))
-        {
-            enemies.Remove(health);
-        }
+        enemies.Remove(health);
     }
 
     public EnemyHealth GetClosestEnemy(Vector3 pos)
@@ -30,7 +26,7 @@ public class EnemyManager : Singleton<EnemyManager>
             return null;
         }
 
-        float distance = 2048;
+        float distance = int.MaxValue;
         int index = 0;
         for (int i = 0; i < enemies.Count; i++)
         {

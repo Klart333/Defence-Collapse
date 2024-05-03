@@ -7,14 +7,11 @@ using UnityEngine;
 using Buildings;
 using System;
 using Sirenix.Utilities;
+using UnityEngine.UIElements;
 
 public class BuildingManager : MonoBehaviour 
 {
     public event Action<Vector3Int> OnCastlePlaced;
-
-    [Title("Misc")]
-    [SerializeField]
-    private Fighter[] fighters;
 
     [Title("Prototypes")]
     [SerializeField]
@@ -61,8 +58,6 @@ public class BuildingManager : MonoBehaviour
     private List<(Vector3Int, Cell)> queryChangedCells = new List<(Vector3Int, Cell)>();
     private List<Vector3Int> queryCollapsedAir = new List<Vector3Int>();
 
-    private List<IBuildable> spawnedPossibilities = new List<IBuildable>();
-
     private List<PrototypeData> prototypes = new List<PrototypeData>();
     private List<Vector3Int> cellsToCollapse = new List<Vector3Int>();
     private Stack<Vector3Int> cellStack = new Stack<Vector3Int>();
@@ -106,8 +101,6 @@ public class BuildingManager : MonoBehaviour
 
     private void Load()
     {
-        Clear();
-
         if (!LoadPrototypeData())
         {
             Debug.LogError("No prototype data found");
@@ -310,7 +303,7 @@ public class BuildingManager : MonoBehaviour
         for (int i = 0; i < cellsToCollapse.Count; i++)
         {
             Vector3Int index = cellsToCollapse[i];
-            if (cells[index.x, index.y, index.z].Collapsed && cells[index.x, index.y, index.z].PossiblePrototypes[0] == unbuildablePrototype)
+            if (this[index].Collapsed && this[index].PossiblePrototypes[0] == unbuildablePrototype)
             {
                 continue;
             }
@@ -344,13 +337,8 @@ public class BuildingManager : MonoBehaviour
 
                 break;
             case BuildingType.Path:
-                //Vector3 minPos2 = new Vector3(queryPos.x - 2f, queryPos.y - 2f, queryPos.z - 2f);
-                //Vector3 maxPos2 = new Vector3(queryPos.x + 2, queryPos.y + 2f, queryPos.z + 2);
-                //cellsToCollapse = GetAllCells(minPos2, maxPos2);
-                //break;
                 cellsToCollapse = GetSurroundingCells(queryPos);
-                //cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3Int.down * 2));
-                cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3Int.up * 2));
+                cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3.up * waveFunction.GridScale.y));
                 break;
         }
 
@@ -672,11 +660,11 @@ public class BuildingManager : MonoBehaviour
     {
         List<Vector3Int> surrounding = new List<Vector3Int>();
 
-        for (float x = min.x; x <= max.x; x += 2)
+        for (float x = min.x; x <= max.x; x += waveFunction.GridScale.x)
         {
-            for (float y = min.y; y <= max.y; y += 2)
+            for (float y = min.y; y <= max.y; y += waveFunction.GridScale.y)
             {
-                for (float z = min.z; z <= max.z; z += 2)
+                for (float z = min.z; z <= max.z; z += waveFunction.GridScale.z)
                 {
                     Vector3Int? index = GetIndex(new Vector3(x, y, z));
                     if (index.HasValue)
@@ -728,7 +716,7 @@ public class BuildingManager : MonoBehaviour
 
     public Vector3Int? GetIndex(Vector3 pos)
     {
-        Vector3Int index = new Vector3Int(Math.GetMultiple(pos.x, 2), Math.GetMultiple(pos.y, 2f), Math.GetMultiple(pos.z, 2));
+        Vector3Int index = new Vector3Int(Math.GetMultiple(pos.x, waveFunction.GridScale.x), Math.GetMultiple(pos.y, waveFunction.GridScale.y), Math.GetMultiple(pos.z, waveFunction.GridScale.z));
         if (cells.IsInBounds(index.x, index.y, index.z))
         {
             return index;
@@ -742,46 +730,7 @@ public class BuildingManager : MonoBehaviour
         return cells[index.x, index.y, index.z].Position;
     }
 
-    public void DisplayPossiblePrototypes()
-    {
-        HidePossiblePrototypes();
-
-        foreach (var cell in cells)
-        {
-            if (cell.Collapsed)
-            {
-                continue;
-            }
-
-            float scale = 1.0f / cell.PossiblePrototypes.Count;
-            int removed = 0;
-            for (int g = 0; g < cell.PossiblePrototypes.Count; g++)
-            {
-                if (cell.PossiblePrototypes[g].MeshRot.Mesh == null)
-                {
-                    removed++;
-                    continue;
-                }
-
-                float offset = (1.0f / cell.PossiblePrototypes.Count) * (((float)(g + 1 - removed) * 2) - cell.PossiblePrototypes.Count);
-                Vector3 pos = cell.Position + Vector3.right * offset;
-
-                spawnedPossibilities.Add(GenerateMesh(pos, cell.PossiblePrototypes[g], scale, false));
-            }
-        }
-    }
-
-    public void HidePossiblePrototypes()
-    {
-        for (int i = 0; i < spawnedPossibilities.Count; i++)
-        {
-            spawnedPossibilities[i].gameObject.SetActive(false);
-        }
-
-        spawnedPossibilities.Clear();
-    }
-
-    private IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1, bool animate = true)
+    private IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, bool animate = true)
     {
         if (prototypeData.MeshRot.Mesh == null)
         {
@@ -789,9 +738,15 @@ public class BuildingManager : MonoBehaviour
         }
 
         IBuildable building;
+        Vector3 scale = Vector3.one;
         if (prototypeData.MeshRot.Mesh.name.Contains("Path")) // Not my best work
         {
             building = pathPrefab.GetAtPosAndRot<Path>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
+
+            if (prototypeData.NegY != "-1s" || prototypeData.PosY != "-1s")
+            {
+                scale = new Vector3(1, waveFunction.GridScale.y / 2.0f, 1);
+            }
         }
         else
         {
@@ -803,9 +758,8 @@ public class BuildingManager : MonoBehaviour
         {
             materials.Add(mats[prototypeData.MaterialIndexes[i]]);
         }
-        building.Setup(prototypeData, materials);
 
-        building.gameObject.transform.localScale *= scale;
+        building.Setup(prototypeData, materials, scale);
 
         if (animate) buildingAnimator.Animate(building.gameObject);
 
@@ -813,12 +767,8 @@ public class BuildingManager : MonoBehaviour
     }
 
     #endregion
-
-    public void Clear()
-    {
-        
-    }
 }
+
 public static class ArrayHelper
 {
     public static bool IsInBounds<T>(this T[,,] array, int x, int y, int z)
