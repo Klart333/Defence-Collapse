@@ -555,7 +555,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f280eac3c681de84d90582ff11259c56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackData: {fileID: 11400000, guid: ee1d9c69d44018c449bd22bae562256d, type: 2}
+  attackData: {fileID: 11400000, guid: bf2b81c88520df945a25c18667cb6fbd, type: 2}
 --- !u!114 &44266211333322211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -781,6 +781,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2584510343069784163}
   - component: {fileID: 1096446415573025859}
+  - component: {fileID: 2921683092948402855}
   m_Layer: 9
   m_Name: TurtleShellPBR
   m_TagString: Untagged
@@ -826,6 +827,27 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!65 &2921683092948402855
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5349759216030691616}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0.43, z: 0}
 --- !u!1 &5386575569534922939
 GameObject:
   m_ObjectHideFlags: 0

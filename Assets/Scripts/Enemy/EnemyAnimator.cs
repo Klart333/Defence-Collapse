@@ -1,6 +1,5 @@
+using Sirenix.OdinInspector;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -9,7 +8,9 @@ public class EnemyAnimator : MonoBehaviour
     [SerializeField]
     private float deathLength = 1f;
 
+    [SerializeField, ReadOnly]
     private Animator cachedAnimator;
+
     private Animator animator
     {
         get

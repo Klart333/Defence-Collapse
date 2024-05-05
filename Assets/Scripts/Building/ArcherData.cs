@@ -1,7 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Archer Data", menuName = "Building/State Data/Archer")]
+[InlineEditor, CreateAssetMenu(fileName = "New Archer Data", menuName = "Building/State Data/Archer")]
 public class ArcherData : ScriptableObject
 {
     [Title("Economy")]

@@ -57,9 +57,9 @@ public class BuildingHandler : SerializedMonoBehaviour
 
         for (int i = 0; i < buildingQueue.Count; i++)
         {
-            if (!BuildingData.ContainsKey(building.Index))
+            if (!BuildingData.ContainsKey(buildingQueue[i].Index))
             {
-                BuildingData.Add(building.Index, CreateData(buildingQueue[i]));
+                BuildingData.Add(buildingQueue[i].Index, CreateData(buildingQueue[i]));
             }
         }
 
@@ -74,12 +74,16 @@ public class BuildingHandler : SerializedMonoBehaviour
     {
         if (!towerMeshData.TowerMeshes.TryGetValue(building.Mesh, out BuildingCellInformation cellInfo))
         {
-            Debug.LogError("Please add all meshes to the list");
-            return null;
+            Debug.Log("Please add all meshes to the list");
+
+            BuildingData wrongdata = new BuildingData(this);
+            wrongdata.SetState(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None}, building.Index);
+
+            return wrongdata;
         }
 
         BuildingData data = new BuildingData(this);
-        data.SetState(cellInfo);
+        data.SetState(cellInfo, building.Index);
 
         return data;
     }

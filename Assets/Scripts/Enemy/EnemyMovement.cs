@@ -32,6 +32,11 @@ public class EnemyMovement : MonoBehaviour
         Events.OnEnemyPathUpdated += OnEnemyPathUpdated;
     }
 
+    private void OnDisable()
+    {
+        Events.OnEnemyPathUpdated -= OnEnemyPathUpdated;
+    }
+
     private void Update()
     {
         if (agent.isOnNavMesh && agent.remainingDistance < agent.stoppingDistance)

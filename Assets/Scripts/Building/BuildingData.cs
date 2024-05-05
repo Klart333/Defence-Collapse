@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+[System.Serializable]   
 public class BuildingData
 {
     private BuildingHandler handler;
@@ -18,7 +19,7 @@ public class BuildingData
         handler = buildingHandler;
     }
 
-    public void SetState(BuildingCellInformation cellInfo)
+    public void SetState(BuildingCellInformation cellInfo, Vector3Int index)
     {
         switch (cellInfo.TowerType)
         {
@@ -36,6 +37,7 @@ public class BuildingData
                 break;
         }
 
+        Index = index;
         houseCount = cellInfo.HouseCount;
 
         state.OnStateEntered();

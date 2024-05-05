@@ -172,6 +172,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     private void Place()
     {
         Index = FindAnyObjectByType<BuildingManager>().GetIndex(transform.position).Value;
+
         BuildingHandler.AddBuilding(this);
     }
 
