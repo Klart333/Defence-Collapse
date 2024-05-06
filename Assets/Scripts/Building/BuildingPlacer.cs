@@ -16,7 +16,6 @@ public class BuildingPlacer : MonoBehaviour
 
     private List<PooledMonoBehaviour> spawnedPlaces = new List<PooledMonoBehaviour>();
 
-    private BuildingManager buildingManager;
     private Camera cam;
 
     private InputActions InputActions;
@@ -66,8 +65,6 @@ public class BuildingPlacer : MonoBehaviour
     {
         cam = Camera.main;
         Events.OnBuildingPurchased += BuildingPurchased;
-
-        buildingManager = GetComponent<BuildingManager>();
     }
 
     private void BuildingPurchased(BuildingType buildingType)
@@ -88,7 +85,7 @@ public class BuildingPlacer : MonoBehaviour
             Vector3 mousePos = GetRayPoint();
             if (mousePos == Vector3.zero || mousePos.x % 1 == 0 || mousePos.z % 1 == 0 || mousePos.y < 1) continue;
 
-            List<Vector3Int> newIndexes = buildingManager.GetCellsToCollapse(mousePos, type);
+            List<Vector3Int> newIndexes = BuildingManager.Instance.GetCellsToCollapse(mousePos, type);
             if (indexes.LooseEquals(newIndexes) || newIndexes.Count == 0)
             {
                 if (buildables.Count > 0 && fire.WasPerformedThisFrame())
@@ -101,13 +98,13 @@ public class BuildingPlacer : MonoBehaviour
             {
                 DisablePlaces();
 
-                buildingManager.RevertQuery();
+                BuildingManager.Instance.RevertQuery();
                 await Task.Delay(50);
 
                 indexes = newIndexes;
             }
 
-            buildables = buildingManager.Query(mousePos, type);
+            buildables = BuildingManager.Instance.Query(mousePos, type);
 
             foreach (var item in buildables)
             {
@@ -116,7 +113,7 @@ public class BuildingPlacer : MonoBehaviour
             
             if (buildables.Count == 0) 
             {
-                ShowPlaces(indexes.Select(x => buildingManager.GetPos(x) + Vector3.up).ToList());
+                ShowPlaces(indexes.Select(x => BuildingManager.Instance.GetPos(x) + Vector3.up).ToList());
                 
                 continue;
             }
@@ -129,7 +126,7 @@ public class BuildingPlacer : MonoBehaviour
         if (canceled)
         {
             DisablePlaces();
-            buildingManager.RevertQuery();
+            BuildingManager.Instance.RevertQuery();
 
             if (!manualCancel)
             {
@@ -141,7 +138,7 @@ public class BuildingPlacer : MonoBehaviour
 
     private void PlaceBuilding(BuildingType buildingType)
     {
-        buildingManager.Place();
+        BuildingManager.Instance.Place();
 
         if (buildingType == BuildingType.Castle)
         {

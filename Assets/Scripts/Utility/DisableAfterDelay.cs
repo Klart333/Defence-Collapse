@@ -1,24 +1,25 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DisableAfterDelay : MonoBehaviour
 {
-    [SerializeField]
-    private float time = 1;
+    public float Lifeime = 1;
 
     [SerializeField]
     private bool shouldDestroy = false;
+
+    private Vector3 startScale;
 
     private void OnEnable()
     {
         if (shouldDestroy)
         {
-            Destroy(gameObject, time);
+            Destroy(gameObject, Lifeime);
         }
         else
         {
+            startScale = transform.localScale;
+
             StopAllCoroutines();
             StartCoroutine(Delay());
         }
@@ -26,6 +27,8 @@ public class DisableAfterDelay : MonoBehaviour
 
     private void OnDisable()
     {
+        transform.localScale = startScale;
+
         StopAllCoroutines();
     }
 
@@ -33,7 +36,7 @@ public class DisableAfterDelay : MonoBehaviour
     {
         float t = 0;
 
-        while (t < time)
+        while (t < Lifeime)
         {
             t += Time.deltaTime;
             yield return null;

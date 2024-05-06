@@ -61,6 +61,10 @@ public class BuildingHandler : SerializedMonoBehaviour
             {
                 BuildingData.Add(buildingQueue[i].Index, CreateData(buildingQueue[i]));
             }
+            else if (BuildingData[buildingQueue[i].Index].Prototype != buildingQueue[i].Prototype)
+            {
+                UpdateData(BuildingData[buildingQueue[i].Index], buildingQueue[i]);
+            }
         }
 
         BuildingGroups.Add(++groupIndexCounter, new List<Building>(buildingQueue));
@@ -70,20 +74,30 @@ public class BuildingHandler : SerializedMonoBehaviour
         CheckMerge(groupIndexCounter);
     }
 
+    private void UpdateData(BuildingData buildingData, Building building)
+    {
+        if (!towerMeshData.TowerMeshes.TryGetValue(building.Prototype.MeshRot.Mesh, out BuildingCellInformation cellInfo))
+        {
+            buildingData.UpdateState(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None }, building.Prototype);
+        }
+
+        buildingData.UpdateState(cellInfo, building.Prototype);
+    }
+
     private BuildingData CreateData(Building building)
     {
-        if (!towerMeshData.TowerMeshes.TryGetValue(building.Mesh, out BuildingCellInformation cellInfo))
+        if (!towerMeshData.TowerMeshes.TryGetValue(building.Prototype.MeshRot.Mesh, out BuildingCellInformation cellInfo))
         {
             Debug.Log("Please add all meshes to the list");
 
             BuildingData wrongdata = new BuildingData(this);
-            wrongdata.SetState(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None}, building.Index);
+            wrongdata.SetState(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None}, building.Index, building.Prototype);
 
             return wrongdata;
         }
 
         BuildingData data = new BuildingData(this);
-        data.SetState(cellInfo, building.Index);
+        data.SetState(cellInfo, building.Index, building.Prototype);
 
         return data;
     }
@@ -146,7 +160,7 @@ public class BuildingHandler : SerializedMonoBehaviour
     {
         Building building = GetBuilding(buildingIndex);
 
-        building.DislayDeath();
+        building.DisplayDeath();
         Events.OnBuildingDestroyed?.Invoke(building);
     }
 

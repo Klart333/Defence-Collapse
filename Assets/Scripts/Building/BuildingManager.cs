@@ -9,7 +9,7 @@ using System;
 using Sirenix.Utilities;
 using UnityEngine.UIElements;
 
-public class BuildingManager : MonoBehaviour 
+public class BuildingManager : Singleton<BuildingManager> 
 {
     public event Action<Vector3Int> OnCastlePlaced;
 
@@ -22,9 +22,6 @@ public class BuildingManager : MonoBehaviour
     private PrototypeKeyData keyData;
 
     [Title("Mesh")]
-    [SerializeField]
-    private List<Material> mats;
-
     [SerializeField]
     private Building buildingPrefab;
 
@@ -78,11 +75,14 @@ public class BuildingManager : MonoBehaviour
         buildingAnimator = GetComponent<BuildingAnimator>();
 
         waveFunction.OnMapGenerated += Load;
+        Events.OnBuildingDestroyed += OnBuildingDestroyed;
+        Events.OnBuildingRepaired += OnBuildingRepaired;
     }
-
     private void OnDisable()
     {
         waveFunction.OnMapGenerated -= Load;
+        Events.OnBuildingDestroyed += OnBuildingDestroyed;
+        Events.OnBuildingRepaired += OnBuildingRepaired;
     }
 
     [Button]
@@ -137,14 +137,14 @@ public class BuildingManager : MonoBehaviour
                 {
                     if (y == cells.GetLength(1) - 1) // Just put air at the top
                     {
-                        cells[x, y, z] = new Cell(true, cells[x, y, z].Position, new List<PrototypeData>() { unbuildablePrototype });
+                        cells[x, y, z] = new Cell(true, cells[x, y, z].Position, new List<PrototypeData>() { unbuildablePrototype }, false);
                         continue;
                     }
 
                     Cell groundCell = waveFunction.GetCellAtIndex(z, y, x);
                     if (groundCell.PossiblePrototypes[0].MeshRot.Mesh == null) // It's air
                     {
-                        cells[x, y, z] = new Cell(true, cells[x, y, z].Position, new List<PrototypeData>() { unbuildablePrototype });
+                        cells[x, y, z] = new Cell(true, cells[x, y, z].Position, new List<PrototypeData>() { unbuildablePrototype }, false);
                     }
                     else if (groundCell.PossiblePrototypes[0].MeshRot.Mesh.name == "Ground_Portal") // yay hard coded names :))))
                     {
@@ -172,7 +172,21 @@ public class BuildingManager : MonoBehaviour
     }
 
     #endregion
-    
+
+    #region Events
+
+    private void OnBuildingRepaired(Building building)
+    {
+        this[building.Index] = new Cell(true, this[building.Index].Position, this[building.Index].PossiblePrototypes, true);
+    }
+
+    private void OnBuildingDestroyed(Building building)
+    {
+        this[building.Index] = new Cell(true, this[building.Index].Position, this[building.Index].PossiblePrototypes, false);
+    }
+
+    #endregion
+
     #region Query & Place
 
     public void Place()
@@ -303,7 +317,7 @@ public class BuildingManager : MonoBehaviour
         for (int i = 0; i < cellsToCollapse.Count; i++)
         {
             Vector3Int index = cellsToCollapse[i];
-            if (this[index].Collapsed && this[index].PossiblePrototypes[0] == unbuildablePrototype)
+            if (!this[index].Buildable)
             {
                 continue;
             }
@@ -753,13 +767,7 @@ public class BuildingManager : MonoBehaviour
             building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
         }
 
-        List<Material> materials = new List<Material>(prototypeData.MaterialIndexes.Length);
-        for (int i = 0; i < prototypeData.MaterialIndexes.Length; i++)
-        {
-            materials.Add(mats[prototypeData.MaterialIndexes[i]]);
-        }
-
-        building.Setup(prototypeData, materials, scale);
+        building.Setup(prototypeData, scale);
 
         if (animate) buildingAnimator.Animate(building.gameObject);
 

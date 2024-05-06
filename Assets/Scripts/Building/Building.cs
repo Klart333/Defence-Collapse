@@ -11,6 +11,9 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     [Title("Visual")]
     [SerializeField]
+    private MaterialData materialData;
+    
+    [SerializeField]
     private Material transparentGreen;
 
     [SerializeField]
@@ -29,9 +32,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     private bool purchasing = true;
 
     public int BuildingGroupIndex { get; set; } = -1;
-
-    public Mesh Mesh { get; set; }
-    public List<Material> Materials { get; set; }
+    public PrototypeData Prototype { get; set; }
     public Vector3Int Index { get; set; }
 
     public BuildingHandler BuildingHandler
@@ -67,6 +68,7 @@ public class Building : PooledMonoBehaviour, IBuildable
             return meshRenderer;
         }
     }
+    public Mesh Mesh => Prototype.MeshRot.Mesh;
 
     private void Awake()
     {
@@ -130,24 +132,43 @@ public class Building : PooledMonoBehaviour, IBuildable
             BuildingHandler.LowlightGroup(this);
         }
 
-        buildingHandler[this]?.State.Update(this);
+        buildingHandler[this]?.Update(this);
     }
 
-    public void Setup(PrototypeData prototypeData, List<Material> materials, Vector3 scale)
+    public void Setup(PrototypeData prototypeData, Vector3 scale)
     {
-        Mesh = prototypeData.MeshRot.Mesh;
+        Index = BuildingManager.Instance.GetIndex(transform.position).Value;
+        Prototype = GetPrototype(prototypeData);
 
-        GetComponentInChildren<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
-        MeshRenderer.SetMaterials(materials);
+        GetComponentInChildren<MeshFilter>().mesh = Mesh;
+        MeshRenderer.SetMaterials(materialData.GetMaterials(Prototype.MaterialIndexes));
 
-        Materials = materials;
         transparentMaterials = new List<Material>();
-        for (int i = 0; i < materials.Count; i++)
+        for (int i = 0; i < prototypeData.MaterialIndexes.Length; i++)
         {
             transparentMaterials.Add(transparentGreen);
         }
 
         MeshRenderer.transform.localScale = scale;
+    }
+
+    private PrototypeData GetPrototype(PrototypeData newProt)
+    {
+        if (BuildingHandler[this] == null)
+        {
+            return newProt;
+        }
+
+        PrototypeData oldProt = BuildingHandler[this].Prototype;
+        if (oldProt.PosX == newProt.PosX && 
+            oldProt.NegX == newProt.NegX && 
+            oldProt.PosZ == newProt.PosZ &&
+            oldProt.NegZ == newProt.NegZ)
+        {
+            return oldProt;
+        }
+
+        return newProt;
     }
 
     private void OnBuildingClicked(BuildingType arg0)
@@ -164,15 +185,13 @@ public class Building : PooledMonoBehaviour, IBuildable
         }
         else
         {
-            MeshRenderer.SetMaterials(Materials);
+            MeshRenderer.SetMaterials(materialData.GetMaterials(Prototype.MaterialIndexes));
             Place();
         }
     }
 
     private void Place()
     {
-        Index = FindAnyObjectByType<BuildingManager>().GetIndex(transform.position).Value;
-
         BuildingHandler.AddBuilding(this);
     }
 
@@ -198,8 +217,16 @@ public class Building : PooledMonoBehaviour, IBuildable
         
     }
 
-    public void DislayDeath()
+    public void DisplayDeath()
     {
         ToggleIsBuildableVisual(true);
+    }
+
+    public void SetData(BuildingData data)
+    {
+        if (!data.Health.Alive)
+        {
+            DisplayDeath();
+        }
     }
 }

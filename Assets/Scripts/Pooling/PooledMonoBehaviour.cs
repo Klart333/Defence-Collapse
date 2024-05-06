@@ -13,7 +13,22 @@ public class PooledMonoBehaviour : MonoBehaviour
 
     public event Action<PooledMonoBehaviour> OnReturnToPool; // Takes a PooledMonoBehaviour as an argument so that we know what object to return
 
-    public int InitialPoolSize { get { return initialPoolSize; } } 
+    public int InitialPoolSize { get { return initialPoolSize; } }
+
+
+    private DisableAfterDelay delay;
+    public DisableAfterDelay Delay
+    {
+        get
+        {
+            if (delay == null)
+            {
+                delay = GetComponent<DisableAfterDelay>();
+            }
+
+            return delay;
+        }
+    }
 
     public T Get<T>(Transform overrideParent = null) where T : PooledMonoBehaviour // 2. Second step called from GetAtPosAndRot<T>, here we ask for a disabled gameobject from the Pool
     {

@@ -44,7 +44,7 @@ public class PrototypeInfoCreator : MonoBehaviour
 
     [Title("Material")]
     [SerializeField]
-    private List<Material> materials = new List<Material>();
+    private MaterialData materialData;
 
     [Title("Weight")]
     [SerializeField]
@@ -120,37 +120,22 @@ public class PrototypeInfoCreator : MonoBehaviour
             string[] posY = GetTopKeys(posYs, true);
             string[] negY = GetTopKeys(negYs, false);
 
-            int[] matIndexes = meshes[i].gameObject.GetComponent<MeshRenderer>().sharedMaterials.Select((x) => materials.IndexOf(x)).ToArray();
+            int[] matIndexes = meshes[i].gameObject.GetComponent<MeshRenderer>().sharedMaterials.Select((x) => materialData.Materials.IndexOf(x)).ToArray();
             // Add all rotations
             // Need to rotate the vertical too
             List<PrototypeData> prots = new List<PrototypeData>
             {
-                new PrototypeData(new MeshWithRotation(mesh, 0), posX, negX, posY[0], negY[0], posZ, negZ, pieceWeights[i], matIndexes)
+                new PrototypeData(new MeshWithRotation(mesh, 0), posX, negX, posY[0], negY[0], posZ, negZ, pieceWeights[i], matIndexes),
+                new PrototypeData(new MeshWithRotation(mesh, 1), posZ, negZ, posY[1], negY[1], negX, posX, pieceWeights[i], matIndexes),
+                new PrototypeData(new MeshWithRotation(mesh, 2), negX, posX, posY[2], negY[2], negZ, posZ, pieceWeights[i], matIndexes),
+                new PrototypeData(new MeshWithRotation(mesh, 3), negZ, posZ, posY[3], negY[3], posX, negX, pieceWeights[i], matIndexes),
             };
-
-            AddIfUnique(prots, new PrototypeData(new MeshWithRotation(mesh, 1), posZ, negZ, posY[1], negY[1], negX, posX, pieceWeights[i], matIndexes));
-            AddIfUnique(prots, new PrototypeData(new MeshWithRotation(mesh, 2), negX, posX, posY[2], negY[2], negZ, posZ, pieceWeights[i], matIndexes));
-            AddIfUnique(prots, new PrototypeData(new MeshWithRotation(mesh, 3), negZ, posZ, posY[3], negY[3], posX, negX, pieceWeights[i], matIndexes));
 
             Prototypes.AddRange(prots);
         }
 
         // Empty
         Prototypes.Add(new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", pieceWeights[meshes.Length], new int[0]));
-
-        void AddIfUnique(List<PrototypeData> prots, PrototypeData prot)
-        {
-            prots.Add(prot);
-            return;
-            for (int i = 0; i < prots.Count; i++)
-            {
-                if (prot.PosX == prots[i].PosX && prot.NegX == prots[i].NegX && prot.PosY == prots[i].PosY && prot.NegY == prots[i].NegY && prot.PosZ == prots[i].PosZ && prot.NegZ == prots[i].NegZ)
-                {
-                    return;
-                }
-            }
-
-        }
     }
 
     private string GetSideKey(List<Vector3> vertexPositions, int mainAxis, int positiveDirection)
@@ -281,7 +266,7 @@ public class PrototypeInfoCreator : MonoBehaviour
             Vector3 pos = new Vector3(i * 5, 0, 0);
             var prot = Instantiate(prefab, pos, Quaternion.identity);
             prot.Setup(Prototypes[i]);
-            prot.GetComponentInChildren<MeshRenderer>().materials = materials.Where(x => Prototypes[i].MaterialIndexes.Contains(materials.IndexOf(x))).ToArray();
+            prot.GetComponentInChildren<MeshRenderer>().materials = materialData.Materials.Where(x => Prototypes[i].MaterialIndexes.Contains(materialData.Materials.IndexOf(x))).ToArray();
 
             spawnedPrototypes.Add(prot.gameObject);
         }
@@ -481,7 +466,8 @@ public struct PrototypeData
                NegZ == data.NegZ &&
                PosY == data.PosY &&
                NegY == data.NegY &&
-               Weight == data.Weight;
+               Weight == data.Weight &&
+               MeshRot.Mesh == data.MeshRot.Mesh;
     }
 
     public override int GetHashCode()

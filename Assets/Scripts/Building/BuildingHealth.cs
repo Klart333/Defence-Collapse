@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class BuildingHealth : MonoBehaviour, IHealth<BuildingHealth>
+public class BuildingHealth : MonoBehaviour, IHealth
 {
     public event Action<BuildingHealth> OnDeath;
 
@@ -12,8 +12,8 @@ public class BuildingHealth : MonoBehaviour, IHealth<BuildingHealth>
         building = GetComponent<Building>();
     }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(DamageInstance damage, out DamageInstance damageDone)
     {
-        building.BuildingHandler[building].Health.TakeDamage(amount);
+        building.BuildingHandler[building].Health.TakeDamage(damage, out damageDone);
     }
 }

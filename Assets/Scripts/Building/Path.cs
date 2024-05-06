@@ -10,6 +10,9 @@ namespace Buildings
     {
         [Title("Visual")]
         [SerializeField]
+        private MaterialData materialData;
+
+        [SerializeField]
         private Material transparentGreen;
 
         private List<Material> transparentMaterials = new List<Material>();
@@ -17,7 +20,7 @@ namespace Buildings
         private MeshCollider meshCollider;
         private MeshRenderer meshRenderer;
         
-        public Mesh Mesh { get; set; }
+        public PrototypeData PrototypeData { get; private set; }
 
         public MeshRenderer MeshRenderer
         {
@@ -38,9 +41,6 @@ namespace Buildings
             }
         }
 
-        public List<Material> Materials { get; set; }
-
-
         protected override void OnDisable()
         {
             base.OnDisable();
@@ -54,16 +54,15 @@ namespace Buildings
             MeshRenderer.transform.localScale = Vector3.one;
         }
 
-        public void Setup(PrototypeData prototypeData, List<Material> materials, Vector3 scale)
+        public void Setup(PrototypeData prototypeData, Vector3 scale)
         {
-            Mesh = prototypeData.MeshRot.Mesh;
+            PrototypeData = prototypeData;
 
             GetComponentInChildren<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
-            MeshRenderer.SetMaterials(materials);
+            MeshRenderer.SetMaterials(materialData.GetMaterials(PrototypeData.MaterialIndexes));
 
-            Materials = materials;
             transparentMaterials = new List<Material>();
-            for (int i = 0; i < materials.Count; i++)
+            for (int i = 0; i < PrototypeData.MaterialIndexes.Length; i++)
             {
                 transparentMaterials.Add(transparentGreen);
             }
@@ -79,8 +78,8 @@ namespace Buildings
             }
             else
             {
-                MeshCollider.sharedMesh = Mesh;
-                MeshRenderer.SetMaterials(Materials);
+                MeshCollider.sharedMesh = PrototypeData.MeshRot.Mesh;
+                MeshRenderer.SetMaterials(materialData.GetMaterials(PrototypeData.MaterialIndexes));
             }
         }   
     }

@@ -1,14 +1,18 @@
+using Sirenix.OdinInspector;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyHealth : MonoBehaviour, IHealth<EnemyHealth>
+public class EnemyHealth : MonoBehaviour, IHealth
 {
     public event Action<EnemyHealth> OnDeath;
 
+    [Title("Data")]
     [SerializeField]
-    private float maxHealth;
+    private EnemyAttackData enemyData;
+
+    [Title("Juice")]
+    [SerializeField]
+    private DamageNumber damageNumber;
 
     [SerializeField]
     private PooledMonoBehaviour hitParticle;
@@ -22,7 +26,7 @@ public class EnemyHealth : MonoBehaviour, IHealth<EnemyHealth>
     {
         animator = GetComponent<EnemyAnimator>();
 
-        health = new Health(maxHealth);
+        health = new Health(enemyData.MaxHealth);
         health.OnDeath += Health_OnDeath;
 
         EnemyManager.Instance.RegisterEnemy(this);
@@ -46,9 +50,9 @@ public class EnemyHealth : MonoBehaviour, IHealth<EnemyHealth>
         //gameObject.SetActive(false);
     }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(DamageInstance damage, out DamageInstance damageDone)
     {
-        health.TakeDamage(amount);
+        health.TakeDamage(damage, out damageDone);
 
         hitParticle.GetAtPosAndRot<PooledMonoBehaviour>(transform.position, hitParticle.transform.rotation);
     }

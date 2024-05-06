@@ -27,7 +27,7 @@ public class WaveFunction : MonoBehaviour
 
     [Header("Mesh")]
     [SerializeField]
-    private List<Material> mats;
+    private MaterialData materialData;
 
     [Header("Prototypes")]
     [SerializeField]
@@ -661,7 +661,7 @@ public class WaveFunction : MonoBehaviour
 
         GameObject gm = new GameObject();
         gm.AddComponent<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
-        gm.AddComponent<MeshRenderer>().materials = mats.Where((x) => prototypeData.MaterialIndexes.Contains(mats.IndexOf(x))).ToArray();
+        gm.AddComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
 
         gm.transform.position = position;
         gm.transform.rotation = Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0);
@@ -759,16 +759,18 @@ public struct MeshWithRotation
 public struct Cell
 {
     public bool Collapsed;
+    public bool Buildable;
 
     public Vector3 Position;
 
     public List<PrototypeData> PossiblePrototypes;
 
-    public Cell(bool collapsed, Vector3 position, List<PrototypeData> possiblePrototypes)
+    public Cell(bool collapsed, Vector3 position, List<PrototypeData> possiblePrototypes, bool buildable = true)
     {
         this.Collapsed = collapsed;
         this.Position = position;
         PossiblePrototypes = possiblePrototypes;
+        Buildable = buildable;
     }
 }
 

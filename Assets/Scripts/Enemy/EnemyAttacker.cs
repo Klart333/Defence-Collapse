@@ -8,8 +8,6 @@ public class EnemyAttacker : MonoBehaviour
     [SerializeField]
     private EnemyAttackData attackData;
 
-    private Collider[] hitResults;
-
     private EnemyAnimator animator;
     private EnemyHealth health;
 
@@ -21,8 +19,6 @@ public class EnemyAttacker : MonoBehaviour
     {
         animator = GetComponent<EnemyAnimator>();
         health = GetComponent<EnemyHealth>();
-
-        hitResults = new Collider[10];
     }
 
     private void Update()
@@ -48,7 +44,7 @@ public class EnemyAttacker : MonoBehaviour
     {
         animator.Attack();
 
-        Vector3 pos = transform.position + transform.forward * attackData.AttackRadius;
+        /*Vector3 pos = transform.position + transform.forward * attackData.AttackRadius;
         Physics.OverlapSphereNonAlloc(pos, attackData.AttackRadius, hitResults, attackData.LayerMask);
 
         for (int i = 0; i < hitResults.Length; i++)
@@ -63,11 +59,11 @@ public class EnemyAttacker : MonoBehaviour
                 continue;
             }
 
-            if (hitResults[i].TryGetComponent(out IHealth<BuildingHealth> health))
+            if (hitResults[i].TryGetComponent(out IHealth health))
             {
                 health.TakeDamage(attackData.Damage);
             }
-        }
+        }*/
     }
 
     public void StartAttacking()

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 
 public abstract class BuildingState
@@ -11,17 +12,46 @@ public abstract class BuildingState
     public abstract void OnWaveStart(int houseCount);
 }
 
-public class ArcherState : BuildingState
+public class ArcherState : BuildingState, IAttacker
 {
-    private ArcherData data;
+    public event Action OnAttack;
 
+    private Attack attack;
+
+    private Stats stats;
+    private ArcherData archerData;
+    private BuildingData buildingData;
     private GameObject rangeIndicator;
+    private DamageInstance lastDamageDone;
 
     private float attackCooldownTimer = 0;
 
-    public ArcherState(ArcherData data)
+    public Stats Stats => stats;
+    public Health Health => buildingData.Health;
+    public DamageInstance LastDamageDone => lastDamageDone;
+    public LayerMask LayerMask => archerData.AttackLayerMask;
+    public Vector3 OriginPosition { get; private set; }
+    public Vector3 AttackPosition { get; set; }
+
+    public ArcherState(ArcherData archerData, BuildingData buildingData)
     {
-        this.data = data;
+        this.archerData = archerData;
+        this.buildingData = buildingData;
+
+        attack = new Attack(archerData.BaseAttack);
+
+        stats = new Stats
+        {
+            AttackSpeed = new Stat(archerData.AttackSpeed),
+            MaxHealth = new Stat(archerData.MaxHealth),
+
+            DamageMultiplier = new Stat(1),
+            Healing = new Stat(0),
+            Armor = new Stat(0),
+            CritChance = new Stat(0),
+            CritMultiplier = new Stat(0),
+            MovementSpeed = new Stat(0),
+        };
     }
 
     public override void OnStateEntered()
@@ -29,8 +59,24 @@ public class ArcherState : BuildingState
         
     }
 
+    public override void OnSelected(Vector3 pos)
+    {
+        rangeIndicator = archerData.RangeIndicator.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.identity).gameObject;
+        rangeIndicator.transform.localScale = new Vector3(archerData.Range * 2.0f, 0.01f, archerData.Range * 2.0f);
+    }
+
+    public override void OnDeselected()
+    {
+        if (rangeIndicator != null)
+        {
+            rangeIndicator.SetActive(false);
+        }
+    }
+
     public override void Update(Building building)
     {
+        OriginPosition = building.transform.position + Vector3.up * 1.5f; // ya never know
+
         if (EnemyManager.Instance.Enemies.Count <= 0)
         {
             return;
@@ -42,10 +88,10 @@ public class ArcherState : BuildingState
             if (closest == null)
                 return;
 
-            if (Vector3.Distance(building.transform.position, closest.transform.position) <= data.Range)
+            if (Vector3.Distance(building.transform.position, closest.transform.position) <= archerData.Range)
             {
-                Attack(closest, building);
-                attackCooldownTimer = 1.0f / data.AttackSpeed;
+                attackCooldownTimer = 1.0f / stats.AttackSpeed.Value;
+                Attack(closest);
             }
         }
         else
@@ -54,24 +100,34 @@ public class ArcherState : BuildingState
         }
     }
 
-    private async void Attack(EnemyHealth target, Building building)
+    private async void Attack(EnemyHealth target)
     {
-        Projectile arrow = data.Arrow.GetAtPosAndRot<Projectile>(building.transform.position, Quaternion.identity);
-        arrow.Damage = data.Damage;
+        AttackPosition = target.transform.position;
+        attack.TriggerAttack(this);
 
-        float t = 0;
-
-        Vector3 startPos = building.transform.position;
-        Vector3 midPos = Vector3.Lerp(startPos, target.transform.position, 0.5f) + Vector3.up * 10f;
-
-        while (t <= 1.0f)
+        float timer = attackCooldownTimer;
+        while (timer > 0 && target.Health.Alive)
         {
-            t += Time.deltaTime;
+            await UniTask.Yield();
 
-            arrow.transform.position = Vector3.Lerp(Vector3.Lerp(startPos, midPos, t), Vector3.Lerp(midPos, target.transform.position, t), t);
-
-            await Task.Yield();
+            timer -= Time.deltaTime;
+            AttackPosition = target.transform.position;
         }
+    }
+
+    public override void OnWaveStart(int houseCount)
+    {
+        MoneyManager.Instance.AddMoney(houseCount * archerData.IncomePerHouse);
+    }
+
+    public void OnUnitDoneDamage(DamageInstance damageInstance)
+    {
+        lastDamageDone = damageInstance;
+    }
+
+    public void OnUnitKill()
+    {
+
     }
 
     public override void Die()
@@ -79,24 +135,6 @@ public class ArcherState : BuildingState
 
     }
 
-    public override void OnSelected(Vector3 pos)
-    {
-        rangeIndicator = data.RangeIndicator.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.identity).gameObject;
-        rangeIndicator.transform.localScale = new Vector3(data.Range * 2.0f, 0.01f, data.Range * 2.0f);
-    }
-
-    public override void OnDeselected()
-    {
-        if (rangeIndicator != null)
-        {
-            rangeIndicator.SetActive(false);
-        }
-    }
-
-    public override void OnWaveStart(int houseCount)
-    {
-        MoneyManager.Instance.AddMoney(houseCount * data.IncomePerHouse);
-    }
 }
 
 public class NormalState : BuildingState

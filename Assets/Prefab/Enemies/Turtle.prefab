@@ -490,6 +490,7 @@ GameObject:
   - component: {fileID: 450540108998313227}
   - component: {fileID: 44266211333322211}
   - component: {fileID: 8741064035590925330}
+  - component: {fileID: 6083471098831758755}
   m_Layer: 9
   m_Name: Turtle
   m_TagString: Untagged
@@ -543,6 +544,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deathLength: 1
+  cachedAnimator: {fileID: 0}
 --- !u!114 &450540108998313227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -568,7 +570,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f4d7599838c8af4a9d45b513169d557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
+  enemyData: {fileID: 11400000, guid: bf2b81c88520df945a25c18667cb6fbd, type: 2}
+  damageNumber: {fileID: 113033579351757082, guid: f03daa4315a134d4d94e833ba3733de0,
+    type: 3}
   hitParticle: {fileID: 542933246792631625, guid: 021a2f7a2c5bc4449b4c64a66a050e8c,
     type: 3}
 --- !u!195 &8741064035590925330
@@ -580,7 +584,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 3526500985480528438}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.1
+  m_Radius: 0.08
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -593,6 +597,27 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 1
+--- !u!135 &6083471098831758755
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3526500985480528438}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.09439844
+  m_Center: {x: 0, y: 0.088608325, z: -0.0076387525}
 --- !u!1 &4737624042681067544
 GameObject:
   m_ObjectHideFlags: 0
@@ -781,7 +806,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2584510343069784163}
   - component: {fileID: 1096446415573025859}
-  - component: {fileID: 2921683092948402855}
   m_Layer: 9
   m_Name: TurtleShellPBR
   m_TagString: Untagged
@@ -827,27 +851,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!65 &2921683092948402855
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5349759216030691616}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.43, z: 0}
 --- !u!1 &5386575569534922939
 GameObject:
   m_ObjectHideFlags: 0

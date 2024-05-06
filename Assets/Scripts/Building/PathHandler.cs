@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -15,29 +16,32 @@ public class PathHandler : MonoBehaviour
     private HashSet<Vector3Int> blacklistedBuildingPositions = new HashSet<Vector3Int>();
 
     private BuildingHandler buildingHandler;
-    private BuildingManager buildingManager;
     private WaveFunction waveFunction;
 
     private Vector3Int castleIndex;
 
-    private void OnEnable()
+    private async void OnEnable()
     {
         buildingHandler = FindAnyObjectByType<BuildingHandler>();
-        buildingManager = FindAnyObjectByType<BuildingManager>();
         waveFunction = FindAnyObjectByType<WaveFunction>();
 
         waveFunction.OnMapGenerated += WaveFunction_OnMapGenerated;
-        buildingManager.OnCastlePlaced += BuildingManager_OnCastlePlaced;
         Events.OnBuildingDestroyed += BuildingHandler_OnBuildingDestroyed;
         Events.OnBuildingRepaired += BuildingHandler_OnBuildingRepaired;
+
+        while (BuildingManager.Instance == null)
+        {
+            await Task.Yield(); // Dont question it man
+        }
+        BuildingManager.Instance.OnCastlePlaced += BuildingManager_OnCastlePlaced;
     }
 
     private void OnDisable()
     {
         waveFunction.OnMapGenerated -= WaveFunction_OnMapGenerated;
-        buildingManager.OnCastlePlaced -= BuildingManager_OnCastlePlaced;
         Events.OnBuildingDestroyed -= BuildingHandler_OnBuildingDestroyed;
         Events.OnBuildingRepaired -= BuildingHandler_OnBuildingRepaired;
+        BuildingManager.Instance.OnCastlePlaced -= BuildingManager_OnCastlePlaced;
     }
 
     private void WaveFunction_OnMapGenerated()
@@ -86,7 +90,7 @@ public class PathHandler : MonoBehaviour
 
         if (target.HasValue)
         {
-            Events.OnEnemyPathUpdated?.Invoke(buildingPos, buildingManager[target.Value].Position);
+            Events.OnEnemyPathUpdated?.Invoke(buildingPos, BuildingManager.Instance[target.Value].Position);
         }
         else
         {
@@ -108,12 +112,12 @@ public class PathHandler : MonoBehaviour
 
     private int FindShortestPath()
     {
-        Vector3 castlePos = buildingManager.GetPos(castleIndex);
+        Vector3 castlePos = BuildingManager.Instance.GetPos(castleIndex);
         int closest = int.MaxValue;
 
         for (int i = 0; i < portalIndexes.Count; i++)
         {
-            List<Node> path = PathFinding.FindPath(buildingManager.GetPos(portalIndexes[i]), castlePos, groundNodes);
+            List<Node> path = PathFinding.FindPath(BuildingManager.Instance.GetPos(portalIndexes[i]), castlePos, groundNodes);
             if (path != null)
             {
                 if (path.Count < closest)
@@ -130,12 +134,12 @@ public class PathHandler : MonoBehaviour
     public List<(Vector3, Vector3)> GetEnemySpawnPoints()
     {
         UpdateNodeMap();
-        Vector3 castlePos = buildingManager.GetPos(castleIndex);
+        Vector3 castlePos = BuildingManager.Instance.GetPos(castleIndex);
 
         // At least one portal must connect to the castle
         for (int i = 0; i < portalIndexes.Count; i++)
         {
-            Vector3 portalPos = buildingManager.GetPos(portalIndexes[i]);
+            Vector3 portalPos = BuildingManager.Instance.GetPos(portalIndexes[i]);
             var path = PathFinding.FindPath(portalPos, castlePos, nodes);
             
             if (path != null)
@@ -152,12 +156,12 @@ public class PathHandler : MonoBehaviour
         List<(Vector3, Vector3)> spawnPoints = new List<(Vector3, Vector3)>();
         for (int i = 0; i < portalIndexes.Count; i++)
         {
-            Vector3 portalPos = buildingManager.GetPos(portalIndexes[i]);
+            Vector3 portalPos = BuildingManager.Instance.GetPos(portalIndexes[i]);
             Vector3Int? target = PathFinding.BreadthFirstSearch(portalPos, buildingPositions, nodes);
 
             if (target.HasValue)
             {
-                spawnPoints.Add((portalPos + GetOffset(), buildingManager[target.Value].Position));
+                spawnPoints.Add((portalPos + GetOffset(), BuildingManager.Instance[target.Value].Position));
             }
         }
 
@@ -179,7 +183,7 @@ public class PathHandler : MonoBehaviour
             {
                 for (int x = 0; x < nodes.GetLength(0); x++)
                 {
-                    Cell buildingCell = buildingManager[new Vector3Int(x, y, z)];
+                    Cell buildingCell = BuildingManager.Instance[new Vector3Int(x, y, z)];
                     if (!buildingCell.Collapsed)
                     {
                         nodes[x, y, z] = new Node(false, buildingCell.Position);

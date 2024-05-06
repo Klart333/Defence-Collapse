@@ -43,7 +43,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1794384937473486232}
   - component: {fileID: 1417858982187071267}
-  - component: {fileID: 77827934900516188}
   m_Layer: 9
   m_Name: Animator
   m_TagString: Untagged
@@ -89,27 +88,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!65 &77827934900516188
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1417858982187071266}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.5261414, y: 1.9987977, z: 2.6577053}
-  m_Center: {x: 0.017542541, y: 0.9554857, z: -0.0043851137}
 --- !u!1 &1830069104371346938
 GameObject:
   m_ObjectHideFlags: 0
@@ -443,6 +421,7 @@ GameObject:
   - component: {fileID: 653367872700333559}
   - component: {fileID: 6431643350246984369}
   - component: {fileID: -470958537817364054}
+  - component: {fileID: 748313301043954341}
   m_Layer: 9
   m_Name: Slime
   m_TagString: Untagged
@@ -522,7 +501,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f4d7599838c8af4a9d45b513169d557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
+  enemyData: {fileID: 11400000, guid: ee1d9c69d44018c449bd22bae562256d, type: 2}
+  damageNumber: {fileID: 113033579351757082, guid: f03daa4315a134d4d94e833ba3733de0,
+    type: 3}
   hitParticle: {fileID: 542933246792631625, guid: 021a2f7a2c5bc4449b4c64a66a050e8c,
     type: 3}
 --- !u!195 &-470958537817364054
@@ -547,6 +528,27 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 1
+--- !u!135 &748313301043954341
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4542743195278680511}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 1.0278845
+  m_Center: {x: 0, y: 0.98316735, z: 0}
 --- !u!1 &5344245619191892981
 GameObject:
   m_ObjectHideFlags: 0

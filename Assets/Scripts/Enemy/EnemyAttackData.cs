@@ -9,6 +9,8 @@ public class EnemyAttackData : ScriptableObject
 
     public float AttackSpeed;
 
+    public float MaxHealth = 10;
+
     [Title("Hit Info")]
     public LayerMask LayerMask;
 
