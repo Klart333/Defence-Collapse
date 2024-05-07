@@ -26,7 +26,7 @@ public class EnemyHealth : MonoBehaviour, IHealth
     {
         animator = GetComponent<EnemyAnimator>();
 
-        health = new Health(enemyData.MaxHealth);
+        health = new Health(enemyData.Stats.MaxHealth.Value);
         health.OnDeath += Health_OnDeath;
 
         EnemyManager.Instance.RegisterEnemy(this);

@@ -24,6 +24,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     private BuildingHandler buildingHandler;
     private BuildingAnimator buildingAnimator;
     private MeshRenderer meshRenderer;
+    private BuildingUI buildingUI;
 
     private int originalLayer;
     
@@ -35,6 +36,18 @@ public class Building : PooledMonoBehaviour, IBuildable
     public PrototypeData Prototype { get; set; }
     public Vector3Int Index { get; set; }
 
+    public BuildingUI BuildingUI
+    {
+        get
+        {
+            if (buildingUI == null)
+            {
+                buildingUI = GetComponentInChildren<BuildingUI>();
+            }
+
+            return buildingUI;
+        }
+    }
     public BuildingHandler BuildingHandler
     {
         get
@@ -195,7 +208,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         BuildingHandler.AddBuilding(this);
     }
 
-    public void Highlight()
+    public void Highlight(BuildingCellInformation cellInfo)
     {
         if (purchasing) return;
 
@@ -203,6 +216,8 @@ public class Building : PooledMonoBehaviour, IBuildable
         BuildingAnimator.BounceInOut(transform);
         MeshRenderer.gameObject.layer = (int)Mathf.Log(selectedLayer.value, 2); // sure ?
         buildingHandler[this].State.OnSelected(transform.position);
+
+        BuildingUI.OnSelected(cellInfo);
     }
 
     public void Lowlight()

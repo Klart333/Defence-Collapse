@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
 
 public class DamageCollider : PooledMonoBehaviour
 {
+    public event Action OnHit;
+
     [SerializeField]
     private LayerMask defualtLayerMask;
 
@@ -26,6 +29,7 @@ public class DamageCollider : PooledMonoBehaviour
         {
             health.TakeDamage(DamageInstance, out DamageInstance damageDone);
             Attacker.OnUnitDoneDamage(damageDone);
+            OnHit?.Invoke();
         }
     }
 }

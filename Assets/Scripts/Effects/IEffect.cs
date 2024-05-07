@@ -16,6 +16,11 @@ namespace Effects
         public float ModifierValue { get; set; }
     }
 
+    public interface IEffectHolder : IEffect 
+    {
+        public List<IEffect> Effects { get; set; }
+    }
+
     #region Increase Stat
 
     public class IncreaseStatEffect : IEffect
@@ -218,14 +223,17 @@ namespace Effects
         [OdinSerialize]
         public float ModifierValue { get; set; } = 20f;
 
-        [Title("Collider")]
-        public float Radius = 2;
+        [Title("Hits")]
+        public bool LimitedHits = false;
+        [ShowIf(nameof(LimitedHits))]
+        public int Hits = 0;
 
-        public Vector3 ColliderOffset;
+        [Title("Collider")]
+        public float Radius = 1;
 
         public void Perform(IAttacker unit)
         {
-            Vector3 pos = unit.AttackPosition + ColliderOffset;
+            Vector3 pos = unit.AttackPosition;
 
             DamageInstance dmg = new DamageInstance
             {
@@ -234,9 +242,24 @@ namespace Effects
             };
 
             DamageCollider collider = ColliderManager.Instance.GetCollider(pos, Radius, layermask: unit.LayerMask);
-
             collider.Attacker = unit;
             collider.DamageInstance = dmg;
+
+            if (LimitedHits)
+            {
+                int hits = 0;
+                Action LimitHitAction = null;
+                LimitHitAction = () =>
+                {
+                    if (++hits >= Hits)
+                    {
+                        collider.OnHit -= LimitHitAction;
+                        collider.gameObject.SetActive(false);
+                    }
+                };
+
+                collider.OnHit += LimitHitAction;
+            }
         }
 
         public void Revert(IAttacker unit)
@@ -247,7 +270,6 @@ namespace Effects
 
     #endregion
 
-
     #region Arched Damage Collider
 
     public class ArchedDamageColliderEffect : IEffect
@@ -255,6 +277,11 @@ namespace Effects
         [Title("Attack Damage")]
         [OdinSerialize]
         public float ModifierValue { get; set; } = 20f;
+
+        [Title("Hits")]
+        public bool LimitedHits = false;
+        [ShowIf(nameof(LimitedHits))]
+        public int Hits = 0;
 
         [Title("Collider")]
         public float Radius = 1;
@@ -277,20 +304,38 @@ namespace Effects
 
             float distance = Vector3.Distance(attacker.OriginPosition, attacker.AttackPosition) + Height;
             float lifetime = distance / UnitsPerSecond;
-            DamageCollider collider = ColliderManager.Instance.GetCollider(attacker.OriginPosition, Radius, lifetime, layermask: attacker.LayerMask);
 
+            AttackVisualEffect visual = AttackEffect.Spawn(attacker.OriginPosition, Quaternion.identity, 1, lifetime);
+            DamageCollider collider = ColliderManager.Instance.GetCollider(attacker.OriginPosition, Radius, lifetime, layermask: attacker.LayerMask);
             collider.Attacker = attacker;
             collider.DamageInstance = dmg;
 
-            AttackVisualEffect visual = AttackEffect.Spawn(attacker.OriginPosition, Quaternion.identity, 1, lifetime);
-
             float t = 0;
-            DOTween.To(() => t, (t) =>
+            var tween = DOTween.To(() => t, (t) =>
             {
                 Vector3 pos = GetPosition(attacker.OriginPosition, attacker.AttackPosition, t);
                 collider.transform.position = pos;
                 visual.transform.position = pos;
             }, 1f, lifetime).SetEase(Ease);
+
+            if (LimitedHits)
+            {
+                int hits = 0;
+                Action LimitHitAction = null;
+                LimitHitAction = () =>
+                {
+                    if (++hits >= Hits)
+                    {
+                        tween.Kill();
+                        collider.OnHit -= LimitHitAction;
+
+                        collider.gameObject.SetActive(false);
+                        visual.gameObject.SetActive(false);
+                    }
+                };
+
+                collider.OnHit += LimitHitAction;
+            }
         }
 
         private Vector3 GetPosition(Vector3 start, Vector3 target, float t)
@@ -306,7 +351,6 @@ namespace Effects
     }
 
     #endregion
-
 
     #region Visual Effect
 
@@ -606,7 +650,7 @@ namespace Effects
 
     #region Repeated Effect
 
-    public class RepeatEffect : IEffect
+    public class RepeatEffect : IEffectHolder
     {
         [Title("Total Time")]
         [OdinSerialize]
@@ -614,7 +658,7 @@ namespace Effects
 
         [Title("Effect")]
         [OdinSerialize]
-        private List<IEffect> EffectToTrigger;
+        public List<IEffect> Effects { get; set; }
 
         [SerializeField]
         private float repeatFrequency = 0.1f;
@@ -637,9 +681,9 @@ namespace Effects
                 if (timer >= repeatFrequency)
                 {
                     timer = 0;
-                    for (int i = 0; i < EffectToTrigger.Count; i++)
+                    for (int i = 0; i < Effects.Count; i++)
                     {
-                        EffectToTrigger[i].Perform(unit);
+                        Effects[i].Perform(unit);
                     }
                 }
             }
@@ -647,9 +691,9 @@ namespace Effects
 
         public void Revert(IAttacker unit)
         {
-            for (int i = 0; i < EffectToTrigger.Count; i++)
+            for (int i = 0; i < Effects.Count; i++)
             {
-                EffectToTrigger[i].Revert(unit); // Might work
+                Effects[i].Revert(unit); // Might work
             }
         }
     }

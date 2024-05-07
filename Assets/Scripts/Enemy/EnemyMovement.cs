@@ -1,4 +1,5 @@
 ﻿using Sirenix.OdinInspector;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -18,27 +19,39 @@ public class EnemyMovement : MonoBehaviour
     private NavMeshAgent agent;
     private EnemyAttacker attacker;
     private EnemyAnimator animator;
+    private EnemyHealth health;
 
     private Vector3 currentTarget;
 
     private void OnEnable()
     {
         attacker = GetComponent<EnemyAttacker>();
+        health = GetComponent<EnemyHealth>();
         animator = GetComponent<EnemyAnimator>();
         agent = GetComponent<NavMeshAgent>();
 
         agent.speed = moveSpeed;
 
         Events.OnEnemyPathUpdated += OnEnemyPathUpdated;
+        health.OnDeath += Health_OnDeath;
     }
 
     private void OnDisable()
     {
         Events.OnEnemyPathUpdated -= OnEnemyPathUpdated;
+        health.OnDeath -= Health_OnDeath;
+    }
+
+    private void Health_OnDeath(EnemyHealth obj)
+    {
+        StopMoving();
+        agent.enabled = false;
     }
 
     private void Update()
     {
+        if (!health.Health.Alive) return;
+
         if (agent.isOnNavMesh && agent.remainingDistance < agent.stoppingDistance)
         {
             StartAttacking();
@@ -47,7 +60,7 @@ public class EnemyMovement : MonoBehaviour
 
     private void OnEnemyPathUpdated(Vector3 oldTargetPos, Vector3 newTargetPos)
     {
-        if (Vector3.Distance(oldTargetPos, currentTarget) > 1.0f)
+        if (!health.Health.Alive || Vector3.Distance(oldTargetPos, currentTarget) > 1.0f)
         {
             return;
         }
@@ -58,7 +71,7 @@ public class EnemyMovement : MonoBehaviour
 
     public void SetPathTarget(Vector3 target)
     {
-        if (attacker.Attacking)
+        if (attacker.Attacking || !health.Health.Alive)
         {
             return;
         }
@@ -74,6 +87,8 @@ public class EnemyMovement : MonoBehaviour
 
     private void UpdateNavAgent()
     {
+        if (!health.Health.Alive) return;
+
         animator.Move();
         if (!agent.isOnNavMesh)
         {
@@ -98,4 +113,10 @@ public class EnemyMovement : MonoBehaviour
         attacker.StopAttacking();
         animator.Move();
     }
+
+    private void StopMoving()
+    {
+        agent.isStopped = true;
+    }
+
 }

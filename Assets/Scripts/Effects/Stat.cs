@@ -34,6 +34,10 @@ public class Stat
         get
         {
             float val = BaseValue;
+            if (modifiers == null)
+            {
+                return val;
+            }
 
             for (int i = 0; i < modifiers.Count; i++)
             {

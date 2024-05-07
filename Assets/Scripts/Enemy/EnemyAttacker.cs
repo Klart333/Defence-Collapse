@@ -3,11 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyAttacker : MonoBehaviour
+public class EnemyAttacker : MonoBehaviour, IAttacker
 {
+    public event Action OnAttack;
+
     [SerializeField]
     private EnemyAttackData attackData;
 
+    private Stats stats;
     private EnemyAnimator animator;
     private EnemyHealth health;
 
@@ -15,10 +18,19 @@ public class EnemyAttacker : MonoBehaviour
 
     public bool Attacking { get; private set; }
 
+    public Stats Stats => stats; 
+    public Health Health => health.Health;
+    public DamageInstance LastDamageDone { get; private set; }
+    public Vector3 AttackPosition { get; set; }
+    public Vector3 OriginPosition => transform.position;
+    public LayerMask LayerMask => attackData.LayerMask;
+
     private void Start()
     {
         animator = GetComponent<EnemyAnimator>();
         health = GetComponent<EnemyHealth>();
+
+        stats = new Stats(attackData.Stats);
     }
 
     private void Update()
@@ -32,7 +44,7 @@ public class EnemyAttacker : MonoBehaviour
         {
             attackTimer += Time.deltaTime;
 
-            if (attackTimer >= 1.0f / attackData.AttackSpeed)
+            if (attackTimer >= 1.0f / Stats.AttackSpeed.Value)
             {
                 attackTimer = 0;
                 Attack();
@@ -44,35 +56,27 @@ public class EnemyAttacker : MonoBehaviour
     {
         animator.Attack();
 
-        /*Vector3 pos = transform.position + transform.forward * attackData.AttackRadius;
-        Physics.OverlapSphereNonAlloc(pos, attackData.AttackRadius, hitResults, attackData.LayerMask);
-
-        for (int i = 0; i < hitResults.Length; i++)
-        {
-            if (hitResults[i] == null)
-            {
-                continue;
-            }
-
-            if (!hitResults[i].gameObject.activeSelf)
-            {
-                continue;
-            }
-
-            if (hitResults[i].TryGetComponent(out IHealth health))
-            {
-                health.TakeDamage(attackData.Damage);
-            }
-        }*/
+        AttackPosition = transform.position + transform.forward * attackData.AttackRadius;
+        attackData.BaseAttack.TriggerAttack(this);
     }
 
-    public void StartAttacking()
+    public void StartAttacking() // Want to replace with responding to events
     {
         Attacking = true;
     }
 
-    internal void StopAttacking()
+    public void StopAttacking()
     {
         Attacking = false;
+    }
+
+    public void OnUnitDoneDamage(DamageInstance damageInstance)
+    {
+        LastDamageDone = damageInstance;
+    }
+
+    public void OnUnitKill()
+    {
+
     }
 }

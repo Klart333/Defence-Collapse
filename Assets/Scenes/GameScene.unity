@@ -6608,48 +6608,90 @@ MonoBehaviour:
     socketname: v5_3
   materialData: {fileID: 11400000, guid: 64f0dca35d7079143abbf4da786afcf2, type: 2}
   pieceWeights:
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 10
-  - 1
-  - 2
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 100
-  - 100
-  - 100
-  - 100
-  - 100
-  - 100
-  - 100
-  - 100
-  - 100
-  - 100
-  - 100
-  - 100
-  - 1
+  - Name: Corner
+    Weight: 1
+  - Name: Corner2
+    Weight: 1
+  - Name: Corner3
+    Weight: 1
+  - Name: "CornerV\xE4g"
+    Weight: 1
+  - Name: "CornerV\xE4gTv\xE5"
+    Weight: 1
+  - Name: Full
+    Weight: 1
+  - Name: Full2
+    Weight: 1
+  - Name: Full3
+    Weight: 1
+  - Name: Full4
+    Weight: 1
+  - Name: Torn
+    Weight: 0
+  - Name: Kanon
+    Weight: 0
+  - Name: Incorner
+    Weight: 1
+  - Name: InCorner2
+    Weight: 1
+  - Name: InCorner3
+    Weight: 1
+  - Name: OnPass
+    Weight: 1
+  - Name: OnPass2
+    Weight: 1
+  - Name: Onpass3
+    Weight: 1
+  - Name: OnPass4
+    Weight: 1
+  - Name: Side
+    Weight: 1
+  - Name: Side2
+    Weight: 1
+  - Name: Side3
+    Weight: 1
+  - Name: Side4
+    Weight: 1
+  - Name: "SideV\xE4g"
+    Weight: 1
+  - Name: "SideV\xE4gTv\xE5"
+    Weight: 1
+  - Name: Path_Corner
+    Weight: 1
+  - Name: Path_DoubleCorner
+    Weight: 1
+  - Name: Path_Full
+    Weight: 1
+  - Name: Path_InCorner
+    Weight: 1
+  - Name: Path_Straight
+    Weight: 1
+  - Name: Path_Up
+    Weight: 1100
+  - Name: Path_AlsoUp
+    Weight: 1100
+  - Name: Path_Down
+    Weight: 1100
+  - Name: Path_AlsoDown
+    Weight: 1100
+  - Name: Path_DoubleUp
+    Weight: 1100
+  - Name: Path_DoubleDown
+    Weight: 1100
+  - Name: Path_AlsoDownCorner
+    Weight: 1100
+  - Name: Path_DownCorner
+    Weight: 1100
+  - Name: Path_UpCorner
+    Weight: 100
+  - Name: Path_AlsoUpCorner
+    Weight: 1100
+  - Name: Path_UpFull
+    Weight: 1100
+  - Name: Path_DownFull
+    Weight: 1100
+  - Name: Air
+    Weight: 1
 --- !u!4 &993496507149202315
 Transform:
   m_ObjectHideFlags: 0
@@ -10396,19 +10438,7 @@ MonoBehaviour:
     - {x: 0, y: -1}
     socketname: v2_3
   materialData: {fileID: 11400000, guid: f205dbfe3ecf34f40bd110ce6d456c4a, type: 2}
-  pieceWeights:
-  - 100
-  - 10
-  - 10
-  - 20
-  - 10
-  - 100
-  - 100
-  - 1
-  - 1
-  - 1
-  - 10
-  - 3000
+  pieceWeights: []
 --- !u!1 &7877222472292367163
 GameObject:
   m_ObjectHideFlags: 0

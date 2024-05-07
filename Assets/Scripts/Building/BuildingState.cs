@@ -40,18 +40,7 @@ public class ArcherState : BuildingState, IAttacker
 
         attack = new Attack(archerData.BaseAttack);
 
-        stats = new Stats
-        {
-            AttackSpeed = new Stat(archerData.AttackSpeed),
-            MaxHealth = new Stat(archerData.MaxHealth),
-
-            DamageMultiplier = new Stat(1),
-            Healing = new Stat(0),
-            Armor = new Stat(0),
-            CritChance = new Stat(0),
-            CritMultiplier = new Stat(0),
-            MovementSpeed = new Stat(0),
-        };
+        stats = new Stats(archerData.Stats);
     }
 
     public override void OnStateEntered()

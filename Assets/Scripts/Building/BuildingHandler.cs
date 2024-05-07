@@ -213,7 +213,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         List<Building> buildings = BuildingGroups[groupIndex];
         foreach (Building building in buildings)
         {
-            building.Highlight();
+            building.Highlight(BuildingData[building.Index].CellInformation);
         }
 
         print("House count: " + GetHouseCount(selectedGroupIndex));
@@ -258,6 +258,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 public struct BuildingCellInformation
 {
     public int HouseCount;
+    public bool Upgradable;
     public TowerType TowerType;
 }
 

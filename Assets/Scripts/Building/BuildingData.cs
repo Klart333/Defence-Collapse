@@ -7,12 +7,11 @@ public class BuildingData
     private BuildingHandler handler;
     private BuildingState state;
 
-    private int houseCount = 0;
-
+    public BuildingCellInformation CellInformation {  get; private set; } 
     public PrototypeData Prototype { get; set; }
-    public Health Health { get; set; }
-    public Vector3Int Index { get; set; }
     public int BuildingLevel { get; set; }
+    public Vector3Int Index { get; set; }
+    public Health Health { get; set; }
 
     public BuildingState State => state;
 
@@ -34,7 +33,7 @@ public class BuildingData
                 break;
             case TowerType.Archer:
                 state = new ArcherState(handler.ArcherData, this);
-                Health = new Health(handler.ArcherData.MaxHealth);
+                Health = new Health(handler.ArcherData.Stats.MaxHealth.Value);
 
                 break;
             default:
@@ -43,7 +42,7 @@ public class BuildingData
 
         Prototype = prot;
         Index = index;
-        houseCount = cellInfo.HouseCount;
+        CellInformation = cellInfo;
 
         State.OnStateEntered();
 
@@ -61,7 +60,7 @@ public class BuildingData
                 break;
             case TowerType.Archer:
                 state = new ArcherState(handler.ArcherData, this);
-                Health.SetMaxHealth(handler.ArcherData.MaxHealth);
+                Health.SetMaxHealth(handler.ArcherData.Stats.MaxHealth.Value);
 
                 break;
             default:
@@ -69,12 +68,12 @@ public class BuildingData
         }
 
         Prototype = prot;
-        houseCount = cellInfo.HouseCount;
+        CellInformation = cellInfo;
 
         State.OnStateEntered();
     }
 
-    public void OnBuildingChanged(Building building)
+    public void OnBuildingChanged(Building building) // ??
     {
         building.SetData(this);
     }
@@ -104,5 +103,4 @@ public class BuildingData
 
         State.Update(building);
     }
-
 }

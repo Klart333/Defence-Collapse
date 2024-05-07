@@ -1,4 +1,5 @@
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
@@ -48,7 +49,7 @@ public class PrototypeInfoCreator : MonoBehaviour
 
     [Title("Weight")]
     [SerializeField]
-    private float[] pieceWeights;
+    private List<StupidWeightThing> pieceWeights;
 
     private List<GameObject> spawnedPrototypes = new List<GameObject>();
 
@@ -125,17 +126,17 @@ public class PrototypeInfoCreator : MonoBehaviour
             // Need to rotate the vertical too
             List<PrototypeData> prots = new List<PrototypeData>
             {
-                new PrototypeData(new MeshWithRotation(mesh, 0), posX, negX, posY[0], negY[0], posZ, negZ, pieceWeights[i], matIndexes),
-                new PrototypeData(new MeshWithRotation(mesh, 1), posZ, negZ, posY[1], negY[1], negX, posX, pieceWeights[i], matIndexes),
-                new PrototypeData(new MeshWithRotation(mesh, 2), negX, posX, posY[2], negY[2], negZ, posZ, pieceWeights[i], matIndexes),
-                new PrototypeData(new MeshWithRotation(mesh, 3), negZ, posZ, posY[3], negY[3], posX, negX, pieceWeights[i], matIndexes),
+                new PrototypeData(new MeshWithRotation(mesh, 0), posX, negX, posY[0], negY[0], posZ, negZ, pieceWeights[i].Weight, matIndexes),
+                new PrototypeData(new MeshWithRotation(mesh, 1), posZ, negZ, posY[1], negY[1], negX, posX, pieceWeights[i].Weight, matIndexes),
+                new PrototypeData(new MeshWithRotation(mesh, 2), negX, posX, posY[2], negY[2], negZ, posZ, pieceWeights[i].Weight, matIndexes),
+                new PrototypeData(new MeshWithRotation(mesh, 3), negZ, posZ, posY[3], negY[3], posX, negX, pieceWeights[i].Weight, matIndexes),
             };
 
             Prototypes.AddRange(prots);
         }
 
         // Empty
-        Prototypes.Add(new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", pieceWeights[meshes.Length], new int[0]));
+        Prototypes.Add(new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", pieceWeights[meshes.Length].Weight, new int[0]));
     }
 
     private string GetSideKey(List<Vector3> vertexPositions, int mainAxis, int positiveDirection)
@@ -289,6 +290,20 @@ public class PrototypeInfoCreator : MonoBehaviour
     public void Clear()
     {
         Reset();
+    }
+
+    [TitleGroup("Util", Order = -45)]
+    [Button]
+    public void CreateWeights()
+    {
+        pieceWeights = new List<StupidWeightThing>();
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            pieceWeights.Add(new StupidWeightThing(transform.GetChild(i).name, 1));
+        }
+
+        pieceWeights.Add(new StupidWeightThing("Air", 1));
     }
 
     private void Reset()
@@ -494,5 +509,18 @@ public static class ListExtensions
         }
 
         return true;
+    }
+}
+
+[System.Serializable]
+public struct StupidWeightThing
+{
+    public string Name;
+    public float Weight;
+
+    public StupidWeightThing(string name, float weight)
+    {
+        Name = name;
+        Weight = weight;
     }
 }

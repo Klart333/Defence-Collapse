@@ -4,24 +4,41 @@ using System;
 [Serializable]
 public class Stats
 {
-    [Title("Fire")]
+    [Title("Damage")]
     public Stat DamageMultiplier;
 
-    [Title("Wind")]
+    [Title("Attack Speed")]
     public Stat AttackSpeed;
     public Stat MovementSpeed;
 
-    [Title("Thunder")]
+    [Title("Crit")]
     public Stat CritChance;
     public Stat CritMultiplier;
 
-    [Title("Rock")]
+    [Title("Defense")]
     public Stat Armor;
     public Stat MaxHealth;
 
-    [Title("Nature")]
+    [Title("Healing")]
     public Stat Healing;
-    
+
+    public Stats()
+    {
+        
+    }
+
+    public Stats(Stats copy)
+    {
+        AttackSpeed = new Stat(copy.AttackSpeed.Value);
+        MaxHealth = new Stat(copy.MaxHealth.Value);
+        DamageMultiplier = new Stat(copy.DamageMultiplier.Value);
+        Healing = new Stat(copy.Healing.Value);
+        Armor = new Stat(copy.Armor.Value);
+        CritChance = new Stat(copy.CritChance.Value);
+        CritMultiplier = new Stat(copy.CritMultiplier.Value);
+        MovementSpeed = new Stat(copy.MovementSpeed.Value);
+    }
+
     public Stat Get(StatType statType)
     {
         switch (statType)
