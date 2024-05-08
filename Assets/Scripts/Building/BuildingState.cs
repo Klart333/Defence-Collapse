@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 public abstract class BuildingState
@@ -10,6 +11,9 @@ public abstract class BuildingState
     public abstract void OnDeselected();
     public abstract void Die();
     public abstract void OnWaveStart(int houseCount);
+
+    public abstract Stats Stats { get; }
+    public float Range { get; set; }
 }
 
 public class ArcherState : BuildingState, IAttacker
@@ -26,20 +30,21 @@ public class ArcherState : BuildingState, IAttacker
 
     private float attackCooldownTimer = 0;
 
-    public Stats Stats => stats;
     public Health Health => buildingData.Health;
     public DamageInstance LastDamageDone => lastDamageDone;
     public LayerMask LayerMask => archerData.AttackLayerMask;
     public Vector3 OriginPosition { get; private set; }
     public Vector3 AttackPosition { get; set; }
+    public override Stats Stats => stats;
 
     public ArcherState(ArcherData archerData, BuildingData buildingData)
     {
         this.archerData = archerData;
         this.buildingData = buildingData;
 
-        attack = new Attack(archerData.BaseAttack);
+        Range = archerData.Range;
 
+        attack = new Attack(archerData.BaseAttack);
         stats = new Stats(archerData.Stats);
     }
 
@@ -51,7 +56,7 @@ public class ArcherState : BuildingState, IAttacker
     public override void OnSelected(Vector3 pos)
     {
         rangeIndicator = archerData.RangeIndicator.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.identity).gameObject;
-        rangeIndicator.transform.localScale = new Vector3(archerData.Range * 2.0f, 0.01f, archerData.Range * 2.0f);
+        rangeIndicator.transform.localScale = new Vector3(Range * 2.0f, 0.01f, Range * 2.0f);
     }
 
     public override void OnDeselected()
@@ -77,7 +82,7 @@ public class ArcherState : BuildingState, IAttacker
             if (closest == null)
                 return;
 
-            if (Vector3.Distance(building.transform.position, closest.transform.position) <= archerData.Range)
+            if (Vector3.Distance(building.transform.position, closest.transform.position) <= Range)
             {
                 attackCooldownTimer = 1.0f / stats.AttackSpeed.Value;
                 Attack(closest);
@@ -129,6 +134,8 @@ public class ArcherState : BuildingState, IAttacker
 public class NormalState : BuildingState
 {
     private NormalHouseData data;
+
+    public override Stats Stats => null;
 
     public NormalState(NormalHouseData data)
     {

@@ -8,8 +8,8 @@ public class BuildingData
     private BuildingState state;
 
     public BuildingCellInformation CellInformation {  get; private set; } 
+    public UpgradeData UpgradeData { get; private set; }
     public PrototypeData Prototype { get; set; }
-    public int BuildingLevel { get; set; }
     public Vector3Int Index { get; set; }
     public Health Health { get; set; }
 
@@ -18,6 +18,7 @@ public class BuildingData
     public BuildingData(BuildingHandler buildingHandler)
     {
         handler = buildingHandler;
+        UpgradeData = new UpgradeData(1, 1, 1);
 
         Events.OnWaveStarted += OnWaveStarted;
     }
@@ -70,8 +71,6 @@ public class BuildingData
         Prototype = prot;
         CellInformation = cellInfo;
 
-        
-
         State.OnStateEntered();
     }
 
@@ -104,9 +103,8 @@ public class BuildingData
         
     }
 
-    private void LevelUp()
+    public void LevelUp()
     {
-        BuildingLevel += 1;
         handler.DislpayLevelUp(Index);
     }
 

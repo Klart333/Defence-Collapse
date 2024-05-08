@@ -14,7 +14,6 @@ public class Stat
         {
             return baseValue;
         }
-
         set
         {
             baseValue = value;

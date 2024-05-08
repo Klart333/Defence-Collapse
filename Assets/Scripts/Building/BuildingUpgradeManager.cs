@@ -50,7 +50,7 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
     {
         currentBuilding = building;
 
-        buildingUpgrade.ShowUpgrades(buildingHandler[building].CellInformation.TowerType);
+        buildingUpgrade.ShowUpgrades(buildingHandler[building]);
     }
 
     public void Close()
