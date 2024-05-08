@@ -6,7 +6,8 @@ using UnityEngine;
 [InlineEditor, CreateAssetMenu(fileName = "New Data", menuName = "Enemy/Attack Data")]
 public class EnemyAttackData : SerializedScriptableObject
 {
-    [Title("Stats")]
+    [TitleGroup("Stats")]
+    [OdinSerialize, NonSerialized]
     public Stats Stats;
 
     [Title("Hit Info")]
@@ -18,21 +19,20 @@ public class EnemyAttackData : SerializedScriptableObject
     [OdinSerialize, NonSerialized]
     public Attack BaseAttack;
 
-    private void OnValidate()
+    [TitleGroup("Stats")]
+    [Button]
+    public void InitStats()
     {
-        if (Stats == null)
+        Stats = new Stats
         {
-            Stats = new Stats
-            {
-                AttackSpeed = new Stat(1),
-                MaxHealth = new Stat(1),
-                DamageMultiplier = new Stat(1),
-                MovementSpeed = new Stat(1),
-                Healing = new Stat(0),
-                Armor = new Stat(0),
-                CritChance = new Stat(0),
-                CritMultiplier = new Stat(0),
-            };
-        }
+            AttackSpeed = new Stat(1),
+            MaxHealth = new Stat(1),
+            DamageMultiplier = new Stat(1),
+            MovementSpeed = new Stat(1),
+            Healing = new Stat(0),
+            Armor = new Stat(0),
+            CritChance = new Stat(0),
+            CritMultiplier = new Stat(0),
+        };
     }
 }

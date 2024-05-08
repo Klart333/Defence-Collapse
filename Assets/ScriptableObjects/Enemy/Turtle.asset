@@ -22,22 +22,106 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
+    - Name: Stats
+      Entry: 7
+      Data: 0|Stats, Assembly-CSharp
+    - Name: DamageMultiplier
+      Entry: 7
+      Data: 1|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AttackSpeed
+      Entry: 7
+      Data: 2|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MovementSpeed
+      Entry: 7
+      Data: 3|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritChance
+      Entry: 7
+      Data: 4|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritMultiplier
+      Entry: 7
+      Data: 5|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Armor
+      Entry: 7
+      Data: 6|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxHealth
+      Entry: 7
+      Data: 7|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 20
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Healing
+      Entry: 7
+      Data: 8|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 0|Attack, Assembly-CSharp
+      Data: 9|Attack, Assembly-CSharp
     - Name: Effects
       Entry: 7
-      Data: 1|System.Collections.Generic.List`1[[Effects.IEffect, Assembly-CSharp]],
+      Data: 10|System.Collections.Generic.List`1[[Effects.IEffect, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 2|Effects.DamageColliderEffect, Assembly-CSharp
+      Data: 11|Effects.DamageColliderEffect, Assembly-CSharp
     - Name: ModifierValue
       Entry: 4
       Data: 5
+    - Name: LimitedHits
+      Entry: 5
+      Data: false
+    - Name: Hits
+      Entry: 3
+      Data: 0
     - Name: Radius
       Entry: 4
       Data: 0.5
@@ -46,7 +130,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 3|Effects.VisualEffectEffect, Assembly-CSharp
+      Data: 12|Effects.VisualEffectEffect, Assembly-CSharp
     - Name: ModifierValue
       Entry: 4
       Data: 1
@@ -80,7 +164,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  Stats: {}
   LayerMask:
     serializedVersion: 2
     m_Bits: 128

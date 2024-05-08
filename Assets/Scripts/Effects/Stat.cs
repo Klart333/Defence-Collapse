@@ -23,7 +23,7 @@ public class Stat
         }
     }
 
-    [ShowInInspector]
+    [SerializeField]
     private float baseValue;
 
     private List<Modifier> modifiers = new List<Modifier>();

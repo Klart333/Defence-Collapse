@@ -1,6 +1,8 @@
-﻿using Sirenix.OdinInspector;
+﻿using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -17,6 +19,9 @@ public class Building : PooledMonoBehaviour, IBuildable
     private Material transparentGreen;
 
     [SerializeField]
+    private LayerMask highlightedLayer;
+
+    [SerializeField]
     private LayerMask selectedLayer;
 
     private List<Material> transparentMaterials = new List<Material>();
@@ -28,6 +33,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private int originalLayer;
     
+    private bool highlighted = false;
     private bool selected = false;
     private bool hovered = false;
     private bool purchasing = true;
@@ -118,6 +124,8 @@ public class Building : PooledMonoBehaviour, IBuildable
         MeshRenderer.gameObject.layer = originalLayer;
     }
 
+    #region Highlight
+
     private void OnMouseDown()
     {
         if (!InputManager.Instance.GetShift)
@@ -125,7 +133,7 @@ public class Building : PooledMonoBehaviour, IBuildable
             return;
         }
 
-        BuildingHandler.HighlightGroup(BuildingGroupIndex);
+        BuildingHandler.HighlightGroup(this);
     }
 
     private void OnMouseEnter()
@@ -138,9 +146,59 @@ public class Building : PooledMonoBehaviour, IBuildable
         hovered = false;
     }
 
+    public async void Highlight(BuildingCellInformation cellInfo)
+    {
+        if (purchasing || highlighted) return;
+
+        BuildingAnimator.BounceInOut(transform);
+        MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2); // sure ?
+
+        BuildingUI.Highlight(cellInfo);
+
+        await UniTask.NextFrame();
+        highlighted = true;
+    }
+
+    public void Lowlight()
+    {
+        BuildingUI.Lowlight();
+
+        MeshRenderer.gameObject.layer = originalLayer;
+        highlighted = false;
+    }
+
+    public void OnSelected(BuildingCellInformation cellInfo)
+    {
+        if (purchasing || selected) return;
+
+        if (highlighted)
+        {
+            BuildingAnimator.BounceInOut(transform);
+        }
+
+        MeshRenderer.gameObject.layer = (int)Mathf.Log(selectedLayer.value, 2);
+
+        BuildingUI.OnSelected(cellInfo);
+        buildingHandler[this].State.OnSelected(transform.position);
+        selected = true;
+    }
+
+    public void OnDeselected()
+    {
+        if (!selected) return;
+
+        MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2); // sure ?
+
+        BuildingUI.OnDeselected();
+        buildingHandler.BuildingData[Index].State.OnDeselected();
+        selected = false;
+    }
+
+    #endregion
+
     private void Update()
     {
-        if (selected && !hovered && InputManager.Instance.Fire.WasPerformedThisFrame())
+        if (highlighted && !hovered && !buildingUI.InMenu && InputManager.Instance.Fire.WasPerformedThisFrame())
         {
             BuildingHandler.LowlightGroup(this);
         }
@@ -208,25 +266,6 @@ public class Building : PooledMonoBehaviour, IBuildable
         BuildingHandler.AddBuilding(this);
     }
 
-    public void Highlight(BuildingCellInformation cellInfo)
-    {
-        if (purchasing) return;
-
-        selected = true;
-        BuildingAnimator.BounceInOut(transform);
-        MeshRenderer.gameObject.layer = (int)Mathf.Log(selectedLayer.value, 2); // sure ?
-        buildingHandler[this].State.OnSelected(transform.position);
-
-        BuildingUI.OnSelected(cellInfo);
-    }
-
-    public void Lowlight()
-    {
-        buildingHandler.BuildingData[Index].State.OnDeselected();
-        MeshRenderer.gameObject.layer = originalLayer;
-        selected = false;
-    }
-
     public void DisplayLevelUp()
     {
         
@@ -234,6 +273,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void DisplayDeath()
     {
+        print("Death");
         ToggleIsBuildableVisual(true);
     }
 

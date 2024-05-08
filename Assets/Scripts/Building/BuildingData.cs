@@ -27,13 +27,13 @@ public class BuildingData
         switch (cellInfo.TowerType)
         {
             case TowerType.None:
-                state = new NormalState(handler.NormalData);
-                Health = new Health(handler.NormalData.MaxHealth);
+                state = new NormalState(BuildingUpgradeManager.Instance.NormalData);
+                Health = new Health(BuildingUpgradeManager.Instance.NormalData.MaxHealth);
 
                 break;
             case TowerType.Archer:
-                state = new ArcherState(handler.ArcherData, this);
-                Health = new Health(handler.ArcherData.Stats.MaxHealth.Value);
+                state = new ArcherState(BuildingUpgradeManager.Instance.ArcherData, this);
+                Health = new Health(BuildingUpgradeManager.Instance.ArcherData.Stats.MaxHealth.Value);
 
                 break;
             default:
@@ -54,13 +54,13 @@ public class BuildingData
         switch (cellInfo.TowerType)
         {
             case TowerType.None:
-                state = new NormalState(handler.NormalData);
-                Health.SetMaxHealth(handler.NormalData.MaxHealth);
+                state = new NormalState(BuildingUpgradeManager.Instance.NormalData);
+                Health.SetMaxHealth(BuildingUpgradeManager.Instance.NormalData.MaxHealth);
 
                 break;
             case TowerType.Archer:
-                state = new ArcherState(handler.ArcherData, this);
-                Health.SetMaxHealth(handler.ArcherData.Stats.MaxHealth.Value);
+                state = new ArcherState(BuildingUpgradeManager.Instance.ArcherData, this);
+                Health.SetMaxHealth(BuildingUpgradeManager.Instance.ArcherData.Stats.MaxHealth.Value);
 
                 break;
             default:
@@ -70,11 +70,27 @@ public class BuildingData
         Prototype = prot;
         CellInformation = cellInfo;
 
+        
+
         State.OnStateEntered();
     }
 
-    public void OnBuildingChanged(Building building) // ??
+    public void AdvanceState(BuildingCellInformation cellInfo, PrototypeData prot)
     {
+        UpdateState(cellInfo, prot);
+        Building building = handler.GetBuilding(Index);
+
+        building.Setup(prot, Vector3.one);
+        building.DisplayLevelUp();
+    }
+
+    public void OnBuildingChanged(BuildingCellInformation cellInfo, Building building)
+    {
+        if (!CellInformation.Equals(cellInfo))
+        {
+            UpdateState(cellInfo, building.Prototype);
+        }
+
         building.SetData(this);
     }
 

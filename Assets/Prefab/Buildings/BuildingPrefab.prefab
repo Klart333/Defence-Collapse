@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 6581211072198323029}
   - component: {fileID: 9181347496856605909}
   - component: {fileID: 1630893403848737158}
+  - component: {fileID: 3713628461818042149}
   - component: {fileID: 7584265292262257173}
   - component: {fileID: 7580732869634546698}
   m_Layer: 7
@@ -128,6 +129,9 @@ MonoBehaviour:
   initialPoolSize: 10
   materialData: {fileID: 11400000, guid: 64f0dca35d7079143abbf4da786afcf2, type: 2}
   transparentGreen: {fileID: 2100000, guid: 6dc1d4258ab1cd64e886f9315c43167e, type: 2}
+  highlightedLayer:
+    serializedVersion: 2
+    m_Bits: 1024
   selectedLayer:
     serializedVersion: 2
     m_Bits: 2048
@@ -143,6 +147,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d19daede777db0b479d2db98eb93b1a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3713628461818042149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 324729412821989089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c93fc61a79cb15745b3fb5796ba6e763, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvas: {fileID: 5429308175008842897}
+  upgradablePanel: {fileID: 2251038230477287245}
 --- !u!65 &7584265292262257173
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -195,7 +213,6 @@ GameObject:
   - component: {fileID: 5429308175008842897}
   - component: {fileID: 4989977725938317544}
   - component: {fileID: 3623050238398840939}
-  - component: {fileID: 1894179314192247289}
   - component: {fileID: 6214889598831424071}
   m_Layer: 7
   m_Name: Canvas
@@ -203,7 +220,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2797608960346223019
 RectTransform:
   m_ObjectHideFlags: 0
@@ -217,7 +234,6 @@ RectTransform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5054356781715753514}
-  - {fileID: 825812071977599108}
   m_Father: {fileID: 6581211072198323029}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -288,20 +304,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4087
---- !u!114 &1894179314192247289
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1055275134929777818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c93fc61a79cb15745b3fb5796ba6e763, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  upgradablePanel: {fileID: 2251038230477287245}
-  upgradePanel: {fileID: 4092841756568211425}
 --- !u!114 &6214889598831424071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -351,81 +353,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &4092841756568211425
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 825812071977599108}
-  - component: {fileID: 2083648060183516132}
-  - component: {fileID: 2667929961999196270}
-  m_Layer: 7
-  m_Name: UpgradePanel
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &825812071977599108
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4092841756568211425}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2797608960346223019}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &2083648060183516132
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4092841756568211425}
-  m_CullTransparentMesh: 1
---- !u!114 &2667929961999196270
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4092841756568211425}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &4606245760328191414
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,7 +539,7 @@ GameObject:
   - component: {fileID: 217166995456989176}
   - component: {fileID: 4590436331901249672}
   - component: {fileID: 5789486188703069735}
-  - component: {fileID: 8503867920181554654}
+  - component: {fileID: 8863960161677753316}
   m_Layer: 7
   m_Name: Fill
   m_TagString: Untagged
@@ -677,7 +604,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8503867920181554654
+--- !u!114 &8863960161677753316
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -686,11 +613,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7660628723699228612}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b41d1943b77a354496f027010cb1aee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -721,7 +648,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1894179314192247289}
+      - m_Target: {fileID: 3713628461818042149}
         m_TargetAssemblyTypeName: BuildingUI, Assembly-CSharp
         m_MethodName: OnUpgradeClicked
         m_Mode: 1

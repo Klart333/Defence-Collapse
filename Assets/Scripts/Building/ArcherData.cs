@@ -9,7 +9,8 @@ public class ArcherData : SerializedScriptableObject
     [Title("Economy")]
     public int IncomePerHouse = 2;
 
-    [Title("Stats")]
+    [TitleGroup("Stats")]
+    [OdinSerialize, NonSerialized]
     public Stats Stats;
 
     [Title("Range")]
@@ -26,22 +27,22 @@ public class ArcherData : SerializedScriptableObject
 
     public LayerMask AttackLayerMask;
 
-    private void OnValidate()
+
+    [TitleGroup("Stats")]
+    [Button]
+    public void InitStats()
     {
-        if (Stats == null)
+        Stats = new Stats
         {
-            Stats = new Stats
-            {
-                AttackSpeed = new Stat(1),
-                MaxHealth = new Stat(20),
-                DamageMultiplier = new Stat(1),
-                MovementSpeed = new Stat(0),
-                Healing = new Stat(0),
-                Armor = new Stat(0),
-                CritChance = new Stat(0),
-                CritMultiplier = new Stat(0),
-            };
-        }
+            AttackSpeed = new Stat(1),
+            MaxHealth = new Stat(10),
+            DamageMultiplier = new Stat(1),
+            MovementSpeed = new Stat(0),
+            Healing = new Stat(0),
+            Armor = new Stat(0),
+            CritChance = new Stat(1),
+            CritMultiplier = new Stat(2),
+        };
     }
 }
 

@@ -22,19 +22,97 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
+    - Name: Stats
+      Entry: 7
+      Data: 0|Stats, Assembly-CSharp
+    - Name: DamageMultiplier
+      Entry: 7
+      Data: 1|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AttackSpeed
+      Entry: 7
+      Data: 2|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MovementSpeed
+      Entry: 7
+      Data: 3|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritChance
+      Entry: 7
+      Data: 4|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritMultiplier
+      Entry: 7
+      Data: 5|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Armor
+      Entry: 7
+      Data: 6|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxHealth
+      Entry: 7
+      Data: 7|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Healing
+      Entry: 7
+      Data: 8|Stat, Assembly-CSharp
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 0|Attack, Assembly-CSharp
+      Data: 9|Attack, Assembly-CSharp
     - Name: Effects
       Entry: 7
-      Data: 1|System.Collections.Generic.List`1[[Effects.IEffect, Assembly-CSharp]],
+      Data: 10|System.Collections.Generic.List`1[[Effects.IEffect, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 2|Effects.ArchedDamageColliderEffect, Assembly-CSharp
+      Data: 11|Effects.ArchedDamageColliderEffect, Assembly-CSharp
     - Name: ModifierValue
       Entry: 4
       Data: 20
@@ -72,7 +150,6 @@ MonoBehaviour:
       Entry: 8
       Data: 
   IncomePerHouse: 2
-  Stats: {}
   Range: 8
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}

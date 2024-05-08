@@ -1,7 +1,6 @@
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -14,22 +13,12 @@ public class BuildingHandler : SerializedMonoBehaviour
     [SerializeField]
     private TowerMeshData towerMeshData;
 
-    [Title("State Data")]
-    [SerializeField]
-    private ArcherData archerData;
-
-    [SerializeField]
-    private NormalHouseData normalData;
-
     private List<Building> buildingQueue = new List<Building>();
     private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
 
     private int selectedGroupIndex = -1;
     private int groupIndexCounter = 0;
     private bool chilling = false;
-
-    public ArcherData ArcherData => archerData;
-    public NormalHouseData NormalData => normalData;
 
     public BuildingData this[Building building]
     {
@@ -60,11 +49,10 @@ public class BuildingHandler : SerializedMonoBehaviour
             if (!BuildingData.ContainsKey(buildingQueue[i].Index))
             {
                 BuildingData.Add(buildingQueue[i].Index, CreateData(buildingQueue[i]));
+                continue;
             }
-            else if (BuildingData[buildingQueue[i].Index].Prototype != buildingQueue[i].Prototype)
-            {
-                UpdateData(BuildingData[buildingQueue[i].Index], buildingQueue[i]);
-            }
+
+            UpdateData(BuildingData[buildingQueue[i].Index], buildingQueue[i]);
         }
 
         BuildingGroups.Add(++groupIndexCounter, new List<Building>(buildingQueue));
@@ -78,10 +66,10 @@ public class BuildingHandler : SerializedMonoBehaviour
     {
         if (!towerMeshData.TowerMeshes.TryGetValue(building.Prototype.MeshRot.Mesh, out BuildingCellInformation cellInfo))
         {
-            buildingData.UpdateState(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None }, building.Prototype);
+            buildingData.OnBuildingChanged(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None }, building);
         }
 
-        buildingData.UpdateState(cellInfo, building.Prototype);
+        buildingData.OnBuildingChanged(cellInfo, building);
     }
 
     private BuildingData CreateData(Building building)
@@ -182,7 +170,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         return total;
     }
 
-    private Building GetBuilding(Vector3Int buildingIndex)
+    public Building GetBuilding(Vector3Int buildingIndex)
     {
         foreach (List<Building> list in BuildingGroups.Values)
         {
@@ -203,20 +191,29 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     #region Visual
 
-    public void HighlightGroup(int groupIndex)
+    public void HighlightGroup(Building building)
     {
-        if (groupIndex == -1) return; 
+        if (building.BuildingGroupIndex == -1) return;
 
-        UnSelect(); 
-        selectedGroupIndex = groupIndex;
-
-        List<Building> buildings = BuildingGroups[groupIndex];
-        foreach (Building building in buildings)
+        if (selectedGroupIndex != building.BuildingGroupIndex)
         {
-            building.Highlight(BuildingData[building.Index].CellInformation);
+            LowLightBuildings();
         }
 
-        print("House count: " + GetHouseCount(selectedGroupIndex));
+        selectedGroupIndex = building.BuildingGroupIndex;
+
+        List<Building> buildings = BuildingGroups[building.BuildingGroupIndex];
+        foreach (Building built in buildings)
+        {
+            built.Highlight(BuildingData[built.Index].CellInformation);
+        }
+
+        building.OnSelected(BuildingData[building.Index].CellInformation);
+
+        if (unSelectedBuildings.Contains(building))
+        {
+            unSelectedBuildings.Remove(building);
+        }
     }
 
     public void LowlightGroup(Building building)
@@ -224,16 +221,17 @@ public class BuildingHandler : SerializedMonoBehaviour
         if (selectedGroupIndex == -1) return;
 
         unSelectedBuildings.Add(building);
+        building.OnDeselected();
 
         if (unSelectedBuildings.Count < BuildingGroups[selectedGroupIndex].Count)
         {
             return;
         }
 
-        UnSelect();
+        LowLightBuildings();
     }
 
-    private void UnSelect()
+    private void LowLightBuildings()
     {
         if (selectedGroupIndex == -1) return;
 
@@ -260,10 +258,25 @@ public struct BuildingCellInformation
     public int HouseCount;
     public bool Upgradable;
     public TowerType TowerType;
+
+    public override bool Equals(object obj)
+    {
+        return obj is BuildingCellInformation information &&
+               HouseCount == information.HouseCount &&
+               Upgradable == information.Upgradable &&
+               TowerType == information.TowerType;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(HouseCount, Upgradable, TowerType);
+    }
 }
 
 public enum TowerType
 {
     None,
-    Archer
+    Archer,
+    Bomb,
+    Church
 }
