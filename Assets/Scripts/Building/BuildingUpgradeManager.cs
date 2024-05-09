@@ -18,6 +18,10 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
     [SerializeField]
     private PrototypeInfoCreator buildingPrototypes;
 
+    [Title("UI")]
+    [SerializeField]
+    private GameObject canvas;
+
     [Title("UI", "Advancement")]
     [SerializeField]
     private GameObject advancementPanel;
@@ -37,12 +41,22 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
         base.Awake();
 
         buildingHandler = FindAnyObjectByType<BuildingHandler>();
+        InputManager.Instance.Cancel.performed += Cancel_performed;
+    }
+
+    private void Cancel_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if (canvas.activeSelf)
+        {
+            Close();
+        }
     }
 
     public void OpenAdvancementMenu(Building building)
     {
         currentBuilding = building;
 
+        canvas.SetActive(true);
         advancementPanel.SetActive(true);
     }
 
@@ -50,6 +64,7 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
     {
         currentBuilding = building;
 
+        canvas.SetActive(true);
         buildingUpgrade.ShowUpgrades(buildingHandler[building]);
     }
 
@@ -58,6 +73,7 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
         currentBuilding.BuildingUI.OnMenuClosed();
         currentBuilding = null;
 
+        canvas.SetActive(false);
         advancementPanel.SetActive(false);
         buildingUpgrade.Close();
     }

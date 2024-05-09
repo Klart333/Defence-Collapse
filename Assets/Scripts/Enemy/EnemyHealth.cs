@@ -48,6 +48,12 @@ public class EnemyHealth : MonoBehaviour, IHealth
     {
         Destroy(gameObject);
         //gameObject.SetActive(false);
+
+        int grade = LootManager.Instance.GetGrade(enemyData.LootProbability);
+        if (grade >= 0)
+        {
+            LootManager.Instance.SpawnLoot(transform.position + Vector3.up * 0.1f, 1, grade);
+        }
     }
 
     public void TakeDamage(DamageInstance damage, out DamageInstance damageDone)

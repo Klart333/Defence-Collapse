@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 public abstract class BuildingState
@@ -13,6 +12,7 @@ public abstract class BuildingState
     public abstract void OnWaveStart(int houseCount);
 
     public abstract Stats Stats { get; }
+    public virtual Attack Attack { get; }
     public float Range { get; set; }
 }
 
@@ -20,9 +20,8 @@ public class ArcherState : BuildingState, IAttacker
 {
     public event Action OnAttack;
 
-    private Attack attack;
-
     private Stats stats;
+    private Attack attack;
     private ArcherData archerData;
     private BuildingData buildingData;
     private GameObject rangeIndicator;
@@ -36,6 +35,7 @@ public class ArcherState : BuildingState, IAttacker
     public Vector3 OriginPosition { get; private set; }
     public Vector3 AttackPosition { get; set; }
     public override Stats Stats => stats;
+    public override Attack Attack => attack;
 
     public ArcherState(ArcherData archerData, BuildingData buildingData)
     {
@@ -85,7 +85,7 @@ public class ArcherState : BuildingState, IAttacker
             if (Vector3.Distance(building.transform.position, closest.transform.position) <= Range)
             {
                 attackCooldownTimer = 1.0f / stats.AttackSpeed.Value;
-                Attack(closest);
+                PerformAttack(closest);
             }
         }
         else
@@ -94,7 +94,7 @@ public class ArcherState : BuildingState, IAttacker
         }
     }
 
-    private async void Attack(EnemyHealth target)
+    private async void PerformAttack(EnemyHealth target)
     {
         AttackPosition = target.transform.position;
         attack.TriggerAttack(this);

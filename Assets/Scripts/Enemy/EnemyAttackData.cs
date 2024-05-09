@@ -1,6 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [InlineEditor, CreateAssetMenu(fileName = "New Data", menuName = "Enemy/Attack Data")]
@@ -18,6 +19,9 @@ public class EnemyAttackData : SerializedScriptableObject
     [Title("Attack")]
     [OdinSerialize, NonSerialized]
     public Attack BaseAttack;
+
+    [Title("Loot")]
+    public List<float> LootProbability;
 
     [TitleGroup("Stats")]
     [Button]

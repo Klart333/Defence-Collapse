@@ -42,7 +42,7 @@ public class UIBuildingUpgrade : MonoBehaviour
 
     public void Close()
     {
-        parentPanel.SetActive(true);
+        parentPanel.SetActive(false);
     }
 
     public void UpgradeStat(LevelStat stat)

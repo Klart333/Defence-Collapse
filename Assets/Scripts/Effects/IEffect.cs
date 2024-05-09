@@ -288,7 +288,7 @@ namespace Effects
 
         [Title("Movement")]
         public float Height = 5;
-        public float UnitsPerSecond = 1;
+        public float MinimumUnitsPerSecond = 8;
         public Ease Ease;
 
         [Title("Visual")]
@@ -303,9 +303,9 @@ namespace Effects
             };
 
             float distance = Vector3.Distance(attacker.OriginPosition, attacker.AttackPosition) + Height;
-            float lifetime = distance / UnitsPerSecond;
+            float lifetime = Mathf.Min(1.0f / attacker.Stats.AttackSpeed.Value, distance / MinimumUnitsPerSecond);
 
-            AttackVisualEffect visual = AttackEffect.Spawn(attacker.OriginPosition, Quaternion.identity, 1, lifetime);
+            AttackVisualEffect visual = AttackEffect.Spawn(attacker.OriginPosition, Quaternion.identity, 1, lifetime + 0.2f);
             DamageCollider collider = ColliderManager.Instance.GetCollider(attacker.OriginPosition, Radius, lifetime, layermask: attacker.LayerMask);
             collider.Attacker = attacker;
             collider.DamageInstance = dmg;

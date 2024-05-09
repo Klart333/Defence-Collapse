@@ -103,6 +103,9 @@ MonoBehaviour:
     - Name: BaseAttack
       Entry: 7
       Data: 9|Attack, Assembly-CSharp
+    - Name: EffectHolders
+      Entry: 6
+      Data: 
     - Name: Effects
       Entry: 7
       Data: 10|System.Collections.Generic.List`1[[Effects.IEffect, Assembly-CSharp]],
@@ -168,3 +171,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   AttackRadius: 0.5
+  LootProbability:
+  - 0.5
+  - 0.25

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class BuildingPlacer : MonoBehaviour
 {
@@ -18,11 +17,6 @@ public class BuildingPlacer : MonoBehaviour
 
     private Camera cam;
 
-    private InputActions InputActions;
-    private InputAction fire;
-    private InputAction mouse;
-    private InputAction cancel;
-
     [Title("Debug")]
     [SerializeField]
     private bool placingCastle = true;
@@ -32,32 +26,17 @@ public class BuildingPlacer : MonoBehaviour
     {
         get
         {
-            return cancel.ReadValue<float>() > 0 || manualCancel;
+            return InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
         }
     }
 
     private void OnEnable()
     {
-        InputActions = new InputActions();
-
-        fire = InputActions.Player.Fire;
-        fire.Enable();
-        
-        cancel = InputActions.Player.Cancel;
-        cancel.Enable();
-
-        mouse = InputActions.Player.Mouse;
-        mouse.Enable();
-
         Events.OnBuildingCanceled += () => manualCancel = true;
     }
 
     private void OnDisable()
     {
-        fire.Disable();
-        cancel.Disable();
-        mouse.Disable();
-
         Events.OnBuildingCanceled -= () => manualCancel = false;
     }
 
@@ -88,7 +67,7 @@ public class BuildingPlacer : MonoBehaviour
             List<Vector3Int> newIndexes = BuildingManager.Instance.GetCellsToCollapse(mousePos, type);
             if (indexes.LooseEquals(newIndexes) || newIndexes.Count == 0)
             {
-                if (buildables.Count > 0 && fire.WasPerformedThisFrame())
+                if (buildables.Count > 0 && InputManager.Instance.Fire.WasPerformedThisFrame())
                 {
                     PlaceBuilding(type);
                 }
@@ -118,7 +97,7 @@ public class BuildingPlacer : MonoBehaviour
                 continue;
             }
 
-            if (!fire.WasPerformedThisFrame()) continue;
+            if (!InputManager.Instance.Fire.WasPerformedThisFrame()) continue;
 
             PlaceBuilding(type);
         }
@@ -164,7 +143,7 @@ public class BuildingPlacer : MonoBehaviour
 
     private Vector3 GetRayPoint()
     {
-        Ray ray = cam.ScreenPointToRay(mouse.ReadValue<Vector2>());
+        Ray ray = cam.ScreenPointToRay(InputManager.Instance.Mouse.ReadValue<Vector2>());
         if (Physics.Raycast(ray, out RaycastHit hit, 100, layerMask))
         {
             return hit.point;

@@ -5,8 +5,10 @@ public class InputManager : Singleton<InputManager>
     private InputActions InputActions;
 
     public InputAction Move { get; private set; }
+    public InputAction Mouse { get; private set; }
     public InputAction Fire { get; private set; }
     public InputAction Shift { get; private set; }
+    public InputAction Cancel {  get; private set; }
 
     public bool GetFire => Fire.IsPressed();
     public bool GetShift => Shift.IsPressed();
@@ -23,6 +25,12 @@ public class InputManager : Singleton<InputManager>
 
         Shift = InputActions.Player.Shift;
         Shift.Enable();
+
+        Cancel = InputActions.Player.Cancel;
+        Cancel.Enable();
+
+        Mouse = InputActions.Player.Mouse;
+        Mouse.Enable();
     }
 
     private void OnDisable()
@@ -30,5 +38,7 @@ public class InputManager : Singleton<InputManager>
         Move.Disable();
         Fire.Disable();
         Shift.Disable();
+        Cancel.Disable();
+        Mouse.Disable();
     }
 }

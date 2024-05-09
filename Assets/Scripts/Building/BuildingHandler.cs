@@ -31,7 +31,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 
             return null; 
         }
-    }
+    } // I like this way too much
 
     #region Handling Groups
 

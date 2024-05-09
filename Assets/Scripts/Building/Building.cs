@@ -128,12 +128,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void OnMouseDown()
     {
-        if (!InputManager.Instance.GetShift)
-        {
-            return;
-        }
-
-        BuildingHandler.HighlightGroup(this);
+        
     }
 
     private void OnMouseEnter()
@@ -198,12 +193,22 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void Update()
     {
-        if (highlighted && !hovered && !buildingUI.InMenu && InputManager.Instance.Fire.WasPerformedThisFrame())
+        buildingHandler[this]?.Update(this);
+
+        if (!InputManager.Instance.Fire.WasReleasedThisFrame())
+        {
+            return;
+        }
+
+        if (hovered && InputManager.Instance.GetShift)
+        {
+            buildingHandler.HighlightGroup(this);
+        }
+
+        if (highlighted && !hovered && !buildingUI.InMenu)
         {
             BuildingHandler.LowlightGroup(this);
         }
-
-        buildingHandler[this]?.Update(this);
     }
 
     public void Setup(PrototypeData prototypeData, Vector3 scale)

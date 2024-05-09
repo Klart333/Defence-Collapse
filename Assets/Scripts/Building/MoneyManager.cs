@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class MoneyManager : Singleton<MoneyManager>
 {
+    public event Action<float> OnMoneyChanged;
+
     [Title("Money")]
     [SerializeField]
     private int startingMoney = 10;
@@ -94,7 +96,7 @@ public class MoneyManager : Singleton<MoneyManager>
         }
         else
         {
-            money -= costData.GetCost(currentBuildingType);
+            RemoveMoney(costData.GetCost(currentBuildingType));
         }
 
         if (!CanPurchase(currentBuildingType))
@@ -113,6 +115,15 @@ public class MoneyManager : Singleton<MoneyManager>
     public void AddMoney(int amount)
     {
         money += amount;
+
+        OnMoneyChanged?.Invoke(money);
+    }
+
+    public void RemoveMoney(int amount)
+    {
+        money -= amount;
+
+        OnMoneyChanged?.Invoke(money);
     }
 
     #endregion
