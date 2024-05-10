@@ -1,17 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
-using Sirenix.OdinInspector;
-using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class Building : PooledMonoBehaviour, IBuildable
 {
-    public event Action<Vector3> OnEnterDefense;
-
-    [Title("Visual")]
     [SerializeField]
     private MaterialData materialData;
     
@@ -278,7 +270,6 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void DisplayDeath()
     {
-        print("Death");
         ToggleIsBuildableVisual(true);
     }
 

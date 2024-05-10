@@ -9,9 +9,9 @@ public class UILootHandler : MonoBehaviour
     [SerializeField]
     private GameObject panelParent;
 
-    public void DisplayLoot(ILoot currentLoot)
+    public void DisplayLoot(LootData currentLoot, int grade)
     {
-        description.text = currentLoot.Description.ToString();
+        description.text = currentLoot.LootEffects[0].GetDescription(grade);
         panelParent.SetActive(true);
     }
 

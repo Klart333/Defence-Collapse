@@ -1,4 +1,6 @@
 using Sirenix.OdinInspector;
+using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,16 +14,20 @@ public class UIBuildingUpgrade : MonoBehaviour
     [SerializeField]
     private GameObject parentPanel;
 
-    [Title("Fills")]
+    [Title("Displays")]
     [SerializeField]
-    private Image attackSpeedFill;
+    private UIUpgradeDisplay attackSpeedDisplay;
 
     [SerializeField]
-    private Image damageFill;
+    private UIUpgradeDisplay damageDisplay;
+
+    [SerializeField]
+    private UIUpgradeDisplay rangeDisplay;
+
+    [Title("Misc")]
+    [SerializeField]
+    private int barCount = 15;
     
-    [SerializeField]
-    private Image rangeFill;
-
     private BuildingData currentData;
 
     public void ShowUpgrades(BuildingData buildingData)
@@ -35,9 +41,9 @@ public class UIBuildingUpgrade : MonoBehaviour
 
     private void DisplayStats()
     {
-        attackSpeedFill.fillAmount = (float)currentData.UpgradeData.Attackspeed / 10.0f;
-        damageFill.fillAmount = (float)currentData.UpgradeData.Damage / 10.0f;
-        rangeFill.fillAmount = (float)currentData.UpgradeData.Range / 10.0f;
+        attackSpeedDisplay.DisplayStat((float)currentData.UpgradeData.Attackspeed / barCount, levelData.GetCost(LevelStat.AttackSpeed, currentData.UpgradeData.Attackspeed));
+        damageDisplay     .DisplayStat((float)currentData.UpgradeData.Damage      / barCount, levelData.GetCost(LevelStat.Damage     , currentData.UpgradeData.Damage     ));
+        rangeDisplay      .DisplayStat((float)currentData.UpgradeData.Range       / barCount, levelData.GetCost(LevelStat.Range      , currentData.UpgradeData.Range      ));
     }
 
     public void Close()
@@ -47,6 +53,8 @@ public class UIBuildingUpgrade : MonoBehaviour
 
     public void UpgradeStat(LevelStat stat)
     {
+        MoneyManager.Instance.RemoveMoney(levelData.GetCost(stat, currentData.UpgradeData.GetStatLevel(stat)));
+
         currentData.UpgradeData.IncreaseStat(stat, 1);
 
         switch (stat)
@@ -68,19 +76,9 @@ public class UIBuildingUpgrade : MonoBehaviour
         DisplayStats();
     }
 
-    public void UpgradeAttackspeed()
+    public bool CanPurchase(LevelStat stat)
     {
-        UpgradeStat(LevelStat.AttackSpeed);
-    }
-
-    public void UpgradeDamage()
-    {
-        UpgradeStat(LevelStat.Damage);
-    }
-
-    public void UpgradeRange()
-    {
-        UpgradeStat(LevelStat.Range);
+        return MoneyManager.Instance.Money >= levelData.GetCost(stat, currentData.UpgradeData.GetStatLevel(stat));
     }
 }
 
@@ -95,6 +93,21 @@ public class UpgradeData
         Attackspeed = speed;
         Damage = damage;
         Range = range;
+    }
+
+    public int GetStatLevel(LevelStat levelStat) 
+    {
+        switch (levelStat)
+        {
+            case LevelStat.AttackSpeed:
+                return Attackspeed;
+            case LevelStat.Damage:
+                return Damage;
+            case LevelStat.Range:
+                return Range;
+        }
+
+        return -1;
     }
 
     public void IncreaseStat(LevelStat stat, int increase)

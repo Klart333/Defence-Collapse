@@ -1,5 +1,7 @@
+using Effects;
 using Sirenix.OdinInspector;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
@@ -29,6 +31,8 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
     [Title("UI", "Upgrade")]
     [SerializeField]
     private UIBuildingUpgrade buildingUpgrade;
+
+    private List<EffectModifier> ModifierEffects = new List<EffectModifier>();
 
     private BuildingHandler buildingHandler;
     private Building currentBuilding;
@@ -92,4 +96,28 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
 
         Close();
     }
+
+    #region Modifier Effects
+
+    public void AddModifierEffect(EffectModifier effect)
+    {
+        ModifierEffects.Add(effect);
+    }
+        
+    #endregion
+}
+
+[Serializable]
+public class EffectModifier
+{
+    [Title("Info")]
+    [PreviewField]
+    public Sprite Icon;
+
+    public string Description;
+
+    public EffectType EffectType;
+
+    [Title("Effects")]
+    public List<IEffect> Effects;
 }

@@ -306,7 +306,7 @@ namespace Effects
             float lifetime = Mathf.Min(1.0f / attacker.Stats.AttackSpeed.Value, distance / MinimumUnitsPerSecond);
 
             AttackVisualEffect visual = AttackEffect.Spawn(attacker.OriginPosition, Quaternion.identity, 1, lifetime + 0.2f);
-            DamageCollider collider = ColliderManager.Instance.GetCollider(attacker.OriginPosition, Radius, lifetime, layermask: attacker.LayerMask);
+            DamageCollider collider = ColliderManager.Instance.GetCollider(attacker.OriginPosition, Radius, lifetime + 0.1f, layermask: attacker.LayerMask);
             collider.Attacker = attacker;
             collider.DamageInstance = dmg;
 
@@ -330,7 +330,7 @@ namespace Effects
                         collider.OnHit -= LimitHitAction;
 
                         collider.gameObject.SetActive(false);
-                        visual.gameObject.SetActive(false);
+                        visual.OnAttackBreak();
                     }
                 };
 
@@ -766,5 +766,11 @@ namespace Effects
     }
 
     #endregion
-}
 
+    public enum EffectType
+    {
+        Effect,
+        Holder,
+        DoneDamage
+    }
+}

@@ -2,12 +2,19 @@
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [System.Serializable]
 public class Attack
 {
-    private List<IEffectHolder> effectHolders = new List<IEffectHolder>();
+    [OdinSerialize, NonSerialized]
+    public List<IEffect> Effects = new List<IEffect>();
 
+    [OdinSerialize, NonSerialized]
+    public List<IEffect> DoneDamageEffects = new List<IEffect>();
+
+    private List<IEffectHolder> effectHolders = new List<IEffectHolder>();
+    
     public List<IEffectHolder> EffectHolders
     {
         get
@@ -20,9 +27,6 @@ public class Attack
             return effectHolders;
         }
     }
-
-    [OdinSerialize, NonSerialized]
-    public List<IEffect> Effects = new List<IEffect>();
 
     public Attack(Attack copy)
     {
@@ -45,18 +49,43 @@ public class Attack
         EffectHolders[EffectHolders.Count - 1].Perform(attacker);
     }
 
-    public void AddEffect(IEffect effect)
+    public void OnDoneDamage(IAttacker attacker)
     {
-        if (effect is IEffectHolder holder)
+        for (int i = 0; i < DoneDamageEffects.Count; i++)
         {
-            EffectHolders.Add(holder);
+            DoneDamageEffects[i].Perform(attacker);
         }
-        else
+    }
+
+    public void AddEffect(List<IEffect> effects, EffectType effectType)
+    {
+        switch (effectType)
         {
-            Effects.Add(effect);
+            case EffectType.Effect:
+                Effects.AddRange(effects);
+                break;
+            case EffectType.Holder:
+                for (int i = 0; i < effects.Count; i++)
+                {
+                    if (effects[i] is IEffectHolder holder)
+                    {
+                        effectHolders.Add(holder);
+                    }
+                    else
+                    {
+                        Debug.LogError("Effect not a holder");
+                    }
+                }
+                BuildEffectHolder();
+
+                break;
+            case EffectType.DoneDamage:
+                DoneDamageEffects.AddRange(effects);
+                break;
+            default:
+                break;
         }
 
-        BuildEffectHolder();
     }
 
     private void BuildEffectHolder()

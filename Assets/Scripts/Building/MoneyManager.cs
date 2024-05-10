@@ -112,14 +112,14 @@ public class MoneyManager : Singleton<MoneyManager>
         AvailableBuildables[buildingType] += amount;
     }
 
-    public void AddMoney(int amount)
+    public void AddMoney(float amount)
     {
         money += amount;
 
         OnMoneyChanged?.Invoke(money);
     }
 
-    public void RemoveMoney(int amount)
+    public void RemoveMoney(float amount)
     {
         money -= amount;
 

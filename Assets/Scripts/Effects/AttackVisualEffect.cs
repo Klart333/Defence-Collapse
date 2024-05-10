@@ -1,3 +1,5 @@
+using DG.Tweening;
+using System;
 using UnityEngine;
 
 public class AttackVisualEffect : PooledMonoBehaviour
@@ -18,6 +20,7 @@ public class AttackVisualEffect : PooledMonoBehaviour
 
     private void Reset()
     {
+        transform.DOKill();
         transform.localScale = originalScale;
     }
 
@@ -28,5 +31,10 @@ public class AttackVisualEffect : PooledMonoBehaviour
         gm.Delay.Lifeime = lifetime;
 
         return gm;
+    }
+
+    public void OnAttackBreak()
+    {
+        transform.DOScale(Vector3.zero, 1).SetEase(Ease.InElastic);
     }
 }

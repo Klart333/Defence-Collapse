@@ -17,10 +17,6 @@ public class BuildingPlacer : MonoBehaviour
 
     private Camera cam;
 
-    [Title("Debug")]
-    [SerializeField]
-    private bool placingCastle = true;
-
     private bool manualCancel = false;
     private bool canceled
     {

@@ -117,6 +117,8 @@ public class ArcherState : BuildingState, IAttacker
     public void OnUnitDoneDamage(DamageInstance damageInstance)
     {
         lastDamageDone = damageInstance;
+
+        Attack.OnDoneDamage(this);
     }
 
     public void OnUnitKill()
