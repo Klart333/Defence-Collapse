@@ -25,6 +25,8 @@ public class UIBuildingHandler : MonoBehaviour
 
     public void ClickBuilding()
     {
+        print("Click");
+
         if (gottaStartWithACastle)
         {
             Events.OnBuildingClicked?.Invoke(BuildingType.Castle);

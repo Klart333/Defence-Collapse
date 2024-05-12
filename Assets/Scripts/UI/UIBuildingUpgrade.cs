@@ -1,5 +1,6 @@
 using Sirenix.OdinInspector;
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,21 +15,35 @@ public class UIBuildingUpgrade : MonoBehaviour
     [SerializeField]
     private GameObject parentPanel;
 
-    [Title("Displays")]
+    [Title("UI")]
     [SerializeField]
-    private UIUpgradeDisplay attackSpeedDisplay;
+    private TextMeshProUGUI upgradeTitleText;
 
     [SerializeField]
-    private UIUpgradeDisplay damageDisplay;
+    private TextMeshProUGUI costText;
 
     [SerializeField]
-    private UIUpgradeDisplay rangeDisplay;
+    private TextMeshProUGUI[] descriptions;
 
-    [Title("Misc")]
     [SerializeField]
-    private int barCount = 15;
-    
+    private Image[] points;
+
+    [Title("Upgrade Displays")]
+    [SerializeField]
+    private List<UIUpgradeDisplay> displays;
+
     private BuildingData currentData;
+    private Canvas canvas;
+
+    private void Awake()
+    {
+        canvas = GetComponentInParent<Canvas>();
+    }
+
+    private void Update()
+    {
+        PositionRectTransform.PositionOnOverlayCanvas(canvas, transform as RectTransform, BuildingManager.Instance.GetPos(currentData.Index), new Vector2(0.25f, 0.5f));
+    }
 
     public void ShowUpgrades(BuildingData buildingData)
     {
@@ -39,16 +54,43 @@ public class UIBuildingUpgrade : MonoBehaviour
         DisplayStats();
     }
 
+    public void DisplayUpgrade(string upgradeName, List<string> descriptionStrings, LevelStat stat)
+    {
+        upgradeTitleText.text = upgradeName;
+
+        for (int i = 0; i < descriptions.Length; i++)
+        {
+            if (i >= descriptionStrings.Count)
+            {
+                descriptions[i].text = "";
+                points[i].gameObject.SetActive(false);
+            }
+            else
+            {
+                descriptions[i].text = descriptionStrings[i];
+                points[i].gameObject.SetActive(true);
+            }
+        }
+
+        costText.text = levelData.GetCost(stat, currentData.UpgradeData.GetStatLevel(stat)).ToString();
+    }
+
     private void DisplayStats()
     {
-        attackSpeedDisplay.DisplayStat((float)currentData.UpgradeData.Attackspeed / barCount, levelData.GetCost(LevelStat.AttackSpeed, currentData.UpgradeData.Attackspeed));
-        damageDisplay     .DisplayStat((float)currentData.UpgradeData.Damage      / barCount, levelData.GetCost(LevelStat.Damage     , currentData.UpgradeData.Damage     ));
-        rangeDisplay      .DisplayStat((float)currentData.UpgradeData.Range       / barCount, levelData.GetCost(LevelStat.Range      , currentData.UpgradeData.Range      ));
+        for (int i = 0; i < displays.Count; i++)
+        {
+            displays[i].DisplayStat(currentData);
+        }
     }
 
     public void Close()
     {
         parentPanel.SetActive(false);
+
+        for (int i = 0; i < displays.Count; i++)
+        {
+            displays[i].Close();
+        }
     }
 
     public void UpgradeStat(LevelStat stat)
@@ -60,13 +102,13 @@ public class UIBuildingUpgrade : MonoBehaviour
         switch (stat)
         {
             case LevelStat.AttackSpeed:
-                currentData.State.Stats.AttackSpeed.BaseValue += levelData.GetIncrease(stat, currentData.UpgradeData.Attackspeed);
+                currentData.State.Stats.AttackSpeed.BaseValue += GetIncrease(stat, currentData.UpgradeData.Attackspeed);
                 break;
             case LevelStat.Damage:
-                currentData.State.Stats.DamageMultiplier.BaseValue += levelData.GetIncrease(stat, currentData.UpgradeData.Damage);
+                currentData.State.Stats.DamageMultiplier.BaseValue += GetIncrease(stat, currentData.UpgradeData.Damage);
                 break;
             case LevelStat.Range:
-                currentData.State.Range += levelData.GetIncrease(stat, currentData.UpgradeData.Range);
+                currentData.State.Range += GetIncrease(stat, currentData.UpgradeData.Range);
                 break;
             default:
                 break;
@@ -74,6 +116,11 @@ public class UIBuildingUpgrade : MonoBehaviour
         currentData.LevelUp();
 
         DisplayStats();
+    }
+
+    public float GetIncrease(LevelStat stat, int level)
+    {
+        return levelData.GetIncrease(stat, level);
     }
 
     public bool CanPurchase(LevelStat stat)
@@ -126,5 +173,28 @@ public class UpgradeData
             default:
                 break;
         }
+    }
+}
+
+public static class PositionRectTransform // Chat gippity
+{
+    // Function to position RectTransform on Overlay Canvas to align with world position
+    public static void PositionOnOverlayCanvas(Canvas canvas, RectTransform rectTransform, Vector3 worldPosition, Vector2 pivot)
+    {
+        // Convert world position to screen space
+        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(Camera.main, worldPosition);
+
+        // Convert screen space to canvas space
+        Vector2 canvasPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPoint, canvas.worldCamera, out canvasPos);
+
+        // Calculate offset based on pivot
+        Vector2 pivotOffset = new Vector2(
+            rectTransform.rect.width * (pivot.x - 0.5f),
+            rectTransform.rect.height * (pivot.y - 0.5f)
+        );
+
+        // Set anchored position
+        rectTransform.anchoredPosition = canvasPos + pivotOffset;
     }
 }
