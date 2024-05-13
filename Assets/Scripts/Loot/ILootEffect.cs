@@ -1,11 +1,8 @@
-﻿using Effects;
-using Sirenix.OdinInspector;
+﻿using Sirenix.OdinInspector;
 using UnityEngine;
 
 public interface ILootEffect
 {
-    string GetDescription(int grade);
-
     void Perform(int grade);
 }
 
@@ -21,11 +18,6 @@ public class GoldLoot : ILootEffect
     {
         MoneyManager.Instance.AddMoney(Gold + Mathf.RoundToInt(Gold * grade * GradeMultiplier));
     }
-
-    public string GetDescription(int grade)
-    {
-        return string.Format("Found {0} gold pieces", Gold + Mathf.RoundToInt(Gold * grade * GradeMultiplier));
-    }
 }
 
 
@@ -36,11 +28,8 @@ public class EffectLoot : ILootEffect
 
     public void Perform(int grade)
     {
-        BuildingUpgradeManager.Instance.AddModifierEffect(new EffectModifier(Effect));
-    }
-
-    public string GetDescription(int grade)
-    {
-        return Effect.Description;
+        EffectModifier effect = new EffectModifier(Effect);
+        BuildingUpgradeManager.Instance.AddModifierEffect(effect);
+        LootManager.Instance.DisplayEffectGained(effect);
     }
 }

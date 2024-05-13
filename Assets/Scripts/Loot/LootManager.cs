@@ -18,10 +18,6 @@ public class LootManager : Singleton<LootManager> // Make a collect all loot but
 
     private Dictionary<int, List<LootData>> GradedLootData = new Dictionary<int, List<LootData>>();
 
-    private LootData currentLoot;
-
-    private int currentGrade = 0;
-
     protected override void Awake()
     {
         base.Awake();
@@ -80,23 +76,8 @@ public class LootManager : Singleton<LootManager> // Make a collect all loot but
         return GradedLootData[lootGrade][Random.Range(0, GradedLootData[lootGrade].Count)];
     }
 
-    public void CollectLoot(int grade, LootData lootData = null)
+    public void DisplayEffectGained(EffectModifier effect)
     {
-        currentLoot = lootData ?? GetLootData(ref grade);
-        currentGrade = grade;
-
-        lootHandler.DisplayLoot(currentLoot, currentGrade);
-    }
-
-    public void ClaimLoot()
-    {
-        if (currentLoot == null)
-        {
-            return;
-        }
-
-        currentLoot.Perform(currentGrade);
-
-        currentLoot = null;
+        lootHandler.DisplayEffect(effect);
     }
 }

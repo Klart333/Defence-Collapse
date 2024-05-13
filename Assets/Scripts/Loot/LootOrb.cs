@@ -51,7 +51,7 @@ public class LootOrb : PooledMonoBehaviour
 
     private void Collect()
     {
-        LootManager.Instance.CollectLoot(Grade);
+        //LootManager.Instance.CollectLoot(Grade);
 
         gameObject.SetActive(false);
     }
