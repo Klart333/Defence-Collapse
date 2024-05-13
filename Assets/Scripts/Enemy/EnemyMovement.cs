@@ -7,7 +7,7 @@ public class EnemyMovement : MonoBehaviour
 {
     [Title("Stats")]
     [SerializeField]
-    private float moveSpeed = 1;
+    private EnemyData enemyData;
 
     [Title("Less important stats")]
     [SerializeField]
@@ -30,16 +30,22 @@ public class EnemyMovement : MonoBehaviour
         animator = GetComponent<EnemyAnimator>();
         agent = GetComponent<NavMeshAgent>();
 
-        agent.speed = moveSpeed;
+        agent.speed = enemyData.Stats.MovementSpeed.Value;
 
         Events.OnEnemyPathUpdated += OnEnemyPathUpdated;
         health.OnDeath += Health_OnDeath;
+        enemyData.Stats.MovementSpeed.OnValueChanged += MovementSpeed_OnValueChanged;
     }
 
     private void OnDisable()
     {
         Events.OnEnemyPathUpdated -= OnEnemyPathUpdated;
         health.OnDeath -= Health_OnDeath;
+    }
+
+    private void MovementSpeed_OnValueChanged()
+    {
+        agent.speed = enemyData.Stats.MovementSpeed.Value;
     }
 
     private void Health_OnDeath(EnemyHealth obj)

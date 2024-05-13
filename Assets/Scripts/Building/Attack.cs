@@ -1,4 +1,5 @@
 ﻿using Effects;
+using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,8 @@ public class Attack
     public List<IEffect> DoneDamageEffects = new List<IEffect>();
 
     private List<IEffectHolder> effectHolders = new List<IEffectHolder>();
-    
+
+    [ReadOnly, OdinSerialize]
     public List<IEffectHolder> EffectHolders
     {
         get
@@ -85,7 +87,42 @@ public class Attack
             default:
                 break;
         }
+    }
 
+    public void RemoveEffect(List<IEffect> effects, EffectType effectType)
+    {
+        switch (effectType)
+        {
+            case EffectType.Effect:
+                foreach (IEffect effect in effects)
+                {
+                    Effects.Remove(effect);
+                }
+                break;
+            case EffectType.Holder:
+                for (int i = 0; i < effects.Count; i++)
+                {
+                    if (effects[i] is IEffectHolder holder)
+                    {
+                        effectHolders.Remove(holder);
+                    }
+                    else
+                    {
+                        Debug.LogError("Effect not a holder");
+                    }
+                }
+                BuildEffectHolder();
+
+                break;
+            case EffectType.DoneDamage:
+                foreach (IEffect effect in effects)
+                {
+                    DoneDamageEffects.Remove(effect);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     private void BuildEffectHolder()

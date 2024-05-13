@@ -36,7 +36,7 @@ public class EffectLoot : ILootEffect
 
     public void Perform(int grade)
     {
-        BuildingUpgradeManager.Instance.AddModifierEffect(Effect);
+        BuildingUpgradeManager.Instance.AddModifierEffect(new EffectModifier(Effect));
     }
 
     public string GetDescription(int grade)

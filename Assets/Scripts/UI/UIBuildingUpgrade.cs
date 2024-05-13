@@ -1,5 +1,5 @@
+using DG.Tweening;
 using Sirenix.OdinInspector;
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -15,7 +15,7 @@ public class UIBuildingUpgrade : MonoBehaviour
     [SerializeField]
     private GameObject parentPanel;
 
-    [Title("UI")]
+    [Title("Upgrade")]
     [SerializeField]
     private TextMeshProUGUI upgradeTitleText;
 
@@ -32,12 +32,38 @@ public class UIBuildingUpgrade : MonoBehaviour
     [SerializeField]
     private List<UIUpgradeDisplay> displays;
 
+    [Title("Sections")]
+    [SerializeField]
+    private GameObject upgradeSection;
+
+    [SerializeField]
+    private GameObject modifySection;
+
+    [SerializeField]
+    private RectTransform line;
+
+    [Title("Effect Panels")]
+    [SerializeField]
+    private UIEffectsHandler ownedEffectsPanel;
+
+    [SerializeField]
+    private UIEffectsHandler towerEffectsPanel;
+
     private BuildingData currentData;
     private Canvas canvas;
 
-    private void Awake()
+    private void OnEnable()
     {
         canvas = GetComponentInParent<Canvas>();
+
+        towerEffectsPanel.OnEffectAdded += AddEffectToTower;
+        towerEffectsPanel.OnEffectRemoved += RemoveEffectFromTower;
+    }
+
+    private void OnDisable()
+    {
+        towerEffectsPanel.OnEffectAdded -= AddEffectToTower;
+        towerEffectsPanel.OnEffectRemoved -= RemoveEffectFromTower;
     }
 
     private void Update()
@@ -45,12 +71,28 @@ public class UIBuildingUpgrade : MonoBehaviour
         PositionRectTransform.PositionOnOverlayCanvas(canvas, transform as RectTransform, BuildingManager.Instance.GetPos(currentData.Index), new Vector2(0.25f, 0.5f));
     }
 
+    #region UI
+
+    public void ShowSection(bool isUpgrade)
+    {
+        upgradeSection.SetActive(isUpgrade);
+        modifySection.SetActive(!isUpgrade);
+
+        //line.DORewind();
+        line.DOAnchorPosX(isUpgrade ? -100 : 100, 0.2f).SetEase(Ease.OutCirc);
+
+        (ownedEffectsPanel.transform.parent as RectTransform).DOAnchorPosX(isUpgrade ? -0 : -420, 0.5f).SetEase(Ease.OutCirc);
+    }
+
     public void ShowUpgrades(BuildingData buildingData)
     {
         currentData = buildingData;
 
         parentPanel.SetActive(true);
+        ownedEffectsPanel.SpawnEffects();
+        (ownedEffectsPanel.transform.parent as RectTransform).anchoredPosition = Vector2.zero;
 
+        ShowSection(true);
         DisplayStats();
     }
 
@@ -92,6 +134,9 @@ public class UIBuildingUpgrade : MonoBehaviour
             displays[i].Close();
         }
     }
+    #endregion
+
+    #region Functionality
 
     public void UpgradeStat(LevelStat stat)
     {
@@ -127,6 +172,19 @@ public class UIBuildingUpgrade : MonoBehaviour
     {
         return MoneyManager.Instance.Money >= levelData.GetCost(stat, currentData.UpgradeData.GetStatLevel(stat));
     }
+
+
+    private void AddEffectToTower(EffectModifier effectModifier)
+    {
+        currentData.State.Attack.AddEffect(effectModifier.Effects, effectModifier.EffectType);
+    }
+
+    private void RemoveEffectFromTower(EffectModifier modifier)
+    {
+        currentData.State.Attack.RemoveEffect(modifier.Effects, modifier.EffectType);
+    }
+
+    #endregion
 }
 
 public class UpgradeData

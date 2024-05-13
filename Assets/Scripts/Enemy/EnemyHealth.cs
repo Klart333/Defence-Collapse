@@ -8,7 +8,7 @@ public class EnemyHealth : MonoBehaviour, IHealth
 
     [Title("Data")]
     [SerializeField]
-    private EnemyAttackData enemyData;
+    private EnemyData enemyData;
 
     [Title("Juice")]
     [SerializeField]

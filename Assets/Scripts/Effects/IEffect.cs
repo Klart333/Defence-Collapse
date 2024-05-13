@@ -19,6 +19,8 @@ namespace Effects
     public interface IEffectHolder : IEffect 
     {
         public List<IEffect> Effects { get; set; }
+
+        public IEffectHolder Clone();
     }
 
     #region Increase Stat
@@ -288,7 +290,7 @@ namespace Effects
 
         [Title("Movement")]
         public float Height = 5;
-        public float MinimumUnitsPerSecond = 8;
+        public float UnitsPerSecond = 8;
         public Ease Ease;
 
         [Title("Visual")]
@@ -302,8 +304,10 @@ namespace Effects
                 Source = attacker
             };
 
-            float distance = Vector3.Distance(attacker.OriginPosition, attacker.AttackPosition) + Height;
-            float lifetime = Mathf.Min(1.0f / attacker.Stats.AttackSpeed.Value, distance / MinimumUnitsPerSecond);
+            Vector3 targetPosition = attacker.AttackPosition;
+
+            float distance = Vector3.Distance(attacker.OriginPosition, targetPosition) + Height;
+            float lifetime = distance / UnitsPerSecond;
 
             AttackVisualEffect visual = AttackEffect.Spawn(attacker.OriginPosition, Quaternion.identity, 1, lifetime + 0.2f);
             DamageCollider collider = ColliderManager.Instance.GetCollider(attacker.OriginPosition, Radius, lifetime + 0.1f, layermask: attacker.LayerMask);
@@ -313,7 +317,7 @@ namespace Effects
             float t = 0;
             var tween = DOTween.To(() => t, (t) =>
             {
-                Vector3 pos = GetPosition(attacker.OriginPosition, attacker.AttackPosition, t);
+                Vector3 pos = GetPosition(attacker.OriginPosition, targetPosition, t);
                 collider.transform.position = pos;
                 visual.transform.position = pos;
             }, 1f, lifetime).SetEase(Ease);
@@ -350,34 +354,6 @@ namespace Effects
         }
     }
 
-    #endregion
-
-    #region Visual Effect
-
-    public class VisualEffectEffect : IEffect // Needs to be placed on target
-    {
-        [Title("Effect Scale")]
-        [OdinSerialize]
-        public float ModifierValue { get; set; } = 1;
-
-        [Title("VFX")]
-        public AttackVisualEffect AttackEffect;
-        
-        public Vector3 Offset;
-
-        public void Perform(IAttacker unit)
-        {
-            Vector3 pos = unit.AttackPosition + Offset;
-
-            AttackEffect.Spawn(pos, Quaternion.identity, ModifierValue);
-        }
-
-        public void Revert(IAttacker unit)
-        {
-            // Cant revert
-        }
-    }
-    
     #endregion
 
     #region Stacking Effect
@@ -696,6 +672,17 @@ namespace Effects
                 Effects[i].Revert(unit); // Might work
             }
         }
+
+        public IEffectHolder Clone()
+        {
+            return new RepeatEffect
+            {
+                Effects = new List<IEffect>(),
+                initialDelay = initialDelay,
+                ModifierValue = ModifierValue,
+                repeatFrequency = repeatFrequency
+            };
+        }
     }
 
     #endregion
@@ -765,6 +752,33 @@ namespace Effects
         }
     }
 
+    #endregion
+
+    #region Visual Effect
+
+    public class VisualEffectEffect : IEffect 
+    {
+        [Title("Effect Scale")]
+        [OdinSerialize]
+        public float ModifierValue { get; set; } = 1;
+
+        [Title("VFX")]
+        [AssetSelector]
+        public AttackVisualEffect AttackEffect;
+        
+        public void Perform(IAttacker unit)
+        {
+            Vector3 pos = unit.AttackPosition;
+
+            AttackEffect.Spawn(pos, Quaternion.identity, ModifierValue);
+        }
+
+        public void Revert(IAttacker unit)
+        {
+            // Cant revert
+        }
+    }
+    
     #endregion
 
     public enum EffectType

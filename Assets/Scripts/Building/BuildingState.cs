@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 
+[System.Serializable]
 public abstract class BuildingState
 {
     public abstract void OnStateEntered();
@@ -16,6 +17,7 @@ public abstract class BuildingState
     public float Range { get; set; }
 }
 
+[System.Serializable]
 public class ArcherState : BuildingState, IAttacker
 {
     public event Action OnAttack;
@@ -99,7 +101,7 @@ public class ArcherState : BuildingState, IAttacker
         AttackPosition = target.transform.position;
         attack.TriggerAttack(this);
 
-        float timer = attackCooldownTimer;
+        float timer = attackCooldownTimer / 2.0f;
         while (timer > 0 && target.Health.Alive)
         {
             await UniTask.Yield();

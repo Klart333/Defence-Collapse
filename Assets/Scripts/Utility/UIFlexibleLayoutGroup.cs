@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Sirenix.OdinInspector;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,7 +37,7 @@ public class UIFlexibleLayoutGroup : MonoBehaviour
         }
     }
 
-    [ContextMenu("Calculate")]
+    [Button]
     public void CalculateNewBounds()
     {
         float width = gameObject.GetComponent<RectTransform>().rect.width;
@@ -49,7 +50,18 @@ public class UIFlexibleLayoutGroup : MonoBehaviour
 
         GridLayoutGroup layoutGroup = GetComponent<GridLayoutGroup>();
 
-        layoutGroup.cellSize = new Vector2(coloumns == 0 ? layoutGroup.cellSize.x - layoutGroup.spacing.x : (width - (layoutGroup.padding.left + layoutGroup.padding.right)) / coloumns - layoutGroup.spacing.x, rows == 0 ? layoutGroup.cellSize.y - layoutGroup.spacing.y : (height - (layoutGroup.padding.top + layoutGroup.padding.bottom)) / rows - layoutGroup.spacing.y);
+        float x;
+        if (coloumns == 0)
+        {
+            x = (float)(layoutGroup.cellSize.x - layoutGroup.spacing.x);
+        }
+        else
+        {
+            x = (float)((width - (layoutGroup.padding.left + layoutGroup.padding.right)) / coloumns - layoutGroup.spacing.x);
+        }
+
+        float y = rows == 0 ? layoutGroup.cellSize.y - layoutGroup.spacing.y : (height - (layoutGroup.padding.top + layoutGroup.padding.bottom)) / rows - layoutGroup.spacing.y;
+        layoutGroup.cellSize = new Vector2(x, y);
 
         if (useElasticClamping)
         {

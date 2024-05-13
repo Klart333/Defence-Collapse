@@ -2,6 +2,8 @@ using Effects;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
@@ -32,11 +34,12 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
     [SerializeField]
     private UIBuildingUpgrade buildingUpgrade;
 
-    private List<EffectModifier> ModifierEffects = new List<EffectModifier>();
+    private List<EffectModifier> modifierEffectsToSpawn = new List<EffectModifier>();
 
     private BuildingHandler buildingHandler;
     private Building currentBuilding;
 
+    public List<EffectModifier> ModifierEffects => modifierEffectsToSpawn;
     public ArcherData ArcherData => archerData;
     public NormalHouseData NormalData => normalData;
 
@@ -101,7 +104,7 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
 
     public void AddModifierEffect(EffectModifier effect)
     {
-        ModifierEffects.Add(effect);
+        modifierEffectsToSpawn.Add(effect);
     }
         
     #endregion
@@ -116,8 +119,40 @@ public class EffectModifier
 
     public string Description;
 
+    public string Title;
+
     public EffectType EffectType;
 
     [Title("Effects")]
     public List<IEffect> Effects;
+
+    public EffectModifier(Sprite icon, string description, string title, EffectType effectType, List<IEffect> effects)
+    {
+        Icon = icon;
+        Description = description;
+        Title = title;
+        EffectType = effectType;
+        Effects = effects;
+    }
+
+    public EffectModifier(EffectModifier copy)
+    {
+        Icon = copy.Icon;
+        Description = copy.Description;
+        Title = copy.Title;
+        EffectType = copy.EffectType;
+        Effects = new List<IEffect>();
+
+        foreach (IEffect effect in copy.Effects)
+        {
+            if (effect is IEffectHolder holder)
+            {
+                Effects.Add(holder.Clone());
+            }
+            else
+            {
+                Effects.Add(effect);
+            }
+        }
+    }
 }

@@ -8,7 +8,7 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
     public event Action OnAttack;
 
     [SerializeField]
-    private EnemyAttackData attackData;
+    private EnemyData attackData;
 
     private Stats stats;
     private EnemyAnimator animator;

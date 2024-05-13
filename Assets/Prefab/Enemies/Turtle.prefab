@@ -526,7 +526,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a36ececf972dcef43937c87e7ff509a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 0.3
+  enemyData: {fileID: 11400000, guid: 6b8b21c7a9925794f90cb289ec0a3f82, type: 2}
   turnSpeed: 0.01
   layerMask:
     serializedVersion: 2
@@ -557,7 +557,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f280eac3c681de84d90582ff11259c56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackData: {fileID: 11400000, guid: bf2b81c88520df945a25c18667cb6fbd, type: 2}
+  attackData: {fileID: 11400000, guid: 6b8b21c7a9925794f90cb289ec0a3f82, type: 2}
 --- !u!114 &44266211333322211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -570,7 +570,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f4d7599838c8af4a9d45b513169d557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyData: {fileID: 11400000, guid: bf2b81c88520df945a25c18667cb6fbd, type: 2}
+  enemyData: {fileID: 11400000, guid: 6b8b21c7a9925794f90cb289ec0a3f82, type: 2}
   damageNumber: {fileID: 113033579351757082, guid: f03daa4315a134d4d94e833ba3733de0,
     type: 3}
   hitParticle: {fileID: 542933246792631625, guid: 021a2f7a2c5bc4449b4c64a66a050e8c,
@@ -585,7 +585,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.08
-  m_Speed: 3.5
+  m_Speed: 2
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120

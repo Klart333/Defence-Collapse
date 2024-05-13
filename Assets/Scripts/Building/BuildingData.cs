@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using Sirenix.Serialization;
+using System;
+using UnityEngine;
 
 [System.Serializable]   
 public class BuildingData

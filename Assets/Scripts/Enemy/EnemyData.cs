@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [InlineEditor, CreateAssetMenu(fileName = "New Data", menuName = "Enemy/Attack Data")]
-public class EnemyAttackData : SerializedScriptableObject
+public class EnemyData : SerializedScriptableObject
 {
     [TitleGroup("Stats")]
     [OdinSerialize, NonSerialized]

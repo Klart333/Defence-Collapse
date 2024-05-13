@@ -19,3 +19,9 @@ public static class Events
     public static UnityAction<Vector3, Vector3> OnEnemyPathUpdated;
     public static UnityAction<Vector3> OnTownDestroyed;
 }
+
+public static class UIEvents
+{
+    public static UnityAction<UIEffectDisplay> OnBeginDrag;
+    public static UnityAction<UIEffectDisplay> OnEndDrag;
+}

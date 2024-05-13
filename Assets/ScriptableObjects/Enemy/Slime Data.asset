@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0faa932942138f4bbba70b800b7b3c3, type: 3}
-  m_Name: Turtle
+  m_Script: {fileID: 11500000, guid: a39d9e0847bee9147a0e20c8ac4e2d3e, type: 3}
+  m_Name: Slime Data
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 337095038099638896, guid: d172fadee8b6d434487a84a0c707188d, type: 3}
+    - {fileID: 6245472720060021658, guid: c7b1bdefc0a9bdd4db8c00a84c721c62, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -48,7 +48,7 @@ MonoBehaviour:
       Data: 3|Stat, Assembly-CSharp
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 0.2
     - Name: 
       Entry: 8
       Data: 
@@ -84,7 +84,7 @@ MonoBehaviour:
       Data: 7|Stat, Assembly-CSharp
     - Name: baseValue
       Entry: 4
-      Data: 20
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -115,16 +115,16 @@ MonoBehaviour:
       Data: 11|Effects.DamageColliderEffect, Assembly-CSharp
     - Name: ModifierValue
       Entry: 4
-      Data: 5
+      Data: 2
     - Name: LimitedHits
       Entry: 5
-      Data: false
+      Data: true
     - Name: Hits
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: Radius
       Entry: 4
-      Data: 0.5
+      Data: 0.3
     - Name: 
       Entry: 8
       Data: 
@@ -133,7 +133,7 @@ MonoBehaviour:
       Data: 12|Effects.VisualEffectEffect, Assembly-CSharp
     - Name: ModifierValue
       Entry: 4
-      Data: 1
+      Data: 0.3
     - Name: AttackEffect
       Entry: 10
       Data: 0
@@ -180,8 +180,8 @@ MonoBehaviour:
   LayerMask:
     serializedVersion: 2
     m_Bits: 128
-  AttackRadius: 0.1
+  AttackRadius: 0.2
   LootProbability:
-  - 1
   - 0.5
+  - 0.25
   - 0.1
