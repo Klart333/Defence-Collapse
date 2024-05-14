@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using UnityEngine;
 
@@ -11,7 +12,13 @@ public class LootOrb : PooledMonoBehaviour
 
     public int Grade {  get; set; }
 
+    private float scale;
     private bool hovered;
+
+    private void OnEnable()
+    {
+        scale = transform.localScale.x;
+    }
 
     protected override void OnDisable()
     {
@@ -25,20 +32,26 @@ public class LootOrb : PooledMonoBehaviour
         Grade = -1;
         hovered = false;
         gameObject.layer = (int)Mathf.Log(normalLayer.value, 2);
+
+        transform.DORewind();
     }
 
     private void OnMouseEnter()
     {
         gameObject.layer = (int)Mathf.Log(hoverLayer.value, 2);
-
         hovered = true;
+
+        transform.DORewind();
+        transform.DOScale(scale * 1.1f, 0.2f);
     }
 
     private void OnMouseExit() 
     {
         gameObject.layer = (int)Mathf.Log(normalLayer.value, 2);
-
         hovered = false;
+
+        transform.DOKill();
+        transform.DOScale(scale, 0.2f);
     }
 
     private void Update()
@@ -51,7 +64,10 @@ public class LootOrb : PooledMonoBehaviour
 
     private void Collect()
     {
-        //LootManager.Instance.CollectLoot(Grade);
+        int grade = Grade;
+        LootData loot = LootManager.Instance.GetLootData(ref grade);
+
+        loot.Perform(grade);
 
         gameObject.SetActive(false);
     }

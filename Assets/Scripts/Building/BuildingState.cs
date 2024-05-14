@@ -101,7 +101,7 @@ public class ArcherState : BuildingState, IAttacker
         AttackPosition = target.transform.position;
         attack.TriggerAttack(this);
 
-        float timer = attackCooldownTimer / 2.0f;
+        float timer = attackCooldownTimer;
         while (timer > 0 && target.Health.Alive)
         {
             await UniTask.Yield();

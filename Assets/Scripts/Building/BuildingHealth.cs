@@ -7,6 +7,8 @@ public class BuildingHealth : MonoBehaviour, IHealth
 
     private Building building;
 
+    public Vector3 Position => transform.position;
+
     private void Awake()
     {
         building = GetComponent<Building>();

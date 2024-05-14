@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -40,8 +41,15 @@ public class WaveFunction : MonoBehaviour
     [SerializeField]
     private int[] notAllowedForSides;
 
-    [Header("Debug")]
-    public bool Manual;
+    [Header("Speed Limits")]
+    [SerializeField]
+    private float maxMillisecondsPerFrame = 4;
+
+    [SerializeField]
+    private bool shouldCombine = true;
+
+    [SerializeField]
+    private int chillTimeMs = 0;
 
     private List<GameObject> spawnedPossibilites = new List<GameObject>();
     private List<GameObject> spawnedMeshes = new List<GameObject>();
@@ -55,7 +63,6 @@ public class WaveFunction : MonoBehaviour
     private PrototypeData emptyPrototype;
 
     public GameObject SpawnedCastle { get; private set; }
-    public bool Auto { get; set; }
     public int Speed { get; set; }
     public Vector3Int GridSize => new Vector3Int(gridSizeX, gridSizeY, gridSizeZ);
     public Vector3 GridScale => gridSize;
@@ -79,29 +86,30 @@ public class WaveFunction : MonoBehaviour
             return;
         }
 
-        if (Manual && !Auto)
-        {
-            return;
-        }
-
         //await PredeterminePath();
         await BottomBuildUp();
 
         Stopwatch watch = Stopwatch.StartNew();
-        int MaxMills = 4;
         while (!AllCollapsed)
         {
-            await Iterate(); // Does not need to await
+            Iterate(); // Does not need to await
            
-            if (watch.ElapsedMilliseconds > MaxMills)
+            if (watch.ElapsedMilliseconds > maxMillisecondsPerFrame)
             {
-                await Task.Yield();
+                await UniTask.NextFrame();
+                if (chillTimeMs > 0)
+                {
+                    await UniTask.Delay(chillTimeMs);
+                }
+
                 watch.Restart();
             }
         }
 
-        CombineMeshes();
-        //GetMap();
+        if (shouldCombine)
+        {
+            CombineMeshes();
+        }
 
         OnMapGenerated?.Invoke();
     }
@@ -120,7 +128,7 @@ public class WaveFunction : MonoBehaviour
         return true;
     }
 
-    private async Task BottomBuildUp()
+    private async UniTask BottomBuildUp()
     {
         for (int x = 0; x < gridSizeX; x++)
         {
@@ -146,27 +154,28 @@ public class WaveFunction : MonoBehaviour
             }
         }
 
-        async Task PlaceGround(int x, int z)
+        async UniTask PlaceGround(int x, int z)
         {
             int index = GetIndex(x, 0, z);
             if (cells[index].PossiblePrototypes.Contains(prototypes[2 * 4]))
             {
                 SetCell(index, prototypes[2 * 4]);
 
-                await Propagate();
-                await Task.Yield();
+                Propagate();
+
+                await UniTask.Yield();
             }
         }
     }
 
-    public async Task Iterate()
+    public void Iterate()
     {
         int index = GetLowestEntropyIndex();
 
         PrototypeData chosenPrototype = Collapse(cells[index]);
         SetCell(index, chosenPrototype);
 
-        await Propagate();
+        Propagate();
     }
 
     private int GetLowestEntropyIndex()
@@ -254,7 +263,7 @@ public class WaveFunction : MonoBehaviour
         }
     }
 
-    public async Task Propagate()
+    public void Propagate()
     {
         while (cellStack.TryPop(out int cellIndex))
         {
@@ -278,26 +287,7 @@ public class WaveFunction : MonoBehaviour
                 {
                     cells[validDirs[i]] = new Cell(neighbour.Collapsed, neighbour.Position, constrainedPrototypes);
                     cellStack.Push(validDirs[i]);
-
-                    if (Manual && Auto)
-                    {
-                        DisplayPossiblePrototypes();
-                        await Task.Delay(Speed);
-                    }
                 } 
-            }
-
-            if (Manual)
-            {
-                DisplayPossiblePrototypes();
-                if (Auto)
-                {
-                    await Task.Delay(Speed);
-                }
-                else
-                {
-                    return;
-                }
             }
         }
     }
@@ -737,6 +727,13 @@ public class WaveFunction : MonoBehaviour
     public Cell GetCellAtIndex(int x, int y, int z)
     {
         return cells[GetIndex(x, y, z)];
+    }
+
+    public void SetGridSize(Vector3Int size)
+    {
+        gridSizeX = size.x;
+        gridSizeY = size.y;
+        gridSizeZ = size.z;
     }
 
     #endregion

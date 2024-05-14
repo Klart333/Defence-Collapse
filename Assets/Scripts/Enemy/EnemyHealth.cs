@@ -21,6 +21,7 @@ public class EnemyHealth : MonoBehaviour, IHealth
     private Health health;
 
     public Health Health => health;
+    public Vector3 Position => transform.position;
 
     private void OnEnable()
     {

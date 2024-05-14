@@ -27,7 +27,7 @@ public class UILootHandler : MonoBehaviour
         icon.sprite = effect.Icon;
     }
 
-    public void Claim()
+    public void Close()
     {
         //LootManager.Instance.ClaimLoot();
         panelParent.SetActive(false);

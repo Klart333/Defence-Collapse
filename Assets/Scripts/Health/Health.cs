@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [System.Serializable]
 public class Health : IHealth
@@ -13,6 +14,8 @@ public class Health : IHealth
     public bool Alive => CurrentHealth > 0;
     public float HealthPercentage => CurrentHealth / MaxHealth;
     public List<StatusEffect> StatusEffects { get; set; } = new List<StatusEffect>();
+
+    public Vector3 Position => throw new NotImplementedException();
 
     public Health(float maxHealth)
     {
@@ -105,4 +108,6 @@ public class Health : IHealth
 public interface IHealth
 {
     public void TakeDamage(DamageInstance damage, out DamageInstance damageDone);
+
+    public Vector3 Position { get; }
 }

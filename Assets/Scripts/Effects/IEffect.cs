@@ -719,35 +719,39 @@ namespace Effects
 
     #region Targeted Effect
 
-    public class TargetedEffect : IEffect
+    public class OnDamageTargetedEffect : IEffectHolder
     {
-        [Title("Range")]
+        [Title("Nohting")]
         [OdinSerialize]
         public float ModifierValue { get; set; } = 10;
 
         [Title("Effect")]
         [OdinSerialize]
-        private List<IEffect> EffectsToTrigger;
+        public List<IEffect> Effects { get; set; }
 
-        public void Perform(IAttacker unit)
+        public IEffectHolder Clone()
         {
-            /*var targetUnit = BattleManager.Instance.GetRandomUnitWithinRange(unit.AttackPosition, ModifierValue);
-            if (targetUnit == null) return;
-
-            unit.AttackPosition = targetUnit.transform.position;
-            for (int i = 0; i < EffectsToTrigger.Count; i++)
+            return new OnDamageTargetedEffect()
             {
-                EffectsToTrigger[i].Perform(unit);
-            }
+                Effects = new List<IEffect>(),
+                ModifierValue = ModifierValue
+            };
+        }
 
-            unit.AttackPosition = unit.transform.position;*/
+        public void Perform(IAttacker attacker)
+        {
+            attacker.AttackPosition = attacker.LastDamageDone.TargetHit.Position;
+            for (int i = 0; i < Effects.Count; i++)
+            {
+                Effects[i].Perform(attacker);
+            }
         }
 
         public void Revert(IAttacker unit)
         {
-            for (int i = 0; i < EffectsToTrigger.Count; i++)
+            for (int i = 0; i < Effects.Count; i++)
             {
-                EffectsToTrigger[i].Revert(unit); // Might work
+                Effects[i].Revert(unit); // Might work
             }
         }
     }
