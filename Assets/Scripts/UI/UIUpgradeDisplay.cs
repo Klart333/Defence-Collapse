@@ -3,7 +3,6 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class UIUpgradeDisplay : MonoBehaviour
 {
@@ -81,23 +80,29 @@ public class UIUpgradeDisplay : MonoBehaviour
 
     public void DisplayUpgrade()
     {
-        List<string> descriptions = new List<string>();
+        List<string> descriptions = new List<string>
+        {
+            string.Format(description, buildingUpgrade.LevelData.GetIncrease(upgradeType, currentData.UpgradeData.GetStatLevel(upgradeType)))
+        };
 
-        descriptions.Add(string.Format(description, buildingUpgrade.GetIncrease(upgradeType, currentData.UpgradeData.GetStatLevel(upgradeType))));
+        float value = 0;
         switch (upgradeType)
         {
             case LevelStat.AttackSpeed:
-                descriptions.Add(string.Format(currentDescription, currentData.State.Stats.AttackSpeed.Value));
+                value = Mathf.RoundToInt(currentData.State.Stats.AttackSpeed.Value * 10f) / 10f;
                 break;
             case LevelStat.Damage:
-                descriptions.Add(string.Format(currentDescription, currentData.State.Stats.DamageMultiplier.Value));
+                value = Mathf.RoundToInt(currentData.State.Stats.DamageMultiplier.Value * 10f) / 10f;
                 break;
             case LevelStat.Range:
-                descriptions.Add(string.Format(currentDescription, currentData.State.Range));
+                value = Mathf.RoundToInt(currentData.State.Range * 10f) / 10f;
                 break;
             default:
                 break;
         }
+
+        descriptions.Add(string.Format(currentDescription, value));
+
 
         buildingUpgrade.DisplayUpgrade(upgradeName, descriptions, upgradeType);
     }

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a39d9e0847bee9147a0e20c8ac4e2d3e, type: 3}
-  m_Name: Turtle Data
+  m_Name: Skeleton Data
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -48,7 +48,7 @@ MonoBehaviour:
       Data: 3|Stat, Assembly-CSharp
     - Name: baseValue
       Entry: 4
-      Data: 0.1
+      Data: 0.6
     - Name: 
       Entry: 8
       Data: 
@@ -84,7 +84,7 @@ MonoBehaviour:
       Data: 7|Stat, Assembly-CSharp
     - Name: baseValue
       Entry: 4
-      Data: 100
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -115,13 +115,13 @@ MonoBehaviour:
       Data: 11|Effects.DamageColliderEffect, Assembly-CSharp
     - Name: ModifierValue
       Entry: 4
-      Data: 1
+      Data: 2
     - Name: LimitedHits
       Entry: 5
-      Data: false
+      Data: true
     - Name: Hits
       Entry: 3
-      Data: 2
+      Data: 1
     - Name: Radius
       Entry: 4
       Data: 0.3
@@ -167,5 +167,6 @@ MonoBehaviour:
     m_Bits: 128
   AttackRadius: 0.2
   LootProbability:
-  - 0.05
-  - 0.01
+  - 0.1
+  - 0.08
+  - 0.04

@@ -52,6 +52,8 @@ public class UIBuildingUpgrade : MonoBehaviour
     private BuildingData currentData;
     private Canvas canvas;
 
+    public LevelData LevelData => levelData;
+
     private void OnEnable()
     {
         canvas = GetComponentInParent<Canvas>();
@@ -147,13 +149,13 @@ public class UIBuildingUpgrade : MonoBehaviour
         switch (stat)
         {
             case LevelStat.AttackSpeed:
-                currentData.State.Stats.AttackSpeed.BaseValue += GetIncrease(stat, currentData.UpgradeData.Attackspeed);
+                currentData.State.Stats.AttackSpeed.BaseValue += levelData.GetIncrease(stat, currentData.State.Stats.AttackSpeed.Value);
                 break;
             case LevelStat.Damage:
-                currentData.State.Stats.DamageMultiplier.BaseValue += GetIncrease(stat, currentData.UpgradeData.Damage);
+                currentData.State.Stats.DamageMultiplier.BaseValue += levelData.GetIncrease(stat, currentData.State.Stats.DamageMultiplier.Value);
                 break;
             case LevelStat.Range:
-                currentData.State.Range += GetIncrease(stat, currentData.UpgradeData.Range);
+                currentData.State.Range += levelData.GetIncrease(stat, currentData.State.Range);
                 break;
             default:
                 break;
@@ -161,11 +163,6 @@ public class UIBuildingUpgrade : MonoBehaviour
         currentData.LevelUp();
 
         DisplayStats();
-    }
-
-    public float GetIncrease(LevelStat stat, int level)
-    {
-        return levelData.GetIncrease(stat, level);
     }
 
     public bool CanPurchase(LevelStat stat)

@@ -9,12 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a495ea7e77707c46850b43351058fb4, type: 3}
-  m_Name: Level Data
+  m_Script: {fileID: 11500000, guid: f3f770c6e4414564db5736737ae6daa4, type: 3}
+  m_Name: 10 Skeleton
   m_EditorClassIdentifier: 
-  AttackSpeedIncrease: 1.2
-  DamageIncrease: 1.2
-  RangeIncrease: 1.2
-  AttackSpeedCost: 1.4
-  DamageCost: 1.4
-  RangeCost: 1.4
+  Enemy: {fileID: 2507997879559971554, guid: d09e2f023ce30344584043d31f1d97b7, type: 3}
+  Amount: 10
+  SpawnRate: 0.5

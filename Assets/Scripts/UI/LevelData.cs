@@ -14,16 +14,16 @@ public class LevelData : ScriptableObject
     public float DamageCost = 1;
     public float RangeCost = 1f;
 
-    public float GetIncrease(LevelStat stat, int level)
+    public float GetIncrease(LevelStat stat, float current)
     {
         switch (stat)
         {
             case LevelStat.AttackSpeed:
-                return AttackSpeedIncrease;
+                return current * AttackSpeedIncrease;
             case LevelStat.Damage:
-                return DamageIncrease;
+                return current * DamageIncrease;
             case LevelStat.Range:
-                return RangeIncrease;
+                return current * RangeIncrease;
         }
 
         return 0;
@@ -34,11 +34,11 @@ public class LevelData : ScriptableObject
         switch (stat)
         {
             case LevelStat.AttackSpeed:
-                return AttackSpeedCost * level;
+                return level * 2 + Mathf.Pow(AttackSpeedCost, level);
             case LevelStat.Damage:
-                return DamageCost * level;
+                return level * 2 + Mathf.Pow(DamageCost, level);
             case LevelStat.Range:
-                return RangeCost * level;
+                return level * 2 + Mathf.Pow(RangeCost, level);
         }
 
         return 0;
