@@ -20,6 +20,11 @@ public class AttackVisualEffect : PooledMonoBehaviour
 
     private void Reset()
     {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
         transform.DOKill();
         transform.localScale = originalScale;
     }

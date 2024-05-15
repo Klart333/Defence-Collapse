@@ -1,10 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     public static T Instance;
+    [Title("Singleton")]
+    [SerializeField]
+    private bool shouldDestroyOnLoad = true;
 
     protected virtual void Awake()
     {
@@ -15,7 +17,11 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         else
         {
             Instance = GetComponent<T>();
-            DontDestroyOnLoad(Instance.gameObject);
+
+            if (!shouldDestroyOnLoad)
+            {
+               DontDestroyOnLoad(Instance.gameObject);
+            }
         }
     }
 }

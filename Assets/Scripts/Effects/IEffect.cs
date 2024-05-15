@@ -293,6 +293,9 @@ namespace Effects
         public float UnitsPerSecond = 8;
         public Ease Ease;
 
+        [Title("OnComplete Effects")]
+        public List<IEffect> Effects;
+
         [Title("Visual")]
         public AttackVisualEffect AttackEffect;
 
@@ -320,7 +323,20 @@ namespace Effects
                 Vector3 pos = GetPosition(attacker.OriginPosition, targetPosition, t);
                 collider.transform.position = pos;
                 visual.transform.position = pos;
-            }, 1f, lifetime).SetEase(Ease);
+            }, 1f, lifetime).SetEase(Ease).OnComplete(() =>
+            {
+                if (Effects == null || attacker == null)
+                {
+                    return;
+                }
+
+                attacker.AttackPosition = targetPosition;
+
+                for (int i = 0; i < Effects.Count; i++)
+                {
+                    Effects[i].Perform(attacker);
+                }
+            });
 
             if (LimitedHits)
             {
@@ -330,7 +346,7 @@ namespace Effects
                 {
                     if (++hits >= Hits)
                     {
-                        tween.Kill();
+                        tween.Complete();
                         collider.OnHit -= LimitHitAction;
 
                         collider.gameObject.SetActive(false);
@@ -740,7 +756,7 @@ namespace Effects
 
         public void Perform(IAttacker attacker)
         {
-            attacker.AttackPosition = attacker.LastDamageDone.TargetHit.Position;
+            attacker.AttackPosition = attacker.LastDamageDone.TargetHit.Attacker.OriginPosition;
             for (int i = 0; i < Effects.Count; i++)
             {
                 Effects[i].Perform(attacker);

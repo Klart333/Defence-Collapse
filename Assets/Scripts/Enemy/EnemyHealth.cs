@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
@@ -17,24 +18,34 @@ public class EnemyHealth : MonoBehaviour, IHealth
     [SerializeField]
     private PooledMonoBehaviour hitParticle;
 
+    [Title("Healthbar")]
+    [SerializeField]
+    private EnemyHealthbar healthbar;
+
+    private EnemyAttacker attacker;
     private EnemyAnimator animator;
     private Health health;
 
     public Health Health => health;
-    public Vector3 Position => transform.position;
+    public IAttacker Attacker => attacker;
 
     private void OnEnable()
     {
         animator = GetComponent<EnemyAnimator>();
+        attacker = GetComponent<EnemyAttacker>();
 
-        health = new Health(enemyData.Stats.MaxHealth.Value);
+        health = new Health(Attacker);
         health.OnDeath += Health_OnDeath;
+
+        healthbar.Setup(this);
 
         EnemyManager.Instance.RegisterEnemy(this);
     }
 
     private void OnDisable()
     {
+        healthbar.Reset();
+
         health.OnDeath -= Health_OnDeath;
     }
 
@@ -59,9 +70,24 @@ public class EnemyHealth : MonoBehaviour, IHealth
 
     public void TakeDamage(DamageInstance damage, out DamageInstance damageDone)
     {
+        if (!health.Alive || damage.Damage <= 0.1f)
+        {
+            damageDone = damage;
+            return;
+        }
+
         health.TakeDamage(damage, out damageDone);
 
         hitParticle.GetAtPosAndRot<PooledMonoBehaviour>(transform.position, hitParticle.transform.rotation);
+
+        SpawnDamageNumber(damage);
+    }
+
+    private void SpawnDamageNumber(DamageInstance dmg)
+    {
+        Vector3 position = transform.position + new Vector3(UnityEngine.Random.Range(-0.4f, 0.4f), 0.5f, UnityEngine.Random.Range(-0.4f, 0.4f));
+        DamageNumber num = damageNumber.GetAtPosAndRot<DamageNumber>(position, Quaternion.identity);
+        num.SetDamage(dmg);
     }
 
 }

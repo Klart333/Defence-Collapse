@@ -137,21 +137,6 @@ MonoBehaviour:
     - Name: AttackEffect
       Entry: 10
       Data: 0
-    - Name: Offset
-      Entry: 7
-      Data: UnityEngine.Vector3, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -182,6 +167,4 @@ MonoBehaviour:
     m_Bits: 128
   AttackRadius: 0.2
   LootProbability:
-  - 0.5
-  - 0.25
-  - 0.1
+  - 0.01

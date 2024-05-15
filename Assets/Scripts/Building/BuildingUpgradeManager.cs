@@ -10,7 +10,10 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
 {
     [Title("State Data")]
     [SerializeField]
-    private ArcherData archerData;
+    private TowerData archerData;
+
+    [SerializeField]
+    private TowerData bombData;
 
     [SerializeField]
     private NormalHouseData normalData;
@@ -40,7 +43,8 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
     private Building currentBuilding;
 
     public List<EffectModifier> ModifierEffects => modifierEffectsToSpawn;
-    public ArcherData ArcherData => archerData;
+    public TowerData BombData => bombData;
+    public TowerData ArcherData => archerData;
     public NormalHouseData NormalData => normalData;
 
     protected override void Awake()

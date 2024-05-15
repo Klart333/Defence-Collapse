@@ -7,7 +7,7 @@ public class BuildingHealth : MonoBehaviour, IHealth
 
     private Building building;
 
-    public Vector3 Position => transform.position;
+    public IAttacker Attacker => building.BuildingHandler[building].State;
 
     private void Awake()
     {

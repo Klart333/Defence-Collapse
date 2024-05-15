@@ -1,8 +1,7 @@
-using DG.Tweening;
-using System;
+﻿using DG.Tweening;
 using UnityEngine;
 
-public class BuildingHealthbar : MonoBehaviour
+public class EnemyHealthbar : MonoBehaviour
 {
     [SerializeField]
     private Transform fillHandle;
@@ -10,50 +9,32 @@ public class BuildingHealthbar : MonoBehaviour
     [SerializeField]
     private float showTime = 5;
 
-    private Building building;
+    private EnemyHealth enemyHealth;
 
     private float maxScale;
     private float timer;
     private bool show = true;
 
-    public Building Building
-    {
-        get
-        {
-            if (building == null)
-            {
-                building = GetComponent<Building>();
-            }
-
-            return building;
-        }
-    }
-
     private void Awake()
     {
         maxScale = fillHandle.transform.localScale.x;
-    }
-
-    private void OnEnable()
-    {
-        Building.BuildingHandler[building].State.Stats.MaxHealth.OnValueChanged += DisplayHealth;
-        Building.BuildingHandler[building].Health.OnTakeDamage += DisplayHealth;
 
         ToggleEnabled(false);
     }
 
-    private void OnDisable()
+    public void Setup(EnemyHealth health)
     {
-        Building.BuildingHandler[building].State.Stats.MaxHealth.OnValueChanged -= DisplayHealth;
-        Building.BuildingHandler[building].Health.OnTakeDamage -= DisplayHealth;
-
-        Reset();
+        enemyHealth = health;
+        enemyHealth.Health.Attacker.Stats.MaxHealth.OnValueChanged += DisplayHealth;
+        enemyHealth.Health.OnTakeDamage += DisplayHealth;
     }
 
-    private void Reset()
+    public void Reset()
     {
         ToggleEnabled(false);
 
+        fillHandle.DOKill();
+        fillHandle.localScale = new Vector3(maxScale, fillHandle.localScale.y, fillHandle.localScale.z);
     }
 
     private void Update()
@@ -75,9 +56,9 @@ public class BuildingHealthbar : MonoBehaviour
 
         fillHandle.DOKill();
 
-        float scale = Mathf.Lerp(0, maxScale, Building.BuildingHandler[building].Health.HealthPercentage);
+        float scale = Mathf.Lerp(0, maxScale, enemyHealth.Health.HealthPercentage);
         fillHandle.DOScaleX(scale, 0.2f);
-        
+
         timer = showTime;
     }
 

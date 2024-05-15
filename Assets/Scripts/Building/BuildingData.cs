@@ -30,18 +30,23 @@ public class BuildingData
         switch (cellInfo.TowerType)
         {
             case TowerType.None:
-                state = new NormalState(BuildingUpgradeManager.Instance.NormalData);
-                Health = new Health(BuildingUpgradeManager.Instance.NormalData.MaxHealth);
+                state = new NormalState(this, BuildingUpgradeManager.Instance.NormalData);
 
                 break;
             case TowerType.Archer:
-                state = new ArcherState(BuildingUpgradeManager.Instance.ArcherData, this);
-                Health = new Health(BuildingUpgradeManager.Instance.ArcherData.Stats.MaxHealth.Value);
+                state = new ArcherState(this, BuildingUpgradeManager.Instance.ArcherData);
+
+                break;
+
+            case TowerType.Bomb:
+                state = new BombState(this, BuildingUpgradeManager.Instance.BombData);
 
                 break;
             default:
                 break;
         }
+
+        Health = new Health(state);
 
         Prototype = prot;
         Index = index;
@@ -57,18 +62,21 @@ public class BuildingData
         switch (cellInfo.TowerType)
         {
             case TowerType.None:
-                state = new NormalState(BuildingUpgradeManager.Instance.NormalData);
-                Health.SetMaxHealth(BuildingUpgradeManager.Instance.NormalData.MaxHealth);
+                state = new NormalState(this, BuildingUpgradeManager.Instance.NormalData);
 
                 break;
             case TowerType.Archer:
-                state = new ArcherState(BuildingUpgradeManager.Instance.ArcherData, this);
-                Health.SetMaxHealth(BuildingUpgradeManager.Instance.ArcherData.Stats.MaxHealth.Value);
+                state = new ArcherState(this, BuildingUpgradeManager.Instance.ArcherData);
+
+                break;
+            case TowerType.Bomb:
+                state = new BombState(this, BuildingUpgradeManager.Instance.BombData);
 
                 break;
             default:
                 break;
         }
+        Health.UpdateAttacker(state);
 
         Prototype = prot;
         CellInformation = cellInfo;

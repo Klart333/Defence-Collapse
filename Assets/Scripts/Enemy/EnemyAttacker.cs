@@ -25,7 +25,7 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
     public Vector3 OriginPosition => transform.position;
     public LayerMask LayerMask => attackData.LayerMask;
 
-    private void Start()
+    private void Awake()
     {
         animator = GetComponent<EnemyAnimator>();
         health = GetComponent<EnemyHealth>();

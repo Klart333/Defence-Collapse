@@ -9,14 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a39d9e0847bee9147a0e20c8ac4e2d3e, type: 3}
-  m_Name: Turtle Data
+  m_Script: {fileID: 11500000, guid: e365721dcb580ea40b5bdb0b995bd4ec, type: 3}
+  m_Name: Bomb Data
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 6245472720060021658, guid: c7b1bdefc0a9bdd4db8c00a84c721c62, type: 3}
+    - {fileID: 8572661992280112000, guid: 22a69d5eac306bf44a5fc4d2fdb22a77, type: 3}
+    - {fileID: 4350053413224435946, guid: 5180bb69e32deeb4b9270cef03889297, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -39,7 +40,7 @@ MonoBehaviour:
       Data: 2|Stat, Assembly-CSharp
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 0.2
     - Name: 
       Entry: 8
       Data: 
@@ -48,7 +49,7 @@ MonoBehaviour:
       Data: 3|Stat, Assembly-CSharp
     - Name: baseValue
       Entry: 4
-      Data: 0.1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -57,7 +58,7 @@ MonoBehaviour:
       Data: 4|Stat, Assembly-CSharp
     - Name: baseValue
       Entry: 4
-      Data: 0
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -66,7 +67,7 @@ MonoBehaviour:
       Data: 5|Stat, Assembly-CSharp
     - Name: baseValue
       Entry: 4
-      Data: 0
+      Data: 2
     - Name: 
       Entry: 8
       Data: 
@@ -75,7 +76,7 @@ MonoBehaviour:
       Data: 6|Stat, Assembly-CSharp
     - Name: baseValue
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -84,7 +85,7 @@ MonoBehaviour:
       Data: 7|Stat, Assembly-CSharp
     - Name: baseValue
       Entry: 4
-      Data: 100
+      Data: 20
     - Name: 
       Entry: 8
       Data: 
@@ -109,31 +110,62 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 11|Effects.ArchedDamageColliderEffect, Assembly-CSharp
+    - Name: ModifierValue
+      Entry: 4
+      Data: 0
+    - Name: LimitedHits
+      Entry: 5
+      Data: true
+    - Name: Hits
+      Entry: 3
+      Data: 1
+    - Name: Radius
+      Entry: 4
+      Data: 0.5
+    - Name: Height
+      Entry: 4
+      Data: 11
+    - Name: UnitsPerSecond
+      Entry: 4
+      Data: 5
+    - Name: Ease
+      Entry: 3
+      Data: 1
+    - Name: Effects
+      Entry: 7
+      Data: 12|System.Collections.Generic.List`1[[Effects.IEffect, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 11|Effects.DamageColliderEffect, Assembly-CSharp
+      Data: 13|Effects.DamageColliderEffect, Assembly-CSharp
     - Name: ModifierValue
       Entry: 4
-      Data: 2
+      Data: 5
     - Name: LimitedHits
       Entry: 5
       Data: false
     - Name: Hits
       Entry: 3
-      Data: 2
+      Data: 0
     - Name: Radius
       Entry: 4
-      Data: 0.3
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 12|Effects.VisualEffectEffect, Assembly-CSharp
+      Data: 14|Effects.VisualEffectEffect, Assembly-CSharp
     - Name: ModifierValue
       Entry: 4
-      Data: 0.3
+      Data: 0.5
     - Name: AttackEffect
       Entry: 10
       Data: 0
@@ -146,9 +178,21 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: AttackEffect
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[Effects.IEffect, Assembly-CSharp]],
+      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -162,10 +206,10 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  LayerMask:
+  IncomePerHouse: 2
+  Range: 5
+  RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
+    type: 3}
+  AttackLayerMask:
     serializedVersion: 2
-    m_Bits: 128
-  AttackRadius: 0.2
-  LootProbability:
-  - 0.05
-  - 0.01
+    m_Bits: 512

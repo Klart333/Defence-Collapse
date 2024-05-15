@@ -1,6 +1,7 @@
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class UIMenuPanel : MonoBehaviour
 {
@@ -23,5 +24,10 @@ public class UIMenuPanel : MonoBehaviour
         selector.DOKill();
 
         selector.DOAnchorPosY(rectTransform.localPosition.y - startOffset, duration).SetEase(Ease.OutCirc);
+    }
+
+    public void StartGame()
+    {
+        SceneManager.LoadScene(1);
     }
 }
