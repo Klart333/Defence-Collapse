@@ -122,7 +122,7 @@ public class ArcherState : BuildingState
         attack.TriggerAttack(this);
 
         float timer = attackCooldownTimer;
-        while (timer > 0 && target.Health.Alive)
+        while (timer > 0 && target != null && target.Health.Alive)
         {
             await UniTask.Yield();
 

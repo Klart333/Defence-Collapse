@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using Debug = UnityEngine.Debug;
 using Sirenix.OdinInspector;
 using Unity.VisualScripting;
+using Sirenix.Utilities;
 using System.Linq;
 using UnityEngine;
 using Buildings;
 using System;
-using Sirenix.Utilities;
-using UnityEngine.UIElements;
 
 public class BuildingManager : Singleton<BuildingManager> 
 {
@@ -41,6 +40,8 @@ public class BuildingManager : Singleton<BuildingManager>
 
     [SerializeField, ShowIf(nameof(DebugPropagate)), Range(1, 1000)]
     private int Speed;
+
+    public const float CellSize = 0.5f; // Needs to be an exponent of 2
 
     private Cell[,,] cells;
 
@@ -113,7 +114,7 @@ public class BuildingManager : Singleton<BuildingManager>
 
     private void LoadCells()
     {
-        cells = new Cell[waveFunction.GridSize.x, waveFunction.GridSize.y + 1, waveFunction.GridSize.z];
+        cells = new Cell[Mathf.RoundToInt(waveFunction.GridSize.x / CellSize), waveFunction.GridSize.y + 1, Mathf.RoundToInt(waveFunction.GridSize.z / CellSize)];
         emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 1, new int[0]);
         unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 0, new int[0]);
 
@@ -123,7 +124,7 @@ public class BuildingManager : Singleton<BuildingManager>
             {
                 for (int x = 0; x < cells.GetLength(0); x++)
                 {
-                    Vector3 pos = new Vector3(x * waveFunction.GridScale.x, y * waveFunction.GridScale.y, z * waveFunction.GridScale.z);
+                    Vector3 pos = new Vector3(x * CellSize * waveFunction.GridScale.x, y * waveFunction.GridScale.y, z * CellSize * waveFunction.GridScale.z);
                     cells[x, y, z] = new Cell(false, pos + transform.position, new List<PrototypeData>() { emptyPrototype });
                 }
             }
@@ -135,28 +136,33 @@ public class BuildingManager : Singleton<BuildingManager>
             {
                 for (int x = 0; x < cells.GetLength(0); x++)
                 {
-                    if (y == cells.GetLength(1) - 1) // Just put air at the top
-                    {
-                        cells[x, y, z] = new Cell(true, cells[x, y, z].Position, new List<PrototypeData>() { unbuildablePrototype }, false);
-                        continue;
-                    }
-
-                    Cell groundCell = waveFunction.GetCellAtIndex(z, y, x);
-                    if (groundCell.PossiblePrototypes[0].MeshRot.Mesh == null) // It's air
-                    {
-                        cells[x, y, z] = new Cell(true, cells[x, y, z].Position, new List<PrototypeData>() { unbuildablePrototype }, false);
-                    }
-                    else if (groundCell.PossiblePrototypes[0].MeshRot.Mesh.name == "Ground_Portal") // yay hard coded names :))))
-                    {
-                        //int index = 0 + ((groundCell.PossiblePrototypes[0].MeshRot.Rot + 1) % 4);
-                        //SetCell(new Vector3Int(x, y, z), pathPrototypeInfo.Prototypes[index], false);
-                        //SetCell(new Vector3Int(x, y - 1, z), groundPathPrototype, false);
-                    }
+                    Vector3Int cellIndex = new Vector3Int(x, y, z);
+                    Vector3Int gridIndex = new Vector3Int(Mathf.FloorToInt(x * CellSize), y, Mathf.FloorToInt(z * CellSize));
+                    SetCell(cellIndex, gridIndex); 
                 }
             }
         }
+    }
 
-        
+    private void SetCell(Vector3Int cellIndex, Vector3Int gridIndex)
+    {
+        if (gridIndex.y == cells.GetLength(1) - 1) // Just put air at the top
+        {
+            cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(true, cells[cellIndex.x, cellIndex.y, gridIndex.z].Position, new List<PrototypeData>() { unbuildablePrototype }, false);
+            return;
+        }
+
+        Cell groundCell = waveFunction.GetCellAtIndex(gridIndex);
+        if (groundCell.PossiblePrototypes[0].MeshRot.Mesh == null) // It's air
+        {
+            cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(true, cells[cellIndex.x, cellIndex.y, cellIndex.z].Position, new List<PrototypeData>() { unbuildablePrototype }, false);
+        }
+        else if (groundCell.PossiblePrototypes[0].MeshRot.Mesh.name == "Ground_Portal") // yay hard coded names :))))
+        {
+            //int index = 0 + ((groundCell.PossiblePrototypes[0].MeshRot.Rot + 1) % 4);
+            //SetCell(new Vector3Int(x, y, z), pathPrototypeInfo.Prototypes[index], false);
+            //SetCell(new Vector3Int(x, y - 1, z), groundPathPrototype, false);
+        }
     }
 
     private bool LoadPrototypeData()
@@ -342,8 +348,8 @@ public class BuildingManager : Singleton<BuildingManager>
         switch (type)
         {
             case BuildingType.Castle:
-                Vector3 minPos = new Vector3(queryPos.x - 2f, queryPos.y, queryPos.z - 2f);
-                Vector3 maxPos = new Vector3(queryPos.x + 2, queryPos.y, queryPos.z + 2);
+                Vector3 minPos = new(queryPos.x - CellSize * 2, queryPos.y, queryPos.z - CellSize * 2);
+                Vector3 maxPos = new(queryPos.x + CellSize * 2, queryPos.y, queryPos.z + CellSize * 2);
                 cellsToCollapse = GetAllCells(minPos, maxPos);
                 break;
             case BuildingType.Building:
@@ -355,6 +361,7 @@ public class BuildingManager : Singleton<BuildingManager>
                 cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3.up * waveFunction.GridScale.y));
                 break;
         }
+        cellsToCollapse.ForEach((x) => Debug.Log("Cell: " + x));
 
         return cellsToCollapse;
     }
@@ -674,11 +681,11 @@ public class BuildingManager : Singleton<BuildingManager>
     {
         List<Vector3Int> surrounding = new List<Vector3Int>();
 
-        for (float x = min.x; x <= max.x; x += waveFunction.GridScale.x)
+        for (float x = min.x; x <= max.x; x += waveFunction.GridScale.x * CellSize)
         {
             for (float y = min.y; y <= max.y; y += waveFunction.GridScale.y)
             {
-                for (float z = min.z; z <= max.z; z += waveFunction.GridScale.z)
+                for (float z = min.z; z <= max.z; z += waveFunction.GridScale.z * CellSize)
                 {
                     Vector3Int? index = GetIndex(new Vector3(x, y, z));
                     if (index.HasValue)
@@ -698,7 +705,7 @@ public class BuildingManager : Singleton<BuildingManager>
         {
             for (int z = -1; z <= 1; z += 2)
             {
-                Vector3Int? index = GetIndex(queryPosition + Vector3.right * x + Vector3.forward * z);
+                Vector3Int? index = GetIndex(queryPosition + Vector3.right * x * CellSize + Vector3.forward * z * CellSize);
                 if (index.HasValue)
                 {
                     surrounding.Add(index.Value);
@@ -730,7 +737,7 @@ public class BuildingManager : Singleton<BuildingManager>
 
     public Vector3Int? GetIndex(Vector3 pos)
     {
-        Vector3Int index = new Vector3Int(Math.GetMultiple(pos.x, waveFunction.GridScale.x), Math.GetMultiple(pos.y, waveFunction.GridScale.y), Math.GetMultiple(pos.z, waveFunction.GridScale.z));
+        Vector3Int index = new Vector3Int(Math.GetMultiple(pos.x, waveFunction.GridScale.x * CellSize), Math.GetMultiple(pos.y, waveFunction.GridScale.y), Math.GetMultiple(pos.z, waveFunction.GridScale.z * CellSize));
         if (cells.IsInBounds(index.x, index.y, index.z))
         {
             return index;
@@ -759,12 +766,13 @@ public class BuildingManager : Singleton<BuildingManager>
 
             if (prototypeData.NegY != "-1s" || prototypeData.PosY != "-1s")
             {
-                scale = new Vector3(1, waveFunction.GridScale.y / 2.0f, 1);
+                scale = new Vector3(CellSize, waveFunction.GridScale.y / 2.0f, CellSize);
             }
         }
         else
         {
             building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
+            scale = new Vector3(CellSize, waveFunction.GridScale.y / 2.0f, CellSize);
         }
 
         building.Setup(prototypeData, scale);

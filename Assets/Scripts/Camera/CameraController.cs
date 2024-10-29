@@ -57,7 +57,7 @@ public class CameraController : MonoBehaviour
 
     private void HandleScroll()
     {
-        float scrollDiff = scroll.ReadValue<Vector2>().y / -120.0f;
+        float scrollDiff = scroll.ReadValue<Vector2>().y / -12.0f;
         float moveDiff = (up.ReadValue<float>() - down.ReadValue<float>()) / 20.0f;
 
         if (Mathf.Abs(scrollDiff) > 0.1f)
