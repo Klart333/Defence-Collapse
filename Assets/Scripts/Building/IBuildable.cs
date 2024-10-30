@@ -3,6 +3,8 @@ using UnityEngine;
 
 public interface IBuildable
 {
+    public int Importance { get; }
+
     public GameObject gameObject { get; }
     public void Setup(PrototypeData prototypeData, Vector3 scale);
     public void ToggleIsBuildableVisual(bool value);

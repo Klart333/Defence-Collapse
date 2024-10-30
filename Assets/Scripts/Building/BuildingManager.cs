@@ -7,6 +7,8 @@ using System.Linq;
 using UnityEngine;
 using Buildings;
 using System;
+using UnityEditor;
+using UnityEngine.UIElements;
 
 public class BuildingManager : Singleton<BuildingManager> 
 {
@@ -41,7 +43,7 @@ public class BuildingManager : Singleton<BuildingManager>
     [SerializeField, ShowIf(nameof(DebugPropagate)), Range(1, 1000)]
     private int Speed;
 
-    public const float CellSize = 0.5f; // Needs to be an exponent of 2
+    public const float CellSize = 0.5f; // Needs to be an exponent of 2, probably
 
     private Cell[,,] cells;
 
@@ -72,7 +74,7 @@ public class BuildingManager : Singleton<BuildingManager>
 
     private void OnEnable()
     {
-        waveFunction = FindObjectOfType<WaveFunction>();
+        waveFunction = FindFirstObjectByType<WaveFunction>();
         buildingAnimator = GetComponent<BuildingAnimator>();
 
         waveFunction.OnMapGenerated += Load;
@@ -152,10 +154,14 @@ public class BuildingManager : Singleton<BuildingManager>
             return;
         }
 
-        Cell groundCell = waveFunction.GetCellAtIndex(gridIndex);
+        Cell groundCell = waveFunction.GetCellAtIndexInverse(gridIndex);
         if (groundCell.PossiblePrototypes[0].MeshRot.Mesh == null) // It's air
         {
-            cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(true, cells[cellIndex.x, cellIndex.y, cellIndex.z].Position, new List<PrototypeData>() { unbuildablePrototype }, false);
+            cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(
+                true, 
+                cells[cellIndex.x, cellIndex.y, cellIndex.z].Position, 
+                new List<PrototypeData>() { unbuildablePrototype }, 
+                false);
         }
         else if (groundCell.PossiblePrototypes[0].MeshRot.Mesh.name == "Ground_Portal") // yay hard coded names :))))
         {
@@ -361,7 +367,7 @@ public class BuildingManager : Singleton<BuildingManager>
                 cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3.up * waveFunction.GridScale.y));
                 break;
         }
-        cellsToCollapse.ForEach((x) => Debug.Log("Cell: " + x));
+        //cellsToCollapse.ForEach((x) => Debug.Log("Cell: " + x));
 
         return cellsToCollapse;
     }
@@ -705,7 +711,7 @@ public class BuildingManager : Singleton<BuildingManager>
         {
             for (int z = -1; z <= 1; z += 2)
             {
-                Vector3Int? index = GetIndex(queryPosition + Vector3.right * x * CellSize + Vector3.forward * z * CellSize);
+                Vector3Int? index = GetIndex(queryPosition + CellSize * x * Vector3.right + Vector3.forward * z * CellSize);
                 if (index.HasValue)
                 {
                     surrounding.Add(index.Value);
@@ -759,27 +765,46 @@ public class BuildingManager : Singleton<BuildingManager>
         }
 
         IBuildable building;
-        Vector3 scale = Vector3.one;
         if (prototypeData.MeshRot.Mesh.name.Contains("Path")) // Not my best work
         {
             building = pathPrefab.GetAtPosAndRot<Path>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
-
-            if (prototypeData.NegY != "-1s" || prototypeData.PosY != "-1s")
-            {
-                scale = new Vector3(CellSize, waveFunction.GridScale.y / 2.0f, CellSize);
-            }
         }
         else
         {
             building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
-            scale = new Vector3(CellSize, waveFunction.GridScale.y / 2.0f, CellSize);
         }
 
+        Vector3 scale = new Vector3(CellSize, waveFunction.GridScale.y / 2.0f, CellSize);
         building.Setup(prototypeData, scale);
 
-        if (animate) buildingAnimator.Animate(building.gameObject);
+        if (animate) buildingAnimator.Animate(building);
 
         return building;
+    }
+
+    #endregion
+
+    #region Debug
+
+    private void OnDrawGizmosSelected()
+    {
+        if (!EditorApplication.isPlaying)
+        {
+            return;
+        }
+
+        for (int z = 0; z < cells.GetLength(2); z++)
+        {
+            for (int y = 0; y < cells.GetLength(1); y++)
+            {
+                for (int x = 0; x < cells.GetLength(0); x++)
+                {
+                    Vector3 pos = cells[x, y, z].Position;
+                    Gizmos.color = cells[x, y, z].Buildable ? Color.white : Color.red;
+                    Gizmos.DrawWireCube(pos, new Vector3(waveFunction.GridScale.x * CellSize, waveFunction.GridScale.y, waveFunction.GridScale.z * CellSize) * 0.4f);
+                }
+            }
+        }
     }
 
     #endregion

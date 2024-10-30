@@ -1,9 +1,8 @@
-using Sirenix.OdinInspector;
-using Sirenix.Serialization;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using System;
 
 public class BuildingHandler : SerializedMonoBehaviour 
 {

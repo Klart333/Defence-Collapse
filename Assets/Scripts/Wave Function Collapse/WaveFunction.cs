@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.Rendering.VolumeComponent;
 using Debug = UnityEngine.Debug;
 
 public class WaveFunction : MonoBehaviour
@@ -718,6 +719,12 @@ public class WaveFunction : MonoBehaviour
     }
 
     #region API
+
+    public Cell GetCellAtIndexInverse(Vector3Int index)
+    {
+        int dex = (index.z * gridSizeY * gridSizeZ) + (index.y * gridSizeZ) + index.x;
+        return cells[dex];
+    }
 
     public Cell GetCellAtIndex(Vector3Int index)
     {

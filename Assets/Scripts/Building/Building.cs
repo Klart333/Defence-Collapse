@@ -22,6 +22,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     private BuildingAnimator buildingAnimator;
     private MeshRenderer meshRenderer;
     private BuildingUI buildingUI;
+    private BoxCollider boxCollider;
 
     private int originalLayer;
     
@@ -33,6 +34,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     public int BuildingGroupIndex { get; set; } = -1;
     public PrototypeData Prototype { get; set; }
     public Vector3Int Index { get; set; }
+    public int Importance => 1;
 
     public BuildingUI BuildingUI
     {
@@ -84,6 +86,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     private void Awake()
     {
         originalLayer = gameObject.layer;
+        boxCollider = GetComponent<BoxCollider>();
     }
 
     private void OnEnable()
@@ -217,6 +220,7 @@ public class Building : PooledMonoBehaviour, IBuildable
             transparentMaterials.Add(transparentGreen);
         }
 
+        boxCollider.size = new Vector3(scale.x * 2, 0.04f, scale.z * 2);
         MeshRenderer.transform.localScale = scale;
     }
 

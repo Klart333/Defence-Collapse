@@ -1,7 +1,5 @@
-﻿using Sirenix.OdinInspector;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Buildings
@@ -21,6 +19,7 @@ namespace Buildings
         private MeshRenderer meshRenderer;
         
         public PrototypeData PrototypeData { get; private set; }
+        public int Importance => 0;
 
         public MeshRenderer MeshRenderer
         {

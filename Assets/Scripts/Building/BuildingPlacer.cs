@@ -18,7 +18,7 @@ public class BuildingPlacer : MonoBehaviour
     private Camera cam;
 
     private bool manualCancel = false;
-    private bool canceled
+    private bool Canceled
     {
         get
         {
@@ -53,7 +53,7 @@ public class BuildingPlacer : MonoBehaviour
 
         List<Vector3Int> indexes = new List<Vector3Int>();
         Dictionary<Vector3Int, IBuildable> buildables = new Dictionary<Vector3Int, IBuildable>();
-        while (!canceled)
+        while (!Canceled)
         {
             await Task.Yield();
 
@@ -98,7 +98,7 @@ public class BuildingPlacer : MonoBehaviour
             PlaceBuilding(type);
         }
 
-        if (canceled)
+        if (Canceled)
         {
             DisablePlaces();
             BuildingManager.Instance.RevertQuery();

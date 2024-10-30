@@ -89,7 +89,7 @@ public class BuildingData
         UpdateState(cellInfo, prot);
         Building building = handler.GetBuilding(Index);
 
-        building.Setup(prot, Vector3.one);
+        building.Setup(prot, building.MeshRenderer.transform.localScale);
         building.DisplayLevelUp();
     }
 
