@@ -726,6 +726,12 @@ public class WaveFunction : MonoBehaviour
         return cells[dex];
     }
 
+    public Cell GetCellAtIndexInverse(int x, int y, int z)
+    {
+        int dex = (z * gridSizeY * gridSizeZ) + (y * gridSizeZ) + x;
+        return cells[dex];
+    }
+
     public Cell GetCellAtIndex(Vector3Int index)
     {
         return GetCellAtIndex(index.x, index.y, index.z);

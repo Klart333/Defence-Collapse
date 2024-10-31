@@ -1,9 +1,7 @@
-﻿using Sirenix.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEditor.Experimental.GraphView;
+using Sirenix.Utilities;
+using System.Linq;
 using UnityEngine;
 
 public class PathHandler : MonoBehaviour
@@ -12,8 +10,8 @@ public class PathHandler : MonoBehaviour
     private Node[,,] nodes;
 
     private List<Vector3Int> portalIndexes = new List<Vector3Int>();
-    private HashSet<Vector3Int> buildingPositions = new HashSet<Vector3Int>();
-    private HashSet<Vector3Int> blacklistedBuildingPositions = new HashSet<Vector3Int>();
+    private readonly HashSet<Vector3Int> buildingPositions = new HashSet<Vector3Int>();
+    private readonly HashSet<Vector3Int> blacklistedBuildingPositions = new HashSet<Vector3Int>();
 
     private BuildingHandler buildingHandler;
     private WaveFunction waveFunction;
@@ -55,7 +53,7 @@ public class PathHandler : MonoBehaviour
             {
                 for (int x = 0; x < waveFunction.GridSize.x; x++)
                 {
-                    Cell groundCell = waveFunction.GetCellAtIndex(z, y, x);
+                    Cell groundCell = waveFunction.GetCellAtIndexInverse(x, y, z);
                     if (groundCell.PossiblePrototypes[0].MeshRot.Mesh == null) // It's air
                     {
                         groundNodes[x, y, z] = new Node(false, groundCell.Position);
@@ -117,7 +115,7 @@ public class PathHandler : MonoBehaviour
 
         for (int i = 0; i < portalIndexes.Count; i++)
         {
-            List<Node> path = PathFinding.FindPath(BuildingManager.Instance.GetPos(portalIndexes[i]), castlePos, groundNodes);
+            List<Node> path = PathFinding.FindPath(waveFunction.GetCellAtIndex(portalIndexes[i]).Position, castlePos, groundNodes);
             if (path != null)
             {
                 if (path.Count < closest)
@@ -128,7 +126,7 @@ public class PathHandler : MonoBehaviour
         }
 
         print("Closest Path: " + closest);
-        return closest;
+        return Mathf.CeilToInt(closest / BuildingManager.Instance.CellSize);
     }
 
     public List<(Vector3, Vector3)> GetEnemySpawnPoints()
@@ -139,7 +137,7 @@ public class PathHandler : MonoBehaviour
         // At least one portal must connect to the castle
         for (int i = 0; i < portalIndexes.Count; i++)
         {
-            Vector3 portalPos = BuildingManager.Instance.GetPos(portalIndexes[i]);
+            Vector3 portalPos = waveFunction.GetCellAtIndex(portalIndexes[i]).Position;
             var path = PathFinding.FindPath(portalPos, castlePos, nodes);
             
             if (path != null)
@@ -156,26 +154,23 @@ public class PathHandler : MonoBehaviour
         List<(Vector3, Vector3)> spawnPoints = new List<(Vector3, Vector3)>();
         for (int i = 0; i < portalIndexes.Count; i++)
         {
-            Vector3 portalPos = BuildingManager.Instance.GetPos(portalIndexes[i]);
+            Vector3 portalPos = waveFunction.GetCellAtIndexInverse(portalIndexes[i]).Position;
             Vector3Int? target = PathFinding.BreadthFirstSearch(portalPos, buildingPositions, nodes);
 
             if (target.HasValue)
             {
-                spawnPoints.Add((portalPos + GetOffset(), BuildingManager.Instance[target.Value].Position));
+                spawnPoints.Add((portalPos + new Vector3(1, 0, 1), BuildingManager.Instance[target.Value].Position));
             }
         }
 
         return spawnPoints;
-    }
-
-    private Vector3 GetOffset()
-    {
-        return new Vector3(1, 0, 1);
-    }
+    } 
 
     private void UpdateNodeMap()
     {
-        nodes = new Node[waveFunction.GridSize.x, waveFunction.GridSize.y, waveFunction.GridSize.z];
+        nodes = new Node[Mathf.RoundToInt(waveFunction.GridSize.x / BuildingManager.Instance.CellSize), 
+            waveFunction.GridSize.y + 1, 
+            Mathf.RoundToInt(waveFunction.GridSize.z / BuildingManager.Instance.CellSize)];
 
         for (int z = 0; z < nodes.GetLength(2); z++)
         {

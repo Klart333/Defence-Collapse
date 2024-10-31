@@ -77,7 +77,12 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnEnemy(EnemyMovement enemy)
     {
-        int spawnPoints = UnityEngine.Random.Range(1, currentSpawnPoints.Count + 1);
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
+        int spawnPoints = UnityEngine.Random.Range(1, currentSpawnPoints.Count);
         for (int i = 0; i < spawnPoints; i++)
         {
             int spawnIndex = UnityEngine.Random.Range(0, currentSpawnPoints.Count);

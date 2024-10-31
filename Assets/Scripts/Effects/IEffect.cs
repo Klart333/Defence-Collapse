@@ -5,6 +5,7 @@ using Sirenix.Serialization;
 using UnityEngine;
 using DG.Tweening;
 using System;
+using System.Linq;
 
 namespace Effects
 {
@@ -233,6 +234,8 @@ namespace Effects
         [Title("Collider")]
         public float Radius = 1;
 
+        public bool TriggerDamageDone = true;
+
         public void Perform(IAttacker unit)
         {
             Vector3 pos = unit.AttackPosition;
@@ -240,25 +243,25 @@ namespace Effects
             DamageInstance dmg = new DamageInstance
             {
                 Damage = ModifierValue * unit.Stats.DamageMultiplier.Value,
-                Source = unit
+                Source = unit,
+                AttackPosition = pos,
             };
 
-            DamageCollider collider = ColliderManager.Instance.GetCollider(pos, Radius, layermask: unit.LayerMask);
+            DamageCollider collider = ColliderManager.Instance.GetCollider(pos, Radius, layermask: unit.LayerMask, triggerDamageDone: TriggerDamageDone);
             collider.Attacker = unit;
             collider.DamageInstance = dmg;
 
             if (LimitedHits)
             {
                 int hits = 0;
-                Action LimitHitAction = null;
-                LimitHitAction = () =>
+                void LimitHitAction()
                 {
                     if (++hits >= Hits)
                     {
                         collider.OnHit -= LimitHitAction;
                         collider.gameObject.SetActive(false);
                     }
-                };
+                }
 
                 collider.OnHit += LimitHitAction;
             }
@@ -301,13 +304,13 @@ namespace Effects
 
         public void Perform(IAttacker attacker)
         {
+            Vector3 targetPosition = attacker.AttackPosition;
             DamageInstance dmg = new DamageInstance
             {
                 Damage = ModifierValue * attacker.Stats.DamageMultiplier.Value,
-                Source = attacker
+                Source = attacker,
+                AttackPosition = targetPosition
             };
-
-            Vector3 targetPosition = attacker.AttackPosition;
 
             float distance = Vector3.Distance(attacker.OriginPosition, targetPosition) + Height;
             float lifetime = distance / UnitsPerSecond;
@@ -482,6 +485,7 @@ namespace Effects
                 TargetHit = damageToDOT.TargetHit,
                 CritMultiplier = unit.Stats.GetCritMultiplier(),
                 SpecialEffectSet = damageToDOT.SpecialEffectSet,
+                AttackPosition = damageToDOT.AttackPosition,
             };
 
             dotInstance.SpecialEffectSet.Add(EffectKey);
@@ -489,7 +493,12 @@ namespace Effects
             for (int i = 0; i < ticks; i++)
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(tickRate));
+                if (dotInstance.TargetHit == null)
+                {
+                    break;
+                }
 
+                dotInstance.AttackPosition = dotInstance.TargetHit.Attacker.OriginPosition;
                 dotInstance.TargetHit.TakeDamage(dotInstance, out DamageInstance damageDone);
 
                 if (!damageDone.SpecialEffectSet.Contains(EffectKey))
@@ -745,20 +754,34 @@ namespace Effects
         [OdinSerialize]
         public List<IEffect> Effects { get; set; }
 
+        [Title("Delay")]
+        public bool UseDelay = false;
+
+        [ShowIf(nameof(UseDelay))]
+        public float[] Delays;
+
         public IEffectHolder Clone()
         {
             return new OnDamageTargetedEffect()
             {
-                Effects = new List<IEffect>(),
-                ModifierValue = ModifierValue
+                Effects = new List<IEffect>(Effects),
+                ModifierValue = ModifierValue,
+                UseDelay = UseDelay,
+                Delays = Delays
             };
         }
 
-        public void Perform(IAttacker attacker)
+        public async void Perform(IAttacker attacker)
         {
-            attacker.AttackPosition = attacker.LastDamageDone.TargetHit.Attacker.OriginPosition;
+            Vector3 attackPosition = attacker.LastDamageDone.AttackPosition;
             for (int i = 0; i < Effects.Count; i++)
             {
+                if (UseDelay && i < Delays.Length)
+                {
+                    await UniTask.Delay(TimeSpan.FromSeconds(Delays[i]));
+                }
+
+                attacker.AttackPosition = attackPosition;
                 Effects[i].Perform(attacker);
             }
         }

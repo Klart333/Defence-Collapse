@@ -18,4 +18,10 @@ public class LootData : SerializedScriptableObject
             LootEffects[i].Perform(grade);
         }
     }
+
+    [Button]
+    public void AddModifierEditorOnly()
+    {
+        Perform(0);
+    }
 }

@@ -124,10 +124,10 @@ public class ArcherState : BuildingState
         float timer = attackCooldownTimer;
         while (timer > 0 && target != null && target.Health.Alive)
         {
-            await UniTask.Yield();
-
             timer -= Time.deltaTime;
             AttackPosition = target.transform.position;
+
+            await UniTask.Yield();
         }
     }
 

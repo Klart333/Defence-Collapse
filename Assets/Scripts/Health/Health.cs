@@ -51,22 +51,22 @@ public class Health : IHealth
             return;
         }
 
+        damageDone = new DamageInstance(damage);
         for (int i = 0; i < StatusEffects.Count; i++)
         {
-            StatusEffects[i].TriggerEFfect(ref damage);
+            StatusEffects[i].TriggerEFfect(ref damageDone);
         }
 
-        LastDamageTaken = damage;
-        damageDone = damage;
+        LastDamageTaken = damageDone;
         damageDone.TargetHit = this;
 
-        CurrentHealth -= damage.Damage;
+        CurrentHealth -= damageDone.Damage;
 
         OnTakeDamage?.Invoke();
 
         if (CurrentHealth <= 0)
         {
-            Die(damage);
+            Die(damageDone);
         }
     }
 

@@ -11,6 +11,7 @@ public class DamageCollider : PooledMonoBehaviour
     public DamageInstance DamageInstance {  get; set; }
     public IAttacker Attacker { get; set; }
     public LayerMask LayerMask { get; set; }
+    public bool TriggerDamageDone {  get; set; }
 
     protected override void OnDisable()
     {
@@ -28,7 +29,10 @@ public class DamageCollider : PooledMonoBehaviour
         if ((LayerMask.value & 1 << other.gameObject.layer) > 0 && other.TryGetComponent(out IHealth health) && health != Attacker.Health)
         {
             health.TakeDamage(DamageInstance, out DamageInstance damageDone);
-            Attacker.OnUnitDoneDamage(damageDone);
+            if (TriggerDamageDone)
+            {
+                Attacker.OnUnitDoneDamage(damageDone);
+            }
             OnHit?.Invoke();
         }
     }

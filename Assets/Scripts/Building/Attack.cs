@@ -48,7 +48,7 @@ public class Attack
             return;
         }
 
-        EffectHolders[EffectHolders.Count - 1].Perform(attacker);
+        EffectHolders[^1].Perform(attacker);
     }
 
     public void OnDoneDamage(IAttacker attacker)
