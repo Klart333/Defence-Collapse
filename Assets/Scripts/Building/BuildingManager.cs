@@ -32,9 +32,8 @@ public class BuildingManager : Singleton<BuildingManager>
     [SerializeField]
     private Path pathPrefab;
 
-    [Title("Castle")]
     [SerializeField]
-    private int CastleIndex = 20;
+    private GroundCellBuildableUtility cellBuildableUtility;
 
     [Title("Debug")]
     [SerializeField]
@@ -129,8 +128,8 @@ public class BuildingManager : Singleton<BuildingManager>
             {
                 for (int x = 0; x < cells.GetLength(0); x++)
                 {
-                    Vector3 pos = new Vector3(x * cellSize * waveFunction.GridScale.x, y * waveFunction.GridScale.y, z * cellSize * waveFunction.GridScale.z);
-                    cells[x, y, z] = new Cell(false, pos + transform.position, new List<PrototypeData>() { emptyPrototype });
+                    Vector3 pos = new Vector3(x * cellSize * waveFunction.GridScale.x - 0.5f, y * waveFunction.GridScale.y, z * cellSize * waveFunction.GridScale.z - 0.5f);
+                    cells[x, y, z] = new Cell(false, pos + transform.position, new List<PrototypeData>() { emptyPrototype }, true);
                 }
             }
         }
@@ -151,26 +150,28 @@ public class BuildingManager : Singleton<BuildingManager>
 
     private void SetCell(Vector3Int cellIndex, Vector3Int gridIndex)
     {
+        Vector3 cellPosition = cells[cellIndex.x, cellIndex.y, cellIndex.z].Position;
         if (gridIndex.y == cells.GetLength(1) - 1) // Just put air at the top
         {
-            cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(true, cells[cellIndex.x, cellIndex.y, gridIndex.z].Position, new List<PrototypeData>() { unbuildablePrototype }, false);
+            cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(true, cellPosition, new List<PrototypeData>() { unbuildablePrototype }, false);
             return;
         }
 
         Cell groundCell = waveFunction.GetCellAtIndexInverse(gridIndex);
-        if (groundCell.PossiblePrototypes[0].MeshRot.Mesh == null) // It's air
+        if (cellIndex.y <= 1)
+        {
+            Debug.DrawLine(cellPosition, groundCell.Position, Color.yellow, 100, false);
+        }
+
+        Vector2 corner = new Vector2(Mathf.Sign(groundCell.Position.x - cellPosition.x), Mathf.Sign(groundCell.Position.z - cellPosition.z));
+
+        if (!cellBuildableUtility.IsBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner))
         {
             cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(
-                true, 
-                cells[cellIndex.x, cellIndex.y, cellIndex.z].Position, 
-                new List<PrototypeData>() { unbuildablePrototype }, 
+                true,
+                cellPosition,
+                new List<PrototypeData>() { unbuildablePrototype },
                 false);
-        }
-        else if (groundCell.PossiblePrototypes[0].MeshRot.Mesh.name == "Ground_Portal") // yay hard coded names :))))
-        {
-            //int index = 0 + ((groundCell.PossiblePrototypes[0].MeshRot.Rot + 1) % 4);
-            //SetCell(new Vector3Int(x, y, z), pathPrototypeInfo.Prototypes[index], false);
-            //SetCell(new Vector3Int(x, y - 1, z), groundPathPrototype, false);
         }
     }
 
@@ -302,7 +303,7 @@ public class BuildingManager : Singleton<BuildingManager>
                 {
                     return querySpawnedBuildings;
                 }
-                SetCell(cellsToCollapse[4], prototypes[CastleIndex]);
+                SetCell(cellsToCollapse[4], prototypes[townPrototypeInfo.CastleIndex]);
                 break;
 
             case BuildingType.Building:
@@ -777,7 +778,7 @@ public class BuildingManager : Singleton<BuildingManager>
             building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
         }
 
-        Vector3 scale = new Vector3(cellSize, waveFunction.GridScale.y * cellSize, cellSize);
+        Vector3 scale = new Vector3(cellSize, /*waveFunction.GridScale.y **/ cellSize, cellSize);
         building.Setup(prototypeData, scale);
 
         if (animate) buildingAnimator.Animate(building);
@@ -798,13 +799,13 @@ public class BuildingManager : Singleton<BuildingManager>
 
         for (int z = 0; z < cells.GetLength(2); z++)
         {
-            for (int y = 0; y < cells.GetLength(1); y++)
+            for (int y = 0; y < 2; y++)
             {
                 for (int x = 0; x < cells.GetLength(0); x++)
                 {
                     Vector3 pos = cells[x, y, z].Position;
                     Gizmos.color = cells[x, y, z].Buildable ? Color.white : Color.red;
-                    Gizmos.DrawWireCube(pos, new Vector3(waveFunction.GridScale.x * cellSize, waveFunction.GridScale.y, waveFunction.GridScale.z * cellSize) * 0.4f);
+                    Gizmos.DrawWireCube(pos, new Vector3(waveFunction.GridScale.x * cellSize, waveFunction.GridScale.y, waveFunction.GridScale.z * cellSize) * 0.75f);
                 }
             }
         }
@@ -847,4 +848,3 @@ public static class ArrayHelper
         return array.IsInBounds(index.x, index.y);
     }
 }
-

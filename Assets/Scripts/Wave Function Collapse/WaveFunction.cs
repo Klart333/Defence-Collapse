@@ -1,10 +1,13 @@
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using static UnityEngine.Rendering.VolumeComponent;
 using Debug = UnityEngine.Debug;
@@ -34,13 +37,6 @@ public class WaveFunction : MonoBehaviour
     [Header("Prototypes")]
     [SerializeField]
     private PrototypeInfoCreator groundPrototypeInfo;
-
-    [Header("Rules")]
-    [SerializeField]
-    private int[] notAllowedForBottom;
-
-    [SerializeField]
-    private int[] notAllowedForSides;
 
     [Header("Speed Limits")]
     [SerializeField]
@@ -594,8 +590,7 @@ public class WaveFunction : MonoBehaviour
         bottomPrototypes.Clear();
         for (int i = 0; i < prototypes.Count; i++)
         {
-            int meshIndex = Mathf.FloorToInt((float)i / 4.0f);
-            if (notAllowedForBottom.Contains(meshIndex))
+            if (groundPrototypeInfo.NotAllowedForBottom.Contains(i))
             {
                 continue;
             }
@@ -630,9 +625,9 @@ public class WaveFunction : MonoBehaviour
 
                         if (x == 0 || x == gridSizeX - 1 || z == 0 || z == gridSizeZ - 1)
                         {
-                            for (int i = 0; i < notAllowedForSides.Length; i++)
+                            for (int i = 0; i < groundPrototypeInfo.NotAllowedForSides.Count; i++)
                             {
-                                prots.RemoveRange(notAllowedForSides[i] * 4, 4);
+                                prots.RemoveAt(groundPrototypeInfo.NotAllowedForSides[i]);
                             }
                         }
                     }
@@ -657,8 +652,8 @@ public class WaveFunction : MonoBehaviour
         gm.transform.position = position;
         gm.transform.rotation = Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0);
         gm.transform.SetParent(transform, true);
-
-        gm.transform.localScale *= scale;
+        
+        gm.transform.localScale = GridScale / 2 * scale;
 
         return gm;
     }
@@ -750,8 +745,26 @@ public class WaveFunction : MonoBehaviour
     }
 
     #endregion
-}
 
+    #region Debug
+
+    private void OnDrawGizmosSelected()
+    {
+        if (!EditorApplication.isPlaying)
+        {
+            return;
+        }
+
+        foreach (var cell in cells)
+        {
+            Vector3 pos = cell.Position;
+            Gizmos.color = cell.Buildable ? Color.white : Color.red;
+            Gizmos.DrawWireCube(pos, new Vector3(GridScale.x, GridScale.y, GridScale.z) * 0.75f);
+        }
+    }
+
+    #endregion
+}
 [System.Serializable]
 public struct MeshWithRotation
 {

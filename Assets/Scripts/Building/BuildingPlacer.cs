@@ -13,7 +13,7 @@ public class BuildingPlacer : MonoBehaviour
     [SerializeField]
     private PooledMonoBehaviour unableToPlacePrefab;
 
-    private List<PooledMonoBehaviour> spawnedPlaces = new List<PooledMonoBehaviour>();
+    private readonly List<PooledMonoBehaviour> spawnedPlaces = new List<PooledMonoBehaviour>();
 
     private Camera cam;
 
@@ -58,7 +58,7 @@ public class BuildingPlacer : MonoBehaviour
             await Task.Yield();
 
             Vector3 mousePos = GetRayPoint();
-            if (mousePos == Vector3.zero || mousePos.x % 1 == 0 || mousePos.z % 1 == 0 || mousePos.y < 1) continue;
+            if (mousePos == Vector3.zero || mousePos.x % 1 == 0 || mousePos.z % 1 == 0 || mousePos.y < 0.2f) continue;
 
             List<Vector3Int> newIndexes = BuildingManager.Instance.GetCellsToCollapse(mousePos, type);
             if (indexes.LooseEquals(newIndexes) || newIndexes.Count == 0)

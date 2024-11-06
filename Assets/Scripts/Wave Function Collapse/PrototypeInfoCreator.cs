@@ -1,10 +1,9 @@
-using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using System.Collections.Generic;
-using System.Linq;
+using UnityEngine.UIElements;
+using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.UIElements;
+using System.Linq;
 
 public class PrototypeInfoCreator : MonoBehaviour
 {
@@ -30,6 +29,16 @@ public class PrototypeInfoCreator : MonoBehaviour
     [SerializeField, ShowIf(nameof(overrideVerticalNegative))]
     private string negativeKey = "v-1_0";
 
+    [Title("Rules")]
+    [SerializeField]
+    private List<int> notAllowedBottomIndexes;
+
+    [SerializeField]
+    private List<int> notAllowedSideIndexes;
+
+    [SerializeField]
+    private int castlePrototypeIndex;
+
     [Title("Scale")]
     [SerializeField]
     private Vector3 moduleScale;
@@ -42,6 +51,15 @@ public class PrototypeInfoCreator : MonoBehaviour
 
     [SerializeField]
     private List<DicData> verticalSocketList = new List<DicData>();
+
+    [SerializeField]
+    private List<int> notAllowedForBottom = new List<int>();
+
+    [SerializeField]
+    private List<int> notAllowedForSides = new List<int>();
+
+    [SerializeField]
+    private int castleIndex;
 
     [Title("Material")]
     [SerializeField]
@@ -57,6 +75,10 @@ public class PrototypeInfoCreator : MonoBehaviour
 
     private int currentSideIndex = 0;
     private int currentTopIndex = 0;
+
+    public List<int> NotAllowedForBottom => notAllowedForBottom;
+    public List<int> NotAllowedForSides => notAllowedForSides;
+    public int CastleIndex => castleIndex;
 
     [TitleGroup("Creation", Order = -100)]
     [Button]
@@ -127,16 +149,60 @@ public class PrototypeInfoCreator : MonoBehaviour
             List<PrototypeData> prots = new List<PrototypeData>
             {
                 new PrototypeData(new MeshWithRotation(mesh, 0), posX, negX, posY[0], negY[0], posZ, negZ, pieceWeights[i].Weight, matIndexes),
-                new PrototypeData(new MeshWithRotation(mesh, 1), posZ, negZ, posY[1], negY[1], negX, posX, pieceWeights[i].Weight, matIndexes),
-                new PrototypeData(new MeshWithRotation(mesh, 2), negX, posX, posY[2], negY[2], negZ, posZ, pieceWeights[i].Weight, matIndexes),
-                new PrototypeData(new MeshWithRotation(mesh, 3), negZ, posZ, posY[3], negY[3], posX, negX, pieceWeights[i].Weight, matIndexes),
             };
 
+            int copies = AddIfUnique(prots, new PrototypeData(new MeshWithRotation(mesh, 1), posZ, negZ, posY[1], negY[1], negX, posX, pieceWeights[i].Weight, matIndexes)) ? 0 : 1;
+            copies += AddIfUnique(prots, new PrototypeData(new MeshWithRotation(mesh, 2), negX, posX, posY[2], negY[2], negZ, posZ, pieceWeights[i].Weight, matIndexes)) ? 0 : 1;
+            copies += AddIfUnique(prots, new PrototypeData(new MeshWithRotation(mesh, 3), negZ, posZ, posY[3], negY[3], posX, negX, pieceWeights[i].Weight, matIndexes)) ? 0 : 1;
+
+            float extraWeight = 1.0f / (1.0f - (copies / 4.0f));
+            if (extraWeight > 1)
+            {
+                for (int j = 0; j < prots.Count; j++)
+                {
+                    prots[j] = new PrototypeData(prots[j].MeshRot, prots[j].PosX, prots[j].NegX, prots[j].PosY, prots[j].NegY, prots[j].PosZ, prots[j].NegZ, prots[j].Weight * extraWeight, prots[j].MaterialIndexes);
+                }
+            }
             Prototypes.AddRange(prots);
+
+            if (notAllowedBottomIndexes.Contains(i))
+            {
+                for (int j = 1; j < prots.Count + 1; j++)
+                {
+                    notAllowedForBottom.Add(Prototypes.Count - j);
+                }
+            }
+
+            if (NotAllowedForSides.Contains(i))
+            {
+                for (int j = 1; j < prots.Count + 1; j++)
+                {
+                    notAllowedForSides.Add(Prototypes.Count - j);
+                }
+            }
+
+            if (i == castlePrototypeIndex)
+            {
+                castleIndex = Prototypes.Count - 1;
+            }
         }
 
         // Empty
         Prototypes.Add(new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", pieceWeights[meshes.Length].Weight, new int[0]));
+
+        static bool AddIfUnique(List<PrototypeData> prots, PrototypeData prot)
+        {
+            for (int i = 0; i < prots.Count; i++)
+            {
+                if (prot.PosX == prots[i].PosX && prot.NegX == prots[i].NegX && prot.PosY == prots[i].PosY && prot.NegY == prots[i].NegY && prot.PosZ == prots[i].PosZ && prot.NegZ == prots[i].NegZ)
+                {
+                    return false;
+                }
+            }
+
+            prots.Add(prot);
+            return true;
+        }
     }
 
     private string GetSideKey(List<Vector3> vertexPositions, int mainAxis, int positiveDirection)
@@ -443,7 +509,7 @@ public struct PrototypeData
 
     public int[] MaterialIndexes;
 
-    public string[] Keys => new string[6] 
+    public readonly string[] Keys => new string[6] 
     {
         PosX, NegX, PosY, NegY, PosZ, NegZ
     };
@@ -472,7 +538,7 @@ public struct PrototypeData
         return !p1.Equals(p2);
     }
 
-    public override bool Equals(object obj)
+    public override readonly bool Equals(object obj)
     {
         return obj is PrototypeData data &&
                PosX == data.PosX &&
@@ -485,7 +551,7 @@ public struct PrototypeData
                MeshRot.Mesh == data.MeshRot.Mesh;
     }
 
-    public override int GetHashCode()
+    public override readonly int GetHashCode()
     {
         return System.HashCode.Combine(PosX, NegX, PosZ, NegZ, PosY, NegY, Weight);
     }
