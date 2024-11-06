@@ -5065,7 +5065,7 @@ PrefabInstance:
     - target: {fileID: 1507636620937791777, guid: 7097ba7ba649e1f41bba232312bdcbd8,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 1507636620937791777, guid: 7097ba7ba649e1f41bba232312bdcbd8,
         type: 3}
@@ -5115,7 +5115,7 @@ PrefabInstance:
     - target: {fileID: 1507636620937791836, guid: 7097ba7ba649e1f41bba232312bdcbd8,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1507636620937791838, guid: 7097ba7ba649e1f41bba232312bdcbd8,
         type: 3}
@@ -5144,7 +5144,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1021072153
 Transform:
   m_ObjectHideFlags: 0
@@ -5261,9 +5261,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 969faebd6a78df744b7f6dffaaead57c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSizeX: 20
-  gridSizeY: 7
-  gridSizeZ: 20
+  gridSizeX: 22
+  gridSizeY: 6
+  gridSizeZ: 22
   gridSize: {x: 2, y: 0.4, z: 2}
   materialData: {fileID: 11400000, guid: f205dbfe3ecf34f40bd110ce6d456c4a, type: 2}
   groundPrototypeInfo: {fileID: 7818375051068540878}
@@ -6471,7 +6471,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1229629332
 Transform:
   m_ObjectHideFlags: 0
@@ -10003,7 +10003,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2045039782
 Transform:
   m_ObjectHideFlags: 0
@@ -14659,8 +14659,8 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a01118aad3fb8a2428db51d380136f69, type: 2}
   - {fileID: 2100000, guid: 16f4b84d776954947aab5daf6fa0d289, type: 2}
+  - {fileID: 2100000, guid: a01118aad3fb8a2428db51d380136f69, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -16462,7 +16462,7 @@ MonoBehaviour:
   positiveKey: -1s
   overrideVerticalNegative: 0
   negativeKey: v-1_0
-  notAllowedBottomIndexes: 01000000040000000600000008000000
+  notAllowedBottomIndexes: 010000000400000006000000
   notAllowedSideIndexes: 
   castlePrototypeIndex: -1
   moduleScale: {x: 2, y: 2, z: 2}
@@ -16525,8 +16525,8 @@ MonoBehaviour:
     NegZ: 1s
     PosY: -1s
     NegY: v0_0
-    Weight: 2
-    MaterialIndexes: 0100000000000000
+    Weight: 0.3
+    MaterialIndexes: 0000000001000000
   - MeshRot:
       Mesh: {fileID: 6743973113291591290, guid: 15684870f50fb434a896dfc6d2d8d2ef,
         type: 3}
@@ -16537,8 +16537,8 @@ MonoBehaviour:
     NegZ: 1s
     PosY: -1s
     NegY: v0_1
-    Weight: 2
-    MaterialIndexes: 0100000000000000
+    Weight: 0.3
+    MaterialIndexes: 0000000001000000
   - MeshRot:
       Mesh: {fileID: 6743973113291591290, guid: 15684870f50fb434a896dfc6d2d8d2ef,
         type: 3}
@@ -16549,8 +16549,8 @@ MonoBehaviour:
     NegZ: 2f
     PosY: -1s
     NegY: v0_2
-    Weight: 2
-    MaterialIndexes: 0100000000000000
+    Weight: 0.3
+    MaterialIndexes: 0000000001000000
   - MeshRot:
       Mesh: {fileID: 6743973113291591290, guid: 15684870f50fb434a896dfc6d2d8d2ef,
         type: 3}
@@ -16561,8 +16561,8 @@ MonoBehaviour:
     NegZ: 2
     PosY: -1s
     NegY: v0_3
-    Weight: 2
-    MaterialIndexes: 0100000000000000
+    Weight: 0.3
+    MaterialIndexes: 0000000001000000
   - MeshRot:
       Mesh: {fileID: 1453043773871479701, guid: 15684870f50fb434a896dfc6d2d8d2ef,
         type: 3}
@@ -16573,7 +16573,7 @@ MonoBehaviour:
     NegZ: 1s
     PosY: -1s
     NegY: -1s
-    Weight: 12
+    Weight: 8
     MaterialIndexes: 01000000
   - MeshRot:
       Mesh: {fileID: -8421418420241044503, guid: 15684870f50fb434a896dfc6d2d8d2ef,
@@ -16681,7 +16681,7 @@ MonoBehaviour:
     NegZ: 1s
     PosY: v2_0
     NegY: -1s
-    Weight: 2
+    Weight: 3
     MaterialIndexes: 0100000000000000
   - MeshRot:
       Mesh: {fileID: -478882678752539408, guid: 15684870f50fb434a896dfc6d2d8d2ef,
@@ -16693,7 +16693,7 @@ MonoBehaviour:
     NegZ: 0
     PosY: v2_1
     NegY: -1s
-    Weight: 2
+    Weight: 3
     MaterialIndexes: 0100000000000000
   - MeshRot:
       Mesh: {fileID: -478882678752539408, guid: 15684870f50fb434a896dfc6d2d8d2ef,
@@ -16705,7 +16705,7 @@ MonoBehaviour:
     NegZ: -1s
     PosY: v2_2
     NegY: -1s
-    Weight: 2
+    Weight: 3
     MaterialIndexes: 0100000000000000
   - MeshRot:
       Mesh: {fileID: -478882678752539408, guid: 15684870f50fb434a896dfc6d2d8d2ef,
@@ -16717,7 +16717,7 @@ MonoBehaviour:
     NegZ: 0f
     PosY: v2_3
     NegY: -1s
-    Weight: 2
+    Weight: 3
     MaterialIndexes: 0100000000000000
   - MeshRot:
       Mesh: {fileID: -811618222592360774, guid: 15684870f50fb434a896dfc6d2d8d2ef,
@@ -16729,7 +16729,7 @@ MonoBehaviour:
     NegZ: -1s
     PosY: -1s
     NegY: v2_0
-    Weight: 1
+    Weight: 3
     MaterialIndexes: 0100000000000000
   - MeshRot:
       Mesh: {fileID: -811618222592360774, guid: 15684870f50fb434a896dfc6d2d8d2ef,
@@ -16741,7 +16741,7 @@ MonoBehaviour:
     NegZ: 2
     PosY: -1s
     NegY: v2_1
-    Weight: 1
+    Weight: 3
     MaterialIndexes: 0100000000000000
   - MeshRot:
       Mesh: {fileID: -811618222592360774, guid: 15684870f50fb434a896dfc6d2d8d2ef,
@@ -16753,7 +16753,7 @@ MonoBehaviour:
     NegZ: 1s
     PosY: -1s
     NegY: v2_2
-    Weight: 1
+    Weight: 3
     MaterialIndexes: 0100000000000000
   - MeshRot:
       Mesh: {fileID: -811618222592360774, guid: 15684870f50fb434a896dfc6d2d8d2ef,
@@ -16765,116 +16765,8 @@ MonoBehaviour:
     NegZ: 2f
     PosY: -1s
     NegY: v2_3
-    Weight: 1
+    Weight: 3
     MaterialIndexes: 0100000000000000
-  - MeshRot:
-      Mesh: {fileID: 3284045297738311301, guid: 15684870f50fb434a896dfc6d2d8d2ef,
-        type: 3}
-      Rot: 0
-    PosX: 3
-    NegX: 3f
-    PosZ: 4s
-    NegZ: 1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 0.2
-    MaterialIndexes: 0100000002000000
-  - MeshRot:
-      Mesh: {fileID: 3284045297738311301, guid: 15684870f50fb434a896dfc6d2d8d2ef,
-        type: 3}
-      Rot: 1
-    PosX: 4s
-    NegX: 1s
-    PosZ: 3f
-    NegZ: 3
-    PosY: -1s
-    NegY: -1s
-    Weight: 0.2
-    MaterialIndexes: 0100000002000000
-  - MeshRot:
-      Mesh: {fileID: 3284045297738311301, guid: 15684870f50fb434a896dfc6d2d8d2ef,
-        type: 3}
-      Rot: 2
-    PosX: 3f
-    NegX: 3
-    PosZ: 1s
-    NegZ: 4s
-    PosY: -1s
-    NegY: -1s
-    Weight: 0.2
-    MaterialIndexes: 0100000002000000
-  - MeshRot:
-      Mesh: {fileID: 3284045297738311301, guid: 15684870f50fb434a896dfc6d2d8d2ef,
-        type: 3}
-      Rot: 3
-    PosX: 1s
-    NegX: 4s
-    PosZ: 3
-    NegZ: 3f
-    PosY: -1s
-    NegY: -1s
-    Weight: 0.2
-    MaterialIndexes: 0100000002000000
-  - MeshRot:
-      Mesh: {fileID: -5333859576041384117, guid: 15684870f50fb434a896dfc6d2d8d2ef,
-        type: 3}
-      Rot: 0
-    PosX: 3f
-    NegX: 1s
-    PosZ: 1s
-    NegZ: 3
-    PosY: -1s
-    NegY: -1s
-    Weight: 0.2
-    MaterialIndexes: 0100000002000000
-  - MeshRot:
-      Mesh: {fileID: -5333859576041384117, guid: 15684870f50fb434a896dfc6d2d8d2ef,
-        type: 3}
-      Rot: 1
-    PosX: 1s
-    NegX: 3
-    PosZ: 1s
-    NegZ: 3f
-    PosY: -1s
-    NegY: -1s
-    Weight: 0.2
-    MaterialIndexes: 0100000002000000
-  - MeshRot:
-      Mesh: {fileID: -5333859576041384117, guid: 15684870f50fb434a896dfc6d2d8d2ef,
-        type: 3}
-      Rot: 2
-    PosX: 1s
-    NegX: 3f
-    PosZ: 3
-    NegZ: 1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 0.2
-    MaterialIndexes: 0100000002000000
-  - MeshRot:
-      Mesh: {fileID: -5333859576041384117, guid: 15684870f50fb434a896dfc6d2d8d2ef,
-        type: 3}
-      Rot: 3
-    PosX: 3
-    NegX: 1s
-    PosZ: 3f
-    NegZ: 1s
-    PosY: -1s
-    NegY: -1s
-    Weight: 0.2
-    MaterialIndexes: 0100000002000000
-  - MeshRot:
-      Mesh: {fileID: 8933730680224484651, guid: 15684870f50fb434a896dfc6d2d8d2ef,
-        type: 3}
-      Rot: 0
-    PosX: 4s
-    NegX: 4s
-    PosZ: 4s
-    NegZ: 4s
-    PosY: -1s
-    NegY: -1s
-    Weight: 0.8
-    MaterialIndexes: 02000000
   - MeshRot:
       Mesh: {fileID: 0}
       Rot: 0
@@ -16884,56 +16776,37 @@ MonoBehaviour:
     NegZ: -1s
     PosY: -1s
     NegY: -1s
-    Weight: 50
+    Weight: 40
     MaterialIndexes: 
   socketList:
   - positions:
-    - {x: 0.65, y: 0.1}
+    - {x: 0.35, y: 0.1}
     - {x: 0, y: 1}
     - {x: 1, y: -0}
-    - {x: 0.75, y: -0}
+    - {x: 0.45, y: -0}
     socketname: 0f
   - positions:
-    - {x: -0.65, y: 0.1}
+    - {x: -0.35, y: 0.1}
     - {x: -0, y: 1}
     - {x: -1, y: -0}
-    - {x: -0.75, y: -0}
+    - {x: -0.45, y: -0}
     socketname: 0
   - positions:
-    - {x: -1, y: -0}
     - {x: 1, y: 0}
+    - {x: -1, y: -0}
     socketname: 1s
   - positions:
-    - {x: -1, y: -0}
-    - {x: -0.75, y: 0}
-    - {x: -0.65, y: -0.1}
     - {x: 0, y: -1}
+    - {x: -0.35, y: -0.1}
+    - {x: -0.45, y: 0}
+    - {x: -1, y: 0}
     socketname: 2f
   - positions:
-    - {x: 1, y: -0}
-    - {x: 0.75, y: 0}
-    - {x: 0.65, y: -0.1}
     - {x: 0, y: -1}
-    socketname: 2
-  - positions:
-    - {x: 0.65, y: -0}
-    - {x: 1, y: -0}
-    - {x: -0.2, y: -0}
-    - {x: -1, y: -0}
-    - {x: -0.6, y: -0}
-    socketname: 3f
-  - positions:
-    - {x: -0.65, y: -0}
-    - {x: -1, y: -0}
-    - {x: 0.2, y: -0}
-    - {x: 1, y: -0}
-    - {x: 0.6, y: -0}
-    socketname: 3
-  - positions:
-    - {x: -0, y: -0.1}
+    - {x: 0.35, y: -0.1}
+    - {x: 0.45, y: 0}
     - {x: 1, y: 0}
-    - {x: -1, y: -0}
-    socketname: 4s
+    socketname: 2
   verticalSocketList:
   - positions:
     - {x: -0.4, y: 0}
@@ -17015,7 +16888,7 @@ MonoBehaviour:
     - {x: -0, y: 1}
     - {x: 0, y: -1}
     socketname: v2_3
-  notAllowedForBottom: 07000000060000000500000004000000100000000f0000000e0000000d00000018000000170000001600000015000000200000001f0000001e0000001d00000007000000060000000500000004000000100000000f0000000e0000000d00000018000000170000001600000015000000200000001f0000001e0000001d00000007000000060000000500000004000000100000000f0000000e0000000d00000018000000170000001600000015000000200000001f0000001e0000001d00000007000000060000000500000004000000100000000f0000000e0000000d00000018000000170000001600000015000000200000001f0000001e0000001d000000
+  notAllowedForBottom: 07000000060000000500000004000000100000000f0000000e0000000d00000018000000170000001600000015000000
   notAllowedForSides: 
   castleIndex: 0
   materialData: {fileID: 11400000, guid: f205dbfe3ecf34f40bd110ce6d456c4a, type: 2}
@@ -17023,27 +16896,19 @@ MonoBehaviour:
   - Name: 0. Down
     Weight: 1
   - Name: 1. InCornerRamp
-    Weight: 2
+    Weight: 0.3
   - Name: 2. Ground
-    Weight: 3
+    Weight: 2
   - Name: 3. OutCornerRamp
     Weight: 1
   - Name: 4. OutReceiver
     Weight: 2
   - Name: 5. Ramp
-    Weight: 2
+    Weight: 3
   - Name: 6. RampReceiver
-    Weight: 1
-  - Name: 7. GoldSide
-    Weight: 0.2
-  - Name: 8. GoldCorner
-    Weight: 0.2
-  - Name: 9. GoldMiddle
-    Weight: 0.2
+    Weight: 3
   - Name: Air
-    Weight: 50
-  - Name: 10. Ground_Portal
-    Weight: 2
+    Weight: 40
 --- !u!1 &7877222472292367163
 GameObject:
   m_ObjectHideFlags: 0

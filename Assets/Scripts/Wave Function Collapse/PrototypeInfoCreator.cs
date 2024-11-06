@@ -380,6 +380,8 @@ public class PrototypeInfoCreator : MonoBehaviour
         socketList.Clear();
         verticalSocketList.Clear();
         displayVerts.Clear();
+        NotAllowedForBottom.Clear();
+        NotAllowedForSides.Clear();
     }
 
     private void OnDrawGizmos()
