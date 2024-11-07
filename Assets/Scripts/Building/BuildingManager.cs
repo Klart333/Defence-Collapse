@@ -12,6 +12,7 @@ using System;
 public class BuildingManager : Singleton<BuildingManager> 
 {
     public event Action<Vector3Int> OnCastlePlaced;
+    public event Action OnLoaded;
 
     [Title("Cells")]
     [SerializeField]
@@ -72,7 +73,9 @@ public class BuildingManager : Singleton<BuildingManager>
 
     private HashSet<string> allowedKeys;
 
+    public int TopBuildableLayer { get; private set; }
     public float CellSize => cellSize;
+    public Cell[,,] Cells => cells;
 
     private void OnEnable()
     {
@@ -113,7 +116,8 @@ public class BuildingManager : Singleton<BuildingManager>
         }
 
         LoadCells();
-        return;
+
+        OnLoaded?.Invoke();
     }
 
     private void LoadCells()
@@ -160,7 +164,7 @@ public class BuildingManager : Singleton<BuildingManager>
         Cell groundCell = waveFunction.GetCellAtIndexInverse(gridIndex);
         if (cellIndex.y <= 1)
         {
-            Debug.DrawLine(cellPosition, groundCell.Position, Color.yellow, 100, false);
+            //Debug.DrawLine(cellPosition, groundCell.Position, Color.yellow, 100, false);
         }
 
         Vector2 corner = new Vector2(Mathf.Sign(groundCell.Position.x - cellPosition.x), Mathf.Sign(groundCell.Position.z - cellPosition.z));
@@ -172,6 +176,10 @@ public class BuildingManager : Singleton<BuildingManager>
                 cellPosition,
                 new List<PrototypeData>() { unbuildablePrototype },
                 false);
+        }
+        else if (cellIndex.y > TopBuildableLayer)
+        {
+            TopBuildableLayer = cellIndex.y;
         }
     }
 

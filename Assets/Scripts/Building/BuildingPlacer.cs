@@ -28,18 +28,23 @@ public class BuildingPlacer : MonoBehaviour
 
     private void OnEnable()
     {
-        Events.OnBuildingCanceled += () => manualCancel = true;
+        Events.OnBuildingCanceled += OnBuildingCanceled;
     }
 
     private void OnDisable()
     {
-        Events.OnBuildingCanceled -= () => manualCancel = false;
+        Events.OnBuildingCanceled -= OnBuildingCanceled;
     }
 
     private void Start()
     {
         cam = Camera.main;
         Events.OnBuildingPurchased += BuildingPurchased;
+    }
+
+    private void OnBuildingCanceled()
+    {
+        manualCancel = true;
     }
 
     private void BuildingPurchased(BuildingType buildingType)

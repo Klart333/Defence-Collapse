@@ -1,16 +1,10 @@
-using Cysharp.Threading.Tasks;
-using DG.Tweening;
-using Sirenix.Utilities;
-using System;
+using Debug = UnityEngine.Debug;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
-using static UnityEngine.Rendering.VolumeComponent;
-using Debug = UnityEngine.Debug;
+using System;
 
 public class WaveFunction : MonoBehaviour
 {
@@ -750,7 +744,7 @@ public class WaveFunction : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        if (!EditorApplication.isPlaying)
+        if (!UnityEditor.EditorApplication.isPlaying)
         {
             return;
         }
