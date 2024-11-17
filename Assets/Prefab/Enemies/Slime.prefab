@@ -60,8 +60,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7230030869619080454}
   - {fileID: 2153486804482122681}
@@ -69,7 +69,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!95 &1417858982187071267
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -83,6 +83,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -439,7 +440,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.075, y: 0.075, z: 0.075}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1794384937473486232}
@@ -516,8 +517,8 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4542743195278680511}
   m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 1
+  m_AgentTypeID: -334000983
+  m_Radius: 0.05
   m_Speed: 2
   m_Acceleration: 30
   avoidancePriority: 50
@@ -526,9 +527,9 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 1.94
+  m_Height: 0.097
   m_BaseOffset: 0
-  m_WalkableMask: 4294967295
+  m_WalkableMask: 9
   m_ObstacleAvoidanceType: 1
 --- !u!135 &748313301043954341
 SphereCollider:
@@ -549,8 +550,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1.0278845
-  m_Center: {x: 0, y: 0.98316735, z: 0}
+  m_Radius: 0.05
+  m_Center: {x: 0, y: 0.04915837, z: 0}
 --- !u!1 &5344245619191892981
 GameObject:
   m_ObjectHideFlags: 0
@@ -695,6 +696,9 @@ SkinnedMeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 3
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -871,17 +875,17 @@ PrefabInstance:
     - target: {fileID: 3802451704793535389, guid: 48b1b4c3d512d3a4ca78a390663ba98f,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 2.77
+      value: 0.1385
       objectReference: {fileID: 0}
     - target: {fileID: 3802451704793535389, guid: 48b1b4c3d512d3a4ca78a390663ba98f,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.77
+      value: 0.1385
       objectReference: {fileID: 0}
     - target: {fileID: 3802451704793535389, guid: 48b1b4c3d512d3a4ca78a390663ba98f,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 2.77
+      value: 0.1385
       objectReference: {fileID: 0}
     - target: {fileID: 3802451704793535389, guid: 48b1b4c3d512d3a4ca78a390663ba98f,
         type: 3}
@@ -891,7 +895,7 @@ PrefabInstance:
     - target: {fileID: 3802451704793535389, guid: 48b1b4c3d512d3a4ca78a390663ba98f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.04
+      value: 0.202
       objectReference: {fileID: 0}
     - target: {fileID: 3802451704793535389, guid: 48b1b4c3d512d3a4ca78a390663ba98f,
         type: 3}

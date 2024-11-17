@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using Sirenix.OdinInspector;
 using UnityEngine;
+using System;
 
 public class PooledMonoBehaviour : MonoBehaviour
 {
     // Note: Multiple functions with the same name 'Get', this is because the thing they "get" is based on the T and the name can't really be more specifik 
     // Note: Some methods are numbered, this is for clarity on how the main steps for how spawning the objects works
 
+    [Title("Pool")]
     [SerializeField]
     private int initialPoolSize = 10;
 

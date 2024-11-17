@@ -1,9 +1,12 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
+using System;
 
 [CreateAssetMenu(menuName = "Ground Object Data")]
 public class GroundObjectData : ScriptableObject
 {
+    public event Action<GameObject> OnObjectSpawned;
+
     [Title("Prefab")]
     [SerializeField]
     private PooledMonoBehaviour prefab;
@@ -28,5 +31,10 @@ public class GroundObjectData : ScriptableObject
     private void OnValidate()
     {
         spawnAmountRange = new RangedFloat(Mathf.RoundToInt(spawnAmountRange.minValue), Mathf.RoundToInt(spawnAmountRange.maxValue));
+    }
+
+    public void CallSpawnEvent(GameObject spawnedObject)
+    {
+        OnObjectSpawned?.Invoke(spawnedObject);
     }
 }

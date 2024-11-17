@@ -1,5 +1,5 @@
-using Debug = UnityEngine.Debug;
 using System.Collections.Generic;
+using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
 using System.Diagnostics;
 using System.Linq;
@@ -566,6 +566,7 @@ public class WaveFunction : MonoBehaviour
         return new Vector3Int(x, y, z);
     }
 
+    private int GetIndex(Vector3Int index) => GetIndex(index.x, index.y, index.z);
     private int GetIndex(int x, int y, int z)
     {
         return (x * gridSizeY * gridSizeZ) + (y * gridSizeZ) + z;
@@ -729,6 +730,12 @@ public class WaveFunction : MonoBehaviour
     public Cell GetCellAtIndex(int x, int y, int z)
     {
         return cells[GetIndex(x, y, z)];
+    }
+
+    public Vector3Int GetIndexAtPosition(Vector3 pos)
+    {
+        Vector3Int index = new Vector3Int(Mathf.FloorToInt(pos.x / gridSize.x), Mathf.FloorToInt(pos.y / gridSize.y), Mathf.FloorToInt(pos.z / gridSize.z));
+        return index;
     }
 
     public void SetGridSize(Vector3Int size)

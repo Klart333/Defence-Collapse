@@ -1,3 +1,4 @@
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class InputManager : Singleton<InputManager>
@@ -40,5 +41,10 @@ public class InputManager : Singleton<InputManager>
         Shift.Disable();
         Cancel.Disable();
         Mouse.Disable();
+    }
+
+    public bool MouseOverUI()
+    {
+        return EventSystem.current.IsPointerOverGameObject();
     }
 }

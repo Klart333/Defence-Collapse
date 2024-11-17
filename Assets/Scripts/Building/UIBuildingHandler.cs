@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,8 +23,6 @@ public class UIBuildingHandler : MonoBehaviour
 
     public void ClickBuilding()
     {
-        print("Click");
-
         if (gottaStartWithACastle)
         {
             Events.OnBuildingClicked?.Invoke(BuildingType.Castle);

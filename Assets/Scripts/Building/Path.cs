@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
-using Unity.AI.Navigation;
 using UnityEngine;
 
 namespace Buildings

@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEditor;
 using Buildings;
 using System;
+using Cysharp.Threading.Tasks;
 
 public class BuildingManager : Singleton<BuildingManager> 
 {
@@ -62,6 +63,7 @@ public class BuildingManager : Singleton<BuildingManager>
     private List<PrototypeData> prototypes = new List<PrototypeData>();
     private List<Vector3Int> cellsToCollapse = new List<Vector3Int>();
     private Stack<Vector3Int> cellStack = new Stack<Vector3Int>();
+    private List<Direction> pathExclude = new List<Direction>() { Direction.Up, Direction.Down };
 
     private WaveFunction waveFunction;
     private BuildingAnimator buildingAnimator;
@@ -328,9 +330,15 @@ public class BuildingManager : Singleton<BuildingManager>
         }
         Propagate();
 
-        while (!cellsToCollapse.All(x => cells[x.x, x.y, x.z].Collapsed))
+        int tries = 1000;
+        while (!cellsToCollapse.All(x => cells[x.x, x.y, x.z].Collapsed) && tries-- > 0)
         {
             Iterate();
+        }
+
+        if (tries <= 0)
+        {
+            Debug.LogError("Ran out of attempts to collapse");
         }
 
         return querySpawnedBuildings;
@@ -349,7 +357,7 @@ public class BuildingManager : Singleton<BuildingManager>
             queryChangedCells.Add((index, cells[index.x, index.y, index.z]));
 
             cells[index.x, index.y, index.z] = new Cell(false, cells[index.x, index.y, index.z].Position, new List<PrototypeData>(prototypes));
-            ValidDirections(index, out _).ForEach(x => cellStack.Push(x));
+            ValidDirections(index, out _, pathExclude).ForEach(x => cellStack.Push(x));
 
             if (spawnedMeshes.TryGetValue(index, out IBuildable buildable))
             {
@@ -362,6 +370,7 @@ public class BuildingManager : Singleton<BuildingManager>
     public List<Vector3Int> GetCellsToCollapse(Vector3 queryPos, BuildingType type)
     {
         List<Vector3Int> cellsToCollapse = new List<Vector3Int>();
+        queryPos += new Vector3(CellSize, 0, CellSize) / 2.0f;
 
         switch (type)
         {
@@ -376,7 +385,7 @@ public class BuildingManager : Singleton<BuildingManager>
                 break;
             case BuildingType.Path:
                 cellsToCollapse = GetSurroundingCells(queryPos);
-                cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3.up * waveFunction.GridScale.y));
+                //cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3.up * waveFunction.GridScale.y));
                 break;
         }
         //cellsToCollapse.ForEach((x) => Debug.Log("Cell: " + x));
@@ -499,7 +508,7 @@ public class BuildingManager : Singleton<BuildingManager>
         {
             Cell changedCell = cells[cellIndex.x, cellIndex.y, cellIndex.z];
 
-            List<Vector3Int> validDirs = ValidDirections(cellIndex, out List<Direction> directions);
+            List<Vector3Int> validDirs = ValidDirections(cellIndex, out List<Direction> directions, pathExclude);//currentBuildingType == BuildingType.Path ? pathExclude : null);
 
             for (int i = 0; i < validDirs.Count; i++)
             {
@@ -526,48 +535,48 @@ public class BuildingManager : Singleton<BuildingManager>
 
     #region Constain
 
-    private List<Vector3Int> ValidDirections(Vector3Int index, out List<Direction> directions, Direction exlcude = Direction.None) // Exclude should be a flag
+    private List<Vector3Int> ValidDirections(Vector3Int index, out List<Direction> directions, List<Direction> exlcudes = null) // Exclude should be a flag
     {
         List<Vector3Int> valids = new List<Vector3Int>();
         directions = new List<Direction>();
 
         // Right
-        if (index.x + 1 < cells.GetLength(0) && Direction.Right != exlcude)
+        if (index.x + 1 < cells.GetLength(0) && (exlcudes == null || !exlcudes.Contains(Direction.Right)))
         {
             valids.Add(index + Vector3Int.right);
             directions.Add(Direction.Right);
         }
 
         // Left
-        if (index.x - 1 >= 0 && Direction.Left != exlcude)
+        if (index.x - 1 >= 0 && (exlcudes == null || !exlcudes.Contains(Direction.Left)))
         {
             valids.Add(index + Vector3Int.left);
             directions.Add(Direction.Left);
         }
 
         // Up
-        if (index.y + 1 < cells.GetLength(1) && Direction.Up != exlcude)
+        if (index.y + 1 < cells.GetLength(1) && (exlcudes == null || !exlcudes.Contains(Direction.Up)))
         {
             valids.Add(index + Vector3Int.up);
             directions.Add(Direction.Up);
         }
 
         // Down
-        if (index.y - 1 >= 0 && Direction.Down != exlcude)
+        if (index.y - 1 >= 0 && (exlcudes == null || !exlcudes.Contains(Direction.Down)))
         {
             valids.Add(index + Vector3Int.down);
             directions.Add(Direction.Down);
         }
 
         // Forward
-        if (index.z + 1 < cells.GetLength(2) && Direction.Forward != exlcude)
+        if (index.z + 1 < cells.GetLength(2) && (exlcudes == null || !exlcudes.Contains(Direction.Forward)))
         {
             valids.Add(index + Vector3Int.forward);
             directions.Add(Direction.Forward);
         }
 
         // Backward
-        if (index.z - 1 >= 0 && Direction.Backward != exlcude)
+        if (index.z - 1 >= 0 && (exlcudes == null || !exlcudes.Contains(Direction.Backward)))
         {
             valids.Add(index + Vector3Int.back);
             directions.Add(Direction.Backward);
