@@ -18,7 +18,7 @@ public class Portal : PooledMonoBehaviour
 
     private bool hovered = false;
 
-    public bool Locked { get; private set; }
+    public bool Locked { get; private set; } = true;
 
     private void Update()
     {

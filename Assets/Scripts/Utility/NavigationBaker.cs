@@ -25,6 +25,7 @@ public class NavigationBaker : MonoBehaviour
     [Button]
     public void Bake()
     {
+        surface.RemoveData();
         surface.BuildNavMesh();
     }
 }

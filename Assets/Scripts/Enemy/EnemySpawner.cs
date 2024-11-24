@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -10,12 +11,15 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField]
     private Wave[] wavesArray;
 
-    private List<(Vector3, Vector3)> currentSpawnPoints = new List<(Vector3, Vector3)>();
+    [SerializeField]
+    private Vector3 spawnOffset;
+
+    private List<Vector3> currentSpawnPoints = new List<Vector3>();
     private Queue<Wave> waves = new Queue<Wave>();
 
     private Vector3[] path;
 
-    private PathHandler pathHandler;
+    private PathManager pathHandler;
 
     private bool inWave = false;
 
@@ -26,7 +30,7 @@ public class EnemySpawner : MonoBehaviour
             waves.Enqueue(wavesArray[i]);
         }
 
-        pathHandler = FindAnyObjectByType<PathHandler>();
+        pathHandler = FindAnyObjectByType<PathManager>();
 
         Events.OnWaveClicked += WaveClicked;
     }
@@ -86,9 +90,9 @@ public class EnemySpawner : MonoBehaviour
         for (int i = 0; i < spawnPoints; i++)
         {
             int spawnIndex = UnityEngine.Random.Range(0, currentSpawnPoints.Count);
-            EnemyMovement spawnedEnemy = Instantiate(enemy, currentSpawnPoints[spawnIndex].Item1, Quaternion.identity);
+            Vector3 pos = currentSpawnPoints[spawnIndex] + spawnOffset;
 
-            spawnedEnemy.SetPathTarget(currentSpawnPoints[spawnIndex].Item2);
+            EnemyMovement spawnedEnemy = Instantiate(enemy, pos, Quaternion.identity);
         }
     }
 }

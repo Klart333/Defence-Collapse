@@ -1,14 +1,12 @@
 using System.Collections.Generic;
 using Debug = UnityEngine.Debug;
 using Sirenix.OdinInspector;
-using Unity.VisualScripting;
 using Sirenix.Utilities;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using Buildings;
 using System;
-using Cysharp.Threading.Tasks;
 
 public class BuildingManager : Singleton<BuildingManager> 
 {
@@ -231,9 +229,12 @@ public class BuildingManager : Singleton<BuildingManager>
         
         UncollapseAir();
 
-        spawnedMeshes.AddRange(querySpawnedBuildings);
-        querySpawnedBuildings.Clear();
+        foreach (var item in querySpawnedBuildings)
+        {
+            spawnedMeshes.Add(item.Key, item.Value);
+        }
 
+        querySpawnedBuildings.Clear();
         queryChangedCells.Clear();
     }
 
