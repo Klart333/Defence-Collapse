@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -9,8 +8,12 @@ using Unity.Jobs;
 public class PathManager : Singleton<PathManager>
 {
     [Title("Flood fill")]
+    [InfoBox("Max size 65536 (256x256)")]
     [SerializeField]
-    private Vector2Int gridResolution;
+    private Vector2Int gridSize;
+
+    [SerializeField]
+    private float cellScale;
 
     [Title("Portal")]
     [SerializeField]
@@ -21,55 +24,43 @@ public class PathManager : Singleton<PathManager>
     private NativeArray<int> distances;
     private NativeArray<int2> neighbourDirections;
 
-    private readonly HashSet<Vector3Int> buildingPositions = new HashSet<Vector3Int>();
-    private readonly HashSet<Vector3Int> blacklistedBuildingPositions = new HashSet<Vector3Int>();
-
+    private readonly HashSet<Blocker> blockers = new HashSet<Blocker>();
+    private readonly HashSet<int> blockedIndexes = new HashSet<int>();
     private readonly List<Portal> portals = new List<Portal>();
 
     private JobHandle jobHandle;
-    private BuildingHandler buildingHandler;
-    private WaveFunction waveFunction;
-
-    private Vector3Int castleIndex;
-
-    private bool updatingFloodFill;
-    private bool updateQueued;
 
     public NativeArray<float2> Directions => directions;
+    public float CellScale => cellScale;
+    public int GridHeight => gridSize.y;
+    public int GridWidth => gridSize.x;
+    public float GridWorldWidth => GridWidth * CellScale;
+    public float GridWorldHeight => GridHeight * CellScale;
 
     private void OnEnable()
     {
-        buildingHandler = FindAnyObjectByType<BuildingHandler>();
-        waveFunction = FindAnyObjectByType<WaveFunction>();
-
-        Events.OnBuildingDestroyed += BuildingHandler_OnBuildingDestroyed;
-        Events.OnBuildingRepaired += BuildingHandler_OnBuildingRepaired;
         portalObjectData.OnObjectSpawned += OnPortalPlaced;
 
-        int length = gridResolution.x * gridResolution.y;
+        int length = gridSize.x * gridSize.y;
         cells = new NativeArray<PathCell>(length, Allocator.Persistent);
         directions = new NativeArray<float2>(length, Allocator.Persistent);
         distances = new NativeArray<int>(length, Allocator.Persistent);
-        neighbourDirections = new NativeArray<int2>(
-            new int2[] 
-            { 
-                new int2(1, 0), new int2(1, 1), new int2(0, 1), new int2(-1, 1), new int2(-1, 0), new int2(-1, -1), new int2(0, -1), new int2(1, -1), 
-            }, 
-            Allocator.Persistent);
-
-        UpdateFloodFill();
+        neighbourDirections = new NativeArray<int2>(new int2[] { new int2(1, 0), new int2(1, 1), new int2(0, 1), new int2(-1, 1), new int2(-1, 0), new int2(-1, -1), new int2(0, -1), new int2(1, -1), }, Allocator.Persistent);
     }
 
     private void OnDisable()
     {
-        Events.OnBuildingDestroyed -= BuildingHandler_OnBuildingDestroyed;
-        Events.OnBuildingRepaired -= BuildingHandler_OnBuildingRepaired;
         portalObjectData.OnObjectSpawned -= OnPortalPlaced;
 
         cells.Dispose();
         directions.Dispose();
         distances.Dispose(); 
         neighbourDirections.Dispose();
+    }
+
+    private void Update()
+    {
+        UpdateFloodFill();
     }
 
     private void OnPortalPlaced(GameObject spawnedObject) 
@@ -82,18 +73,6 @@ public class PathManager : Singleton<PathManager>
         {
             Debug.LogError("Could not find portal script on spawned portal?");
         }
-    }
-
-    private void BuildingHandler_OnBuildingDestroyed(Building building)
-    {
-        blacklistedBuildingPositions.Add(building.Index);
-
-        UpdateFloodFill();
-    }
-
-    private void BuildingHandler_OnBuildingRepaired(Building building)
-    {
-        blacklistedBuildingPositions.Remove(building.Index);
     }
 
     public List<Vector3> GetEnemySpawnPoints()
@@ -113,28 +92,18 @@ public class PathManager : Singleton<PathManager>
         return spawnPoints;
     }
 
-    [Button]
-    private async void UpdateFloodFill()
+    private void UpdateFloodFill()
     {
-        if (updateQueued)
-        {
-            return;
-        }
-
-        updateQueued = true;
-        await UniTask.WaitWhile(() => updatingFloodFill);
-
-        updatingFloodFill = true;
-        updateQueued = false;
-
         for (int i = 0; i < cells.Length; i++)
         {
+            bool walkable = !blockedIndexes.Contains(i);
+
             cells[i] = new PathCell
             {
-                Index = i,
+                Index = (ushort)i,
                 MovementCost = 1,
-                IsTarget = i % 10 == 0,
-                IsWalkable = true,
+                IsTarget = i % 166 == 0,
+                IsWalkable = walkable,
             };
         }
 
@@ -143,12 +112,10 @@ public class PathManager : Singleton<PathManager>
             cells = cells,
             distances = distances,
             neighbourDirections = neighbourDirections,
-            GridWidth = gridResolution.x,
+            GridWidth = gridSize.x,
         };
 
         jobHandle = distanceJob.Schedule();
-        
-        await UniTask.WaitUntil(() => jobHandle.IsCompleted);
         jobHandle.Complete();
 
         PathJob pathJob = new PathJob()
@@ -156,19 +123,50 @@ public class PathManager : Singleton<PathManager>
             directions = directions,
             distances = distances,
             neighbourDirections = neighbourDirections,
-            GridWidth = gridResolution.x,
+            GridWidth = gridSize.x,
         };
-        jobHandle = pathJob.Schedule(gridResolution.y, 32);
-
-        await UniTask.WaitUntil(() => jobHandle.IsCompleted);
+        jobHandle = pathJob.Schedule(gridSize.y, 32);
         jobHandle.Complete();
-
-        updatingFloodFill = false;
     }
+
+    public void RegisterBlocker(Blocker blocker)
+    {
+        if (!blockers.Add(blocker))
+        {
+            Debug.LogError("Trying to add same blocker again");
+            return;
+        }
+        Debug.Log("Added Blocker");
+        blocker.OnBlockerRebuilt += RebuildBLockerHashSet;
+    }
+
+    public void UnregisterBlocker(Blocker blocker)
+    {
+        if (!blockers.Remove(blocker))
+        {
+            Debug.LogError("Trying to remove non-registered blocker");
+        }
+
+        blocker.OnBlockerRebuilt -= RebuildBLockerHashSet;
+    }
+
+    private void RebuildBLockerHashSet()
+    {
+        blockedIndexes.Clear();
+        foreach (var blocker in blockers)
+        {
+            for (int i = 0; i < blocker.BlockedIndexes.Count; i++)
+            {
+                blockedIndexes.Add(blocker.BlockedIndexes[i]);
+            }
+        }
+    }
+
+    #region Debug
 
     private void OnDrawGizmosSelected()
     {
-        if (directions == null || directions.Length <= 0 || !jobHandle.IsCompleted)
+        if (directions == null || directions.Length <= 0)
         {
             return;
         }
@@ -176,10 +174,41 @@ public class PathManager : Singleton<PathManager>
         Gizmos.color = Color.red;
         for (int i = 0; i < directions.Length; i++)
         {
-            Vector3 pos = new Vector3(i % gridResolution.x, 5, i / gridResolution.x);
-            Gizmos.DrawLine(pos, pos + new Vector3(directions[i].x, 0, directions[i].y));
+            Vector3 pos = new Vector3(i % gridSize.x, 5, i / gridSize.x) * cellScale;
+            Gizmos.DrawLine(pos, pos + new Vector3(directions[i].x, 0, directions[i].y) * cellScale);
         }
     }
+
+    #endregion
+
+    #region Utility
+
+    public bool CheckIfValid(float xPos, float zPos)
+    {
+        return xPos > 0 && zPos > 0 && xPos < GridWorldWidth && zPos < GridWorldHeight;
+    }
+
+    public bool CheckIfValid(Vector2 pos)
+    {
+        return pos.x > 0 && pos.y > 0 && pos.x < GridWorldWidth && pos.y < GridWorldHeight;
+    }
+
+    public int GetIndex(float xPos, float zPos)
+    {
+        return Math.GetMultiple(xPos, CellScale) + Math.GetMultiple(zPos, CellScale) * GridWidth;
+    }
+
+    public int GetIndex(Vector2 pos)
+    {
+        return Math.GetMultiple(pos.x, CellScale) + Math.GetMultiple(pos.y, CellScale) * GridWidth;
+    }
+
+    public Vector2 GetPos(int index)
+    {
+        return new Vector2(index % GridWidth, Mathf.FloorToInt(index / GridWidth)) * CellScale;
+    }
+
+    #endregion
 }
 
 public struct PathCell
@@ -187,7 +216,7 @@ public struct PathCell
     public bool IsWalkable;
     public bool IsTarget;
     public byte MovementCost;
-    public int Index;
+    public ushort Index;
 }
 
 public struct DistanceJob : IJob
@@ -224,9 +253,16 @@ public struct DistanceJob : IJob
             for (int i = 0; i < count; i++)
             {
                 PathCell neighbour = cells[neighbours[i]];
+                visited.Add(neighbour.Index);
+
+                if (!neighbour.IsWalkable)
+                {
+                    distances[neighbour.Index] = 1000;
+                    continue;
+                }
+
                 distances[neighbour.Index] = distances[cell.Index] + neighbour.MovementCost;
                 frontierQueue.Enqueue(neighbour);
-                visited.Add(neighbour.Index);
             }
         }
 

@@ -16,7 +16,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         }
         else
         {
-            Instance = GetComponent<T>();
+            Instance = this as T;
 
             if (!shouldDestroyOnLoad)
             {
