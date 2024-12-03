@@ -54,5 +54,6 @@ public class Portal : PooledMonoBehaviour
     public void Unlock()
     {
         Locked = false;
+        Debug.Log("Unlock");
     }
 }

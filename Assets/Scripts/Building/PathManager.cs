@@ -4,11 +4,13 @@ using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using Unity.Jobs;
+using System;
 
 public class PathManager : Singleton<PathManager>
 {
+    public event Action GetUnitCount;
+
     [Title("Flood fill")]
-    [InfoBox("Max size 65536 (256x256)")]
     [SerializeField]
     private Vector2Int gridSize;
 
@@ -23,9 +25,8 @@ public class PathManager : Singleton<PathManager>
     private NativeArray<float2> directions;
     private NativeArray<int> distances;
     private NativeArray<int2> neighbourDirections;
+    public NativeArray<int> UnitCounts;
 
-    private readonly HashSet<Blocker> blockers = new HashSet<Blocker>();
-    private readonly HashSet<int> blockedIndexes = new HashSet<int>();
     private readonly List<Portal> portals = new List<Portal>();
 
     private JobHandle jobHandle;
@@ -37,6 +38,19 @@ public class PathManager : Singleton<PathManager>
     public float GridWorldWidth => GridWidth * CellScale;
     public float GridWorldHeight => GridHeight * CellScale;
 
+    public PathSet BlockerPathSet { get; private set; }
+    public PathSet TargetPathSet { get; private set; }
+    public PathSet PathPathSet { get; private set; }
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        BlockerPathSet = new PathSet();
+        TargetPathSet = new PathSet();
+        PathPathSet = new PathSet();
+    }
+
     private void OnEnable()
     {
         portalObjectData.OnObjectSpawned += OnPortalPlaced;
@@ -45,6 +59,7 @@ public class PathManager : Singleton<PathManager>
         cells = new NativeArray<PathCell>(length, Allocator.Persistent);
         directions = new NativeArray<float2>(length, Allocator.Persistent);
         distances = new NativeArray<int>(length, Allocator.Persistent);
+        UnitCounts = new NativeArray<int>(length, Allocator.Persistent);
         neighbourDirections = new NativeArray<int2>(new int2[] { new int2(1, 0), new int2(1, 1), new int2(0, 1), new int2(-1, 1), new int2(-1, 0), new int2(-1, -1), new int2(0, -1), new int2(1, -1), }, Allocator.Persistent);
     }
 
@@ -58,7 +73,7 @@ public class PathManager : Singleton<PathManager>
         neighbourDirections.Dispose();
     }
 
-    private void Update()
+    private void Update() // DONT DO EVERY UPDATE, :P
     {
         UpdateFloodFill();
     }
@@ -94,21 +109,32 @@ public class PathManager : Singleton<PathManager>
 
     private void UpdateFloodFill()
     {
+        for (int i = 0; i < UnitCounts.Length; i++)
+        {
+            UnitCounts[i] = 0;
+        }
+
+        GetUnitCount?.Invoke();
+
         for (int i = 0; i < cells.Length; i++)
         {
-            bool walkable = !blockedIndexes.Contains(i);
+            bool walkable = !BlockerPathSet.TargetIndexes.Contains(i); // USE SET DIRTY FOR THESE AND REBUILD ON NOW
+            bool target = walkable && TargetPathSet.TargetIndexes.Contains(i);
+            bool isPath = PathPathSet.TargetIndexes.Contains(i);
 
+            byte movementCost = (byte)((isPath ? 1 : 10) + UnitCounts[i]);
             cells[i] = new PathCell
             {
-                Index = (ushort)i,
-                MovementCost = 1,
-                IsTarget = i % 166 == 0,
+                Index = i,
+                MovementCost = movementCost,
+                IsTarget = target,
                 IsWalkable = walkable,
             };
-        }
+        } 
 
         DistanceJob distanceJob = new DistanceJob()
         {
+            directions = directions,
             cells = cells,
             distances = distances,
             neighbourDirections = neighbourDirections,
@@ -117,7 +143,7 @@ public class PathManager : Singleton<PathManager>
 
         jobHandle = distanceJob.Schedule();
         jobHandle.Complete();
-
+/*
         PathJob pathJob = new PathJob()
         {
             directions = directions,
@@ -126,40 +152,7 @@ public class PathManager : Singleton<PathManager>
             GridWidth = gridSize.x,
         };
         jobHandle = pathJob.Schedule(gridSize.y, 32);
-        jobHandle.Complete();
-    }
-
-    public void RegisterBlocker(Blocker blocker)
-    {
-        if (!blockers.Add(blocker))
-        {
-            Debug.LogError("Trying to add same blocker again");
-            return;
-        }
-        Debug.Log("Added Blocker");
-        blocker.OnBlockerRebuilt += RebuildBLockerHashSet;
-    }
-
-    public void UnregisterBlocker(Blocker blocker)
-    {
-        if (!blockers.Remove(blocker))
-        {
-            Debug.LogError("Trying to remove non-registered blocker");
-        }
-
-        blocker.OnBlockerRebuilt -= RebuildBLockerHashSet;
-    }
-
-    private void RebuildBLockerHashSet()
-    {
-        blockedIndexes.Clear();
-        foreach (var blocker in blockers)
-        {
-            for (int i = 0; i < blocker.BlockedIndexes.Count; i++)
-            {
-                blockedIndexes.Add(blocker.BlockedIndexes[i]);
-            }
-        }
+        jobHandle.Complete();*/
     }
 
     #region Debug
@@ -171,10 +164,11 @@ public class PathManager : Singleton<PathManager>
             return;
         }
 
-        Gizmos.color = Color.red;
         for (int i = 0; i < directions.Length; i++)
         {
+            Gizmos.color = Color.Lerp(Color.red, Color.black, distances[i] / (float)2000);
             Vector3 pos = new Vector3(i % gridSize.x, 5, i / gridSize.x) * cellScale;
+            //Handles.Label(pos, distances[i].ToString());
             Gizmos.DrawLine(pos, pos + new Vector3(directions[i].x, 0, directions[i].y) * cellScale);
         }
     }
@@ -210,81 +204,13 @@ public class PathManager : Singleton<PathManager>
 
     #endregion
 }
-
+ 
 public struct PathCell
-{
+{ 
     public bool IsWalkable;
     public bool IsTarget;
     public byte MovementCost;
-    public ushort Index;
-}
-
-public struct DistanceJob : IJob
-{
-    public NativeArray<int> distances;
-
-    [Unity.Collections.ReadOnly]
-    public NativeArray<PathCell> cells;
-
-    [Unity.Collections.ReadOnly]
-    public int GridWidth;
-
-    [Unity.Collections.ReadOnly]
-    public NativeArray<int2> neighbourDirections;
-
-    public void Execute()
-    {
-        NativeQueue<PathCell> frontierQueue = new NativeQueue<PathCell>(Allocator.Temp);
-        NativeHashSet<int> visited = new NativeHashSet<int>(10, Allocator.Temp);
-
-        for (int i = 0; i < cells.Length; i++)
-        {
-            if (cells[i].IsTarget)
-            {
-                frontierQueue.Enqueue(cells[i]);
-                visited.Add(i);
-            }
-        }
-
-        NativeArray<int> neighbours = new NativeArray<int>(8, Allocator.Temp);
-        while (frontierQueue.TryDequeue(out PathCell cell))
-        {
-            int count = GetNeighbours(cell.Index, visited, neighbours);
-            for (int i = 0; i < count; i++)
-            {
-                PathCell neighbour = cells[neighbours[i]];
-                visited.Add(neighbour.Index);
-
-                if (!neighbour.IsWalkable)
-                {
-                    distances[neighbour.Index] = 1000;
-                    continue;
-                }
-
-                distances[neighbour.Index] = distances[cell.Index] + neighbour.MovementCost;
-                frontierQueue.Enqueue(neighbour);
-            }
-        }
-
-        frontierQueue.Dispose();
-        visited.Dispose();
-        neighbours.Dispose();
-    }
-
-    private int GetNeighbours(int index, NativeHashSet<int> set, NativeArray<int> array)
-    {
-        int count = 0;
-        for (int i = 0; i < neighbourDirections.Length; i++)
-        {
-            int n = index + neighbourDirections[i].x + neighbourDirections[i].y * GridWidth;
-            if (n >= 0 && n < cells.Length && !set.Contains(n))
-            {
-                array[count++] = n;
-            }
-        }
-
-        return count;
-    }
+    public int Index;
 }
 
 public struct PathJob : IJobParallelFor

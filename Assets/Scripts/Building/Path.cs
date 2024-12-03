@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Buildings
 {
@@ -13,9 +14,16 @@ namespace Buildings
         [SerializeField]
         private Material transparentGreen;
 
+        [Title("Events")]
+        [SerializeField]
+        private UnityEvent OnPlacedEvent;
+
+        [SerializeField]
+        private UnityEvent OnResetEvent;
+
         private List<Material> transparentMaterials = new List<Material>();
 
-        private MeshCollider meshCollider;
+        private BoxCollider boxCollider;
         private MeshRenderer meshRenderer;
         
         public PrototypeData PrototypeData { get; private set; }
@@ -30,13 +38,13 @@ namespace Buildings
                 return meshRenderer;
             }
         }
-        public MeshCollider MeshCollider
+        public BoxCollider BoxCollider
         {
             get
             {
-                if (meshCollider == null) meshCollider = GetComponentInChildren<MeshCollider>();
+                boxCollider ??= GetComponentInChildren<BoxCollider>();
 
-                return meshCollider;
+                return boxCollider;
             }
         }
 
@@ -51,6 +59,7 @@ namespace Buildings
         {
             transform.localScale = Vector3.one;
             MeshRenderer.transform.localScale = Vector3.one;
+            OnResetEvent?.Invoke();
         }
 
         public void Setup(PrototypeData prototypeData, Vector3 scale)
@@ -77,8 +86,12 @@ namespace Buildings
             }
             else
             {
-                MeshCollider.sharedMesh = PrototypeData.MeshRot.Mesh;
+                Bounds meshBounds = PrototypeData.MeshRot.Mesh.bounds;
+                BoxCollider.size = meshBounds.size;
+                boxCollider.center = meshBounds.center;
                 MeshRenderer.SetMaterials(materialData.GetMaterials(PrototypeData.MaterialIndexes));
+
+                OnPlacedEvent?.Invoke();
             }
         }   
     }

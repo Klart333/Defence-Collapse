@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
@@ -7,20 +8,26 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField]
     private EnemyData enemyData;
 
-    [Title("Less important stats")]
+    [Title("Ground Collision")]
     [SerializeField]
-    private float turnSpeed = 0.05f;
+    private LayerMask groundMask;
 
+    [Title("Movement")]
     [SerializeField]
-    private LayerMask layerMask;
+    private float turnSpeed = 2;
+
+    private readonly RaycastHit[] results = new RaycastHit[1];
 
     private EnemyAttacker attacker;
     private EnemyAnimator animator;
     private EnemyHealth health;
 
-    private bool shouldMove = true;
+    private Vector3 direction;
 
-    private void OnEnable()
+    private bool shouldMove = true;
+    private int unitIndex = 0;
+
+    private async void OnEnable()
     {
         attacker = GetComponent<EnemyAttacker>();
         health = GetComponent<EnemyHealth>();
@@ -29,16 +36,34 @@ public class EnemyMovement : MonoBehaviour
         //agent.speed = enemyData.Stats.MovementSpeed.Value;
 
         health.OnDeath += Health_OnDeath;
+
+        await UniTask.WaitUntil(() => PathManager.Instance != null);
+        PathManager.Instance.GetUnitCount += PathManager_GetUnitCount;
     }
 
     private void OnDisable()
     {
+        PathManager.Instance.GetUnitCount -= PathManager_GetUnitCount; ;
+
         health.OnDeath -= Health_OnDeath;
+    }
+
+    private void PathManager_GetUnitCount()
+    {
+        PathManager.Instance.UnitCounts[unitIndex] += 1; // Replace 1 with weight
     }
 
     private void Update()
     {
         if (!health.Health.Alive) return;
+
+        Vector3 rayPos = transform.position + Vector3.up;
+        int count = Physics.RaycastNonAlloc(rayPos, Vector3.down, results, 2, groundMask);
+        for (int i = 0; i < count; i++)
+        {
+            transform.position = results[i].point;
+            transform.rotation = Quaternion.LookRotation(direction, results[i].normal);
+        }
 
         if (shouldMove)
         {
@@ -48,7 +73,12 @@ public class EnemyMovement : MonoBehaviour
 
     private void Move()
     {
+        Vector2 pos = transform.position.XZ();
+        unitIndex = PathManager.Instance.GetIndex(pos);
+        Vector2 dir = PathManager.Instance.Directions[unitIndex];
+        direction = (direction + dir.ToXyZ() * turnSpeed * Time.deltaTime).normalized;
 
+        transform.position += enemyData.Stats.MovementSpeed.Value * Time.deltaTime * direction;
     }
 
     private void StartAttacking()

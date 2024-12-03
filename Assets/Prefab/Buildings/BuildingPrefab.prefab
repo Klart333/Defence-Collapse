@@ -89,7 +89,8 @@ GameObject:
   - component: {fileID: 1630893403848737158}
   - component: {fileID: 3713628461818042149}
   - component: {fileID: 7584265292262257173}
-  - component: {fileID: 7580732869634546698}
+  - component: {fileID: 5369626395685876177}
+  - component: {fileID: 5252059480578289724}
   m_Layer: 7
   m_Name: BuildingPrefab
   m_TagString: Untagged
@@ -135,6 +136,60 @@ MonoBehaviour:
   selectedLayer:
     serializedVersion: 2
     m_Bits: 2048
+  OnPlacedEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5369626395685876177}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 5252059480578289724}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  OnResetEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5369626395685876177}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 5252059480578289724}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1630893403848737158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,7 +237,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 0.04768927, z: 2.0000134}
   m_Center: {x: 0, y: 0.01934577, z: -0.000006556511}
---- !u!114 &7580732869634546698
+--- !u!114 &5369626395685876177
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -191,17 +246,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 324729412821989089}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Script: {fileID: 11500000, guid: eba2292f6225c1f43baeeea0c52ed055, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SerializedVersion: 0
-  m_OverrideArea: 0
-  m_Area: 0
-  m_OverrideGenerateLinks: 0
-  m_GenerateLinks: 0
-  m_IgnoreFromBuild: 0
-  m_ApplyToChildren: 1
-  m_AffectedAgents: ffffffff
+  indexCollider: {fileID: 7584265292262257173}
+--- !u!114 &5252059480578289724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 324729412821989089}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2be6dffb6cd3afb43a83c65acf94dd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetType: 1
+  indexer: {fileID: 5369626395685876177}
 --- !u!1 &1055275134929777818
 GameObject:
   m_ObjectHideFlags: 0

@@ -15,6 +15,11 @@ public class Indexer : MonoBehaviour
 
     public List<int> Indexes => indexes;
 
+    private void OnValidate()
+    {
+        indexCollider ??= GetComponent<Collider>();
+    }
+
     private void OnEnable()
     {
         indexCollider ??= GetComponent<Collider>();
@@ -43,6 +48,7 @@ public class Indexer : MonoBehaviour
         float zMin = Mathf.Max(0, indexCollider.bounds.min.z);
         float zMax = Mathf.Min(PathManager.Instance.GridHeight, indexCollider.bounds.max.z);
 
+        bool isCube = indexCollider is BoxCollider;
         bool isSphere = indexCollider is SphereCollider;
         float increment = PathManager.Instance.CellScale;
         for (float xPos = xMin; xPos < xMax; xPos+= increment)
@@ -63,10 +69,10 @@ public class Indexer : MonoBehaviour
                         indexes.Add(PathManager.Instance.GetIndex(xPos, zPos));
                     }
                 }
-                //else if (GetComponent<Collider>().OverlapPoint(new Vector2(xPos, zPos)))
-                //{
-                //    indexes.Add(xPos + zPos * PathManager.Instance.GridWidth);
-                //}
+                else if (isCube)
+                {
+                    indexes.Add(PathManager.Instance.GetIndex(xPos, zPos));
+                }
             }
         }
 

@@ -1001,8 +1001,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shouldDestroyOnLoad: 1
-  gridSize: {x: 50, y: 50}
-  cellScale: 0.5
+  gridSize: {x: 80, y: 80}
+  cellScale: 0.4
   portalObjectData: {fileID: 11400000, guid: 93aab513e5129e54c84e7f26e74c41b9, type: 2}
 --- !u!1 &326702140
 GameObject:
@@ -1154,14 +1154,14 @@ GameObject:
   - component: {fileID: 329381664}
   - component: {fileID: 329381663}
   - component: {fileID: 329381662}
-  - component: {fileID: 329381661}
+  - component: {fileID: 329381666}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &329381660
 Transform:
   m_ObjectHideFlags: 0
@@ -1172,24 +1172,11 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.81, y: 1.03, z: 5.96}
-  m_LocalScale: {x: 2.9516, y: 2.9516, z: 2.9516}
+  m_LocalScale: {x: 2.9516, y: 0.51883227, z: 2.9516}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 606289848}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &329381661
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 329381659}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99d7babc10d7187468b704eac2ca8528, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  indexer: {fileID: 329381662}
 --- !u!114 &329381662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1277,6 +1264,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 329381659}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &329381666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 329381659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2be6dffb6cd3afb43a83c65acf94dd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetType: 0
+  indexer: {fileID: 329381662}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -1550,7 +1551,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shouldDestroyOnLoad: 0
-  targetFrameRate: 30
+  targetFrameRate: 400
 --- !u!1 &370144368
 GameObject:
   m_ObjectHideFlags: 0
@@ -7273,7 +7274,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9ae02800b8fb7c6448282be507714d6b, type: 2}
   - {fileID: 11400000, guid: 9ae02800b8fb7c6448282be507714d6b, type: 2}
   - {fileID: 11400000, guid: 9ae02800b8fb7c6448282be507714d6b, type: 2}
-  spawnOffset: {x: -1, y: 0.1, z: -1}
+  spawnOffset: {x: 0, y: 0.1, z: 0}
 --- !u!4 &1309848886
 Transform:
   m_ObjectHideFlags: 0
@@ -10824,8 +10825,8 @@ Transform:
   - {fileID: 7433980463988477709}
   - {fileID: 7140357448543096769}
   - {fileID: 6242416476658786109}
-  - {fileID: 1823361146}
   - {fileID: 1350447463}
+  - {fileID: 1823361146}
   - {fileID: 8471640077736776285}
   - {fileID: 3308589320641008296}
   - {fileID: 7271590866574509238}

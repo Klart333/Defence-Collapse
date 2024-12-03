@@ -1,7 +1,7 @@
-using Sirenix.OdinInspector;
-using System;
 using System.Threading.Tasks;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using System;
 
 public class EnemyAnimator : MonoBehaviour
 {

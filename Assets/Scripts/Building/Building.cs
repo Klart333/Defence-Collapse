@@ -1,6 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Building : PooledMonoBehaviour, IBuildable
 {
@@ -15,6 +17,13 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     [SerializeField]
     private LayerMask selectedLayer;
+
+    [Title("Events")]
+    [SerializeField]
+    private UnityEvent OnPlacedEvent;
+
+    [SerializeField]
+    private UnityEvent OnResetEvent;
 
     private List<Material> transparentMaterials = new List<Material>();
 
@@ -117,6 +126,8 @@ public class Building : PooledMonoBehaviour, IBuildable
         hovered = false;
         selected = false;
         MeshRenderer.gameObject.layer = originalLayer;
+
+        OnResetEvent?.Invoke();
     }
 
     #region Highlight
@@ -265,6 +276,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     private void Place()
     {
         BuildingHandler.AddBuilding(this);
+        OnPlacedEvent?.Invoke();
     }
 
     public void DisplayLevelUp()
