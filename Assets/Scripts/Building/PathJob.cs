@@ -7,13 +7,13 @@ using Unity.Jobs;
 using System;
 using Unity.Burst;
 
-[BurstCompile]
-public struct DistanceJob : IJob
+[BurstCompile(FloatPrecision.Low, FloatMode.Fast, OptimizeFor = OptimizeFor.Performance)]
+public struct PathJob : IJob
 {
-    private struct IndexDistance : IComparable<IndexDistance>
+    private readonly struct IndexDistance : IComparable<IndexDistance>
     {
-        public int Index;
-        public int Distance;
+        public readonly int Index;
+        public readonly int Distance;
 
         public IndexDistance(int index, int distance)
         {
@@ -21,7 +21,7 @@ public struct DistanceJob : IJob
             Distance = distance;
         }
 
-        public readonly int CompareTo(IndexDistance other) => Distance.CompareTo(other.Distance);
+        public int CompareTo(IndexDistance other) => Distance.CompareTo(other.Distance);
     }
 
     public NativeArray<int> distances;
@@ -29,22 +29,32 @@ public struct DistanceJob : IJob
     public NativeArray<float2> directions;
 
     [Unity.Collections.ReadOnly]
-    public NativeArray<PathCell> cells;
+    public NativeArray<bool> notWalkableIndexes;
+    
+    [Unity.Collections.ReadOnly]
+    public NativeArray<bool> targetIndexes;
+    
+    [Unity.Collections.ReadOnly]
+    public NativeArray<byte> movementCosts;
 
+    [Unity.Collections.ReadOnly]
+    public NativeArray<int2> neighbourDirections;
+    
     [Unity.Collections.ReadOnly]
     public int GridWidth;
 
     [Unity.Collections.ReadOnly]
-    public NativeArray<int2> neighbourDirections;
+    public int ArrayLength; 
 
     [BurstCompile]
     public void Execute()
     {
+        // DONT NEED TO ALLOCATE THESE QUEUES EVERY TIME, COULD SEND THEM IN!!
         NativePriorityQueue<IndexDistance> frontierQueue = new NativePriorityQueue<IndexDistance>(capacity: 512, allocator: Allocator.Temp);
 
-        for (int i = 0; i < cells.Length; i++)
+        for (int i = 0; i < ArrayLength; i++)
         {
-            if (cells[i].IsTarget)
+            if (targetIndexes[i])
             {
                 distances[i] = 0;
                 frontierQueue.Enqueue(new IndexDistance(i, 0));
@@ -62,20 +72,17 @@ public struct DistanceJob : IJob
             GetNeighbours(cell.Index, neighbours);
             for (int i = 0; i < 8; i++)
             {
-                if (neighbours[i] == -1) continue;
-
-                PathCell neighbour = cells[neighbours[i]];
-
-                if (!neighbour.IsWalkable) continue;
+                int index = neighbours[i];
+                if (index == -1) continue;
+                if (notWalkableIndexes[index]) continue;
 
                 int manhattanDist = i % 2 == 0 ? 10 : 14;
-                int dist = cell.Distance + neighbour.MovementCost * manhattanDist;
-                if (dist < distances[neighbour.Index])
-                {
-                    distances[neighbour.Index] = dist;
-                    directions[neighbour.Index] = -neighbourDirections[i];
-                    frontierQueue.Enqueue(new IndexDistance(neighbour.Index, dist));
-                }
+                int dist = cell.Distance + movementCosts[index] * manhattanDist;
+                if (dist >= distances[index]) continue;
+                
+                distances[index] = dist;
+                directions[index] = -neighbourDirections[i];
+                frontierQueue.Enqueue(new IndexDistance(index, dist));
             }
         }
 
@@ -88,12 +95,12 @@ public struct DistanceJob : IJob
         int x = index % GridWidth;
         int y = index / GridWidth;
 
-        for (int i = 0; i < neighbourDirections.Length; i++)
+        for (int i = 0; i < 8; i++)
         {
             int nx = x + neighbourDirections[i].x;
             int ny = y + neighbourDirections[i].y;
 
-            if (nx >= 0 && nx < GridWidth && ny >= 0 && ny < cells.Length / GridWidth)
+            if (nx >= 0 && nx < GridWidth && ny >= 0 && ny < ArrayLength / GridWidth)
             {
                 array[i] = ny * GridWidth + nx;
             }

@@ -8,7 +8,7 @@ using System;
 
 public class PathManager : Singleton<PathManager>
 {
-    public event Action GetUnitCount;
+    public event Action GetPathInformation;
 
     [Title("Flood fill")]
     [SerializeField]
@@ -21,11 +21,14 @@ public class PathManager : Singleton<PathManager>
     [SerializeField]
     private GroundObjectData portalObjectData;
 
-    private NativeArray<PathCell> cells;
+    private NativeArray<bool> targetIndexes;
+    private NativeArray<bool> notWalkableIndexes;
+    private NativeArray<byte> movementCosts;
+    
     private NativeArray<float2> directions;
     private NativeArray<int> distances;
     private NativeArray<int2> neighbourDirections;
-    public NativeArray<int> UnitCounts;
+    public NativeArray<byte> UnitCounts;
 
     private readonly List<Portal> portals = new List<Portal>();
 
@@ -38,39 +41,53 @@ public class PathManager : Singleton<PathManager>
     public float GridWorldWidth => GridWidth * CellScale;
     public float GridWorldHeight => GridHeight * CellScale;
 
-    public PathSet BlockerPathSet { get; private set; }
-    public PathSet TargetPathSet { get; private set; }
-    public PathSet PathPathSet { get; private set; }
-
-    protected override void Awake()
-    {
-        base.Awake();
-
-        BlockerPathSet = new PathSet();
-        TargetPathSet = new PathSet();
-        PathPathSet = new PathSet();
-    }
+    public BoolPathSet BlockerPathSet { get; private set; }
+    public BoolPathSet TargetPathSet { get; private set; }
+    public BytePathSet PathPathSet { get; private set; }
 
     private void OnEnable()
     {
         portalObjectData.OnObjectSpawned += OnPortalPlaced;
 
         int length = gridSize.x * gridSize.y;
-        cells = new NativeArray<PathCell>(length, Allocator.Persistent);
+        targetIndexes = new NativeArray<bool>(length, Allocator.Persistent);
+        notWalkableIndexes = new NativeArray<bool>(length, Allocator.Persistent);
+        movementCosts = new NativeArray<byte>(length, Allocator.Persistent);
         directions = new NativeArray<float2>(length, Allocator.Persistent);
         distances = new NativeArray<int>(length, Allocator.Persistent);
-        UnitCounts = new NativeArray<int>(length, Allocator.Persistent);
+        UnitCounts = new NativeArray<byte>(length, Allocator.Persistent);
         neighbourDirections = new NativeArray<int2>(new int2[] { new int2(1, 0), new int2(1, 1), new int2(0, 1), new int2(-1, 1), new int2(-1, 0), new int2(-1, -1), new int2(0, -1), new int2(1, -1), }, Allocator.Persistent);
+
+        for (int i = 0; i < length; i++)
+        {
+            movementCosts[i] = 10;
+        }
+        
+        BlockerPathSet = new BoolPathSet(notWalkableIndexes);
+        GetPathInformation += BlockerPathSet.RebuildTargetHashSet;
+        
+        TargetPathSet = new BoolPathSet(targetIndexes);
+        GetPathInformation += TargetPathSet.RebuildTargetHashSet;
+        
+        PathPathSet = new BytePathSet(movementCosts, -9);
+        GetPathInformation += PathPathSet.RebuildTargetHashSet;
     }
 
     private void OnDisable()
     {
         portalObjectData.OnObjectSpawned -= OnPortalPlaced;
 
-        cells.Dispose();
+        targetIndexes.Dispose();
+        notWalkableIndexes.Dispose();
+        movementCosts.Dispose();
         directions.Dispose();
         distances.Dispose(); 
+        UnitCounts.Dispose();
         neighbourDirections.Dispose();
+        
+        GetPathInformation -= BlockerPathSet.RebuildTargetHashSet;
+        GetPathInformation -= TargetPathSet.RebuildTargetHashSet;
+        GetPathInformation -= PathPathSet.RebuildTargetHashSet;
     }
 
     private void Update() // DONT DO EVERY UPDATE, :P
@@ -111,55 +128,38 @@ public class PathManager : Singleton<PathManager>
     {
         for (int i = 0; i < UnitCounts.Length; i++)
         {
+            movementCosts[i] -= UnitCounts[i];
             UnitCounts[i] = 0;
         }
 
-        GetUnitCount?.Invoke();
+        GetPathInformation?.Invoke();
 
-        for (int i = 0; i < cells.Length; i++)
+        for (int i = 0; i < UnitCounts.Length; i++)
         {
-            bool walkable = !BlockerPathSet.TargetIndexes.Contains(i); // USE SET DIRTY FOR THESE AND REBUILD ON NOW
-            bool target = walkable && TargetPathSet.TargetIndexes.Contains(i);
-            bool isPath = PathPathSet.TargetIndexes.Contains(i);
+            movementCosts[i] += UnitCounts[i];
+        }
 
-            byte movementCost = (byte)((isPath ? 1 : 10) + UnitCounts[i]);
-            cells[i] = new PathCell
-            {
-                Index = i,
-                MovementCost = movementCost,
-                IsTarget = target,
-                IsWalkable = walkable,
-            };
-        } 
-
-        DistanceJob distanceJob = new DistanceJob()
-        {
-            directions = directions,
-            cells = cells,
-            distances = distances,
-            neighbourDirections = neighbourDirections,
-            GridWidth = gridSize.x,
-        };
-
-        jobHandle = distanceJob.Schedule();
-        jobHandle.Complete();
-/*
         PathJob pathJob = new PathJob()
         {
             directions = directions,
             distances = distances,
+            movementCosts = movementCosts,
+            targetIndexes = targetIndexes,
+            notWalkableIndexes = notWalkableIndexes,
             neighbourDirections = neighbourDirections,
             GridWidth = gridSize.x,
+            ArrayLength = distances.Length
         };
-        jobHandle = pathJob.Schedule(gridSize.y, 32);
-        jobHandle.Complete();*/
+
+        jobHandle = pathJob.Schedule();
+        jobHandle.Complete();
     }
 
     #region Debug
 
     private void OnDrawGizmosSelected()
     {
-        if (directions == null || directions.Length <= 0)
+        if (directions.Length <= 0)
         {
             return;
         }
@@ -167,8 +167,8 @@ public class PathManager : Singleton<PathManager>
         for (int i = 0; i < directions.Length; i++)
         {
             Gizmos.color = Color.Lerp(Color.red, Color.black, distances[i] / (float)2000);
-            Vector3 pos = new Vector3(i % gridSize.x, 5, i / gridSize.x) * cellScale;
-            //Handles.Label(pos, distances[i].ToString());
+            // ReSharper disable once PossibleLossOfFraction
+            Vector3 pos = new Vector3(i % gridSize.x, 1.0f / cellScale, i / gridSize.x) * cellScale;
             Gizmos.DrawLine(pos, pos + new Vector3(directions[i].x, 0, directions[i].y) * cellScale);
         }
     }
@@ -199,52 +199,9 @@ public class PathManager : Singleton<PathManager>
 
     public Vector2 GetPos(int index)
     {
+        // ReSharper disable once PossibleLossOfFraction
         return new Vector2(index % GridWidth, Mathf.FloorToInt(index / GridWidth)) * CellScale;
     }
 
     #endregion
-}
- 
-public struct PathCell
-{ 
-    public bool IsWalkable;
-    public bool IsTarget;
-    public byte MovementCost;
-    public int Index;
-}
-
-public struct PathJob : IJobParallelFor
-{
-    [NativeDisableParallelForRestriction]
-    public NativeArray<float2> directions;
-
-    [Unity.Collections.ReadOnly]
-    public NativeArray<int> distances;
-
-    [Unity.Collections.ReadOnly]
-    public NativeArray<int2> neighbourDirections;
-
-    [Unity.Collections.ReadOnly]
-    public int GridWidth;
-
-    public void Execute(int index)
-    {
-        for (int i = 0; i < GridWidth; i++)
-        {
-            int cellIndex = index * GridWidth + i;
-            int lowestCost = int.MaxValue;
-            int2 lowestCostDir = 0;
-            for (int j = 0; j < neighbourDirections.Length; j++)
-            {
-                int neighbour = cellIndex + neighbourDirections[j].x + neighbourDirections[j].y * GridWidth;
-                if (neighbour >= 0 && neighbour < distances.Length && distances[neighbour] < lowestCost)
-                {
-                    lowestCost = distances[neighbour];
-                    lowestCostDir = neighbourDirections[j];
-                }
-            }
-
-            directions[cellIndex] = lowestCostDir;
-        }
-    }
 }

@@ -17,11 +17,13 @@ public class CameraController : MonoBehaviour
     private InputAction up;
     private InputAction down;
     private InputAction move;
+    private Camera cam;
 
     private float zoom = 1;
 
     private void OnEnable()
     {
+        cam = Camera.main;
         inputActions = new InputActions();
 
         scroll = inputActions.Player.Scroll;
@@ -63,7 +65,7 @@ public class CameraController : MonoBehaviour
         if (Mathf.Abs(scrollDiff) > 0.1f)
         {
             Vector3 mousePosition = Input.mousePosition;
-            Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+            Ray ray = cam.ScreenPointToRay(mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hitInfo))
             {
                 Vector3 dir = (transform.position - hitInfo.point).normalized;
@@ -78,7 +80,7 @@ public class CameraController : MonoBehaviour
         if (Mathf.Abs(moveDiff) != 0)
         {
             Vector3 mousePosition = Input.mousePosition;
-            Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+            Ray ray = cam.ScreenPointToRay(mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hitInfo))
             {
                 transform.rotation = Quaternion.AngleAxis(moveDiff * rotationSens * Time.deltaTime, Vector3.up) * transform.rotation;

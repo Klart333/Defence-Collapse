@@ -38,17 +38,17 @@ public class EnemyMovement : MonoBehaviour
         health.OnDeath += Health_OnDeath;
 
         await UniTask.WaitUntil(() => PathManager.Instance != null);
-        PathManager.Instance.GetUnitCount += PathManager_GetUnitCount;
+        PathManager.Instance.GetPathInformation += PathManagerGetPathInformation;
     }
 
     private void OnDisable()
     {
-        PathManager.Instance.GetUnitCount -= PathManager_GetUnitCount; ;
+        PathManager.Instance.GetPathInformation -= PathManagerGetPathInformation; ;
 
         health.OnDeath -= Health_OnDeath;
     }
 
-    private void PathManager_GetUnitCount()
+    private void PathManagerGetPathInformation()
     {
         PathManager.Instance.UnitCounts[unitIndex] += 1; // Replace 1 with weight
     }
@@ -58,7 +58,7 @@ public class EnemyMovement : MonoBehaviour
         if (!health.Health.Alive) return;
 
         Vector3 rayPos = transform.position + Vector3.up;
-        int count = Physics.RaycastNonAlloc(rayPos, Vector3.down, results, 2, groundMask);
+        int count = Physics.RaycastNonAlloc(rayPos, Vector3.down, results, 2, groundMask); // VERY SLOW! DONT NEED EVERY FRAME, IF IT HASN'T CHANGED IN A WHILE STOP SHOOTING RAYS THE WORLD IS BASICALLY FLAT
         for (int i = 0; i < count; i++)
         {
             transform.position = results[i].point;

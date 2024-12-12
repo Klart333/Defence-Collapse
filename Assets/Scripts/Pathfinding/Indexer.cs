@@ -102,7 +102,7 @@ public class Indexer : MonoBehaviour
         Gizmos.color = Color.green;
         for (int i = 0; i < indexes.Count; i++)
         {
-            Gizmos.DrawCube(PathManager.Instance.GetPos(indexes[i]).ToXyZ(), Vector3.one * 0.5f * PathManager.Instance.CellScale);
+            Gizmos.DrawCube(PathManager.Instance.GetPos(indexes[i]).ToXyZ(0), Vector3.one * 0.5f * PathManager.Instance.CellScale);
         }
     }
 }
