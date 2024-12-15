@@ -53,26 +53,26 @@ public class BuildingManager : Singleton<BuildingManager>
         private set => cells[index.x, index.y, index.z] = value;
     }
 
-    private readonly Dictionary<Vector3Int, IBuildable> spawnedMeshes = new Dictionary<Vector3Int, IBuildable>();
     private readonly Dictionary<Vector3Int, IBuildable> querySpawnedBuildings = new Dictionary<Vector3Int, IBuildable>();
+    private readonly Dictionary<Vector3Int, IBuildable> spawnedMeshes = new Dictionary<Vector3Int, IBuildable>();
+    private readonly List<Direction> pathExclude = new List<Direction> { Direction.Up, Direction.Down };
     private readonly List<(Vector3Int, Cell)> queryChangedCells = new List<(Vector3Int, Cell)>();
     private readonly List<Vector3Int> queryCollapsedAir = new List<Vector3Int>();
-
+    private readonly Stack<Vector3Int> cellStack = new();
+    
     private List<PrototypeData> prototypes = new List<PrototypeData>();
     private List<Vector3Int> cellsToCollapse = new List<Vector3Int>();
-    private readonly Stack<Vector3Int> cellStack = new();
-    private readonly List<Direction> pathExclude = new List<Direction> { Direction.Up, Direction.Down };
+    private HashSet<string> allowedKeys;
 
     private WaveFunction waveFunction;
     private BuildingAnimator buildingAnimator;
-
     private PrototypeData emptyPrototype;
     private PrototypeData unbuildablePrototype;
 
     private BuildingType currentBuildingType;
 
-    private HashSet<string> allowedKeys;
-
+    private Vector3Int? queryIndex; 
+        
     public int TopBuildableLayer { get; private set; }
     public float CellSize => cellSize;
     public Cell[,,] Cells => cells;
@@ -134,7 +134,7 @@ public class BuildingManager : Singleton<BuildingManager>
             {
                 for (int x = 0; x < cells.GetLength(0); x++)
                 {
-                    Vector3 pos = new Vector3(x * cellSize * waveFunction.GridScale.x - 0.5f, y * waveFunction.GridScale.y, z * cellSize * waveFunction.GridScale.z - 0.5f);
+                    Vector3 pos = new Vector3(x * cellSize * waveFunction.GridScale.x, y * waveFunction.GridScale.y, z * cellSize * waveFunction.GridScale.z);
                     cells[x, y, z] = new Cell(false, pos + transform.position, new List<PrototypeData>() { emptyPrototype }, true);
                 }
             }
@@ -236,6 +236,7 @@ public class BuildingManager : Singleton<BuildingManager>
             spawnedMeshes.Add(item.Key, item.Value);
         }
 
+        queryIndex = null;
         querySpawnedBuildings.Clear();
         queryChangedCells.Clear();
     }
@@ -291,6 +292,13 @@ public class BuildingManager : Singleton<BuildingManager>
                 cells[index.x, index.y, index.z] = queryChangedCells[i].Item2;
             }
         }
+
+        if (queryIndex.HasValue)
+        {
+            cellsBuilt[queryIndex.Value.x, queryIndex.Value.y, queryIndex.Value.z] = false;
+            queryIndex = null;
+        }
+        
         queryChangedCells.Clear();
         queryCollapsedAir.Clear();
     }
@@ -304,7 +312,19 @@ public class BuildingManager : Singleton<BuildingManager>
 
         currentBuildingType = buildingType;
         cellsToCollapse = GetCellsToCollapse(queryPosition, buildingType);
-
+        if (cellsToCollapse.Count <= 0) return querySpawnedBuildings;
+        
+        queryIndex = GetIndexFloored(queryPosition);
+        if (!queryIndex.HasValue) return querySpawnedBuildings;
+        if (cellsBuilt[queryIndex.Value.x, queryIndex.Value.y, queryIndex.Value.z])
+        {
+            queryIndex = null;
+        }
+        else
+        {
+            cellsBuilt[queryIndex.Value.x, queryIndex.Value.y, queryIndex.Value.z] = true;
+        }
+        
         switch (buildingType)
         {
             case BuildingType.Castle:
@@ -327,13 +347,11 @@ public class BuildingManager : Singleton<BuildingManager>
                 allowedKeys = keyData.PathKeys;
                 MakeBuildable(cellsToCollapse);
                 break;
-            default:
-                break;
         }
         Propagate();
 
         int tries = 1000;
-        while (!cellsToCollapse.All(x => cells[x.x, x.y, x.z].Collapsed) && tries-- > 0)
+        while (cellsToCollapse.Any(x => !cells[x.x, x.y, x.z].Collapsed) && tries-- > 0)
         {
             Iterate();
         }
@@ -773,6 +791,17 @@ public class BuildingManager : Singleton<BuildingManager>
         
         return null;
     }
+    
+    public Vector3Int? GetIndexFloored(Vector3 pos)
+    {
+        Vector3Int index = new Vector3Int(Math.GetMultipleFloored(pos.x, waveFunction.GridScale.x * cellSize), Math.GetMultiple(pos.y, waveFunction.GridScale.y), Math.GetMultipleFloored(pos.z, waveFunction.GridScale.z * cellSize));
+        if (cells.IsInBounds(index.x, index.y, index.z))
+        {
+            return index;
+        }
+        
+        return null;
+    }
 
     public Vector3 GetPos(Vector3Int index)
     {
@@ -821,8 +850,8 @@ public class BuildingManager : Singleton<BuildingManager>
             {
                 for (int x = 0; x < cells.GetLength(0); x++)
                 {
-                    Vector3 pos = cells[x, y, z].Position;
-                    Gizmos.color = cells[x, y, z].Buildable ? Color.white : Color.red;
+                    Vector3 pos = cells[x, y, z].Position;//+ new Vector3(waveFunction.GridScale.x * cellSize, 0, waveFunction.GridScale.z * cellSize);
+                    Gizmos.color = !cellsBuilt[x, y, z] ? Color.white : Color.magenta;
                     Gizmos.DrawWireCube(pos, new Vector3(waveFunction.GridScale.x * cellSize, waveFunction.GridScale.y, waveFunction.GridScale.z * cellSize) * 0.75f);
                 }
             }

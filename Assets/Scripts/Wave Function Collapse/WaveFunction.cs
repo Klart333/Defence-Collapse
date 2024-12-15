@@ -759,7 +759,7 @@ public class WaveFunction : MonoBehaviour
     #endregion
 }
 [System.Serializable]
-public struct MeshWithRotation
+public struct MeshWithRotation : IEquatable<MeshWithRotation>
 {
     public Mesh Mesh;
     public int Rot;
@@ -768,6 +768,21 @@ public struct MeshWithRotation
     {
         Mesh = mesh;
         Rot = rot;
+    }
+
+    public bool Equals(MeshWithRotation other)
+    {
+        return Equals(Mesh, other.Mesh) && Rot == other.Rot;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is MeshWithRotation other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Mesh, Rot);
     }
 }
 

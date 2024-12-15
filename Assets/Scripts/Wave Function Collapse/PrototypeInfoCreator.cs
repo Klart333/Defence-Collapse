@@ -1,11 +1,12 @@
+using System;
 using System.Collections.Generic;
-using UnityEngine.UIElements;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
+using Sirenix.Serialization;
 
-public class PrototypeInfoCreator : MonoBehaviour
+public class PrototypeInfoCreator : SerializedMonoBehaviour
 {
     [Title("Debug")]
     public bool Debug;
@@ -39,10 +40,17 @@ public class PrototypeInfoCreator : MonoBehaviour
     [SerializeField]
     private int castlePrototypeIndex;
 
-    [Title("Scale")]
+    [Title("Settings")]
     [SerializeField]
     private Vector3 moduleScale;
 
+    [SerializeField]
+    private bool useMCode = false;
+
+    [SerializeField]
+    [ShowIf(nameof(useMCode))]
+    private bool useMCodeHeight = false;
+    
     [Title("Generated")]
     public List<PrototypeData> Prototypes = new List<PrototypeData>();
 
@@ -58,6 +66,9 @@ public class PrototypeInfoCreator : MonoBehaviour
     [SerializeField]
     private List<int> notAllowedForSides = new List<int>();
 
+    [SerializeField, OdinSerialize]
+    private List<PrototypeData>[] marchingTable;
+    
     [SerializeField]
     private int castleIndex;
 
@@ -71,8 +82,6 @@ public class PrototypeInfoCreator : MonoBehaviour
 
     private List<GameObject> spawnedPrototypes = new List<GameObject>();
 
-    private List<Vector3> displayVerts = new List<Vector3>();
-
     private int currentSideIndex = 0;
     private int currentTopIndex = 0;
 
@@ -85,6 +94,18 @@ public class PrototypeInfoCreator : MonoBehaviour
     public void CreateInfo()
     {
         Reset();
+
+        marchingTable = useMCode switch
+        {
+            true when useMCodeHeight => new List<PrototypeData>[256],
+            true => new List <PrototypeData>[16], // https://ragingnexus.com/creative-code-lab/experiments/algorithms-marching-squares/
+            _ => marchingTable
+        };
+
+        for (int i = 0; i < marchingTable.Length; i++)
+        {
+            marchingTable[i] = new List<PrototypeData>();
+        }
 
         MeshFilter[] meshes = GetComponentsInChildren<MeshFilter>();
         for (int i = 0; i < meshes.Length; i++)
@@ -104,34 +125,34 @@ public class PrototypeInfoCreator : MonoBehaviour
             {
                 Vector3 vec = new Vector3(math.round(noDupes[g].x * divider * (2.0f / moduleScale.x)) / divider, math.round(noDupes[g].y * divider * (2.0f / moduleScale.y)) / divider, math.round(noDupes[g].z * divider * (2.0f / moduleScale.z)) / divider);
 
-                if (vec.x == 1f)
+                switch (vec.x)
                 {
-                    posXs.Add(vec);
+                    case 1f:
+                        posXs.Add(vec);
+                        break;
+                    case -1f:
+                        negXs.Add(vec);
+                        break;
                 }
 
-                if (vec.x == -1f)
+                switch (vec.y)
                 {
-                    negXs.Add(vec);
+                    case 1f:
+                        posYs.Add(vec);
+                        break;
+                    case -1f:
+                        negYs.Add(vec);
+                        break;
                 }
 
-                if (vec.y == 1f)
+                switch (vec.z)
                 {
-                    posYs.Add(vec);
-                }
-
-                if (vec.y == -1f)
-                {
-                    negYs.Add(vec);
-                }
-
-                if (vec.z == 1f)
-                {
-                    posZs.Add(vec);
-                }
-
-                if (vec.z == -1f)
-                {
-                    negZs.Add(vec);
+                    case 1f:
+                        posZs.Add(vec);
+                        break;
+                    case -1f:
+                        negZs.Add(vec);
+                        break;
                 }
             }
 
@@ -185,10 +206,22 @@ public class PrototypeInfoCreator : MonoBehaviour
             {
                 castleIndex = Prototypes.Count - 1;
             }
+
+            if (useMCode && !useMCodeHeight)
+            {
+                SetMarchingTable2D(prots);
+            }
         }
 
         // Empty
-        Prototypes.Add(new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", pieceWeights[meshes.Length].Weight, new int[0]));
+        PrototypeData air = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", pieceWeights[meshes.Length].Weight, System.Array.Empty<int>());
+        Prototypes.Add(air);
+
+        if (useMCode && !useMCodeHeight)
+        {
+            marchingTable[0].Add(air);
+            marchingTable[15].Add(air);
+        }
 
         static bool AddIfUnique(List<PrototypeData> prots, PrototypeData prot)
         {
@@ -321,7 +354,43 @@ public class PrototypeInfoCreator : MonoBehaviour
 
         return keys;
     }
+    
+    private void SetMarchingTable2D(List<PrototypeData> prots)
+    {
+        UnityEngine.Debug.Log("Mesh: " + prots[0].MeshRot.Mesh.name);
 
+        string code = prots[0].MeshRot.Mesh.name[^4..]; 
+        
+        for (int i = 0; i < prots.Count; i++)
+        {
+            int rot = prots[i].MeshRot.Rot;
+            string key = code;
+            if (rot > 0)
+            {
+                // Rotate code
+                UnityEngine.Debug.Log("Rot: " + rot);
+                key = RotateBinaryClockwise(code, rot);
+            }
+            int index = System.Convert.ToInt32(key, 2);
+            UnityEngine.Debug.Log("Code: " + key);
+            UnityEngine.Debug.Log("Index: " + index);
+            marchingTable[index].Add(prots[i]);
+        }
+    }
+    
+    private string RotateBinaryClockwise(string binaryString, int rotations)
+    {
+        char[] rotated = new char[4];
+        for (int i = 0; i < 4; i++)
+        {
+            int newIndex = (i + rotations) % 4;
+            rotated[newIndex] = binaryString[i];
+        }
+
+        return new string(rotated);
+    }
+  
+    
     [TitleGroup("Display", Order = -50)]
     [Button]
     public void DisplayPrototypes()
@@ -379,21 +448,11 @@ public class PrototypeInfoCreator : MonoBehaviour
         currentTopIndex = 0;
         socketList.Clear();
         verticalSocketList.Clear();
-        displayVerts.Clear();
         NotAllowedForBottom.Clear();
         NotAllowedForSides.Clear();
+        marchingTable = Array.Empty<List<PrototypeData>>();
     }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        for (int i = 0; i < displayVerts.Count; i++)
-        {
-            Gizmos.DrawSphere(displayVerts[i], 0.05f);
-        }   
-    }
-
-
+    
     public bool StrictEquals(List<Vector2> vec1, List<Vector2> vec2)
     {
         if (vec1.Count != vec2.Count)
@@ -479,7 +538,7 @@ public class PrototypeInfoCreator : MonoBehaviour
     [Button]
     public void PrintChildrenCount()
     {
-        print(transform.childCount);
+        UnityEngine.Debug.Log(transform.childCount);
     }
 }
 
@@ -497,7 +556,7 @@ public struct DicData
 }
 
 [System.Serializable]
-public struct PrototypeData
+public struct PrototypeData : System.IEquatable<PrototypeData>
 {
     public MeshWithRotation MeshRot;
 
@@ -540,22 +599,26 @@ public struct PrototypeData
         return !p1.Equals(p2);
     }
 
-    public override readonly bool Equals(object obj)
+    public readonly override bool Equals(object obj)
     {
-        return obj is PrototypeData data &&
-               PosX == data.PosX &&
+        return obj is PrototypeData data && Equals(data);
+    }
+
+    public readonly override int GetHashCode()
+    {
+        return System.HashCode.Combine(PosX, NegX, PosZ, NegZ, PosY, NegY, Weight);
+    }
+
+    public readonly bool Equals(PrototypeData data)
+    {
+        return PosX == data.PosX &&
                NegX == data.NegX &&
                PosZ == data.PosZ &&
                NegZ == data.NegZ &&
                PosY == data.PosY &&
                NegY == data.NegY &&
-               Weight == data.Weight &&
+               Mathf.Approximately(Weight, data.Weight) &&
                MeshRot.Mesh == data.MeshRot.Mesh;
-    }
-
-    public override readonly int GetHashCode()
-    {
-        return System.HashCode.Combine(PosX, NegX, PosZ, NegZ, PosY, NegY, Weight);
     }
 }
 

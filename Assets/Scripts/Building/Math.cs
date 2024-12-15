@@ -17,4 +17,9 @@ public static class Math
     {
         return Mathf.RoundToInt(x / multiple);
     }
+    
+    public static int GetMultipleFloored(float x, float multiple)
+    {
+        return Mathf.FloorToInt(x / multiple);
+    }
 }
