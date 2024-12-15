@@ -42,28 +42,20 @@ public class WaveFunction : MonoBehaviour
     [SerializeField]
     private int chillTimeMs = 0;
 
-    private List<GameObject> spawnedPossibilites = new List<GameObject>();
-    private List<GameObject> spawnedMeshes = new List<GameObject>();
+    private readonly List<GameObject> spawnedPossibilites = new List<GameObject>();
+    private readonly List<GameObject> spawnedMeshes = new List<GameObject>();
 
     private List<PrototypeData> prototypes = new List<PrototypeData>();
-    private List<PrototypeData> bottomPrototypes = new List<PrototypeData>();
-    private List<Cell> cells = new List<Cell>();
+    private readonly List<PrototypeData> bottomPrototypes = new List<PrototypeData>();
+    private readonly List<Cell> cells = new List<Cell>();
 
-    private Stack<int> cellStack = new Stack<int>();
+    private readonly Stack<int> cellStack = new Stack<int>();
 
     private PrototypeData emptyPrototype;
 
-    public GameObject SpawnedCastle { get; private set; }
-    public int Speed { get; set; }
     public Vector3Int GridSize => new Vector3Int(gridSizeX, gridSizeY, gridSizeZ);
+    private bool AllCollapsed => cells.All(cell => cell.Collapsed);
     public Vector3 GridScale => gridSize;
-    private bool AllCollapsed
-    {
-        get
-        {
-            return !cells.Any(cell => !cell.Collapsed);
-        }
-    }
 
     private void Start()
     {

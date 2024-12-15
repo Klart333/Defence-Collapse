@@ -18,13 +18,7 @@ public class BuildingPlacer : MonoBehaviour
     private Camera cam;
 
     private bool manualCancel = false;
-    private bool Canceled
-    {
-        get
-        {
-            return InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
-        }
-    }
+    private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
 
     private void OnEnable()
     {

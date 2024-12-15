@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class UIBuildingHandler : MonoBehaviour
 {
-    private bool gottaStartWithACastle = true;
+    private bool gottaStartWithACastle = false;
 
     private void OnEnable()
     {

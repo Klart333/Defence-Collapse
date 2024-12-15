@@ -76,7 +76,7 @@ public class EnemyMovement : MonoBehaviour
         Vector2 pos = transform.position.XZ();
         unitIndex = PathManager.Instance.GetIndex(pos);
         Vector2 dir = PathManager.Instance.Directions[unitIndex];
-        direction = (direction + dir.ToXyZ() * turnSpeed * Time.deltaTime).normalized;
+        direction = (direction + dir.ToXyZ() * (turnSpeed * Time.deltaTime)).normalized;
 
         transform.position += enemyData.Stats.MovementSpeed.Value * Time.deltaTime * direction;
     }

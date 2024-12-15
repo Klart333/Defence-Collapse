@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Debug = UnityEngine.Debug;
 using Sirenix.OdinInspector;
-using Sirenix.Utilities;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
@@ -46,22 +45,23 @@ public class BuildingManager : Singleton<BuildingManager>
     private int Speed;
 
     private Cell[,,] cells;
+    private bool[,,] cellsBuilt;
 
     public Cell this[Vector3Int index]
     {
-        get { return cells[index.x, index.y, index.z]; }
-        set { cells[index.x, index.y, index.z] = value; }
+        get => cells[index.x, index.y, index.z];
+        private set => cells[index.x, index.y, index.z] = value;
     }
 
-    private Dictionary<Vector3Int, IBuildable> spawnedMeshes = new Dictionary<Vector3Int, IBuildable>();
-    private Dictionary<Vector3Int, IBuildable> querySpawnedBuildings = new Dictionary<Vector3Int, IBuildable>();
-    private List<(Vector3Int, Cell)> queryChangedCells = new List<(Vector3Int, Cell)>();
-    private List<Vector3Int> queryCollapsedAir = new List<Vector3Int>();
+    private readonly Dictionary<Vector3Int, IBuildable> spawnedMeshes = new Dictionary<Vector3Int, IBuildable>();
+    private readonly Dictionary<Vector3Int, IBuildable> querySpawnedBuildings = new Dictionary<Vector3Int, IBuildable>();
+    private readonly List<(Vector3Int, Cell)> queryChangedCells = new List<(Vector3Int, Cell)>();
+    private readonly List<Vector3Int> queryCollapsedAir = new List<Vector3Int>();
 
     private List<PrototypeData> prototypes = new List<PrototypeData>();
     private List<Vector3Int> cellsToCollapse = new List<Vector3Int>();
-    private Stack<Vector3Int> cellStack = new Stack<Vector3Int>();
-    private List<Direction> pathExclude = new List<Direction>() { Direction.Up, Direction.Down };
+    private readonly Stack<Vector3Int> cellStack = new();
+    private readonly List<Direction> pathExclude = new List<Direction> { Direction.Up, Direction.Down };
 
     private WaveFunction waveFunction;
     private BuildingAnimator buildingAnimator;
@@ -86,6 +86,7 @@ public class BuildingManager : Singleton<BuildingManager>
         Events.OnBuildingDestroyed += OnBuildingDestroyed;
         Events.OnBuildingRepaired += OnBuildingRepaired;
     }
+    
     private void OnDisable()
     {
         waveFunction.OnMapGenerated -= Load;
@@ -123,6 +124,7 @@ public class BuildingManager : Singleton<BuildingManager>
     private void LoadCells()
     {
         cells = new Cell[Mathf.RoundToInt(waveFunction.GridSize.x / cellSize), waveFunction.GridSize.y + 1, Mathf.RoundToInt(waveFunction.GridSize.z / cellSize)];
+        cellsBuilt = new bool[Mathf.RoundToInt(waveFunction.GridSize.x / cellSize), waveFunction.GridSize.y + 1, Mathf.RoundToInt(waveFunction.GridSize.z / cellSize)];
         emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 1, new int[0]);
         unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 0, new int[0]);
 
@@ -246,20 +248,19 @@ public class BuildingManager : Singleton<BuildingManager>
             bool fixedit = false;
             for (int g = 0; g < queryChangedCells.Count; g++)
             {
-                if (index == queryChangedCells[g].Item1)
+                if (index != queryChangedCells[g].Item1) continue;
+                
+                fixedit = true;
+                Vector3Int changedIndex = queryChangedCells[g].Item1;
+                if (queryChangedCells[g].Item2.Collapsed)
                 {
-                    fixedit = true;
-                    Vector3Int changedIndex = queryChangedCells[g].Item1;
-                    if (queryChangedCells[g].Item2.Collapsed)
-                    {
-                        SetCell(changedIndex, queryChangedCells[g].Item2.PossiblePrototypes[0], false);
-                    }
-                    else
-                    {
-                        this[changedIndex] = queryChangedCells[g].Item2;
-                    }
-                    break;
+                    SetCell(changedIndex, queryChangedCells[g].Item2.PossiblePrototypes[0], false);
                 }
+                else
+                {
+                    this[changedIndex] = queryChangedCells[g].Item2;
+                }
+                break;
             }
             
             if (!fixedit)
@@ -350,10 +351,7 @@ public class BuildingManager : Singleton<BuildingManager>
         for (int i = 0; i < cellsToCollapse.Count; i++)
         {
             Vector3Int index = cellsToCollapse[i];
-            if (!this[index].Buildable)
-            {
-                continue;
-            }
+            if (!this[index].Buildable) continue;
 
             queryChangedCells.Add((index, cells[index.x, index.y, index.z]));
 
@@ -370,7 +368,7 @@ public class BuildingManager : Singleton<BuildingManager>
 
     public List<Vector3Int> GetCellsToCollapse(Vector3 queryPos, BuildingType type)
     {
-        List<Vector3Int> cellsToCollapse = new List<Vector3Int>();
+        List<Vector3Int> toCollapse;
         queryPos += new Vector3(CellSize, 0, CellSize) / 2.0f;
 
         switch (type)
@@ -378,20 +376,22 @@ public class BuildingManager : Singleton<BuildingManager>
             case BuildingType.Castle:
                 Vector3 minPos = new(queryPos.x - cellSize * 2, queryPos.y, queryPos.z - cellSize * 2);
                 Vector3 maxPos = new(queryPos.x + cellSize * 2, queryPos.y, queryPos.z + cellSize * 2);
-                cellsToCollapse = GetAllCells(minPos, maxPos);
+                toCollapse = GetAllCells(minPos, maxPos);
                 break;
             case BuildingType.Building:
-                cellsToCollapse = GetSurroundingCells(queryPos);
+                toCollapse = GetSurroundingCells(queryPos);
 
                 break;
             case BuildingType.Path:
-                cellsToCollapse = GetSurroundingCells(queryPos);
+                toCollapse = GetSurroundingCells(queryPos);
                 //cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3.up * waveFunction.GridScale.y));
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
         //cellsToCollapse.ForEach((x) => Debug.Log("Cell: " + x));
 
-        return cellsToCollapse;
+        return toCollapse;
     }
 
     #endregion
