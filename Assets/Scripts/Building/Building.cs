@@ -1,8 +1,8 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine;
 
 public class Building : PooledMonoBehaviour, IBuildable
 {
@@ -35,61 +35,20 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private int originalLayer;
     
-    private bool highlighted = false;
-    private bool selected = false;
-    private bool hovered = false;
     private bool purchasing = true;
+    private bool highlighted;
+    private bool selected;
+    private bool hovered;
 
     public int BuildingGroupIndex { get; set; } = -1;
-    public PrototypeData Prototype { get; set; }
-    public Vector3Int Index { get; set; }
+    public PrototypeData Prototype { get; private set; }
+    public Vector3Int Index { get; private set; }
     public int Importance => 1;
 
-    public BuildingUI BuildingUI
-    {
-        get
-        {
-            if (buildingUI == null)
-            {
-                buildingUI = GetComponentInChildren<BuildingUI>();
-            }
-
-            return buildingUI;
-        }
-    }
-    public BuildingHandler BuildingHandler
-    {
-        get
-        {
-            if (buildingHandler == null)
-            {
-                buildingHandler = FindAnyObjectByType<BuildingHandler>();
-            }
-
-            return buildingHandler;
-        }
-    }
-    public BuildingAnimator BuildingAnimator
-    {
-        get
-        {
-            if (buildingAnimator == null)
-            {
-                buildingAnimator = FindAnyObjectByType<BuildingAnimator>();
-            }
-
-            return buildingAnimator;
-        }
-    }
-    public MeshRenderer MeshRenderer
-    {
-        get
-        {
-            if (meshRenderer == null) meshRenderer = GetComponentInChildren<MeshRenderer>();
-
-            return meshRenderer;
-        }
-    }
+    private BuildingAnimator BuildingAnimator => buildingAnimator ??= FindAnyObjectByType<BuildingAnimator>();
+    public BuildingHandler BuildingHandler => buildingHandler ??= FindAnyObjectByType<BuildingHandler>();
+    public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
+    public BuildingUI BuildingUI => buildingUI ??= GetComponentInChildren<BuildingUI>();
     public Mesh Mesh => Prototype.MeshRot.Mesh;
 
     private void Awake()
@@ -147,7 +106,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         hovered = false;
     }
 
-    public async void Highlight(BuildingCellInformation cellInfo)
+    public async UniTask Highlight(BuildingCellInformation cellInfo)
     {
         if (purchasing || highlighted) return;
 
@@ -219,7 +178,10 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void Setup(PrototypeData prototypeData, Vector3 scale)
     {
-        Index = BuildingManager.Instance.GetIndex(transform.position).Value;
+        Vector3Int? nullableIndex = BuildingManager.Instance.GetIndex(transform.position);
+        if (!nullableIndex.HasValue) return;
+        
+        Index = nullableIndex.Value;
         Prototype = GetPrototype(prototypeData);
 
         GetComponentInChildren<MeshFilter>().mesh = Mesh;
@@ -275,7 +237,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void Place()
     {
-        BuildingHandler.AddBuilding(this);
+        _ = BuildingHandler.AddBuilding(this);
         OnPlacedEvent?.Invoke();
     }
 

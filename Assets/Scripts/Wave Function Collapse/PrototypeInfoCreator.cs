@@ -87,6 +87,7 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
 
     public List<int> NotAllowedForBottom => notAllowedForBottom;
     public List<int> NotAllowedForSides => notAllowedForSides;
+    public List<PrototypeData>[] MarchingTable => marchingTable;
     public int CastleIndex => castleIndex;
 
     [TitleGroup("Creation", Order = -100)]
@@ -619,6 +620,19 @@ public struct PrototypeData : System.IEquatable<PrototypeData>
                NegY == data.NegY &&
                Mathf.Approximately(Weight, data.Weight) &&
                MeshRot.Mesh == data.MeshRot.Mesh;
+    }
+    
+    public override string ToString()
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.Append("PrototypeData { ");
+        sb.Append("MeshRot: { Mesh: ").Append(MeshRot.Mesh?.name ?? "null").Append(", Rotation: ").Append(MeshRot.Rot).Append(" }, ");
+        //sb.Append("PosX: ").Append(PosX).Append(", NegX: ").Append(NegX).Append(", ");
+        //sb.Append("PosY: ").Append(PosY).Append(", NegY: ").Append(NegY).Append(", ");
+        //sb.Append("PosZ: ").Append(PosZ).Append(", NegZ: ").Append(NegZ).Append(", ");
+        sb.Append("Weight: ").Append(Weight);
+        sb.Append("}");
+        return sb.ToString();
     }
 }
 

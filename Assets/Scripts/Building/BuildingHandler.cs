@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
+using System.Linq;
 
 public class BuildingHandler : SerializedMonoBehaviour 
 {
@@ -20,22 +22,11 @@ public class BuildingHandler : SerializedMonoBehaviour
     private int groupIndexCounter = 0;
     private bool chilling = false;
 
-    public BuildingData this[Building building]
-    {
-        get 
-        { 
-            if (BuildingData.TryGetValue(building.Index, out BuildingData data))
-            {
-                return data;
-            }
-
-            return null; 
-        }
-    } // I like this way too much
+    public BuildingData this[Building building] => BuildingData.GetValueOrDefault(building.Index);  // I like this way too much
 
     #region Handling Groups
 
-    public async void AddBuilding(Building building)
+    public async UniTask AddBuilding(Building building)
     {
         buildingQueue.Add(building);
         if (chilling) return;
@@ -56,7 +47,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         }
 
         BuildingGroups.Add(++groupIndexCounter, new List<Building>(buildingQueue));
-        buildingQueue.ForEach(building => building.BuildingGroupIndex = groupIndexCounter);
+        buildingQueue.ForEach(build => build.BuildingGroupIndex = groupIndexCounter);
         buildingQueue.Clear();
 
         CheckMerge(groupIndexCounter);
@@ -95,31 +86,16 @@ public class BuildingHandler : SerializedMonoBehaviour
         List<Building> buildings = BuildingGroups[groupToCheck];
         int adjacenyCount = 0;
 
-        foreach (KeyValuePair<int, List<Building>> group in BuildingGroups)
+        foreach (KeyValuePair<int, List<Building>> group in BuildingGroups.Where(group => group.Key != groupToCheck))
         {
-            if (group.Key == groupToCheck)
-            {
-                continue;
-            }
-
-            for (int i = 0; i < buildings.Count; i++)
+            for (int i = buildings.Count - 1; i >= 0; i--)
             {
                 Building building = buildings[i];
-                for (int g = 0; g < group.Value.Count; g++)
-                {
-                    if (IsAdjacent(building, group.Value[g]))
-                    {
-                        if (++adjacenyCount < 2)
-                        {
-                            continue;
-                        }
-                        Merge(groupToCheck, group.Key);
-                        CheckMerge(group.Key);
-                        return;
-                    }
-                }
+                if (!group.Value.Where(t => IsAdjacent(building, t)).Any(t => ++adjacenyCount >= 2)) continue;
+                Merge(groupToCheck, group.Key);
+                CheckMerge(group.Key);
+                return;
             }
-            
         }
     }
 
@@ -130,7 +106,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         BuildingGroups.Remove(groupToMerge);
     }
 
-    private bool IsAdjacent(Building building1, Building building2, float scale = 2)
+    private static bool IsAdjacent(Building building1, Building building2, float scale = 2)
     {
         float distance = Vector3.Distance(building1.transform.position, building2.transform.position);
         return distance <= scale;
@@ -253,7 +229,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 }
 
 [System.Serializable]
-public struct BuildingCellInformation
+public struct BuildingCellInformation : IEquatable<BuildingCellInformation>
 {
     public int HouseCount;
     public bool Upgradable;
@@ -270,6 +246,11 @@ public struct BuildingCellInformation
     public override int GetHashCode()
     {
         return HashCode.Combine(HouseCount, Upgradable, TowerType);
+    }
+
+    public bool Equals(BuildingCellInformation other)
+    {
+        return HouseCount == other.HouseCount && Upgradable == other.Upgradable && TowerType == other.TowerType;
     }
 }
 

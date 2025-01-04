@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using Unity.Jobs;
 using System;
+using System.Linq;
 
 public class PathManager : Singleton<PathManager>
 {
@@ -56,11 +57,11 @@ public class PathManager : Singleton<PathManager>
         directions = new NativeArray<float2>(length, Allocator.Persistent);
         distances = new NativeArray<int>(length, Allocator.Persistent);
         UnitCounts = new NativeArray<byte>(length, Allocator.Persistent);
-        neighbourDirections = new NativeArray<int2>(new int2[] { new int2(1, 0), new int2(1, 1), new int2(0, 1), new int2(-1, 1), new int2(-1, 0), new int2(-1, -1), new int2(0, -1), new int2(1, -1), }, Allocator.Persistent);
+        neighbourDirections = new NativeArray<int2>(new[] { new int2(1, 0), new int2(1, 1), new int2(0, 1), new int2(-1, 1), new int2(-1, 0), new int2(-1, -1), new int2(0, -1), new int2(1, -1), }, Allocator.Persistent);
 
         for (int i = 0; i < length; i++)
         {
-            movementCosts[i] = 10;
+            movementCosts[i] = 50;
         }
         
         BlockerPathSet = new BoolPathSet(notWalkableIndexes);
@@ -69,7 +70,7 @@ public class PathManager : Singleton<PathManager>
         TargetPathSet = new BoolPathSet(targetIndexes);
         GetPathInformation += TargetPathSet.RebuildTargetHashSet;
         
-        PathPathSet = new BytePathSet(movementCosts, -9);
+        PathPathSet = new BytePathSet(movementCosts, -45);
         GetPathInformation += PathPathSet.RebuildTargetHashSet;
     }
 
@@ -109,19 +110,7 @@ public class PathManager : Singleton<PathManager>
 
     public List<Vector3> GetEnemySpawnPoints()
     {
-        List<Vector3> spawnPoints = new List<Vector3>();
-        for (int i = 0; i < portals.Count; i++)
-        {
-            if (portals[i].Locked)
-            {
-                continue;
-            }
-
-            Vector3 portalPos = portals[i].transform.position;
-            spawnPoints.Add(portalPos);
-        }
-
-        return spawnPoints;
+        return (from t in portals where !t.Locked select t.transform.position).ToList();
     }
 
     private void UpdateFloodFill()

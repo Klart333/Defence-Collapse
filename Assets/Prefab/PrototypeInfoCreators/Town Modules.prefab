@@ -1,0 +1,3629 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1038369239017074738
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2885764773382081743}
+  - component: {fileID: 6400630825631149914}
+  - component: {fileID: 2787943096128394068}
+  m_Layer: 0
+  m_Name: Path_Full
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2885764773382081743
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038369239017074738}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 16, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &6400630825631149914
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038369239017074738}
+  m_Mesh: {fileID: -1785177617388048132, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
+--- !u!23 &2787943096128394068
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038369239017074738}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &1464202449924654237
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2519136606593905434}
+  - component: {fileID: 855127878843882316}
+  - component: {fileID: 8959883716912116983}
+  m_Layer: 0
+  m_Name: "SideV\xE4g"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2519136606593905434
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464202449924654237}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 8, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &855127878843882316
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464202449924654237}
+  m_Mesh: {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+--- !u!23 &8959883716912116983
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464202449924654237}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: df6ba97d9f327ca4ebf0c2680397425d, type: 2}
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &1887220562505658087
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5660219141561585625}
+  - component: {fileID: 7998736701293585143}
+  - component: {fileID: 3732301576682587877}
+  m_Layer: 0
+  m_Name: Path_DoubleCorner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5660219141561585625
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1887220562505658087}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 14, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &7998736701293585143
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1887220562505658087}
+  m_Mesh: {fileID: -7022312304108209055, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
+--- !u!23 &3732301576682587877
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1887220562505658087}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2212840265148739021
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2391168213113158236}
+  - component: {fileID: 1649679585980194947}
+  - component: {fileID: 860664240842930409}
+  m_Layer: 0
+  m_Name: Path_Corner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2391168213113158236
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2212840265148739021}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 12, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &1649679585980194947
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2212840265148739021}
+  m_Mesh: {fileID: -1269883566850833621, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
+--- !u!23 &860664240842930409
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2212840265148739021}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2332324302506590997
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8937457377877375731}
+  - component: {fileID: 4303481698769753988}
+  - component: {fileID: 6734043101368868218}
+  m_Layer: 0
+  m_Name: Corner2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8937457377877375731
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2332324302506590997}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &4303481698769753988
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2332324302506590997}
+  m_Mesh: {fileID: -4423153410692427784, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+--- !u!23 &6734043101368868218
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2332324302506590997}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: df6ba97d9f327ca4ebf0c2680397425d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2651975235251520770
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4138382863133268831}
+  - component: {fileID: 8948932104382070788}
+  - component: {fileID: 3064397599043489485}
+  m_Layer: 0
+  m_Name: "SideV\xE4gTv\xE5"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4138382863133268831
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2651975235251520770}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 10, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &8948932104382070788
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2651975235251520770}
+  m_Mesh: {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+--- !u!23 &3064397599043489485
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2651975235251520770}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: df6ba97d9f327ca4ebf0c2680397425d, type: 2}
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2911804275011792689
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2372009415461817715}
+  - component: {fileID: 1876164607935299218}
+  - component: {fileID: 4339274355088454056}
+  m_Layer: 0
+  m_Name: OnPass2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2372009415461817715
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2911804275011792689}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 4, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &1876164607935299218
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2911804275011792689}
+  m_Mesh: {fileID: -5672807904190475791, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+--- !u!23 &4339274355088454056
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2911804275011792689}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: df6ba97d9f327ca4ebf0c2680397425d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5121971549517448098
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6627271170812180962}
+  - component: {fileID: 4479195785063293089}
+  - component: {fileID: 3250053339205489506}
+  m_Layer: 0
+  m_Name: Side
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6627271170812180962
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5121971549517448098}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 6, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &4479195785063293089
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5121971549517448098}
+  m_Mesh: {fileID: -3014119590633635102, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+--- !u!23 &3250053339205489506
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5121971549517448098}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: df6ba97d9f327ca4ebf0c2680397425d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5689529409041346657
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4974116604679377333}
+  - component: {fileID: 5331702663022488884}
+  - component: {fileID: 3778056251620811237}
+  m_Layer: 0
+  m_Name: Path_InCorner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4974116604679377333
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5689529409041346657}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 18, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &5331702663022488884
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5689529409041346657}
+  m_Mesh: {fileID: -5408031269339016196, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
+--- !u!23 &3778056251620811237
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5689529409041346657}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6649105521214000837
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5044296607891217854}
+  - component: {fileID: 1281656504183526806}
+  - component: {fileID: 1019148168075738124}
+  m_Layer: 0
+  m_Name: Incorner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5044296607891217854
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6649105521214000837}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 2, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &1281656504183526806
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6649105521214000837}
+  m_Mesh: {fileID: -328551932046892300, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+--- !u!23 &1019148168075738124
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6649105521214000837}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: df6ba97d9f327ca4ebf0c2680397425d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &7678650891849433126
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5482521378734196235}
+  - component: {fileID: 2195327521899184231}
+  - component: {fileID: 1632227419239974257}
+  m_Layer: 0
+  m_Name: Path_Straight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5482521378734196235
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7678650891849433126}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 20, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &2195327521899184231
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7678650891849433126}
+  m_Mesh: {fileID: 7823569963600667838, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
+--- !u!23 &1632227419239974257
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7678650891849433126}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9c5345c99fc2be44fb1a3731a09d6299, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &8139223857813074696
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4686075068635936782}
+  - component: {fileID: 2511382896000271184}
+  m_Layer: 0
+  m_Name: Town Modules
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4686075068635936782
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8139223857813074696}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8937457377877375731}
+  - {fileID: 5044296607891217854}
+  - {fileID: 2372009415461817715}
+  - {fileID: 6627271170812180962}
+  - {fileID: 2519136606593905434}
+  - {fileID: 4138382863133268831}
+  - {fileID: 2391168213113158236}
+  - {fileID: 5660219141561585625}
+  - {fileID: 2885764773382081743}
+  - {fileID: 4974116604679377333}
+  - {fileID: 5482521378734196235}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2511382896000271184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8139223857813074696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3253df256416cdc4eaa7d485e1f8c680, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: -4423153410692427784, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+    - {fileID: -1269883566850833621, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
+    - {fileID: -3014119590633635102, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+    - {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+    - {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+    - {fileID: 7823569963600667838, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
+    - {fileID: -5672807904190475791, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+    - {fileID: -7022312304108209055, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
+    - {fileID: -328551932046892300, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+    - {fileID: -5408031269339016196, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
+    - {fileID: -1785177617388048132, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: marchingTable
+      Entry: 7
+      Data: 0|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]][], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 16
+    - Name: 
+      Entry: 7
+      Data: 1|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 6
+      Data: 
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 0.01
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 2|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 3|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 0
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: 0f
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 0
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 4|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 4
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 1
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: 1f
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 1
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 5|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 6|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 0
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 0f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 1
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 1f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 7|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 2
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0
+    - Name: NegX
+      Entry: 1
+      Data: 0f
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 8|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 4
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 3
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 2
+    - Name: NegX
+      Entry: 1
+      Data: 0f
+    - Name: PosZ
+      Entry: 1
+      Data: 1
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 9|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 3
+    - Name: 
+      Entry: 3
+      Data: 4
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 4
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0
+    - Name: NegX
+      Entry: 1
+      Data: 2f
+    - Name: PosZ
+      Entry: 1
+      Data: 1f
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 10|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 3
+    - Name: 
+      Entry: 3
+      Data: 4
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 5
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1
+    - Name: NegX
+      Entry: 1
+      Data: 1f
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 3s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 11|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 12|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 0
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0f
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 0
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 1
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1f
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 1
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 13|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 6
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0f
+    - Name: NegX
+      Entry: 1
+      Data: 0f
+    - Name: PosZ
+      Entry: 1
+      Data: 0
+    - Name: NegZ
+      Entry: 1
+      Data: 0
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 2
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 14|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 4
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 7
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1f
+    - Name: NegX
+      Entry: 1
+      Data: 1f
+    - Name: PosZ
+      Entry: 1
+      Data: 1
+    - Name: NegZ
+      Entry: 1
+      Data: 1
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 2
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 15|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 16|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 2
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 0
+    - Name: NegZ
+      Entry: 1
+      Data: 0f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 3
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: 1
+    - Name: PosZ
+      Entry: 1
+      Data: 2
+    - Name: NegZ
+      Entry: 1
+      Data: 0f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 4
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: 1f
+    - Name: PosZ
+      Entry: 1
+      Data: 0
+    - Name: NegZ
+      Entry: 1
+      Data: 2f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 5
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 3s
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 1
+    - Name: NegZ
+      Entry: 1
+      Data: 1f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 11
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 17|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 8
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: 0f
+    - Name: PosZ
+      Entry: 1
+      Data: 0
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 18|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 4
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 9
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 3s
+    - Name: NegX
+      Entry: 1
+      Data: 1f
+    - Name: PosZ
+      Entry: 1
+      Data: 1
+    - Name: NegZ
+      Entry: 1
+      Data: 3s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 19|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 20|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 0
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: 0
+    - Name: PosZ
+      Entry: 1
+      Data: 0f
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 1
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: 1
+    - Name: PosZ
+      Entry: 1
+      Data: 1f
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 21|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 2
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 0f
+    - Name: NegZ
+      Entry: 1
+      Data: 0
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 3
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 0f
+    - Name: NegZ
+      Entry: 1
+      Data: 2
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 4
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1f
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 2f
+    - Name: NegZ
+      Entry: 1
+      Data: 0
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 5
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: 3s
+    - Name: PosZ
+      Entry: 1
+      Data: 1f
+    - Name: NegZ
+      Entry: 1
+      Data: 1
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 11
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 22|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 6
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0
+    - Name: NegX
+      Entry: 1
+      Data: 0
+    - Name: PosZ
+      Entry: 1
+      Data: 0f
+    - Name: NegZ
+      Entry: 1
+      Data: 0f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 2
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 14
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 7
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1
+    - Name: NegX
+      Entry: 1
+      Data: 1
+    - Name: PosZ
+      Entry: 1
+      Data: 1f
+    - Name: NegZ
+      Entry: 1
+      Data: 1f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 2
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 23|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 8
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 0f
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 9
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1
+    - Name: NegX
+      Entry: 1
+      Data: 3s
+    - Name: PosZ
+      Entry: 1
+      Data: 1f
+    - Name: NegZ
+      Entry: 1
+      Data: 3s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 19
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 24|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 2
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0f
+    - Name: NegX
+      Entry: 1
+      Data: 0
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 3
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0f
+    - Name: NegX
+      Entry: 1
+      Data: 2
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 1
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 4
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 2f
+    - Name: NegX
+      Entry: 1
+      Data: 0
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 1f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 5
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1f
+    - Name: NegX
+      Entry: 1
+      Data: 1
+    - Name: PosZ
+      Entry: 1
+      Data: 3s
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 11
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 25|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 8
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0f
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 0
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 9
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1f
+    - Name: NegX
+      Entry: 1
+      Data: 3s
+    - Name: PosZ
+      Entry: 1
+      Data: 3s
+    - Name: NegZ
+      Entry: 1
+      Data: 1
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 19
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 26|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 8
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: 0
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 0f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 9
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 3s
+    - Name: NegX
+      Entry: 1
+      Data: 1
+    - Name: PosZ
+      Entry: 1
+      Data: 3s
+    - Name: NegZ
+      Entry: 1
+      Data: 1f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 19
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 27|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 10
+      Data: 10
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 3s
+    - Name: NegX
+      Entry: 1
+      Data: 3s
+    - Name: PosZ
+      Entry: 1
+      Data: 3s
+    - Name: NegZ
+      Entry: 1
+      Data: 3s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 4
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 28|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Assembly-CSharp
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Assembly-CSharp
+    - Name: Mesh
+      Entry: 6
+      Data: 
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 0.01
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  Debug: 1
+  prefab: {fileID: 4871325552601967121, guid: 14ff2370657d66e40b14fa18d3f6de32, type: 3}
+  divider: 100
+  overrideVerticalPositive: 0
+  positiveKey: -1s
+  overrideVerticalNegative: 0
+  negativeKey: v-1_0
+  notAllowedBottomIndexes: 
+  notAllowedSideIndexes: 
+  castlePrototypeIndex: 0
+  moduleScale: {x: 2, y: 2, z: 2}
+  useMCode: 1
+  useMCodeHeight: 0
+  Prototypes:
+  - MeshRot:
+      Mesh: {fileID: -4423153410692427784, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 0
+    PosZ: 0f
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -4423153410692427784, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 1
+    PosX: 0f
+    NegX: -1s
+    PosZ: 0
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -4423153410692427784, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 2
+    PosX: 0
+    NegX: -1s
+    PosZ: -1s
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -4423153410692427784, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 3
+    PosX: -1s
+    NegX: 0f
+    PosZ: -1s
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -328551932046892300, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 0f
+    PosZ: 0
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -328551932046892300, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 1
+    PosX: 0
+    NegX: -1s
+    PosZ: 0f
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -328551932046892300, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 2
+    PosX: 0f
+    NegX: -1s
+    PosZ: -1s
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -328551932046892300, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 3
+    PosX: -1s
+    NegX: 0
+    PosZ: -1s
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -5672807904190475791, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 0
+    PosX: 0
+    NegX: 0
+    PosZ: 0f
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 2
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -5672807904190475791, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 1
+    PosX: 0f
+    NegX: 0f
+    PosZ: 0
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 2
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -3014119590633635102, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: -1s
+    PosZ: 0f
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -3014119590633635102, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 1
+    PosX: 0f
+    NegX: 0
+    PosZ: -1s
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -3014119590633635102, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 2
+    PosX: -1s
+    NegX: -1s
+    PosZ: 0
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: -3014119590633635102, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 3
+    PosX: 0
+    NegX: 0f
+    PosZ: -1s
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 0400000002000000
+  - MeshRot:
+      Mesh: {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 0
+    PosX: 1
+    NegX: -1s
+    PosZ: 0f
+    NegZ: 2
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 040000000200000000000000
+  - MeshRot:
+      Mesh: {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 1
+    PosX: 0f
+    NegX: 2
+    PosZ: -1s
+    NegZ: 1
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 040000000200000000000000
+  - MeshRot:
+      Mesh: {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 2
+    PosX: -1s
+    NegX: 1
+    PosZ: 2
+    NegZ: 0f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 040000000200000000000000
+  - MeshRot:
+      Mesh: {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 3
+    PosX: 2
+    NegX: 0f
+    PosZ: 1
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 040000000200000000000000
+  - MeshRot:
+      Mesh: {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 0
+    PosX: 1f
+    NegX: -1s
+    PosZ: 2f
+    NegZ: 0
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 040000000200000000000000
+  - MeshRot:
+      Mesh: {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 1
+    PosX: 2f
+    NegX: 0
+    PosZ: -1s
+    NegZ: 1f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 040000000200000000000000
+  - MeshRot:
+      Mesh: {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 2
+    PosX: -1s
+    NegX: 1f
+    PosZ: 0
+    NegZ: 2f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 040000000200000000000000
+  - MeshRot:
+      Mesh: {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a,
+        type: 3}
+      Rot: 3
+    PosX: 0
+    NegX: 2f
+    PosZ: 1f
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 040000000200000000000000
+  - MeshRot:
+      Mesh: {fileID: -1269883566850833621, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 1
+    PosZ: 1f
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -1269883566850833621, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 1f
+    NegX: -1s
+    PosZ: 1
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -1269883566850833621, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: 1
+    NegX: -1s
+    PosZ: -1s
+    NegZ: 1f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -1269883566850833621, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: -1s
+    NegX: 1f
+    PosZ: -1s
+    NegZ: 1
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -7022312304108209055, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: 1
+    NegX: 1
+    PosZ: 1f
+    NegZ: 1f
+    PosY: -1s
+    NegY: -1s
+    Weight: 2
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -7022312304108209055, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 1f
+    NegX: 1f
+    PosZ: 1
+    NegZ: 1
+    PosY: -1s
+    NegY: -1s
+    Weight: 2
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -1785177617388048132, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: 3s
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 4
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -5408031269339016196, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: 1
+    NegX: 3s
+    PosZ: 1f
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -5408031269339016196, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 1f
+    NegX: 3s
+    PosZ: 3s
+    NegZ: 1
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -5408031269339016196, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: 3s
+    NegX: 1
+    PosZ: 3s
+    NegZ: 1f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: -5408031269339016196, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: 3s
+    NegX: 1f
+    PosZ: 1
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 7823569963600667838, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 0
+    PosX: -1s
+    NegX: 3s
+    PosZ: 1f
+    NegZ: 1
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 7823569963600667838, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 1
+    PosX: 1f
+    NegX: 1
+    PosZ: 3s
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 7823569963600667838, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 2
+    PosX: 3s
+    NegX: -1s
+    PosZ: 1
+    NegZ: 1f
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 7823569963600667838, guid: 5600a9201c3fe584da45b4be12bcab5c,
+        type: 3}
+      Rot: 3
+    PosX: 1
+    NegX: 1f
+    PosZ: -1s
+    NegZ: 3s
+    PosY: -1s
+    NegY: -1s
+    Weight: 1
+    MaterialIndexes: 00000000
+  - MeshRot:
+      Mesh: {fileID: 0}
+      Rot: 0
+    PosX: -1s
+    NegX: -1s
+    PosZ: -1s
+    NegZ: -1s
+    PosY: -1s
+    NegY: -1s
+    Weight: 0.01
+    MaterialIndexes: 
+  socketList:
+  - positions:
+    - {x: -0.01, y: 0.13}
+    - {x: 0, y: 0.18}
+    - {x: 0, y: -0}
+    - {x: -0.02, y: 0.29}
+    - {x: -0.02, y: 0.41}
+    - {x: 0, y: 0.48}
+    - {x: -0.01, y: 0.52}
+    - {x: 0.2, y: 0.13}
+    - {x: 0.2, y: 0.18}
+    - {x: 0.19, y: -0}
+    - {x: 0.22, y: 0.29}
+    - {x: 0.2, y: 0.48}
+    - {x: 0.21, y: 0.41}
+    - {x: 0.2, y: 0.52}
+    - {x: 0, y: 0.7}
+    - {x: 0.1, y: 0.7}
+    - {x: 0.19, y: 0.7}
+    socketname: 0f
+  - positions:
+    - {x: 0.01, y: 0.13}
+    - {x: 0, y: 0.18}
+    - {x: -0, y: -0}
+    - {x: 0.02, y: 0.29}
+    - {x: 0.02, y: 0.41}
+    - {x: 0, y: 0.48}
+    - {x: 0.01, y: 0.52}
+    - {x: -0.2, y: 0.13}
+    - {x: -0.2, y: 0.18}
+    - {x: -0.19, y: -0}
+    - {x: -0.22, y: 0.29}
+    - {x: -0.2, y: 0.48}
+    - {x: -0.21, y: 0.41}
+    - {x: -0.2, y: 0.52}
+    - {x: 0, y: 0.7}
+    - {x: -0.1, y: 0.7}
+    - {x: -0.19, y: 0.7}
+    socketname: 0
+  - positions:
+    - {x: 0.7, y: 0}
+    - {x: 0.7, y: 0.04}
+    - {x: 1, y: 0}
+    - {x: 1, y: 0.04}
+    socketname: 1f
+  - positions:
+    - {x: -0.7, y: 0}
+    - {x: -0.7, y: 0.04}
+    - {x: -1, y: 0}
+    - {x: -1, y: 0.04}
+    socketname: 1
+  - positions:
+    - {x: 0, y: 0.7}
+    - {x: 0.1, y: 0.7}
+    - {x: 0.19, y: 0.7}
+    - {x: -1, y: 0}
+    - {x: 0.6, y: 0}
+    - {x: 0.5, y: 0.04}
+    - {x: -1, y: 0.04}
+    socketname: 2f
+  - positions:
+    - {x: 0, y: 0.7}
+    - {x: -0.1, y: 0.7}
+    - {x: -0.19, y: 0.7}
+    - {x: 1, y: 0}
+    - {x: -0.6, y: 0}
+    - {x: -0.5, y: 0.04}
+    - {x: 1, y: 0.04}
+    socketname: 2
+  - positions:
+    - {x: -1, y: 0.04}
+    - {x: -1, y: 0}
+    - {x: 1, y: 0}
+    - {x: 1, y: 0.04}
+    socketname: 3s
+  verticalSocketList: []
+  notAllowedForBottom: 
+  notAllowedForSides: 
+  castleIndex: 3
+  materialData: {fileID: 11400000, guid: 64f0dca35d7079143abbf4da786afcf2, type: 2}
+  pieceWeights:
+  - Name: Corner2
+    Weight: 1
+  - Name: Incorner
+    Weight: 1
+  - Name: OnPass2
+    Weight: 1
+  - Name: Side
+    Weight: 1
+  - Name: "SideV\xE4g"
+    Weight: 1
+  - Name: "SideV\xE4gTv\xE5"
+    Weight: 1
+  - Name: Path_Corner
+    Weight: 1
+  - Name: Path_DoubleCorner
+    Weight: 1
+  - Name: Path_Full
+    Weight: 1
+  - Name: Path_InCorner
+    Weight: 1
+  - Name: Path_Straight
+    Weight: 1
+  - Name: Air
+    Weight: 0.01

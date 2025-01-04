@@ -10,14 +10,14 @@ public static class PathFinding
     public static Node[,] Map;
     public static Node[,] ThiccMap;
 
-    public static Vector3Int[] Directions { get; private set; } = new Vector3Int[]
+    private static Vector3Int[] Directions { get; } = 
     {
         new Vector3Int(1, 0, 0), new Vector3Int(-1, 0, 0), // (right, left)
         new Vector3Int(0, 1, 0), new Vector3Int(0, -1, 0), // (up, down)
         new Vector3Int(0, 0, 1), new Vector3Int(0, 0, -1)  // (forward, backward)
     };
 
-    public static Vector3Int[] XYDirections { get; private set; } = new Vector3Int[]
+    private static Vector3Int[] XYDirections { get; } = 
     {
         new Vector3Int(1, 0, 0), new Vector3Int(-1, 0, 0), // (right, left)
         new Vector3Int(0, 0, 1), new Vector3Int(0, 0, -1)  // (forward, backward)
@@ -305,14 +305,9 @@ namespace DataStructures.Queue
 
     public class PriorityQueue<TPrio, TItem> where TPrio : IComparable
     {
-        private LinkedList<PriorityQueueEntry<TPrio, TItem>> q;
+        private readonly LinkedList<PriorityQueueEntry<TPrio, TItem>> q = new();
 
-        public PriorityQueue()
-        {
-            q = new LinkedList<PriorityQueueEntry<TPrio, TItem>>();
-        }
-
-        public int Count { get { return q.Count(); } }
+        public int Count => q.Count();
 
         public void Enqueue(TPrio p, TItem data)
         {

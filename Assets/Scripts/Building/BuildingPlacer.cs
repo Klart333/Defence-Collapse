@@ -1,8 +1,9 @@
-﻿using Sirenix.OdinInspector;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using System.Linq;
 
 public class BuildingPlacer : MonoBehaviour
 {
@@ -13,29 +14,69 @@ public class BuildingPlacer : MonoBehaviour
     [SerializeField]
     private PooledMonoBehaviour unableToPlacePrefab;
 
-    private readonly List<PooledMonoBehaviour> spawnedPlaces = new List<PooledMonoBehaviour>();
+    [SerializeField]
+    private PlaceSquare placeSquarePrefab;
 
-    private Camera cam;
+    private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
+    private readonly List<PlaceSquare> spawnedSpawnPlaces = new List<PlaceSquare>();
 
-    private bool manualCancel = false;
+    private WaveFunction waveFunction;
+
+    private bool manualCancel;
     private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
+    public Vector3Int? SquareIndex { get; set; }
+    public int SpawnSquareIndex { get; set; }
 
     private void OnEnable()
     {
         Events.OnBuildingCanceled += OnBuildingCanceled;
+        waveFunction = FindFirstObjectByType<WaveFunction>();
+        waveFunction.OnMapGenerated += InitializeSpawnPlaces;
     }
 
     private void OnDisable()
     {
         Events.OnBuildingCanceled -= OnBuildingCanceled;
+        waveFunction.OnMapGenerated -= InitializeSpawnPlaces;
     }
 
     private void Start()
     {
-        cam = Camera.main;
         Events.OnBuildingPurchased += BuildingPurchased;
     }
-
+    
+    private async void InitializeSpawnPlaces()
+    {
+        if (BuildingManager.Instance is null) return;
+        
+        await UniTask.WaitUntil(() => BuildingManager.Instance.Cells != null);
+        Vector3 scale = waveFunction.GridScale * BuildingManager.Instance.CellSize;
+        for (int z = 0; z < BuildingManager.Instance.Cells.GetLength(2); z++)
+        {
+            for (int x = 0; x < BuildingManager.Instance.Cells.GetLength(0); x++)
+            {
+                for (int y = 0; y < BuildingManager.Instance.Cells.GetLength(1); y++)
+                {
+                    if (!BuildingManager.Instance.Cells[x, y, z].Buildable
+                     || !BuildingManager.Instance.Cells[x + 1, y, z].Buildable
+                     || !BuildingManager.Instance.Cells[x, y, z + 1].Buildable
+                     || !BuildingManager.Instance.Cells[x + 1, y, z + 1].Buildable) continue;
+                    
+                    Vector3 pos = BuildingManager.Instance.Cells[x, y, z].Position + new Vector3(scale.x / 2.0f, 0.1f, scale.z / 2.0f);
+                    PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
+                    placeSquare.Placer = this;
+                    placeSquare.Index = new Vector3Int(x, y, z);
+                    placeSquare.transform.localScale = scale * 0.95f;
+                    placeSquare.transform.SetParent(transform, true);
+                    placeSquare.gameObject.SetActive(false);
+                    placeSquare.SquareIndex = spawnedSpawnPlaces.Count;
+                    spawnedSpawnPlaces.Add(placeSquare);
+                }
+            }
+        }
+        
+    }
+    
     private void OnBuildingCanceled()
     {
         manualCancel = true;
@@ -46,21 +87,21 @@ public class BuildingPlacer : MonoBehaviour
         PlacingTower(buildingType);
     }
 
-    private async void PlacingTower(BuildingType type)
+    private async UniTask PlacingTower(BuildingType type)
     {
         manualCancel = false;
+        
+        ToggleSpawnPlaces(true);
 
-        List<Vector3Int> indexes = new List<Vector3Int>();
+        Vector3Int queryIndex = new Vector3Int();
         Dictionary<Vector3Int, IBuildable> buildables = new Dictionary<Vector3Int, IBuildable>();
         while (!Canceled)
         {
-            await Task.Yield();
+            await UniTask.Yield();
 
-            Vector3 mousePos = GetRayPoint();
-            if (mousePos == Vector3.zero || mousePos.x % 1 == 0 || mousePos.z % 1 == 0 || mousePos.y < 0.2f) continue;
+            if (!SquareIndex.HasValue) continue;
 
-            List<Vector3Int> newIndexes = BuildingManager.Instance.GetCellsToCollapse(mousePos, type);
-            if (indexes.LooseEquals(newIndexes) || newIndexes.Count == 0)
+            if (queryIndex == SquareIndex.Value)
             {
                 if (buildables.Count > 0 && InputManager.Instance.Fire.WasPerformedThisFrame())
                 {
@@ -68,18 +109,16 @@ public class BuildingPlacer : MonoBehaviour
                 }
                 continue;
             }
-            else
-            {
-                DisablePlaces();
+            
+            DisablePlaces();
 
-                BuildingManager.Instance.RevertQuery();
-                await Task.Delay(50);
+            BuildingManager.Instance.RevertQuery();
+            await UniTask.Delay(50);
+            if (!SquareIndex.HasValue) continue;
 
-                indexes = newIndexes;
-            }
-
-            buildables = BuildingManager.Instance.Query(mousePos, type);
-
+            queryIndex = SquareIndex.Value;
+            buildables = BuildingManager.Instance.Query(queryIndex, type);
+            
             foreach (var item in buildables)
             {
                 item.Value.ToggleIsBuildableVisual(true);
@@ -87,8 +126,7 @@ public class BuildingPlacer : MonoBehaviour
             
             if (buildables.Count == 0) 
             {
-                ShowPlaces(indexes.Select(x => BuildingManager.Instance.GetPos(x) + Vector3.up).ToList());
-                
+                ShowUnablePlaces(BuildingManager.Instance.GetCellsToCollapse(queryIndex, type).Select(x => BuildingManager.Instance.GetPos(x) + Vector3.up * BuildingManager.Instance.CellSize / 2.0f).ToList());
                 continue;
             }
 
@@ -99,6 +137,7 @@ public class BuildingPlacer : MonoBehaviour
 
         if (Canceled)
         {
+            ToggleSpawnPlaces(false);
             DisablePlaces();
             BuildingManager.Instance.RevertQuery();
 
@@ -106,12 +145,20 @@ public class BuildingPlacer : MonoBehaviour
             {
                 Events.OnBuildingCanceled?.Invoke();
             }
-            return;
         }
     }
 
+    private void ToggleSpawnPlaces(bool value)
+    {
+        for (int i = 0; i < spawnedSpawnPlaces.Count; i++)
+        {
+            spawnedSpawnPlaces[i].gameObject.SetActive(value);
+        }
+    }
+    
     private void PlaceBuilding(BuildingType buildingType)
     {
+        spawnedSpawnPlaces[SpawnSquareIndex].Placed = true;
         BuildingManager.Instance.Place();
 
         if (buildingType == BuildingType.Castle)
@@ -120,31 +167,20 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
-    private void ShowPlaces(List<Vector3> positions)
+    private void ShowUnablePlaces(List<Vector3> positions)
     {
         for (int i = 0; i < positions.Count; i++)
         {
-            spawnedPlaces.Add(unableToPlacePrefab.GetAtPosAndRot<PooledMonoBehaviour>(positions[i], Quaternion.identity));
+            spawnedUnablePlaces.Add(unableToPlacePrefab.GetAtPosAndRot<PooledMonoBehaviour>(positions[i], Quaternion.identity));
         }
     }
 
     private void DisablePlaces()
     {
-        for (int i = 0; i < spawnedPlaces.Count; i++)
+        for (int i = 0; i < spawnedUnablePlaces.Count; i++)
         {
-            spawnedPlaces[i].gameObject.SetActive(false);
+            spawnedUnablePlaces[i].gameObject.SetActive(false);
         }
-    }
-
-    private Vector3 GetRayPoint()
-    {
-        Ray ray = cam.ScreenPointToRay(InputManager.Instance.Mouse.ReadValue<Vector2>());
-        if (Physics.Raycast(ray, out RaycastHit hit, 100, layerMask))
-        {
-            return hit.point;
-        }
-
-        return Vector3.zero;
     }
 }
 

@@ -23,30 +23,15 @@ namespace Buildings
 
         private List<Material> transparentMaterials = new List<Material>();
 
-        private BoxCollider boxCollider;
+        private MeshCollider meshCollider;
         private MeshRenderer meshRenderer;
         
         public PrototypeData PrototypeData { get; private set; }
         public int Importance => 0;
 
-        public MeshRenderer MeshRenderer
-        {
-            get
-            {
-                if (meshRenderer == null) meshRenderer = GetComponentInChildren<MeshRenderer>();
+        public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
 
-                return meshRenderer;
-            }
-        }
-        public BoxCollider BoxCollider
-        {
-            get
-            {
-                boxCollider ??= GetComponentInChildren<BoxCollider>();
-
-                return boxCollider;
-            }
-        }
+        public MeshCollider MeshCollider => meshCollider ??= GetComponentInChildren<MeshCollider>();
 
         protected override void OnDisable()
         {
@@ -86,9 +71,7 @@ namespace Buildings
             }
             else
             {
-                Bounds meshBounds = PrototypeData.MeshRot.Mesh.bounds;
-                BoxCollider.size = meshBounds.size;
-                boxCollider.center = meshBounds.center;
+                MeshCollider.sharedMesh = PrototypeData.MeshRot.Mesh;
                 MeshRenderer.SetMaterials(materialData.GetMaterials(PrototypeData.MaterialIndexes));
 
                 OnPlacedEvent?.Invoke();

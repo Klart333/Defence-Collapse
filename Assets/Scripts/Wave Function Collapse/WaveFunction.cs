@@ -40,7 +40,7 @@ public class WaveFunction : MonoBehaviour
     private bool shouldCombine = true;
 
     [SerializeField]
-    private int chillTimeMs = 0;
+    private int chillTimeMs;
 
     private readonly List<GameObject> spawnedPossibilites = new List<GameObject>();
     private readonly List<GameObject> spawnedMeshes = new List<GameObject>();
@@ -59,10 +59,10 @@ public class WaveFunction : MonoBehaviour
 
     private void Start()
     {
-        Run();
+        _ = Run();
     }
 
-    public async void Run()
+    public async UniTask Run()
     {
         if (!Load())
         {
@@ -76,17 +76,16 @@ public class WaveFunction : MonoBehaviour
         while (!AllCollapsed)
         {
             Iterate(); // Does not need to await
-           
-            if (watch.ElapsedMilliseconds > maxMillisecondsPerFrame)
-            {
-                await UniTask.NextFrame();
-                if (chillTimeMs > 0)
-                {
-                    await UniTask.Delay(chillTimeMs);
-                }
 
-                watch.Restart();
+            if (!(watch.ElapsedMilliseconds > maxMillisecondsPerFrame)) continue;
+            
+            await UniTask.NextFrame();
+            if (chillTimeMs > 0)
+            {
+                await UniTask.Delay(chillTimeMs);
             }
+
+            watch.Restart();
         }
 
         if (shouldCombine)
@@ -137,6 +136,8 @@ public class WaveFunction : MonoBehaviour
             }
         }
 
+        return;
+
         async UniTask PlaceGround(int x, int z)
         {
             int index = GetIndex(x, 0, z);
@@ -151,7 +152,7 @@ public class WaveFunction : MonoBehaviour
         }
     }
 
-    public void Iterate()
+    private void Iterate()
     {
         int index = GetLowestEntropyIndex();
 
@@ -191,7 +192,7 @@ public class WaveFunction : MonoBehaviour
             for (int g = 0; g < cells[i].PossiblePrototypes.Count; g++)
             {
                 float distFromAverage = 1.0f - (cells[i].PossiblePrototypes[g].Weight / averageWeight);
-                if (distFromAverage < 1.0f) distFromAverage *= distFromAverage; // Because of using the percentage as a distance, smaller weights weigh more, so this is is to try to correct that.
+                if (distFromAverage < 1.0f) distFromAverage *= distFromAverage; // Because of using the percentage as a distance, smaller weights weigh more, so this is to try to correct that.
 
                 possibleMeshAmount += Mathf.Lerp(1, 0, Mathf.Abs(distFromAverage));
             }
@@ -246,7 +247,7 @@ public class WaveFunction : MonoBehaviour
         }
     }
 
-    public void Propagate()
+    private void Propagate()
     {
         while (cellStack.TryPop(out int cellIndex))
         {
@@ -264,7 +265,7 @@ public class WaveFunction : MonoBehaviour
                 Cell neighbour = cells[validDirs[i]];
                 Direction dir = directions[i];
 
-                var constrainedPrototypes = Constrain(changedCell, neighbour, validDirs[i], dir, out bool changed);
+                List<PrototypeData> constrainedPrototypes = Constrain(changedCell, neighbour, validDirs[i], dir, out bool changed);
 
                 if (changed)
                 {
@@ -291,18 +292,14 @@ public class WaveFunction : MonoBehaviour
             bool onlyAir = true;
             while (IsDirectionValid(directIndex, Direction.Down, out directIndex) && onlyAir)
             {
-                onlyAir = true;
                 upKeys.Clear();
                 for (int i = 0; i < cells[directIndex].PossiblePrototypes.Count; i++)
                 {
                     upKeys.Add(cells[directIndex].PossiblePrototypes[i].PosY);
 
-                    if (onlyAir)
+                    if (onlyAir && (!string.Equals(cells[directIndex].PossiblePrototypes[i].NegY, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].PosX, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].NegX, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].NegZ, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].PosZ, "-1s")))
                     {
-                        if (!string.Equals(cells[directIndex].PossiblePrototypes[i].NegY, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].PosX, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].NegX, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].NegZ, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].PosZ, "-1s"))
-                        {
-                            onlyAir = false;
-                        }
+                        onlyAir = false;
                     }
                 }
             }
@@ -325,11 +322,7 @@ public class WaveFunction : MonoBehaviour
                 {
                     if (cells[aboveIndex].PossiblePrototypes[0].NegY == "-1s")
                     {
-                        bool onlyAir = true;
-                        if (!string.Equals(cells[aboveIndex].PossiblePrototypes[0].PosY, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].PosX, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].NegX, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].NegZ, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].PosZ, "-1s"))
-                        {
-                            onlyAir = false;
-                        }
+                        bool onlyAir = !(!string.Equals(cells[aboveIndex].PossiblePrototypes[0].PosY, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].PosX, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].NegX, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].NegZ, "-1s") || !string.Equals(cells[aboveIndex].PossiblePrototypes[0].PosZ, "-1s"));
 
                         if (!onlyAir)
                         {
@@ -345,80 +338,41 @@ public class WaveFunction : MonoBehaviour
         List<string> validKeys = new List<string>();
         for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
         {
-            // Right
-            switch (direction)
+            validKeys.Add(direction switch 
             {
-                case Direction.Right:
-                    validKeys.Add(changedCell.PossiblePrototypes[i].PosX);
-                    break;
-
-                case Direction.Left:
-                    validKeys.Add(changedCell.PossiblePrototypes[i].NegX);
-                    break;
-                    
-                case Direction.Up:
-                    validKeys.Add(changedCell.PossiblePrototypes[i].PosY);
-                    break;
-                    
-                case Direction.Down:
-                    validKeys.Add(changedCell.PossiblePrototypes[i].NegY);
-                    break;
-                    
-                case Direction.Forward:
-                    validKeys.Add(changedCell.PossiblePrototypes[i].PosZ);
-                    break;
-                    
-                case Direction.Backward:
-                    validKeys.Add(changedCell.PossiblePrototypes[i].NegZ);
-                    break;
-                    
-            }
+                Direction.Right => changedCell.PossiblePrototypes[i].PosX,
+                Direction.Left => changedCell.PossiblePrototypes[i].NegX,
+                Direction.Up => changedCell.PossiblePrototypes[i].PosY,
+                Direction.Down => changedCell.PossiblePrototypes[i].NegY,
+                Direction.Forward => changedCell.PossiblePrototypes[i].PosZ,
+                Direction.Backward => changedCell.PossiblePrototypes[i].NegZ,
+                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+            });
         }
 
-        int removed = 0;
-        for (int i = 0; i < affectedCell.PossiblePrototypes.Count; i++)
+        changed = false;
+        for (int i = affectedCell.PossiblePrototypes.Count - 1; i >= 0; i--)
         {
-            bool shouldRemove = false;
-            switch (direction)
+            bool shouldRemove = direction switch
             {
-                case Direction.Right:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegX, validKeys);
+                Direction.Right => !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegX, validKeys),
+                Direction.Left => !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosX, validKeys),
+                Direction.Forward => !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegZ, validKeys),
+                Direction.Backward => !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosZ, validKeys),
+                Direction.Up => !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegY, validKeys),
+                Direction.Down => !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosY, validKeys),
+                _ => false
+            };
 
-                    break;
-                case Direction.Left:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosX, validKeys);
-
-                    break;
-                case Direction.Up:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegY, validKeys);
-
-                    break;
-                case Direction.Down:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosY, validKeys);
-
-                    break;
-                case Direction.Forward:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegZ, validKeys);
-
-                    break;
-                case Direction.Backward:
-                    shouldRemove = !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosZ, validKeys);
-
-                    break;
-            }
-
-            if (shouldRemove)
-            {
-                affectedCell.PossiblePrototypes.RemoveAt(i--);
-                removed++;
-            }
+            if (!shouldRemove) continue;
+            affectedCell.PossiblePrototypes.RemoveAt(i);
+            changed = true;
         }
 
-        changed = removed > 0;
         return affectedCell.PossiblePrototypes;
     }
 
-    private bool CheckValidSocket(string key, List<string> validKeys)
+    private static bool CheckValidSocket(string key, List<string> validKeys)
     {
         if (key.Contains('v')) // Ex. v0_0
         {
@@ -458,36 +412,34 @@ public class WaveFunction : MonoBehaviour
                 }
                 break;
             case Direction.Up:
-                int thing = 1 + Mathf.FloorToInt((float)index / (float)(gridSizeX * gridSizeY));
-                if ((index + gridSizeX) < (gridSizeX * gridSizeY) * thing)
+                int thing = 1 + Mathf.FloorToInt(index / (float)(gridSizeX * gridSizeY));
+                if (index + gridSizeX < gridSizeX * gridSizeY * thing)
                 {
                     directIndex = index + gridSizeX;
                     return true;
                 }
                 break;
             case Direction.Down:
-                int thing1 = 1 + Mathf.FloorToInt((float)index / (float)(gridSizeX * gridSizeY));
-                if ((index - gridSizeX) >= (gridSizeX * gridSizeY) * (thing1 - 1))
+                int thing1 = 1 + Mathf.FloorToInt(index / (float)(gridSizeX * gridSizeY));
+                if (index - gridSizeX >= gridSizeX * gridSizeY * (thing1 - 1))
                 {
                     directIndex = index - gridSizeX;
                     return true;
                 }
                 break;
             case Direction.Forward:
-                if (index + (gridSizeX * gridSizeY) < cells.Count)
+                if (index + gridSizeX * gridSizeY < cells.Count)
                 {
-                    directIndex = index + (gridSizeX * gridSizeY);
+                    directIndex = index + gridSizeX * gridSizeY;
                     return true;
                 }
                 break;
             case Direction.Backward:
-                if (index - (gridSizeX * gridSizeY) >= 0)
+                if (index - gridSizeX * gridSizeY >= 0)
                 {
-                    directIndex = index - (gridSizeX * gridSizeY);
+                    directIndex = index - gridSizeX * gridSizeY;
                     return true;
                 }
-                break;
-            default:
                 break;
         }
 
@@ -503,8 +455,8 @@ public class WaveFunction : MonoBehaviour
         if (all)
         {
             // Up
-            int thing = 1 + Mathf.FloorToInt((float)index / (float)(gridSizeX * gridSizeY));
-            if ((index + gridSizeX) < (gridSizeX * gridSizeY) * thing)
+            int thing = 1 + Mathf.FloorToInt(index / (float)(gridSizeX * gridSizeY));
+            if (index + gridSizeX < gridSizeX * gridSizeY * thing)
             {
                 valids.Add(index + gridSizeX);
                 directions.Add(Direction.Up);
@@ -551,22 +503,18 @@ public class WaveFunction : MonoBehaviour
 
     private Vector3Int GetCords(int index)
     {
-        int x = Mathf.FloorToInt(index / (gridSizeZ * gridSizeY));
-        int y = Mathf.FloorToInt(index / gridSizeZ) % gridSizeY;
+        int x = index / (gridSizeZ * gridSizeY);
+        int y = (index / gridSizeZ) % gridSizeY;
         int z = index % gridSizeZ;
 
         return new Vector3Int(x, y, z);
     }
 
-    private int GetIndex(Vector3Int index) => GetIndex(index.x, index.y, index.z);
-    private int GetIndex(int x, int y, int z)
-    {
-        return (x * gridSizeY * gridSizeZ) + (y * gridSizeZ) + z;
-    }
+    private int GetIndex(int x, int y, int z) => (x * gridSizeY * gridSizeZ) + (y * gridSizeZ) + z;
 
     private bool LoadPrototypeData()
     {
-        if (groundPrototypeInfo == null)
+        if (groundPrototypeInfo is null)
         {
             Debug.LogError("Please enter prototype reference");
             return false;
@@ -590,7 +538,7 @@ public class WaveFunction : MonoBehaviour
 
     private void LoadCells()
     {
-        emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 20, new int[0]);
+        emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 20, Array.Empty<int>());
 
         for (int z = 0; z < gridSizeZ; z++)
         {
@@ -600,22 +548,26 @@ public class WaveFunction : MonoBehaviour
                 {
                     Vector3 pos = new Vector3(x * gridSize.x, y * gridSize.y, z * gridSize.z);
 
-                    List<PrototypeData> prots;
+                    bool isBottom = y == 0;
+                    List<PrototypeData> prots = new(isBottom ? bottomPrototypes : prototypes);
 
-                    if (y == 0)
+                    List<Direction> directions = GetAdjacentSides(x, y, z, gridSizeX, gridSizeY, gridSizeZ, 1);
+                    foreach (Direction direction in directions)
                     {
-                        prots = new List<PrototypeData>(bottomPrototypes);
-                    }
-                    else
-                    {
-                        prots = new List<PrototypeData>(prototypes);
-
-                        if (x == 0 || x == gridSizeX - 1 || z == 0 || z == gridSizeZ - 1)
+                        for (int i = prots.Count - 1; i >= 0; i--)
                         {
-                            for (int i = 0; i < groundPrototypeInfo.NotAllowedForSides.Count; i++)
+                            bool shouldRemove = direction switch
                             {
-                                prots.RemoveAt(groundPrototypeInfo.NotAllowedForSides[i]);
-                            }
+                                Direction.Right => prots[i].PosX != "-1s",
+                                Direction.Left => prots[i].NegX != "-1s", 
+                                Direction.Backward => prots[i].NegZ != "-1s",
+                                Direction.Forward => prots[i].PosZ != "-1s",
+                                Direction.Up => prots[i].PosY != "-1s",
+                                Direction.Down => prots[i].NegY != "-1s",
+                                _ => false
+                            };
+
+                            if (shouldRemove) prots.RemoveAt(i);
                         }
                     }
 
@@ -625,9 +577,35 @@ public class WaveFunction : MonoBehaviour
         }
     }
 
+    private static List<Direction> GetAdjacentSides(int x, int y, int z, int width, int height, int depth, int minY = 0)
+    {
+        // Validate the input dimensions
+        if (width <= 0 || height <= 0 || depth <= 0)
+            throw new ArgumentException("Invalid dimensions for the 3D array.");
+
+        var directions = new List<Direction>();
+
+        // Check each adjacent direction based on boundaries and add if there is NO adjacent cell
+        if (x + 1 >= width && y >= minY)
+            directions.Add(Direction.Right);
+        if (x - 1 < 0 && y >= minY)
+            directions.Add(Direction.Left);
+        if (y + 1 >= height)
+            directions.Add(Direction.Up);
+        if (y - 1 < 0)
+            directions.Add(Direction.Down);
+        if (z + 1 >= depth && y >= minY)
+            directions.Add(Direction.Forward);
+        if (z - 1 < 0 && y >= minY)
+            directions.Add(Direction.Backward);
+
+
+        return directions;
+    }
+
     private GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1)
     {
-        if (prototypeData.MeshRot.Mesh == null)
+        if (prototypeData.MeshRot.Mesh is null)
         {
             return null;
         }
@@ -660,46 +638,7 @@ public class WaveFunction : MonoBehaviour
         spawnedMeshes.Clear();
         cells.Clear();
     }
-
-    public void DisplayPossiblePrototypes()
-    {
-        HidePossiblePrototypes();
-
-        for (int i = 0; i < cells.Count; i++)
-        {
-            if (cells[i].Collapsed)
-            {
-                continue;
-            }
-
-            float scale = 1.0f / cells[i].PossiblePrototypes.Count;
-            int removed = 0;
-            for (int g = 0; g < cells[i].PossiblePrototypes.Count; g++)
-            {
-                if (cells[i].PossiblePrototypes[g].MeshRot.Mesh == null)
-                {
-                    removed++;
-                    continue;
-                }
-
-                float offset = (1.0f / cells[i].PossiblePrototypes.Count) * (((float)(g + 1 - removed) * 2) - cells[i].PossiblePrototypes.Count);
-                Vector3 pos = cells[i].Position + Vector3.right * offset;
-
-                spawnedPossibilites.Add(GenerateMesh(pos, cells[i].PossiblePrototypes[g], scale));
-            }
-        }
-    }
-
-    public void HidePossiblePrototypes()
-    {
-        for (int i = 0; i < spawnedPossibilites.Count; i++)
-        {
-            DestroyImmediate(spawnedPossibilites[i]);
-        }
-
-        spawnedPossibilites.Clear();
-    }
-
+    
     #region API
 
     public Cell GetCellAtIndexInverse(Vector3Int index)
@@ -719,7 +658,7 @@ public class WaveFunction : MonoBehaviour
         return GetCellAtIndex(index.x, index.y, index.z);
     }
 
-    public Cell GetCellAtIndex(int x, int y, int z)
+    private Cell GetCellAtIndex(int x, int y, int z)
     {
         return cells[GetIndex(x, y, z)];
     }
@@ -755,10 +694,50 @@ public class WaveFunction : MonoBehaviour
             Gizmos.DrawWireCube(pos, new Vector3(GridScale.x, GridScale.y, GridScale.z) * 0.75f);
         }
     }
+    
+    
+    public void DisplayPossiblePrototypes()
+    {
+        HidePossiblePrototypes();
+
+        for (int i = 0; i < cells.Count; i++)
+        {
+            if (cells[i].Collapsed)
+            {
+                continue;
+            }
+
+            float scale = 1.0f / cells[i].PossiblePrototypes.Count;
+            int removed = 0;
+            for (int g = 0; g < cells[i].PossiblePrototypes.Count; g++)
+            {
+                if (cells[i].PossiblePrototypes[g].MeshRot.Mesh == null)
+                {
+                    removed++;
+                    continue;
+                }
+
+                float offset = (1.0f / cells[i].PossiblePrototypes.Count) * (((float)(g + 1 - removed) * 2) - cells[i].PossiblePrototypes.Count);
+                Vector3 pos = cells[i].Position + Vector3.right * offset;
+
+                spawnedPossibilites.Add(GenerateMesh(pos, cells[i].PossiblePrototypes[g], scale));
+            }
+        }
+    }
+
+    private void HidePossiblePrototypes()
+    {
+        for (int i = 0; i < spawnedPossibilites.Count; i++)
+        {
+            DestroyImmediate(spawnedPossibilites[i]);
+        }
+
+        spawnedPossibilites.Clear();
+    }
 
     #endregion
 }
-[System.Serializable]
+[Serializable]
 public struct MeshWithRotation : IEquatable<MeshWithRotation>
 {
     public Mesh Mesh;
@@ -786,7 +765,7 @@ public struct MeshWithRotation : IEquatable<MeshWithRotation>
     }
 }
 
-[System.Serializable]
+[Serializable]
 public struct Cell
 {
     public bool Collapsed;
@@ -807,7 +786,7 @@ public struct Cell
 
 public struct Node
 {
-    public bool Walkable;
+    public readonly bool Walkable;
     public Vector3 Position;
 
     public Node(bool walkable, Vector3 position)
@@ -824,6 +803,5 @@ public enum Direction
     Up,
     Down,
     Forward,
-    Backward,
-    None
+    Backward
 }
