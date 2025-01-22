@@ -69,11 +69,11 @@ public class CameraController : MonoBehaviour
             if (Physics.Raycast(ray, out RaycastHit hitInfo))
             {
                 Vector3 dir = (transform.position - hitInfo.point).normalized;
-                transform.position += dir * scrollDiff * sensitivity * 0.01f;
+                transform.position += dir * (scrollDiff * sensitivity * 0.01f);
             }
             else
             {
-                transform.position += Vector3.up * scrollDiff * sensitivity * 0.01f;
+                transform.position += Vector3.up * (scrollDiff * sensitivity * 0.01f);
             }
         }
 

@@ -20,7 +20,7 @@ public class BuildingPlacer : MonoBehaviour
     private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
     private readonly List<PlaceSquare> spawnedSpawnPlaces = new List<PlaceSquare>();
 
-    private WaveFunction waveFunction;
+    private GroundGenerator groundGenerator;
 
     private bool manualCancel;
     private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
@@ -30,14 +30,14 @@ public class BuildingPlacer : MonoBehaviour
     private void OnEnable()
     {
         Events.OnBuildingCanceled += OnBuildingCanceled;
-        waveFunction = FindFirstObjectByType<WaveFunction>();
-        waveFunction.OnMapGenerated += InitializeSpawnPlaces;
+        groundGenerator = FindFirstObjectByType<GroundGenerator>();
+        groundGenerator.OnMapGenerated += InitializeSpawnPlaces;
     }
 
     private void OnDisable()
     {
         Events.OnBuildingCanceled -= OnBuildingCanceled;
-        waveFunction.OnMapGenerated -= InitializeSpawnPlaces;
+        groundGenerator.OnMapGenerated -= InitializeSpawnPlaces;
     }
 
     private void Start()
@@ -50,7 +50,8 @@ public class BuildingPlacer : MonoBehaviour
         if (BuildingManager.Instance is null) return;
         
         await UniTask.WaitUntil(() => BuildingManager.Instance.Cells != null);
-        Vector3 scale = waveFunction.GridScale * BuildingManager.Instance.CellSize;
+        
+        Vector3 scale = groundGenerator.WaveFunction.GridScale * BuildingManager.Instance.CellSize;
         for (int z = 0; z < BuildingManager.Instance.Cells.GetLength(2); z++)
         {
             for (int x = 0; x < BuildingManager.Instance.Cells.GetLength(0); x++)

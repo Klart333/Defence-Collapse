@@ -70,7 +70,7 @@ public class BuildingManager : Singleton<BuildingManager>
     private List<Vector3Int> cellsToCollapse = new List<Vector3Int>();
     private HashSet<string> allowedKeys;
 
-    private WaveFunction waveFunction;
+    private GroundGenerator groundGenerator;
     private BuildingAnimator buildingAnimator;
     private PrototypeData emptyPrototype;
     private PrototypeData unbuildablePrototype;
@@ -86,17 +86,17 @@ public class BuildingManager : Singleton<BuildingManager>
 
     private void OnEnable()
     {
-        waveFunction = FindFirstObjectByType<WaveFunction>();
+        groundGenerator = FindFirstObjectByType<GroundGenerator>();
         buildingAnimator = GetComponent<BuildingAnimator>();
 
-        waveFunction.OnMapGenerated += Load;
+        groundGenerator.OnMapGenerated += Load;
         Events.OnBuildingDestroyed += OnBuildingDestroyed;
         Events.OnBuildingRepaired += OnBuildingRepaired;
     }
     
     private void OnDisable()
     {
-        waveFunction.OnMapGenerated -= Load;
+        groundGenerator.OnMapGenerated -= Load;
         Events.OnBuildingDestroyed += OnBuildingDestroyed;
         Events.OnBuildingRepaired += OnBuildingRepaired;
     }
@@ -130,8 +130,8 @@ public class BuildingManager : Singleton<BuildingManager>
 
     private void LoadCells()
     {
-        Cells = new Cell[Mathf.RoundToInt(waveFunction.GridSize.x / cellSize), waveFunction.GridSize.y + 1, Mathf.RoundToInt(waveFunction.GridSize.z / cellSize)];
-        cellsBuilt = new bool[Mathf.RoundToInt(waveFunction.GridSize.x / cellSize), waveFunction.GridSize.y + 1, Mathf.RoundToInt(waveFunction.GridSize.z / cellSize)];
+        Cells = new Cell[Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.x / cellSize), groundGenerator.WaveFunction.GridSize.y + 1, Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.z / cellSize)];
+        cellsBuilt = new bool[Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.x / cellSize), groundGenerator.WaveFunction.GridSize.y + 1, Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.z / cellSize)];
         emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 1, Array.Empty<int>());
         unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 0, Array.Empty<int>());
         unbuildablePrototypeList = new List<PrototypeData> { unbuildablePrototype };
@@ -142,7 +142,7 @@ public class BuildingManager : Singleton<BuildingManager>
             {
                 for (int x = 0; x < Cells.GetLength(0); x++)
                 {
-                    Vector3 pos = new Vector3(x * cellSize * waveFunction.GridScale.x, y * waveFunction.GridScale.y, z * cellSize * waveFunction.GridScale.z) - new Vector3(cellSize * waveFunction.GridScale.x, 0, cellSize * waveFunction.GridScale.z) / 2.0f;
+                    Vector3 pos = new Vector3(x * cellSize * groundGenerator.WaveFunction.GridScale.x, y * groundGenerator.WaveFunction.GridScale.y, z * cellSize * groundGenerator.WaveFunction.GridScale.z) - new Vector3(cellSize * groundGenerator.WaveFunction.GridScale.x, 0, cellSize * groundGenerator.WaveFunction.GridScale.z) / 2.0f;
                     Cells[x, y, z] = new Cell(false, pos + transform.position, new List<PrototypeData> { emptyPrototype }, y > 0);
                 }
             }
@@ -171,7 +171,7 @@ public class BuildingManager : Singleton<BuildingManager>
             return;
         }
 
-        Cell groundCell = waveFunction.GetCellAtIndexInverse(gridIndex);
+        Cell groundCell = groundGenerator.WaveFunction.GetCellAtIndexInverse(gridIndex);
         /*if (groundCell.PossiblePrototypes[0].MeshRot.Mesh is not null)
         {
             Debug.DrawLine(cellPosition, groundCell.Position, Color.red, 100, false);
@@ -708,11 +708,11 @@ public class BuildingManager : Singleton<BuildingManager>
     {
         List<Vector3Int> surrounding = new List<Vector3Int>();
 
-        for (float x = min.x; x <= max.x; x += waveFunction.GridScale.x * cellSize)
+        for (float x = min.x; x <= max.x; x += groundGenerator.WaveFunction.GridScale.x * cellSize)
         {
-            for (float y = min.y; y <= max.y; y += waveFunction.GridScale.y)
+            for (float y = min.y; y <= max.y; y += groundGenerator.WaveFunction.GridScale.y)
             {
-                for (float z = min.z; z <= max.z; z += waveFunction.GridScale.z * cellSize)
+                for (float z = min.z; z <= max.z; z += groundGenerator.WaveFunction.GridScale.z * cellSize)
                 {
                     Vector3Int? index = GetIndex(new Vector3(x, y, z));
                     if (index.HasValue)
@@ -745,7 +745,7 @@ public class BuildingManager : Singleton<BuildingManager>
 
     public Vector3Int? GetIndex(Vector3 pos)
     {
-        Vector3Int index = new Vector3Int(Math.GetMultiple(pos.x, waveFunction.GridScale.x * cellSize), Math.GetMultiple(pos.y, waveFunction.GridScale.y), Math.GetMultiple(pos.z, waveFunction.GridScale.z * cellSize));
+        Vector3Int index = new Vector3Int(Math.GetMultiple(pos.x, groundGenerator.WaveFunction.GridScale.x * cellSize), Math.GetMultiple(pos.y, groundGenerator.WaveFunction.GridScale.y), Math.GetMultiple(pos.z, groundGenerator.WaveFunction.GridScale.z * cellSize));
         if (Cells.IsInBounds(index.x, index.y, index.z))
         {
             return index;
@@ -796,9 +796,9 @@ public class BuildingManager : Singleton<BuildingManager>
             {
                 for (int x = 0; x < Cells.GetLength(0); x++)
                 {
-                    Vector3 pos = Cells[x, y, z].Position + new Vector3(waveFunction.GridScale.x * cellSize / 2.0f, 0, waveFunction.GridScale.z * cellSize / 2.0f);
+                    Vector3 pos = Cells[x, y, z].Position + new Vector3(groundGenerator.WaveFunction.GridScale.x * cellSize / 2.0f, 0, groundGenerator.WaveFunction.GridScale.z * cellSize / 2.0f);
                     Gizmos.color = !cellsBuilt[x, y, z] ? Color.white : Color.magenta;
-                    Gizmos.DrawWireCube(pos, new Vector3(waveFunction.GridScale.x * cellSize, waveFunction.GridScale.y, waveFunction.GridScale.z * cellSize) * 0.75f);
+                    Gizmos.DrawWireCube(pos, new Vector3(groundGenerator.WaveFunction.GridScale.x * cellSize, groundGenerator.WaveFunction.GridScale.y, groundGenerator.WaveFunction.GridScale.z * cellSize) * 0.75f);
                 }
             }
         }

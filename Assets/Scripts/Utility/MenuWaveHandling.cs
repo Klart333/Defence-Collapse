@@ -29,21 +29,21 @@ public class MenuWaveHandling : MonoBehaviour
     private float angle = 0;
 
     private Camera cam;    
-    private WaveFunction waveFunction;
+    private GroundGenerator groundGenerator;
 
     private void Awake()
     {
         cam = Camera.main;
 
-        waveFunction = FindAnyObjectByType<WaveFunction>();
-        waveFunction.OnMapGenerated += WaveFunction_OnMapGenerated;
+        groundGenerator = FindAnyObjectByType<GroundGenerator>();
+        groundGenerator.OnMapGenerated += WaveFunction_OnMapGenerated;
 
-        midPoint.position = new Vector3(waveFunction.GridSize.x * waveFunction.GridScale.x / 2.0f, waveFunction.GridSize.y * waveFunction.GridScale.y / 2.0f, waveFunction.GridSize.z * waveFunction.GridScale.z / 2.0f);
+        midPoint.position = new Vector3(groundGenerator.WaveFunction.GridSize.x * groundGenerator.WaveFunction.GridScale.x / 2.0f, groundGenerator.WaveFunction.GridSize.y * groundGenerator.WaveFunction.GridScale.y / 2.0f, groundGenerator.WaveFunction.GridSize.z * groundGenerator.WaveFunction.GridScale.z / 2.0f);
     }
 
     private void OnDisable()
     {
-        waveFunction.OnMapGenerated -= WaveFunction_OnMapGenerated;
+        groundGenerator.OnMapGenerated -= WaveFunction_OnMapGenerated;
     }
 
     private async void WaveFunction_OnMapGenerated()
@@ -51,11 +51,11 @@ public class MenuWaveHandling : MonoBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(5));
 
         int xz = Random.Range(minMaxXZ.x, minMaxXZ.y);
-        waveFunction.SetGridSize(new Vector3Int(xz, Random.Range(minMaxY.x, minMaxY.y), xz));
-        waveFunction.GetComponent<MeshFilter>().sharedMesh = null;  
-        waveFunction.Run();
+        groundGenerator.WaveFunction.SetGridSize(new Vector3Int(xz, Random.Range(minMaxY.x, minMaxY.y), xz));
+        groundGenerator.GetComponent<MeshFilter>().sharedMesh = null;  
+        _ = groundGenerator.Run();
 
-        midPoint.position = new Vector3(waveFunction.GridSize.x * waveFunction.GridScale.x / 2.0f, waveFunction.GridSize.y * waveFunction.GridScale.y / 2.0f, waveFunction.GridSize.z * waveFunction.GridScale.z / 2.0f);
+        midPoint.position = new Vector3(groundGenerator.WaveFunction.GridSize.x * groundGenerator.WaveFunction.GridScale.x / 2.0f, groundGenerator.WaveFunction.GridSize.y * groundGenerator.WaveFunction.GridScale.y / 2.0f, groundGenerator.WaveFunction.GridSize.z * groundGenerator.WaveFunction.GridScale.z / 2.0f);
     }
 
     private void Update()
