@@ -1,7 +1,7 @@
-using DG.Tweening;
-using Sirenix.OdinInspector;
-using UnityEngine;
 using UnityEngine.SceneManagement;
+using Sirenix.OdinInspector;
+using DG.Tweening;
+using UnityEngine;
 
 public class UIMenuPanel : MonoBehaviour
 {

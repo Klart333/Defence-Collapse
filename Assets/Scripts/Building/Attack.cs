@@ -1,34 +1,23 @@
-﻿using Effects;
+﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
+using Effects;
+using System;
 
 [System.Serializable]
 public class Attack
 {
     [OdinSerialize, NonSerialized]
-    public List<IEffect> Effects = new List<IEffect>();
+    public List<IEffect> Effects;
 
     [OdinSerialize, NonSerialized]
     public List<IEffect> DoneDamageEffects = new List<IEffect>();
 
-    private List<IEffectHolder> effectHolders = new List<IEffectHolder>();
+    private List<IEffectHolder> effectHolders;
 
     [ReadOnly, OdinSerialize]
-    public List<IEffectHolder> EffectHolders
-    {
-        get
-        {
-            if (effectHolders == null)
-            {
-                effectHolders = new List<IEffectHolder>();
-            }
-
-            return effectHolders;
-        }
-    }
+    public List<IEffectHolder> EffectHolders => effectHolders ??= new List<IEffectHolder>();
 
     public Attack(Attack copy)
     {
@@ -65,7 +54,7 @@ public class Attack
         {
             case EffectType.Effect:
                 Effects.AddRange(effects);
-                break;
+                break; 
             case EffectType.Holder:
                 for (int i = 0; i < effects.Count; i++)
                 {
@@ -129,14 +118,9 @@ public class Attack
     {
         for (int i = 0; i < EffectHolders.Count; i++)
         {
-            if (i == 0)
-            {
-                EffectHolders[i].Effects = Effects;
-            }
-            else
-            {
-                EffectHolders[i].Effects = new List<IEffect>() { EffectHolders[i - 1] };
-            }
+            EffectHolders[i].Effects = i == 0 
+                ? Effects 
+                : new List<IEffect> { EffectHolders[i - 1] };
         }
     }
 }
