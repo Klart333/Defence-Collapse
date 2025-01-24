@@ -33,6 +33,9 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
     [Title("Rules")]
     [SerializeField]
     private List<int> notAllowedBottomIndexes;
+    
+    [SerializeField]
+    private List<int> onlyAllowedBottomIndexes;
 
     [SerializeField]
     private List<int> notAllowedSideIndexes;
@@ -64,6 +67,9 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
     private List<int> notAllowedForBottom = new List<int>();
 
     [SerializeField]
+    private List<int> onlyAllowedForBottom = new List<int>();
+    
+    [SerializeField]
     private List<int> notAllowedForSides = new List<int>();
 
     [SerializeField, OdinSerialize]
@@ -86,6 +92,7 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
     private int currentTopIndex = 0;
 
     public List<int> NotAllowedForBottom => notAllowedForBottom;
+    public List<int> OnlyAllowedForBottom => onlyAllowedForBottom;
     public List<int> NotAllowedForSides => notAllowedForSides;
     public List<PrototypeData>[] MarchingTable => marchingTable;
     public int CastleIndex => castleIndex;
@@ -192,6 +199,14 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
                 for (int j = 1; j < prots.Count + 1; j++)
                 {
                     notAllowedForBottom.Add(Prototypes.Count - j);
+                }
+            }
+            
+            if (onlyAllowedBottomIndexes.Contains(i))
+            {
+                for (int j = 1; j < prots.Count + 1; j++)
+                {
+                    onlyAllowedForBottom.Add(Prototypes.Count - j);
                 }
             }
 
@@ -626,12 +641,12 @@ public struct PrototypeData : System.IEquatable<PrototypeData>
     {
         var sb = new System.Text.StringBuilder();
         sb.Append("PrototypeData { ");
-        sb.Append("MeshRot: { Mesh: ").Append(MeshRot.Mesh?.name ?? "null").Append(", Rotation: ").Append(MeshRot.Rot).Append(" }, ");
+        sb.Append("MeshRot: { Mesh: ").Append(MeshRot.Mesh != null ? MeshRot.Mesh.name : "null").Append(", Rotation: ").Append(MeshRot.Rot).Append(" }, ");
         //sb.Append("PosX: ").Append(PosX).Append(", NegX: ").Append(NegX).Append(", ");
         //sb.Append("PosY: ").Append(PosY).Append(", NegY: ").Append(NegY).Append(", ");
         //sb.Append("PosZ: ").Append(PosZ).Append(", NegZ: ").Append(NegZ).Append(", ");
         sb.Append("Weight: ").Append(Weight);
-        sb.Append("}");
+        sb.Append("}"); 
         return sb.ToString();
     }
 }

@@ -59,6 +59,7 @@ public class BuildingManager : Singleton<BuildingManager>
         new Vector2Int(0, 0), 
         new Vector2Int(-1, 0),
     };
+    
     private readonly Dictionary<Vector3Int, IBuildable> querySpawnedBuildings = new Dictionary<Vector3Int, IBuildable>();
     private readonly Dictionary<Vector3Int, IBuildable> spawnedMeshes = new Dictionary<Vector3Int, IBuildable>();
     private readonly List<(Vector3Int, Cell)> queryChangedCells = new List<(Vector3Int, Cell)>();

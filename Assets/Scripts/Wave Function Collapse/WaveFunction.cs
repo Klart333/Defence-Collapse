@@ -432,8 +432,8 @@ public class WaveFunction
             return false;
         }
 
-        prototypes = prototypeInfo.Prototypes;
-
+        prototypes = new List<PrototypeData>(prototypeInfo.Prototypes);
+        
         bottomPrototypes.Clear();
         for (int i = 0; i < prototypes.Count; i++)
         {
@@ -683,6 +683,7 @@ public struct Cell
     public Vector3 Position;
 
     public List<PrototypeData> PossiblePrototypes; // SHOULD BE AN ARRAY, 
+    // SHOULD PROBABLY DIRTY CACHE THE TOTAL WEIGHT
 
     public Cell(bool collapsed, Vector3 position, List<PrototypeData> possiblePrototypes, bool buildable = true)
     {

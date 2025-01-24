@@ -20,15 +20,19 @@ public class ChunkWaveFunction
     [SerializeField]
     private PrototypeInfoCreator prototypeInfo;
     
-    private List<Chunk> chunks = new List<Chunk>();
+    [Title("Debug")]
+    [SerializeField, Sirenix.OdinInspector.ReadOnly]
+    private List<Chunk> chunks;
 
     private readonly List<GameObject> spawnedMeshes = new List<GameObject>();
     private List<PrototypeData> prototypes = new List<PrototypeData>();
+    private List<PrototypeData> bottomPrototypes = new List<PrototypeData>();
     private readonly Stack<ChunkIndex> cellStack = new Stack<ChunkIndex>();
 
     private Transform parentTransform;
     private PrototypeData emptyPrototype;
 
+    public List<Chunk> Chunks => chunks;
     public Vector3 GridScale => gridScale;
     
     public Vector3 OriginPosition { get; set; }
@@ -52,17 +56,29 @@ public class ChunkWaveFunction
 
     public void LoadChunk(Vector3 position, Vector3Int size)
     {
+        foreach (Chunk existingChunk in chunks)
+        {
+            if (Vector3.Distance(existingChunk.OriginPosition, position) < 1)
+            {
+                //existingChunk.Reset(); // Should reset ye
+                return;
+            }
+        }
+        
+        Debug.Log("Loading chunk at: " + position + ", size: " + size);
         Chunk[] adjacentChunks = GetAdjacentChunks(position, size);
         Chunk chunk = new Chunk(size.x, size.y, size.z, chunks.Count, position, adjacentChunks, gridScale);
-        chunk.LoadCells(prototypes, gridScale);
+        chunk.LoadCells(prototypes, gridScale, cellStack);
         chunks.Add(chunk);
         
         for (int i = 0; i < adjacentChunks.Length; i++)
         {
             if (adjacentChunks[i] == null) continue;
             
-            adjacentChunks[i].SetAdjacentChunk(chunk, WaveFunctionUtility.OppositeDirection((Direction)i), prototypes);
+            adjacentChunks[i].SetAdjacentChunk(chunk, WaveFunctionUtility.OppositeDirection((Direction)i), prototypes, cellStack);
         }
+        
+        Propagate();
     }
 
     private Chunk[] GetAdjacentChunks(Vector3 position, Vector3Int size)
@@ -101,6 +117,7 @@ public class ChunkWaveFunction
         ChunkIndex index = GetLowestEntropyIndex();
 
         PrototypeData chosenPrototype = Collapse(this[index]);
+        //Debug.Log("Collapsing: " + index + "\n ChosenPrototype: " + chosenPrototype);
         SetCell(index, chosenPrototype);
 
         Propagate();
@@ -122,7 +139,9 @@ public class ChunkWaveFunction
                 continue;
             }
 
-            float possibleMeshAmount = 0;
+            float possibleMeshAmount = y * 10;
+            if (possibleMeshAmount > lowestEntropy) continue;
+            
             float totalWeight = 0;
             for (int g = 0; g < cell.PossiblePrototypes.Count; g++)
             {
@@ -137,7 +156,6 @@ public class ChunkWaveFunction
 
                 possibleMeshAmount += Mathf.Lerp(1, 0, Mathf.Abs(distFromAverage));
             }
-
             if (possibleMeshAmount >= lowestEntropy) continue;
             
             lowestEntropy = possibleMeshAmount;
@@ -178,7 +196,7 @@ public class ChunkWaveFunction
 
     public void SetCell(ChunkIndex index, PrototypeData chosenPrototype)
     {
-        this[index] = new Cell(true, this[index].Position, new List<PrototypeData>() { chosenPrototype });
+        this[index] = new Cell(true, this[index].Position, new List<PrototypeData> { chosenPrototype });
         cellStack.Push(index);
 
         GameObject spawned = GenerateMesh(this[index].Position, chosenPrototype);
@@ -285,18 +303,27 @@ public class ChunkWaveFunction
             return false;
         }
 
-        prototypes = prototypeInfo.Prototypes;
+        prototypes = new List<PrototypeData>(prototypeInfo.Prototypes);
+        bottomPrototypes = new List<PrototypeData>(prototypeInfo.Prototypes);
+        for (int i = prototypes.Count - 1; i >= 0; i--)
+        {
+            if (prototypeInfo.OnlyAllowedForBottom.Contains(i))
+            {
+                prototypes.RemoveAt(i);
+            }
+        }
+
         return prototypes.Count > 0;
     }
 
     private GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1)
     {
-        if (prototypeData.MeshRot.Mesh is null)
+        if (prototypeData.MeshRot.Mesh == null)
         {
             return null;
         }
 
-        GameObject gm = new GameObject();
+        GameObject gm = new GameObject(prototypeData.MeshRot.Mesh.name);
         gm.AddComponent<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
         gm.AddComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
 
@@ -320,31 +347,23 @@ public class ChunkWaveFunction
         spawnedMeshes.Clear();
         chunks.Clear();
     }
-
-    #region Debug
-
-    public void DrawGizmos()
+    
+    public bool AllCollapsed()
     {
-        if (!UnityEditor.EditorApplication.isPlaying)
+        foreach (Chunk chunk in chunks)
+        foreach (Cell cell in chunk.Cells)   
         {
-            return;
-        }
-
-        foreach (var chunk in chunks)
-        {
-            foreach (var cell in chunk.Cells)
+            if (!cell.Collapsed)
             {
-                Vector3 pos = cell.Position;
-                Gizmos.color = cell.Buildable ? Color.white : Color.red;
-                Gizmos.DrawWireCube(pos, new Vector3(GridScale.x, GridScale.y, GridScale.z) * 0.75f);
+                return false;
             }
         }
+
+        return true;
     }
-    
-    #endregion
 }
 
-public struct ChunkIndex
+public readonly struct ChunkIndex
 {
     public readonly int Index;
     public readonly Vector3Int CellIndex;
@@ -354,17 +373,27 @@ public struct ChunkIndex
         Index = index;
         CellIndex = cellIndex;
     }
+
+    public override string ToString()
+    {
+        return $"Chunk Index: {Index}, Cell Index: {CellIndex}";
+    }
 }
 
 [Serializable]
 public class Chunk
 {
+#if UNITY_EDITOR
+    [SerializeField, Sirenix.OdinInspector.ReadOnly]
+    private Vector3 position;
+#endif
+    
     // In the Following order: Right, Left, Up, Down, Forward, Backward
     public readonly Chunk[] AdjacentChunks;
     public readonly Cell[,,] Cells;
-
+    
     public readonly Vector3 OriginPosition;
-    public int ChunkIndex;
+    public readonly int ChunkIndex;
     
     private readonly int width;
     private readonly int height;
@@ -401,9 +430,13 @@ public class Chunk
         max = originPosition + new Vector3(width * gridScale.x, height * gridScale.y, depth * gridScale.z);
         
         Cells = new Cell[width, height, depth];
+        
+        #if UNITY_EDITOR
+        position = originPosition;
+        #endif
     }
     
-    public void LoadCells(List<PrototypeData> prototypes, Vector3 gridScale)
+    public void LoadCells(List<PrototypeData> prototypes, Vector3 gridScale, Stack<ChunkIndex> cellStack)
     {
         for (int z = 0; z < depth; z++)
         for (int y = 0; y < height; y++)
@@ -414,6 +447,7 @@ public class Chunk
 
             List<PrototypeData> prots = new List<PrototypeData>(prototypes);
             List<Direction> directions = GetAdjacentSides(index);
+            bool changed = false;
             foreach (Direction direction in directions)
             {
                 for (int i = prots.Count - 1; i >= 0; i--)
@@ -429,11 +463,18 @@ public class Chunk
                         _ => false
                     };
 
-                    if (shouldRemove) prots.RemoveAt(i);
+                    if (!shouldRemove) continue;
+                    
+                    prots.RemoveAt(i);
+                    changed = true;
                 }
             }
 
             Cells[x, y, z] = new Cell(false, pos + OriginPosition, prots);
+            if (changed)
+            {
+                cellStack.Push(new ChunkIndex(ChunkIndex, index));
+            }
         }
     }
 
@@ -514,7 +555,7 @@ public class Chunk
         };
     }
 
-    public void SetAdjacentChunk(Chunk chunk, Direction direction, List<PrototypeData> prototypes)
+    public void SetAdjacentChunk(Chunk chunk, Direction direction, List<PrototypeData> prototypes, Stack<ChunkIndex> cellStack)
     {
         int index = (int)direction;
         if (AdjacentChunks[index] != null)
@@ -524,10 +565,10 @@ public class Chunk
         }
         
         AdjacentChunks[index] = chunk;
-        UpdateCellsAlongSide(direction, prototypes);
+        UpdateCellsAlongSide(direction, prototypes, cellStack);
     }
 
-    private void UpdateCellsAlongSide(Direction sideDirection, List<PrototypeData> prototypes)
+    private void UpdateCellsAlongSide(Direction sideDirection, List<PrototypeData> prototypes, Stack<ChunkIndex> cellStack)
     {
         int startX = sideDirection == Direction.Right ? width - 1 : 0;
         int maxX = sideDirection == Direction.Left ? 1 : width;
@@ -543,6 +584,7 @@ public class Chunk
             Vector3Int index = new Vector3Int(x, y, z);
             List<PrototypeData> prots = new List<PrototypeData>(prototypes);
             List<Direction> directions = GetAdjacentSides(index);
+            bool changed = false;
             foreach (Direction direction in directions)
             {
                 for (int i = prots.Count - 1; i >= 0; i--)
@@ -558,11 +600,19 @@ public class Chunk
                         _ => false
                     };
 
-                    if (shouldRemove) prots.RemoveAt(i);
+                    if (shouldRemove)
+                    {
+                        prots.RemoveAt(i);
+                        changed = true;
+                    }
                 }
             }
 
-            Cells[x, y, z] = new Cell(false, this[index].Position + OriginPosition, prots);
+            Cells[x, y, z] = new Cell(false, this[index].Position, prots);
+            if (changed)
+            {
+                cellStack.Push(new ChunkIndex(ChunkIndex, index));
+            }
         }
     }
 }

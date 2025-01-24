@@ -1992,7 +1992,7 @@ GameObject:
   - component: {fileID: 9074229110782455076}
   - component: {fileID: 7422178902860833338}
   m_Layer: 0
-  m_Name: Building Modules
+  m_Name: District Modules
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2063,8 +2063,8 @@ MonoBehaviour:
     SerializationNodes:
     - Name: marchingTable
       Entry: 7
-      Data: 0|System.Collections.Generic.List`1[[PrototypeData, Assembly-CSharp,
-        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]][], mscorlib
+      Data: 0|System.Collections.Generic.List`1[[PrototypeData, Core, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null]][], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -2082,6 +2082,7 @@ MonoBehaviour:
   overrideVerticalNegative: 0
   negativeKey: v-1_0
   notAllowedBottomIndexes: 
+  onlyAllowedBottomIndexes: 0000000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d0000000e0000000f00000010000000110000001200000013000000
   notAllowedSideIndexes: 
   castlePrototypeIndex: 0
   moduleScale: {x: 2, y: 2, z: 2}
@@ -3452,9 +3453,10 @@ MonoBehaviour:
     - {x: -1, y: -0}
     socketname: v3_3
   notAllowedForBottom: 
+  onlyAllowedForBottom: 
   notAllowedForSides: 
   castleIndex: 3
-  materialData: {fileID: 11400000, guid: 64f0dca35d7079143abbf4da786afcf2, type: 2}
+  materialData: {fileID: 11400000, guid: d607b7626b2ef464cbaa6473ec1fb6ef, type: 2}
   pieceWeights:
   - Name: CornerBot
     Weight: 1

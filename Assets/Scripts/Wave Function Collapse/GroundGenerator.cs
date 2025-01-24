@@ -21,12 +21,17 @@ public class GroundGenerator : MonoBehaviour
     
     [SerializeField]
     private bool shouldCombine = true;
-
+    
+    [Title("Debug")]
+    [SerializeField]
+    private bool shouldRun = true;
+    
     public WaveFunction WaveFunction => waveFunction;
     
     private void Start()
     {
-        _ = Run();
+        if (shouldRun)
+            _ = Run();
     }
 
     public async UniTask Run()
@@ -44,7 +49,7 @@ public class GroundGenerator : MonoBehaviour
         {
             waveFunction.Iterate(); // Does not need to await
 
-            if (!(watch.ElapsedMilliseconds > maxMillisecondsPerFrame)) continue;
+            if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
             
             await UniTask.NextFrame();
             if (chillTimeMs > 0)
