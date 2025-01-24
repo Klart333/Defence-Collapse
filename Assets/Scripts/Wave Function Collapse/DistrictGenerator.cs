@@ -26,10 +26,14 @@ public class DistrictGenerator : MonoBehaviour
     private void OnEnable()
     {
         waveFunction.Load();
-        waveFunction.LoadChunk(Vector3.zero, new Vector3Int(10, 2, 10));
-        waveFunction.LoadChunk(new Vector3(10, 0, 0), new Vector3Int(10, 2, 10));
-        waveFunction.LoadChunk(new Vector3(10, 0, 10), new Vector3Int(10, 2, 10));
-        _ = Run();
+        //waveFunction.LoadChunk(Vector3.zero, new Vector3Int(2, 2, 2));
+        //waveFunction.LoadChunk(new Vector3(2, 0, 0), new Vector3Int(2, 2, 2));
+        //waveFunction.LoadChunk(new Vector3(2, 0, 2), new Vector3Int(2, 2, 2));
+        //waveFunction.LoadChunk(new Vector3(0, 0, 2), new Vector3Int(2, 2, 2));
+        //waveFunction.LoadChunk(new Vector3(0, 2, 2), new Vector3Int(2, 2, 2));
+        //waveFunction.LoadChunk(new Vector3(2, 2, 2), new Vector3Int(2, 2, 2));
+        //waveFunction.LoadChunk(new Vector3(2, 2, 0), new Vector3Int(2, 2, 2));
+        //_ = Run();
 
         Events.OnBuildingBuilt += OnBuildingBuilt;
     }

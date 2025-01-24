@@ -60,7 +60,7 @@ public class ChunkWaveFunction
         {
             if (Vector3.Distance(existingChunk.OriginPosition, position) < 1)
             {
-                //existingChunk.Reset(); // Should reset ye
+                existingChunk.Reset();
                 return;
             }
         }
@@ -68,14 +68,14 @@ public class ChunkWaveFunction
         Debug.Log("Loading chunk at: " + position + ", size: " + size);
         Chunk[] adjacentChunks = GetAdjacentChunks(position, size);
         Chunk chunk = new Chunk(size.x, size.y, size.z, chunks.Count, position, adjacentChunks, gridScale);
-        chunk.LoadCells(prototypes, gridScale, cellStack);
+        chunk.LoadCells(prototypes, bottomPrototypes, gridScale, cellStack);
         chunks.Add(chunk);
         
         for (int i = 0; i < adjacentChunks.Length; i++)
         {
             if (adjacentChunks[i] == null) continue;
             
-            adjacentChunks[i].SetAdjacentChunk(chunk, WaveFunctionUtility.OppositeDirection((Direction)i), prototypes, cellStack);
+            adjacentChunks[i].SetAdjacentChunk(chunk, WaveFunctionUtility.OppositeDirection((Direction)i), prototypes, bottomPrototypes, cellStack);
         }
         
         Propagate();
@@ -436,7 +436,7 @@ public class Chunk
         #endif
     }
     
-    public void LoadCells(List<PrototypeData> prototypes, Vector3 gridScale, Stack<ChunkIndex> cellStack)
+    public void LoadCells(List<PrototypeData> prototypes, List<PrototypeData> bottomPrototypes, Vector3 gridScale, Stack<ChunkIndex> cellStack)
     {
         for (int z = 0; z < depth; z++)
         for (int y = 0; y < height; y++)
@@ -445,7 +445,8 @@ public class Chunk
             Vector3Int index = new Vector3Int(x, y, z);
             Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z);
 
-            List<PrototypeData> prots = new List<PrototypeData>(prototypes);
+            bool isBottom = AdjacentChunks[3] == null && y == 0;
+            List<PrototypeData> prots = new List<PrototypeData>(isBottom ? bottomPrototypes : prototypes);
             List<Direction> directions = GetAdjacentSides(index);
             bool changed = false;
             foreach (Direction direction in directions)
@@ -555,7 +556,7 @@ public class Chunk
         };
     }
 
-    public void SetAdjacentChunk(Chunk chunk, Direction direction, List<PrototypeData> prototypes, Stack<ChunkIndex> cellStack)
+    public void SetAdjacentChunk(Chunk chunk, Direction direction, List<PrototypeData> prototypes, List<PrototypeData> bottomPrototypes, Stack<ChunkIndex> cellStack)
     {
         int index = (int)direction;
         if (AdjacentChunks[index] != null)
@@ -565,10 +566,10 @@ public class Chunk
         }
         
         AdjacentChunks[index] = chunk;
-        UpdateCellsAlongSide(direction, prototypes, cellStack);
+        UpdateCellsAlongSide(direction, prototypes, bottomPrototypes, cellStack);
     }
 
-    private void UpdateCellsAlongSide(Direction sideDirection, List<PrototypeData> prototypes, Stack<ChunkIndex> cellStack)
+    private void UpdateCellsAlongSide(Direction sideDirection, List<PrototypeData> prototypes, List<PrototypeData> bottomPrototypes, Stack<ChunkIndex> cellStack)
     {
         int startX = sideDirection == Direction.Right ? width - 1 : 0;
         int maxX = sideDirection == Direction.Left ? 1 : width;
@@ -582,7 +583,8 @@ public class Chunk
         for (int x = startX; x < maxX; x++)
         {
             Vector3Int index = new Vector3Int(x, y, z);
-            List<PrototypeData> prots = new List<PrototypeData>(prototypes);
+            bool isBottom = AdjacentChunks[3] == null && y == 0;    
+            List<PrototypeData> prots = new List<PrototypeData>(isBottom ? bottomPrototypes : prototypes);
             List<Direction> directions = GetAdjacentSides(index);
             bool changed = false;
             foreach (Direction direction in directions)
@@ -614,6 +616,11 @@ public class Chunk
                 cellStack.Push(new ChunkIndex(ChunkIndex, index));
             }
         }
+    }
+
+    public void Reset()
+    {
+        
     }
 }
 

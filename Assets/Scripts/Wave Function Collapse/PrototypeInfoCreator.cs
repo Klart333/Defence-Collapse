@@ -465,6 +465,7 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
         socketList.Clear();
         verticalSocketList.Clear();
         NotAllowedForBottom.Clear();
+        OnlyAllowedForBottom.Clear();
         NotAllowedForSides.Clear();
         marchingTable = Array.Empty<List<PrototypeData>>();
     }
