@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
-using Sirenix.Serialization;
+using System;
 
 public class PrototypeInfoCreator : SerializedMonoBehaviour
 {
@@ -54,6 +54,15 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
     [ShowIf(nameof(useMCode))]
     private bool useMCodeHeight = false;
     
+    [SerializeField]
+    private bool useBuildableCorners = false;
+
+    [SerializeField, ShowIf(nameof(useBuildableCorners))]
+    private string rightBuildableCode = "0";
+    
+    [SerializeField, ShowIf(nameof(useBuildableCorners))]
+    private BuildableCornerData buildableCornerData;    
+    
     [Title("Generated")]
     public List<PrototypeData> Prototypes = new List<PrototypeData>();
 
@@ -72,7 +81,7 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
     [SerializeField]
     private List<int> notAllowedForSides = new List<int>();
 
-    [SerializeField, OdinSerialize]
+    [SerializeField, ShowIf(nameof(useMCode))]
     private List<PrototypeData>[] marchingTable;
     
     [SerializeField]
@@ -91,10 +100,10 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
     private int currentSideIndex = 0;
     private int currentTopIndex = 0;
 
-    public List<int> NotAllowedForBottom => notAllowedForBottom;
     public List<int> OnlyAllowedForBottom => onlyAllowedForBottom;
-    public List<int> NotAllowedForSides => notAllowedForSides;
+    public List<int> NotAllowedForBottom => notAllowedForBottom;
     public List<PrototypeData>[] MarchingTable => marchingTable;
+    public List<int> NotAllowedForSides => notAllowedForSides;
     public int CastleIndex => castleIndex;
 
     [TitleGroup("Creation", Order = -100)]
@@ -142,7 +151,6 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
                         negXs.Add(vec);
                         break;
                 }
-
                 switch (vec.y)
                 {
                     case 1f:
@@ -152,7 +160,6 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
                         negYs.Add(vec);
                         break;
                 }
-
                 switch (vec.z)
                 {
                     case 1f:
@@ -227,6 +234,11 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
             {
                 SetMarchingTable2D(prots);
             }
+
+            if (useBuildableCorners && prots[0].Keys.Any(x => x.Contains(rightBuildableCode)))
+            {
+                buildableCornerData.BuildableDictionary.Add(mesh, GetBuildableCorners(prots[0]));
+            }
         }
 
         // Empty
@@ -252,6 +264,31 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
             prots.Add(prot);
             return true;
         }
+    }
+
+    private BuildableCorners GetBuildableCorners(PrototypeData prot) // DOES NOT WORK FOR ALL ROTATIONS!! AAAAHH!
+    {
+        if (rightBuildableCode[^1] == 'f')
+        {
+            UnityEngine.Debug.LogError("This was not how you built it man");
+        }
+
+        bool topLeft = prot.PosZ == $"{rightBuildableCode}f";
+        bool topRight = prot.PosZ == rightBuildableCode;
+        bool botLeft = (prot.NegZ == "-1s" && prot.NegX == $"{rightBuildableCode}f") || prot.NegZ == $"{rightBuildableCode}";
+        bool botRight = (topRight && botLeft && prot.NegZ == "-1s") || prot.NegZ == $"{rightBuildableCode}f";
+        BuildableCorners corner = new BuildableCorners()
+        {
+            CornerDictionary = new Dictionary<Corner, bool>()
+            {
+                {Corner.TopLeft, topLeft}, 
+                {Corner.TopRight, topRight}, 
+                {Corner.BottomLeft, botLeft}, 
+                {Corner.BottomRight, botRight}, 
+            }
+        };
+        
+        return corner;
     }
 
     private string GetSideKey(List<Vector3> vertexPositions, int mainAxis, int positiveDirection)
@@ -321,9 +358,15 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
 
     private string[] GetTopKeys(List<Vector3> vertexPositions, bool positive)
     {
-        if ( positive && overrideVerticalPositive)  return new string[] { positiveKey, positiveKey, positiveKey, positiveKey };
-        if (!positive && overrideVerticalNegative)  return new string[] { negativeKey, negativeKey, negativeKey, negativeKey };
-        if ( vertexPositions.Count == 0)            return new string[] { "-1s", "-1s", "-1s", "-1s" };
+        switch (positive)
+        {
+            case true when overrideVerticalPositive:
+                return new[] { positiveKey, positiveKey, positiveKey, positiveKey };
+            case false when overrideVerticalNegative:
+                return new[] { negativeKey, negativeKey, negativeKey, negativeKey };
+        }
+
+        if ( vertexPositions.Count == 0) return new[] { "-1s", "-1s", "-1s", "-1s" };
 
         // Project on 2 Dimensional plane
         List<Vector2> positions = new List<Vector2>();
@@ -338,22 +381,21 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
 
         for (int g = 0; g < verticalSocketList.Count; g++)
         {
-            if (LooseEquals(verticalSocketList[g].positions.ToList(), poses))
+            if (!LooseEquals(verticalSocketList[g].positions.ToList(), poses)) continue;
+            
+            string[] kes = new string[4];
+            kes[0] = verticalSocketList[g].socketname;
+
+            if (int.TryParse(kes[0][3].ToString(), out int index))
             {
-                string[] kes = new string[4];
-                kes[0] = verticalSocketList[g].socketname;
-
-                if (int.TryParse(kes[0][3].ToString(), out int index))
+                for (int i = 1; i < 4; i++)
                 {
-                    for (int i = 1; i < 4; i++)
-                    {
-                        int newdex = index + i >= 4 ? index + i - 4 : index + i;
-                        kes[i] = string.Format("v{0}_{1}", kes[0][1], newdex);
-                    }
+                    int newdex = index + i >= 4 ? index + i - 4 : index + i;
+                    kes[i] = $"v{kes[0][1]}_{newdex}";
                 }
-
-                return kes;
             }
+
+            return kes;
         }
 
         // Add all four rotations
@@ -373,7 +415,10 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
     
     private void SetMarchingTable2D(List<PrototypeData> prots)
     {
-        UnityEngine.Debug.Log("Mesh: " + prots[0].MeshRot.Mesh.name);
+        if (Debug)
+        {
+            UnityEngine.Debug.Log("Mesh: " + prots[0].MeshRot.Mesh.name);
+        }
 
         string code = prots[0].MeshRot.Mesh.name[^4..]; 
         
@@ -383,13 +428,20 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
             string key = code;
             if (rot > 0)
             {
+                if (Debug)
+                {
+                    UnityEngine.Debug.Log("Rot: " + rot);
+                }
                 // Rotate code
-                UnityEngine.Debug.Log("Rot: " + rot);
                 key = RotateBinaryClockwise(code, rot);
             }
+            
             int index = System.Convert.ToInt32(key, 2);
-            UnityEngine.Debug.Log("Code: " + key);
-            UnityEngine.Debug.Log("Index: " + index);
+            if (Debug)
+            {
+                UnityEngine.Debug.Log("Code: " + key);
+                UnityEngine.Debug.Log("Index: " + index);
+            }
             marchingTable[index].Add(prots[i]);
         }
     }
@@ -467,6 +519,7 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
         NotAllowedForBottom.Clear();
         OnlyAllowedForBottom.Clear();
         NotAllowedForSides.Clear();
+        buildableCornerData?.Clear();
         marchingTable = Array.Empty<List<PrototypeData>>();
     }
     
@@ -643,9 +696,9 @@ public struct PrototypeData : System.IEquatable<PrototypeData>
         var sb = new System.Text.StringBuilder();
         sb.Append("PrototypeData { ");
         sb.Append("MeshRot: { Mesh: ").Append(MeshRot.Mesh != null ? MeshRot.Mesh.name : "null").Append(", Rotation: ").Append(MeshRot.Rot).Append(" }, ");
-        //sb.Append("PosX: ").Append(PosX).Append(", NegX: ").Append(NegX).Append(", ");
-        //sb.Append("PosY: ").Append(PosY).Append(", NegY: ").Append(NegY).Append(", ");
-        //sb.Append("PosZ: ").Append(PosZ).Append(", NegZ: ").Append(NegZ).Append(", ");
+        sb.Append("PosX: ").Append(PosX).Append(", NegX: ").Append(NegX).Append(", ");
+        sb.Append("PosY: ").Append(PosY).Append(", NegY: ").Append(NegY).Append(", ");
+        sb.Append("PosZ: ").Append(PosZ).Append(", NegZ: ").Append(NegZ).Append(", ");
         sb.Append("Weight: ").Append(Weight);
         sb.Append("}"); 
         return sb.ToString();

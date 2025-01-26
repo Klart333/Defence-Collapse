@@ -1,29 +1,26 @@
-﻿using Sirenix.OdinInspector;
-using Sirenix.Serialization;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.UIElements;
+using System;
 
-[CreateAssetMenu(fileName = "Buildable", menuName = "Ground Cell Buildable Utility")]
-public class GroundCellBuildableUtility : SerializedScriptableObject
+[CreateAssetMenu(fileName = "Buildable", menuName = "Town/Buildable Corner Data")]
+public class BuildableCornerData : SerializedScriptableObject
 {
     [Title("Dictionary")]
-    [SerializeField]
-    private Dictionary<Mesh, BuildableCorners> BuildableDictionary = new();
+    public Dictionary<Mesh, BuildableCorners> BuildableDictionary;
         
-    public bool IsBuildable(MeshWithRotation meshRot, Vector2 corner)
+    public bool IsBuildable(MeshWithRotation meshRot, Vector2Int corner)
     {
-        if (meshRot.Mesh == null)
+        if (meshRot.Mesh == null || !BuildableDictionary.TryGetValue(meshRot.Mesh, out BuildableCorners buildableCorners))
         {
             return false;
         }
 
         Corner rotatedCorner = RotateCorner(meshRot.Rot, corner);
-        return BuildableDictionary[meshRot.Mesh].CornerDictionary[rotatedCorner];
+        return buildableCorners.CornerDictionary[rotatedCorner];
     }
 
-    private Corner RotateCorner(int rot, Vector2 corner)
+    private Corner RotateCorner(int rot, Vector2Int corner)
     {
         float angle = rot * 90 * Mathf.Deg2Rad;
         int x = -Mathf.RoundToInt(corner.x * Mathf.Cos(angle) - corner.y * Mathf.Sin(angle));
@@ -37,6 +34,11 @@ public class GroundCellBuildableUtility : SerializedScriptableObject
             (-1, -1) => Corner.BottomLeft,
             _ => throw new NotImplementedException(),
         };
+    }
+
+    public void Clear()
+    {
+        BuildableDictionary.Clear();   
     }
 }
 

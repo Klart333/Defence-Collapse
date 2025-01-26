@@ -4,10 +4,10 @@ using UnityEngine;
 public interface IBuildable
 {
     public int Importance { get; }
-
+    public MeshWithRotation MeshRot { get; }
     public GameObject gameObject { get; }
+    
     public void Setup(PrototypeData prototypeData, Vector3 scale);
     public void ToggleIsBuildableVisual(bool value);
-    public T GetAtPosAndRot<T>(Vector3 position, Quaternion rotation) where T : PooledMonoBehaviour;
 }
 

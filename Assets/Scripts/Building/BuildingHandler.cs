@@ -67,7 +67,7 @@ public class BuildingHandler : SerializedMonoBehaviour
     {
         if (!towerMeshData.TowerMeshes.TryGetValue(building.Prototype.MeshRot.Mesh, out BuildingCellInformation cellInfo))
         {
-            Debug.Log("Please add all meshes to the list");
+            //Debug.Log("Please add all meshes to the list");
 
             BuildingData wrongdata = new BuildingData(this);
             wrongdata.SetState(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None}, building.Index, building.Prototype);
@@ -132,7 +132,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     #region Utility
 
-    public int GetHouseCount(int groupIndex)
+    public int GetHouseCount(int groupIndex) // OUTDATED
     {
         int total = 0;
         foreach (var item in BuildingGroups[groupIndex])

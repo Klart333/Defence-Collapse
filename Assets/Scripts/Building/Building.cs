@@ -39,6 +39,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     private bool highlighted;
     private bool selected;
     private bool hovered;
+    private IBuildable _buildableImplementation;
 
     public int BuildingGroupIndex { get; set; } = -1;
     public PrototypeData Prototype { get; private set; }
@@ -49,6 +50,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     public BuildingHandler BuildingHandler => buildingHandler ??= FindAnyObjectByType<BuildingHandler>();
     public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
     public BuildingUI BuildingUI => buildingUI ??= GetComponentInChildren<BuildingUI>();
+    public MeshWithRotation MeshRot => Prototype.MeshRot;
     public Mesh Mesh => Prototype.MeshRot.Mesh;
 
     private void Awake()

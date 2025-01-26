@@ -30,8 +30,8 @@ namespace Buildings
         public int Importance => 0;
 
         public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
-
         public MeshCollider MeshCollider => meshCollider ??= GetComponentInChildren<MeshCollider>();
+        public MeshWithRotation MeshRot => PrototypeData.MeshRot;
 
         protected override void OnDisable()
         {

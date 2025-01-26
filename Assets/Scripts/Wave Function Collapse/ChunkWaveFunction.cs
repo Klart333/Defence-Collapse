@@ -24,10 +24,10 @@ public class ChunkWaveFunction
     [SerializeField, Sirenix.OdinInspector.ReadOnly]
     private List<Chunk> chunks;
 
-    private readonly List<GameObject> spawnedMeshes = new List<GameObject>();
     private List<PrototypeData> prototypes = new List<PrototypeData>();
     private List<PrototypeData> bottomPrototypes = new List<PrototypeData>();
     private readonly Stack<ChunkIndex> cellStack = new Stack<ChunkIndex>();
+    private readonly Stack<GameObject> gameObjectPool = new Stack<GameObject>();
 
     private Transform parentTransform;
     private PrototypeData emptyPrototype;
@@ -58,9 +58,21 @@ public class ChunkWaveFunction
     {
         foreach (Chunk existingChunk in chunks)
         {
-            if (Vector3.Distance(existingChunk.OriginPosition, position) < 1)
+            // Get the bounds of the existing chunk
+            Vector3 existingMin = existingChunk.OriginPosition;
+            Vector3 existingMax = existingChunk.OriginPosition + Vector3.Scale(new Vector3(existingChunk.width, existingChunk.height, existingChunk.depth), gridScale);
+
+            // Get the bounds of the incoming chunk
+            Vector3 incomingMax = position + Vector3.Scale(size, gridScale);
+
+            // Check for overlap between the AABBs
+            if (position.x < existingMax.x && incomingMax.x > existingMin.x &&
+                position.y < existingMax.y && incomingMax.y > existingMin.y &&
+                position.z < existingMax.z && incomingMax.z > existingMin.z)
             {
-                existingChunk.Reset();
+                Debug.Log("Chunk overlaps with " + existingChunk + ", resetting it instead");  
+                existingChunk.Clear(gameObjectPool);
+                existingChunk.LoadCells(prototypes, bottomPrototypes, gridScale, cellStack);
                 return;
             }
         }
@@ -202,7 +214,7 @@ public class ChunkWaveFunction
         GameObject spawned = GenerateMesh(this[index].Position, chosenPrototype);
         if (spawned != null)
         {
-            spawnedMeshes.Add(spawned);
+            chunks[index.Index].SpawnedMeshes.Add(spawned);
         }
     }
 
@@ -323,9 +335,7 @@ public class ChunkWaveFunction
             return null;
         }
 
-        GameObject gm = new GameObject(prototypeData.MeshRot.Mesh.name);
-        gm.AddComponent<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
-        gm.AddComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
+        GameObject gm = GetPoolObject(prototypeData);
 
         gm.transform.position = position;
         gm.transform.rotation = Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0);
@@ -337,14 +347,29 @@ public class ChunkWaveFunction
         return gm;
     }
 
+    private GameObject GetPoolObject(PrototypeData prototypeData)
+    {
+        if (gameObjectPool.TryPop(out GameObject gameObject))
+        {
+            gameObject.SetActive(true);
+            gameObject.GetComponent<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
+            gameObject.GetComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
+            return gameObject;
+        }
+        
+        var gm = new GameObject(prototypeData.MeshRot.Mesh.name);
+        gm.AddComponent<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
+        gm.AddComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));    
+        return gm;
+    }
+    
+
     public void Clear()
     {
-        for (int i = 0; i < spawnedMeshes.Count; i++)
+        foreach (Chunk chunk in chunks)
         {
-            Object.DestroyImmediate(spawnedMeshes[i]);
+            chunk.Clear(gameObjectPool);
         }
-
-        spawnedMeshes.Clear();
         chunks.Clear();
     }
     
@@ -392,12 +417,15 @@ public class Chunk
     public readonly Chunk[] AdjacentChunks;
     public readonly Cell[,,] Cells;
     
+    [NonSerialized]
+    public List<GameObject> SpawnedMeshes = new List<GameObject>();
+    
     public readonly Vector3 OriginPosition;
     public readonly int ChunkIndex;
     
-    private readonly int width;
-    private readonly int height;
-    private readonly int depth;
+    public readonly int width;
+    public readonly int height;
+    public readonly int depth;
 
     private readonly Vector3 min;
     private readonly Vector3 max;
@@ -447,7 +475,7 @@ public class Chunk
 
             bool isBottom = AdjacentChunks[3] == null && y == 0;
             List<PrototypeData> prots = new List<PrototypeData>(isBottom ? bottomPrototypes : prototypes);
-            List<Direction> directions = GetAdjacentSides(index);
+            List<Direction> directions = GetAdjacentSides(index, cellStack);
             bool changed = false;
             foreach (Direction direction in directions)
             {
@@ -511,18 +539,29 @@ public class Chunk
     /// <summary>
     /// Gets the directions of the index that are invalid
     /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    public List<Direction> GetAdjacentSides(Vector3Int index)
+    public List<Direction> GetAdjacentSides(Vector3Int index, Stack<ChunkIndex> cellStack)
     {
         List<Direction> adjacentDirections = new List<Direction>();
 
         for (int i = 0; i < Directions.Length; i++)
         {
             Vector3Int neighborIndex = index + Directions[i];
-
-            // Check if neighbor is within the bounds of the current chunk
-            if (AdjacentChunks[i] == null && !IsWithinBounds(neighborIndex))
+            if (AdjacentChunks[i] != null)
+            {
+                Vector3Int adjacentIndex = WrapIndexToAdjacentChunk(index, i);
+                Cell cell = AdjacentChunks[i][adjacentIndex];
+                if (!cell.Collapsed || string.IsNullOrEmpty(cell.PossiblePrototypes[0].Keys[i])) continue;
+                
+                if (cell.PossiblePrototypes[0].Keys[i][0] == '-')
+                {
+                    adjacentDirections.Add((Direction)i);
+                }
+                else 
+                {
+                    cellStack.Push(new ChunkIndex(AdjacentChunks[i].ChunkIndex, adjacentIndex));
+                }
+            }
+            else if (AdjacentChunks[i] == null && !IsWithinBounds(neighborIndex))
             {
                 adjacentDirections.Add((Direction)i);
             }
@@ -585,7 +624,7 @@ public class Chunk
             Vector3Int index = new Vector3Int(x, y, z);
             bool isBottom = AdjacentChunks[3] == null && y == 0;    
             List<PrototypeData> prots = new List<PrototypeData>(isBottom ? bottomPrototypes : prototypes);
-            List<Direction> directions = GetAdjacentSides(index);
+            List<Direction> directions = GetAdjacentSides(index, cellStack);
             bool changed = false;
             foreach (Direction direction in directions)
             {
@@ -618,9 +657,14 @@ public class Chunk
         }
     }
 
-    public void Reset()
+    public void Clear(Stack<GameObject> pool)
     {
-        
+        for (int i = SpawnedMeshes.Count - 1; i >= 0; i--)
+        {
+            SpawnedMeshes[i].SetActive(false);
+            pool.Push(SpawnedMeshes[i]);
+            SpawnedMeshes.RemoveAt(i);
+        }
     }
 }
 

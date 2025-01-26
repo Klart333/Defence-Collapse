@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEditor;
 using Buildings;
 using System;
+using UnityEngine.Serialization;
 
 public class BuildingManager : Singleton<BuildingManager> 
 {
@@ -31,8 +32,9 @@ public class BuildingManager : Singleton<BuildingManager>
     [SerializeField]
     private Path pathPrefab;
 
+    [FormerlySerializedAs("cellBuildableUtility")]
     [SerializeField]
-    private GroundCellBuildableUtility cellBuildableUtility;
+    private BuildableCornerData cellBuildableCornerData;
 
     [Title("Debug")]
     [SerializeField]
@@ -178,9 +180,9 @@ public class BuildingManager : Singleton<BuildingManager>
             Debug.DrawLine(cellPosition, groundCell.Position, Color.red, 100, false);
         }*/
         
-        Vector2 corner = new Vector2(Mathf.Sign(groundCell.Position.x - cellPosition.x), Mathf.Sign(groundCell.Position.z - cellPosition.z));
+        Vector2Int corner = new Vector2Int((int)Mathf.Sign(groundCell.Position.x - cellPosition.x), (int)Mathf.Sign(groundCell.Position.z - cellPosition.z));
 
-        if (!cellBuildableUtility.IsBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner))
+        if (!cellBuildableCornerData.IsBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner))
         {
             Cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(
                 true,
