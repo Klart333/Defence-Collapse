@@ -36,6 +36,7 @@ public class GroundGenerator : MonoBehaviour
 
     public async UniTask Run()
     {
+        waveFunction.ParentTransform = transform;
         if (!waveFunction.Load())
         {
             return;

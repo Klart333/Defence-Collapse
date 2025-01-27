@@ -251,6 +251,11 @@ public class PrototypeInfoCreator : SerializedMonoBehaviour
             marchingTable[15].Add(air);
         }
 
+        if (useBuildableCorners)
+        {
+            buildableCornerData.Save();
+        }
+
         static bool AddIfUnique(List<PrototypeData> prots, PrototypeData prot)
         {
             for (int i = 0; i < prots.Count; i++)
@@ -644,6 +649,17 @@ public struct PrototypeData : System.IEquatable<PrototypeData>
     {
         PosX, NegX, PosY, NegY, PosZ, NegZ
     };
+    
+    public readonly string DirectionToKey(Direction direction) => direction switch 
+    {
+        Direction.Right => PosX,
+        Direction.Left => NegX,
+        Direction.Up => PosY,
+        Direction.Down => NegY,
+        Direction.Forward => PosZ,
+        Direction.Backward => NegZ,
+        _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+    }; 
 
     public PrototypeData(MeshWithRotation mesh, string posX, string negX, string posY, string negY, string posZ, string negZ, float weight, int[] mats)
     {
@@ -659,6 +675,7 @@ public struct PrototypeData : System.IEquatable<PrototypeData>
         Weight = weight;
     }
 
+    
     public static bool operator ==(PrototypeData p1, PrototypeData p2)
     {
         return p1.Equals(p2);
@@ -696,10 +713,10 @@ public struct PrototypeData : System.IEquatable<PrototypeData>
         var sb = new System.Text.StringBuilder();
         sb.Append("PrototypeData { ");
         sb.Append("MeshRot: { Mesh: ").Append(MeshRot.Mesh != null ? MeshRot.Mesh.name : "null").Append(", Rotation: ").Append(MeshRot.Rot).Append(" }, ");
-        sb.Append("PosX: ").Append(PosX).Append(", NegX: ").Append(NegX).Append(", ");
-        sb.Append("PosY: ").Append(PosY).Append(", NegY: ").Append(NegY).Append(", ");
-        sb.Append("PosZ: ").Append(PosZ).Append(", NegZ: ").Append(NegZ).Append(", ");
-        sb.Append("Weight: ").Append(Weight);
+        //sb.Append("PosX: ").Append(PosX).Append(", NegX: ").Append(NegX).Append(", ");
+        //sb.Append("PosY: ").Append(PosY).Append(", NegY: ").Append(NegY).Append(", ");
+        //sb.Append("PosZ: ").Append(PosZ).Append(", NegZ: ").Append(NegZ).Append(", ");
+        //sb.Append("Weight: ").Append(Weight);
         sb.Append("}"); 
         return sb.ToString();
     }

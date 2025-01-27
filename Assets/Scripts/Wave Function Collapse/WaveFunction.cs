@@ -39,7 +39,6 @@ public class WaveFunction
     private readonly Stack<int> cellStack = new Stack<int>();
     private readonly List<Cell> cells = new List<Cell>();
 
-    private Transform parentTransform;
     private PrototypeData emptyPrototype;
 
     public Vector3Int GridSize => new Vector3Int(gridSizeX, gridSizeY, gridSizeZ);
@@ -47,6 +46,7 @@ public class WaveFunction
     public List<Cell> Cells => cells;
     public Vector3 GridScale => gridScale;
     
+    public Transform ParentTransform { get; set; }
     public Vector3 OriginPosition { get; set; }
     public List<PrototypeData> Prototypes => prototypes;
 
@@ -528,8 +528,8 @@ public class WaveFunction
 
         gm.transform.position = position;
         gm.transform.rotation = Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0);
-        parentTransform ??= new GameObject("Wave Function Parent").transform;
-        gm.transform.SetParent(parentTransform, true);
+        ParentTransform ??= new GameObject("Wave Function Parent").transform;
+        gm.transform.SetParent(ParentTransform, true);
         
         gm.transform.localScale = GridScale / 2 * scale;
 
@@ -692,6 +692,25 @@ public struct Cell
         PossiblePrototypes = possiblePrototypes;
         Buildable = buildable;
     }
+    
+    public override string ToString()
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.Append($"Cell(Position: {Position}, Buildable: {Buildable}, Collapsed: {Collapsed}, PossiblePrototypes: [");
+
+        if (PossiblePrototypes != null)
+        {
+            for (int i = 0; i < PossiblePrototypes.Count; i++)
+            {
+                sb.Append(PossiblePrototypes[i].ToString());
+                if (i < PossiblePrototypes.Count - 1)
+                    sb.Append(", ");
+            }
+        }
+
+        sb.Append("])");
+        return sb.ToString();
+    }
 }
 
 public struct Node
@@ -728,6 +747,20 @@ public static class WaveFunctionUtility
             Direction.Down => Direction.Up,
             Direction.Forward => Direction.Backward,
             Direction.Backward => Direction.Forward,
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+        };
+    }
+    
+    public static Direction OppositeDirection(int direction)
+    {
+        return direction switch
+        {
+            0 => Direction.Left,
+            1 => Direction.Right,
+            2 => Direction.Down,
+            3 => Direction.Up,
+            4 => Direction.Backward,
+            5 => Direction.Forward,
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
     }

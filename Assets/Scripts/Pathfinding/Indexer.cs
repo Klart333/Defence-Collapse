@@ -123,7 +123,7 @@ public class Indexer : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"Indexer {this} failed to build valid indexes", this);
+                //Debug.LogWarning($"Indexer {this} failed to build valid indexes", this);
             }
         }
 

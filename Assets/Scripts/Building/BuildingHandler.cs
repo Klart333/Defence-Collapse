@@ -55,6 +55,12 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private void UpdateData(BuildingData buildingData, Building building)
     {
+        if (building.Prototype.MeshRot.Mesh == null) // Full
+        {
+            buildingData.OnBuildingChanged(new BuildingCellInformation { HouseCount = 4, TowerType = TowerType.None }, building);
+            return; 
+        }
+        
         if (!towerMeshData.TowerMeshes.TryGetValue(building.Prototype.MeshRot.Mesh, out BuildingCellInformation cellInfo))
         {
             buildingData.OnBuildingChanged(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None }, building);

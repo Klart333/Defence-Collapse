@@ -34,8 +34,8 @@ public class ChunkWaveFunction
 
     public List<Chunk> Chunks => chunks;
     public Vector3 GridScale => gridScale;
+    public Stack<GameObject> GameObjectPool => gameObjectPool;
     
-    public Vector3 OriginPosition { get; set; }
     public List<PrototypeData> Prototypes => prototypes;
     
     public Cell this[ChunkIndex index]
@@ -54,8 +54,32 @@ public class ChunkWaveFunction
         return false;
     }
 
-    public void LoadChunk(Vector3 position, Vector3Int size)
+    public Chunk LoadChunk(Vector3 position, Vector3Int size)
     {
+        Debug.Log("Loading chunk at: " + position + ", size: " + size);
+        Chunk[] adjacentChunks = GetAdjacentChunks(position, size);
+        Chunk chunk = new Chunk(size.x, size.y, size.z, chunks.Count, position, adjacentChunks, gridScale);
+        chunks.Add(chunk);
+        LoadCells(chunk);
+        return chunk;
+    }
+
+    public void LoadCells(Chunk chunk)
+    {
+        chunk.LoadCells(prototypes, bottomPrototypes, gridScale, cellStack);
+        for (int i = 0; i < chunk.AdjacentChunks.Length; i++)
+        {
+            if (chunk.AdjacentChunks[i] == null || chunk.AdjacentChunks[i].IsClear || chunk.AdjacentChunks[i].AllCollapsed) continue;
+            
+            Direction oppositeDirection = WaveFunctionUtility.OppositeDirection(i);
+            Debug.Log("Set Neighbour Chunk for : " + chunk.AdjacentChunks[i].ChunkIndex + ", Dir: " + oppositeDirection);
+            chunk.AdjacentChunks[i].SetAdjacentChunk(chunk, oppositeDirection, prototypes, bottomPrototypes, cellStack);
+        }
+    }
+    
+    public bool CheckChunkOverlap(Vector3 position, Vector3Int size, out Chunk chunk)
+    {
+        chunk = null;
         foreach (Chunk existingChunk in chunks)
         {
             // Get the bounds of the existing chunk
@@ -66,31 +90,17 @@ public class ChunkWaveFunction
             Vector3 incomingMax = position + Vector3.Scale(size, gridScale);
 
             // Check for overlap between the AABBs
-            if (position.x < existingMax.x && incomingMax.x > existingMin.x &&
-                position.y < existingMax.y && incomingMax.y > existingMin.y &&
-                position.z < existingMax.z && incomingMax.z > existingMin.z)
-            {
-                Debug.Log("Chunk overlaps with " + existingChunk + ", resetting it instead");  
-                existingChunk.Clear(gameObjectPool);
-                existingChunk.LoadCells(prototypes, bottomPrototypes, gridScale, cellStack);
-                return;
-            }
-        }
-        
-        Debug.Log("Loading chunk at: " + position + ", size: " + size);
-        Chunk[] adjacentChunks = GetAdjacentChunks(position, size);
-        Chunk chunk = new Chunk(size.x, size.y, size.z, chunks.Count, position, adjacentChunks, gridScale);
-        chunk.LoadCells(prototypes, bottomPrototypes, gridScale, cellStack);
-        chunks.Add(chunk);
-        
-        for (int i = 0; i < adjacentChunks.Length; i++)
-        {
-            if (adjacentChunks[i] == null) continue;
+            if (position.x >= existingMax.x || incomingMax.x <= existingMin.x ||
+                position.y >= existingMax.y || incomingMax.y <= existingMin.y ||
+                position.z >= existingMax.z || incomingMax.z <= existingMin.z) continue;
             
-            adjacentChunks[i].SetAdjacentChunk(chunk, WaveFunctionUtility.OppositeDirection((Direction)i), prototypes, bottomPrototypes, cellStack);
+            Debug.Log("Chunk overlaps with Index:" + existingChunk.ChunkIndex + ", resetting it instead");  
+            existingChunk.Clear(gameObjectPool);
+            chunk = existingChunk;
+            return true;
         }
         
-        Propagate();
+        return false;
     }
 
     private Chunk[] GetAdjacentChunks(Vector3 position, Vector3Int size)
@@ -223,66 +233,50 @@ public class ChunkWaveFunction
         while (cellStack.TryPop(out ChunkIndex chunkIndex))
         {
             Cell changedCell = this[chunkIndex];
+            if (!changedCell.Collapsed && changedCell.PossiblePrototypes.Count == 1 && changedCell.PossiblePrototypes[0].MeshRot.Mesh == null)
+            {
+                Debug.Log("Propagating ONLY air at: " + chunkIndex);
+            }
 
             List<ChunkIndex> neighbours = chunks[chunkIndex.Index].GetAdjacentCells(chunkIndex.CellIndex, out List<Direction> directions);
 
             for (int i = 0; i < neighbours.Count; i++)
             {
                 Cell neighbour = this[neighbours[i]];
-                List<PrototypeData> constrainedPrototypes = Constrain(changedCell, neighbour, directions[i], out bool changed);
+                Constrain(changedCell, neighbour, directions[i], out bool changed);
 
                 if (changed)
                 {
-                    this[neighbours[i]] = new Cell(neighbour.Collapsed, neighbour.Position, constrainedPrototypes);
                     cellStack.Push(neighbours[i]);
                 } 
             }
         }
     }
 
-    private List<PrototypeData> Constrain(Cell changedCell, Cell affectedCell, Direction direction, out bool changed)
+    private void Constrain(Cell changedCell, Cell affectedCell, Direction direction, out bool changed)
     {
-        if (affectedCell.Collapsed)
-        {
-            changed = false;
-            return new List<PrototypeData>(affectedCell.PossiblePrototypes);
-        }
+        changed = false;
+        if (affectedCell.Collapsed) return;
 
         List<string> validKeys = new List<string>();
         for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
         {
-            validKeys.Add(direction switch 
-            {
-                Direction.Right => changedCell.PossiblePrototypes[i].PosX,
-                Direction.Left => changedCell.PossiblePrototypes[i].NegX,
-                Direction.Up => changedCell.PossiblePrototypes[i].PosY,
-                Direction.Down => changedCell.PossiblePrototypes[i].NegY,
-                Direction.Forward => changedCell.PossiblePrototypes[i].PosZ,
-                Direction.Backward => changedCell.PossiblePrototypes[i].NegZ,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            });
+            validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
         }
 
-        changed = false;
+        Direction oppositeDirection = WaveFunctionUtility.OppositeDirection(direction);
         for (int i = affectedCell.PossiblePrototypes.Count - 1; i >= 0; i--)
         {
-            bool shouldRemove = direction switch
-            {
-                Direction.Right => !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegX, validKeys),
-                Direction.Left => !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosX, validKeys),
-                Direction.Forward => !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegZ, validKeys),
-                Direction.Backward => !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosZ, validKeys),
-                Direction.Up => !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegY, validKeys),
-                Direction.Down => !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosY, validKeys),
-                _ => false
-            };
-
-            if (!shouldRemove) continue;
+            if (CheckValidSocket(affectedCell.PossiblePrototypes[i].DirectionToKey(oppositeDirection), validKeys)) continue;
+            
             affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
             changed = true;
         }
-
-        return affectedCell.PossiblePrototypes;
+        
+        if (changed && affectedCell.PossiblePrototypes.Count == 1 && affectedCell.PossiblePrototypes[0].MeshRot.Mesh == null)
+        {
+            Debug.Log("Constraining ONLY air from: \n" + changedCell + "\n To: " + affectedCell);
+        }
     }
     
     private static bool CheckValidSocket(string key, List<string> validKeys)
@@ -376,9 +370,8 @@ public class ChunkWaveFunction
     public bool AllCollapsed()
     {
         foreach (Chunk chunk in chunks)
-        foreach (Cell cell in chunk.Cells)   
         {
-            if (!cell.Collapsed)
+            if (!chunk.AllCollapsed)
             {
                 return false;
             }
@@ -401,7 +394,7 @@ public readonly struct ChunkIndex
 
     public override string ToString()
     {
-        return $"Chunk Index: {Index}, Cell Index: {CellIndex}";
+        return $"(ChunkIndex) {Index}, {CellIndex}";
     }
 }
 
@@ -416,7 +409,7 @@ public class Chunk
     // In the Following order: Right, Left, Up, Down, Forward, Backward
     public readonly Chunk[] AdjacentChunks;
     public readonly Cell[,,] Cells;
-    
+
     [NonSerialized]
     public List<GameObject> SpawnedMeshes = new List<GameObject>();
     
@@ -429,6 +422,8 @@ public class Chunk
 
     private readonly Vector3 min;
     private readonly Vector3 max;
+
+    public bool IsClear { get; private set; } = true; 
 
     private static readonly Vector3Int[] Directions = {
         new Vector3Int(1, 0, 0),  // Right
@@ -463,9 +458,32 @@ public class Chunk
         position = originPosition;
         #endif
     }
-    
+
+    public bool AllCollapsed
+    {
+        get
+        {
+            if (IsClear)
+            {
+                return false;
+            }
+            
+            foreach (Cell cell in Cells)
+            {
+                if (!cell.Collapsed)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
     public void LoadCells(List<PrototypeData> prototypes, List<PrototypeData> bottomPrototypes, Vector3 gridScale, Stack<ChunkIndex> cellStack)
     {
+        IsClear = false;
+        
         for (int z = 0; z < depth; z++)
         for (int y = 0; y < height; y++)
         for (int x = 0; x < width; x++)
@@ -481,20 +499,9 @@ public class Chunk
             {
                 for (int i = prots.Count - 1; i >= 0; i--)
                 {
-                    bool shouldRemove = direction switch
-                    {
-                        Direction.Right => prots[i].PosX != "-1s",
-                        Direction.Left => prots[i].NegX != "-1s", 
-                        Direction.Backward => prots[i].NegZ != "-1s",
-                        Direction.Forward => prots[i].PosZ != "-1s",
-                        Direction.Up => prots[i].PosY != "-1s",
-                        Direction.Down => prots[i].NegY != "-1s",
-                        _ => false
-                    };
-
-                    if (!shouldRemove) continue;
+                    if (prots[i].DirectionToKey(direction)[0] == '-') continue;
                     
-                    prots.RemoveAt(i);
+                    prots.RemoveAtSwapBack(i);
                     changed = true;
                 }
             }
@@ -541,29 +548,34 @@ public class Chunk
     /// </summary>
     public List<Direction> GetAdjacentSides(Vector3Int index, Stack<ChunkIndex> cellStack)
     {
+        //Debug.Log("Get Adjacent Sides for : " + ChunkIndex + ", " + index);
         List<Direction> adjacentDirections = new List<Direction>();
 
         for (int i = 0; i < Directions.Length; i++)
         {
             Vector3Int neighborIndex = index + Directions[i];
-            if (AdjacentChunks[i] != null)
-            {
-                Vector3Int adjacentIndex = WrapIndexToAdjacentChunk(index, i);
-                Cell cell = AdjacentChunks[i][adjacentIndex];
-                if (!cell.Collapsed || string.IsNullOrEmpty(cell.PossiblePrototypes[0].Keys[i])) continue;
-                
-                if (cell.PossiblePrototypes[0].Keys[i][0] == '-')
-                {
-                    adjacentDirections.Add((Direction)i);
-                }
-                else 
-                {
-                    cellStack.Push(new ChunkIndex(AdjacentChunks[i].ChunkIndex, adjacentIndex));
-                }
-            }
-            else if (AdjacentChunks[i] == null && !IsWithinBounds(neighborIndex))
+            if (IsWithinBounds(neighborIndex)) continue;
+
+            if (AdjacentChunks[i] == null)
             {
                 adjacentDirections.Add((Direction)i);
+                continue;
+            }
+
+            if (AdjacentChunks[i].IsClear) continue;
+
+            Vector3Int adjacentIndex = WrapIndexToAdjacentChunk(index, i);
+            Cell cell = AdjacentChunks[i][adjacentIndex];
+            if (!cell.Collapsed || string.IsNullOrEmpty(cell.PossiblePrototypes[0].Keys[i])) continue;
+
+            if (cell.PossiblePrototypes[0].Keys[i][0] == '-')
+            {
+                adjacentDirections.Add((Direction)i);
+            }
+            else
+            {
+                Debug.Log("Next to this prototypedata: " + cell.PossiblePrototypes[0] + ", Dir: " + (Direction)i);
+                cellStack.Push(new ChunkIndex(AdjacentChunks[i].ChunkIndex, adjacentIndex));
             }
         }
 
@@ -598,7 +610,7 @@ public class Chunk
     public void SetAdjacentChunk(Chunk chunk, Direction direction, List<PrototypeData> prototypes, List<PrototypeData> bottomPrototypes, Stack<ChunkIndex> cellStack)
     {
         int index = (int)direction;
-        if (AdjacentChunks[index] != null)
+        if (AdjacentChunks[index] != null && AdjacentChunks[index].ChunkIndex != chunk.ChunkIndex)
         {
             Debug.LogError("Adjacent chunk already exists, big issue!");
             return;
@@ -659,6 +671,8 @@ public class Chunk
 
     public void Clear(Stack<GameObject> pool)
     {
+        IsClear = true;
+        
         for (int i = SpawnedMeshes.Count - 1; i >= 0; i--)
         {
             SpawnedMeshes[i].SetActive(false);

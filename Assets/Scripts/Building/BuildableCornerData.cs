@@ -40,6 +40,16 @@ public class BuildableCornerData : SerializedScriptableObject
     {
         BuildableDictionary.Clear();   
     }
+
+#if UNITY_EDITOR
+    [Button]
+    public void Save()
+    {
+        UnityEditor.EditorUtility.SetDirty(this);
+        UnityEditor.AssetDatabase.SaveAssets();
+    }
+    
+#endif
 }
 
 [System.Serializable]
