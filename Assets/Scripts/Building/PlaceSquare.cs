@@ -7,7 +7,7 @@ public class PlaceSquare : MonoBehaviour
 
     [SerializeField]
     private MeshRenderer meshRenderer;
-
+    
     [SerializeField]
     private Color defaultColor = Color.white;
     
@@ -19,13 +19,19 @@ public class PlaceSquare : MonoBehaviour
     public BuildingPlacer Placer { get; set; }
     public Vector3Int Index { get; set; }
     public int SquareIndex { get; set; }
-    public bool Placed { get; set; }
+    private bool Placed { get; set; }
 
     private void OnEnable()
     {
+        if (Placed)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+        
         block = new MaterialPropertyBlock();
         meshRenderer.GetPropertyBlock(block);
-        block.SetColor(Color1, Placed ? hoveredColor : defaultColor);
+        block.SetColor(Color1, defaultColor);
         meshRenderer.SetPropertyBlock(block);
     }
 
@@ -46,5 +52,11 @@ public class PlaceSquare : MonoBehaviour
         block.SetColor(Color1, defaultColor);
         meshRenderer.SetPropertyBlock(block);
         Placer.SquareIndex = null;
+    }
+
+    public void OnPlaced()
+    {
+        Placed = true;
+        gameObject.SetActive(false);
     }
 }

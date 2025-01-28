@@ -7246,8 +7246,10 @@ MonoBehaviour:
   chunkSize: {x: 2, y: 2, z: 2}
   buildableCornerData: {fileID: 11400000, guid: 21c6865fe1599b64699908607cd7f257,
     type: 2}
-  chillTimeMs: 1
-  maxMillisecondsPerFrame: 0.1
+  awaitEveryFrame: 4
+  awaitTimeMs: 1
+  maxMillisecondsPerFrame: 1
+  debug: 0
 --- !u!1 &1611296565
 GameObject:
   m_ObjectHideFlags: 0

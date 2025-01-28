@@ -56,7 +56,6 @@ public class ChunkWaveFunction
 
     public Chunk LoadChunk(Vector3 position, Vector3Int size)
     {
-        Debug.Log("Loading chunk at: " + position + ", size: " + size);
         Chunk[] adjacentChunks = GetAdjacentChunks(position, size);
         Chunk chunk = new Chunk(size.x, size.y, size.z, chunks.Count, position, adjacentChunks, gridScale);
         chunks.Add(chunk);
@@ -72,7 +71,6 @@ public class ChunkWaveFunction
             if (chunk.AdjacentChunks[i] == null || chunk.AdjacentChunks[i].IsClear || chunk.AdjacentChunks[i].AllCollapsed) continue;
             
             Direction oppositeDirection = WaveFunctionUtility.OppositeDirection(i);
-            Debug.Log("Set Neighbour Chunk for : " + chunk.AdjacentChunks[i].ChunkIndex + ", Dir: " + oppositeDirection);
             chunk.AdjacentChunks[i].SetAdjacentChunk(chunk, oppositeDirection, prototypes, bottomPrototypes, cellStack);
         }
     }
@@ -94,7 +92,6 @@ public class ChunkWaveFunction
                 position.y >= existingMax.y || incomingMax.y <= existingMin.y ||
                 position.z >= existingMax.z || incomingMax.z <= existingMin.z) continue;
             
-            Debug.Log("Chunk overlaps with Index:" + existingChunk.ChunkIndex + ", resetting it instead");  
             existingChunk.Clear(gameObjectPool);
             chunk = existingChunk;
             return true;
@@ -222,7 +219,7 @@ public class ChunkWaveFunction
         cellStack.Push(index);
 
         GameObject spawned = GenerateMesh(this[index].Position, chosenPrototype);
-        if (spawned != null)
+        if (spawned is not null)
         {
             chunks[index.Index].SpawnedMeshes.Add(spawned);
         }
@@ -233,11 +230,6 @@ public class ChunkWaveFunction
         while (cellStack.TryPop(out ChunkIndex chunkIndex))
         {
             Cell changedCell = this[chunkIndex];
-            if (!changedCell.Collapsed && changedCell.PossiblePrototypes.Count == 1 && changedCell.PossiblePrototypes[0].MeshRot.Mesh == null)
-            {
-                Debug.Log("Propagating ONLY air at: " + chunkIndex);
-            }
-
             List<ChunkIndex> neighbours = chunks[chunkIndex.Index].GetAdjacentCells(chunkIndex.CellIndex, out List<Direction> directions);
 
             for (int i = 0; i < neighbours.Count; i++)
@@ -271,11 +263,6 @@ public class ChunkWaveFunction
             
             affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
             changed = true;
-        }
-        
-        if (changed && affectedCell.PossiblePrototypes.Count == 1 && affectedCell.PossiblePrototypes[0].MeshRot.Mesh == null)
-        {
-            Debug.Log("Constraining ONLY air from: \n" + changedCell + "\n To: " + affectedCell);
         }
     }
     
@@ -567,14 +554,13 @@ public class Chunk
             Vector3Int adjacentIndex = WrapIndexToAdjacentChunk(index, i);
             Cell cell = AdjacentChunks[i][adjacentIndex];
             if (!cell.Collapsed || string.IsNullOrEmpty(cell.PossiblePrototypes[0].Keys[i])) continue;
-
-            if (cell.PossiblePrototypes[0].Keys[i][0] == '-')
+            
+            if (cell.PossiblePrototypes[0].Keys[(int)WaveFunctionUtility.OppositeDirection(i)][0] == '-')
             {
                 adjacentDirections.Add((Direction)i);
             }
             else
             {
-                Debug.Log("Next to this prototypedata: " + cell.PossiblePrototypes[0] + ", Dir: " + (Direction)i);
                 cellStack.Push(new ChunkIndex(AdjacentChunks[i].ChunkIndex, adjacentIndex));
             }
         }

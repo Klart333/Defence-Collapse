@@ -159,7 +159,7 @@ public class BuildingPlacer : MonoBehaviour
     
     private void PlaceBuilding(BuildingType buildingType)
     {
-        spawnedSpawnPlaces[SpawnSquareIndex].Placed = true;
+        spawnedSpawnPlaces[SpawnSquareIndex].OnPlaced();
         BuildingManager.Instance.Place();
 
         if (buildingType == BuildingType.Castle)

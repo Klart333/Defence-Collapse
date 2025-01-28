@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
 using System.Linq;
+using NUnit.Framework;
 using Sirenix.Utilities;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -23,12 +23,21 @@ public class DistrictGenerator : MonoBehaviour
     
     [Title("Settings")]
     [SerializeField]
-    private int chillTimeMs;
+    private int awaitEveryFrame = 1;
+
+    [SerializeField, ShowIf(nameof(ShouldAwait))]
+    private int awaitTimeMs = 1;
     
     [SerializeField]
     private float maxMillisecondsPerFrame = 4;
-
-    private readonly Queue<IEnumerable<IBuildable>> buildQueue = new Queue<IEnumerable<IBuildable>>();
+    
+    [Title("Debug")]
+    [SerializeField]
+    private bool debug = false;
+    
+    private bool ShouldAwait => awaitEveryFrame > 0;
+    
+    private readonly Queue<List<IBuildable>> buildQueue = new Queue<List<IBuildable>>();
     
     private readonly Vector2Int[] corners = new Vector2Int[4]
     {
@@ -38,12 +47,16 @@ public class DistrictGenerator : MonoBehaviour
         new Vector2Int(-1, 1),
     };
 
+    private Vector3 offset;
+    
     private bool isUpdatingChunks = false;
     
     public ChunkWaveFunction WaveFunction => waveFunction;
 
     private void OnEnable()
     {
+        offset = new Vector3(waveFunction.GridScale.x, 0 , waveFunction.GridScale.z) / -2.0f;
+
         waveFunction.Load();
         Events.OnBuildingBuilt += OnBuildingBuilt;
     }
@@ -63,26 +76,25 @@ public class DistrictGenerator : MonoBehaviour
                 waveFunction.LoadCells(chunk);
             }
 
-            _ = Run();
+            Run();
         }
     }
 
     private void OnBuildingBuilt(IEnumerable<IBuildable> buildables)
     {
-        buildQueue.Enqueue(buildables);
+        buildQueue.Enqueue(new List<IBuildable>(buildables));
 
         if (!isUpdatingChunks)
         {
-            _ = UpdateChunks();
+            UpdateChunks();
         }
     }
 
     private async UniTask UpdateChunks()
     {
         isUpdatingChunks = true;
-        Vector3 offset = new Vector3(waveFunction.GridScale.x, 0 , waveFunction.GridScale.z) / -2.0f;
 
-        while (buildQueue.TryDequeue(out IEnumerable<IBuildable> buildables))
+        while (buildQueue.TryDequeue(out List<IBuildable> buildables))
         {
             List<Vector3> positions = new List<Vector3>();
             HashSet<int> overrideChunks = new HashSet<int>();
@@ -106,7 +118,6 @@ public class DistrictGenerator : MonoBehaviour
         
             foreach (int chunkIndex in overrideChunks)
             {
-                Debug.Log("Loading Override Chunk: " + chunkIndex);
                 waveFunction.LoadCells(waveFunction.Chunks[chunkIndex]);
             }
         
@@ -121,7 +132,6 @@ public class DistrictGenerator : MonoBehaviour
 
             while (CheckFailed(overrideChunks))
             {
-                Debug.Log("Failed!!");
                 HashSet<int> neighbours = new HashSet<int>();
                 foreach (int chunkIndex in overrideChunks)
                 {
@@ -152,8 +162,10 @@ public class DistrictGenerator : MonoBehaviour
     private bool CheckFailed(IEnumerable<int> overrideChunks)
     {
         int minValid = 2;
+        int count = 0;
         foreach (int chunkIndex in overrideChunks)
         {
+            count++;
             foreach (Cell cell in waveFunction.Chunks[chunkIndex].Cells)
             {
                 if (cell.PossiblePrototypes[0].MeshRot.Mesh != null)
@@ -168,28 +180,31 @@ public class DistrictGenerator : MonoBehaviour
                 break;
             }
         }
-        return minValid > 0;
+        return count > 2 && minValid > 0;
     }
 
     public async UniTask Run()
     {
         Stopwatch watch = Stopwatch.StartNew();
+        int frameCount = 0;
         while (!waveFunction.AllCollapsed())
         {
-            waveFunction.Iterate(); // Does not need to await
-
-            if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
+            watch.Start();
+            waveFunction.Iterate();
+            watch.Stop();
             
-            await UniTask.NextFrame();
-            if (chillTimeMs > 0)
+            if (awaitEveryFrame > 0 && ++frameCount % awaitEveryFrame == 0)
             {
-                await UniTask.Delay(chillTimeMs);
+                frameCount = 0;
+                await UniTask.Delay(awaitTimeMs);
             }
+            
+            if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
 
+            await UniTask.NextFrame();
+            
             watch.Restart();
         }
-
-        Debug.Log("Done");
     }
 
     
@@ -197,7 +212,7 @@ public class DistrictGenerator : MonoBehaviour
 
     public void OnDrawGizmosSelected()
     {
-        if (!UnityEditor.EditorApplication.isPlaying)
+        if (!UnityEditor.EditorApplication.isPlaying || !debug)
         {
             return;
         }
