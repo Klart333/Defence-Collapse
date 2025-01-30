@@ -76,7 +76,10 @@ public class DistrictGenerator : MonoBehaviour
                 waveFunction.LoadCells(chunk);
             }
 
-            Run();
+            Run().Forget(ex =>
+            {
+                Debug.LogError($"Async function failed: {ex}");
+            });;
         }
     }
 
@@ -86,7 +89,10 @@ public class DistrictGenerator : MonoBehaviour
 
         if (!isUpdatingChunks)
         {
-            UpdateChunks();
+            UpdateChunks().Forget(ex =>
+            {
+                Debug.LogError($"Async function failed: {ex}");
+            });;
         }
     }
 
@@ -97,33 +103,60 @@ public class DistrictGenerator : MonoBehaviour
         while (buildQueue.TryDequeue(out List<IBuildable> buildables))
         {
             List<Vector3> positions = new List<Vector3>();
-            HashSet<int> overrideChunks = new HashSet<int>();
+            HashSet<Chunk> overrideChunks = new HashSet<Chunk>();
             foreach (IBuildable buildable in buildables)
             {
                 for (int i = 0; i < corners.Length; i++)
                 {
-                    if (buildable.MeshRot.Mesh != null && !buildableCornerData.IsBuildable(buildable.MeshRot, corners[i])) continue;
+                    bool isBuildable = buildableCornerData.IsBuildable(buildable.MeshRot, corners[i], out bool meshIsBuildable);
+                    isBuildable |= buildable.MeshRot.Mesh == null;
+                    if (!isBuildable && !meshIsBuildable) continue;
                 
                     Vector3 pos = buildable.gameObject.transform.position + new Vector3(corners[i].x * chunkSize.x * waveFunction.GridScale.x, 0, corners[i].y * chunkSize.z * waveFunction.GridScale.z) / -2.0f + offset;
                     if (waveFunction.CheckChunkOverlap(pos, chunkSize, out Chunk chunk))
                     {
-                        overrideChunks.Add(chunk.ChunkIndex);
+                        if (isBuildable)
+                        {
+                            chunk.Clear(waveFunction.GameObjectPool);
+                            overrideChunks.Add(chunk);
+                        }
+                        else
+                        {
+                            waveFunction.RemoveChunk(chunk.ChunkIndex, out List<Chunk> neighbourChunks);
+                            for (int j = 0; j < neighbourChunks.Count; j++)
+                            {
+                                neighbourChunks[j].Clear(waveFunction.GameObjectPool);
+                                overrideChunks.Add(neighbourChunks[j]);
+                                for (int k = 0; k < neighbourChunks[j].AdjacentChunks.Length; k++)
+                                {
+                                    if (neighbourChunks[j].AdjacentChunks[k] == null) continue;
+                                    
+                                    neighbourChunks[j].AdjacentChunks[k].Clear(waveFunction.GameObjectPool);
+                                    overrideChunks.Add(neighbourChunks[j].AdjacentChunks[k]);
+                                }
+                            }
+                        }
                     }
-                    else
+                    else if (isBuildable)
                     {
                         positions.Add(pos);
                     }
                 }
             }
         
-            foreach (int chunkIndex in overrideChunks)
+            foreach (Chunk chunk in overrideChunks)
             {
-                waveFunction.LoadCells(waveFunction.Chunks[chunkIndex]);
+                if (chunk.IsRemoved)
+                {
+                    continue;
+                }
+                
+                waveFunction.LoadCells(chunk);
             }
         
             foreach (Vector3 pos in positions)
             {
-                overrideChunks.Add(waveFunction.LoadChunk(pos, chunkSize).ChunkIndex);
+                overrideChunks.Add(waveFunction.LoadChunk(pos, chunkSize));
             }
 
             waveFunction.Propagate();
@@ -132,23 +165,23 @@ public class DistrictGenerator : MonoBehaviour
 
             while (CheckFailed(overrideChunks))
             {
-                HashSet<int> neighbours = new HashSet<int>();
-                foreach (int chunkIndex in overrideChunks)
+                HashSet<Chunk> neighbours = new HashSet<Chunk>();
+                foreach (Chunk overrideChunk in overrideChunks)
                 {
-                    for (int i = 0; i < waveFunction.Chunks[chunkIndex].AdjacentChunks.Length; i++)
+                    for (int i = 0; i < overrideChunk.AdjacentChunks.Length; i++)
                     {
-                        Chunk chunk = waveFunction.Chunks[chunkIndex].AdjacentChunks[i];
-                        if (chunk == null || overrideChunks.Contains(chunk.ChunkIndex)) continue;
+                        Chunk chunk = overrideChunk.AdjacentChunks[i];
+                        if (chunk == null || overrideChunks.Contains(overrideChunk)) continue;
                         
-                        neighbours.Add(chunk.ChunkIndex);
+                        neighbours.Add(overrideChunk);
                     }
                 }
                 overrideChunks.AddRange(neighbours);
 
-                foreach (int chunkIndex in overrideChunks)
+                foreach (Chunk chunk in overrideChunks)
                 {
-                    waveFunction.Chunks[chunkIndex].Clear(waveFunction.GameObjectPool);
-                    waveFunction.LoadCells(waveFunction.Chunks[chunkIndex]);
+                    chunk.Clear(waveFunction.GameObjectPool);
+                    waveFunction.LoadCells(chunk);
                 }
                 
                 await Run();
@@ -159,14 +192,14 @@ public class DistrictGenerator : MonoBehaviour
         isUpdatingChunks = false;
     }
 
-    private bool CheckFailed(IEnumerable<int> overrideChunks)
+    private bool CheckFailed(IEnumerable<Chunk> overrideChunks)
     {
         int minValid = 2;
         int count = 0;
-        foreach (int chunkIndex in overrideChunks)
+        foreach (Chunk chunk in overrideChunks)
         {
             count++;
-            foreach (Cell cell in waveFunction.Chunks[chunkIndex].Cells)
+            foreach (Cell cell in chunk.Cells)
             {
                 if (cell.PossiblePrototypes[0].MeshRot.Mesh != null)
                 {
@@ -183,7 +216,7 @@ public class DistrictGenerator : MonoBehaviour
         return count > 2 && minValid > 0;
     }
 
-    public async UniTask Run()
+    private async UniTask Run()
     {
         Stopwatch watch = Stopwatch.StartNew();
         int frameCount = 0;

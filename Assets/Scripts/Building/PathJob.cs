@@ -24,21 +24,21 @@ public struct PathJob : IJob
         public int CompareTo(IndexDistance other) => Distance.CompareTo(other.Distance);
     }
 
-    public NativeArray<int> distances;
+    public NativeArray<int> Distances;
 
-    public NativeArray<float2> directions;
+    public NativeArray<byte> Directions;
 
     [Unity.Collections.ReadOnly]
-    public NativeArray<bool> notWalkableIndexes;
+    public NativeArray<bool>.ReadOnly NotWalkableIndexes;
     
     [Unity.Collections.ReadOnly]
-    public NativeArray<bool> targetIndexes;
+    public NativeArray<bool>.ReadOnly TargetIndexes;
     
     [Unity.Collections.ReadOnly]
-    public NativeArray<byte> movementCosts;
+    public NativeArray<byte>.ReadOnly MovementCosts;
 
     [Unity.Collections.ReadOnly]
-    public NativeArray<int2> neighbourDirections;
+    public NativeArray<int2>.ReadOnly NeighbourDirections;
     
     [Unity.Collections.ReadOnly]
     public int GridWidth;
@@ -54,14 +54,14 @@ public struct PathJob : IJob
 
         for (int i = 0; i < ArrayLength; i++)
         {
-            if (targetIndexes[i])
+            if (TargetIndexes[i])
             {
-                distances[i] = 0;
+                Distances[i] = 0;
                 frontierQueue.Enqueue(new IndexDistance(i, 0));
             }
             else
             {
-                distances[i] = int.MaxValue;
+                Distances[i] = int.MaxValue;
             }
         }
 
@@ -74,14 +74,14 @@ public struct PathJob : IJob
             {
                 int index = neighbours[i];
                 if (index == -1) continue;
-                if (notWalkableIndexes[index]) continue;
+                if (NotWalkableIndexes[index]) continue;
 
                 int manhattanDist = i % 2 == 0 ? 10 : 14;
-                int dist = cell.Distance + movementCosts[index] * manhattanDist;
-                if (dist >= distances[index]) continue;
+                int dist = cell.Distance + MovementCosts[index] * manhattanDist;
+                if (dist >= Distances[index]) continue;
                 
-                distances[index] = dist;
-                directions[index] = -neighbourDirections[i];
+                Distances[index] = dist;
+                Directions[index] = GetDirection(-NeighbourDirections[i]);
                 frontierQueue.Enqueue(new IndexDistance(index, dist));
             }
         }
@@ -97,8 +97,8 @@ public struct PathJob : IJob
 
         for (int i = 0; i < 8; i++)
         {
-            int nx = x + neighbourDirections[i].x;
-            int ny = y + neighbourDirections[i].y;
+            int nx = x + NeighbourDirections[i].x;
+            int ny = y + NeighbourDirections[i].y;
 
             if (nx >= 0 && nx < GridWidth && ny >= 0 && ny < ArrayLength / GridWidth)
             {
@@ -109,6 +109,23 @@ public struct PathJob : IJob
                 array[i] = -1;
             }
         }
+    }
+
+    private static byte GetDirection(int2 direction)
+    {
+        // Directly map the 8 possible int2 values to corresponding byte values
+        return (direction.x, direction.y) switch
+        {
+            (1, 0) => 0,       // Right
+            (1, 1) => 32,      // Up-Right
+            (0, 1) => 64,      // Up
+            (-1, 1) => 96,     // Up-Left
+            (-1, 0) => 128,    // Left
+            (-1, -1) => 160,   // Down-Left
+            (0, -1) => 192,    // Down
+            (1, -1) => 224,    // Down-Right
+            _ => 0             // Default case (should never happen with valid inputs)
+        };
     }
 }
 

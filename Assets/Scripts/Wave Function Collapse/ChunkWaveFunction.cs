@@ -92,7 +92,6 @@ public class ChunkWaveFunction
                 position.y >= existingMax.y || incomingMax.y <= existingMin.y ||
                 position.z >= existingMax.z || incomingMax.z <= existingMin.z) continue;
             
-            existingChunk.Clear(gameObjectPool);
             chunk = existingChunk;
             return true;
         }
@@ -130,7 +129,31 @@ public class ChunkWaveFunction
         
         return adjacentChunks;
     }
+    
+    public void RemoveChunk(int chunkIndex, out List<Chunk> neighbours)
+    {
+        neighbours = new List<Chunk>();
+        Chunk chunk = chunks[chunkIndex];
+        for (int i = 0; i < chunk.AdjacentChunks.Length; i++)
+        {
+            if (chunk.AdjacentChunks[i] == null) continue;
+            
+            int oppositeDirection = (int)WaveFunctionUtility.OppositeDirection(i);
+            chunk.AdjacentChunks[i].AdjacentChunks[oppositeDirection] = null;
+            neighbours.Add(chunk.AdjacentChunks[i]);
+        }
+        
+        chunk.Clear(gameObjectPool);
+        chunk.IsRemoved = true;
+        chunks.RemoveAtSwapBack(chunkIndex);
 
+        if (chunkIndex >= chunks.Count)
+        {
+            return;
+        }
+        chunks[chunkIndex].ChunkIndex = chunkIndex;
+    }
+    
     public void Iterate()
     {
         ChunkIndex index = GetLowestEntropyIndex();
@@ -401,7 +424,6 @@ public class Chunk
     public List<GameObject> SpawnedMeshes = new List<GameObject>();
     
     public readonly Vector3 OriginPosition;
-    public readonly int ChunkIndex;
     
     public readonly int width;
     public readonly int height;
@@ -410,7 +432,10 @@ public class Chunk
     private readonly Vector3 min;
     private readonly Vector3 max;
 
+    public int ChunkIndex { get; set; }
+    public bool IsRemoved { get; set; }
     public bool IsClear { get; private set; } = true; 
+
 
     private static readonly Vector3Int[] Directions = {
         new Vector3Int(1, 0, 0),  // Right
@@ -466,6 +491,7 @@ public class Chunk
             return true;
         }
     }
+
 
     public void LoadCells(List<PrototypeData> prototypes, List<PrototypeData> bottomPrototypes, Vector3 gridScale, Stack<ChunkIndex> cellStack)
     {

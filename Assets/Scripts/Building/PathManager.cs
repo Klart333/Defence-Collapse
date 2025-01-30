@@ -26,7 +26,7 @@ public class PathManager : Singleton<PathManager>
     private NativeArray<bool> notWalkableIndexes;
     private NativeArray<byte> movementCosts;
     
-    private NativeArray<float2> directions;
+    private NativeArray<byte> directions;
     private NativeArray<int> distances;
     private NativeArray<int2> neighbourDirections;
     public NativeArray<byte> UnitCounts;
@@ -35,7 +35,7 @@ public class PathManager : Singleton<PathManager>
 
     private JobHandle jobHandle;
 
-    public NativeArray<float2> Directions => directions;
+    public NativeArray<byte> Directions => directions;
     public float CellScale => cellScale;
     public int GridHeight => gridSize.y;
     public int GridWidth => gridSize.x;
@@ -54,7 +54,7 @@ public class PathManager : Singleton<PathManager>
         targetIndexes = new NativeArray<bool>(length, Allocator.Persistent);
         notWalkableIndexes = new NativeArray<bool>(length, Allocator.Persistent);
         movementCosts = new NativeArray<byte>(length, Allocator.Persistent);
-        directions = new NativeArray<float2>(length, Allocator.Persistent);
+        directions = new NativeArray<byte>(length, Allocator.Persistent);
         distances = new NativeArray<int>(length, Allocator.Persistent);
         UnitCounts = new NativeArray<byte>(length, Allocator.Persistent);
         neighbourDirections = new NativeArray<int2>(new[] { new int2(1, 0), new int2(1, 1), new int2(0, 1), new int2(-1, 1), new int2(-1, 0), new int2(-1, -1), new int2(0, -1), new int2(1, -1), }, Allocator.Persistent);
@@ -91,9 +91,9 @@ public class PathManager : Singleton<PathManager>
         GetPathInformation -= PathPathSet.RebuildTargetHashSet;
     }
 
-    private void Update() // DONT DO EVERY UPDATE, :P
+    private void Update() // DONT DO EVERY UPDATE :P
     {
-        UpdateFloodFill();
+        UpdateFlowField();
     }
 
     private void OnPortalPlaced(GameObject spawnedObject) 
@@ -113,7 +113,7 @@ public class PathManager : Singleton<PathManager>
         return (from t in portals where !t.Locked select t.transform.position).ToList();
     }
 
-    private void UpdateFloodFill()
+    private void UpdateFlowField()
     {
         for (int i = 0; i < UnitCounts.Length; i++)
         {
@@ -130,12 +130,12 @@ public class PathManager : Singleton<PathManager>
 
         PathJob pathJob = new PathJob()
         {
-            directions = directions,
-            distances = distances,
-            movementCosts = movementCosts,
-            targetIndexes = targetIndexes,
-            notWalkableIndexes = notWalkableIndexes,
-            neighbourDirections = neighbourDirections,
+            Directions = directions,
+            Distances = distances,
+            MovementCosts = movementCosts.AsReadOnly(),
+            TargetIndexes = targetIndexes.AsReadOnly(),
+            NotWalkableIndexes = notWalkableIndexes.AsReadOnly(),
+            NeighbourDirections = neighbourDirections.AsReadOnly(),
             GridWidth = gridSize.x,
             ArrayLength = distances.Length
         };
@@ -156,9 +156,9 @@ public class PathManager : Singleton<PathManager>
         for (int i = 0; i < directions.Length; i++)
         {
             Gizmos.color = Color.Lerp(Color.red, Color.black, distances[i] / (float)2000);
-            // ReSharper disable once PossibleLossOfFraction
             Vector3 pos = new Vector3(i % gridSize.x, 1.0f / cellScale, i / gridSize.x) * cellScale;
-            Gizmos.DrawLine(pos, pos + new Vector3(directions[i].x, 0, directions[i].y) * cellScale);
+            float2 dir = PathManager.ByteToDirection(directions[i]);
+            Gizmos.DrawLine(pos, pos + new Vector3(dir.x, 0, dir.y) * cellScale);
         }
     }
 
@@ -173,24 +173,44 @@ public class PathManager : Singleton<PathManager>
 
     public bool CheckIfValid(Vector2 pos)
     {
-        return pos.x > 0 && pos.y > 0 && pos.x < GridWorldWidth && pos.y < GridWorldHeight;
+        return pos is { x: > 0, y: > 0 } && pos.x < GridWorldWidth && pos.y < GridWorldHeight;
     }
 
     public int GetIndex(float xPos, float zPos)
     {
-        return Math.GetMultiple(xPos, CellScale) + Math.GetMultiple(zPos, CellScale) * GridWidth;
+        return GetIndex(xPos, zPos, CellScale, GridWidth);
     }
 
     public int GetIndex(Vector2 pos)
     {
-        return Math.GetMultiple(pos.x, CellScale) + Math.GetMultiple(pos.y, CellScale) * GridWidth;
+        return GetIndex(pos.x, pos.y, CellScale, GridWidth);
     }
 
     public Vector2 GetPos(int index)
     {
-        // ReSharper disable once PossibleLossOfFraction
         return new Vector2(index % GridWidth, Mathf.FloorToInt(index / GridWidth)) * CellScale;
     }
 
+    #region Static
+
+    public static int GetIndex(float xPos, float zPos, float cellScale, int gridWidth)
+    {
+        return Math.GetMultiple(xPos, cellScale) + Math.GetMultiple(zPos, cellScale) * gridWidth;
+    }
+    
+    public static float2 ByteToDirection(byte directionByte)
+    {
+        float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees
+        return new float2(math.cos(angleRad), math.sin(angleRad));
+    }
+    
+    public static float3 ByteToDirectionFloat3(byte directionByte)
+    {
+        float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees
+        return new float3(math.cos(angleRad), 0, math.sin(angleRad));
+    }
+
+    #endregion
+    
     #endregion
 }

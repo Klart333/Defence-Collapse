@@ -45,10 +45,18 @@ public class BuildingPlacer : MonoBehaviour
         Events.OnBuildingPurchased += BuildingPurchased;
     }
     
-    private async void InitializeSpawnPlaces()
+    private void InitializeSpawnPlaces()
     {
         if (BuildingManager.Instance is null) return;
         
+        InitalizeSpawnPlacesAsync().Forget(ex =>
+        {
+            Debug.LogError($"Async function failed: {ex}");
+        });
+    }
+
+    private async UniTask InitalizeSpawnPlacesAsync()
+    {
         await UniTask.WaitUntil(() => BuildingManager.Instance.Cells != null);
         
         Vector3 scale = groundGenerator.WaveFunction.GridScale * BuildingManager.Instance.CellSize;
@@ -59,9 +67,9 @@ public class BuildingPlacer : MonoBehaviour
                 for (int y = 0; y < BuildingManager.Instance.Cells.GetLength(1); y++)
                 {
                     if (!BuildingManager.Instance.Cells[x, y, z].Buildable
-                     || !BuildingManager.Instance.Cells[x + 1, y, z].Buildable
-                     || !BuildingManager.Instance.Cells[x, y, z + 1].Buildable
-                     || !BuildingManager.Instance.Cells[x + 1, y, z + 1].Buildable) continue;
+                        || !BuildingManager.Instance.Cells[x + 1, y, z].Buildable
+                        || !BuildingManager.Instance.Cells[x, y, z + 1].Buildable
+                        || !BuildingManager.Instance.Cells[x + 1, y, z + 1].Buildable) continue;
                     
                     Vector3 pos = BuildingManager.Instance.Cells[x, y, z].Position + new Vector3(scale.x / 2.0f, 0.1f, scale.z / 2.0f);
                     PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
@@ -75,7 +83,7 @@ public class BuildingPlacer : MonoBehaviour
                 }
             }
         }
-        
+
     }
     
     private void OnBuildingCanceled()
@@ -85,7 +93,10 @@ public class BuildingPlacer : MonoBehaviour
 
     private void BuildingPurchased(BuildingType buildingType)
     {
-        PlacingTower(buildingType);
+        PlacingTower(buildingType).Forget(ex =>
+        {
+            Debug.LogError($"Async function failed: {ex}");
+        });
     }
 
     private async UniTask PlacingTower(BuildingType type)

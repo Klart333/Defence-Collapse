@@ -30,17 +30,9 @@ public class PooledMonoBehaviour : MonoBehaviour
         }
     }
 
-    public T Get<T>(Transform overrideParent = null) where T : PooledMonoBehaviour // 2. Second step called from GetAtPosAndRot<T>, here we ask for a disabled gameobject from the Pool
+    public T Get<T>() where T : PooledMonoBehaviour // 2. Second step called from GetAtPosAndRot<T>, here we ask for a disabled gameobject from the Pool
     {
-        Pool pool;
-        if (overrideParent == null)
-        {
-            pool = Pool.GetPool(this); // 3. Calls the static method of Pool, GetPool(PooledMonoBehaviour prefab) returns the pool for the prefab, if there isn't one, a pool is created  
-        }
-        else
-        {
-            pool = Pool.GetPool(this, overrideParent); // Same but uses the given transform instead if it needs to create one
-        }
+        Pool pool = Pool.GetPool(this); // 3. Calls the static method of Pool, GetPool(PooledMonoBehaviour prefab) returns the pool for the prefab, if there isn't one, a pool is created  
 
         var pooledObject = pool.Get<T>(); // 4. The pooledObject is the one we want to show/enable in the scene. We get it from the Get<T> function of the pool of the prefab, the Get<T> Method returns the first element of the pooled queue 
 

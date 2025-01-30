@@ -126,7 +126,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1464202449924654237}
-  m_Mesh: {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+  m_Mesh: {fileID: 5100790488240125665, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
 --- !u!23 &8959883716912116983
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -473,7 +473,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2651975235251520770}
-  m_Mesh: {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+  m_Mesh: {fileID: 3711616725709068245, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
 --- !u!23 &3064397599043489485
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1016,12 +1016,12 @@ MonoBehaviour:
     - {fileID: -4423153410692427784, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
     - {fileID: -1269883566850833621, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
     - {fileID: -3014119590633635102, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
-    - {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
-    - {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
     - {fileID: 7823569963600667838, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
     - {fileID: -5672807904190475791, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
     - {fileID: -7022312304108209055, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
     - {fileID: -328551932046892300, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+    - {fileID: 5100790488240125665, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+    - {fileID: 3711616725709068245, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
     - {fileID: -5408031269339016196, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
     - {fileID: -1785177617388048132, guid: 5600a9201c3fe584da45b4be12bcab5c, type: 3}
     SerializedBytesString: 
@@ -1323,7 +1323,7 @@ MonoBehaviour:
       Data: 7|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 4
+      Data: 2
     - Name: 
       Entry: 7
       Data: PrototypeData, Core
@@ -1398,126 +1398,6 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 1
-      Data: 2
-    - Name: NegX
-      Entry: 1
-      Data: 0f
-    - Name: PosZ
-      Entry: 1
-      Data: 1
-    - Name: NegZ
-      Entry: 1
-      Data: -1s
-    - Name: PosY
-      Entry: 1
-      Data: -1s
-    - Name: NegY
-      Entry: 1
-      Data: -1s
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 7
-      Data: 9|System.Int32[], mscorlib
-    - Name: 
-      Entry: 14
-      Data: 3
-    - Name: 
-      Entry: 3
-      Data: 4
-    - Name: 
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 4
-    - Name: Rot
-      Entry: 3
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 1
-      Data: 0
-    - Name: NegX
-      Entry: 1
-      Data: 2f
-    - Name: PosZ
-      Entry: 1
-      Data: 1f
-    - Name: NegZ
-      Entry: 1
-      Data: -1s
-    - Name: PosY
-      Entry: 1
-      Data: -1s
-    - Name: NegY
-      Entry: 1
-      Data: -1s
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 7
-      Data: 10|System.Int32[], mscorlib
-    - Name: 
-      Entry: 14
-      Data: 3
-    - Name: 
-      Entry: 3
-      Data: 4
-    - Name: 
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 5
-    - Name: Rot
-      Entry: 3
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 1
       Data: 1
     - Name: NegX
       Entry: 1
@@ -1539,7 +1419,7 @@ MonoBehaviour:
       Data: 1
     - Name: MaterialIndexes
       Entry: 7
-      Data: 11|System.Int32[], mscorlib
+      Data: 9|System.Int32[], mscorlib
     - Name: 
       Entry: 14
       Data: 1
@@ -1563,7 +1443,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 12|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
+      Data: 10|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -1659,7 +1539,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
+      Data: 11|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -1671,7 +1551,7 @@ MonoBehaviour:
       Data: MeshWithRotation, Core
     - Name: Mesh
       Entry: 10
-      Data: 6
+      Data: 4
     - Name: Rot
       Entry: 3
       Data: 1
@@ -1701,7 +1581,226 @@ MonoBehaviour:
       Data: 2
     - Name: MaterialIndexes
       Entry: 7
-      Data: 14|System.Int32[], mscorlib
+      Data: 12|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 4
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 5
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1f
+    - Name: NegX
+      Entry: 1
+      Data: 1f
+    - Name: PosZ
+      Entry: 1
+      Data: 1
+    - Name: NegZ
+      Entry: 1
+      Data: 1
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 2
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 13|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 14|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 2
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 0
+    - Name: NegZ
+      Entry: 1
+      Data: 0f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 3
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 3s
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 1
+    - Name: NegZ
+      Entry: 1
+      Data: 1f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 15|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 6
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: 0f
+    - Name: PosZ
+      Entry: 1
+      Data: 0
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 16|System.Int32[], mscorlib
     - Name: 
       Entry: 14
       Data: 2
@@ -1731,22 +1830,22 @@ MonoBehaviour:
       Data: 7
     - Name: Rot
       Entry: 3
-      Data: 1
+      Data: 3
     - Name: 
       Entry: 8
       Data: 
     - Name: PosX
       Entry: 1
-      Data: 1f
+      Data: 2
     - Name: NegX
       Entry: 1
-      Data: 1f
+      Data: 0f
     - Name: PosZ
       Entry: 1
       Data: 1
     - Name: NegZ
       Entry: 1
-      Data: 1
+      Data: -1s
     - Name: PosY
       Entry: 1
       Data: -1s
@@ -1755,118 +1854,28 @@ MonoBehaviour:
       Data: -1s
     - Name: Weight
       Entry: 4
-      Data: 2
+      Data: 1
     - Name: MaterialIndexes
       Entry: 7
-      Data: 15|System.Int32[], mscorlib
+      Data: 17|System.Int32[], mscorlib
     - Name: 
       Entry: 14
-      Data: 1
-    - Name: 
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 7
-      Data: PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 2
-    - Name: Rot
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 1
-      Data: -1s
-    - Name: NegX
-      Entry: 1
-      Data: -1s
-    - Name: PosZ
-      Entry: 1
-      Data: 0
-    - Name: NegZ
-      Entry: 1
-      Data: 0f
-    - Name: PosY
-      Entry: 1
-      Data: -1s
-    - Name: NegY
-      Entry: 1
-      Data: -1s
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 8
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
       Data: 3
-    - Name: Rot
+    - Name: 
+      Entry: 3
+      Data: 4
+    - Name: 
       Entry: 3
       Data: 2
     - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
       Entry: 8
       Data: 
-    - Name: PosX
-      Entry: 1
-      Data: -1s
-    - Name: NegX
-      Entry: 1
-      Data: 1
-    - Name: PosZ
-      Entry: 1
-      Data: 2
-    - Name: NegZ
-      Entry: 1
-      Data: 0f
-    - Name: PosY
-      Entry: 1
-      Data: -1s
-    - Name: NegY
-      Entry: 1
-      Data: -1s
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 9
     - Name: 
       Entry: 8
       Data: 
@@ -1878,7 +1887,7 @@ MonoBehaviour:
       Data: MeshWithRotation, Core
     - Name: Mesh
       Entry: 10
-      Data: 4
+      Data: 8
     - Name: Rot
       Entry: 3
       Data: 2
@@ -1907,113 +1916,20 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: MaterialIndexes
-      Entry: 9
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 5
-    - Name: Rot
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 1
-      Data: 3s
-    - Name: NegX
-      Entry: 1
-      Data: -1s
-    - Name: PosZ
-      Entry: 1
-      Data: 1
-    - Name: NegZ
-      Entry: 1
-      Data: 1f
-    - Name: PosY
-      Entry: 1
-      Data: -1s
-    - Name: NegY
-      Entry: 1
-      Data: -1s
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 11
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 8
-    - Name: Rot
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 1
-      Data: -1s
-    - Name: NegX
-      Entry: 1
-      Data: 0f
-    - Name: PosZ
-      Entry: 1
-      Data: 0
-    - Name: NegZ
-      Entry: 1
-      Data: -1s
-    - Name: PosY
-      Entry: 1
-      Data: -1s
-    - Name: NegY
-      Entry: 1
-      Data: -1s
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
       Entry: 7
       Data: 18|System.Int32[], mscorlib
     - Name: 
       Entry: 14
-      Data: 2
+      Data: 3
     - Name: 
       Entry: 3
       Data: 4
     - Name: 
       Entry: 3
       Data: 2
+    - Name: 
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -2184,7 +2100,7 @@ MonoBehaviour:
       Data: 21|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 4
+      Data: 2
     - Name: 
       Entry: 7
       Data: PrototypeData, Core
@@ -2244,90 +2160,6 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 1
-      Data: 1
-    - Name: NegX
-      Entry: 1
-      Data: -1s
-    - Name: PosZ
-      Entry: 1
-      Data: 0f
-    - Name: NegZ
-      Entry: 1
-      Data: 2
-    - Name: PosY
-      Entry: 1
-      Data: -1s
-    - Name: NegY
-      Entry: 1
-      Data: -1s
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 9
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 4
-    - Name: Rot
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 1
-      Data: 1f
-    - Name: NegX
-      Entry: 1
-      Data: -1s
-    - Name: PosZ
-      Entry: 1
-      Data: 2f
-    - Name: NegZ
-      Entry: 1
-      Data: 0
-    - Name: PosY
-      Entry: 1
-      Data: -1s
-    - Name: NegY
-      Entry: 1
-      Data: -1s
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 5
-    - Name: Rot
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 1
       Data: -1s
     - Name: NegX
       Entry: 1
@@ -2349,7 +2181,7 @@ MonoBehaviour:
       Data: 1
     - Name: MaterialIndexes
       Entry: 9
-      Data: 11
+      Data: 9
     - Name: 
       Entry: 8
       Data: 
@@ -2373,7 +2205,7 @@ MonoBehaviour:
       Data: MeshWithRotation, Core
     - Name: Mesh
       Entry: 10
-      Data: 6
+      Data: 4
     - Name: Rot
       Entry: 3
       Data: 0
@@ -2403,7 +2235,103 @@ MonoBehaviour:
       Data: 2
     - Name: MaterialIndexes
       Entry: 9
-      Data: 14
+      Data: 12
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 5
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1
+    - Name: NegX
+      Entry: 1
+      Data: 1
+    - Name: PosZ
+      Entry: 1
+      Data: 1f
+    - Name: NegZ
+      Entry: 1
+      Data: 1f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 2
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 13
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 23|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 6
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 0f
+    - Name: NegZ
+      Entry: 1
+      Data: -1s
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 16
     - Name: 
       Entry: 8
       Data: 
@@ -2427,13 +2355,13 @@ MonoBehaviour:
       Data: 1
     - Name: NegX
       Entry: 1
-      Data: 1
+      Data: -1s
     - Name: PosZ
       Entry: 1
-      Data: 1f
+      Data: 0f
     - Name: NegZ
       Entry: 1
-      Data: 1f
+      Data: 2
     - Name: PosY
       Entry: 1
       Data: -1s
@@ -2442,25 +2370,13 @@ MonoBehaviour:
       Data: -1s
     - Name: Weight
       Entry: 4
-      Data: 2
+      Data: 1
     - Name: MaterialIndexes
       Entry: 9
-      Data: 15
+      Data: 17
     - Name: 
       Entry: 8
       Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 23|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 2
     - Name: 
       Entry: 7
       Data: PrototypeData, Core
@@ -2472,7 +2388,7 @@ MonoBehaviour:
       Data: 8
     - Name: Rot
       Entry: 3
-      Data: 1
+      Data: 3
     - Name: 
       Entry: 8
       Data: 
@@ -2481,10 +2397,10 @@ MonoBehaviour:
       Data: 0
     - Name: NegX
       Entry: 1
-      Data: -1s
+      Data: 2f
     - Name: PosZ
       Entry: 1
-      Data: 0f
+      Data: 1f
     - Name: NegZ
       Entry: 1
       Data: -1s
@@ -2556,7 +2472,7 @@ MonoBehaviour:
       Data: 24|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 4
+      Data: 2
     - Name: 
       Entry: 7
       Data: PrototypeData, Core
@@ -2616,90 +2532,6 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 1
-      Data: 0f
-    - Name: NegX
-      Entry: 1
-      Data: 2
-    - Name: PosZ
-      Entry: 1
-      Data: -1s
-    - Name: NegZ
-      Entry: 1
-      Data: 1
-    - Name: PosY
-      Entry: 1
-      Data: -1s
-    - Name: NegY
-      Entry: 1
-      Data: -1s
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 9
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 4
-    - Name: Rot
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 1
-      Data: 2f
-    - Name: NegX
-      Entry: 1
-      Data: 0
-    - Name: PosZ
-      Entry: 1
-      Data: -1s
-    - Name: NegZ
-      Entry: 1
-      Data: 1f
-    - Name: PosY
-      Entry: 1
-      Data: -1s
-    - Name: NegY
-      Entry: 1
-      Data: -1s
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 5
-    - Name: Rot
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 1
       Data: 1f
     - Name: NegX
       Entry: 1
@@ -2721,7 +2553,7 @@ MonoBehaviour:
       Data: 1
     - Name: MaterialIndexes
       Entry: 9
-      Data: 11
+      Data: 9
     - Name: 
       Entry: 8
       Data: 
@@ -2736,7 +2568,7 @@ MonoBehaviour:
       Data: 25|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 4
     - Name: 
       Entry: 7
       Data: PrototypeData, Core
@@ -2745,7 +2577,7 @@ MonoBehaviour:
       Data: MeshWithRotation, Core
     - Name: Mesh
       Entry: 10
-      Data: 8
+      Data: 6
     - Name: Rot
       Entry: 3
       Data: 2
@@ -2761,6 +2593,90 @@ MonoBehaviour:
     - Name: PosZ
       Entry: 1
       Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 0
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 16
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 7
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 0f
+    - Name: NegX
+      Entry: 1
+      Data: 2
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 1
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 17
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 8
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 1f
+    - Name: NegX
+      Entry: 1
+      Data: -1s
+    - Name: PosZ
+      Entry: 1
+      Data: 2f
     - Name: NegZ
       Entry: 1
       Data: 0
@@ -2832,7 +2748,7 @@ MonoBehaviour:
       Data: 26|System.Collections.Generic.List`1[[PrototypeData, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 4
     - Name: 
       Entry: 7
       Data: PrototypeData, Core
@@ -2841,7 +2757,7 @@ MonoBehaviour:
       Data: MeshWithRotation, Core
     - Name: Mesh
       Entry: 10
-      Data: 8
+      Data: 6
     - Name: Rot
       Entry: 3
       Data: 3
@@ -2860,6 +2776,90 @@ MonoBehaviour:
     - Name: NegZ
       Entry: 1
       Data: 0f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 16
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 7
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: -1s
+    - Name: NegX
+      Entry: 1
+      Data: 1
+    - Name: PosZ
+      Entry: 1
+      Data: 2
+    - Name: NegZ
+      Entry: 1
+      Data: 0f
+    - Name: PosY
+      Entry: 1
+      Data: -1s
+    - Name: NegY
+      Entry: 1
+      Data: -1s
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 17
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 8
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 1
+      Data: 2f
+    - Name: NegX
+      Entry: 1
+      Data: 0
+    - Name: PosZ
+      Entry: 1
+      Data: -1s
+    - Name: NegZ
+      Entry: 1
+      Data: 1f
     - Name: PosY
       Entry: 1
       Data: -1s
@@ -3037,7 +3037,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  Debug: 1
+  Debug: 0
   prefab: {fileID: 4871325552601967121, guid: 14ff2370657d66e40b14fa18d3f6de32, type: 3}
   divider: 100
   overrideVerticalPositive: 0
@@ -3045,11 +3045,16 @@ MonoBehaviour:
   overrideVerticalNegative: 0
   negativeKey: v-1_0
   notAllowedBottomIndexes: 
+  onlyAllowedBottomIndexes: 
   notAllowedSideIndexes: 
   castlePrototypeIndex: 0
   moduleScale: {x: 2, y: 2, z: 2}
   useMCode: 1
   useMCodeHeight: 0
+  useBuildableCorners: 1
+  rightBuildableCode: 0
+  buildableCornerData: {fileID: 11400000, guid: 21c6865fe1599b64699908607cd7f257,
+    type: 2}
   Prototypes:
   - MeshRot:
       Mesh: {fileID: -4423153410692427784, guid: fcc547fb15d1db845858c2be4a58b67a,
@@ -3220,7 +3225,7 @@ MonoBehaviour:
     Weight: 1
     MaterialIndexes: 0400000002000000
   - MeshRot:
-      Mesh: {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a,
+      Mesh: {fileID: 5100790488240125665, guid: fcc547fb15d1db845858c2be4a58b67a,
         type: 3}
       Rot: 0
     PosX: 1
@@ -3232,7 +3237,7 @@ MonoBehaviour:
     Weight: 1
     MaterialIndexes: 040000000200000000000000
   - MeshRot:
-      Mesh: {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a,
+      Mesh: {fileID: 5100790488240125665, guid: fcc547fb15d1db845858c2be4a58b67a,
         type: 3}
       Rot: 1
     PosX: 0f
@@ -3244,7 +3249,7 @@ MonoBehaviour:
     Weight: 1
     MaterialIndexes: 040000000200000000000000
   - MeshRot:
-      Mesh: {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a,
+      Mesh: {fileID: 5100790488240125665, guid: fcc547fb15d1db845858c2be4a58b67a,
         type: 3}
       Rot: 2
     PosX: -1s
@@ -3256,7 +3261,7 @@ MonoBehaviour:
     Weight: 1
     MaterialIndexes: 040000000200000000000000
   - MeshRot:
-      Mesh: {fileID: 2516016018045399974, guid: fcc547fb15d1db845858c2be4a58b67a,
+      Mesh: {fileID: 5100790488240125665, guid: fcc547fb15d1db845858c2be4a58b67a,
         type: 3}
       Rot: 3
     PosX: 2
@@ -3268,7 +3273,7 @@ MonoBehaviour:
     Weight: 1
     MaterialIndexes: 040000000200000000000000
   - MeshRot:
-      Mesh: {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a,
+      Mesh: {fileID: 3711616725709068245, guid: fcc547fb15d1db845858c2be4a58b67a,
         type: 3}
       Rot: 0
     PosX: 1f
@@ -3280,7 +3285,7 @@ MonoBehaviour:
     Weight: 1
     MaterialIndexes: 040000000200000000000000
   - MeshRot:
-      Mesh: {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a,
+      Mesh: {fileID: 3711616725709068245, guid: fcc547fb15d1db845858c2be4a58b67a,
         type: 3}
       Rot: 1
     PosX: 2f
@@ -3292,7 +3297,7 @@ MonoBehaviour:
     Weight: 1
     MaterialIndexes: 040000000200000000000000
   - MeshRot:
-      Mesh: {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a,
+      Mesh: {fileID: 3711616725709068245, guid: fcc547fb15d1db845858c2be4a58b67a,
         type: 3}
       Rot: 2
     PosX: -1s
@@ -3304,7 +3309,7 @@ MonoBehaviour:
     Weight: 1
     MaterialIndexes: 040000000200000000000000
   - MeshRot:
-      Mesh: {fileID: 4695964620750274042, guid: fcc547fb15d1db845858c2be4a58b67a,
+      Mesh: {fileID: 3711616725709068245, guid: fcc547fb15d1db845858c2be4a58b67a,
         type: 3}
       Rot: 3
     PosX: 0
@@ -3583,6 +3588,7 @@ MonoBehaviour:
     socketname: 3s
   verticalSocketList: []
   notAllowedForBottom: 
+  onlyAllowedForBottom: 
   notAllowedForSides: 
   castleIndex: 3
   materialData: {fileID: 11400000, guid: 64f0dca35d7079143abbf4da786afcf2, type: 2}

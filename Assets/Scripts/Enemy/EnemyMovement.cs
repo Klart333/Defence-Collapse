@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
+using Unity.Entities;
 using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
@@ -75,7 +76,7 @@ public class EnemyMovement : MonoBehaviour
     {
         Vector2 pos = transform.position.XZ();
         unitIndex = PathManager.Instance.GetIndex(pos);
-        Vector2 dir = PathManager.Instance.Directions[unitIndex];
+        Vector2 dir = PathManager.ByteToDirection(PathManager.Instance.Directions[unitIndex]);
         direction = (direction + dir.ToXyZ() * (turnSpeed * Time.deltaTime)).normalized;
 
         transform.position += enemyData.Stats.MovementSpeed.Value * Time.deltaTime * direction;
@@ -101,5 +102,24 @@ public class EnemyMovement : MonoBehaviour
     private void StopMoving()
     {
         shouldMove = false;
+    }
+
+    public class EnemyMovementBaker : Baker<EnemyMovement>
+    {
+        public override void Bake(EnemyMovement authoring)
+        {
+            if (authoring.enemyData == null)
+            {
+                return;
+            }
+            
+            Entity enemyEntity = GetEntity(TransformUsageFlags.Dynamic);
+            AddComponent(enemyEntity, new SpeedComponent
+            {
+                Speed = authoring.enemyData.Stats.MovementSpeed.BaseValue,
+            });
+            
+            AddComponent(enemyEntity, new FlowFieldTag());
+        }
     }
 }

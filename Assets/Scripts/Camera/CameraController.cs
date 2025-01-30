@@ -49,7 +49,7 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        Vector2 movee = move.ReadValue<Vector2>() * Time.deltaTime * flySpeed;
+        Vector2 movee = move.ReadValue<Vector2>() * (Time.deltaTime * flySpeed);
 
         transform.position += Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up) * Vector3.forward * movee.y;
         transform.position += transform.right * movee.x;

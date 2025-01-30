@@ -1,19 +1,16 @@
-﻿using Sirenix.OdinInspector;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using System;
 
-[Serializable]
+[Serializable, InlineProperty]
 public class Stat
 {
     public event Action OnValueChanged;
 
     public float BaseValue
     {
-        get
-        {
-            return baseValue;
-        }
+        get => baseValue;
         set
         {
             baseValue = value;

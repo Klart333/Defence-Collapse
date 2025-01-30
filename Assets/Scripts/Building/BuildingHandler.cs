@@ -187,7 +187,10 @@ public class BuildingHandler : SerializedMonoBehaviour
         List<Building> buildings = BuildingGroups[building.BuildingGroupIndex];
         foreach (Building built in buildings)
         {
-            built.Highlight(BuildingData[built.Index].CellInformation);
+            built.Highlight(BuildingData[built.Index].CellInformation).Forget(ex =>
+            {
+                Debug.LogError($"Async function failed: {ex}");
+            });;
         }
 
         building.OnSelected(BuildingData[building.Index].CellInformation);

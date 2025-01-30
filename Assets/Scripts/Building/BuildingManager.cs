@@ -182,7 +182,7 @@ public class BuildingManager : Singleton<BuildingManager>
         
         Vector2Int corner = new Vector2Int((int)Mathf.Sign(groundCell.Position.x - cellPosition.x), (int)Mathf.Sign(groundCell.Position.z - cellPosition.z));
 
-        if (!cellBuildableCornerData.IsBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner))
+        if (!cellBuildableCornerData.IsBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner, out _))
         {
             Cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(
                 true,
@@ -387,7 +387,7 @@ public class BuildingManager : Singleton<BuildingManager>
             Cells[index.x, index.y, index.z] = new Cell(false, 
                 Cells[index.x, index.y, index.z].Position, 
                 new List<PrototypeData>(townPrototypeInfo.MarchingTable[marchedIndex]));
-            
+
             ValidDirections(index, out _).ForEach(x => cellStack.Push(x));
 
             if (spawnedMeshes.TryGetValue(index, out IBuildable buildable))

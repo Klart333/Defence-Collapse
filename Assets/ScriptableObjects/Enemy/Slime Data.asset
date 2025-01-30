@@ -24,10 +24,10 @@ MonoBehaviour:
     SerializationNodes:
     - Name: Stats
       Entry: 7
-      Data: 0|Stats, Assembly-CSharp
+      Data: 0|Stats, Core
     - Name: DamageMultiplier
       Entry: 7
-      Data: 1|Stat, Assembly-CSharp
+      Data: 1|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -36,7 +36,7 @@ MonoBehaviour:
       Data: 
     - Name: AttackSpeed
       Entry: 7
-      Data: 2|Stat, Assembly-CSharp
+      Data: 2|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -45,7 +45,7 @@ MonoBehaviour:
       Data: 
     - Name: MovementSpeed
       Entry: 7
-      Data: 3|Stat, Assembly-CSharp
+      Data: 3|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0.2
@@ -54,7 +54,7 @@ MonoBehaviour:
       Data: 
     - Name: CritChance
       Entry: 7
-      Data: 4|Stat, Assembly-CSharp
+      Data: 4|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -63,7 +63,7 @@ MonoBehaviour:
       Data: 
     - Name: CritMultiplier
       Entry: 7
-      Data: 5|Stat, Assembly-CSharp
+      Data: 5|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -72,7 +72,7 @@ MonoBehaviour:
       Data: 
     - Name: Armor
       Entry: 7
-      Data: 6|Stat, Assembly-CSharp
+      Data: 6|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -81,7 +81,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxHealth
       Entry: 7
-      Data: 7|Stat, Assembly-CSharp
+      Data: 7|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 10
@@ -90,7 +90,7 @@ MonoBehaviour:
       Data: 
     - Name: Healing
       Entry: 7
-      Data: 8|Stat, Assembly-CSharp
+      Data: 8|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -102,17 +102,16 @@ MonoBehaviour:
       Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 9|Attack, Assembly-CSharp
+      Data: 9|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 10|System.Collections.Generic.List`1[[Effects.IEffect, Assembly-CSharp]],
-        mscorlib
+      Data: 10|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 11|Effects.DamageColliderEffect, Assembly-CSharp
+      Data: 11|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 1
@@ -125,12 +124,15 @@ MonoBehaviour:
     - Name: Radius
       Entry: 4
       Data: 0.3
+    - Name: TriggerDamageDone
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 12|Effects.VisualEffectEffect, Assembly-CSharp
+      Data: 12|Effects.VisualEffectEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 0.3
@@ -148,8 +150,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[Effects.IEffect, Assembly-CSharp]],
-        mscorlib
+      Data: 13|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
