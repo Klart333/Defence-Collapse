@@ -1,15 +1,16 @@
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
+using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
 
 namespace DataStructures.Queue.ECS
 {
+    [UpdateInGroup(typeof(TransformSystemGroup))]
     public partial struct FlowMovementSystem : ISystem
     {
+        
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
@@ -26,7 +27,7 @@ namespace DataStructures.Queue.ECS
                 CellScale = PathManager.Instance.CellScale,
                 GridWidth = PathManager.Instance.GridWidth,
                 Directions = PathManager.Instance.Directions.AsReadOnly(),
-            }.Schedule();
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
@@ -36,27 +37,33 @@ namespace DataStructures.Queue.ECS
         }
     }
 
-    [WithAll(typeof(FlowFieldTag))]
     [BurstCompile]
     internal partial struct FlowMovementJob : IJobEntity
     {
-        [Unity.Collections.ReadOnly]
+        [ReadOnly]
         public float DeltaTime;
 
-        [Unity.Collections.ReadOnly]
+        [ReadOnly]
         public float CellScale;
 
-        [Unity.Collections.ReadOnly]
+        [ReadOnly]
         public int GridWidth;
         
-        [Unity.Collections.ReadOnly, NativeDisableContainerSafetyRestriction]
+        [ReadOnly, NativeDisableContainerSafetyRestriction]
         public NativeArray<byte>.ReadOnly Directions;
 
-        private void Execute(in SpeedComponent speed, ref LocalTransform transform)
+        [BurstCompile]
+        private void Execute(in SpeedComponent speed, ref FlowFieldComponent flowField, ref LocalTransform transform)
         {
             int index = PathManager.GetIndex(transform.Position.x, transform.Position.z, CellScale, GridWidth);
-            float3 direction = PathManager.ByteToDirectionFloat3(Directions[index]);
-            transform.Position += direction * speed.Speed * DeltaTime;
+            float3 direction = PathManager.ByteToDirectionFloat3(Directions[index], flowField.Forward.y);
+            
+            flowField.Forward = math.normalize(flowField.Forward + direction * (flowField.TurnSpeed * DeltaTime));
+            flowField.Up = math.normalize(flowField.Up + flowField.TargetUp * flowField.TurnSpeed * DeltaTime * 5);
+            transform.Rotation = quaternion.LookRotation(flowField.Forward, flowField.Up);
+            
+            transform.Position += transform.Forward() * speed.Speed * DeltaTime;
         }
     }
 }
+

@@ -3,11 +3,15 @@ using Sirenix.OdinInspector;
 using System.Diagnostics;
 using UnityEngine;
 using System;
+using Unity.Entities;
+using Unity.Physics;
+using Unity.Transforms;
+using Material = Unity.Physics.Material;
 
 public class GroundGenerator : MonoBehaviour
 {
     public event Action OnMapGenerated;
-    
+
     [Title("Wave Function")]
     [SerializeField]
     private WaveFunction waveFunction;
@@ -15,19 +19,19 @@ public class GroundGenerator : MonoBehaviour
     [Title("Settings")]
     [SerializeField]
     private int chillTimeMs;
-    
+
     [SerializeField]
     private float maxMillisecondsPerFrame = 4;
-    
+
     [SerializeField]
     private bool shouldCombine = true;
-    
+
     [Title("Debug")]
     [SerializeField]
     private bool shouldRun = true;
-    
+
     public WaveFunction WaveFunction => waveFunction;
-    
+
     private void Start()
     {
         if (shouldRun)
@@ -51,7 +55,7 @@ public class GroundGenerator : MonoBehaviour
             waveFunction.Iterate(); // Does not need to await
 
             if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
-            
+
             await UniTask.NextFrame();
             if (chillTimeMs > 0)
             {
@@ -68,7 +72,7 @@ public class GroundGenerator : MonoBehaviour
 
         OnMapGenerated?.Invoke();
     }
-    
+
     private async UniTask BottomBuildUp()
     {
         for (int x = 0; x < waveFunction.GridSize.x; x++)
@@ -110,10 +114,41 @@ public class GroundGenerator : MonoBehaviour
             }
         }
     }
-    
+
 
     private void CombineMeshes()
     {
-        GetComponent<MeshCombiner>().CombineMeshes();
+        Mesh mesh = GetComponent<MeshCombiner>().CombineMeshes();
+        BlobAssetReference<Unity.Physics.Collider> blobCollider = Unity.Physics.MeshCollider.Create(mesh, new CollisionFilter
+        {
+            BelongsTo = 6,
+            CollidesWith = 6,
+            GroupIndex = 0,
+        }, Material.Default);
+
+        ComponentType[] componentTypes = new ComponentType[4]
+        {
+            typeof(LocalTransform),
+            typeof(LocalToWorld),
+            typeof(PhysicsCollider),
+            typeof(PhysicsWorldIndex),
+        };
+        
+        Entity entity = World.DefaultGameObjectInjectionWorld.EntityManager.CreateEntity(componentTypes);
+        World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new LocalToWorld
+        {
+            Value = gameObject.transform.localToWorldMatrix,
+        });
+        World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new LocalTransform()
+        {
+            Position = transform.localPosition,
+            Rotation = transform.localRotation,
+            Scale = transform.localScale.x,
+        });
+        World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new PhysicsCollider
+        {
+            Value = blobCollider,
+        });
     }
 }
+

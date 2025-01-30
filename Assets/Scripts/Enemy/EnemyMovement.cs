@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
@@ -119,7 +120,14 @@ public class EnemyMovement : MonoBehaviour
                 Speed = authoring.enemyData.Stats.MovementSpeed.BaseValue,
             });
             
-            AddComponent(enemyEntity, new FlowFieldTag());
+            AddComponent(enemyEntity, new FlowFieldComponent()
+            {
+                Up = new float3(0, 1, 0),
+                TargetUp = new float3(0, 1, 0),
+                Forward = new float3(0, 0, 1),
+                TurnSpeed = authoring.turnSpeed,
+                LayerMask = authoring.groundMask,
+            });
         }
     }
 }

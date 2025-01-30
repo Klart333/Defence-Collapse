@@ -204,10 +204,10 @@ public class PathManager : Singleton<PathManager>
         return new float2(math.cos(angleRad), math.sin(angleRad));
     }
     
-    public static float3 ByteToDirectionFloat3(byte directionByte)
+    public static float3 ByteToDirectionFloat3(byte directionByte, float y = 0)
     {
         float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees
-        return new float3(math.cos(angleRad), 0, math.sin(angleRad));
+        return new float3(math.cos(angleRad), y, math.sin(angleRad));
     }
 
     #endregion

@@ -10,7 +10,7 @@ public class MeshCombiner : MonoBehaviour
         meshFilter = GetComponent<MeshFilter>();
     }
 
-    public void CombineMeshes()
+    public Mesh CombineMeshes()
     {
         // All our children (and us)
         MeshFilter[] filters = GetComponentsInChildren<MeshFilter>(false);
@@ -18,12 +18,12 @@ public class MeshCombiner : MonoBehaviour
         // All the meshes in our children (just a big list)
         List<Material> materials = new List<Material>();
         MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>(false); // <-- you can optimize this
-        foreach (MeshRenderer renderer in renderers)
+        foreach (MeshRenderer meshRenderer in renderers)
         {
-            if (renderer.transform == transform)
+            if (meshRenderer.transform == transform)
                 continue;
 
-            Material[] localMats = renderer.sharedMaterials;
+            Material[] localMats = meshRenderer.sharedMaterials;
             foreach (Material localMat in localMats)
                 if (!materials.Contains(localMat))
                     materials.Add(localMat);
@@ -93,5 +93,7 @@ public class MeshCombiner : MonoBehaviour
             }
             Destroy(renderers[i].gameObject);
         }
+
+        return finalMesh;
     }
 }
