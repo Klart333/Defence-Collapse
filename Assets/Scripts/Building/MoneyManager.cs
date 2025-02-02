@@ -30,7 +30,6 @@ public class MoneyManager : Singleton<MoneyManager>
     {
         AvailableBuildables = new Dictionary<BuildingType, int>
         {
-            { BuildingType.Castle, 1 },
             { BuildingType.Building, 0 },
             { BuildingType.Path, 0 },
         };

@@ -389,6 +389,11 @@ public class ChunkWaveFunction
 
         return true;
     }
+
+    public int GetTotalCellCount()
+    {
+        return chunks.Count * 8;
+    }
 }
 
 public readonly struct ChunkIndex
@@ -692,6 +697,11 @@ public class Chunk
             SpawnedMeshes.RemoveAt(i);
         }
     }
+}
+
+public interface IChunkWaveFunction
+{
+    public ChunkWaveFunction ChunkWaveFunction { get; }
 }
 
 

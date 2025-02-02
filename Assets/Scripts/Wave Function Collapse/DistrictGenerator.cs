@@ -8,7 +8,7 @@ using Sirenix.Utilities;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-public class DistrictGenerator : MonoBehaviour
+public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
 {
     [Title("Wave Function")]
     [SerializeField]
@@ -51,7 +51,7 @@ public class DistrictGenerator : MonoBehaviour
     
     private bool isUpdatingChunks = false;
     
-    public ChunkWaveFunction WaveFunction => waveFunction;
+    public ChunkWaveFunction ChunkWaveFunction => waveFunction;
 
     private void OnEnable()
     {

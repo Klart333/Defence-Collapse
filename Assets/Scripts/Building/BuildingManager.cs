@@ -230,11 +230,6 @@ public class BuildingManager : Singleton<BuildingManager>
     {
         Events.OnBuildingBuilt?.Invoke(querySpawnedBuildings.Values);
 
-        if (currentBuildingType == BuildingType.Castle)
-        {
-            OnCastlePlaced?.Invoke(cellsToCollapse[4]);
-        }
-
         foreach (var item in querySpawnedBuildings)
         {
             item.Value.ToggleIsBuildableVisual(false);
@@ -338,17 +333,6 @@ public class BuildingManager : Singleton<BuildingManager>
         
         switch (buildingType)
         {
-            case BuildingType.Castle:
-                allowedKeys = keyData.BuildingKeys;
-                MakeBuildable(cellsToCollapse);
-                Propagate();
-                if (cellsToCollapse.Count < 9 || this[cellsToCollapse[4]].PossiblePrototypes.Count == 1)
-                {
-                    return querySpawnedBuildings;
-                }
-                SetCell(cellsToCollapse[4], prototypes[townPrototypeInfo.CastleIndex]);
-                break;
-
             case BuildingType.Building:
                 allowedKeys = keyData.BuildingKeys;
                 MakeBuildable(cellsToCollapse);
@@ -406,28 +390,9 @@ public class BuildingManager : Singleton<BuildingManager>
     
     private List<Vector3Int> GetCellsToCollapse(Vector3 queryPos, BuildingType type)
     {
-        List<Vector3Int> toCollapse;
+        List<Vector3Int> toCollapse = GetSurroundingCells(queryPos);
 
-        switch (type)
-        {
-            case BuildingType.Castle:
-                Vector3 minPos = new(queryPos.x - cellSize * 2, queryPos.y, queryPos.z - cellSize * 2);
-                Vector3 maxPos = new(queryPos.x + cellSize * 2, queryPos.y, queryPos.z + cellSize * 2);
-                toCollapse = GetAllCells(minPos, maxPos);
-                break;
-            case BuildingType.Building:
-                toCollapse = GetSurroundingCells(queryPos);
-
-                break;
-            case BuildingType.Path:
-                toCollapse = GetSurroundingCells(queryPos);
-                //cellsToCollapse.AddRange(GetSurroundingCells(queryPos + Vector3.up * waveFunction.GridScale.y));
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(type), type, null);
-        }
         //cellsToCollapse.ForEach((x) => Debug.Log("Cell: " + x));
-
         return toCollapse;
     }
 

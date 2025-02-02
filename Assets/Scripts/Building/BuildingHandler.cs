@@ -14,13 +14,17 @@ public class BuildingHandler : SerializedMonoBehaviour
     [Title("Mesh Information")]
     [SerializeField]
     private TowerMeshData towerMeshData;
+    
+    [Title("District")]
+    [SerializeField]
+    private IChunkWaveFunction districtGenerator;
 
     private List<Building> buildingQueue = new List<Building>();
     private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
 
     private int selectedGroupIndex = -1;
-    private int groupIndexCounter = 0;
-    private bool chilling = false;
+    private int groupIndexCounter;
+    private bool chilling;
 
     public BuildingData this[Building building] => BuildingData.GetValueOrDefault(building.Index);  // I like this way too much
 
@@ -55,7 +59,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private void UpdateData(BuildingData buildingData, Building building)
     {
-        if (building.Prototype.MeshRot.Mesh == null) // Full
+        if (building.Prototype.MeshRot.Mesh is null) // Full
         {
             buildingData.OnBuildingChanged(new BuildingCellInformation { HouseCount = 4, TowerType = TowerType.None }, building);
             return; 
@@ -92,12 +96,24 @@ public class BuildingHandler : SerializedMonoBehaviour
         List<Building> buildings = BuildingGroups[groupToCheck];
         int adjacenyCount = 0;
 
-        foreach (KeyValuePair<int, List<Building>> group in BuildingGroups.Where(group => group.Key != groupToCheck))
+        foreach (KeyValuePair<int, List<Building>> group in BuildingGroups)
         {
+            if (group.Key == groupToCheck) continue;
+            
             for (int i = buildings.Count - 1; i >= 0; i--)
             {
                 Building building = buildings[i];
-                if (!group.Value.Where(t => IsAdjacent(building, t)).Any(t => ++adjacenyCount >= 2)) continue;
+                bool any = false;
+                for (int j = 0; j < group.Value.Count && !any; j++)
+                {
+                    Building otherBuilding = group.Value[j];
+                    if (!IsAdjacent(building, otherBuilding)) continue;
+                    if (++adjacenyCount < 2) continue;
+
+                    any = true;
+                }
+
+                if (!any) continue;
                 Merge(groupToCheck, group.Key);
                 CheckMerge(group.Key);
                 return;
@@ -243,13 +259,11 @@ public struct BuildingCellInformation : IEquatable<BuildingCellInformation>
     public int HouseCount;
     public bool Upgradable;
     public TowerType TowerType;
-
+    
     public override bool Equals(object obj)
     {
         return obj is BuildingCellInformation information &&
-               HouseCount == information.HouseCount &&
-               Upgradable == information.Upgradable &&
-               TowerType == information.TowerType;
+               information.Equals(this);
     }
 
     public override int GetHashCode()
@@ -259,7 +273,9 @@ public struct BuildingCellInformation : IEquatable<BuildingCellInformation>
 
     public bool Equals(BuildingCellInformation other)
     {
-        return HouseCount == other.HouseCount && Upgradable == other.Upgradable && TowerType == other.TowerType;
+        return HouseCount == other.HouseCount 
+               && Upgradable == other.Upgradable 
+               && TowerType == other.TowerType;
     }
 }
 

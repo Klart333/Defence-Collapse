@@ -39,7 +39,6 @@ public class Building : PooledMonoBehaviour, IBuildable
     private bool highlighted;
     private bool selected;
     private bool hovered;
-    private IBuildable _buildableImplementation;
 
     public int BuildingGroupIndex { get; set; } = -1;
     public PrototypeData Prototype { get; private set; }
@@ -207,10 +206,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         }
 
         PrototypeData oldProt = BuildingHandler[this].Prototype;
-        if (oldProt.PosX == newProt.PosX && 
-            oldProt.NegX == newProt.NegX && 
-            oldProt.PosZ == newProt.PosZ &&
-            oldProt.NegZ == newProt.NegZ)
+        if (oldProt == newProt)
         {
             return oldProt;
         }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System.Linq;
+using DG.Tweening;
 
 public class BuildingPlacer : MonoBehaviour
 {
@@ -160,11 +161,22 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
-    private void ToggleSpawnPlaces(bool value)
+    private void ToggleSpawnPlaces(bool enabled)
     {
         for (int i = 0; i < spawnedSpawnPlaces.Count; i++)
         {
-            spawnedSpawnPlaces[i].gameObject.SetActive(value);
+            spawnedSpawnPlaces[i].gameObject.SetActive(enabled);
+
+            if (enabled)
+            {
+                Vector3 scale = spawnedSpawnPlaces[i].transform.localScale;
+                spawnedSpawnPlaces[i].transform.localScale = Vector3.zero;
+                spawnedSpawnPlaces[i].transform.DOScale(scale, 0.5f).SetEase(Ease.OutCirc);
+            }
+            else
+            {
+                spawnedSpawnPlaces[i].transform.DOComplete();
+            }
         }
     }
     
@@ -172,11 +184,6 @@ public class BuildingPlacer : MonoBehaviour
     {
         spawnedSpawnPlaces[SpawnSquareIndex].OnPlaced();
         BuildingManager.Instance.Place();
-
-        if (buildingType == BuildingType.Castle)
-        {
-            Events.OnBuildingCanceled?.Invoke();
-        }
     }
 
     private void ShowUnablePlaces(List<Vector3> positions)
@@ -198,7 +205,6 @@ public class BuildingPlacer : MonoBehaviour
 
 public enum BuildingType
 {
-    Castle,
     Building,
     Path
 }
