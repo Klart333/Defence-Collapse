@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEditor;
 using Buildings;
 using System;
+using Buildings.District;
 using UnityEngine.Serialization;
 
 public class BuildingManager : Singleton<BuildingManager> 
@@ -721,11 +722,6 @@ public class BuildingManager : Singleton<BuildingManager>
         
         return null;
     }
-    
-    public Vector3 GetPos(Vector3Int index)
-    {
-        return Cells[index.x, index.y, index.z].Position;
-    }
 
     private IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, bool animate = true)
     {
@@ -749,6 +745,15 @@ public class BuildingManager : Singleton<BuildingManager>
 
     #endregion
 
+    #region API
+
+    public Vector3 GetPos(Vector3Int index)
+    {
+        return Cells[index.x, index.y, index.z].Position;
+    }
+    
+    #endregion
+    
     #region Debug
 
     private void OnDrawGizmosSelected()

@@ -25,8 +25,8 @@ public class EnemyHealthbar : MonoBehaviour
     public void Setup(EnemyHealth health)
     {
         enemyHealth = health;
-        enemyHealth.Health.Attacker.Stats.MaxHealth.OnValueChanged += DisplayHealth;
-        enemyHealth.Health.OnTakeDamage += DisplayHealth;
+        enemyHealth.Health.Stats.MaxHealth.OnValueChanged += DisplayHealthComponent;
+        enemyHealth.Health.OnTakeDamage += DisplayHealthComponent;
     }
 
     public void Reset()
@@ -50,7 +50,7 @@ public class EnemyHealthbar : MonoBehaviour
         }
     }
 
-    private void DisplayHealth()
+    private void DisplayHealthComponent()
     {
         ToggleEnabled(true);
 

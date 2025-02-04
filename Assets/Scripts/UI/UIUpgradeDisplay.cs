@@ -2,6 +2,7 @@
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using Buildings.District;
 using UnityEngine;
 
 public class UIUpgradeDisplay : MonoBehaviour
@@ -27,11 +28,11 @@ public class UIUpgradeDisplay : MonoBehaviour
     [SerializeField]
     private StupidButton button;
 
-    private BuildingData currentData;
+    private DistrictData currentData;
 
     private bool hoveredLastFrame = false;
 
-    public void DisplayStat(BuildingData buildingData)
+    public void DisplayStat(DistrictData buildingData)
     {
         currentData = buildingData;
 

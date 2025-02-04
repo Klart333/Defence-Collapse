@@ -140,7 +140,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         MeshRenderer.gameObject.layer = (int)Mathf.Log(selectedLayer.value, 2);
 
         BuildingUI.OnSelected(cellInfo);
-        buildingHandler[this].State.OnSelected(transform.position);
+        //buildingHandler[this].State.OnSelected(transform.position);
         selected = true;
     }
 
@@ -151,7 +151,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2); // sure ?
 
         BuildingUI.OnDeselected();
-        buildingHandler.BuildingData[Index].State.OnDeselected();
+        //buildingHandler.BuildingData[Index].State.OnDeselected();
         selected = false;
     }
 

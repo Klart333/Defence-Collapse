@@ -1,11 +1,12 @@
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
+using DG.Tweening;
 using UnityEngine;
 
-public class UIDistrictDisplay : SerializedMonoBehaviour
+namespace Buildings.District
+{
+    public class UIDistrictDisplay : SerializedMonoBehaviour
 {
     [Title("Display")]
     [SerializeField]
@@ -19,7 +20,7 @@ public class UIDistrictDisplay : SerializedMonoBehaviour
     
     [Title("District")]
     [SerializeField]
-    private BuildingHandler buildingHandler;
+    private DistrictHandler districtHandler;
     
     [SerializeField]
     private IChunkWaveFunction districtGenerator;
@@ -72,6 +73,8 @@ public class UIDistrictDisplay : SerializedMonoBehaviour
             for (int z = 0; z < chunk.Cells.GetLength(2); z++)
             {
                 Cell cell = chunk.Cells[x, 0, z];
+                if (districtHandler.IsBuilt(cell)) continue;
+                
                 Vector3 pos = cell.Position + Vector3.up;
                 var spawned = displayPrefab.GetAtPosAndRot<PooledMonoBehaviour>(pos, quaternion.identity);
                 spawned.transform.localScale = Vector3.zero;
@@ -91,4 +94,5 @@ public class UIDistrictDisplay : SerializedMonoBehaviour
         }
         spawnedObjects.Clear();
     }
+}
 }

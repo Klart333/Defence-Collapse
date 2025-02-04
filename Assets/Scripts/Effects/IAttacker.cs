@@ -5,7 +5,6 @@ public interface IAttacker
 {
     // References
     public Stats Stats { get; }
-    public Health Health { get; }   
 
     // Position
     public Vector3 AttackPosition { get; set; }

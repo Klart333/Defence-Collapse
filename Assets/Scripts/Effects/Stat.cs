@@ -13,8 +13,9 @@ public class Stat
         get => baseValue;
         set
         {
-            baseValue = value;
+            if (Mathf.Approximately(baseValue, value)) return;
 
+            baseValue = value;
             OnValueChanged?.Invoke();
         }
     }

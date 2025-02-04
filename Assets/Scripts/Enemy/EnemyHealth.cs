@@ -1,7 +1,6 @@
-using DG.Tweening;
 using Sirenix.OdinInspector;
-using System;
 using UnityEngine;
+using System;
 
 public class EnemyHealth : MonoBehaviour, IHealth
 {
@@ -24,9 +23,10 @@ public class EnemyHealth : MonoBehaviour, IHealth
 
     private EnemyAttacker attacker;
     private EnemyAnimator animator;
-    private Health health;
+    private HealthComponent health;
 
-    public Health Health => health;
+    public HealthComponent Health => health;
+    public Vector3 OriginPosition => Health.OriginPosition;
     public IAttacker Attacker => attacker;
 
     private void OnEnable()
@@ -34,8 +34,8 @@ public class EnemyHealth : MonoBehaviour, IHealth
         animator = GetComponent<EnemyAnimator>();
         attacker = GetComponent<EnemyAttacker>();
 
-        health = new Health(Attacker);
-        health.OnDeath += Health_OnDeath;
+        health = new HealthComponent(Attacker.Stats, transform);
+        health.OnDeath += HealthOnDeath;
 
         healthbar.Setup(this);
 
@@ -46,10 +46,10 @@ public class EnemyHealth : MonoBehaviour, IHealth
     {
         healthbar.Reset();
 
-        health.OnDeath -= Health_OnDeath;
+        health.OnDeath -= HealthOnDeath;
     }
 
-    private void Health_OnDeath()
+    private void HealthOnDeath()
     {
         OnDeath?.Invoke(this);
 

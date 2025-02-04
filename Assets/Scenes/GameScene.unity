@@ -1934,6 +1934,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 491554920}
+  - component: {fileID: 491554922}
   - component: {fileID: 491554921}
   m_Layer: 0
   m_Name: DistrictHandler
@@ -1986,7 +1987,19 @@ MonoBehaviour:
     type: 3}
   maxDelay: 2
   maxDelayDistance: 20
-  buildingHandler: {fileID: 231546246}
+  districtHandler: {fileID: 491554922}
+--- !u!114 &491554922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 491554919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 930429080dea0be48a22c8edcfbadf1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &513559009
 GameObject:
   m_ObjectHideFlags: 0
@@ -5443,7 +5456,7 @@ MonoBehaviour:
     materialData: {fileID: 11400000, guid: f205dbfe3ecf34f40bd110ce6d456c4a, type: 2}
     prototypeInfo: {fileID: 7818375051068540878}
   chillTimeMs: 0
-  maxMillisecondsPerFrame: 4
+  maxMillisecondsPerFrame: 6
   shouldCombine: 1
   shouldRun: 1
 --- !u!1 &1036420026

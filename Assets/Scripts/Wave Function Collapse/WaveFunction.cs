@@ -194,92 +194,54 @@ public class WaveFunction
             changed = false;
             return new List<PrototypeData>(affectedCell.PossiblePrototypes);
         }
-
+        
         // Check downward
         // Rule is above flat tile is only air
+        // Check downward
+        int directIndex = index;
+        bool onlyAir = true;
+        bool allNegatives = true;
+    
+        while (IsDirectionValid(directIndex, Direction.Down, out directIndex) && onlyAir)
         {
-            int directIndex = index;
-            List<string> upKeys = new List<string>();
-            bool onlyAir = true;
-            while (IsDirectionValid(directIndex, Direction.Down, out directIndex) && onlyAir)
+            allNegatives = true;
+            foreach (PrototypeData proto in cells[directIndex].PossiblePrototypes)
             {
-                upKeys.Clear();
-                for (int i = 0; i < cells[directIndex].PossiblePrototypes.Count; i++)
+                if (proto.PosY[0] != '-')
+                    allNegatives = false;
+            
+                if (proto.NegY[0] != '-' || proto.PosX[0] != '-' || proto.NegX[0] != '-' || proto.NegZ[0] != '-' || proto.PosZ[0] != '-')
                 {
-                    upKeys.Add(cells[directIndex].PossiblePrototypes[i].PosY);
-
-                    if (onlyAir && (!string.Equals(cells[directIndex].PossiblePrototypes[i].NegY, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].PosX, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].NegX, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].NegZ, "-1s") || !string.Equals(cells[directIndex].PossiblePrototypes[i].PosZ, "-1s")))
-                    {
-                        onlyAir = false;
-                    }
+                    onlyAir = false;
                 }
             }
+        }
 
-            // If we exited because we found a tile with not only air and not because the direction became invalid
-            if (!onlyAir && upKeys.All(x => x[0] == '-')) // key == -1s (only -1s starts with -)
-            {
-                SetCell(index, emptyPrototype);
-                changed = false;
-                return new List<PrototypeData> { emptyPrototype };
-            }
+        if (!onlyAir && allNegatives)
+        {
+            SetCell(index, emptyPrototype);
+            changed = false;
+            return new List<PrototypeData> { emptyPrototype };
         }
 
         // Check Directly Above
         // Rule is Below flat tile is only air
+        if (IsDirectionValid(index, Direction.Up, out int aboveIndex) 
+            && cells[aboveIndex].Collapsed 
+            && cells[aboveIndex].PossiblePrototypes[0].NegY[0] == '-')
         {
-            if (IsDirectionValid(index, Direction.Up, out int aboveIndex))
-            {
-                if (cells[aboveIndex].Collapsed)
-                {
-                    if (cells[aboveIndex].PossiblePrototypes[0].NegY[0] == '-')
-                    {
-                        bool onlyAir = !(cells[aboveIndex].PossiblePrototypes[0].PosY[0] != '-' || cells[aboveIndex].PossiblePrototypes[0].PosX[0] != '-' || cells[aboveIndex].PossiblePrototypes[0].NegX[0] != '-' || cells[aboveIndex].PossiblePrototypes[0].NegZ[0] != '-' || cells[aboveIndex].PossiblePrototypes[0].PosZ[0] != '-');
+            bool airAbove = !(cells[aboveIndex].PossiblePrototypes[0].PosY[0] != '-' || cells[aboveIndex].PossiblePrototypes[0].PosX[0] != '-' || cells[aboveIndex].PossiblePrototypes[0].NegX[0] != '-' || cells[aboveIndex].PossiblePrototypes[0].NegZ[0] != '-' || cells[aboveIndex].PossiblePrototypes[0].PosZ[0] != '-');
 
-                        if (!onlyAir)
-                        {
-                            SetCell(index, emptyPrototype);
-                            changed = false;
-                            return new List<PrototypeData>() { emptyPrototype };
-                        }
-                    }
-                }
+            if (!airAbove)
+            {
+                SetCell(index, emptyPrototype);
+                changed = false;
+                return new List<PrototypeData>() { emptyPrototype };
             }
         }
 
-        List<string> validKeys = new List<string>();
-        for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
-        {
-            validKeys.Add(direction switch 
-            {
-                Direction.Right => changedCell.PossiblePrototypes[i].PosX,
-                Direction.Left => changedCell.PossiblePrototypes[i].NegX,
-                Direction.Up => changedCell.PossiblePrototypes[i].PosY,
-                Direction.Down => changedCell.PossiblePrototypes[i].NegY,
-                Direction.Forward => changedCell.PossiblePrototypes[i].PosZ,
-                Direction.Backward => changedCell.PossiblePrototypes[i].NegZ,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            });
-        }
-
-        changed = false;
-        for (int i = affectedCell.PossiblePrototypes.Count - 1; i >= 0; i--)
-        {
-            bool shouldRemove = direction switch
-            {
-                Direction.Right => !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegX, validKeys),
-                Direction.Left => !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosX, validKeys),
-                Direction.Forward => !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegZ, validKeys),
-                Direction.Backward => !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosZ, validKeys),
-                Direction.Up => !CheckValidSocket(affectedCell.PossiblePrototypes[i].NegY, validKeys),
-                Direction.Down => !CheckValidSocket(affectedCell.PossiblePrototypes[i].PosY, validKeys),
-                _ => false
-            };
-
-            if (!shouldRemove) continue;
-            affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
-            changed = true;
-        }
-
+        WaveFunctionUtility.Constrain(changedCell, affectedCell, direction, out changed);
+        
         return affectedCell.PossiblePrototypes;
     }
 
@@ -391,28 +353,6 @@ public class WaveFunction
         return valids;
     }
     
-    private static bool CheckValidSocket(string key, List<string> validKeys)
-    {
-        if (key.Contains('v')) // Ex. v0_0
-        {
-            return validKeys.Contains(key);
-        }
-
-        if (key.Contains('s')) // Ex. 0s
-        {
-            return validKeys.Contains(key);
-        }
-
-        if (key.Contains('f')) // Ex. 0f
-        {
-            return validKeys.Contains(key.Replace("f", ""));
-        }
-
-        // Ex. 0
-        string keyf = key + 'f';
-        return validKeys.Contains(keyf);
-    }
-    
     private Vector3Int GetCords(int index)
     {
         int x = index / (gridSizeZ * gridSizeY);
@@ -453,39 +393,35 @@ public class WaveFunction
         emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 20, Array.Empty<int>());
 
         for (int z = 0; z < gridSizeZ; z++)
+        for (int y = 0; y < gridSizeY; y++)
+        for (int x = 0; x < gridSizeX; x++)
         {
-            for (int y = 0; y < gridSizeY; y++)
+            Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z);
+
+            bool isBottom = y == 0;
+            List<PrototypeData> prots = new(isBottom ? bottomPrototypes : prototypes);
+
+            List<Direction> directions = GetAdjacentSides(x, y, z, gridSizeX, gridSizeY, gridSizeZ, 1);
+            foreach (Direction direction in directions)
             {
-                for (int x = 0; x < gridSizeX; x++)
+                for (int i = prots.Count - 1; i >= 0; i--)
                 {
-                    Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z);
-
-                    bool isBottom = y == 0;
-                    List<PrototypeData> prots = new(isBottom ? bottomPrototypes : prototypes);
-
-                    List<Direction> directions = GetAdjacentSides(x, y, z, gridSizeX, gridSizeY, gridSizeZ, 1);
-                    foreach (Direction direction in directions)
+                    bool shouldRemove = direction switch
                     {
-                        for (int i = prots.Count - 1; i >= 0; i--)
-                        {
-                            bool shouldRemove = direction switch
-                            {
-                                Direction.Right => prots[i].PosX != "-1s",
-                                Direction.Left => prots[i].NegX != "-1s", 
-                                Direction.Backward => prots[i].NegZ != "-1s",
-                                Direction.Forward => prots[i].PosZ != "-1s",
-                                Direction.Up => prots[i].PosY != "-1s",
-                                Direction.Down => prots[i].NegY != "-1s",
-                                _ => false
-                            };
+                        Direction.Right => prots[i].PosX != "-1s",
+                        Direction.Left => prots[i].NegX != "-1s", 
+                        Direction.Backward => prots[i].NegZ != "-1s",
+                        Direction.Forward => prots[i].PosZ != "-1s",
+                        Direction.Up => prots[i].PosY != "-1s",
+                        Direction.Down => prots[i].NegY != "-1s",
+                        _ => false
+                    };
 
-                            if (shouldRemove) prots.RemoveAt(i);
-                        }
-                    }
-
-                    cells.Add(new Cell(false, pos + OriginPosition, prots));
+                    if (shouldRemove) prots.RemoveAt(i);
                 }
             }
+
+            cells.Add(new Cell(false, pos + OriginPosition, prots));
         }
     }
 
@@ -675,7 +611,7 @@ public struct MeshWithRotation : IEquatable<MeshWithRotation>
 }
 
 [Serializable]
-public struct Cell
+public struct Cell : IEquatable<Cell>
 {
     public bool Collapsed;
     public bool Buildable;
@@ -692,7 +628,25 @@ public struct Cell
         PossiblePrototypes = possiblePrototypes;
         Buildable = buildable;
     }
-    
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Cell cell)
+            return Equals(cell);
+        
+        return false;
+    }
+
+    public bool Equals(Cell other)
+    {
+        return other.Position == Position;
+    }
+
+    public override int GetHashCode()
+    {
+        return Position.GetHashCode();
+    }
+
     public override string ToString()
     {
         var sb = new System.Text.StringBuilder();
@@ -713,18 +667,6 @@ public struct Cell
     }
 }
 
-public struct Node
-{
-    public readonly bool Walkable;
-    public Vector3 Position;
-
-    public Node(bool walkable, Vector3 position)
-    {
-        Walkable = walkable;
-        Position = position;
-    }
-}
-
 public enum Direction
 {
     Right, 
@@ -737,6 +679,40 @@ public enum Direction
 
 public static class WaveFunctionUtility
 {
+    public static void Constrain(Cell changedCell, Cell affectedCell, Direction direction, out bool changed)
+    {
+        changed = false;
+        if (affectedCell.Collapsed) return;
+
+        HashSet<string> validKeys = new HashSet<string>();
+        for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
+        {
+            validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
+        }
+
+        Direction oppositeDirection = OppositeDirection(direction);
+        for (int i = affectedCell.PossiblePrototypes.Count - 1; i >= 0; i--)
+        {
+            if (CheckValidSocket(affectedCell.PossiblePrototypes[i].DirectionToKey(oppositeDirection), validKeys)) continue;
+            
+            affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
+            changed = true;
+        }
+    }
+    
+    public static bool CheckValidSocket(string key, HashSet<string> validKeys)
+    {
+        // Direct lookup first
+        if (validKeys.Contains(key)) return true;
+    
+        // Try alternative versions of the key
+        string keyWithoutF = key.EndsWith('f') ? key[..^1] : null;
+        string keyWithF = keyWithoutF == null ? key + 'f' : null;
+    
+        return (keyWithoutF != null && validKeys.Contains(keyWithoutF)) ||
+               (keyWithF != null && validKeys.Contains(keyWithF));
+    }
+    
     public static Direction OppositeDirection(Direction direction)
     {
         return direction switch

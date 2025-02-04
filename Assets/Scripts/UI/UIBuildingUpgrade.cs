@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Buildings.District;
 using Sirenix.OdinInspector;
 using UnityEngine.UI;
 using DG.Tweening;
@@ -49,7 +50,7 @@ public class UIBuildingUpgrade : MonoBehaviour
     [SerializeField]
     private UIEffectsHandler towerEffectsPanel;
 
-    private BuildingData currentData;
+    private DistrictData currentData;
     private Canvas canvas;
 
     public LevelData LevelData => levelData;
@@ -70,7 +71,7 @@ public class UIBuildingUpgrade : MonoBehaviour
 
     private void Update()
     {
-        PositionRectTransform.PositionOnOverlayCanvas(canvas, transform as RectTransform, BuildingManager.Instance.GetPos(currentData.Index), new Vector2(0.25f, 0.5f));
+        PositionRectTransform.PositionOnOverlayCanvas(canvas, transform as RectTransform, currentData.Position, new Vector2(0.25f, 0.5f));
     }
 
     #region UI
@@ -86,9 +87,9 @@ public class UIBuildingUpgrade : MonoBehaviour
         (ownedEffectsPanel.transform.parent as RectTransform).DOAnchorPosX(isUpgrade ? -0 : -420, 0.5f).SetEase(Ease.OutCirc);
     }
 
-    public void ShowUpgrades(BuildingData buildingData)
+    public void ShowUpgrades(DistrictData districtData)
     {
-        currentData = buildingData;
+        currentData = districtData;
 
         parentPanel.SetActive(true);
         ownedEffectsPanel.SpawnEffects();

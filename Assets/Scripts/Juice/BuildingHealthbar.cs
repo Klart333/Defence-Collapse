@@ -36,7 +36,7 @@ public class BuildingHealthbar : MonoBehaviour
 
     private void OnEnable()
     {
-        Building.BuildingHandler[building].State.Stats.MaxHealth.OnValueChanged += DisplayHealth;
+        Building.BuildingHandler[building].Health.Stats.MaxHealth.OnValueChanged += DisplayHealth;
         Building.BuildingHandler[building].Health.OnTakeDamage += DisplayHealth;
 
         ToggleEnabled(false);
@@ -44,7 +44,7 @@ public class BuildingHealthbar : MonoBehaviour
 
     private void OnDisable()
     {
-        Building.BuildingHandler[building].State.Stats.MaxHealth.OnValueChanged -= DisplayHealth;
+        Building.BuildingHandler[building].Health.Stats.MaxHealth.OnValueChanged -= DisplayHealth;
         Building.BuildingHandler[building].Health.OnTakeDamage -= DisplayHealth;
 
         Reset();

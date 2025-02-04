@@ -1,38 +1,40 @@
-using System;
 using System.Collections.Generic;
+using UnityEngine;
+using System;
 
 [System.Serializable]
-public class Health : IHealth
+public class HealthComponent : IHealth // THIS DOESN'T WORK WITH ECS SO WHATEVER!
 {
     public event Action OnDeath;
     public event Action OnTakeDamage;
 
-    public float MaxHealth;
     public float CurrentHealth;
+    public float MaxHealth;
 
     public bool Alive => CurrentHealth > 0;
-    public float HealthPercentage => CurrentHealth / MaxHealth;
+    public float HealthPercentage => CurrentHealth / Stats.MaxHealth.Value;
 
+    private readonly Transform transform;
+    
     public List<StatusEffect> StatusEffects { get; set; } = new List<StatusEffect>();
     public DamageInstance LastDamageTaken { get; private set; }
-    public IAttacker Attacker { get; private set; }
-
-    public Health(IAttacker attacker)
+    public Stats Stats { get; private set; }
+    
+    public Vector3 OriginPosition => transform.position;
+    public HealthComponent Health => this;
+    
+    public HealthComponent(Stats stats, Transform transform)
     {
-        UpdateAttacker(attacker);
-    }
-
-    public void UpdateAttacker(IAttacker attacker)
-    {
-        Attacker = attacker;
-        attacker.Stats.MaxHealth.OnValueChanged += UpdateMaxHealth;
-
+        Stats = stats;
+        this.transform = transform;
+        
+        Stats.MaxHealth.OnValueChanged += UpdateMaxHealth;
         UpdateMaxHealth();
     }
 
     private void UpdateMaxHealth()
     {
-        SetMaxHealth(Attacker.Stats.MaxHealth.Value);
+        SetMaxHealth(Stats.MaxHealth.Value);
     }
 
     public void SetMaxHealth(float maxHealth)
@@ -69,7 +71,7 @@ public class Health : IHealth
             Die(damageDone);
         }
     }
-
+    
     private void Die(DamageInstance killingDamage)
     {
         killingDamage.Source.OnUnitKill();
@@ -81,7 +83,8 @@ public class Health : IHealth
 
 public interface IHealth
 {
+    public HealthComponent Health { get; }
+    public Vector3 OriginPosition { get; }
+    
     public void TakeDamage(DamageInstance damage, out DamageInstance damageDone);
-
-    public IAttacker Attacker { get; }
 }

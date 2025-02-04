@@ -74,7 +74,7 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
         currentBuilding = building;
 
         canvas.SetActive(true);
-        buildingUpgrade.ShowUpgrades(buildingHandler[building]);
+        //buildingUpgrade.ShowUpgrades(buildingHandler[building]);
     }
 
     public void Close()
@@ -89,10 +89,11 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
 
     public void SelectAdvancementOption(TowerType towerType)
     {
-        var data = towerMeshData.GetInfo(towerType, buildingPrototypes.Prototypes);
+        Debug.LogError("DEPRECATED");
+        (PrototypeData, BuildingCellInformation)? data = towerMeshData.GetInfo(towerType, buildingPrototypes.Prototypes);
         if (data.HasValue)
         {
-            buildingHandler[currentBuilding].AdvanceState(data.Value.Item2, data.Value.Item1);
+            //buildingHandler[currentBuilding].AdvanceState(data.Value.Item2, data.Value.Item1);
         }
         else
         {

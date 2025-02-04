@@ -71,10 +71,12 @@ public class MeshCombiner : MonoBehaviour
         List<CombineInstance> finalCombiners = new List<CombineInstance>();
         foreach (Mesh mesh in submeshes)
         {
-            CombineInstance ci = new CombineInstance();
-            ci.mesh = mesh;
-            ci.subMeshIndex = 0;
-            ci.transform = Matrix4x4.identity;
+            CombineInstance ci = new CombineInstance
+            {
+                mesh = mesh,
+                subMeshIndex = 0,
+                transform = Matrix4x4.identity
+            };
             finalCombiners.Add(ci);
         }
         Mesh finalMesh = new Mesh();

@@ -498,13 +498,10 @@ namespace Effects
                     break;
                 }
 
-                dotInstance.AttackPosition = dotInstance.TargetHit.Attacker.OriginPosition;
+                dotInstance.AttackPosition = dotInstance.TargetHit.OriginPosition;
                 dotInstance.TargetHit.TakeDamage(dotInstance, out DamageInstance damageDone);
 
-                if (!damageDone.SpecialEffectSet.Contains(EffectKey))
-                {
-                    damageDone.SpecialEffectSet.Add(EffectKey);
-                }
+                damageDone.SpecialEffectSet.Add(EffectKey);
                 unit.OnUnitDoneDamage(damageDone);
             }
         }
@@ -605,6 +602,11 @@ namespace Effects
 
         public void Perform(IAttacker unit)
         {
+            if (unit is not IHealth health)
+            {
+                return;
+            }
+            
             if (TriggeredUnits == null)
             {
                 TriggeredUnits = new HashSet<IAttacker>();
@@ -615,7 +617,7 @@ namespace Effects
                 return;
             }
 
-            if (unit.Health.HealthPercentage <= ModifierValue)
+            if (health.Health.HealthPercentage <= ModifierValue)
             {
                 EffectToTrigger.Perform(unit);
 
@@ -726,11 +728,23 @@ namespace Effects
 
         public async void Perform(IAttacker unit)
         {
-            unit.Health.StatusEffects.Add(statusEffect);
+            try // Because of async
+            {
+                if (unit is not IHealth health)
+                {
+                    return;
+                }
+            
+                health.Health.StatusEffects.Add(statusEffect);
 
-            await UniTask.Delay(TimeSpan.FromSeconds(ModifierValue));
+                await UniTask.Delay(TimeSpan.FromSeconds(ModifierValue));
 
-            unit.Health.StatusEffects.Remove(statusEffect);
+                health.Health.StatusEffects.Remove(statusEffect);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
         }
 
         public void Revert(IAttacker unit)

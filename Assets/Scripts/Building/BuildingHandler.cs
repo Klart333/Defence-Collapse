@@ -80,13 +80,13 @@ public class BuildingHandler : SerializedMonoBehaviour
             //Debug.Log("Please add all meshes to the list");
 
             BuildingData wrongdata = new BuildingData(this);
-            wrongdata.SetState(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None}, building.Index, building.Prototype);
+            //wrongdata.SetState(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None}, building.Index, building.Prototype);
 
             return wrongdata;
         }
 
         BuildingData data = new BuildingData(this);
-        data.SetState(cellInfo, building.Index, building.Prototype);
+        //data.SetState(cellInfo, building.Index, building.Prototype);
 
         return data;
     }

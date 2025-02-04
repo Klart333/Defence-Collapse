@@ -26,7 +26,9 @@ public class DamageCollider : PooledMonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if ((LayerMask.value & 1 << other.gameObject.layer) > 0 && other.TryGetComponent(out IHealth health) && health != Attacker.Health)
+        if ((LayerMask.value & 1 << other.gameObject.layer) > 0 
+            && other.TryGetComponent(out IHealth health) 
+            && Attacker is IHealth attackerHealth && health != attackerHealth)
         {
             health.TakeDamage(DamageInstance, out DamageInstance damageDone);
             if (TriggerDamageDone)

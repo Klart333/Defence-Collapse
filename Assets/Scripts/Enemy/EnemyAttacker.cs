@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyAttacker : MonoBehaviour, IAttacker
+public class EnemyAttacker : MonoBehaviour, IAttacker, IHealth
 {
     public event Action OnAttack;
 
@@ -19,11 +19,12 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
     public bool Attacking { get; private set; }
 
     public Stats Stats => stats; 
-    public Health Health => health.Health;
+    public HealthComponent Health => health.Health;
     public DamageInstance LastDamageDone { get; private set; }
     public Vector3 AttackPosition { get; set; }
     public Vector3 OriginPosition => transform.position;
     public LayerMask LayerMask => attackData.LayerMask;
+    public IAttacker Attacker => this;
 
     private void Awake()
     {
@@ -78,5 +79,10 @@ public class EnemyAttacker : MonoBehaviour, IAttacker
     public void OnUnitKill()
     {
 
+    }
+
+    public void TakeDamage(DamageInstance damage, out DamageInstance damageDone)
+    {
+        health.TakeDamage(damage, out damageDone);
     }
 }

@@ -258,7 +258,7 @@ public class ChunkWaveFunction
             for (int i = 0; i < neighbours.Count; i++)
             {
                 Cell neighbour = this[neighbours[i]];
-                Constrain(changedCell, neighbour, directions[i], out bool changed);
+                WaveFunctionUtility.Constrain(changedCell, neighbour, directions[i], out bool changed);
 
                 if (changed)
                 {
@@ -266,49 +266,6 @@ public class ChunkWaveFunction
                 } 
             }
         }
-    }
-
-    private void Constrain(Cell changedCell, Cell affectedCell, Direction direction, out bool changed)
-    {
-        changed = false;
-        if (affectedCell.Collapsed) return;
-
-        List<string> validKeys = new List<string>();
-        for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
-        {
-            validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
-        }
-
-        Direction oppositeDirection = WaveFunctionUtility.OppositeDirection(direction);
-        for (int i = affectedCell.PossiblePrototypes.Count - 1; i >= 0; i--)
-        {
-            if (CheckValidSocket(affectedCell.PossiblePrototypes[i].DirectionToKey(oppositeDirection), validKeys)) continue;
-            
-            affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
-            changed = true;
-        }
-    }
-    
-    private static bool CheckValidSocket(string key, List<string> validKeys)
-    {
-        if (key.Contains('v')) // Ex. v0_0
-        {
-            return validKeys.Contains(key);
-        }
-
-        if (key.Contains('s')) // Ex. 0s
-        {
-            return validKeys.Contains(key);
-        }
-
-        if (key.Contains('f')) // Ex. 0f
-        {
-            return validKeys.Contains(key.Replace("f", ""));
-        }
-
-        // Ex. 0
-        string keyf = key + 'f';
-        return validKeys.Contains(keyf);
     }
 
     private bool LoadPrototypeData()
