@@ -430,7 +430,6 @@ GameObject:
   m_Component:
   - component: {fileID: 231546245}
   - component: {fileID: 231546246}
-  - component: {fileID: 231546247}
   m_Layer: 0
   m_Name: BuildingHandler
   m_TagString: Untagged
@@ -519,34 +518,6 @@ MonoBehaviour:
       Entry: 10
       Data: 0
   towerMeshData: {fileID: 11400000, guid: 6a80373d5d2a40444a8f9391c08a93a2, type: 2}
---- !u!114 &231546247
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 231546244}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d10500ea0b74910b8a6a6d5d3e5ba1b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects:
-    - {fileID: 1551488502}
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes:
-    - Name: districtGenerator
-      Entry: 10
-      Data: 0
-  displayPrefab: {fileID: 6791807759357262451, guid: d2175c259b214fa4d9fb7894596e2573,
-    type: 3}
-  buildingHandler: {fileID: 231546246}
 --- !u!4 &248058524 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1507636620937791777, guid: 7097ba7ba649e1f41bba232312bdcbd8,
@@ -1954,6 +1925,68 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 468109193}
   m_CullTransparentMesh: 1
+--- !u!1 &491554919
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 491554920}
+  - component: {fileID: 491554921}
+  m_Layer: 0
+  m_Name: DistrictHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &491554920
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 491554919}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1411626119}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &491554921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 491554919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d10500ea0b74910b8a6a6d5d3e5ba1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 1551488502}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: districtGenerator
+      Entry: 10
+      Data: 0
+  displayPrefab: {fileID: 6791807759357262451, guid: d2175c259b214fa4d9fb7894596e2573,
+    type: 3}
+  maxDelay: 2
+  maxDelayDistance: 20
+  buildingHandler: {fileID: 231546246}
 --- !u!1 &513559009
 GameObject:
   m_ObjectHideFlags: 0
@@ -2568,9 +2601,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
+        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 527352178}
+    - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2689035945723465800, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
       propertyPath: m_PreferredWidth
@@ -3465,9 +3508,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
+        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 527352178}
+    - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 2689035945723465800, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
       propertyPath: m_PreferredWidth
@@ -7523,6 +7576,7 @@ Transform:
   m_Children:
   - {fileID: 1309848886}
   - {fileID: 231546245}
+  - {fileID: 491554920}
   - {fileID: 604477865}
   - {fileID: 773890296}
   m_Father: {fileID: 0}
@@ -15883,9 +15937,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
+        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 527352178}
+    - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ClickDistrict
+      objectReference: {fileID: 0}
     - target: {fileID: 2689035945723465800, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
       propertyPath: m_PreferredWidth
@@ -15947,8 +16011,8 @@ GameObject:
   - component: {fileID: 7129838151864867937}
   - component: {fileID: 7129838151864867949}
   - component: {fileID: 7129838151864867948}
-  - component: {fileID: 7129838151864867951}
   - component: {fileID: 7129838151864867950}
+  - component: {fileID: 7129838151864867951}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -16044,7 +16108,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7129838151864867936}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
@@ -16076,7 +16140,10 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 7129838151864867948}
-  m_OnClick:
+  toggleTransition: 1
+  graphic: {fileID: 0}
+  m_Group: {fileID: 0}
+  onValueChanged:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1409401081}
@@ -16091,6 +16158,7 @@ MonoBehaviour:
           m_StringArgument: Open
           m_BoolArgument: 0
         m_CallState: 2
+  m_IsOn: 0
 --- !u!224 &7129838152036704640
 RectTransform:
   m_ObjectHideFlags: 0

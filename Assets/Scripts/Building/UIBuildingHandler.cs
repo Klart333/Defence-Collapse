@@ -13,8 +13,8 @@ public class UIBuildingHandler : MonoBehaviour
         Events.OnBuildingClicked?.Invoke(BuildingType.Path);
     }
 
-    public void ClickDistrict()
+    public void ClickDistrict(int type)
     {
-        Events.OnDistrictClicked?.Invoke();
+        Events.OnDistrictClicked?.Invoke((DistrictType)type);
     }
 }
