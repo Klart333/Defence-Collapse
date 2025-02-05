@@ -12,9 +12,9 @@ namespace Buildings.District
         
         public UpgradeData UpgradeData { get; private set; }
         public Vector3 Position { get; private set; }
-        public int2 Index { get; set; }
-        
         public DistrictState State { get; }
+        
+        public int2 Index { get; set; }
 
         public DistrictData(DistrictType districtType, int cellsCount, Vector3 position)
         {

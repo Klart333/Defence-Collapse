@@ -159,7 +159,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void Update()
     {
-        buildingHandler[this]?.Update(this);
+        BuildingHandler[this]?.Update(this);
 
         if (!InputManager.Instance.Fire.WasReleasedThisFrame())
         {
@@ -168,7 +168,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
         if (hovered && InputManager.Instance.GetShift)
         {
-            buildingHandler.HighlightGroup(this);
+            BuildingHandler.HighlightGroup(this);
         }
 
         if (highlighted && !hovered && !buildingUI.InMenu)

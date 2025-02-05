@@ -197,27 +197,30 @@ public class WaveFunction
         
         // Check downward
         // Rule is above flat tile is only air
-        // Check downward
         int directIndex = index;
         bool onlyAir = true;
-        bool allNegatives = true;
+        bool noConnectionsUp = true;
     
         while (IsDirectionValid(directIndex, Direction.Down, out directIndex) && onlyAir)
         {
-            allNegatives = true;
+            bool hasConnections = false;
             foreach (PrototypeData proto in cells[directIndex].PossiblePrototypes)
             {
-                if (proto.PosY[0] != '-')
-                    allNegatives = false;
+                if (!hasConnections && proto.PosY[0] != '-')
+                {
+                    hasConnections = true;
+                }
             
                 if (proto.NegY[0] != '-' || proto.PosX[0] != '-' || proto.NegX[0] != '-' || proto.NegZ[0] != '-' || proto.PosZ[0] != '-')
                 {
                     onlyAir = false;
                 }
             }
+            
+            noConnectionsUp = !hasConnections;
         }
 
-        if (!onlyAir && allNegatives)
+        if (!onlyAir && noConnectionsUp)
         {
             SetCell(index, emptyPrototype);
             changed = false;

@@ -22,7 +22,8 @@ public class BuildingPlacer : MonoBehaviour
     private readonly List<PlaceSquare> spawnedSpawnPlaces = new List<PlaceSquare>();
 
     private GroundGenerator groundGenerator;
-
+    private Vector3 targetScale;
+    
     private bool manualCancel;
     private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
     public Vector3Int? SquareIndex { get; set; }
@@ -60,7 +61,7 @@ public class BuildingPlacer : MonoBehaviour
     {
         await UniTask.WaitUntil(() => BuildingManager.Instance.Cells != null);
         
-        Vector3 scale = groundGenerator.WaveFunction.GridScale * BuildingManager.Instance.CellSize;
+        targetScale = groundGenerator.WaveFunction.GridScale * BuildingManager.Instance.CellSize;
         for (int z = 0; z < BuildingManager.Instance.Cells.GetLength(2); z++)
         {
             for (int x = 0; x < BuildingManager.Instance.Cells.GetLength(0); x++)
@@ -72,11 +73,11 @@ public class BuildingPlacer : MonoBehaviour
                         || !BuildingManager.Instance.Cells[x, y, z + 1].Buildable
                         || !BuildingManager.Instance.Cells[x + 1, y, z + 1].Buildable) continue;
                     
-                    Vector3 pos = BuildingManager.Instance.Cells[x, y, z].Position + new Vector3(scale.x / 2.0f, 0.1f, scale.z / 2.0f);
+                    Vector3 pos = BuildingManager.Instance.Cells[x, y, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
                     PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
                     placeSquare.Placer = this;
                     placeSquare.Index = new Vector3Int(x, y, z);
-                    placeSquare.transform.localScale = scale * 0.95f;
+                    placeSquare.transform.localScale = targetScale * 0.95f;
                     placeSquare.transform.SetParent(transform, true);
                     placeSquare.gameObject.SetActive(false);
                     placeSquare.SquareIndex = spawnedSpawnPlaces.Count;
@@ -165,17 +166,21 @@ public class BuildingPlacer : MonoBehaviour
     {
         for (int i = 0; i < spawnedSpawnPlaces.Count; i++)
         {
-            spawnedSpawnPlaces[i].gameObject.SetActive(enabled);
-
+            PlaceSquare placeSquare = spawnedSpawnPlaces[i];
             if (enabled)
             {
-                Vector3 scale = spawnedSpawnPlaces[i].transform.localScale;
-                spawnedSpawnPlaces[i].transform.localScale = Vector3.zero;
-                spawnedSpawnPlaces[i].transform.DOScale(scale, 0.5f).SetEase(Ease.OutCirc);
+                placeSquare.gameObject.SetActive(true);
+                placeSquare.transform.DOKill();
+                placeSquare.transform.DOScale(targetScale * 0.95f, 0.5f).SetEase(Ease.OutCirc);
             }
             else
             {
-                spawnedSpawnPlaces[i].transform.DOComplete();
+                placeSquare.transform.DOKill();
+                placeSquare.transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.OutCirc).OnComplete(() =>
+                {
+                    placeSquare.gameObject.SetActive(false);
+                });
+                
             }
         }
     }

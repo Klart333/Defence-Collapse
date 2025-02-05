@@ -15,6 +15,7 @@ public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT 
     public BuildingData(BuildingHandler buildingHandler)
     {
         handler = buildingHandler;
+        //Health = new HealthComponent(null, null);
     }
 
     public void OnBuildingChanged(BuildingCellInformation cellInfo, Building building)
@@ -39,6 +40,7 @@ public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT 
 
     public void Update(Building building)
     {
+        return;
         if (!Health.Alive)
         {
             return;

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
@@ -24,12 +26,18 @@ namespace Buildings.District
 
         public void BuildDistrict(List<Cell> cells, DistrictType districtType)
         {
-            Vector3 position = Vector3.zero; // Middle point of cells
-            DistrictData buildingData = GetDistrictData(districtType, cells.Count, position);
-        
+            Vector3 position = Vector3.zero;
             for (int i = 0; i < cells.Count; i++)
             {
+                position += cells[i].Position;
+            }
+            position /= cells.Count;
             
+            DistrictData districtData = GetDistrictData(districtType, cells.Count, position);
+
+            for (int i = 0; i < cells.Count; i++)
+            {
+                districts.Add(GetDistrictIndex(cells[i].Position), districtData);
             }
         }
 
@@ -47,10 +55,22 @@ namespace Buildings.District
 
         public int2 GetDistrictIndex(Vector3 position)
         {
-            int x = Math.GetMultiple(position.x, districtGenerator.ChunkWaveFunction.GridScale.x);
-            int y = Math.GetMultiple(position.z, districtGenerator.ChunkWaveFunction.GridScale.z);
-        
+            int x = Math.GetMultipleFloored(position.x, districtGenerator.ChunkWaveFunction.GridScale.x);
+            int y = Math.GetMultipleFloored(position.z, districtGenerator.ChunkWaveFunction.GridScale.z);
             return new int2(x, y);
+        }
+
+        public static bool CanBuildDistrict(int width, int depth, DistrictType currentType)
+        {
+            return currentType switch
+            {
+                DistrictType.Archer => width >= 8 && depth >= 8,
+                DistrictType.Bomb => width >= 12 && depth >= 12,
+                DistrictType.Church => width >= 12 && depth >= 12,
+                DistrictType.Farm => width >= 6 && depth >= 6,
+                DistrictType.Mine => width >= 6 && depth >= 6,
+                _ => throw new ArgumentOutOfRangeException(nameof(currentType), currentType, null)
+            };
         }
     }
 }
