@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
@@ -24,21 +25,26 @@ namespace Buildings.District
     
         private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
 
-        public void BuildDistrict(List<Cell> cells, DistrictType districtType)
+        public void BuildDistrict(List<Chunk> chunks, DistrictType districtType)
         {
             Vector3 position = Vector3.zero;
-            for (int i = 0; i < cells.Count; i++)
+            for (int i = 0; i < chunks.Count; i++)
             {
-                position += cells[i].Position;
+                position += chunks[i].Position;
             }
-            position /= cells.Count;
+            position /= chunks.Count;
             
-            DistrictData districtData = GetDistrictData(districtType, cells.Count, position);
+            DistrictData districtData = GetDistrictData(districtType, chunks.Count, position);
 
-            for (int i = 0; i < cells.Count; i++)
+            for (int i = 0; i < chunks.Count; i++)
             {
-                districts.Add(GetDistrictIndex(cells[i].Position), districtData);
+                districts.Add(GetDistrictIndex(chunks[i].Position, districtGenerator), districtData);
+                
+                chunks[i].Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
+                districtGenerator.ChunkWaveFunction.LoadCells(chunks[i]);
             }
+            
+            districtGenerator.Run().Forget(Debug.LogError);
         }
 
         private DistrictData GetDistrictData(DistrictType districtType, int cellsCount, Vector3 position)
@@ -47,28 +53,28 @@ namespace Buildings.District
             return districtData;
         }
 
-        public bool IsBuilt(Cell cell)
+        public bool IsBuilt(Chunk chunk)
         {
-            int2 index = GetDistrictIndex(cell.Position);
+            int2 index = GetDistrictIndex(chunk.Position, districtGenerator);
             return districts.TryGetValue(index, out _);
         }
 
-        public int2 GetDistrictIndex(Vector3 position)
+        public static int2 GetDistrictIndex(Vector3 position, IChunkWaveFunction wave)
         {
-            int x = Math.GetMultipleFloored(position.x, districtGenerator.ChunkWaveFunction.GridScale.x);
-            int y = Math.GetMultipleFloored(position.z, districtGenerator.ChunkWaveFunction.GridScale.z);
+            int x = Math.GetMultipleFloored(position.x, wave.ChunkSize.x);
+            int y = Math.GetMultipleFloored(position.z, wave.ChunkSize.z);
             return new int2(x, y);
-        }
+        }   
 
         public static bool CanBuildDistrict(int width, int depth, DistrictType currentType)
         {
             return currentType switch
             {
-                DistrictType.Archer => width >= 8 && depth >= 8,
-                DistrictType.Bomb => width >= 12 && depth >= 12,
-                DistrictType.Church => width >= 12 && depth >= 12,
-                DistrictType.Farm => width >= 6 && depth >= 6,
-                DistrictType.Mine => width >= 6 && depth >= 6,
+                DistrictType.Archer => width >= 2 && depth >= 2,
+                DistrictType.Bomb => width >= 3 && depth >= 3,
+                DistrictType.Church => width >= 3 && depth >= 3,
+                DistrictType.Farm => width >= 2 && depth >= 2,
+                DistrictType.Mine => width >= 2 && depth >= 2,
                 _ => throw new ArgumentOutOfRangeException(nameof(currentType), currentType, null)
             };
         }

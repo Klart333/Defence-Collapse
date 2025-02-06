@@ -5740,7 +5740,7 @@ MonoBehaviour:
     materialData: {fileID: 11400000, guid: f205dbfe3ecf34f40bd110ce6d456c4a, type: 2}
     prototypeInfo: {fileID: 7818375051068540878}
   chillTimeMs: 0
-  maxMillisecondsPerFrame: 6
+  maxMillisecondsPerFrame: 4
   shouldCombine: 1
   shouldRun: 1
 --- !u!1 &1036420026
@@ -9137,9 +9137,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 370144370}
-        m_TargetAssemblyTypeName: UIStartWave, Assembly-CSharp
-        m_MethodName: StartWave
+      - m_Target: {fileID: 491554921}
+        m_TargetAssemblyTypeName: Buildings.District.UIDistrictDisplay, Core
+        m_MethodName: PlacementConfirmed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

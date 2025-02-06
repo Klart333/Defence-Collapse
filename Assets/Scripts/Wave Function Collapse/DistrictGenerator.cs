@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
-using System.Linq;
-using NUnit.Framework;
 using Sirenix.Utilities;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -33,14 +31,13 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
     
     [Title("Debug")]
     [SerializeField]
-    private bool debug = false;
+    private bool debug;
     
     private bool ShouldAwait => awaitEveryFrame > 0;
     
     private readonly Queue<List<IBuildable>> buildQueue = new Queue<List<IBuildable>>();
     
-    private readonly Vector2Int[] corners = new Vector2Int[4]
-    {
+    private readonly Vector2Int[] corners = {
         new Vector2Int(-1, -1),
         new Vector2Int(1, -1),
         new Vector2Int(1, 1),
@@ -49,9 +46,10 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
 
     private Vector3 offset;
     
-    private bool isUpdatingChunks = false;
+    private bool isUpdatingChunks;
     
     public ChunkWaveFunction ChunkWaveFunction => waveFunction;
+    public Vector3 ChunkSize => new Vector3(chunkSize.x * ChunkWaveFunction.GridScale.x, chunkSize.y * ChunkWaveFunction.GridScale.y, chunkSize.z * ChunkWaveFunction.GridScale.z);
 
     private void OnEnable()
     {
@@ -79,7 +77,7 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
             Run().Forget(ex =>
             {
                 Debug.LogError($"Async function failed: {ex}");
-            });;
+            });
         }
     }
 
@@ -92,7 +90,7 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
             UpdateChunks().Forget(ex =>
             {
                 Debug.LogError($"Async function failed: {ex}");
-            });;
+            });
         }
     }
 
@@ -125,14 +123,20 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
                             waveFunction.RemoveChunk(chunk.ChunkIndex, out List<Chunk> neighbourChunks);
                             for (int j = 0; j < neighbourChunks.Count; j++)
                             {
+                                if (!overrideChunks.Add(neighbourChunks[j]))
+                                {
+                                    continue;
+                                }
+                                
                                 neighbourChunks[j].Clear(waveFunction.GameObjectPool);
-                                overrideChunks.Add(neighbourChunks[j]);
                                 for (int k = 0; k < neighbourChunks[j].AdjacentChunks.Length; k++)
                                 {
                                     if (neighbourChunks[j].AdjacentChunks[k] == null) continue;
-                                    
-                                    neighbourChunks[j].AdjacentChunks[k].Clear(waveFunction.GameObjectPool);
-                                    overrideChunks.Add(neighbourChunks[j].AdjacentChunks[k]);
+
+                                    if (overrideChunks.Add(neighbourChunks[j].AdjacentChunks[k]))
+                                    {
+                                        neighbourChunks[j].AdjacentChunks[k].Clear(waveFunction.GameObjectPool);
+                                    }
                                 }
                             }
                         }
@@ -216,7 +220,7 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
         return count > 2 && minValid > 0;
     }
 
-    private async UniTask Run()
+    public async UniTask Run()
     {
         Stopwatch watch = Stopwatch.StartNew();
         int frameCount = 0;

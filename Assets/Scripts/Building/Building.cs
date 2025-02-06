@@ -251,6 +251,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void SetData(BuildingData data)
     {
+        return;
         if (!data.Health.Alive)
         {
             DisplayDeath();

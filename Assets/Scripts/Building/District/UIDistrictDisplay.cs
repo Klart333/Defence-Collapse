@@ -66,91 +66,72 @@ namespace Buildings.District
         
         private void Display(ChunkWaveFunction chunkWaveFunction)
         {
-            Vector3 scale = chunkWaveFunction.GridScale * 0.75f;
+            Vector3 scale = districtGenerator.ChunkSize * 0.75f;
 
-            GetBounds(chunkWaveFunction, out Vector2 min, out Vector2 max);
+            Bounds bounds = GetBounds(chunkWaveFunction);
 
-            float maxDistance = Vector2.Distance(min, max);
+            float maxDistance = Vector2.Distance(bounds.Min, bounds.Max);
             float scaledDelay = maxDelay * Mathf.Clamp01(maxDistance / maxDelayDistance);
             foreach (Chunk chunk in chunkWaveFunction.Chunks)
             {
-                for (int x = 0; x < chunk.Cells.GetLength(0); x++)
-                for (int z = 0; z < chunk.Cells.GetLength(2); z++)
-                {
-                    Cell cell = chunk.Cells[x, 0, z];
-                    if (districtHandler.IsBuilt(cell)) continue;
+                if (districtHandler.IsBuilt(chunk)) continue;
                     
-                    Vector3 pos = cell.Position + Vector3.up;
-                    DistrictPlacer spawned = displayPrefab.GetAtPosAndRot<DistrictPlacer>(pos, quaternion.identity);
-                    spawned.Index = districtHandler.GetDistrictIndex(pos);
+                Vector3 pos = chunk.Position + Vector3.up;
+                DistrictPlacer spawned = displayPrefab.GetAtPosAndRot<DistrictPlacer>(pos, quaternion.identity);
+                spawned.Index = DistrictHandler.GetDistrictIndex(pos, districtGenerator);
                     
-                    spawned.transform.localScale = Vector3.zero;
-                    float delay = scaledDelay * (Vector2.Distance(min, cell.Position.XZ()) / maxDistance);
-                    spawned.transform.DOScale(scale, 0.5f).SetEase(Ease.OutBounce).SetDelay(delay);
-                    spawnedPlacers.Add(spawned);
+                spawned.transform.localScale = Vector3.zero;
+                float delay = scaledDelay * (Vector2.Distance(bounds.Min, chunk.Position.XZ()) / maxDistance);
+                spawned.transform.DOScale(scale, 0.5f).SetEase(Ease.OutBounce).SetDelay(delay);
+                spawnedPlacers.Add(spawned);
                     
-                    spawned.OnSelected += PlacerOnOnSelected;
-                }
+                spawned.OnSelected += PlacerOnOnSelected;
             }
         }
         
-        private static void GetBounds(ChunkWaveFunction chunkWaveFunction, out Vector2 min, out Vector2 max)
-        {
-            min = Vector2.positiveInfinity;
-            max = Vector2.negativeInfinity;
-            
-            foreach (Chunk chunk in chunkWaveFunction.Chunks) 
-            {
-                for (int x = 0; x < chunk.Cells.GetLength(0); x++)
-                for (int z = 0; z < chunk.Cells.GetLength(2); z++)
-                {
-                    Vector3 pos = chunk.Cells[x, 0, z].Position;
-                    if (pos.x < min.x) min.x = pos.x;
-                    if (pos.z < min.y) min.y = pos.z;
-                    if (pos.x > max.x) max.x = pos.x;
-                    if (pos.z > max.y) max.y = pos.z;
-                }
-            }
-        }
-
         private void PlacerOnOnSelected(DistrictPlacer selectedPlacer)
         {
             selectedPlacers.Enqueue(selectedPlacer);
             selectedPlacer.SetSelected();
 
-            if (selectedPlacers.Count == 1) return;
-            
-            if (selectedPlacers.Count > 2)
+            switch (selectedPlacers.Count)
             {
-                var removedPlacer = selectedPlacers.Dequeue();
-                removedPlacer.Unselect();
+                case 1:
+                    return;
+                case > 2:
+                {
+                    var removedPlacer = selectedPlacers.Dequeue();
+                    removedPlacer.Unselect();
+                    break;
+                }
             }
 
-            int minX = int.MaxValue, minZ = int.MaxValue, maxX = 0, maxZ = 0;
-            foreach (DistrictPlacer placer in selectedPlacers)
+            Bounds bounds = GetBounds(selectedPlacers);
+            int width = (int)bounds.Max.x - (int)bounds.Min.x + 1;
+            int depth = (int)bounds.Max.y - (int)bounds.Min.y + 1;
+
+            int includedPlacers = 0;
+            for (int i = 0; i < spawnedPlacers.Count; i++)
             {
-                if (placer.Index.x < minX) minX = placer.Index.x;
-                if (placer.Index.x > maxX) maxX = placer.Index.x;
-                if (placer.Index.y < minZ) minZ = placer.Index.y;
-                if (placer.Index.y > maxZ) maxZ = placer.Index.y;
+                int2 index = spawnedPlacers[i].Index;
+                if (bounds.Contains(new Vector2(index.x, index.y)))
+                {
+                    includedPlacers++;
+                }
             }
+
+            bool isSquare = includedPlacers >= width * depth;
+            bool canBuild = isSquare && DistrictHandler.CanBuildDistrict(width, depth, currentType);
             
-            if (DistrictHandler.CanBuildDistrict(maxX - minX + 1, maxZ - minZ + 1, currentType))
-            {
-                Debug.Log("Valid");
-                confirmButton.SetActive(true);
-            }
-            else
-            {
-                confirmButton.SetActive(false);
-            }
+            confirmButton.SetActive(canBuild);
+            Color color = canBuild ? Color.green : Color.red;
 
             for (int i = 0; i < spawnedPlacers.Count; i++)
             {
                 int2 index = spawnedPlacers[i].Index;
-                if (index.x >= minX && index.x <= maxX && index.y >= minZ && index.y <= maxZ)
+                if (bounds.Contains(new Vector2(index.x, index.y)))
                 {
-                    spawnedPlacers[i].SetSelected();
+                    spawnedPlacers[i].SetSelected(color);
                 }
                 else
                 {
@@ -159,11 +140,89 @@ namespace Buildings.District
             }
         }
 
+        public void PlacementConfirmed()
+        {
+            Bounds bounds = GetPositionBounds(selectedPlacers);
+            
+            List<Chunk> chunks = new List<Chunk>();
+            foreach (Chunk chunk in districtGenerator.ChunkWaveFunction.Chunks)
+            {
+                if (bounds.Contains(chunk.Position.XZ()))
+                {
+                    chunks.Add(chunk);
+                }
+            }
+            
+            HideAnimated();
+            districtHandler.BuildDistrict(chunks, currentType);
+        }
+        
+        private static Bounds GetBounds(ChunkWaveFunction chunkWaveFunction)
+        {
+            Vector2 min = Vector2.positiveInfinity;
+            Vector2 max = Vector2.negativeInfinity;
+            
+            foreach (Chunk chunk in chunkWaveFunction.Chunks) 
+            {
+                Vector3 pos = chunk.Position;
+                if (pos.x < min.x) min.x = pos.x;
+                if (pos.z < min.y) min.y = pos.z;
+                if (pos.x > max.x) max.x = pos.x;
+                if (pos.z > max.y) max.y = pos.z;
+            }
+
+            return new Bounds
+            {
+                Min = min,
+                Max = max
+            };
+        }
+        
+        private static Bounds GetBounds(IEnumerable<DistrictPlacer> placers)
+        {
+            int minX = int.MaxValue, minZ = int.MaxValue, maxX = 0, maxZ = 0;
+            foreach (DistrictPlacer placer in placers)
+            {
+                if (placer.Index.x < minX) minX = placer.Index.x;
+                if (placer.Index.x > maxX) maxX = placer.Index.x;
+                if (placer.Index.y < minZ) minZ = placer.Index.y;
+                if (placer.Index.y > maxZ) maxZ = placer.Index.y;
+            }
+
+            return new Bounds
+            {
+                Min = new Vector2(minX, minZ),
+                Max = new Vector2(maxX, maxZ),
+            };
+        }
+        
+        private static Bounds GetPositionBounds(IEnumerable<DistrictPlacer> placers)
+        {
+            Vector2 min = Vector2.positiveInfinity;
+            Vector2 max = Vector2.negativeInfinity;
+
+            foreach (DistrictPlacer placer in placers)
+            {
+                Vector3 pos = placer.transform.position;
+                if (pos.x < min.x) min.x = pos.x;
+                if (pos.z < min.y) min.y = pos.z;
+                if (pos.x > max.x) max.x = pos.x;
+                if (pos.z > max.y) max.y = pos.z;
+            }
+
+            return new Bounds
+            {
+                Min = min,
+                Max = max,
+            };
+        }
+        
         public void Hide()
         {
             for (int i = 0; i < spawnedPlacers.Count; i++)
             {
                 spawnedPlacers[i].gameObject.SetActive(false);
+                spawnedPlacers[i].OnSelected -= PlacerOnOnSelected;
             }
             
             Clear();
@@ -188,6 +247,8 @@ namespace Buildings.District
                 {
                     placer.gameObject.SetActive(false);
                 });
+                
+                spawnedPlacers[i].OnSelected -= PlacerOnOnSelected;
             }
             
             Clear();
@@ -199,6 +260,15 @@ namespace Buildings.District
             selectedPlacers.Clear();
 
             confirmButton.SetActive(false);
+        }
+        
+        private struct Bounds
+        {
+            public Vector2 Min, Max;
+
+            public bool Contains(Vector2 vec) => 
+                   vec.x >= Min.x && vec.x <= Max.x 
+                && vec.y >= Min.y && vec.y <= Max.y;
         }
     }
 }

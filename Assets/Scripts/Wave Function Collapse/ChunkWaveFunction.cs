@@ -81,8 +81,8 @@ public class ChunkWaveFunction
         foreach (Chunk existingChunk in chunks)
         {
             // Get the bounds of the existing chunk
-            Vector3 existingMin = existingChunk.OriginPosition;
-            Vector3 existingMax = existingChunk.OriginPosition + Vector3.Scale(new Vector3(existingChunk.width, existingChunk.height, existingChunk.depth), gridScale);
+            Vector3 existingMin = existingChunk.Position;
+            Vector3 existingMax = existingChunk.Position + Vector3.Scale(new Vector3(existingChunk.width, existingChunk.height, existingChunk.depth), gridScale);
 
             // Get the bounds of the incoming chunk
             Vector3 incomingMax = position + Vector3.Scale(size, gridScale);
@@ -385,7 +385,7 @@ public class Chunk
     [NonSerialized]
     public List<GameObject> SpawnedMeshes = new List<GameObject>();
     
-    public readonly Vector3 OriginPosition;
+    public readonly Vector3 Position;
     
     public readonly int width;
     public readonly int height;
@@ -414,22 +414,22 @@ public class Chunk
         set => Cells[index.x, index.y, index.z] = value;
     }
 
-    public Chunk(int _width, int _height, int _depth, int chunkIndex, Vector3 originPosition, Chunk[] adjacentChunks, Vector3 gridScale)
+    public Chunk(int _width, int _height, int _depth, int chunkIndex, Vector3 position, Chunk[] adjacentChunks, Vector3 gridScale)
     {
-        OriginPosition = originPosition;
+        Position = position;
         AdjacentChunks = adjacentChunks;
         width = _width;
         height = _height;
         depth = _depth;
         ChunkIndex = chunkIndex;
 
-        min = originPosition;
-        max = originPosition + new Vector3(width * gridScale.x, height * gridScale.y, depth * gridScale.z);
+        min = position;
+        max = position + new Vector3(width * gridScale.x, height * gridScale.y, depth * gridScale.z);
         
         Cells = new Cell[width, height, depth];
         
         #if UNITY_EDITOR
-        position = originPosition;
+        this.position = position;
         #endif
     }
 
@@ -481,7 +481,7 @@ public class Chunk
                 }
             }
 
-            Cells[x, y, z] = new Cell(false, pos + OriginPosition, prots);
+            Cells[x, y, z] = new Cell(false, pos + Position, prots);
             if (changed)
             {
                 cellStack.Push(new ChunkIndex(ChunkIndex, index));
@@ -659,6 +659,7 @@ public class Chunk
 public interface IChunkWaveFunction
 {
     public ChunkWaveFunction ChunkWaveFunction { get; }
+    public Vector3 ChunkSize { get; }
 }
 
 

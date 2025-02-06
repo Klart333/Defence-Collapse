@@ -76,6 +76,14 @@ namespace Buildings.District
             block.SetColor(Color1, selectedColor);
             meshRenderer.SetPropertyBlock(block);
         }
+        
+        public void SetSelected(Color color)
+        {
+            selected = true;
+            
+            block.SetColor(Color1, color);
+            meshRenderer.SetPropertyBlock(block);
+        }
 
         public void Unselect()
         {
