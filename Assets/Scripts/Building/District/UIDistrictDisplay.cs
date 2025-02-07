@@ -66,20 +66,20 @@ namespace Buildings.District
         
         private void Display(ChunkWaveFunction chunkWaveFunction)
         {
-            Vector3 scale = districtGenerator.ChunkSize * 0.75f;
+            Vector3 scale = districtGenerator.ChunkScale * 0.75f;
 
             Bounds bounds = GetBounds(chunkWaveFunction);
 
             float maxDistance = Vector2.Distance(bounds.Min, bounds.Max);
             float scaledDelay = maxDelay * Mathf.Clamp01(maxDistance / maxDelayDistance);
-            foreach (Chunk chunk in chunkWaveFunction.Chunks)
+            foreach (Chunk chunk in chunkWaveFunction.Chunks.Values)
             {
                 if (districtHandler.IsBuilt(chunk)) continue;
                     
                 Vector3 pos = chunk.Position + Vector3.up;
                 DistrictPlacer spawned = displayPrefab.GetAtPosAndRot<DistrictPlacer>(pos, quaternion.identity);
-                spawned.Index = DistrictHandler.GetDistrictIndex(pos, districtGenerator);
-                    
+                spawned.Index = ChunkWaveUtility.GetDistrictIndex2(pos, districtGenerator.ChunkScale);
+                
                 spawned.transform.localScale = Vector3.zero;
                 float delay = scaledDelay * (Vector2.Distance(bounds.Min, chunk.Position.XZ()) / maxDistance);
                 spawned.transform.DOScale(scale, 0.5f).SetEase(Ease.OutBounce).SetDelay(delay);
@@ -145,7 +145,7 @@ namespace Buildings.District
             Bounds bounds = GetPositionBounds(selectedPlacers);
             
             List<Chunk> chunks = new List<Chunk>();
-            foreach (Chunk chunk in districtGenerator.ChunkWaveFunction.Chunks)
+            foreach (Chunk chunk in districtGenerator.ChunkWaveFunction.Chunks.Values)
             {
                 if (bounds.Contains(chunk.Position.XZ()))
                 {
@@ -162,7 +162,7 @@ namespace Buildings.District
             Vector2 min = Vector2.positiveInfinity;
             Vector2 max = Vector2.negativeInfinity;
             
-            foreach (Chunk chunk in chunkWaveFunction.Chunks) 
+            foreach (Chunk chunk in chunkWaveFunction.Chunks.Values) 
             {
                 Vector3 pos = chunk.Position;
                 if (pos.x < min.x) min.x = pos.x;

@@ -38,10 +38,18 @@ namespace Buildings.District
 
             for (int i = 0; i < chunks.Count; i++)
             {
-                districts.Add(GetDistrictIndex(chunks[i].Position, districtGenerator), districtData);
+                districts.Add(chunks[i].ChunkIndex.xz, districtData);
                 
                 chunks[i].Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
                 districtGenerator.ChunkWaveFunction.LoadCells(chunks[i]);
+
+                const int height = 2;
+                for (int j = 0; j < height; j++)
+                {
+                    int heightLevel = 1 + j; // Assumes that the chunk has exactly 2 levels already
+                    Vector3 pos = chunks[i].Position + Vector3.up * districtGenerator.ChunkScale.y * heightLevel; 
+                    districtGenerator.ChunkWaveFunction.LoadChunk(pos, districtGenerator.ChunkSize);
+                }
             }
             
             districtGenerator.Run().Forget(Debug.LogError);
@@ -55,16 +63,9 @@ namespace Buildings.District
 
         public bool IsBuilt(Chunk chunk)
         {
-            int2 index = GetDistrictIndex(chunk.Position, districtGenerator);
+            int2 index = chunk.ChunkIndex.xz;
             return districts.TryGetValue(index, out _);
         }
-
-        public static int2 GetDistrictIndex(Vector3 position, IChunkWaveFunction wave)
-        {
-            int x = Math.GetMultipleFloored(position.x, wave.ChunkSize.x);
-            int y = Math.GetMultipleFloored(position.z, wave.ChunkSize.z);
-            return new int2(x, y);
-        }   
 
         public static bool CanBuildDistrict(int width, int depth, DistrictType currentType)
         {

@@ -4,6 +4,8 @@ using Sirenix.OdinInspector;
 using Unity.Collections;
 using UnityEngine;
 using System;
+using Unity.Mathematics;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class ChunkWaveFunction
@@ -20,32 +22,30 @@ public class ChunkWaveFunction
     [SerializeField]
     private PrototypeInfoCreator prototypeInfo;
     
-    [Title("Debug")]
-    [SerializeField, Sirenix.OdinInspector.ReadOnly]
-    private List<Chunk> chunks;
-
-    private List<PrototypeData> prototypes = new List<PrototypeData>();
+    private readonly Stack<GameObject> gameObjectPool = new Stack<GameObject>();
     private List<PrototypeData> bottomPrototypes = new List<PrototypeData>();
     private readonly Stack<ChunkIndex> cellStack = new Stack<ChunkIndex>();
-    private readonly Stack<GameObject> gameObjectPool = new Stack<GameObject>();
+    private List<PrototypeData> prototypes = new List<PrototypeData>();
 
     private Transform parentTransform;
     private PrototypeData emptyPrototype;
-
-    public List<Chunk> Chunks => chunks;
-    public Vector3 GridScale => gridScale;
-    public Stack<GameObject> GameObjectPool => gameObjectPool;
     
+    private IChunkWaveFunction handler;
+
+    public Dictionary<int3, Chunk> Chunks { get; } = new Dictionary<int3, Chunk>();
+    public Stack<GameObject> GameObjectPool => gameObjectPool;
     public List<PrototypeData> Prototypes => prototypes;
+    public Vector3 GridScale => gridScale;
     
     public Cell this[ChunkIndex index]
     {
-        get => chunks[index.Index][index.CellIndex];
-        set => chunks[index.Index][index.CellIndex] = value;
+        get => Chunks[index.Index][index.CellIndex];
+        set => Chunks[index.Index][index.CellIndex] = value;
     }
 
-    public bool Load()
+    public bool Load(IChunkWaveFunction handler)
     {
+        this.handler = handler;
         Clear();
 
         if (LoadPrototypeData()) return true;
@@ -56,9 +56,10 @@ public class ChunkWaveFunction
 
     public Chunk LoadChunk(Vector3 position, Vector3Int size)
     {
-        Chunk[] adjacentChunks = GetAdjacentChunks(position, size);
-        Chunk chunk = new Chunk(size.x, size.y, size.z, chunks.Count, position, adjacentChunks, gridScale);
-        chunks.Add(chunk);
+        int3 index = ChunkWaveUtility.GetDistrictIndex3(position, handler.ChunkScale);
+        Chunk[] adjacentChunks = GetAdjacentChunks(index);
+        Chunk chunk = new Chunk(size.x, size.y, size.z, index, position, adjacentChunks, gridScale);
+        Chunks.Add(index, chunk);
         LoadCells(chunk);
         return chunk;
     }
@@ -74,66 +75,32 @@ public class ChunkWaveFunction
             chunk.AdjacentChunks[i].SetAdjacentChunk(chunk, oppositeDirection, prototypes, bottomPrototypes, cellStack);
         }
     }
-    
-    public bool CheckChunkOverlap(Vector3 position, Vector3Int size, out Chunk chunk)
-    {
-        chunk = null;
-        foreach (Chunk existingChunk in chunks)
-        {
-            // Get the bounds of the existing chunk
-            Vector3 existingMin = existingChunk.Position;
-            Vector3 existingMax = existingChunk.Position + Vector3.Scale(new Vector3(existingChunk.width, existingChunk.height, existingChunk.depth), gridScale);
 
-            // Get the bounds of the incoming chunk
-            Vector3 incomingMax = position + Vector3.Scale(size, gridScale);
-
-            // Check for overlap between the AABBs
-            if (position.x >= existingMax.x || incomingMax.x <= existingMin.x ||
-                position.y >= existingMax.y || incomingMax.y <= existingMin.y ||
-                position.z >= existingMax.z || incomingMax.z <= existingMin.z) continue;
-            
-            chunk = existingChunk;
-            return true;
-        }
-        
-        return false;
-    }
-
-    private Chunk[] GetAdjacentChunks(Vector3 position, Vector3Int size)
+    private Chunk[] GetAdjacentChunks(int3 index)
     {
         Chunk[] adjacentChunks = new Chunk[6];
-        
-        // Calculate positions of the adjacent chunks
-        Vector3?[] offsets = 
+
+        for (int i = 0; i < 6; i++)
         {
-            new Vector3(size.x * gridScale.x, 0, 0),   // Right
-            new Vector3(-size.x * gridScale.x, 0, 0),  // Left
-            new Vector3(0, size.y * gridScale.y, 0),   // Up
-            new Vector3(0, -size.y * gridScale.y, 0),  // Down
-            new Vector3(0, 0, size.z * gridScale.z),   // Forward
-            new Vector3(0, 0, -size.z * gridScale.z)   // Backward
-        };
-        
-        foreach (Chunk chunk in chunks)
-        {
-            for (int i = 0; i < offsets.Length; i++)
+            int3 adjacentIndex = index + ChunkWaveUtility.Directions[i];
+            if (Chunks.TryGetValue(adjacentIndex, out Chunk chunk))
             {
-                if (!offsets[i].HasValue) continue;
-                if (!chunk.IsWithinBounds(position + offsets[i].Value)) continue;
-                
                 adjacentChunks[i] = chunk;
-                offsets[i] = null;
-                break;
             }
         }
         
         return adjacentChunks;
     }
     
-    public void RemoveChunk(int chunkIndex, out List<Chunk> neighbours)
+    public void RemoveChunk(int3 chunkIndex, out List<Chunk> neighbours)
     {
         neighbours = new List<Chunk>();
-        Chunk chunk = chunks[chunkIndex];
+        if (!Chunks.TryGetValue(chunkIndex, out Chunk chunk))
+        {
+            Debug.LogError("Chunk to remove not found");
+            return;
+        }
+        
         for (int i = 0; i < chunk.AdjacentChunks.Length; i++)
         {
             if (chunk.AdjacentChunks[i] == null) continue;
@@ -145,13 +112,7 @@ public class ChunkWaveFunction
         
         chunk.Clear(gameObjectPool);
         chunk.IsRemoved = true;
-        chunks.RemoveAtSwapBack(chunkIndex);
-
-        if (chunkIndex >= chunks.Count)
-        {
-            return;
-        }
-        chunks[chunkIndex].ChunkIndex = chunkIndex;
+        Chunks.Remove(chunkIndex);
     }
     
     public void Iterate()
@@ -170,40 +131,41 @@ public class ChunkWaveFunction
         float lowestEntropy = 10000;
         ChunkIndex index = new ChunkIndex();
 
-        for (int i = 0; i < chunks.Count; i++)
-        for (int x = 0; x < chunks[i].Cells.GetLength(0); x++)
-        for (int y = 0; y < chunks[i].Cells.GetLength(1); y++)
-        for (int z = 0; z < chunks[i].Cells.GetLength(2); z++)
+        foreach (Chunk chunk in Chunks.Values)
         {
-            Cell cell = chunks[i].Cells[x, y, z];
-            if (cell.Collapsed)
+            for (int x = 0; x < chunk.Cells.GetLength(0); x++)
+            for (int y = 0; y < chunk.Cells.GetLength(1); y++)
+            for (int z = 0; z < chunk.Cells.GetLength(2); z++)
             {
-                continue;
-            }
+                Cell cell = chunk.Cells[x, y, z];
+                if (cell.Collapsed)
+                {
+                    continue;
+                }
 
-            float possibleMeshAmount = y * 10;
-            if (possibleMeshAmount > lowestEntropy) continue;
+                float possibleMeshAmount = y * 10;
+                if (possibleMeshAmount > lowestEntropy) continue;
             
-            float totalWeight = 0;
-            for (int g = 0; g < cell.PossiblePrototypes.Count; g++)
-            {
-                totalWeight += cell.PossiblePrototypes[g].Weight;
-            }
+                float totalWeight = 0;
+                for (int g = 0; g < cell.PossiblePrototypes.Count; g++)
+                {
+                    totalWeight += cell.PossiblePrototypes[g].Weight;
+                }
 
-            float averageWeight = totalWeight / cell.PossiblePrototypes.Count;
-            for (int g = 0; g < cell.PossiblePrototypes.Count; g++)
-            {
-                float distFromAverage = 1.0f - (cell.PossiblePrototypes[g].Weight / averageWeight);
-                if (distFromAverage < 1.0f) distFromAverage *= distFromAverage; // Because of using the percentage as a distance, smaller weights weigh more, so this is to try to correct that.
+                float averageWeight = totalWeight / cell.PossiblePrototypes.Count;
+                for (int g = 0; g < cell.PossiblePrototypes.Count; g++)
+                {
+                    float distFromAverage = 1.0f - (cell.PossiblePrototypes[g].Weight / averageWeight);
+                    if (distFromAverage < 1.0f) distFromAverage *= distFromAverage; // Because of using the percentage as a distance, smaller weights weigh more, so this is to try to correct that.
 
-                possibleMeshAmount += Mathf.Lerp(1, 0, Mathf.Abs(distFromAverage));
-            }
-            if (possibleMeshAmount >= lowestEntropy) continue;
+                    possibleMeshAmount += Mathf.Lerp(1, 0, Mathf.Abs(distFromAverage));
+                }
+                if (possibleMeshAmount >= lowestEntropy) continue;
             
-            lowestEntropy = possibleMeshAmount;
-            index = new ChunkIndex(i, new Vector3Int(x, y, z));
+                lowestEntropy = possibleMeshAmount;
+                index = new ChunkIndex(chunk.ChunkIndex, new int3(x, y, z));
+            }
         }
-        
 
         return index;
     }
@@ -244,7 +206,7 @@ public class ChunkWaveFunction
         GameObject spawned = GenerateMesh(this[index].Position, chosenPrototype);
         if (spawned is not null)
         {
-            chunks[index.Index].SpawnedMeshes.Add(spawned);
+            Chunks[index.Index].SpawnedMeshes.Add(spawned);
         }
     }
 
@@ -253,7 +215,7 @@ public class ChunkWaveFunction
         while (cellStack.TryPop(out ChunkIndex chunkIndex))
         {
             Cell changedCell = this[chunkIndex];
-            List<ChunkIndex> neighbours = chunks[chunkIndex.Index].GetAdjacentCells(chunkIndex.CellIndex, out List<Direction> directions);
+            List<ChunkIndex> neighbours = Chunks[chunkIndex.Index].GetAdjacentCells(chunkIndex.CellIndex, out List<Direction> directions);
 
             for (int i = 0; i < neighbours.Count; i++)
             {
@@ -327,16 +289,16 @@ public class ChunkWaveFunction
 
     public void Clear()
     {
-        foreach (Chunk chunk in chunks)
+        foreach (Chunk chunk in Chunks.Values)
         {
             chunk.Clear(gameObjectPool);
         }
-        chunks.Clear();
+        Chunks.Clear();
     }
     
     public bool AllCollapsed()
     {
-        foreach (Chunk chunk in chunks)
+        foreach (Chunk chunk in Chunks.Values)
         {
             if (!chunk.AllCollapsed)
             {
@@ -349,16 +311,16 @@ public class ChunkWaveFunction
 
     public int GetTotalCellCount()
     {
-        return chunks.Count * 8;
+        return Chunks.Count * 8;
     }
 }
 
 public readonly struct ChunkIndex
 {
-    public readonly int Index;
-    public readonly Vector3Int CellIndex;
+    public readonly int3 Index;
+    public readonly int3 CellIndex;
 
-    public ChunkIndex(int index, Vector3Int cellIndex)
+    public ChunkIndex(int3 index, int3 cellIndex)
     {
         Index = index;
         CellIndex = cellIndex;
@@ -374,8 +336,9 @@ public readonly struct ChunkIndex
 public class Chunk
 {
 #if UNITY_EDITOR
+    [FormerlySerializedAs("position")]
     [SerializeField, Sirenix.OdinInspector.ReadOnly]
-    private Vector3 position;
+    private Vector3 editorOnlyPosition;
 #endif
     
     // In the Following order: Right, Left, Up, Down, Forward, Backward
@@ -391,30 +354,17 @@ public class Chunk
     public readonly int height;
     public readonly int depth;
 
-    private readonly Vector3 min;
-    private readonly Vector3 max;
-
-    public int ChunkIndex { get; set; }
+    public int3 ChunkIndex { get; set; }
     public bool IsRemoved { get; set; }
     public bool IsClear { get; private set; } = true; 
 
-
-    private static readonly Vector3Int[] Directions = {
-        new Vector3Int(1, 0, 0),  // Right
-        new Vector3Int(-1, 0, 0), // Left
-        new Vector3Int(0, 1, 0),  // Up
-        new Vector3Int(0, -1, 0), // Down
-        new Vector3Int(0, 0, 1),  // Forward
-        new Vector3Int(0, 0, -1)  // Backward
-    };
-
-    public Cell this[Vector3Int index]
+    public Cell this[int3 index]
     {
         get => Cells[index.x, index.y, index.z];
         set => Cells[index.x, index.y, index.z] = value;
     }
 
-    public Chunk(int _width, int _height, int _depth, int chunkIndex, Vector3 position, Chunk[] adjacentChunks, Vector3 gridScale)
+    public Chunk(int _width, int _height, int _depth, int3 chunkIndex, Vector3 position, Chunk[] adjacentChunks, Vector3 gridScale)
     {
         Position = position;
         AdjacentChunks = adjacentChunks;
@@ -423,13 +373,10 @@ public class Chunk
         depth = _depth;
         ChunkIndex = chunkIndex;
 
-        min = position;
-        max = position + new Vector3(width * gridScale.x, height * gridScale.y, depth * gridScale.z);
-        
         Cells = new Cell[width, height, depth];
         
         #if UNITY_EDITOR
-        this.position = position;
+        editorOnlyPosition = position;
         #endif
     }
 
@@ -463,7 +410,7 @@ public class Chunk
         for (int y = 0; y < height; y++)
         for (int x = 0; x < width; x++)
         {
-            Vector3Int index = new Vector3Int(x, y, z);
+            int3 index = new int3(x, y, z);
             Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z);
 
             bool isBottom = AdjacentChunks[3] == null && y == 0;
@@ -489,14 +436,14 @@ public class Chunk
         }
     }
 
-    public List<ChunkIndex> GetAdjacentCells(Vector3Int index, out List<Direction> directions)
+    public List<ChunkIndex> GetAdjacentCells(int3 index, out List<Direction> directions)
     {
         List<ChunkIndex> adjacentCells = new List<ChunkIndex>();
         directions = new List<Direction>();
 
-        for (int i = 0; i < Directions.Length; i++)
+        for (int i = 0; i < 6; i++)
         {
-            Vector3Int neighborIndex = index + Directions[i];
+            int3 neighborIndex = index + ChunkWaveUtility.Directions[i];
 
             // Check if neighbor is within the bounds of the current chunk
             if (IsWithinBounds(neighborIndex))
@@ -509,7 +456,7 @@ public class Chunk
                 // If on the edge, check for an adjacent chunk
                 if (AdjacentChunks[i] == null) continue;
                 
-                Vector3Int adjIndex = WrapIndexToAdjacentChunk(neighborIndex, i);
+                int3 adjIndex = WrapIndexToAdjacentChunk(neighborIndex, i);
                 adjacentCells.Add(new ChunkIndex(AdjacentChunks[i].ChunkIndex, adjIndex));
                 directions.Add((Direction)i);
             }
@@ -518,17 +465,21 @@ public class Chunk
         return adjacentCells;
     }
     
+    private bool IsWithinBounds(int3 index) =>
+        index.x >= 0 && index.x < width &&
+        index.y >= 0 && index.y < height &&
+        index.z >= 0 && index.z < depth;
+    
     /// <summary>
     /// Gets the directions of the index that are invalid
     /// </summary>
-    public List<Direction> GetAdjacentSides(Vector3Int index, Stack<ChunkIndex> cellStack)
+    public List<Direction> GetAdjacentSides(int3 index, Stack<ChunkIndex> cellStack)
     {
-        //Debug.Log("Get Adjacent Sides for : " + ChunkIndex + ", " + index);
         List<Direction> adjacentDirections = new List<Direction>();
 
-        for (int i = 0; i < Directions.Length; i++)
+        for (int i = 0; i < 6; i++)
         {
-            Vector3Int neighborIndex = index + Directions[i];
+            int3 neighborIndex = index + ChunkWaveUtility.Directions[i];
             if (IsWithinBounds(neighborIndex)) continue;
 
             if (AdjacentChunks[i] == null)
@@ -539,7 +490,7 @@ public class Chunk
 
             if (AdjacentChunks[i].IsClear) continue;
 
-            Vector3Int adjacentIndex = WrapIndexToAdjacentChunk(index, i);
+            int3 adjacentIndex = WrapIndexToAdjacentChunk(index, i);
             Cell cell = AdjacentChunks[i][adjacentIndex];
             if (!cell.Collapsed || string.IsNullOrEmpty(cell.PossiblePrototypes[0].Keys[i])) continue;
             
@@ -555,28 +506,17 @@ public class Chunk
 
         return adjacentDirections;
     }
-
-    private bool IsWithinBounds(Vector3Int index) =>
-        index.x >= 0 && index.x < width &&
-        index.y >= 0 && index.y < height &&
-        index.z >= 0 && index.z < depth;
     
-    public bool IsWithinBounds(Vector3 position) =>
-        position.x >= min.x && position.x < max.x &&
-        position.y >= min.y && position.y < max.y &&
-        position.z >= min.z && position.z < max.z;
-    
-
-    private Vector3Int WrapIndexToAdjacentChunk(Vector3Int index, int direction)
+    private int3 WrapIndexToAdjacentChunk(int3 index, int direction)
     {
         return direction switch
         {
-            0 => new Vector3Int(0, index.y, index.z), // Right
-            1 => new Vector3Int(width - 1, index.y, index.z), // Left
-            2 => new Vector3Int(index.x, 0, index.z), // Up
-            3 => new Vector3Int(index.x, height - 1, index.z), // Down
-            4 => new Vector3Int(index.x, index.y, 0), // Forward
-            5 => new Vector3Int(index.x, index.y, depth - 1),    // Backward
+            0 => new int3(0, index.y, index.z), // Right
+            1 => new int3(width - 1, index.y, index.z), // Left
+            2 => new int3(index.x, 0, index.z), // Up
+            3 => new int3(index.x, height - 1, index.z), // Down
+            4 => new int3(index.x, index.y, 0), // Forward
+            5 => new int3(index.x, index.y, depth - 1),    // Backward
             _ => throw new ArgumentOutOfRangeException(nameof(direction), "Invalid direction index")
         };
     }
@@ -584,7 +524,7 @@ public class Chunk
     public void SetAdjacentChunk(Chunk chunk, Direction direction, List<PrototypeData> prototypes, List<PrototypeData> bottomPrototypes, Stack<ChunkIndex> cellStack)
     {
         int index = (int)direction;
-        if (AdjacentChunks[index] != null && AdjacentChunks[index].ChunkIndex != chunk.ChunkIndex)
+        if (AdjacentChunks[index] != null && !AdjacentChunks[index].ChunkIndex.Equals(chunk.ChunkIndex))
         {
             Debug.LogError("Adjacent chunk already exists, big issue!");
             return;
@@ -607,8 +547,8 @@ public class Chunk
         for (int y = startY; y < maxY; y++)
         for (int x = startX; x < maxX; x++)
         {
-            Vector3Int index = new Vector3Int(x, y, z);
-            bool isBottom = AdjacentChunks[3] == null && y == 0;    
+            int3 index = new int3(x, y, z);
+            bool isBottom = AdjacentChunks[3] == null && y == 0;
             List<PrototypeData> prots = new List<PrototypeData>(isBottom ? bottomPrototypes : prototypes);
             List<Direction> directions = GetAdjacentSides(index, cellStack);
             bool changed = false;
@@ -616,22 +556,10 @@ public class Chunk
             {
                 for (int i = prots.Count - 1; i >= 0; i--)
                 {
-                    bool shouldRemove = direction switch
-                    {
-                        Direction.Right => prots[i].PosX != "-1s",
-                        Direction.Left => prots[i].NegX != "-1s", 
-                        Direction.Backward => prots[i].NegZ != "-1s",
-                        Direction.Forward => prots[i].PosZ != "-1s",
-                        Direction.Up => prots[i].PosY != "-1s",
-                        Direction.Down => prots[i].NegY != "-1s",
-                        _ => false
-                    };
-
-                    if (shouldRemove)
-                    {
-                        prots.RemoveAt(i);
-                        changed = true;
-                    }
+                    if (prots[i].DirectionToKey(direction)[0] == '-') continue;
+                    
+                    prots.RemoveAtSwapBack(i);
+                    changed = true;
                 }
             }
 
@@ -654,12 +582,42 @@ public class Chunk
             SpawnedMeshes.RemoveAt(i);
         }
     }
+    
+    
+}
+
+public static class ChunkWaveUtility
+{
+    public static readonly int3[] Directions = 
+    {
+        new int3(1, 0, 0),
+        new int3(-1, 0, 0),
+        new int3(0, 1, 0),
+        new int3(0, -1, 0),
+        new int3(0, 0, 1),
+        new int3(0, 0, -1),
+    };
+    
+    public static int2 GetDistrictIndex2(Vector3 position, Vector3 chunkScale)
+    {
+        int x = Math.GetMultipleFloored(position.x, chunkScale.x);
+        int y = Math.GetMultipleFloored(position.z, chunkScale.z);
+        return new int2(x, y);
+    } 
+    
+    public static int3 GetDistrictIndex3(Vector3 position, Vector3 chunkScale)
+    {
+        int x = Math.GetMultipleFloored(position.x, chunkScale.x);
+        int y = Math.GetMultipleFloored(position.y, chunkScale.y);
+        int z = Math.GetMultipleFloored(position.z, chunkScale.z);
+        return new int3(x, y, z);
+    }   
 }
 
 public interface IChunkWaveFunction
 {
     public ChunkWaveFunction ChunkWaveFunction { get; }
-    public Vector3 ChunkSize { get; }
+    public Vector3 ChunkScale { get; }
 }
 
 

@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
 using Sirenix.Utilities;
+using Unity.Mathematics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -49,13 +50,14 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
     private bool isUpdatingChunks;
     
     public ChunkWaveFunction ChunkWaveFunction => waveFunction;
-    public Vector3 ChunkSize => new Vector3(chunkSize.x * ChunkWaveFunction.GridScale.x, chunkSize.y * ChunkWaveFunction.GridScale.y, chunkSize.z * ChunkWaveFunction.GridScale.z);
-
+    public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.GridScale.x, chunkSize.y * ChunkWaveFunction.GridScale.y, chunkSize.z * ChunkWaveFunction.GridScale.z);
+    public Vector3Int ChunkSize => chunkSize;
+    
     private void OnEnable()
     {
         offset = new Vector3(waveFunction.GridScale.x, 0 , waveFunction.GridScale.z) / -2.0f;
 
-        waveFunction.Load();
+        waveFunction.Load(this);
         Events.OnBuildingBuilt += OnBuildingBuilt;
     }
 
@@ -68,7 +70,7 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            foreach (Chunk chunk in waveFunction.Chunks)
+            foreach (Chunk chunk in waveFunction.Chunks.Values)
             {
                 chunk.Clear(waveFunction.GameObjectPool);
                 waveFunction.LoadCells(chunk);
@@ -109,9 +111,11 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
                     bool isBuildable = buildableCornerData.IsBuildable(buildable.MeshRot, corners[i], out bool meshIsBuildable);
                     isBuildable |= buildable.MeshRot.Mesh == null;
                     if (!isBuildable && !meshIsBuildable) continue;
-                
+                    
                     Vector3 pos = buildable.gameObject.transform.position + new Vector3(corners[i].x * chunkSize.x * waveFunction.GridScale.x, 0, corners[i].y * chunkSize.z * waveFunction.GridScale.z) / -2.0f + offset;
-                    if (waveFunction.CheckChunkOverlap(pos, chunkSize, out Chunk chunk))
+                    int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, ChunkScale); 
+                    
+                    if (waveFunction.Chunks.TryGetValue(index, out Chunk chunk))
                     {
                         if (isBuildable)
                         {
@@ -123,21 +127,7 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
                             waveFunction.RemoveChunk(chunk.ChunkIndex, out List<Chunk> neighbourChunks);
                             for (int j = 0; j < neighbourChunks.Count; j++)
                             {
-                                if (!overrideChunks.Add(neighbourChunks[j]))
-                                {
-                                    continue;
-                                }
-                                
-                                neighbourChunks[j].Clear(waveFunction.GameObjectPool);
-                                for (int k = 0; k < neighbourChunks[j].AdjacentChunks.Length; k++)
-                                {
-                                    if (neighbourChunks[j].AdjacentChunks[k] == null) continue;
-
-                                    if (overrideChunks.Add(neighbourChunks[j].AdjacentChunks[k]))
-                                    {
-                                        neighbourChunks[j].AdjacentChunks[k].Clear(waveFunction.GameObjectPool);
-                                    }
-                                }
+                                ResetNeighbours(overrideChunks, neighbourChunks[j], 1);
                             }
                         }
                     }
@@ -196,6 +186,23 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
         isUpdatingChunks = false;
     }
 
+    private void ResetNeighbours(HashSet<Chunk> overrideChunks, Chunk neighbourChunk, int depth)
+    {
+        for (int i = 0; i < neighbourChunk.AdjacentChunks.Length; i++)
+        {
+            if (neighbourChunk.AdjacentChunks[i] == null) continue;
+
+            if (overrideChunks.Add(neighbourChunk.AdjacentChunks[i]))
+            {
+                neighbourChunk.AdjacentChunks[i].Clear(waveFunction.GameObjectPool);
+                if (depth > 0)
+                {
+                    ResetNeighbours(overrideChunks, neighbourChunk.AdjacentChunks[i], depth - 1);
+                }
+            }
+        }
+    }
+
     private bool CheckFailed(IEnumerable<Chunk> overrideChunks)
     {
         int minValid = 2;
@@ -243,7 +250,6 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
             watch.Restart();
         }
     }
-
     
     #region Debug
 
@@ -254,9 +260,9 @@ public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
             return;
         }
 
-        foreach (var chunk in waveFunction.Chunks)
+        foreach (Chunk chunk in waveFunction.Chunks.Values)
         {
-            foreach (var cell in chunk.Cells)
+            foreach (Cell cell in chunk.Cells)
             {
                 Vector3 pos = cell.Position;
                 Gizmos.color = cell.Buildable ? Color.white : Color.red;
