@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: cffa7a1f8c402f546a3ad935eee1f529,
+  m_LightingDataAsset: {fileID: 112000004, guid: cffa7a1f8c402f546a3ad935eee1f529,
     type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: ddd7c1c02999c50498a2ab11b3cd6cbc,
     type: 2}
@@ -2939,7 +2939,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &606289848
 Transform:
   m_ObjectHideFlags: 0
@@ -10999,8 +10999,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7422178902860833338, guid: 2be1bd8da712d78428179d99d243eb9b,
         type: 3}
+      propertyPath: Prototypes.Array.data[12].Weight
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7422178902860833338, guid: 2be1bd8da712d78428179d99d243eb9b,
+        type: 3}
+      propertyPath: Prototypes.Array.data[13].Weight
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7422178902860833338, guid: 2be1bd8da712d78428179d99d243eb9b,
+        type: 3}
+      propertyPath: Prototypes.Array.data[14].Weight
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7422178902860833338, guid: 2be1bd8da712d78428179d99d243eb9b,
+        type: 3}
+      propertyPath: Prototypes.Array.data[15].Weight
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7422178902860833338, guid: 2be1bd8da712d78428179d99d243eb9b,
+        type: 3}
       propertyPath: pieceWeights.Array.data[3].Weight
-      value: 10
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7422178902860833338, guid: 2be1bd8da712d78428179d99d243eb9b,
         type: 3}

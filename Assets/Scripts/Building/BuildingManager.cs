@@ -7,6 +7,7 @@ using UnityEditor;
 using Buildings;
 using System;
 using Buildings.District;
+using Unity.Collections;
 using UnityEngine.Serialization;
 
 public class BuildingManager : Singleton<BuildingManager> 
@@ -583,45 +584,28 @@ public class BuildingManager : Singleton<BuildingManager>
             return;
         }
 
-        List<string> validKeys = new List<string>();
+        HashSet<string> validKeys = new HashSet<string>();
         for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
         {
-            validKeys.Add(direction switch
-            {
-                Direction.Right => changedCell.PossiblePrototypes[i].PosX,
-                Direction.Left => changedCell.PossiblePrototypes[i].NegX,
-                Direction.Up => changedCell.PossiblePrototypes[i].PosY,
-                Direction.Down => changedCell.PossiblePrototypes[i].NegY,
-                Direction.Forward => changedCell.PossiblePrototypes[i].PosZ,
-                Direction.Backward => changedCell.PossiblePrototypes[i].NegZ,
-                _ => ""
-            });
+            validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
         }
 
         changed = false;
-        for (int i = 0; i < affectedCell.PossiblePrototypes.Count; i++)
+        var oppositeDirection = WaveFunctionUtility.OppositeDirection(direction);
+        for (int i = affectedCell.PossiblePrototypes.Count - 1; i >= 0; i--)
         {
             PrototypeData prot = affectedCell.PossiblePrototypes[i];
             if (!prot.Keys.Any(x => allowedKeys.Contains(x))) // Could be pre-calculated based on prototype
             {
-                affectedCell.PossiblePrototypes.RemoveAt(i--);
+                affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
                 continue;
             }
 
-            bool shouldRemove = !CheckValidSocket(direction switch
-            {
-                Direction.Right => prot.NegX,
-                Direction.Left => prot.PosX,
-                Direction.Up => prot.NegY,
-                Direction.Down => prot.PosY,
-                Direction.Forward => prot.NegZ,
-                Direction.Backward => prot.PosZ,
-                _ => throw new NotImplementedException()
-            }, validKeys); 
+            bool shouldRemove = !WaveFunctionUtility.CheckValidSocket(prot.DirectionToKey(oppositeDirection), validKeys); 
 
             if (shouldRemove)
             {
-                affectedCell.PossiblePrototypes.RemoveAt(i--);
+                affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
                 changed = true;
             }
         }
@@ -630,28 +614,6 @@ public class BuildingManager : Singleton<BuildingManager>
         {
             affectedCell.PossiblePrototypes.Add(emptyPrototype);
         }
-    }
-
-    private static bool CheckValidSocket(string key, List<string> validKeys)
-    {
-        if (key.Contains('v')) // Ex. v0_0
-        {
-            return validKeys.Contains(key);
-        }
-
-        if (key.Contains('s')) // Ex. 0s
-        {
-            return validKeys.Contains(key);
-        }
-         
-        if (key.Contains('f')) // Ex. 0f
-        {
-            return validKeys.Contains(key.Replace("f", ""));
-        }
-        
-        // Ex. 0
-        string keyf = key + 'f';
-        return validKeys.Contains(keyf);
     }
 
     #endregion

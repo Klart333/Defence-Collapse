@@ -3,6 +3,7 @@ using Debug = UnityEngine.Debug;
 using System.Linq;
 using UnityEngine;
 using System;
+using JetBrains.Annotations;
 using Sirenix.OdinInspector;
 using Unity.Collections;
 using UnityEngine.Serialization;
@@ -632,7 +633,7 @@ public struct Cell : IEquatable<Cell>
         Buildable = buildable;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals([CanBeNull] object obj)
     {
         if (obj is Cell cell)
             return Equals(cell);
@@ -703,17 +704,47 @@ public static class WaveFunctionUtility
         }
     }
     
+    public static void Constrain(Cell changedCell, Cell affectedCell, Direction direction, Func<string[], bool> isValid, out bool changed)
+    {
+        changed = false;
+        if (affectedCell.Collapsed) return;
+
+        HashSet<string> validKeys = new HashSet<string>();
+        for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
+        {
+            validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
+        }
+
+        Direction oppositeDirection = OppositeDirection(direction);
+        for (int i = affectedCell.PossiblePrototypes.Count - 1; i >= 0; i--)
+        {
+            if (CheckValidSocket(affectedCell.PossiblePrototypes[i].DirectionToKey(oppositeDirection), validKeys) || !isValid(affectedCell.PossiblePrototypes[i].Keys)) continue;
+            
+            affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
+            changed = true;
+        }
+    }
+    
     public static bool CheckValidSocket(string key, HashSet<string> validKeys)
     {
-        // Direct lookup first
-        if (validKeys.Contains(key)) return true;
-    
-        // Try alternative versions of the key
-        string keyWithoutF = key.EndsWith('f') ? key[..^1] : null;
-        string keyWithF = keyWithoutF == null ? key + 'f' : null;
-    
-        return (keyWithoutF != null && validKeys.Contains(keyWithoutF)) ||
-               (keyWithF != null && validKeys.Contains(keyWithF));
+        if (key.StartsWith('v')) // Ex. v0_0
+        {
+            return validKeys.Contains(key);
+        }
+
+        if (key.EndsWith('s')) // Ex. 0s
+        {
+            return validKeys.Contains(key);
+        }
+
+        if (key.EndsWith('f')) // Ex. 0f
+        {
+            return validKeys.Contains(key.Replace("f", ""));
+        }
+
+        // Ex. 0
+        string keyf = key + 'f';
+        return validKeys.Contains(keyf);
     }
     
     public static Direction OppositeDirection(Direction direction)
