@@ -2,6 +2,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
+using WaveFunctionCollapse;
 
 namespace Buildings
 {

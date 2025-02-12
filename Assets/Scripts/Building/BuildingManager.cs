@@ -9,10 +9,10 @@ using System;
 using Buildings.District;
 using Unity.Collections;
 using UnityEngine.Serialization;
+using WaveFunctionCollapse;
 
 public class BuildingManager : Singleton<BuildingManager> 
 {
-    public event Action<Vector3Int> OnCastlePlaced;
     public event Action OnLoaded;
 
     [Title("Cells")]
@@ -21,7 +21,7 @@ public class BuildingManager : Singleton<BuildingManager>
 
     [Title("Prototypes")]
     [SerializeField]
-    private PrototypeInfoCreator townPrototypeInfo;
+    private PrototypeInfoData townPrototypeInfo;
 
     [Title("Keys")]
     [SerializeField]

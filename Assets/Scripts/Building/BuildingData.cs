@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using WaveFunctionCollapse;
 
 [System.Serializable]   
 public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT A DISTRICT

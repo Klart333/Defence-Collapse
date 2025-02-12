@@ -1,37 +1,38 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.XR;
 
-public class PrototypeDisplay : MonoBehaviour
+namespace WaveFunctionCollapse
 {
-    [SerializeField]
-    private GameObject mesh;
-
-    [SerializeField]
-    private TextMeshPro posX;
-    [SerializeField]
-    private TextMeshPro negX;
-    [SerializeField]
-    private TextMeshPro posY;
-    [SerializeField]
-    private TextMeshPro negY;
-    [SerializeField]
-    private TextMeshPro posZ;
-    [SerializeField]
-    private TextMeshPro negZ;
-
-    public void Setup(PrototypeData prototype)
+    public class PrototypeDisplay : MonoBehaviour
     {
-        mesh.GetComponent<MeshFilter>().mesh = prototype.MeshRot.Mesh;
-        mesh.transform.rotation = Quaternion.Euler(0, 90 * prototype.MeshRot.Rot, 0);
+        [SerializeField]
+        private GameObject mesh;
 
-        posX.text = prototype.PosX;
-        negX.text = prototype.NegX;
-        posY.text = prototype.PosY;
-        negY.text = prototype.NegY;
-        posZ.text = prototype.PosZ;
-        negZ.text = prototype.NegZ;
+        [SerializeField]
+        private TextMeshPro posX;
+        [SerializeField]
+        private TextMeshPro negX;
+        [SerializeField]
+        private TextMeshPro posY;
+        [SerializeField]
+        private TextMeshPro negY;
+        [SerializeField]
+        private TextMeshPro posZ;
+        [SerializeField]
+        private TextMeshPro negZ;
+
+        public void Setup(PrototypeData prototype)
+        {
+            mesh.GetComponent<MeshFilter>().mesh = prototype.MeshRot.Mesh;
+            mesh.transform.rotation = Quaternion.Euler(0, 90 * prototype.MeshRot.Rot, 0);
+
+            posX.text = prototype.PosX;
+            negX.text = prototype.NegX;
+            posY.text = prototype.PosY;
+            negY.text = prototype.NegY;
+            posZ.text = prototype.PosZ;
+            negZ.text = prototype.NegZ;
+        }
     }
 }
+

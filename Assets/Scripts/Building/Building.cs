@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine.Events;
 using UnityEngine;
+using WaveFunctionCollapse;
 
 public class Building : PooledMonoBehaviour, IBuildable
 {

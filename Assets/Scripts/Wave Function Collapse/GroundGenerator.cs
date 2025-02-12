@@ -6,149 +6,156 @@ using System;
 using Unity.Entities;
 using Unity.Physics;
 using Unity.Transforms;
+using Collider = Unity.Physics.Collider;
 using Material = Unity.Physics.Material;
+using MeshCollider = Unity.Physics.MeshCollider;
+using Random = UnityEngine.Random;
 
-public class GroundGenerator : MonoBehaviour
+namespace WaveFunctionCollapse
 {
-    public event Action OnMapGenerated;
-
-    [Title("Wave Function")]
-    [SerializeField]
-    private WaveFunction waveFunction;
-
-    [Title("Settings")]
-    [SerializeField]
-    private int chillTimeMs;
-
-    [SerializeField]
-    private float maxMillisecondsPerFrame = 4;
-
-    [SerializeField]
-    private bool shouldCombine = true;
-
-    [Title("Debug")]
-    [SerializeField]
-    private bool shouldRun = true;
-
-    public WaveFunction WaveFunction => waveFunction;
-
-    private void Start()
+    public class GroundGenerator : MonoBehaviour
     {
-        if (shouldRun)
-            _ = Run();
-    }
+        public event Action OnMapGenerated;
 
-    public async UniTask Run()
-    {
-        waveFunction.ParentTransform = transform;
-        if (!waveFunction.Load())
+        [Title("Wave Function")]
+        [SerializeField]
+        private WaveFunction waveFunction;
+
+        [Title("Settings")]
+        [SerializeField]
+        private int chillTimeMs;
+
+        [SerializeField]
+        private float maxMillisecondsPerFrame = 4;
+
+        [SerializeField]
+        private bool shouldCombine = true;
+
+        [Title("Debug")]
+        [SerializeField]
+        private bool shouldRun = true;
+
+        public WaveFunction WaveFunction => waveFunction;
+
+        private void Start()
         {
-            return;
+            if (shouldRun)
+                _ = Run();
         }
 
-        //await PredeterminePath();
-        await BottomBuildUp();
-
-        Stopwatch watch = Stopwatch.StartNew();
-        while (!waveFunction.AllCollapsed)
+        public async UniTask Run()
         {
-            waveFunction.Iterate(); // Does not need to await
-
-            if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
-
-            await UniTask.NextFrame();
-            if (chillTimeMs > 0)
+            waveFunction.ParentTransform = transform;
+            if (!waveFunction.Load())
             {
-                await UniTask.Delay(chillTimeMs);
+                return;
             }
 
-            watch.Restart();
-        }
+            //await PredeterminePath();
+            await BottomBuildUp();
 
-        if (shouldCombine)
-        {
-            CombineMeshes();
-        }
-
-        OnMapGenerated?.Invoke();
-    }
-
-    private async UniTask BottomBuildUp()
-    {
-        for (int x = 0; x < waveFunction.GridSize.x; x++)
-        {
-            for (int z = 0; z < waveFunction.GridSize.z; z++)
+            Stopwatch watch = Stopwatch.StartNew();
+            while (!waveFunction.AllCollapsed)
             {
-                if ((x == 0 || x == waveFunction.GridSize.x - 1) && (z == 0 || z == waveFunction.GridSize.z - 1))
+                waveFunction.Iterate(); // Does not need to await
+
+                if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
+
+                await UniTask.NextFrame();
+                if (chillTimeMs > 0)
                 {
+                    await UniTask.Delay(chillTimeMs);
+                }
+
+                watch.Restart();
+            }
+
+            if (shouldCombine)
+            {
+                CombineMeshes();
+            }
+
+            OnMapGenerated?.Invoke();
+        }
+
+        private async UniTask BottomBuildUp()
+        {
+            for (int x = 0; x < waveFunction.GridSize.x; x++)
+            {
+                for (int z = 0; z < waveFunction.GridSize.z; z++)
+                {
+                    if ((x == 0 || x == waveFunction.GridSize.x - 1) && (z == 0 || z == waveFunction.GridSize.z - 1))
+                    {
+                        await PlaceGround(x, z);
+                        continue;
+                    }
+
+                    if ((x != 0 && x != waveFunction.GridSize.x - 1) && (z != 0 && z != waveFunction.GridSize.z - 1))
+                    {
+                        continue;
+                    }
+
+                    if (Random.value < 0.8f)
+                    {
+                        continue;
+                    }
+
                     await PlaceGround(x, z);
-                    continue;
                 }
-
-                if ((x != 0 && x != waveFunction.GridSize.x - 1) && (z != 0 && z != waveFunction.GridSize.z - 1))
-                {
-                    continue;
-                }
-
-                if (UnityEngine.Random.value < 0.8f)
-                {
-                    continue;
-                }
-
-                await PlaceGround(x, z);
             }
-        }
 
-        return;
+            return;
 
-        async UniTask PlaceGround(int x, int z)
-        {
-            int index = waveFunction.GetIndex(x, 0, z);
-            if (waveFunction.Cells[index].PossiblePrototypes.Contains(waveFunction.Prototypes[2 * 4]))
+            async UniTask PlaceGround(int x, int z)
             {
-                waveFunction.SetCell(index, waveFunction.Prototypes[2 * 4]);
+                int index = waveFunction.GetIndex(x, 0, z);
+                if (waveFunction.Cells[index].PossiblePrototypes.Contains(waveFunction.Prototypes[2 * 4]))
+                {
+                    waveFunction.SetCell(index, waveFunction.Prototypes[2 * 4]);
 
-                waveFunction.Propagate();
+                    waveFunction.Propagate();
 
-                await UniTask.Yield();
+                    await UniTask.Yield();
+                }
             }
+        }
+
+
+        private void CombineMeshes()
+        {
+            Mesh mesh = GetComponent<MeshCombiner>().CombineMeshes();
+            BlobAssetReference<Collider> blobCollider = MeshCollider.Create(mesh, new CollisionFilter
+            {
+                BelongsTo = 6,
+                CollidesWith = 6,
+                GroupIndex = 0,
+            }, Material.Default);
+
+            ComponentType[] componentTypes = new ComponentType[4]
+            {
+                typeof(LocalTransform),
+                typeof(LocalToWorld),
+                typeof(PhysicsCollider),
+                typeof(PhysicsWorldIndex),
+            };
+
+            Entity entity = World.DefaultGameObjectInjectionWorld.EntityManager.CreateEntity(componentTypes);
+            World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new LocalToWorld
+            {
+                Value = gameObject.transform.localToWorldMatrix,
+            });
+            World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new LocalTransform()
+            {
+                Position = transform.localPosition,
+                Rotation = transform.localRotation,
+                Scale = transform.localScale.x,
+            });
+            World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new PhysicsCollider
+            {
+                Value = blobCollider,
+            });
         }
     }
 
 
-    private void CombineMeshes()
-    {
-        Mesh mesh = GetComponent<MeshCombiner>().CombineMeshes();
-        BlobAssetReference<Unity.Physics.Collider> blobCollider = Unity.Physics.MeshCollider.Create(mesh, new CollisionFilter
-        {
-            BelongsTo = 6,
-            CollidesWith = 6,
-            GroupIndex = 0,
-        }, Material.Default);
-
-        ComponentType[] componentTypes = new ComponentType[4]
-        {
-            typeof(LocalTransform),
-            typeof(LocalToWorld),
-            typeof(PhysicsCollider),
-            typeof(PhysicsWorldIndex),
-        };
-        
-        Entity entity = World.DefaultGameObjectInjectionWorld.EntityManager.CreateEntity(componentTypes);
-        World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new LocalToWorld
-        {
-            Value = gameObject.transform.localToWorldMatrix,
-        });
-        World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new LocalTransform()
-        {
-            Position = transform.localPosition,
-            Rotation = transform.localRotation,
-            Scale = transform.localScale.x,
-        });
-        World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new PhysicsCollider
-        {
-            Value = blobCollider,
-        });
-    }
 }
-

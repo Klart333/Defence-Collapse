@@ -6,6 +6,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using WaveFunctionCollapse;
 
 namespace Buildings.District
 {
@@ -144,7 +145,7 @@ namespace Buildings.District
         {
             Bounds bounds = GetPositionBounds(selectedPlacers);
             
-            List<Chunk> chunks = new List<Chunk>();
+            HashSet<Chunk> chunks = new HashSet<Chunk>();
             foreach (Chunk chunk in districtGenerator.ChunkWaveFunction.Chunks.Values)
             {
                 if (bounds.Contains(chunk.Position.XZ()))

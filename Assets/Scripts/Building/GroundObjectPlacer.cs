@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using WaveFunctionCollapse;
 
 public class GroundObjectPlacer : MonoBehaviour
 {

@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using UnityEngine;
+using WaveFunctionCollapse;
 
 [InlineEditor]
 [CreateAssetMenu(fileName = "New Data", menuName = "Building/Mesh Data")]

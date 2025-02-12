@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
+using WaveFunctionCollapse;
 using Random = UnityEngine.Random;
 
 public class MenuWaveHandling : MonoBehaviour

@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using Effects;
 using System;
+using WaveFunctionCollapse;
 
 public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
 {
@@ -21,7 +22,7 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
     private TowerMeshData towerMeshData;
 
     [SerializeField]
-    private PrototypeInfoCreator buildingPrototypes;
+    private PrototypeInfoData buildingPrototypes;
 
     [Title("UI")]
     [SerializeField]

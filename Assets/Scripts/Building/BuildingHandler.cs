@@ -5,6 +5,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
 using System.Linq;
+using WaveFunctionCollapse;
 
 public class BuildingHandler : SerializedMonoBehaviour 
 {
