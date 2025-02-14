@@ -315,6 +315,8 @@ namespace WaveFunctionCollapse
         private Vector3 editorOnlyPosition;
 #endif
 
+        // KEEP A SEPARATE ARRAY OF SPAWNED MESHES SO THAT I CAN DO VISUAL STUFF
+        
         // In the Following order: Right, Left, Up, Down, Forward, Backward
         public readonly Chunk[] AdjacentChunks;
         public readonly Cell[,,] Cells;

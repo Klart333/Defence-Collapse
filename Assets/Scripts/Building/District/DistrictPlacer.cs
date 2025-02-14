@@ -28,7 +28,7 @@ namespace Buildings.District
         
         private bool selected;
 
-        public int2 Index { get; set; }
+        public int3 Index { get; set; }
 
         private void OnEnable()
         {

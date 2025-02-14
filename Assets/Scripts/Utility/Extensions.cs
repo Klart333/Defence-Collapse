@@ -11,4 +11,9 @@ public static class Extensions
     {
         return new Vector3(v.x, y, v.y);
     }
+    
+    public static Vector3 MultiplyByAxis(this Vector3 a, Vector3 b)
+    {
+        return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
+    }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using Sirenix.Utilities;
 using Unity.Mathematics;
 using UnityEngine;
 using WaveFunctionCollapse;
@@ -12,13 +13,11 @@ namespace Buildings.District
 {
     public class DistrictHandler : SerializedMonoBehaviour
     {
+        public event Action<DistrictData> OnDistrictCreated;
+        
         // NEEDS TO KEEP TRACK OF WHICH CELLS ARE PART OF A DISTRICT, AND WHAT TYPE
         // CAN PROBABLY HANDLE THE COLLIDERS...
         // NEEDS A REFERENCE TO THE BUILDING GROUP INDEX, WHEN CLICKING ON THE CITY THE DISTRICTS SHOULD BE SHOWN, FUTURE THING THO
-        // KEEP IT SIMPLE
-        // NEEDS REFERENCE TO THE DISTRICT GENERATOR TO REGENERATE THE INDEXES INTO THE RIGHT TYPE
-        // SHOULD LISTEN TO THE EVENT.CS AND TELL THE DISPLAY WHAT TO DISPLAY, OTHERWISE COULD QUERY BUT DOESN'T SOUND GOOD
-        // MAKE THE THINGS SELECTABLE, AND IMPLEMENT MINIMUM SIZE PER TYPE
 
         [Title("District")]
         [SerializeField]
@@ -37,43 +36,57 @@ namespace Buildings.District
                 return;
             }
             
-            Vector3 position = Vector3.zero;
-            foreach (Chunk chunk in chunks)
-            {
-                position += chunk.Position;
-            }
-            position /= chunks.Count;
+            Vector3 position = GetAveragePosition();
             
-            DistrictData districtData = GetDistrictData(districtType, chunks.Count, position);
-
             HashSet<Chunk> neighbours = new HashSet<Chunk>();
+            List<Chunk> addedChunks = new List<Chunk>();
             foreach (Chunk chunk in chunks)
             {
                 GetNeighbours(chunks, chunk, neighbours, 1);
-                
-                districts.Add(chunk.ChunkIndex.xz, districtData);
-                
+
                 chunk.Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
                 districtGenerator.ChunkWaveFunction.LoadCells(chunk, prototypeInfo);
 
-                const int height = 2;
-                for (int j = 0; j < height; j++)
+                const int height = 1;
+                for (int j = 0; j < height; j++) // Assumes that the chunks are not stacked vertically already
                 {
-                    int heightLevel = 1 + j; // Assumes that the chunk has exactly 2 levels already
+                    int heightLevel = 1 + j;
                     Vector3 pos = chunk.Position + Vector3.up * districtGenerator.ChunkScale.y * heightLevel; 
-                    districtGenerator.ChunkWaveFunction.LoadChunk(pos, districtGenerator.ChunkSize, prototypeInfo);
+                    addedChunks.Add(districtGenerator.ChunkWaveFunction.LoadChunk(pos, districtGenerator.ChunkSize, prototypeInfo));
                 }
             }
-
+            chunks.AddRange(addedChunks);
+            
             foreach (Chunk chunk in neighbours)
             {
                 chunk.Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
                 districtGenerator.ChunkWaveFunction.LoadCells(chunk, chunk.PrototypeInfoData);
             }
             
-            districtGenerator.Run().Forget(Debug.LogError);
-        }
+            DistrictData districtData = GetDistrictData(districtType, chunks, position);
 
+            foreach (Chunk chunk in chunks)
+            {
+                districts.TryAdd(chunk.ChunkIndex.xz, districtData);
+            }
+
+            OnDistrictCreated?.Invoke(districtData);
+            districtGenerator.Run().Forget(Debug.LogError);
+            return;
+
+
+            Vector3 GetAveragePosition()
+            {
+                Vector3 vector3 = Vector3.zero;
+                foreach (Chunk chunk in chunks)
+                {
+                    vector3 += chunk.Position;
+                }
+                vector3 /= chunks.Count;
+                return vector3;
+            }
+        }
+        
         private static void GetNeighbours(HashSet<Chunk> chunks, Chunk chunk, HashSet<Chunk> neighbours, int depth)
         {
             foreach (Chunk adjacentChunk in chunk.AdjacentChunks)
@@ -91,9 +104,9 @@ namespace Buildings.District
             }
         }
 
-        private DistrictData GetDistrictData(DistrictType districtType, int cellsCount, Vector3 position)
+        private DistrictData GetDistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position)
         {
-            DistrictData districtData = new DistrictData(districtType, cellsCount, position);
+            DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator);
             return districtData;
         }
 
