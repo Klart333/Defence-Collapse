@@ -384,7 +384,7 @@ namespace WaveFunctionCollapse
                 {
                     for (int i = prots.Count - 1; i >= 0; i--)
                     {
-                        if (prots[i].DirectionToKey(direction)[0] == '-') continue;
+                        if (prots[i].DirectionToKey(direction) == -1) continue;
 
                         prots.RemoveAtSwapBack(i);
                         changed = true;
@@ -455,9 +455,9 @@ namespace WaveFunctionCollapse
 
                 int3 adjacentIndex = WrapIndexToAdjacentChunk(index, i);
                 Cell cell = AdjacentChunks[i][adjacentIndex];
-                if (!cell.Collapsed || string.IsNullOrEmpty(cell.PossiblePrototypes[0].Keys[i])) continue;
+                if (!cell.Collapsed) continue;
 
-                if (cell.PossiblePrototypes[0].Keys[(int)WaveFunctionUtility.OppositeDirection(i)][0] == '-')
+                if (cell.PossiblePrototypes[0].Keys[(int)WaveFunctionUtility.OppositeDirection(i)] == -1)
                 {
                     adjacentDirections.Add((Direction)i);
                 }
@@ -519,7 +519,7 @@ namespace WaveFunctionCollapse
                 {
                     for (int i = prots.Count - 1; i >= 0; i--)
                     {
-                        if (prots[i].DirectionToKey(direction)[0] == '-') continue;
+                        if (prots[i].DirectionToKey(direction) == -1) continue;
 
                         prots.RemoveAtSwapBack(i);
                         changed = true;

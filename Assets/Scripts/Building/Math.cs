@@ -22,4 +22,9 @@ public static class Math
     {
         return Mathf.FloorToInt(x / multiple);
     }
+
+    public static short GetSecondSocketValue(short socket)
+    {
+        return (short)((socket / 100) % 10);
+    }
 }

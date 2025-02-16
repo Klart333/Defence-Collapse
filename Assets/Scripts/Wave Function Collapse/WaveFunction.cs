@@ -197,12 +197,12 @@ namespace WaveFunctionCollapse
                 bool hasConnections = false;
                 foreach (PrototypeData proto in cells[directIndex].PossiblePrototypes)
                 {
-                    if (!hasConnections && proto.PosY[0] != '-')
+                    if (!hasConnections && proto.PosY != -1)
                     {
                         hasConnections = true;
                     }
 
-                    if (proto.NegY[0] != '-' || proto.PosX[0] != '-' || proto.NegX[0] != '-' || proto.NegZ[0] != '-' || proto.PosZ[0] != '-')
+                    if (proto.NegY != -1 || proto.PosX != -1 || proto.NegX != -1 || proto.NegZ != -1 || proto.PosZ != -1)
                     {
                         onlyAir = false;
                     }
@@ -222,11 +222,11 @@ namespace WaveFunctionCollapse
             // Rule is Below flat tile is only air
             if (IsDirectionValid(index, Direction.Up, out int aboveIndex)
                 && cells[aboveIndex].Collapsed
-                && cells[aboveIndex].PossiblePrototypes[0].NegY[0] == '-')
+                && cells[aboveIndex].PossiblePrototypes[0].NegY == -1)
             {
-                bool airAbove = !(cells[aboveIndex].PossiblePrototypes[0].PosY[0] != '-' || cells[aboveIndex].PossiblePrototypes[0].PosX[0] != '-' ||
-                                  cells[aboveIndex].PossiblePrototypes[0].NegX[0] != '-' || cells[aboveIndex].PossiblePrototypes[0].NegZ[0] != '-' ||
-                                  cells[aboveIndex].PossiblePrototypes[0].PosZ[0] != '-');
+                bool airAbove = !(cells[aboveIndex].PossiblePrototypes[0].PosY != -1 || cells[aboveIndex].PossiblePrototypes[0].PosX != -1 ||
+                                  cells[aboveIndex].PossiblePrototypes[0].NegX != -1 || cells[aboveIndex].PossiblePrototypes[0].NegZ != -1 ||
+                                  cells[aboveIndex].PossiblePrototypes[0].PosZ != -1);
 
                 if (!airAbove)
                 {
@@ -392,7 +392,7 @@ namespace WaveFunctionCollapse
 
         private void LoadCells()
         {
-            emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 20, Array.Empty<int>());
+            emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 20, Array.Empty<int>());
 
             for (int z = 0; z < gridSizeZ; z++)
             for (int y = 0; y < gridSizeY; y++)
@@ -408,16 +408,7 @@ namespace WaveFunctionCollapse
                 {
                     for (int i = prots.Count - 1; i >= 0; i--)
                     {
-                        bool shouldRemove = direction switch
-                        {
-                            Direction.Right => prots[i].PosX != "-1s",
-                            Direction.Left => prots[i].NegX != "-1s",
-                            Direction.Backward => prots[i].NegZ != "-1s",
-                            Direction.Forward => prots[i].PosZ != "-1s",
-                            Direction.Up => prots[i].PosY != "-1s",
-                            Direction.Down => prots[i].NegY != "-1s",
-                            _ => false
-                        };
+                        bool shouldRemove = prots[i].DirectionToKey(direction) != -1;
 
                         if (shouldRemove) prots.RemoveAt(i);
                     }
@@ -704,7 +695,7 @@ namespace WaveFunctionCollapse
             changed = false;
             if (affectedCell.Collapsed) return;
 
-            HashSet<string> validKeys = new HashSet<string>();
+            HashSet<short> validKeys = new HashSet<short>();
             for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
             {
                 validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
@@ -720,12 +711,12 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public static void Constrain(Cell changedCell, Cell affectedCell, Direction direction, Func<string[], bool> isValid, out bool changed)
+        public static void Constrain(Cell changedCell, Cell affectedCell, Direction direction, Func<short[], bool> isValid, out bool changed)
         {
             changed = false;
             if (affectedCell.Collapsed) return;
 
-            HashSet<string> validKeys = new HashSet<string>();
+            HashSet<short> validKeys = new HashSet<short>();
             for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
             {
                 validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
@@ -741,26 +732,15 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public static bool CheckValidSocket(string key, HashSet<string> validKeys)
+        public static bool CheckValidSocket(short key, HashSet<short> validKeys)
         {
-            if (key.StartsWith('v')) // Ex. v0_0
+            return key switch
             {
-                return validKeys.Contains(key);
-            }
-
-            if (key.EndsWith('s')) // Ex. 0s
-            {
-                return validKeys.Contains(key);
-            }
-
-            if (key.EndsWith('f')) // Ex. 0f
-            {
-                return validKeys.Contains(key.Replace("f", ""));
-            }
-
-            // Ex. 0
-            string keyf = key + 'f';
-            return validKeys.Contains(keyf);
+                //>= 5000 => validKeys.Contains(key), // Ex. v0_0
+                >= 2000 => validKeys.Contains(key), // Ex. 0s
+                >= 1000 => validKeys.Contains((short)(key - 1000)), // Ex. 0f
+                _       => validKeys.Contains((short)(key + 1000)) // Ex. 0
+            };
         }
 
         public static Direction OppositeDirection(Direction direction)

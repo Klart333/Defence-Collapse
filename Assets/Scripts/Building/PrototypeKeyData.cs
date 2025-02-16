@@ -7,8 +7,8 @@ using UnityEngine;
 public class PrototypeKeyData : SerializedScriptableObject
 {
     [Title("Key Info")]
-    public HashSet<string> BuildingKeys;
+    public HashSet<short> BuildingKeys;
 
-    public HashSet<string> PathKeys;
+    public HashSet<short> PathKeys;
 }
 

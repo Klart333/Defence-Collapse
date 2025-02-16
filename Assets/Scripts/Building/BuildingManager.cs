@@ -73,7 +73,7 @@ public class BuildingManager : Singleton<BuildingManager>
     private List<PrototypeData> unbuildablePrototypeList;
     private List<PrototypeData> prototypes = new List<PrototypeData>();
     private List<Vector3Int> cellsToCollapse = new List<Vector3Int>();
-    private HashSet<string> allowedKeys;
+    private HashSet<short> allowedKeys;
 
     private GroundGenerator groundGenerator;
     private BuildingAnimator buildingAnimator;
@@ -137,8 +137,8 @@ public class BuildingManager : Singleton<BuildingManager>
     {
         Cells = new Cell[Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.x / cellSize), groundGenerator.WaveFunction.GridSize.y + 1, Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.z / cellSize)];
         cellsBuilt = new bool[Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.x / cellSize), groundGenerator.WaveFunction.GridSize.y + 1, Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.z / cellSize)];
-        emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 1, Array.Empty<int>());
-        unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", 0, Array.Empty<int>());
+        emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 1, Array.Empty<int>());
+        unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 0, Array.Empty<int>());
         unbuildablePrototypeList = new List<PrototypeData> { unbuildablePrototype };
 
         for (int z = 0; z < Cells.GetLength(2); z++)
@@ -570,7 +570,7 @@ public class BuildingManager : Singleton<BuildingManager>
             return;
         }
 
-        HashSet<string> validKeys = new HashSet<string>();
+        HashSet<short> validKeys = new HashSet<short>();
         for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
         {
             validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));

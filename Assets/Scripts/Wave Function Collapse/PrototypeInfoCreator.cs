@@ -18,19 +18,6 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private float divider = 100f;
 
-        [Title("Override")]
-        [SerializeField]
-        private bool overrideVerticalPositive = false;
-
-        [SerializeField, ShowIf(nameof(overrideVerticalPositive))]
-        private string positiveKey = "-1s";
-
-        [SerializeField]
-        private bool overrideVerticalNegative = false;
-
-        [SerializeField, ShowIf(nameof(overrideVerticalNegative))]
-        private string negativeKey = "v-1_0";
-
         [Title("Rules")]
         [SerializeField]
         private List<int> notAllowedBottomIndexes;
@@ -46,7 +33,7 @@ namespace WaveFunctionCollapse
         private Vector3 moduleScale;
 
         [SerializeField]
-        private int startKeyNumber;
+        private short startKeyNumber;
         
         [SerializeField]
         private bool useVerticiesOutsideUnitCube = false;
@@ -62,7 +49,7 @@ namespace WaveFunctionCollapse
         private bool useBuildableCorners = false;
 
         [SerializeField, ShowIf(nameof(useBuildableCorners))]
-        private string rightBuildableCode = "0";
+        private short rightBuildableCode = 0;
         
         [SerializeField, ShowIf(nameof(useBuildableCorners))]
         private BuildableCornerData buildableCornerData;
@@ -81,8 +68,8 @@ namespace WaveFunctionCollapse
 
         private List<GameObject> spawnedPrototypes = new List<GameObject>();
 
-        private int currentSideIndex = 0;
-        private int currentTopIndex = 0;
+        private short currentSideIndex = 0;
+        private short currentTopIndex = 0;
 
         [TitleGroup("Creation", Order = -100)]
         [Button]
@@ -133,13 +120,13 @@ namespace WaveFunctionCollapse
                     }
                 }
 
-                string posX = GetSideKey(posXs, 0, 1);
-                string negX = GetSideKey(negXs, 0, -1);
-                string posZ = GetSideKey(posZs, 1, -1);
-                string negZ = GetSideKey(negZs, 1, 1);
+                short posX = GetSideKey(posXs, 0, 1);
+                short negX = GetSideKey(negXs, 0, -1);
+                short posZ = GetSideKey(posZs, 1, -1);
+                short negZ = GetSideKey(negZs, 1, 1);
 
-                string[] posY = GetTopKeys(posYs, true);
-                string[] negY = GetTopKeys(negYs, false);
+                short[] posY = GetTopKeys(posYs);
+                short[] negY = GetTopKeys(negYs);
 
                 int[] matIndexes = meshes[i].gameObject.GetComponent<MeshRenderer>().sharedMaterials.Select((x) => materialData.Materials.IndexOf(x)).ToArray();
                 // Add all rotations
@@ -192,14 +179,14 @@ namespace WaveFunctionCollapse
                     SetMarchingTable2D(prots);
                 }
 
-                if (useBuildableCorners && prots[0].Keys.Any(x => x.Contains(rightBuildableCode)))
+                if (useBuildableCorners && prots[0].Keys.Any(x => x % 1000 == rightBuildableCode))
                 {
                     buildableCornerData.BuildableDictionary.Add(mesh, GetBuildableCorners(prots[0]));
                 }
             }
 
             // Empty
-            PrototypeData air = new PrototypeData(new MeshWithRotation(null, 0), "-1s", "-1s", "-1s", "-1s", "-1s", "-1s", pieceWeights[meshes.Length].Weight, System.Array.Empty<int>());
+            PrototypeData air = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, pieceWeights[meshes.Length].Weight, System.Array.Empty<int>());
             prototypeData.Prototypes.Add(air);
 
             if (useMCode && !useMCodeHeight)
@@ -294,15 +281,10 @@ namespace WaveFunctionCollapse
 
         private BuildableCorners GetBuildableCorners(PrototypeData prot) // DOES NOT WORK FOR ALL ROTATIONS!! AAAAHH!
         {
-            if (rightBuildableCode[^1] == 'f')
-            {
-                UnityEngine.Debug.LogError("This was not how you built it man");
-            }
-
-            bool topLeft = prot.PosZ == $"{rightBuildableCode}f";
+            bool topLeft = prot.PosZ == rightBuildableCode + 1000;
             bool topRight = prot.PosZ == rightBuildableCode;
-            bool botLeft = (prot.NegZ == "-1s" && prot.NegX == $"{rightBuildableCode}f") || prot.NegZ == $"{rightBuildableCode}";
-            bool botRight = (topRight && botLeft && prot.NegZ == "-1s") || prot.NegZ == $"{rightBuildableCode}f";
+            bool botLeft = (prot.NegZ == -1 && prot.NegX == rightBuildableCode + 1000) || prot.NegZ == rightBuildableCode;
+            bool botRight = (topRight && botLeft && prot.NegZ == -1) || prot.NegZ == rightBuildableCode + 1000;
             BuildableCorners corner = new BuildableCorners()
             {
                 CornerDictionary = new Dictionary<Corner, bool>()
@@ -317,11 +299,11 @@ namespace WaveFunctionCollapse
             return corner;
         }
 
-        private string GetSideKey(List<Vector3> vertexPositions, int mainAxis, int positiveDirection)
+        private short GetSideKey(List<Vector3> vertexPositions, int mainAxis, int positiveDirection)
         {
             if (vertexPositions.Count == 0)
             {
-                return "-1s";
+                return -1;
             }
 
             // Project on 2 Dimensional plane
@@ -359,7 +341,7 @@ namespace WaveFunctionCollapse
                 }
             }
 
-            string key = currentSideIndex++.ToString();
+            short key = currentSideIndex;
 
             // Check for symmetry
             List<Vector2> negPositions = new List<Vector2>();
@@ -370,11 +352,11 @@ namespace WaveFunctionCollapse
 
             if (LooseEquals(positions, negPositions))
             {
-                key += 's';
+                key += 2000;
             }
             else
             {
-                prototypeData.SocketList.Add(new DicData(negPositions.ToArray(), key + 'f'));
+                prototypeData.SocketList.Add(new DicData(negPositions.ToArray(), (short)(key + 1000)));
             }
 
             prototypeData.SocketList.Add(new DicData(positions.ToArray(), key));
@@ -382,17 +364,9 @@ namespace WaveFunctionCollapse
             return key;
         }
 
-        private string[] GetTopKeys(List<Vector3> vertexPositions, bool positive)
+        private short[] GetTopKeys(List<Vector3> vertexPositions)
         {
-            switch (positive)
-            {
-                case true when overrideVerticalPositive:
-                    return new[] { positiveKey, positiveKey, positiveKey, positiveKey };
-                case false when overrideVerticalNegative:
-                    return new[] { negativeKey, negativeKey, negativeKey, negativeKey };
-            }
-
-            if ( vertexPositions.Count == 0) return new[] { "-1s", "-1s", "-1s", "-1s" };
+            if ( vertexPositions.Count == 0) return new short[] { -1, -1, -1, -1 };
 
             // Project on 2 Dimensional plane
             List<Vector2> positions = new List<Vector2>();
@@ -409,29 +383,25 @@ namespace WaveFunctionCollapse
             {
                 if (!LooseEquals(prototypeData.VerticalSocketList[g].positions.ToList(), poses)) continue;
                 
-                string[] existingKeys = new string[4];
+                short[] existingKeys = new short[4];
                 existingKeys[0] = prototypeData.VerticalSocketList[g].socketname;
-
-                if (!int.TryParse(existingKeys[0][3].ToString(), out int index))
-                {
-                    UnityEngine.Debug.LogError("Could not parse key??");
-                    return existingKeys;
-                }
+                short index = Math.GetSecondSocketValue(existingKeys[0]);
+                short keyValue = (short)(existingKeys[0] % 100);
                 
                 for (int i = 1; i < 4; i++)
                 {
                     int newdex = (index + i) % 4;
-                    existingKeys[i] = $"v{existingKeys[0][1]}_{newdex}";
+                    existingKeys[i] = (short)(5000 + newdex * 100 +  keyValue);
                 }
 
                 return existingKeys;
             }
 
             // Add all four rotations
-            string[] keys = new string[4];
+            short[] keys = new short[4];
             for (int i = 0; i < 4; i++)
             {
-                string key = $"v{currentTopIndex}_{i}";
+                short key = (short)(5000 + i * 100 + currentTopIndex);
                 Vector2[] pos = Rotated(positions, i);
                 keys[i] = key;
                 prototypeData.VerticalSocketList.Add(new DicData(pos, key));
@@ -639,9 +609,9 @@ namespace WaveFunctionCollapse
     public struct DicData
     {
         public Vector2[] positions;
-        public string socketname;
+        public short socketname;
 
-        public DicData(Vector2[] positions, string socketname)
+        public DicData(Vector2[] positions, short socketname)
         {
             this.positions = positions;
             this.socketname = socketname;
@@ -653,22 +623,22 @@ namespace WaveFunctionCollapse
     {
         public MeshWithRotation MeshRot;
 
-        public string PosX;
-        public string NegX; 
-        public string PosZ;
-        public string NegZ;
-        public string PosY;
-        public string NegY;
+        public short PosX;
+        public short NegX;
+        public short PosZ;
+        public short NegZ;
+        public short PosY;
+        public short NegY;
         public float Weight;
 
         public int[] MaterialIndexes;
 
-        public readonly string[] Keys => new string[6] 
+        public readonly short[] Keys => new short[6] 
         {
             PosX, NegX, PosY, NegY, PosZ, NegZ
         };
         
-        public readonly string DirectionToKey(Direction direction) => direction switch 
+        public readonly short DirectionToKey(Direction direction) => direction switch 
         {
             Direction.Right => PosX,
             Direction.Left => NegX,
@@ -679,7 +649,7 @@ namespace WaveFunctionCollapse
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         }; 
 
-        public PrototypeData(MeshWithRotation mesh, string posX, string negX, string posY, string negY, string posZ, string negZ, float weight, int[] mats)
+        public PrototypeData(MeshWithRotation mesh, short posX, short negX, short posY, short negY, short posZ, short negZ, float weight, int[] mats)
         {
             MaterialIndexes = mats;
             MeshRot = mesh;
@@ -692,7 +662,6 @@ namespace WaveFunctionCollapse
 
             Weight = weight;
         }
-
         
         public static bool operator ==(PrototypeData p1, PrototypeData p2)
         {
