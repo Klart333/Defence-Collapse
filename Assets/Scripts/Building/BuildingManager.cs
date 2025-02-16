@@ -424,22 +424,8 @@ public class BuildingManager : Singleton<BuildingManager>
                 continue;
             }
 
-            float possibleMeshAmount = 0;
-            float totalWeight = 0;
-            for (int g = 0; g < cell.PossiblePrototypes.Count; g++)
-            {
-                totalWeight += cell.PossiblePrototypes[g].Weight;
-            }
-
-            float averageWeight = totalWeight / cell.PossiblePrototypes.Count;
-            for (int g = 0; g < cell.PossiblePrototypes.Count; g++)
-            {
-                float distFromAverage = 1.0f - (cell.PossiblePrototypes[g].Weight / averageWeight);
-                if (distFromAverage < 1.0f) distFromAverage *= distFromAverage; // Because of using the percentage as a distance, smaller weights weigh more, so this is is to try to correct that.
-
-                possibleMeshAmount += Mathf.Lerp(1, 0, Mathf.Abs(distFromAverage));
-            }
-
+            float possibleMeshAmount = WaveFunctionUtility.CalculateEntropy(cell);
+            
             if (possibleMeshAmount < lowestEntropy)
             {
                 lowestEntropy = possibleMeshAmount;

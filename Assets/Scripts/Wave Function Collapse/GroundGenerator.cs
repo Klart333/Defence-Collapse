@@ -86,7 +86,8 @@ namespace WaveFunctionCollapse
                 {
                     if ((x == 0 || x == waveFunction.GridSize.x - 1) && (z == 0 || z == waveFunction.GridSize.z - 1))
                     {
-                        await PlaceGround(x, z);
+                        PlaceGround(x, z);
+                        await UniTask.Yield();
                         continue;
                     }
 
@@ -100,13 +101,14 @@ namespace WaveFunctionCollapse
                         continue;
                     }
 
-                    await PlaceGround(x, z);
+                    PlaceGround(x, z);
+                    await UniTask.Yield();
                 }
             }
 
             return;
 
-            async UniTask PlaceGround(int x, int z)
+            void PlaceGround(int x, int z)
             {
                 int index = waveFunction.GetIndex(x, 0, z);
                 if (waveFunction.Cells[index].PossiblePrototypes.Contains(waveFunction.Prototypes[2 * 4]))
@@ -114,8 +116,6 @@ namespace WaveFunctionCollapse
                     waveFunction.SetCell(index, waveFunction.Prototypes[2 * 4]);
 
                     waveFunction.Propagate();
-
-                    await UniTask.Yield();
                 }
             }
         }

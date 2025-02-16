@@ -91,31 +91,17 @@ namespace WaveFunctionCollapse
                     continue;
                 }
 
-                float possibleMeshAmount = 0;
-                possibleMeshAmount += GetCords(i).y * 100; // Add the Y level
-                if (possibleMeshAmount > lowestEntropy)
+                float cellEntropy = GetCords(i).y * 100; // Add the Y level
+                if (cellEntropy > lowestEntropy)
                 {
                     continue;
                 }
 
-                float totalWeight = 0;
-                for (int g = 0; g < cells[i].PossiblePrototypes.Count; g++)
-                {
-                    totalWeight += cells[i].PossiblePrototypes[g].Weight;
-                }
+                cellEntropy += WaveFunctionUtility.CalculateEntropy(cells[i]);
 
-                float averageWeight = totalWeight / cells[i].PossiblePrototypes.Count;
-                for (int g = 0; g < cells[i].PossiblePrototypes.Count; g++)
+                if (cellEntropy < lowestEntropy)
                 {
-                    float distFromAverage = 1.0f - (cells[i].PossiblePrototypes[g].Weight / averageWeight);
-                    if (distFromAverage < 1.0f) distFromAverage *= distFromAverage; // Because of using the percentage as a distance, smaller weights weigh more, so this is to try to correct that.
-
-                    possibleMeshAmount += Mathf.Lerp(1, 0, Mathf.Abs(distFromAverage));
-                }
-
-                if (possibleMeshAmount < lowestEntropy)
-                {
-                    lowestEntropy = possibleMeshAmount;
+                    lowestEntropy = cellEntropy;
                     index = i;
                 }
             }
@@ -695,6 +681,24 @@ namespace WaveFunctionCollapse
 
     public static class WaveFunctionUtility
     {
+        public static float CalculateEntropy(Cell cell)
+        {
+            float totalWeight = 0;
+            float entropy = 0;
+            for (int i = 0; i < cell.PossiblePrototypes.Count; i++)
+            {
+                totalWeight += cell.PossiblePrototypes[i].Weight;
+            }
+
+            for (int i = 0; i < cell.PossiblePrototypes.Count; i++)
+            {
+                float probability = cell.PossiblePrototypes[i].Weight / totalWeight;
+                entropy += probability * Unity.Mathematics.math.log(probability);
+            }
+
+            return -entropy;
+        }
+        
         public static void Constrain(Cell changedCell, Cell affectedCell, Direction direction, out bool changed)
         {
             changed = false;

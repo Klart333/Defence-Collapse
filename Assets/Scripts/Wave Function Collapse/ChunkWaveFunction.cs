@@ -136,27 +136,13 @@ namespace WaveFunctionCollapse
                         continue;
                     }
 
-                    float possibleMeshAmount = y * 10;
-                    if (possibleMeshAmount > lowestEntropy) continue;
+                    float cellEntropy = y * 10;
+                    if (cellEntropy > lowestEntropy) continue;
 
-                    float totalWeight = 0;
-                    for (int g = 0; g < cell.PossiblePrototypes.Count; g++)
-                    {
-                        totalWeight += cell.PossiblePrototypes[g].Weight;
-                    }
+                    cellEntropy += WaveFunctionUtility.CalculateEntropy(cell);
+                    if (cellEntropy >= lowestEntropy) continue;
 
-                    float averageWeight = totalWeight / cell.PossiblePrototypes.Count;
-                    for (int g = 0; g < cell.PossiblePrototypes.Count; g++)
-                    {
-                        float distFromAverage = 1.0f - (cell.PossiblePrototypes[g].Weight / averageWeight);
-                        if (distFromAverage < 1.0f) distFromAverage *= distFromAverage; // Because of using the percentage as a distance, smaller weights weigh more, so this is to try to correct that.
-
-                        possibleMeshAmount += Mathf.Lerp(1, 0, Mathf.Abs(distFromAverage));
-                    }
-
-                    if (possibleMeshAmount >= lowestEntropy) continue;
-
-                    lowestEntropy = possibleMeshAmount;
+                    lowestEntropy = cellEntropy;
                     index = new ChunkIndex(chunk.ChunkIndex, new int3(x, y, z));
                 }
             }
@@ -559,8 +545,6 @@ namespace WaveFunctionCollapse
                 SpawnedMeshes.RemoveAt(i);
             }
         }
-
-
     }
 
     public static class ChunkWaveUtility

@@ -975,7 +975,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &304523227
 Transform:
   m_ObjectHideFlags: 0
@@ -10890,6 +10890,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5491686913427258174, guid: 1ed07172bda0f254d8ec7d586a69302f,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6593328200608171191, guid: 1ed07172bda0f254d8ec7d586a69302f,
         type: 3}
       propertyPath: Debug
@@ -10923,13 +10928,58 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6593328200608171191, guid: 1ed07172bda0f254d8ec7d586a69302f,
         type: 3}
+      propertyPath: pieceWeights.Array.data[0].Name
+      value: 0. Corner
+      objectReference: {fileID: 0}
+    - target: {fileID: 6593328200608171191, guid: 1ed07172bda0f254d8ec7d586a69302f,
+        type: 3}
       propertyPath: Prototypes.Array.data[25].Weight
       value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 6593328200608171191, guid: 1ed07172bda0f254d8ec7d586a69302f,
         type: 3}
+      propertyPath: pieceWeights.Array.data[0].Weight
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6593328200608171191, guid: 1ed07172bda0f254d8ec7d586a69302f,
+        type: 3}
+      propertyPath: pieceWeights.Array.data[1].Weight
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6593328200608171191, guid: 1ed07172bda0f254d8ec7d586a69302f,
+        type: 3}
+      propertyPath: pieceWeights.Array.data[2].Weight
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6593328200608171191, guid: 1ed07172bda0f254d8ec7d586a69302f,
+        type: 3}
+      propertyPath: pieceWeights.Array.data[3].Weight
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6593328200608171191, guid: 1ed07172bda0f254d8ec7d586a69302f,
+        type: 3}
+      propertyPath: pieceWeights.Array.data[4].Weight
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6593328200608171191, guid: 1ed07172bda0f254d8ec7d586a69302f,
+        type: 3}
+      propertyPath: pieceWeights.Array.data[5].Weight
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6593328200608171191, guid: 1ed07172bda0f254d8ec7d586a69302f,
+        type: 3}
+      propertyPath: pieceWeights.Array.data[6].Weight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6593328200608171191, guid: 1ed07172bda0f254d8ec7d586a69302f,
+        type: 3}
       propertyPath: pieceWeights.Array.data[7].Weight
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6775393791512248736, guid: 1ed07172bda0f254d8ec7d586a69302f,
+        type: 3}
+      propertyPath: m_Name
+      value: 0. Corner
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

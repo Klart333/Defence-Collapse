@@ -19,6 +19,11 @@ namespace DataStructures.Queue.ECS
 
         public void OnUpdate(ref SystemState state)
         {
+            if (PathManager.Instance == null)
+            {
+                return;
+            }
+            
             float deltaTime = SystemAPI.Time.DeltaTime;
             
             new FlowMovementJob()

@@ -67,6 +67,11 @@ namespace Buildings.District
                     {
                         for (int z = 0; z < 2; z++)
                         {
+                            if (chunk.Cells[x, y, z].PossiblePrototypes[0].MeshRot.Mesh == null)
+                            {
+                                continue;
+                            }
+
                             // Calculate cell's bottom-left-front corner position
                             Vector3 cellPosition = chunkPosition + new Vector3(x, y, z).MultiplyByAxis(chunkWaveFunction.ChunkScale / 2);
 
