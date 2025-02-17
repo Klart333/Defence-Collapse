@@ -81,30 +81,29 @@ namespace WaveFunctionCollapse
         private async UniTask BottomBuildUp()
         {
             for (int x = 0; x < waveFunction.GridSize.x; x++)
+            for (int z = 0; z < waveFunction.GridSize.z; z++)
             {
-                for (int z = 0; z < waveFunction.GridSize.z; z++)
+                if ((x == 0 || x == waveFunction.GridSize.x - 1) && (z == 0 || z == waveFunction.GridSize.z - 1))
                 {
-                    if ((x == 0 || x == waveFunction.GridSize.x - 1) && (z == 0 || z == waveFunction.GridSize.z - 1))
-                    {
-                        PlaceGround(x, z);
-                        await UniTask.Yield();
-                        continue;
-                    }
-
-                    if ((x != 0 && x != waveFunction.GridSize.x - 1) && (z != 0 && z != waveFunction.GridSize.z - 1))
-                    {
-                        continue;
-                    }
-
-                    if (Random.value < 0.8f)
-                    {
-                        continue;
-                    }
-
                     PlaceGround(x, z);
                     await UniTask.Yield();
+                    continue;
                 }
+
+                if ((x != 0 && x != waveFunction.GridSize.x - 1) && (z != 0 && z != waveFunction.GridSize.z - 1))
+                {
+                    continue;
+                }
+
+                if (Random.value < 0.8f)
+                {
+                    continue;
+                }
+
+                PlaceGround(x, z);
+                await UniTask.Yield();
             }
+        
 
             return;
 

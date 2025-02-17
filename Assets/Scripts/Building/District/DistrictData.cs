@@ -52,6 +52,7 @@ namespace Buildings.District
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             Dictionary<Vector3, int> vertexIndices = new Dictionary<Vector3, int>();
+            Vector3 offset = new Vector3(chunkWaveFunction.ChunkWaveFunction.GridScale.x, 0, chunkWaveFunction.ChunkWaveFunction.GridScale.z) / -2.0f;
 
             float chunkWidth = chunkWaveFunction.ChunkScale.x / 2;
             float chunkHeight = chunkWaveFunction.ChunkScale.y / 2;
@@ -60,50 +61,46 @@ namespace Buildings.District
             foreach (Chunk chunk in chunks)
             {
                 // Assuming each chunk has a position and contains 2x2x2 cells
-                Vector3 chunkPosition = chunk.Position - Position; // Replace with actual chunk position retrieval
+                Vector3 chunkPosition = chunk.Position - Position;
                 for (int x = 0; x < 2; x++)
+                for (int y = 0; y < 2; y++)
+                for (int z = 0; z < 2; z++)
                 {
-                    for (int y = 0; y < 2; y++)
+                    if (chunk.Cells[x, y, z].PossiblePrototypes[0].Keys.All(s => s == -1))
                     {
-                        for (int z = 0; z < 2; z++)
-                        {
-                            if (chunk.Cells[x, y, z].PossiblePrototypes[0].MeshRot.Mesh == null)
-                            {
-                                continue;
-                            }
-
-                            // Calculate cell's bottom-left-front corner position
-                            Vector3 cellPosition = chunkPosition + new Vector3(x, y, z).MultiplyByAxis(chunkWaveFunction.ChunkScale / 2);
-
-                            // Define the 8 corners of the 3D cell
-                            Vector3 bottomLeftFront = new Vector3(cellPosition.x, cellPosition.y, cellPosition.z);
-                            Vector3 bottomRightFront = new Vector3(cellPosition.x + chunkWidth, cellPosition.y, cellPosition.z);
-                            Vector3 topRightFront = new Vector3(cellPosition.x + chunkWidth, cellPosition.y + chunkHeight, cellPosition.z);
-                            Vector3 topLeftFront = new Vector3(cellPosition.x, cellPosition.y + chunkHeight, cellPosition.z);
-                            Vector3 bottomLeftBack = new Vector3(cellPosition.x, cellPosition.y, cellPosition.z + chunkDepth);
-                            Vector3 bottomRightBack = new Vector3(cellPosition.x + chunkWidth, cellPosition.y, cellPosition.z + chunkDepth);
-                            Vector3 topRightBack = new Vector3(cellPosition.x + chunkWidth, cellPosition.y + chunkHeight, cellPosition.z + chunkDepth);
-                            Vector3 topLeftBack = new Vector3(cellPosition.x, cellPosition.y + chunkHeight, cellPosition.z + chunkDepth);
-
-                            // Add vertices if they don't already exist
-                            int bottomLeftFrontIndex = AddVertex(bottomLeftFront);
-                            int bottomRightFrontIndex = AddVertex(bottomRightFront);
-                            int topRightFrontIndex = AddVertex(topRightFront);
-                            int topLeftFrontIndex = AddVertex(topLeftFront);
-                            int bottomLeftBackIndex = AddVertex(bottomLeftBack);
-                            int bottomRightBackIndex = AddVertex(bottomRightBack);
-                            int topRightBackIndex = AddVertex(topRightBack);
-                            int topLeftBackIndex = AddVertex(topLeftBack);
-
-                            // Generate triangles for all 6 faces of the 3D cell
-                            AddQuad(bottomLeftFrontIndex, bottomRightFrontIndex, topRightFrontIndex, topLeftFrontIndex);
-                            AddQuad(bottomRightBackIndex, bottomLeftBackIndex, topLeftBackIndex, topRightBackIndex);
-                            AddQuad(topLeftFrontIndex, topRightFrontIndex, topRightBackIndex, topLeftBackIndex);
-                            AddQuad(bottomRightFrontIndex, bottomLeftFrontIndex, bottomLeftBackIndex, bottomRightBackIndex);
-                            AddQuad(bottomLeftFrontIndex, bottomLeftBackIndex, topLeftBackIndex, topLeftFrontIndex);
-                            AddQuad(bottomRightBackIndex, bottomRightFrontIndex, topRightFrontIndex, topRightBackIndex);
-                        }
+                        continue;
                     }
+
+                    // Calculate cell's bottom-left-front corner position
+                    Vector3 cellPosition = chunkPosition + new Vector3(x, y, z).MultiplyByAxis(chunkWaveFunction.ChunkScale / 2) + offset;
+
+                    // Define the 8 corners of the 3D cell
+                    Vector3 bottomLeftFront = new Vector3(cellPosition.x, cellPosition.y, cellPosition.z);
+                    Vector3 bottomRightFront = new Vector3(cellPosition.x + chunkWidth, cellPosition.y, cellPosition.z);
+                    Vector3 topRightFront = new Vector3(cellPosition.x + chunkWidth, cellPosition.y + chunkHeight, cellPosition.z);
+                    Vector3 topLeftFront = new Vector3(cellPosition.x, cellPosition.y + chunkHeight, cellPosition.z);
+                    Vector3 bottomLeftBack = new Vector3(cellPosition.x, cellPosition.y, cellPosition.z + chunkDepth);
+                    Vector3 bottomRightBack = new Vector3(cellPosition.x + chunkWidth, cellPosition.y, cellPosition.z + chunkDepth);
+                    Vector3 topRightBack = new Vector3(cellPosition.x + chunkWidth, cellPosition.y + chunkHeight, cellPosition.z + chunkDepth);
+                    Vector3 topLeftBack = new Vector3(cellPosition.x, cellPosition.y + chunkHeight, cellPosition.z + chunkDepth);
+
+                    // Add vertices if they don't already exist
+                    int bottomLeftFrontIndex = AddVertex(bottomLeftFront);
+                    int bottomRightFrontIndex = AddVertex(bottomRightFront);
+                    int topRightFrontIndex = AddVertex(topRightFront);
+                    int topLeftFrontIndex = AddVertex(topLeftFront);
+                    int bottomLeftBackIndex = AddVertex(bottomLeftBack);
+                    int bottomRightBackIndex = AddVertex(bottomRightBack);
+                    int topRightBackIndex = AddVertex(topRightBack);
+                    int topLeftBackIndex = AddVertex(topLeftBack);
+
+                    // Generate triangles for all 6 faces of the 3D cell
+                    AddQuad(bottomLeftFrontIndex, bottomRightFrontIndex, topRightFrontIndex, topLeftFrontIndex);
+                    AddQuad(bottomRightBackIndex, bottomLeftBackIndex, topLeftBackIndex, topRightBackIndex);
+                    AddQuad(topLeftFrontIndex, topRightFrontIndex, topRightBackIndex, topLeftBackIndex);
+                    AddQuad(bottomRightFrontIndex, bottomLeftFrontIndex, bottomLeftBackIndex, bottomRightBackIndex);
+                    AddQuad(bottomLeftFrontIndex, bottomLeftBackIndex, topLeftBackIndex, topLeftFrontIndex);
+                    AddQuad(bottomRightBackIndex, bottomRightFrontIndex, topRightFrontIndex, topRightBackIndex);
                 }
             }
             Mesh mesh = new Mesh

@@ -341,7 +341,7 @@ namespace WaveFunctionCollapse
                 }
             }
 
-            short key = currentSideIndex;
+            short key = currentSideIndex++;
 
             // Check for symmetry
             List<Vector2> negPositions = new List<Vector2>();

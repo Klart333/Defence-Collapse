@@ -11,13 +11,16 @@ public class PathManager : Singleton<PathManager>
 {
     public event Action GetPathInformation;
 
-    [Title("Flood fill")]
+    [Title("Flow Field")]
     [SerializeField]
     private Vector2Int gridSize;
 
     [SerializeField]
     private float cellScale;
 
+    [SerializeField]
+    private float updateFrequency = 1; 
+    
     [Title("Portal")]
     [SerializeField]
     private GroundObjectData portalObjectData;
@@ -34,6 +37,8 @@ public class PathManager : Singleton<PathManager>
     private readonly List<Portal> portals = new List<Portal>();
 
     private JobHandle jobHandle;
+    
+    private float updateTimer;
 
     public NativeArray<byte> Directions => directions;
     public float CellScale => cellScale;
@@ -93,7 +98,12 @@ public class PathManager : Singleton<PathManager>
 
     private void Update() // DONT DO EVERY UPDATE :P
     {
-        UpdateFlowField();
+        updateTimer += Time.deltaTime;
+        if (updateTimer >= updateFrequency)
+        {
+            updateTimer = 0;
+            UpdateFlowField();
+        }
     }
 
     private void OnPortalPlaced(GameObject spawnedObject) 
@@ -141,7 +151,7 @@ public class PathManager : Singleton<PathManager>
         };
 
         jobHandle = pathJob.Schedule();
-        jobHandle.Complete();
+        jobHandle.Complete(); // Dont like having to complete it immediately, maybe dont have to?
     }
 
     #region Debug

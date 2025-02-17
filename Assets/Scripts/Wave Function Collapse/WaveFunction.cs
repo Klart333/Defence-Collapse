@@ -159,7 +159,6 @@ namespace WaveFunctionCollapse
                 }
 
                 Cell changedCell = cells[cellIndex];
-
                 List<int> validDirs = ValidDirections(cellIndex, out List<Direction> directions);
 
                 for (int i = 0; i < validDirs.Count; i++)
@@ -180,10 +179,10 @@ namespace WaveFunctionCollapse
 
         private List<PrototypeData> Constrain(Cell changedCell, Cell affectedCell, int index, Direction direction, out bool changed)
         {
-            if (affectedCell.Collapsed)
+            if (affectedCell.Collapsed)  
             {
                 changed = false;
-                return new List<PrototypeData>(affectedCell.PossiblePrototypes);
+                return null;
             }
 
             // Check downward
@@ -215,7 +214,7 @@ namespace WaveFunctionCollapse
             {
                 SetCell(index, emptyPrototype);
                 changed = false;
-                return new List<PrototypeData> { emptyPrototype };
+                return null;
             }
 
             // Check Directly Above
@@ -232,7 +231,7 @@ namespace WaveFunctionCollapse
                 {
                     SetCell(index, emptyPrototype);
                     changed = false;
-                    return new List<PrototypeData>() { emptyPrototype };
+                    return null;
                 }
             }
 
@@ -711,34 +710,14 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public static void Constrain(Cell changedCell, Cell affectedCell, Direction direction, Func<short[], bool> isValid, out bool changed)
-        {
-            changed = false;
-            if (affectedCell.Collapsed) return;
-
-            HashSet<short> validKeys = new HashSet<short>();
-            for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
-            {
-                validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
-            }
-
-            Direction oppositeDirection = OppositeDirection(direction);
-            for (int i = affectedCell.PossiblePrototypes.Count - 1; i >= 0; i--)
-            {
-                if (CheckValidSocket(affectedCell.PossiblePrototypes[i].DirectionToKey(oppositeDirection), validKeys) || !isValid(affectedCell.PossiblePrototypes[i].Keys)) continue;
-
-                affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
-                changed = true;
-            }
-        }
-
         public static bool CheckValidSocket(short key, HashSet<short> validKeys)
         {
             return key switch
             {
                 //>= 5000 => validKeys.Contains(key), // Ex. v0_0
-                >= 2000 => validKeys.Contains(key), // Ex. 0s
+                >= 2000 or -1 => validKeys.Contains(key), // Ex. 0s
                 >= 1000 => validKeys.Contains((short)(key - 1000)), // Ex. 0f
+                //-1      => validKeys.Contains(key), // For the -1s case
                 _       => validKeys.Contains((short)(key + 1000)) // Ex. 0
             };
         }
