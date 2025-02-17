@@ -26,6 +26,15 @@ namespace Buildings.District
         private Dictionary<DistrictType, PrototypeInfoData> districtInfoData = new Dictionary<DistrictType, PrototypeInfoData>();
     
         private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
+        private readonly List<DistrictData> uniqueDistricts = new List<DistrictData>();
+
+        private void Update()
+        {
+            for (int i = 0; i < uniqueDistricts.Count; i++)
+            {
+                uniqueDistricts[i].Update();
+            }
+        }
 
         public void BuildDistrict(HashSet<Chunk> chunks, DistrictType districtType)
         {
@@ -63,7 +72,8 @@ namespace Buildings.District
             }
             
             DistrictData districtData = GetDistrictData(districtType, chunks, position);
-
+            uniqueDistricts.Add(districtData);
+            
             foreach (Chunk chunk in chunks)
             {
                 districts.TryAdd(chunk.ChunkIndex.xz, districtData);

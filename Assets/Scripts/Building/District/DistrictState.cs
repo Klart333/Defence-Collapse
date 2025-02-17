@@ -1,5 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
+using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace Buildings.District
@@ -14,6 +17,8 @@ namespace Buildings.District
         protected Stats stats;
         protected DistrictData districtData;
         protected DamageInstance lastDamageDone;
+        protected Entity spawnedEntity;
+        protected EntityManager entityManager;
 
         public virtual Attack Attack { get; }
         public DamageInstance LastDamageDone => lastDamageDone;
@@ -26,6 +31,11 @@ namespace Buildings.District
         {
             this.districtData = districtData;
             OriginPosition = position;
+
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            
+            spawnedEntity = entityManager.CreateEntity();
+            entityManager.AddComponentData(spawnedEntity, new LocalTransform { Position = position });
         }
 
         public abstract void OnStateEntered();
@@ -66,6 +76,9 @@ namespace Buildings.District
 
             attack = new Attack(archerData.BaseAttack);
             stats = new Stats(archerData.Stats);
+
+            entityManager.AddComponentData(spawnedEntity, new RangeComponent { Range = Range });
+            entityManager.AddComponentData(spawnedEntity, new EnemyTargetComponent());
         }
 
         public override Attack Attack => attack;
@@ -95,15 +108,12 @@ namespace Buildings.District
         {
             if (attackCooldownTimer <= 0)
             {
-                //EnemyHealth closest = EnemyManager.Instance.GetClosestEnemy(OriginPosition);
-                //if (closest == null)
-                //    return;
-
-                //if (Vector3.Distance(OriginPosition, closest.transform.position) <= Range)
-                //{
-                //    attackCooldownTimer = 1.0f / stats.AttackSpeed.Value;
-                //    PerformAttack(closest);
-                //}
+                Entity targetEntity = entityManager.GetComponentData<EnemyTargetComponent>(spawnedEntity).Target;
+                Debug.Log("Attacking Entity: " + targetEntity);
+                if (entityManager.Exists(targetEntity))
+                {
+                    PerformAttack(entityManager.GetComponentData<LocalTransform>(targetEntity).Position);
+                }
             }
             else
             {
@@ -111,19 +121,10 @@ namespace Buildings.District
             }
         }
 
-        private async void PerformAttack(EnemyHealth target)
+        private void PerformAttack(float3 targetPosition)
         {
-            AttackPosition = target.transform.position;
+            AttackPosition = targetPosition;
             attack.TriggerAttack(this);
-
-            float timer = attackCooldownTimer;
-            while (timer > 0 && target != null && target.Health.Alive)
-            {
-                timer -= Time.deltaTime;
-                AttackPosition = target.transform.position;
-
-                await UniTask.Yield();
-            }
         }
 
         public override void OnWaveStart(int houseCount)

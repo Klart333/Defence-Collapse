@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace DataStructures.Queue.ECS
 {
@@ -29,10 +30,12 @@ namespace DataStructures.Queue.ECS
         [BurstCompile]
         protected override void OnUpdate()
         {
+            Debug.Log("OnUpdate");
+
             SpatialGrid.Clear();
             new BuildEnemyHashGridJob
             {
-                SpatialGrid = SpatialGrid,
+                SpatialGrid = SpatialGrid.AsParallelWriter(),
                 CellSize = 1,
             }.ScheduleParallel();
         }
@@ -42,7 +45,7 @@ namespace DataStructures.Queue.ECS
     [WithAll(typeof(SpeedComponent))]
     public partial struct BuildEnemyHashGridJob : IJobEntity
     {
-        public NativeParallelMultiHashMap<int2, Entity> SpatialGrid;
+        public NativeParallelMultiHashMap<int2, Entity>.ParallelWriter SpatialGrid;
 
         public float CellSize;
 

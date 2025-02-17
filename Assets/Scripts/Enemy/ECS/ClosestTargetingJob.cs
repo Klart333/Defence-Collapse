@@ -22,7 +22,7 @@ namespace DataStructures.Queue.ECS
         public void Execute(in LocalTransform towerTransform, in RangeComponent rangeComponent, ref EnemyTargetComponent targetComponent)
         {
             float2 towerPosition = new float2(towerTransform.Position.x, towerTransform.Position.z);
-
+            Debug.Log("Tower Pos: " + towerPosition);
             // Get the grid cell of the tower
             int2 towerCell = HashGridUtility.GetCell(towerPosition, CellSize);
 
@@ -46,6 +46,8 @@ namespace DataStructures.Queue.ECS
                     if (!transformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform)) continue;
 
                     float2 enemyPosition = new float2(enemyTransform.Position.x, enemyTransform.Position.z);
+                    Debug.Log("enemyPosition: " + towerPosition);
+
                     float distSq = math.distancesq(towerPosition, enemyPosition);
 
                     // Check if this enemy is closer
