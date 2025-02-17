@@ -38,8 +38,6 @@ public class EnemyHealth : MonoBehaviour, IHealth
         health.OnDeath += HealthOnDeath;
 
         healthbar.Setup(this);
-
-        EnemyManager.Instance.RegisterEnemy(this);
     }
 
     private void OnDisable()

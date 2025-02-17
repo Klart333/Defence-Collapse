@@ -93,22 +93,17 @@ namespace Buildings.District
 
         public override void Update()
         {
-            if (EnemyManager.Instance.Enemies.Count <= 0)
-            {
-                return;
-            }
-
             if (attackCooldownTimer <= 0)
             {
-                EnemyHealth closest = EnemyManager.Instance.GetClosestEnemy(OriginPosition);
-                if (closest == null)
-                    return;
+                //EnemyHealth closest = EnemyManager.Instance.GetClosestEnemy(OriginPosition);
+                //if (closest == null)
+                //    return;
 
-                if (Vector3.Distance(OriginPosition, closest.transform.position) <= Range)
-                {
-                    attackCooldownTimer = 1.0f / stats.AttackSpeed.Value;
-                    PerformAttack(closest);
-                }
+                //if (Vector3.Distance(OriginPosition, closest.transform.position) <= Range)
+                //{
+                //    attackCooldownTimer = 1.0f / stats.AttackSpeed.Value;
+                //    PerformAttack(closest);
+                //}
             }
             else
             {
@@ -188,22 +183,19 @@ namespace Buildings.District
 
         public override void Update()
         {
-            if (EnemyManager.Instance.Enemies.Count <= 0)
-            {
-                return;
-            }
-
+            
             if (attackCooldownTimer <= 0)
             {
-                EnemyHealth closest = EnemyManager.Instance.GetClosestEnemy(OriginPosition);
-                if (closest == null)
-                    return;
+                // Get Data from Entity
+                //EnemyHealth closest = EnemyManager.Instance.GetClosestEnemy(OriginPosition);
+                //if (closest == null)
+                //    return;
 
-                if (Vector3.Distance(OriginPosition, closest.transform.position) <= Range)
-                {
-                    attackCooldownTimer = 1.0f / stats.AttackSpeed.Value;
-                    PerformAttack(closest).Forget(Debug.LogError);
-                }
+                //if (Vector3.Distance(OriginPosition, closest.transform.position) <= Range)
+                //{
+                //    attackCooldownTimer = 1.0f / stats.AttackSpeed.Value;
+                //    PerformAttack(closest).Forget(Debug.LogError);
+                //}
             }
             else
             {

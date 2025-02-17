@@ -106,6 +106,14 @@ public class PathManager : Singleton<PathManager>
         }
     }
 
+    private void LateUpdate()
+    {
+        if (updateTimer == 0 && !jobHandle.IsCompleted)
+        {
+            jobHandle.Complete();
+        }
+    }
+    
     private void OnPortalPlaced(GameObject spawnedObject) 
     {
         if (spawnedObject.TryGetComponent(out Portal portal))
@@ -151,7 +159,6 @@ public class PathManager : Singleton<PathManager>
         };
 
         jobHandle = pathJob.Schedule();
-        jobHandle.Complete(); // Dont like having to complete it immediately, maybe dont have to?
     }
 
     #region Debug
