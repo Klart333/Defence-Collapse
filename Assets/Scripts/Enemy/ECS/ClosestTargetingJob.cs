@@ -1,5 +1,6 @@
 using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Entities;
@@ -13,8 +14,8 @@ namespace DataStructures.Queue.ECS
         [ReadOnly]
         public ComponentLookup<LocalTransform> transformLookup;
         
-        [ReadOnly]
-        public NativeParallelMultiHashMap<int2, Entity> SpatialGrid;
+        [ReadOnly, NativeDisableContainerSafetyRestriction]
+        public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
 
         public float CellSize;
 
@@ -22,7 +23,6 @@ namespace DataStructures.Queue.ECS
         public void Execute(in LocalTransform towerTransform, in RangeComponent rangeComponent, ref EnemyTargetComponent targetComponent)
         {
             float2 towerPosition = new float2(towerTransform.Position.x, towerTransform.Position.z);
-            Debug.Log("Tower Pos: " + towerPosition);
             // Get the grid cell of the tower
             int2 towerCell = HashGridUtility.GetCell(towerPosition, CellSize);
 
@@ -46,7 +46,6 @@ namespace DataStructures.Queue.ECS
                     if (!transformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform)) continue;
 
                     float2 enemyPosition = new float2(enemyTransform.Position.x, enemyTransform.Position.z);
-                    Debug.Log("enemyPosition: " + towerPosition);
 
                     float distSq = math.distancesq(towerPosition, enemyPosition);
 

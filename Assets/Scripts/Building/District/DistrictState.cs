@@ -109,10 +109,13 @@ namespace Buildings.District
             if (attackCooldownTimer <= 0)
             {
                 Entity targetEntity = entityManager.GetComponentData<EnemyTargetComponent>(spawnedEntity).Target;
-                Debug.Log("Attacking Entity: " + targetEntity);
                 if (entityManager.Exists(targetEntity))
                 {
                     PerformAttack(entityManager.GetComponentData<LocalTransform>(targetEntity).Position);
+                }
+                else
+                {
+                    attackCooldownTimer = 0.1f;
                 }
             }
             else
@@ -125,6 +128,7 @@ namespace Buildings.District
         {
             AttackPosition = targetPosition;
             attack.TriggerAttack(this);
+            attackCooldownTimer = 1.0f / stats.AttackSpeed.Value;
         }
 
         public override void OnWaveStart(int houseCount)

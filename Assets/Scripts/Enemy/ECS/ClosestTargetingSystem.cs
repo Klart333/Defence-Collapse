@@ -3,15 +3,16 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace DataStructures.Queue.ECS
 {
+    [UpdateAfter(typeof(EnemyHashGridSystem))]
     public partial struct ClosestTargetingSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
-        {
-            state.RequireForUpdate<EnemyHashGridSystem>();
+        { 
         }
 
         public void OnUpdate(ref SystemState state)
@@ -23,7 +24,7 @@ namespace DataStructures.Queue.ECS
             new ClosestTargetingJob
             {
                 transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
-                SpatialGrid = spatialGrid,
+                SpatialGrid = spatialGrid.AsReadOnly(),
                 CellSize = 1
             }.ScheduleParallel();
         }

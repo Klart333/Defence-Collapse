@@ -1,10 +1,8 @@
-using Unity.Burst;
 using Unity.Collections;
-using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
+using Unity.Entities;
+using Unity.Burst;
 
 namespace DataStructures.Queue.ECS
 {
@@ -30,8 +28,6 @@ namespace DataStructures.Queue.ECS
         [BurstCompile]
         protected override void OnUpdate()
         {
-            Debug.Log("OnUpdate");
-
             SpatialGrid.Clear();
             new BuildEnemyHashGridJob
             {
