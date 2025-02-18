@@ -471,7 +471,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb8156d5e2226241b9d881891e641db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPoolSize: 1
   regularMask:
     serializedVersion: 2
     m_Bits: 1
@@ -482,6 +481,8 @@ MonoBehaviour:
   - {fileID: 58342929689540731}
   - {fileID: 8209515463990722260}
   unlockCanvas: {fileID: 2688155629362669111}
+  spawnDataUtility: {fileID: 11400000, guid: 14e0cdc191631d54d99384f21e9b5d6f, type: 2}
+  spawnerFrequency: 10
 --- !u!65 &2579864576004176817
 BoxCollider:
   m_ObjectHideFlags: 0

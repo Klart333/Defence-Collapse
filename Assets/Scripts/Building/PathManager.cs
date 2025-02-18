@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using Sirenix.OdinInspector;
+﻿using Sirenix.OdinInspector;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using Unity.Jobs;
 using System;
-using System.Linq;
 
 public class PathManager : Singleton<PathManager>
 {
@@ -25,27 +23,25 @@ public class PathManager : Singleton<PathManager>
     [SerializeField]
     private GroundObjectData portalObjectData;
 
-    private NativeArray<bool> targetIndexes;
     private NativeArray<bool> notWalkableIndexes;
     private NativeArray<byte> movementCosts;
+    private NativeArray<bool> targetIndexes;
     
-    private NativeArray<byte> directions;
-    private NativeArray<int> distances;
     private NativeArray<int2> neighbourDirections;
-    public NativeArray<byte> UnitCounts;
-
-    private readonly List<Portal> portals = new List<Portal>();
-
+    private NativeArray<byte> directions;
+    private NativeArray<byte> UnitCounts;
+    private NativeArray<int> distances;
+    
     private JobHandle jobHandle;
     
     private float updateTimer;
 
+    public float GridWorldHeight => GridHeight * CellScale;
+    public float GridWorldWidth => GridWidth * CellScale;
     public NativeArray<byte> Directions => directions;
     public float CellScale => cellScale;
     public int GridHeight => gridSize.y;
     public int GridWidth => gridSize.x;
-    public float GridWorldWidth => GridWidth * CellScale;
-    public float GridWorldHeight => GridHeight * CellScale;
 
     public BoolPathSet BlockerPathSet { get; private set; }
     public BoolPathSet TargetPathSet { get; private set; }
@@ -53,8 +49,6 @@ public class PathManager : Singleton<PathManager>
 
     private void OnEnable()
     {
-        portalObjectData.OnObjectSpawned += OnPortalPlaced;
-
         int length = gridSize.x * gridSize.y;
         targetIndexes = new NativeArray<bool>(length, Allocator.Persistent);
         notWalkableIndexes = new NativeArray<bool>(length, Allocator.Persistent);
@@ -81,8 +75,6 @@ public class PathManager : Singleton<PathManager>
 
     private void OnDisable()
     {
-        portalObjectData.OnObjectSpawned -= OnPortalPlaced;
-
         targetIndexes.Dispose();
         notWalkableIndexes.Dispose();
         movementCosts.Dispose();
@@ -114,23 +106,6 @@ public class PathManager : Singleton<PathManager>
         }
     }
     
-    private void OnPortalPlaced(GameObject spawnedObject) 
-    {
-        if (spawnedObject.TryGetComponent(out Portal portal))
-        {
-            portals.Add(portal);
-        }
-        else
-        {
-            Debug.LogError("Could not find portal script on spawned portal?");
-        }
-    }
-
-    public List<Vector3> GetEnemySpawnPoints()
-    {
-        return (from t in portals where !t.Locked select t.transform.position).ToList();
-    }
-
     private void UpdateFlowField()
     {
         for (int i = 0; i < UnitCounts.Length; i++)

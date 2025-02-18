@@ -16,7 +16,7 @@ namespace DataStructures.Queue.ECS
         {
             base.OnCreate();
             
-            SpatialGrid = new NativeParallelMultiHashMap<int2, Entity>(1000, Allocator.Persistent);
+            SpatialGrid = new NativeParallelMultiHashMap<int2, Entity>(20000, Allocator.Persistent);
         }
 
         [BurstCompile]

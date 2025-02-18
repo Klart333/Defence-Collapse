@@ -138,18 +138,19 @@ namespace WaveFunctionCollapse
                 typeof(PhysicsWorldIndex),
             };
 
-            Entity entity = World.DefaultGameObjectInjectionWorld.EntityManager.CreateEntity(componentTypes);
-            World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new LocalToWorld
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Entity entity = entityManager.CreateEntity(componentTypes);
+            entityManager.SetComponentData(entity, new LocalToWorld
             {
                 Value = gameObject.transform.localToWorldMatrix,
             });
-            World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new LocalTransform()
+            entityManager.SetComponentData(entity, new LocalTransform()
             {
                 Position = transform.localPosition,
                 Rotation = transform.localRotation,
                 Scale = transform.localScale.x,
             });
-            World.DefaultGameObjectInjectionWorld.EntityManager.SetComponentData(entity, new PhysicsCollider
+            entityManager.SetComponentData(entity, new PhysicsCollider
             {
                 Value = blobCollider,
             });

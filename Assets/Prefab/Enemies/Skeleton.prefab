@@ -635,7 +635,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 249136421253790142}
-  - component: {fileID: 2507997879559971554}
+  - component: {fileID: 963110416564017035}
   - component: {fileID: 4586479872800882983}
   - component: {fileID: 3516669082298736364}
   - component: {fileID: 9165015436409488771}
@@ -664,7 +664,7 @@ Transform:
   - {fileID: 8545183556401368694}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2507997879559971554
+--- !u!114 &963110416564017035
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -673,14 +673,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 6117266073140076101}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a36ececf972dcef43937c87e7ff509a6, type: 3}
+  m_Script: {fileID: 11500000, guid: d216bcff514e4485b5a22848714bc579, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   enemyData: {fileID: 11400000, guid: 925df8f9da1f97a4f9b4140e161b7cdc, type: 2}
   groundMask:
     serializedVersion: 2
     m_Bits: 64
-  turnSpeed: 1
+  turnSpeed: 2
 --- !u!114 &4586479872800882983
 MonoBehaviour:
   m_ObjectHideFlags: 0

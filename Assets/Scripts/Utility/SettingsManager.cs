@@ -14,4 +14,12 @@ public class SettingsManager : Singleton<SettingsManager>
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
     }
+
+    private void Update()
+    {
+        if (targetFrameRate != Application.targetFrameRate)
+        {
+            Application.targetFrameRate = targetFrameRate;
+        }
+    }
 }

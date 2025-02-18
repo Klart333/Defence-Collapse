@@ -6,6 +6,6 @@ public class UIStartWave : MonoBehaviour
 {
     public void StartWave()
     {
-        Events.OnWaveClicked?.Invoke();
+        Events.OnWaveStarted?.Invoke(); // NEEDS TO CHECK IF A PORTAL IS UNLOCKED
     }
 }
