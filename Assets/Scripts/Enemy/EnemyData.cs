@@ -24,6 +24,8 @@ public class EnemyData : SerializedScriptableObject
     public List<float> LootProbability;
 
     [Title("Spawning")]
+    public int UnlockedThreshold = 0;
+    
     public int CreditCost = 1;
     
     [TitleGroup("Stats")]

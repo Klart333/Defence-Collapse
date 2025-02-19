@@ -19,6 +19,8 @@ namespace Enemy
         [SerializeField]
         private float turnSpeed = 2;
         
+        public EnemyData EnemyData => enemyData;
+        
         public class EnemyBaker : Baker<Enemy>
         {
             public override void Bake(Enemy authoring)
