@@ -23,8 +23,9 @@ public class EnemyAttacker : MonoBehaviour, IAttacker, IHealth
     public DamageInstance LastDamageDone { get; private set; }
     public Vector3 AttackPosition { get; set; }
     public Vector3 OriginPosition => transform.position;
-    public LayerMask LayerMask => attackData.LayerMask;
+    public LayerMask CollideWith => attackData.LayerMask;
     public IAttacker Attacker => this;
+    public int Key { get; }
 
     private void Awake()
     {

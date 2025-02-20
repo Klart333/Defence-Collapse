@@ -24,7 +24,7 @@ namespace Buildings.District
         
         public int2 Index { get; set; }
 
-        public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction chunkWaveFunction)
+        public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction chunkWaveFunction, int key)
         {
             UpgradeData = new UpgradeData(1, 1, 1);
             cellCount = chunks.Count;
@@ -32,8 +32,8 @@ namespace Buildings.District
             
             State = districtType switch
             {
-                DistrictType.Archer => new ArcherState(this, BuildingUpgradeManager.Instance.ArcherData, position),
-                DistrictType.Bomb => new BombState(this, BuildingUpgradeManager.Instance.BombData, position),
+                DistrictType.Archer => new ArcherState(this, BuildingUpgradeManager.Instance.ArcherData, position, key),
+                DistrictType.Bomb => new BombState(this, BuildingUpgradeManager.Instance.BombData, position, key),
                 //DistrictType.Church => expr,
                 //DistrictType.Farm => expr,
                 //DistrictType.Mine => expr,

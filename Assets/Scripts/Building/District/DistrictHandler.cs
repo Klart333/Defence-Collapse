@@ -28,6 +28,8 @@ namespace Buildings.District
         private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
         private readonly List<DistrictData> uniqueDistricts = new List<DistrictData>();
 
+        private int districtKey;
+
         private void Update()
         {
             for (int i = 0; i < uniqueDistricts.Count; i++)
@@ -115,7 +117,7 @@ namespace Buildings.District
 
         private DistrictData GetDistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position)
         {
-            DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator);
+            DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator, districtKey++);
             return districtData;
         }
 

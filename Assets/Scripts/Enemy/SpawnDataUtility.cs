@@ -7,12 +7,18 @@ namespace Enemy
     [CreateAssetMenu(fileName = "SpawnDataUtility", menuName = "Enemy/Spawn Data Utility"), InlineEditor] 
     class SpawnDataUtility : ScriptableObject
     {
+        [Title("Data")]
         [SerializeField]
         private EnemyUtility enemyUtility;
+
+        [Title("Settings")]
+        [SerializeField]
+        private AnimationCurve targetWaveDuration;
         
         public SpawnPointComponent GetSpawnPointData(int spawnPointLevel, int waveLevel)
         {
-            float credits = 5 + Mathf.Pow((spawnPointLevel + waveLevel) / 2.0f, 1.5f) * Random.Range(0.9f, 1.1f);
+            float combinedWaveLevel = (spawnPointLevel + waveLevel) / 2.0f;
+            float credits = 5 + Mathf.Pow(combinedWaveLevel, 1.5f) * Random.Range(0.9f, 1.1f);
             List<int> possibleEnemies = new List<int>();
 
             for (int i = 0; i < enemyUtility.Enemies.Count; i++)
@@ -23,11 +29,15 @@ namespace Enemy
                 }
             }
             
+            int enemyIndex = Random.Range(0, possibleEnemies.Count);
+            int amount = Mathf.FloorToInt(credits / enemyUtility.Enemies[enemyIndex].EnemyData.CreditCost);
+            float spawnRate = (targetWaveDuration.Evaluate(combinedWaveLevel) / amount) * Random.Range(0.75f, 1.5f);
+            
             return new SpawnPointComponent
             {
-                EnemyIndex = 0,
-                SpawnRate = 0,
-                Amount = 1000,
+                EnemyIndex = enemyIndex,
+                SpawnRate = spawnRate,
+                Amount = amount,
                 Timer = 1,
             };
         }

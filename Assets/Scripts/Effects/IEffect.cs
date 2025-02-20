@@ -6,6 +6,10 @@ using UnityEngine;
 using DG.Tweening;
 using System;
 using System.Linq;
+using Effects.ECS;
+using Unity.Entities;
+using Unity.Rendering;
+using Unity.Transforms;
 
 namespace Effects
 {
@@ -234,37 +238,49 @@ namespace Effects
         [Title("Collider")]
         public float Radius = 1;
 
+        public float Lifetime = 0.5f;
+
         public bool TriggerDamageDone = true;
 
         public void Perform(IAttacker unit)
         {
             Vector3 pos = unit.AttackPosition;
-
-            DamageInstance dmg = new DamageInstance
+            
+            DamageComponent dmgComponent = new DamageComponent
             {
                 Damage = ModifierValue * unit.Stats.DamageMultiplier.Value,
-                Source = unit,
-                AttackPosition = pos,
+                Key = unit.Key,
+                TriggerDamageDone = TriggerDamageDone,
+                LimitedHits = LimitedHits ? Hits : -1,
             };
 
-            DamageCollider collider = ColliderManager.Instance.GetCollider(pos, Radius, layermask: unit.LayerMask, triggerDamageDone: TriggerDamageDone);
-            collider.Attacker = unit;
-            collider.DamageInstance = dmg;
-
-            if (LimitedHits)
+            ColliderComponent colliderComponent = new ColliderComponent
             {
-                int hits = 0;
-                void LimitHitAction()
-                {
-                    if (++hits >= Hits)
-                    {
-                        collider.OnHit -= LimitHitAction;
-                        collider.gameObject.SetActive(false);
-                    }
-                }
+                Radius = Radius,
+                CollideWith = unit.CollideWith
+            };
+            
+            Entity colliderEntity = CreateEntity(pos, colliderComponent, dmgComponent);
+        }
 
-                collider.OnHit += LimitHitAction;
-            }
+        private Entity CreateEntity(Vector3 pos, ColliderComponent colliderComponent, DamageComponent dmgComponent)
+        {
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+
+            ComponentType[] componentTypes = {
+                typeof(DamageComponent),
+                typeof(ColliderComponent),
+                typeof(PositionComponent),
+                typeof(LifetimeComponent),
+            };
+
+            Entity spawned = entityManager.CreateEntity(componentTypes);
+            entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
+            entityManager.SetComponentData(spawned, new LifetimeComponent{Lifetime = Lifetime});
+            entityManager.SetComponentData(spawned, colliderComponent);
+            entityManager.SetComponentData(spawned, dmgComponent);
+
+            return spawned;
         }
 
         public void Revert(IAttacker unit)
@@ -285,8 +301,11 @@ namespace Effects
 
         [Title("Hits")]
         public bool LimitedHits = false;
+        
         [ShowIf(nameof(LimitedHits))]
         public int Hits = 0;
+        
+        public bool TriggerDamageDone = true;
 
         [Title("Collider")]
         public float Radius = 1;
@@ -300,71 +319,85 @@ namespace Effects
         public List<IEffect> Effects;
 
         [Title("Visual")]
-        public AttackVisualEffect AttackEffect;
+        public Mesh Mesh;
+        public Material Material;
 
-        public void Perform(IAttacker attacker)
+        public void Perform(IAttacker unit)
         {
-            Vector3 targetPosition = attacker.AttackPosition;
-            DamageInstance dmg = new DamageInstance
+            Vector3 targetPosition = unit.AttackPosition;
+            float distance = Vector3.Distance(unit.OriginPosition, targetPosition) + Height;
+            float lifetime = distance / UnitsPerSecond;
+            
+            DamageComponent damage = new DamageComponent
             {
-                Damage = ModifierValue * attacker.Stats.DamageMultiplier.Value,
-                Source = attacker,
-                AttackPosition = targetPosition
+                Damage = ModifierValue * unit.Stats.DamageMultiplier.Value,
+                Key = unit.Key,
+                TriggerDamageDone = true,
+                LimitedHits = LimitedHits ? Hits : -1,
             };
 
-            float distance = Vector3.Distance(attacker.OriginPosition, targetPosition) + Height;
-            float lifetime = distance / UnitsPerSecond;
-
-            AttackVisualEffect visual = AttackEffect.Spawn(attacker.OriginPosition, Quaternion.identity, 1, lifetime + 0.2f);
-            DamageCollider collider = ColliderManager.Instance.GetCollider(attacker.OriginPosition, Radius, lifetime + 0.1f, layermask: attacker.LayerMask);
-            collider.Attacker = attacker;
-            collider.DamageInstance = dmg;
-
-            float t = 0;
-            var tween = DOTween.To(() => t, (t) =>
+            ColliderComponent collider = new ColliderComponent
             {
-                Vector3 pos = GetPosition(attacker.OriginPosition, targetPosition, t);
-                collider.transform.position = pos;
-                visual.transform.position = pos;
-            }, 1f, lifetime).SetEase(Ease).OnComplete(() =>
+                Radius = Radius,
+                CollideWith = unit.CollideWith
+            };
+
+            ArchedMovementComponent arch = new ArchedMovementComponent
             {
-                if (Effects == null || attacker == null)
-                {
-                    return;
-                }
+                StartPosition = unit.OriginPosition,
+                EndPosition = targetPosition,
+                Pivot = Vector3.Lerp(unit.OriginPosition, targetPosition, 0.5f) + Vector3.up * Height,
+            };
+            
+            Entity colliderEntity = CreateEntity(unit.OriginPosition, lifetime, collider, damage, arch);
 
-                attacker.AttackPosition = targetPosition;
+            //.OnComplete(() =>
+            //{
+            //    if (Effects == null)
+            //    {
+            //        return;
+            //    }
 
-                for (int i = 0; i < Effects.Count; i++)
-                {
-                    Effects[i].Perform(attacker);
-                }
-            });
+            //    unit.AttackPosition = targetPosition;
 
-            if (LimitedHits)
-            {
-                int hits = 0;
-                Action LimitHitAction = null;
-                LimitHitAction = () =>
-                {
-                    if (++hits >= Hits)
-                    {
-                        tween.Complete();
-                        collider.OnHit -= LimitHitAction;
-
-                        collider.gameObject.SetActive(false);
-                        visual.OnAttackBreak();
-                    }
-                };
-
-                collider.OnHit += LimitHitAction;
-            }
+            //    for (int i = 0; i < Effects.Count; i++)
+            //    {
+            //        Effects[i].Perform(unit);
+            //    }
+            //});
         }
 
-        private Vector3 GetPosition(Vector3 start, Vector3 target, float t)
+        private Entity CreateEntity(Vector3 pos, float lifetime, ColliderComponent collider, DamageComponent damage, ArchedMovementComponent arch)
         {
-            Vector3 midPos = Vector3.Lerp(start, target, 0.5f) + Vector3.up * Height;
-            return Vector3.Lerp(Vector3.Lerp(start, midPos, t), Vector3.Lerp(midPos, target, t), t);
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+
+            ComponentType[] componentTypes = {
+                typeof(DamageComponent),
+                typeof(ColliderComponent),
+                typeof(PositionComponent),
+                typeof(LifetimeComponent),
+                typeof(ArchedMovementComponent),
+                typeof(SpeedComponent),
+                typeof(RenderMeshUnmanaged)
+            };
+
+            Entity spawned = entityManager.CreateEntity(componentTypes);
+            entityManager.SetComponentData(spawned, new SpeedComponent{Speed = 1.0f / lifetime});
+            entityManager.SetComponentData(spawned, new LifetimeComponent{Lifetime = lifetime});
+            entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
+            entityManager.SetComponentData(spawned, collider);
+            entityManager.SetComponentData(spawned, damage);
+            entityManager.SetComponentData(spawned, arch);
+            
+            UnityObjectRef<Mesh> meshRef = Mesh;
+            UnityObjectRef<Material> matRef = Material;
+            entityManager.SetComponentData(spawned, new RenderMeshUnmanaged
+            {
+                mesh = meshRef.Value,
+                materialForSubMesh = matRef.Value,
+            });
+
+            return spawned;
         }
 
         public void Revert(IAttacker unit)

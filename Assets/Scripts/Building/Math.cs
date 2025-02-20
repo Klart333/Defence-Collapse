@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Mathematics;
+using UnityEngine;
 
 public static class Math
 {
@@ -25,6 +26,20 @@ public static class Math
 
     public static short GetSecondSocketValue(short socket)
     {
-        return (short)((socket / 100) % 10);
+        return (short)(socket / 100 % 10);
+    }
+
+    public static float3 CubicLerp(float3 a, float3 b, float3 c, float t)
+    {
+        //t = math.clamp(t, 0f, 1f);
+
+        // Quadratic Bézier interpolation formula:
+        // P(t) = (1 - t)^2 * a + 2 * (1 - t) * t * c + t^2 * b
+        float oneMinusT = 1f - t;
+        float oneMinusTSquared = oneMinusT * oneMinusT;
+        float tSquared = t * t;
+
+        // Compute the interpolated value
+        return oneMinusTSquared * a + 2f * oneMinusT * t * c + tSquared * b;
     }
 }

@@ -104,7 +104,6 @@ namespace Enemy
             waveLevel++;
             if (Locked) return;
 
-            Debug.Log("Wave Started");
             if (spawnLevel % spawnerFrequency == 0)
             {
                 CreateEntity();
@@ -117,7 +116,6 @@ namespace Enemy
                 comp.Timer = i * 5;
                 entityManager.SetComponentData(entities[i], comp);
                 entityManager.AddComponent<SpawningTag>(entities[i]);
-                Debug.Log("Spawning " + comp.Amount + " Enemy Index" + comp.EnemyIndex);
             }
 
         }

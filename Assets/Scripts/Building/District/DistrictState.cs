@@ -1,9 +1,10 @@
-﻿using Cysharp.Threading.Tasks;
-using System;
-using Unity.Entities;
+﻿using DataStructures.Queue.ECS;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Unity.Entities;
 using UnityEngine;
+using System;
+using Effects.ECS;
 
 namespace Buildings.District
 {
@@ -14,25 +15,31 @@ namespace Buildings.District
         
         public float Range { get; set; }
 
-        protected Stats stats;
-        protected DistrictData districtData;
         protected DamageInstance lastDamageDone;
-        protected Entity spawnedEntity;
         protected EntityManager entityManager;
+        protected DistrictData districtData;
+        protected Entity spawnedEntity;
+        protected Stats stats;
 
+        private float totalDamageDealt;
+        
         public virtual Attack Attack { get; }
         public DamageInstance LastDamageDone => lastDamageDone;
         public Stats Stats => stats;
         public Vector3 OriginPosition { get; protected set; }
         public Vector3 AttackPosition { get; set; }
-        public abstract LayerMask LayerMask { get; }
+        public abstract LayerMask CollideWith { get; }
+        public int Key { get; set; }
 
-        protected DistrictState(DistrictData districtData, Vector3 position)
+        protected DistrictState(DistrictData districtData, Vector3 position, int key)
         {
             this.districtData = districtData;
             OriginPosition = position;
 
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            Key = key;
+            
+            CollisionSystem.DamageDoneEvent.Add(key, OnDamageDone);
         }
 
         public abstract void OnStateEntered();
@@ -41,6 +48,12 @@ namespace Buildings.District
         public abstract void OnDeselected();
         public abstract void Die();
         public abstract void OnWaveStart(int houseCount);
+        
+        private void OnDamageDone(DamageComponent damage)
+        {
+            totalDamageDealt += damage.Damage;
+            Debug.Log($"Dealt {damage.Damage}, total: {totalDamageDealt}");
+        }
 
         public void OnUnitDoneDamage(DamageInstance damageInstance)
         {
@@ -66,7 +79,7 @@ namespace Buildings.District
 
         private float attackCooldownTimer = 0;
 
-        public ArcherState(DistrictData districtData, TowerData archerData, Vector3 position) : base(districtData, position)
+        public ArcherState(DistrictData districtData, TowerData archerData, Vector3 position, int key) : base(districtData, position, key)
         {
             this.archerData = archerData;
             Range = archerData.Range;
@@ -88,7 +101,7 @@ namespace Buildings.District
 
         public override Attack Attack => attack;
 
-        public override LayerMask LayerMask => archerData.AttackLayerMask;
+        public override LayerMask CollideWith => archerData.AttackLayerMask;
 
         public override void OnStateEntered()
         {
@@ -159,7 +172,7 @@ namespace Buildings.District
 
         private float attackCooldownTimer = 0;
 
-        public BombState(DistrictData districtData, TowerData bombData, Vector3 position) : base(districtData, position)
+        public BombState(DistrictData districtData, TowerData bombData, Vector3 position, int key) : base(districtData, position, key)
         {
             this.bombData = bombData;
             Range = bombData.Range;
@@ -178,7 +191,7 @@ namespace Buildings.District
 
         public override Attack Attack => attack;
 
-        public override LayerMask LayerMask => bombData.AttackLayerMask;
+        public override LayerMask CollideWith => bombData.AttackLayerMask;
 
         public override void OnStateEntered()
         {

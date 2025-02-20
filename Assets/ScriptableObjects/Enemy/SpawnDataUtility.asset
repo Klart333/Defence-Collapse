@@ -13,3 +13,27 @@ MonoBehaviour:
   m_Name: SpawnDataUtility
   m_EditorClassIdentifier: 
   enemyUtility: {fileID: 11400000, guid: 130b46e5638c7ce44b5484c7f65679c5, type: 2}
+  targetWaveDuration:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 10
+      inSlope: 2.0341763
+      outSlope: 2.0341763
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.042279415
+    - serializedVersion: 3
+      time: 100
+      value: 100
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

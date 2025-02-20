@@ -20,12 +20,6 @@ namespace DataStructures.Queue.ECS
         }
 
         [BurstCompile]
-        protected override void OnDestroy()
-        {
-            SpatialGrid.Dispose();
-        }
-
-        [BurstCompile]
         protected override void OnUpdate()
         {
             SpatialGrid.Clear();
@@ -34,6 +28,12 @@ namespace DataStructures.Queue.ECS
                 SpatialGrid = SpatialGrid.AsParallelWriter(),
                 CellSize = 1,
             }.ScheduleParallel();
+        }
+
+        [BurstCompile]
+        protected override void OnDestroy()
+        {
+            SpatialGrid.Dispose();
         }
     }
     
