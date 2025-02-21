@@ -49,8 +49,9 @@ namespace Buildings.District
         public abstract void Die();
         public abstract void OnWaveStart(int houseCount);
         
-        private void OnDamageDone(DamageComponent damage)
+        private void OnDamageDone(Entity entity)
         {
+            DamageComponent damage = entityManager.GetComponentData<DamageComponent>(entity);
             totalDamageDealt += damage.Damage;
             Debug.Log($"Dealt {damage.Damage}, total: {totalDamageDealt}");
         }

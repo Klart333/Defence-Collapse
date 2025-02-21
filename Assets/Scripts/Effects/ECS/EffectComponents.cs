@@ -40,5 +40,11 @@ namespace Effects.ECS
 	public struct HealthComponent : IComponentData
 	{
 		public float Health;
+		public float PendingDamage;
+	}
+
+	public struct DeathTag : IComponentData
+	{
+		
 	}
 }

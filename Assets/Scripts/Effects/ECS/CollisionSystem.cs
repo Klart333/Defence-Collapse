@@ -11,23 +11,21 @@ namespace Effects.ECS
 {
     public partial struct CollisionSystem : ISystem
     {
-        public static Dictionary<int, Action<DamageComponent>> DamageDoneEvent;
+        public static Dictionary<int, Action<Entity>> DamageDoneEvent;
             
         private EntityQuery collisionQuery;
-        private NativeQueue<DamageComponent> collisionQueue;
+        private NativeQueue<Entity> collisionQueue;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        public void OnCreate(ref SystemState state) 
         {
             collisionQuery = SystemAPI.QueryBuilder()
                 .WithAspect<ColliderAspect>()
                 .Build();
             
-            collisionQueue = new NativeQueue<DamageComponent>(Allocator.Persistent);
-            DamageDoneEvent = new Dictionary<int, Action<DamageComponent>>();
+            collisionQueue = new NativeQueue<Entity>(Allocator.Persistent);
+            DamageDoneEvent = new Dictionary<int, Action<Entity>>();
         }
 
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             if (collisionQuery.IsEmpty)
@@ -48,11 +46,11 @@ namespace Effects.ECS
             
             state.Dependency.Complete();
 
-            while (collisionQueue.TryDequeue(out DamageComponent damage))
+            while (collisionQueue.TryDequeue(out Entity entity))
             {
-                if (DamageDoneEvent.TryGetValue(damage.Key, out var action))
+                if (DamageDoneEvent.TryGetValue(state.EntityManager.GetComponentData<DamageComponent>(entity).Key, out var action))
                 {
-                    action.Invoke(damage);
+                    action.Invoke(entity);
                 }
             }
         }
@@ -79,13 +77,13 @@ namespace Effects.ECS
         [ReadOnly]
         public ComponentLookup<HealthComponent> HealthLookup;
         
-        public NativeQueue<DamageComponent>.ParallelWriter CollisionQueue;
+        public NativeQueue<Entity>.ParallelWriter CollisionQueue;
         
         [ReadOnly]
         public float CellSize;
         
         [BurstCompile]
-        public void Execute(ColliderAspect colliderAspect)
+        public void Execute(Entity entity, ColliderAspect colliderAspect)
         {
             int2 cell = HashGridUtility.GetCell(colliderAspect.PositionComponent.ValueRO.Position, CellSize);
             float3 pos = colliderAspect.PositionComponent.ValueRO.Position;
@@ -103,9 +101,9 @@ namespace Effects.ECS
                 if (distSq < radius * radius && HealthLookup.TryGetComponent(enemy, out HealthComponent health))
                 {
                     // COLLIDE
-                    health.Health -= colliderAspect.DamageComponent.ValueRO.Damage; // Change later if resistances
+                    health.PendingDamage += colliderAspect.DamageComponent.ValueRO.Damage; // Change later if resistances
                     colliderAspect.DamageComponent.ValueRW.LimitedHits--;
-                    CollisionQueue.Enqueue(colliderAspect.DamageComponent.ValueRO);
+                    CollisionQueue.Enqueue(entity);
                 }
 
             } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
