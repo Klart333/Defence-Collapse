@@ -6,15 +6,22 @@ namespace Effects.ECS
 {
     public partial struct DeathSystem : ISystem
     {
+        private EntityQuery deathQuery;
+        
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            
+            deathQuery = SystemAPI.QueryBuilder().WithAll<DeathTag>().Build();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            if (deathQuery.IsEmpty)
+            {
+                return;
+            }
+            
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
             new DeathJob
@@ -35,11 +42,12 @@ namespace Effects.ECS
     }
 
     [WithAll(typeof(DeathTag))]
+    [BurstCompile]
     public partial struct DeathJob : IJobEntity
     {
-        [ReadOnly]
         public EntityCommandBuffer.ParallelWriter ECB;
         
+        [BurstCompile]
         public void Execute([ChunkIndexInQuery] int sortKey, Entity entity)
         {
             ECB.DestroyEntity(sortKey, entity);

@@ -47,4 +47,9 @@ namespace Effects.ECS
 	{
 		
 	}
+
+	public struct RotateTowardsVelocityComponent : IComponentData
+	{
+		public float3 LastPosition;
+	}
 }

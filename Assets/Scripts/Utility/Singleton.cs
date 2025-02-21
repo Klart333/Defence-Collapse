@@ -1,5 +1,12 @@
 using Sirenix.OdinInspector;
+using Unity.Collections;
+using Unity.Entities;
+using Unity.Jobs;
+using Unity.Mathematics;
+using Unity.Rendering;
+using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {

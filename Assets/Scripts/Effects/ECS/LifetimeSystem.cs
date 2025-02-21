@@ -36,6 +36,7 @@ namespace Effects.ECS
         }
     }
 
+    [BurstCompile]
     public partial struct LifetimeJob : IJobEntity
     {
         [ReadOnly]
@@ -43,6 +44,7 @@ namespace Effects.ECS
 
         public EntityCommandBuffer.ParallelWriter ECB;
         
+        [BurstCompile]
         public void Execute([ChunkIndexInQuery]int index, Entity entity, ref LifetimeComponent component)
         {
             component.Lifetime -= DeltaTime;

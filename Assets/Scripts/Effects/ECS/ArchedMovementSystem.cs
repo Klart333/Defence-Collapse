@@ -35,7 +35,7 @@ namespace Effects.ECS
         [BurstCompile]
         public void Execute(ref PositionComponent position, ref ArchedMovementComponent arch, in SpeedComponent speed)
         {
-            arch.Value = speed.Speed * DeltaTime;
+            arch.Value += speed.Speed * DeltaTime;
             
             position.Position = Math.CubicLerp(arch.StartPosition, arch.EndPosition, arch.Pivot, arch.Value);
         }

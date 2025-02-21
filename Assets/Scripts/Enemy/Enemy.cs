@@ -44,6 +44,11 @@ namespace Enemy
                     TurnSpeed = authoring.turnSpeed,
                     LayerMask = authoring.groundMask,
                 });
+                
+                AddComponent(enemyEntity, new Effects.ECS.HealthComponent
+                {
+                    Health = authoring.EnemyData.Stats.MaxHealth.Value,
+                });
             }
         }
     }

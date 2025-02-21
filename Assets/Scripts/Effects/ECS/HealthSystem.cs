@@ -34,10 +34,12 @@ namespace Effects.ECS
         }
     }
     
+    [BurstCompile]
     public partial struct HealthJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter ECB;
         
+        [BurstCompile]
         public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent component)
         {
             if (component.PendingDamage <= 0)

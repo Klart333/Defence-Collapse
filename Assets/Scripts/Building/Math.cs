@@ -31,6 +31,7 @@ public static class Math
 
     public static float3 CubicLerp(float3 a, float3 b, float3 c, float t)
     {
+        //return math.lerp(math.lerp(a, c, t), math.lerp(c, b, t), t);
         //t = math.clamp(t, 0f, 1f);
 
         // Quadratic Bézier interpolation formula:

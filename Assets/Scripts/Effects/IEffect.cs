@@ -2,14 +2,15 @@
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
-using UnityEngine;
-using DG.Tweening;
-using System;
-using System.Linq;
-using Effects.ECS;
-using Unity.Entities;
-using Unity.Rendering;
+using Unity.Mathematics;
 using Unity.Transforms;
+using Unity.Rendering;
+using Unity.Entities;
+using UnityEngine;
+using Effects.ECS;
+using System;
+using UnityEngine.Rendering;
+using Hash128 = Unity.Entities.Hash128;
 
 namespace Effects
 {
@@ -313,7 +314,6 @@ namespace Effects
         [Title("Movement")]
         public float Height = 5;
         public float UnitsPerSecond = 8;
-        public Ease Ease;
 
         [Title("OnComplete Effects")]
         public List<IEffect> Effects;
@@ -321,6 +321,7 @@ namespace Effects
         [Title("Visual")]
         public Mesh Mesh;
         public Material Material;
+        public float Scale = 1;
 
         public void Perform(IAttacker unit)
         {
@@ -332,7 +333,7 @@ namespace Effects
             {
                 Damage = ModifierValue * unit.Stats.DamageMultiplier.Value,
                 Key = unit.Key,
-                TriggerDamageDone = true,
+                TriggerDamageDone = TriggerDamageDone,
                 LimitedHits = LimitedHits ? Hits : -1,
             };
 
@@ -372,31 +373,38 @@ namespace Effects
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             ComponentType[] componentTypes = {
-                typeof(DamageComponent),
+                typeof(RotateTowardsVelocityComponent),
+                typeof(ArchedMovementComponent),
                 typeof(ColliderComponent),
                 typeof(PositionComponent),
                 typeof(LifetimeComponent),
-                typeof(ArchedMovementComponent),
+                typeof(DamageComponent),
                 typeof(SpeedComponent),
-                typeof(RenderMeshUnmanaged)
+                typeof(LocalTransform),
             };
 
             Entity spawned = entityManager.CreateEntity(componentTypes);
             entityManager.SetComponentData(spawned, new SpeedComponent{Speed = 1.0f / lifetime});
             entityManager.SetComponentData(spawned, new LifetimeComponent{Lifetime = lifetime});
             entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
+            entityManager.SetComponentData(spawned, new LocalTransform{Position = pos, Scale = Scale});
             entityManager.SetComponentData(spawned, collider);
             entityManager.SetComponentData(spawned, damage);
             entityManager.SetComponentData(spawned, arch);
             
-            UnityObjectRef<Mesh> meshRef = Mesh;
-            UnityObjectRef<Material> matRef = Material;
-            entityManager.SetComponentData(spawned, new RenderMeshUnmanaged
-            {
-                mesh = meshRef.Value,
-                materialForSubMesh = matRef.Value,
-            });
+            RenderMeshDescription desc = new RenderMeshDescription(
+                shadowCastingMode: ShadowCastingMode.Off,
+                receiveShadows: false);
 
+            RenderMeshArray renderMeshArray = new RenderMeshArray(new Material[] { Material }, new Mesh[] { Mesh });
+
+            RenderMeshUtility.AddComponents(
+                spawned,
+                entityManager,
+                desc,
+                renderMeshArray,
+                MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
+            
             return spawned;
         }
 

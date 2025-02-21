@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 9031087238719494386}
   - component: {fileID: 653367872700333559}
   - component: {fileID: 6431643350246984369}
-  - component: {fileID: 5572884893359123784}
   m_Layer: 9
   m_Name: Slime
   m_TagString: Untagged
@@ -99,27 +98,6 @@ MonoBehaviour:
   hitParticle: {fileID: 542933246792631625, guid: 021a2f7a2c5bc4449b4c64a66a050e8c,
     type: 3}
   healthbar: {fileID: 0}
---- !u!135 &5572884893359123784
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4542743195278680511}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.06
-  m_Center: {x: 0, y: 0.05, z: 0}
 --- !u!1 &8119019412388548127
 GameObject:
   m_ObjectHideFlags: 0

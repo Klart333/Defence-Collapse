@@ -38,10 +38,10 @@ namespace Effects.ECS
             new CollisionJob
             {
                 SpatialGrid = spatialGrid.AsReadOnly(),
-                ColliderLookup = SystemAPI.GetComponentLookup<ColliderComponent>(),
-                TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(),
-                HealthLookup = SystemAPI.GetComponentLookup<HealthComponent>(),
+                TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                HealthLookup = SystemAPI.GetComponentLookup<HealthComponent>(false),
                 CollisionQueue = collisionQueue.AsParallelWriter(),
+                CellSize = 1,
             }.ScheduleParallel();
             
             state.Dependency.Complete();
@@ -69,9 +69,6 @@ namespace Effects.ECS
         public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
         
         [ReadOnly]
-        public ComponentLookup<ColliderComponent> ColliderLookup;
-
-        [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
 
         [ReadOnly]
@@ -93,12 +90,11 @@ namespace Effects.ECS
                 
             do
             {
-                if (!TransformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform) || !ColliderLookup.TryGetComponent(enemy, out ColliderComponent colliderComponent)) continue;
+                if (!TransformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform)) continue;
                 
                 float distSq = math.distancesq(pos, enemyTransform.Position);
-                float radius = colliderComponent.Radius + colliderRadius;
                 
-                if (distSq < radius * radius && HealthLookup.TryGetComponent(enemy, out HealthComponent health))
+                if (distSq < colliderRadius * colliderRadius && HealthLookup.TryGetComponent(enemy, out HealthComponent health))
                 {
                     // COLLIDE
                     health.PendingDamage += colliderAspect.DamageComponent.ValueRO.Damage; // Change later if resistances
