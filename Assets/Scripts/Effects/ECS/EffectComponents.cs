@@ -12,10 +12,11 @@ namespace Effects.ECS
 
 	public struct DamageComponent : IComponentData
 	{
-		public float Damage;
-		public int LimitedHits;
 		public bool TriggerDamageDone;
+		public bool HasLimitedHits;
+		public byte LimitedHits;
 		public int Key;
+		public float Damage;
 	}
 
 	public struct PositionComponent : IComponentData

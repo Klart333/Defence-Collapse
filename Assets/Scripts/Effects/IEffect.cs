@@ -2,15 +2,17 @@
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
-using Unity.Mathematics;
+using UnityEngine.Rendering;
 using Unity.Transforms;
 using Unity.Rendering;
 using Unity.Entities;
 using UnityEngine;
 using Effects.ECS;
 using System;
-using UnityEngine.Rendering;
-using Hash128 = Unity.Entities.Hash128;
+// ReSharper disable FieldCanBeMadeReadOnly.Global
+// ReSharper disable ConvertToConstant.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnassignedField.Global
 
 namespace Effects
 {
@@ -110,9 +112,9 @@ namespace Effects
                 ModifierDictionary = new Dictionary<IAttacker, Modifier>();
             }
 
-            if (ModifierDictionary.ContainsKey(unit))
+            if (ModifierDictionary.TryGetValue(unit, out Modifier value))
             {
-                ModifierDictionary[unit].Value += ModifierValue;
+                value.Value += ModifierValue;
             }
             else
             {
@@ -128,17 +130,7 @@ namespace Effects
 
             await UniTask.Delay(TimeSpan.FromSeconds(Time + originalValue / 100.0f));
 
-            if (unit == null)
-            {
-                if (ModifierDictionary.ContainsKey(unit))
-                {
-                    ModifierDictionary.Remove(unit);
-                }
-
-                return;
-            }
-
-            if (ModifierDictionary[unit].Value != originalValue) // A different instance will revert it
+            if (!Mathf.Approximately(ModifierDictionary[unit].Value, originalValue)) // A different instance will revert it
             {
                 return;
             }
@@ -234,7 +226,7 @@ namespace Effects
         [Title("Hits")]
         public bool LimitedHits = false;
         [ShowIf(nameof(LimitedHits))]
-        public int Hits = 0;
+        public byte Hits = 1;
 
         [Title("Collider")]
         public float Radius = 1;
@@ -252,7 +244,8 @@ namespace Effects
                 Damage = ModifierValue * unit.Stats.DamageMultiplier.Value,
                 Key = unit.Key,
                 TriggerDamageDone = TriggerDamageDone,
-                LimitedHits = LimitedHits ? Hits : -1,
+                LimitedHits = Hits,
+                HasLimitedHits = LimitedHits,
             };
 
             ColliderComponent colliderComponent = new ColliderComponent
@@ -304,7 +297,7 @@ namespace Effects
         public bool LimitedHits = false;
         
         [ShowIf(nameof(LimitedHits))]
-        public int Hits = 0;
+        public byte Hits = 1;
         
         public bool TriggerDamageDone = true;
 
@@ -334,7 +327,8 @@ namespace Effects
                 Damage = ModifierValue * unit.Stats.DamageMultiplier.Value,
                 Key = unit.Key,
                 TriggerDamageDone = TriggerDamageDone,
-                LimitedHits = LimitedHits ? Hits : -1,
+                LimitedHits = Hits,
+                HasLimitedHits = LimitedHits,
             };
 
             ColliderComponent collider = new ColliderComponent

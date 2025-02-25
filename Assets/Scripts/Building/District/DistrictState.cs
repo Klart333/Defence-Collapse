@@ -53,7 +53,6 @@ namespace Buildings.District
         {
             DamageComponent damage = entityManager.GetComponentData<DamageComponent>(entity);
             totalDamageDealt += damage.Damage;
-            Debug.Log($"Dealt {damage.Damage}, total: {totalDamageDealt}");
         }
 
         public void OnUnitDoneDamage(DamageInstance damageInstance)
