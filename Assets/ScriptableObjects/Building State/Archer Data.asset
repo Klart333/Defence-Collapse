@@ -16,6 +16,7 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
+    - {fileID: 8572661992280112000, guid: 22a69d5eac306bf44a5fc4d2fdb22a77, type: 3}
     - {fileID: -7929139438592967118, guid: b81e4778696bab64387c2007f044d4c1, type: 3}
     - {fileID: 2100000, guid: 88c864d0ced9a80468df8b5dc67ac4d3, type: 2}
     SerializedBytesString: 
@@ -139,7 +140,19 @@ MonoBehaviour:
       Data: 12|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 13|Effects.VisualEffectEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 0.5
+    - Name: AttackEffect
+      Entry: 10
       Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -148,10 +161,10 @@ MonoBehaviour:
       Data: 
     - Name: Mesh
       Entry: 10
-      Data: 0
+      Data: 1
     - Name: Material
       Entry: 10
-      Data: 1
+      Data: 2
     - Name: Scale
       Entry: 4
       Data: 0.15
@@ -166,7 +179,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 14|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0

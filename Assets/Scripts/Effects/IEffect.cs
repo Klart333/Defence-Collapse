@@ -342,63 +342,66 @@ namespace Effects
                 Pivot = Vector3.Lerp(unit.OriginPosition, targetPosition, 0.5f) + Vector3.up * Height,
             };
             
-            Entity colliderEntity = CreateEntity(unit.OriginPosition, lifetime, collider, damage, arch);
+            Entity colliderEntity = CreateEntity(unit.OriginPosition);
 
-            //.OnComplete(() =>
-            //{
-            //    if (Effects == null)
-            //    {
-            //        return;
-            //    }
+            
+            Entity CreateEntity(Vector3 pos)
+            {
+                EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-            //    unit.AttackPosition = targetPosition;
+                ComponentType[] componentTypes = {
+                    typeof(RotateTowardsVelocityComponent),
+                    typeof(ArchedMovementComponent),
+                    typeof(ColliderComponent),
+                    typeof(PositionComponent),
+                    typeof(LifetimeComponent),
+                    typeof(DamageComponent),
+                    typeof(SpeedComponent),
+                    typeof(LocalTransform),
+                };
 
-            //    for (int i = 0; i < Effects.Count; i++)
-            //    {
-            //        Effects[i].Perform(unit);
-            //    }
-            //});
+                Entity spawned = entityManager.CreateEntity(componentTypes);
+                entityManager.SetComponentData(spawned, new SpeedComponent{Speed = 1.0f / lifetime});
+                entityManager.SetComponentData(spawned, new LifetimeComponent{Lifetime = lifetime});
+                entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
+                entityManager.SetComponentData(spawned, new LocalTransform{Position = pos, Scale = Scale});
+                entityManager.SetComponentData(spawned, collider);
+                entityManager.SetComponentData(spawned, damage);
+                entityManager.SetComponentData(spawned, arch);
+
+                if (Effects.Count > 0)
+                {
+                    entityManager.AddComponentData(spawned, new DeathCallbackComponent{Key = DeathSystem.Key});
+                    DeathSystem.DeathCallbacks.Add(DeathSystem.Key++, OnColliderDestroyed);
+                }
+                
+                RenderMeshDescription desc = new RenderMeshDescription(
+                    shadowCastingMode: ShadowCastingMode.Off,
+                    receiveShadows: false);
+
+                RenderMeshArray renderMeshArray = new RenderMeshArray(new Material[] { Material }, new Mesh[] { Mesh });
+
+                RenderMeshUtility.AddComponents(
+                    spawned,
+                    entityManager,
+                    desc,
+                    renderMeshArray,
+                    MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
+                
+                return spawned;
+            }
+            
+            void OnColliderDestroyed()
+            {
+                unit.AttackPosition = targetPosition;
+
+                for (int i = 0; i < Effects.Count; i++)
+                {
+                    Effects[i].Perform(unit);
+                }
+            }
         }
 
-        private Entity CreateEntity(Vector3 pos, float lifetime, ColliderComponent collider, DamageComponent damage, ArchedMovementComponent arch)
-        {
-            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-            ComponentType[] componentTypes = {
-                typeof(RotateTowardsVelocityComponent),
-                typeof(ArchedMovementComponent),
-                typeof(ColliderComponent),
-                typeof(PositionComponent),
-                typeof(LifetimeComponent),
-                typeof(DamageComponent),
-                typeof(SpeedComponent),
-                typeof(LocalTransform),
-            };
-
-            Entity spawned = entityManager.CreateEntity(componentTypes);
-            entityManager.SetComponentData(spawned, new SpeedComponent{Speed = 1.0f / lifetime});
-            entityManager.SetComponentData(spawned, new LifetimeComponent{Lifetime = lifetime});
-            entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
-            entityManager.SetComponentData(spawned, new LocalTransform{Position = pos, Scale = Scale});
-            entityManager.SetComponentData(spawned, collider);
-            entityManager.SetComponentData(spawned, damage);
-            entityManager.SetComponentData(spawned, arch);
-            
-            RenderMeshDescription desc = new RenderMeshDescription(
-                shadowCastingMode: ShadowCastingMode.Off,
-                receiveShadows: false);
-
-            RenderMeshArray renderMeshArray = new RenderMeshArray(new Material[] { Material }, new Mesh[] { Mesh });
-
-            RenderMeshUtility.AddComponents(
-                spawned,
-                entityManager,
-                desc,
-                renderMeshArray,
-                MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
-            
-            return spawned;
-        }
 
         public void Revert(IAttacker unit)
         {

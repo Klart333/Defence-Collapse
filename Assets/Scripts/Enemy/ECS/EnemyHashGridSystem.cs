@@ -38,7 +38,7 @@ namespace DataStructures.Queue.ECS
     }
     
     [BurstCompile]
-    [WithAll(typeof(SpeedComponent))]
+    [WithAll(typeof(FlowFieldComponent))]
     public partial struct BuildEnemyHashGridJob : IJobEntity
     {
         public NativeParallelMultiHashMap<int2, Entity>.ParallelWriter SpatialGrid;

@@ -51,4 +51,9 @@ namespace Effects.ECS
 	{
 		public float3 LastPosition;
 	}
+
+	public struct DeathCallbackComponent : IComponentData
+	{
+		public int Key;
+	}
 }
