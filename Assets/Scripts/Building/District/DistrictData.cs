@@ -29,11 +29,13 @@ namespace Buildings.District
             UpgradeData = new UpgradeData(1, 1, 1);
             cellCount = chunks.Count;
             DistrictChunks = chunks;
+
+            Vector3 statePosition = new Vector3(position.x, GetHighestPos(chunks), position.z); 
             
             State = districtType switch
             {
-                DistrictType.Archer => new ArcherState(this, BuildingUpgradeManager.Instance.ArcherData, position, key),
-                DistrictType.Bomb => new BombState(this, BuildingUpgradeManager.Instance.BombData, position, key),
+                DistrictType.Archer => new ArcherState(this, BuildingUpgradeManager.Instance.ArcherData, statePosition, key),
+                DistrictType.Bomb => new BombState(this, BuildingUpgradeManager.Instance.BombData, statePosition, key),
                 //DistrictType.Church => expr,
                 //DistrictType.Farm => expr,
                 //DistrictType.Mine => expr,
@@ -45,6 +47,20 @@ namespace Buildings.District
 
             Events.OnWaveStarted += OnWaveStarted;
             State.OnStateEntered();
+        }
+
+        private float GetHighestPos(IEnumerable<Chunk> chunks)
+        {
+            float max = float.MinValue;
+            foreach (Chunk chunk in chunks)
+            {
+                if (chunk.Position.y > max)
+                {
+                    max = chunk.Position.y;
+                }
+            }
+
+            return max;
         }
 
         private void GenerateCollider(IEnumerable<Chunk> chunks, IChunkWaveFunction chunkWaveFunction)

@@ -22,9 +22,6 @@ public class TowerData : SerializedScriptableObject
     [OdinSerialize, NonSerialized]
     public Attack BaseAttack;
 
-    public LayerMask AttackLayerMask;
-
-
     [TitleGroup("Stats")]
     [Button]
     public void InitStats()

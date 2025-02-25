@@ -28,7 +28,6 @@ namespace Buildings.District
         public Stats Stats => stats;
         public Vector3 OriginPosition { get; protected set; }
         public Vector3 AttackPosition { get; set; }
-        public abstract LayerMask CollideWith { get; }
         public int Key { get; set; }
 
         protected DistrictState(DistrictData districtData, Vector3 position, int key)
@@ -53,6 +52,8 @@ namespace Buildings.District
         {
             DamageComponent damage = entityManager.GetComponentData<DamageComponent>(entity);
             totalDamageDealt += damage.Damage;
+            
+            
         }
 
         public void OnUnitDoneDamage(DamageInstance damageInstance)
@@ -78,6 +79,8 @@ namespace Buildings.District
         private GameObject rangeIndicator;
 
         private float attackCooldownTimer = 0;
+        
+        public override Attack Attack => attack;
 
         public ArcherState(DistrictData districtData, TowerData archerData, Vector3 position, int key) : base(districtData, position, key)
         {
@@ -93,16 +96,12 @@ namespace Buildings.District
                 typeof(RangeComponent),
                 typeof(EnemyTargetComponent),
             };
-            
+
             spawnedEntity = entityManager.CreateEntity(componentTypes);
             entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = position });
             entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = Range });
         }
-
-        public override Attack Attack => attack;
-
-        public override LayerMask CollideWith => archerData.AttackLayerMask;
-
+        
         public override void OnStateEntered()
         {
 
@@ -190,9 +189,7 @@ namespace Buildings.District
         }
 
         public override Attack Attack => attack;
-
-        public override LayerMask CollideWith => bombData.AttackLayerMask;
-
+        
         public override void OnStateEntered()
         {
 

@@ -6,8 +6,6 @@ namespace Effects.ECS
     public struct ColliderComponent : IComponentData
     {
         public float Radius;
-        public int CollideWith;
-        public int BelongsTo;
     }
 
 	public struct DamageComponent : IComponentData

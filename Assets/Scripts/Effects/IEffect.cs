@@ -251,7 +251,6 @@ namespace Effects
             ColliderComponent colliderComponent = new ColliderComponent
             {
                 Radius = Radius,
-                CollideWith = unit.CollideWith
             };
             
             Entity colliderEntity = CreateEntity(pos, colliderComponent, dmgComponent);
@@ -334,7 +333,6 @@ namespace Effects
             ColliderComponent collider = new ColliderComponent
             {
                 Radius = Radius,
-                CollideWith = unit.CollideWith
             };
 
             ArchedMovementComponent arch = new ArchedMovementComponent

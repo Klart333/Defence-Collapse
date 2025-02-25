@@ -12,7 +12,6 @@ public interface IAttacker
 
     // Attack
     public DamageInstance LastDamageDone {  get; }
-    public LayerMask CollideWith { get; }
     public int Key { get; }
 
     // Events
