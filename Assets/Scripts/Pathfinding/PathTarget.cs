@@ -4,79 +4,83 @@ using UnityEngine;
 using System;
 using Sirenix.OdinInspector;
 
-public class PathTarget : MonoBehaviour, IPathTarget
+namespace Pathfinding
 {
-    private enum PathTargetType
+    public class PathTarget : MonoBehaviour, IPathTarget
     {
-        Blocker,
-        Target,
-        Path,
-    }
-
-    public event Action OnIndexerRebuild;
-
-    [Title("Path Target")]
-    [SerializeField]
-    private PathTargetType targetType;
-
-    [Title("References")]
-    [SerializeField]
-    private Indexer indexer;
-
-    public List<int> TargetIndexes => indexer.Indexes;
-
-    private void OnValidate()
-    {
-        if (indexer == null)
+        private enum PathTargetType
         {
-            indexer = GetComponent<Indexer>();
+            Blocker,
+            Target,
+            Path,
         }
-    }
 
-    private async void OnEnable()
-    {
-        indexer ??= GetComponent<Indexer>();
+        public event Action OnIndexerRebuild;
 
-        indexer.OnRebuilt += OnRebuilt;
+        [Title("Path Target")]
+        [SerializeField]
+        private PathTargetType targetType;
 
-        await UniTask.WaitUntil(() => PathManager.Instance != null);
-        switch (targetType)
+        [Title("References")]
+        [SerializeField]
+        private Indexer indexer;
+
+        public List<int> TargetIndexes => indexer.Indexes;
+
+        private void OnValidate()
         {
-            case PathTargetType.Blocker:
-                PathManager.Instance.BlockerPathSet.Register(this);
-                break;
-            case PathTargetType.Target:
-                PathManager.Instance.TargetPathSet.Register(this);
-                break;
-            case PathTargetType.Path:
-                PathManager.Instance.PathPathSet.Register(this);
-                break;
-            default:
-                break;
+            if (indexer == null)
+            {
+                indexer = GetComponent<Indexer>();
+            }
         }
-    }
 
-    private void OnDisable()
-    {
-        switch (targetType)
+        private async void OnEnable()
         {
-            case PathTargetType.Blocker:
-                PathManager.Instance.BlockerPathSet.Unregister(this);
-                break;
-            case PathTargetType.Target:
-                PathManager.Instance.TargetPathSet.Unregister(this);
-                break;
-            case PathTargetType.Path:
-                PathManager.Instance.PathPathSet.Unregister(this);
-                break;
-            default:
-                break;
-        }
-        indexer.OnRebuilt -= OnRebuilt;
-    }
+            indexer ??= GetComponent<Indexer>();
 
-    private void OnRebuilt()
-    {
-        OnIndexerRebuild?.Invoke();
+            indexer.OnRebuilt += OnRebuilt;
+
+            await UniTask.WaitUntil(() => PathManager.Instance != null);
+            switch (targetType)
+            {
+                case PathTargetType.Blocker:
+                    PathManager.Instance.BlockerPathSet.Register(this);
+                    break;
+                case PathTargetType.Target:
+                    PathManager.Instance.TargetPathSet.Register(this);
+                    break;
+                case PathTargetType.Path:
+                    PathManager.Instance.PathPathSet.Register(this);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void OnDisable()
+        {
+            switch (targetType)
+            {
+                case PathTargetType.Blocker:
+                    PathManager.Instance.BlockerPathSet.Unregister(this);
+                    break;
+                case PathTargetType.Target:
+                    PathManager.Instance.TargetPathSet.Unregister(this);
+                    break;
+                case PathTargetType.Path:
+                    PathManager.Instance.PathPathSet.Unregister(this);
+                    break;
+                default:
+                    break;
+            }
+
+            indexer.OnRebuilt -= OnRebuilt;
+        }
+
+        private void OnRebuilt()
+        {
+            OnIndexerRebuild?.Invoke();
+        }
     }
 }

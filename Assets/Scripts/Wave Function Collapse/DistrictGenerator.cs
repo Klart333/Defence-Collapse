@@ -119,7 +119,7 @@ namespace WaveFunctionCollapse
                 {
                     for (int i = 0; i < corners.Length; i++)
                     {
-                        bool isBuildable = buildableCornerData.IsBuildable(buildable.MeshRot, corners[i], out bool meshIsBuildable);
+                        bool isBuildable = buildableCornerData.IsCornerBuildable(buildable.MeshRot, corners[i], out bool meshIsBuildable);
                         isBuildable |= buildable.MeshRot.Mesh == null;
                         if (!isBuildable && !meshIsBuildable) continue;
 

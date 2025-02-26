@@ -11,7 +11,7 @@ public class BuildableCornerData : SerializedScriptableObject
     [Title("Dictionary")]
     public Dictionary<Mesh, BuildableCorners> BuildableDictionary;
         
-    public bool IsBuildable(MeshWithRotation meshRot, Vector2Int corner, out bool meshIsBuildable)
+    public bool IsCornerBuildable(MeshWithRotation meshRot, Vector2Int corner, out bool meshIsBuildable)
     {
         if (meshRot.Mesh == null || !BuildableDictionary.TryGetValue(meshRot.Mesh, out BuildableCorners buildableCorners))
         {
@@ -24,12 +24,17 @@ public class BuildableCornerData : SerializedScriptableObject
         return buildableCorners.CornerDictionary[rotatedCorner];
     }
 
-    private Corner RotateCorner(int rot, Vector2Int corner)
+    public static Corner RotateCorner(int rot, Vector2Int corner)
     {
         float angle = rot * 90 * Mathf.Deg2Rad;
         int x = -Mathf.RoundToInt(corner.x * Mathf.Cos(angle) - corner.y * Mathf.Sin(angle));
         int y = -Mathf.RoundToInt(corner.x * Mathf.Sin(angle) + corner.y * Mathf.Cos(angle));
 
+        return VectorToCorner(x, y);
+    }
+
+    public static Corner VectorToCorner(int x, int y)
+    {
         return (x, y) switch
         {
             (1, 1) => Corner.TopRight,
@@ -55,6 +60,8 @@ public class BuildableCornerData : SerializedScriptableObject
     
 #endif
 }
+
+
 
 [System.Serializable]
 public class BuildableCorners

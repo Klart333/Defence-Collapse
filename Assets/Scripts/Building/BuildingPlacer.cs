@@ -96,10 +96,7 @@ public class BuildingPlacer : MonoBehaviour
 
     private void BuildingPurchased(BuildingType buildingType)
     {
-        PlacingTower(buildingType).Forget(ex =>
-        {
-            Debug.LogError($"Async function failed: {ex}");
-        });
+        PlacingTower(buildingType).Forget(Debug.LogError);
     }
 
     private async UniTask PlacingTower(BuildingType type)

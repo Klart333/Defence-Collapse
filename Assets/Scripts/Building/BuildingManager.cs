@@ -184,7 +184,7 @@ public class BuildingManager : Singleton<BuildingManager>
         
         Vector2Int corner = new Vector2Int((int)Mathf.Sign(groundCell.Position.x - cellPosition.x), (int)Mathf.Sign(groundCell.Position.z - cellPosition.z));
 
-        if (!cellBuildableCornerData.IsBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner, out _))
+        if (!cellBuildableCornerData.IsCornerBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner, out _))
         {
             Cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(
                 true,

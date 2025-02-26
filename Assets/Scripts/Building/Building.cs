@@ -7,6 +7,7 @@ using WaveFunctionCollapse;
 
 public class Building : PooledMonoBehaviour, IBuildable
 {
+    [Title("Visual")]
     [SerializeField]
     private MaterialData materialData;
     
@@ -19,6 +20,13 @@ public class Building : PooledMonoBehaviour, IBuildable
     [SerializeField]
     private LayerMask selectedLayer;
 
+    [Title("Collider")]
+    [SerializeField]
+    private Collider[] cornerColliders;
+    
+    [SerializeField]
+    private BuildableCornerData buildableCornerData;
+
     [Title("Events")]
     [SerializeField]
     private UnityEvent OnPlacedEvent;
@@ -26,13 +34,20 @@ public class Building : PooledMonoBehaviour, IBuildable
     [SerializeField]
     private UnityEvent OnResetEvent;
 
+    private readonly Vector2Int[] corners =
+    {
+        new Vector2Int(-1, 1),
+        new Vector2Int(1, 1),
+        new Vector2Int(1, -1),
+        new Vector2Int(-1, -1),
+    };
+    
     private List<Material> transparentMaterials = new List<Material>();
 
     private BuildingHandler buildingHandler;
     private BuildingAnimator buildingAnimator;
     private MeshRenderer meshRenderer;
     private BuildingUI buildingUI;
-    private BoxCollider boxCollider;
 
     private int originalLayer;
     
@@ -56,7 +71,6 @@ public class Building : PooledMonoBehaviour, IBuildable
     private void Awake()
     {
         originalLayer = gameObject.layer;
-        boxCollider = GetComponent<BoxCollider>();
     }
 
     private void OnEnable()
@@ -195,8 +209,7 @@ public class Building : PooledMonoBehaviour, IBuildable
             transparentMaterials.Add(transparentGreen);
         }
 
-        boxCollider.size = new Vector3(scale.x * 2, 0.04f, scale.z * 2);
-        MeshRenderer.transform.localScale = scale;
+        transform.localScale = scale;
     }
 
     private PrototypeData GetPrototype(PrototypeData newProt)
@@ -236,7 +249,20 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void Place()
     {
-        _ = BuildingHandler.AddBuilding(this);
+        for (int i = 0; i < cornerColliders.Length; i++)
+        {
+            if (MeshRot.Mesh != null && buildableCornerData.BuildableDictionary.TryGetValue(MeshRot.Mesh, out BuildableCorners cornerData))
+            {
+                bool value = cornerData.CornerDictionary[BuildableCornerData.VectorToCorner(corners[i].x, corners[i].y)];
+                cornerColliders[i].gameObject.SetActive(value);
+            }
+            else
+            {
+                cornerColliders[i].gameObject.SetActive(false);
+            }
+        }
+        
+        BuildingHandler.AddBuilding(this).Forget(Debug.LogError);
         OnPlacedEvent?.Invoke();
     }
 

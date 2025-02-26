@@ -1,3 +1,4 @@
+using Pathfinding;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Collections;

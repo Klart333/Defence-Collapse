@@ -321,27 +321,6 @@ namespace Effects
             float distance = Vector3.Distance(unit.OriginPosition, targetPosition) + Height;
             float lifetime = distance / UnitsPerSecond;
             
-            DamageComponent damage = new DamageComponent
-            {
-                Damage = ModifierValue * unit.Stats.DamageMultiplier.Value,
-                Key = unit.Key,
-                TriggerDamageDone = TriggerDamageDone,
-                LimitedHits = Hits,
-                HasLimitedHits = LimitedHits,
-            };
-
-            ColliderComponent collider = new ColliderComponent
-            {
-                Radius = Radius,
-            };
-
-            ArchedMovementComponent arch = new ArchedMovementComponent
-            {
-                StartPosition = unit.OriginPosition,
-                EndPosition = targetPosition,
-                Pivot = Vector3.Lerp(unit.OriginPosition, targetPosition, 0.5f) + Vector3.up * Height,
-            };
-            
             Entity colliderEntity = CreateEntity(unit.OriginPosition);
 
             
@@ -365,9 +344,25 @@ namespace Effects
                 entityManager.SetComponentData(spawned, new LifetimeComponent{Lifetime = lifetime});
                 entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
                 entityManager.SetComponentData(spawned, new LocalTransform{Position = pos, Scale = Scale});
-                entityManager.SetComponentData(spawned, collider);
-                entityManager.SetComponentData(spawned, damage);
-                entityManager.SetComponentData(spawned, arch);
+                
+                entityManager.SetComponentData(spawned, new ColliderComponent
+                {
+                    Radius = Radius,
+                });
+                entityManager.SetComponentData(spawned, new DamageComponent
+                {
+                    Damage = ModifierValue * unit.Stats.DamageMultiplier.Value,
+                    Key = unit.Key,
+                    TriggerDamageDone = TriggerDamageDone,
+                    LimitedHits = Hits,
+                    HasLimitedHits = LimitedHits,
+                });
+                entityManager.SetComponentData(spawned, new ArchedMovementComponent
+                {
+                    StartPosition = unit.OriginPosition,
+                    EndPosition = targetPosition,
+                    Pivot = Vector3.Lerp(unit.OriginPosition, targetPosition, 0.5f) + Vector3.up * Height,
+                });
 
                 if (Effects.Count > 0)
                 {
