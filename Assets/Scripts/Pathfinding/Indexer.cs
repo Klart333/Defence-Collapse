@@ -44,9 +44,9 @@ public class Indexer : MonoBehaviour
     {
         Indexes.Clear();
         float xMin = Mathf.Max(0, indexCollider.bounds.min.x);
-        float xMax = Mathf.Min(PathManager.Instance.GridWidth, indexCollider.bounds.max.x);
+        float xMax = Mathf.Min(PathManager.Instance.GridWorldWidth, indexCollider.bounds.max.x);
         float zMin = Mathf.Max(0, indexCollider.bounds.min.z);
-        float zMax = Mathf.Min(PathManager.Instance.GridHeight, indexCollider.bounds.max.z);
+        float zMax = Mathf.Min(PathManager.Instance.GridWorldHeight, indexCollider.bounds.max.z);
 
         ColliderType colliderType = indexCollider switch
         {
@@ -69,9 +69,9 @@ public class Indexer : MonoBehaviour
             boxRotation = boxCollider.transform.rotation;
         }
         
-        for (float xPos = xMin; xPos < xMax; xPos+= increment)
+        for (float xPos = xMin; xPos <= xMax; xPos+= increment)
         {
-            for (float zPos = zMin; zPos < zMax; zPos += increment)
+            for (float zPos = zMin; zPos <= zMax; zPos += increment)
             {
                 if (!PathManager.Instance.CheckIfValid(xPos, zPos))
                     continue;
@@ -83,7 +83,7 @@ public class Indexer : MonoBehaviour
                         float zRange = zMax - zMin;
                         float xDistance = xPos * 2 - xMax - xMin + 1;
                         float zDistance = zPos * 2 - zMax - zMin + 1;
-                        if (xDistance * xDistance + zDistance * zDistance < xRange * zRange)
+                        if (xDistance * xDistance + zDistance * zDistance <= xRange * zRange)
                         {
                             Indexes.Add(PathManager.Instance.GetIndex(xPos, zPos));
                         }
@@ -137,7 +137,7 @@ public class Indexer : MonoBehaviour
             return;
         }
 
-        Gizmos.color = Color.green;
+        Gizmos.color = Color.blue;
         for (int i = 0; i < Indexes.Count; i++)
         {
             Gizmos.DrawCube(PathManager.Instance.GetPos(Indexes[i]).ToXyZ(0), Vector3.one * 0.5f * PathManager.Instance.CellScale);

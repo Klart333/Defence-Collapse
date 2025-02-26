@@ -10,7 +10,7 @@ using Unity.Burst;
 [BurstCompile(FloatPrecision.Low, FloatMode.Fast, OptimizeFor = OptimizeFor.Performance)]
 public struct PathJob : IJob
 {
-    private readonly struct IndexDistance : IComparable<IndexDistance>
+    public readonly struct IndexDistance : IComparable<IndexDistance>
     {
         public readonly int Index;
         public readonly int Distance;
@@ -24,40 +24,37 @@ public struct PathJob : IJob
         public int CompareTo(IndexDistance other) => Distance.CompareTo(other.Distance);
     }
 
+    public NativePriorityQueue<IndexDistance> FrontierQueue;
+    public NativeArray<byte> Directions;
     public NativeArray<int> Distances;
 
-    public NativeArray<byte> Directions;
-
-    [Unity.Collections.ReadOnly]
+    [ReadOnly]
     public NativeArray<bool>.ReadOnly NotWalkableIndexes;
     
-    [Unity.Collections.ReadOnly]
+    [ReadOnly]
     public NativeArray<bool>.ReadOnly TargetIndexes;
     
-    [Unity.Collections.ReadOnly]
+    [ReadOnly]
     public NativeArray<byte>.ReadOnly MovementCosts;
 
-    [Unity.Collections.ReadOnly]
+    [ReadOnly]
     public NativeArray<int2>.ReadOnly NeighbourDirections;
     
-    [Unity.Collections.ReadOnly]
+    [ReadOnly]
     public int GridWidth;
 
-    [Unity.Collections.ReadOnly]
-    public int ArrayLength; 
-
+    [ReadOnly]
+    public int ArrayLength;
+    
     [BurstCompile]
     public void Execute()
     {
-        // DONT NEED TO ALLOCATE THESE QUEUES EVERY TIME, COULD SEND THEM IN!!
-        NativePriorityQueue<IndexDistance> frontierQueue = new NativePriorityQueue<IndexDistance>(capacity: 512, allocator: Allocator.Temp);
-
         for (int i = 0; i < ArrayLength; i++)
         {
             if (TargetIndexes[i])
             {
                 Distances[i] = 0;
-                frontierQueue.Enqueue(new IndexDistance(i, 0));
+                FrontierQueue.Enqueue(new IndexDistance(i, 0));
             }
             else
             {
@@ -66,9 +63,9 @@ public struct PathJob : IJob
         }
 
         NativeArray<int> neighbours = new NativeArray<int>(8, Allocator.Temp);
-        while (frontierQueue.Length > 0)
+        while (FrontierQueue.Length > 0)
         {
-            IndexDistance cell = frontierQueue.Dequeue();
+            IndexDistance cell = FrontierQueue.Dequeue();
             GetNeighbours(cell.Index, neighbours);
             for (int i = 0; i < 8; i++)
             {
@@ -82,11 +79,10 @@ public struct PathJob : IJob
                 
                 Distances[index] = dist;
                 Directions[index] = GetDirection(-NeighbourDirections[i]);
-                frontierQueue.Enqueue(new IndexDistance(index, dist));
+                FrontierQueue.Enqueue(new IndexDistance(index, dist));
             }
         }
 
-        frontierQueue.Dispose();
         neighbours.Dispose();
     }
 

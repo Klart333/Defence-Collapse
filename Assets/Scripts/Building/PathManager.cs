@@ -27,6 +27,7 @@ public class PathManager : Singleton<PathManager>
     private NativeArray<byte> movementCosts;
     private NativeArray<bool> targetIndexes;
     
+    private NativePriorityQueue<PathJob.IndexDistance> PathJobQueue;
     private NativeArray<int2> neighbourDirections;
     private NativeArray<byte> directions;
     private NativeArray<byte> UnitCounts;
@@ -57,6 +58,7 @@ public class PathManager : Singleton<PathManager>
         distances = new NativeArray<int>(length, Allocator.Persistent);
         UnitCounts = new NativeArray<byte>(length, Allocator.Persistent);
         neighbourDirections = new NativeArray<int2>(new[] { new int2(1, 0), new int2(1, 1), new int2(0, 1), new int2(-1, 1), new int2(-1, 0), new int2(-1, -1), new int2(0, -1), new int2(1, -1), }, Allocator.Persistent);
+        PathJobQueue = new NativePriorityQueue<PathJob.IndexDistance>(1024, Allocator.Persistent);
 
         for (int i = 0; i < length; i++)
         {
@@ -82,6 +84,7 @@ public class PathManager : Singleton<PathManager>
         distances.Dispose(); 
         UnitCounts.Dispose();
         neighbourDirections.Dispose();
+        PathJobQueue.Dispose();
         
         GetPathInformation -= BlockerPathSet.RebuildTargetHashSet;
         GetPathInformation -= TargetPathSet.RebuildTargetHashSet;
@@ -93,18 +96,24 @@ public class PathManager : Singleton<PathManager>
         updateTimer += Time.deltaTime;
         if (updateTimer >= updateFrequency)
         {
+            if (!jobHandle.IsCompleted)
+            {
+                Debug.Log("Not Completed...");
+                jobHandle.Complete();
+            }
+            
             updateTimer = 0;
             UpdateFlowField();
         }
     }
 
-    private void LateUpdate()
-    {
-        if (updateTimer == 0 && !jobHandle.IsCompleted)
-        {
-            jobHandle.Complete();
-        }
-    }
+    //private void LateUpdate()
+    //{
+    //    if (updateTimer == 0 && !jobHandle.IsCompleted)
+    //    {
+    //        jobHandle.Complete();
+    //    }
+    //}
     
     private void UpdateFlowField()
     {
@@ -130,10 +139,12 @@ public class PathManager : Singleton<PathManager>
             NotWalkableIndexes = notWalkableIndexes.AsReadOnly(),
             NeighbourDirections = neighbourDirections.AsReadOnly(),
             GridWidth = gridSize.x,
-            ArrayLength = distances.Length
+            ArrayLength = distances.Length,
+            FrontierQueue = PathJobQueue,
         };
-
+        
         jobHandle = pathJob.Schedule();
+        jobHandle.Complete();
     }
 
     #region Debug
@@ -147,10 +158,11 @@ public class PathManager : Singleton<PathManager>
 
         for (int i = 0; i < directions.Length; i++)
         {
-            Gizmos.color = Color.Lerp(Color.red, Color.black, distances[i] / (float)2000);
+            Gizmos.color = Color.Lerp(Color.red, Color.black, distances[i] / (float)10000);
             Vector3 pos = new Vector3(i % gridSize.x, 1.0f / cellScale, i / gridSize.x) * cellScale;
             float2 dir = PathManager.ByteToDirection(directions[i]);
             Gizmos.DrawLine(pos, pos + new Vector3(dir.x, 0, dir.y) * cellScale);
+            
         }
     }
 
@@ -180,7 +192,7 @@ public class PathManager : Singleton<PathManager>
 
     public Vector2 GetPos(int index)
     {
-        return new Vector2(index % GridWidth, Mathf.FloorToInt(index / GridWidth)) * CellScale;
+        return new Vector2(index % GridWidth - 0.5f, Mathf.FloorToInt(index / GridWidth) - 0.5f) * CellScale;
     }
 
     #region Static
