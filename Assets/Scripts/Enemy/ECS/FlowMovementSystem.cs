@@ -27,7 +27,7 @@ namespace DataStructures.Queue.ECS
             
             float deltaTime = SystemAPI.Time.DeltaTime;
             
-            new FlowMovementJob()
+            new FlowMovementJob
             {
                 DeltaTime = deltaTime,
                 CellScale = PathManager.Instance.CellScale,

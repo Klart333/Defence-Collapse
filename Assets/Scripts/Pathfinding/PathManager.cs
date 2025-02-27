@@ -4,6 +4,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using Unity.Jobs;
 using System;
+using Cysharp.Threading.Tasks;
 
 namespace Pathfinding
 {
@@ -25,14 +26,14 @@ namespace Pathfinding
         [SerializeField]
         private GroundObjectData portalObjectData;
 
-        private NativeArray<bool> notWalkableIndexes;
-        private NativeArray<byte> movementCosts;
-        private NativeArray<bool> targetIndexes;
-
+        public NativeArray<short> MovementCosts;
+        public NativeArray<short> Units;
+        
         private NativePriorityQueue<PathJob.IndexDistance> PathJobQueue;
         private NativeArray<int2> neighbourDirections;
+        private NativeArray<bool> notWalkableIndexes;
+        private NativeArray<bool> targetIndexes;
         private NativeArray<byte> directions;
-        private NativeArray<byte> UnitCounts;
         private NativeArray<int> distances;
 
         private JobHandle jobHandle;
@@ -48,23 +49,23 @@ namespace Pathfinding
 
         public BoolPathSet BlockerPathSet { get; private set; }
         public BoolPathSet TargetPathSet { get; private set; }
-        public BytePathSet PathPathSet { get; private set; }
+        public ShortPathSet PathPathSet { get; private set; }
 
         private void OnEnable()
         {
             int length = gridSize.x * gridSize.y;
-            targetIndexes = new NativeArray<bool>(length, Allocator.Persistent);
-            notWalkableIndexes = new NativeArray<bool>(length, Allocator.Persistent);
-            movementCosts = new NativeArray<byte>(length, Allocator.Persistent);
-            directions = new NativeArray<byte>(length, Allocator.Persistent);
-            distances = new NativeArray<int>(length, Allocator.Persistent);
-            UnitCounts = new NativeArray<byte>(length, Allocator.Persistent);
             neighbourDirections = new NativeArray<int2>(new[] { new int2(1, 0), new int2(1, 1), new int2(0, 1), new int2(-1, 1), new int2(-1, 0), new int2(-1, -1), new int2(0, -1), new int2(1, -1), }, Allocator.Persistent);
             PathJobQueue = new NativePriorityQueue<PathJob.IndexDistance>(1024, Allocator.Persistent);
+            notWalkableIndexes = new NativeArray<bool>(length, Allocator.Persistent);
+            MovementCosts = new NativeArray<short>(length, Allocator.Persistent);
+            targetIndexes = new NativeArray<bool>(length, Allocator.Persistent);
+            directions = new NativeArray<byte>(length, Allocator.Persistent);
+            distances = new NativeArray<int>(length, Allocator.Persistent);
+            Units = new NativeArray<short>(length, Allocator.Persistent);
 
             for (int i = 0; i < length; i++)
             {
-                movementCosts[i] = 50;
+                MovementCosts[i] = 100;
             }
 
             BlockerPathSet = new BoolPathSet(notWalkableIndexes);
@@ -73,20 +74,20 @@ namespace Pathfinding
             TargetPathSet = new BoolPathSet(targetIndexes);
             GetPathInformation += TargetPathSet.RebuildTargetHashSet;
 
-            PathPathSet = new BytePathSet(movementCosts, -45);
+            PathPathSet = new ShortPathSet(MovementCosts, -94);
             GetPathInformation += PathPathSet.RebuildTargetHashSet;
         }
 
         private void OnDisable()
         {
-            targetIndexes.Dispose();
+            neighbourDirections.Dispose();
             notWalkableIndexes.Dispose();
-            movementCosts.Dispose();
+            MovementCosts.Dispose();
+            targetIndexes.Dispose();
+            PathJobQueue.Dispose();
             directions.Dispose();
             distances.Dispose();
-            UnitCounts.Dispose();
-            neighbourDirections.Dispose();
-            PathJobQueue.Dispose();
+            Units.Dispose();
 
             GetPathInformation -= BlockerPathSet.RebuildTargetHashSet;
             GetPathInformation -= TargetPathSet.RebuildTargetHashSet;
@@ -105,7 +106,7 @@ namespace Pathfinding
                 }
 
                 updateTimer = 0;
-                UpdateFlowField();
+                UpdateFlowField().Forget(Debug.LogError);
             }
         }
 
@@ -117,26 +118,22 @@ namespace Pathfinding
         //    }
         //}
 
-        private void UpdateFlowField()
+        private async UniTask UpdateFlowField()
         {
-            for (int i = 0; i < UnitCounts.Length; i++)
+            for (int i = 0; i < MovementCosts.Length; i++)
             {
-                movementCosts[i] -= UnitCounts[i];
-                UnitCounts[i] = 0;
+                MovementCosts[i] -= Units[i];
+                Units[i] = 0;
             }
-
+            
             GetPathInformation?.Invoke();
-
-            for (int i = 0; i < UnitCounts.Length; i++)
-            {
-                movementCosts[i] += UnitCounts[i];
-            }
+            await UniTask.DelayFrame(2);
 
             PathJob pathJob = new PathJob()
             {
                 Directions = directions,
                 Distances = distances,
-                MovementCosts = movementCosts.AsReadOnly(),
+                MovementCosts = MovementCosts.AsReadOnly(),
                 TargetIndexes = targetIndexes.AsReadOnly(),
                 NotWalkableIndexes = notWalkableIndexes.AsReadOnly(),
                 NeighbourDirections = neighbourDirections.AsReadOnly(),
@@ -161,7 +158,7 @@ namespace Pathfinding
             for (int i = 0; i < directions.Length; i++)
             {
                 Gizmos.color = Color.Lerp(Color.red, Color.black, distances[i] / (float)10000);
-                Vector3 pos = new Vector3(i % gridSize.x, 1.0f / cellScale, i / gridSize.x) * cellScale;
+                Vector3 pos = GetPos(i).ToXyZ(1);
                 float2 dir = ByteToDirection(directions[i]);
                 Gizmos.DrawLine(pos, pos + new Vector3(dir.x, 0, dir.y) * cellScale);
 
@@ -192,9 +189,10 @@ namespace Pathfinding
             return GetIndex(pos.x, pos.y, CellScale, GridWidth);
         }
 
+        private const float HALF_BUILDING_CELL = 0.0f;
         public Vector2 GetPos(int index)
         {
-            return new Vector2(index % GridWidth - 0.5f, Mathf.FloorToInt(index / GridWidth) - 0.5f) * CellScale;
+            return new Vector2(index % GridWidth + HALF_BUILDING_CELL, Mathf.FloorToInt((float)index / GridWidth) + HALF_BUILDING_CELL) * CellScale;
         }
 
         #region Static

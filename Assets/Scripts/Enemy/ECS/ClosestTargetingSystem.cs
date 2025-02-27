@@ -24,7 +24,7 @@ namespace DataStructures.Queue.ECS
             // Create and schedule the job
             new ClosestTargetingJob
             {
-                transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
                 SpatialGrid = spatialGrid.AsReadOnly(),
                 CellSize = 1
             }.ScheduleParallel();
@@ -41,7 +41,7 @@ namespace DataStructures.Queue.ECS
     public partial struct ClosestTargetingJob : IJobEntity
     {
         [ReadOnly]
-        public ComponentLookup<LocalTransform> transformLookup;
+        public ComponentLookup<LocalTransform> TransformLookup;
         
         [ReadOnly, NativeDisableContainerSafetyRestriction]
         public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
@@ -72,10 +72,9 @@ namespace DataStructures.Queue.ECS
                 
                 do
                 {
-                    if (!transformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform)) continue;
-
-                    float2 enemyPosition = new float2(enemyTransform.Position.x, enemyTransform.Position.z);
-
+                    RefRO<LocalTransform> enemyTransform = TransformLookup.GetRefRO(enemy);
+                    
+                    float2 enemyPosition = new float2(enemyTransform.ValueRO.Position.x, enemyTransform.ValueRO.Position.z);
                     float distSq = math.distancesq(towerPosition, enemyPosition);
 
                     // Check if this enemy is closer

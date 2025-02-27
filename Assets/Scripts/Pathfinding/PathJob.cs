@@ -35,7 +35,7 @@ public struct PathJob : IJob
     public NativeArray<bool>.ReadOnly TargetIndexes;
     
     [ReadOnly]
-    public NativeArray<byte>.ReadOnly MovementCosts;
+    public NativeArray<short>.ReadOnly MovementCosts;
 
     [ReadOnly]
     public NativeArray<int2>.ReadOnly NeighbourDirections;

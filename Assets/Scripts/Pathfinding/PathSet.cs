@@ -74,9 +74,9 @@ public class BoolPathSet : PathSet<bool>
         }
     }
 }
-public class BytePathSet : PathSet<byte>
+public class ShortPathSet : PathSet<short>
 {
-    public BytePathSet(NativeArray<byte> targetArray, int value) : base(targetArray)
+    public ShortPathSet(NativeArray<short> targetArray, int value) : base(targetArray)
     {
         this.value = value;
     }
@@ -93,7 +93,7 @@ public class BytePathSet : PathSet<byte>
         isDirty = false;
         foreach (var index in TargetIndexes)
         {
-            targetArray[index] = (byte)(targetArray[index] - value);
+            targetArray[index] = (short)(targetArray[index] - value);
         }
         
         TargetIndexes.Clear();
@@ -104,7 +104,7 @@ public class BytePathSet : PathSet<byte>
                 int index = target.TargetIndexes[i];
                 if (TargetIndexes.Add(index))
                 {
-                    targetArray[index] = (byte)(targetArray[index] + value);
+                    targetArray[index] = (short)(targetArray[index] + value);
                 }
             }
         }

@@ -13,7 +13,7 @@ namespace Pathfinding
 
         [SerializeField]
         private bool getChildrenColliders;
-        
+
         private readonly List<Collider> colliders = new List<Collider>();
 
         private bool needsRebuilding = true;
@@ -37,6 +37,11 @@ namespace Pathfinding
             {
                 colliders.AddRange(GetComponentsInChildren<Collider>(false));
             }
+        }
+
+        private void OnDisable()
+        {
+            colliders.Clear();
         }
 
         private void Update()
@@ -68,7 +73,7 @@ namespace Pathfinding
                 Vector2 pos = transform.position;
                 if (PathManager.Instance.CheckIfValid(pos))
                 {
-                    Indexes.Add(PathManager.Instance.GetIndex(pos));
+                    //Indexes.Add(PathManager.Instance.GetIndex(pos));
                 }
                 else
                 {
@@ -89,7 +94,7 @@ namespace Pathfinding
             Gizmos.color = Color.blue;
             for (int i = 0; i < Indexes.Count; i++)
             {
-                Gizmos.DrawCube(PathManager.Instance.GetPos(Indexes[i]).ToXyZ(0), Vector3.one * 0.5f * PathManager.Instance.CellScale);
+                Gizmos.DrawCube(PathManager.Instance.GetPos(Indexes[i]).ToXyZ(1), Vector3.one * 0.5f * PathManager.Instance.CellScale);
             }
         }
     }
