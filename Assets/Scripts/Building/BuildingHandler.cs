@@ -19,6 +19,10 @@ public class BuildingHandler : SerializedMonoBehaviour
     [Title("District")]
     [SerializeField]
     private IChunkWaveFunction districtGenerator;
+    
+    [Title("Data")]
+    [SerializeField]
+    private WallData wallData;
 
     private List<Building> buildingQueue = new List<Building>();
     private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
@@ -80,13 +84,13 @@ public class BuildingHandler : SerializedMonoBehaviour
         {
             //Debug.Log("Please add all meshes to the list");
 
-            BuildingData wrongdata = new BuildingData(this);
+            BuildingData wrongdata = new BuildingData(this, wallData.Stats);
             //wrongdata.SetState(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None}, building.Index, building.Prototype);
 
             return wrongdata;
         }
 
-        BuildingData data = new BuildingData(this);
+        BuildingData data = new BuildingData(this, wallData.Stats);
         //data.SetState(cellInfo, building.Index, building.Prototype);
 
         return data;
@@ -147,7 +151,7 @@ public class BuildingHandler : SerializedMonoBehaviour
     {
         Building building = GetBuilding(buildingIndex);
 
-        building.DisplayDeath();
+        building.OnDestroyed();
         Events.OnBuildingDestroyed?.Invoke(building);
     }
 

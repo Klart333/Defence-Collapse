@@ -3,30 +3,26 @@ using UnityEngine;
 using System;
 
 [System.Serializable]
-public class HealthComponent : IHealth // THIS DOESN'T WORK WITH ECS SO WHATEVER!
+public class HealthComponent : IHealth
 {
     public event Action OnDeath;
     public event Action OnTakeDamage;
 
     public float CurrentHealth;
     public float MaxHealth;
-
+    
     public bool Alive => CurrentHealth > 0;
     public float HealthPercentage => CurrentHealth / Stats.MaxHealth.Value;
-
-    private readonly Transform transform;
     
     public List<StatusEffect> StatusEffects { get; set; } = new List<StatusEffect>();
     public DamageInstance LastDamageTaken { get; private set; }
     public Stats Stats { get; private set; }
     
-    public Vector3 OriginPosition => transform.position;
     public HealthComponent Health => this;
     
-    public HealthComponent(Stats stats, Transform transform)
+    public HealthComponent(Stats stats)
     {
         Stats = stats;
-        this.transform = transform;
         
         Stats.MaxHealth.OnValueChanged += UpdateMaxHealth;
         UpdateMaxHealth();
@@ -72,19 +68,39 @@ public class HealthComponent : IHealth // THIS DOESN'T WORK WITH ECS SO WHATEVER
         }
     }
     
+    public void TakeDamage(float damage)
+    {
+        if (!Alive)
+        {
+            return;
+        }
+
+        var damageDone = new DamageInstance(damage);
+        for (int i = 0; i < StatusEffects.Count; i++)
+        {
+            StatusEffects[i].TriggerEFfect(ref damageDone);
+        }
+
+        CurrentHealth -= damageDone.Damage;
+        OnTakeDamage?.Invoke();
+
+        if (CurrentHealth <= 0)
+        {
+            Die(damageDone);
+        }
+    }
+    
     private void Die(DamageInstance killingDamage)
     {
         killingDamage.Source.OnUnitKill();
 
         OnDeath?.Invoke();
     }
-
 }
 
 public interface IHealth
 {
     public HealthComponent Health { get; }
-    public Vector3 OriginPosition { get; }
     
     public void TakeDamage(DamageInstance damage, out DamageInstance damageDone);
 }

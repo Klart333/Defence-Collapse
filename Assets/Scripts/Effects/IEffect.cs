@@ -529,7 +529,7 @@ namespace Effects
                     break;
                 }
 
-                dotInstance.AttackPosition = dotInstance.TargetHit.OriginPosition;
+                //dotInstance.AttackPosition = dotInstance.TargetHit.OriginPosition;
                 dotInstance.TargetHit.TakeDamage(dotInstance, out DamageInstance damageDone);
 
                 damageDone.SpecialEffectSet.Add(EffectKey);

@@ -8,7 +8,6 @@ public class BuildingHealth : MonoBehaviour, IHealth
     private Building building;
 
     public HealthComponent Health => building.BuildingHandler[building].Health;
-    public Vector3 OriginPosition => Health.OriginPosition;
 
     private void Awake()
     {

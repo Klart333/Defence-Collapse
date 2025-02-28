@@ -40,7 +40,7 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
-
+            deathQuery.Dispose();
         }
     }
 }

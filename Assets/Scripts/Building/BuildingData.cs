@@ -11,12 +11,11 @@ public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT 
     public Vector3Int Index { get; set; }
 
     public HealthComponent Health { get; set; }
-    public Vector3 OriginPosition => Health.OriginPosition;
 
-    public BuildingData(BuildingHandler buildingHandler)
+    public BuildingData(BuildingHandler buildingHandler, Stats stats)
     {
         handler = buildingHandler;
-        //Health = new HealthComponent(null, null);
+        Health = new HealthComponent(stats);
     }
 
     public void OnBuildingChanged(BuildingCellInformation cellInfo, Building building)
@@ -29,11 +28,6 @@ public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT 
         building.SetData(this);
     }
 
-    public void OnBuildingDeath()
-    {
-        handler.BuildingDestroyed(Index);
-    }
-
     public void LevelUp()
     {
         handler.DislpayLevelUp(Index);
@@ -41,7 +35,6 @@ public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT 
 
     public void Update(Building building)
     {
-        return;
         if (!Health.Alive)
         {
             return;
@@ -51,5 +44,25 @@ public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT 
     public void TakeDamage(DamageInstance damage, out DamageInstance damageDone)
     {
         Health.TakeDamage(damage, out damageDone);
+
+        if (!Health.Alive)
+        {
+            OnBuildingDeath();
+        }
+    }
+    
+    public void TakeDamage(float damage)
+    {
+        Health.TakeDamage(damage);
+
+        if (!Health.Alive)
+        {
+            OnBuildingDeath();
+        }
+    }
+    
+    public void OnBuildingDeath()
+    {
+        handler.BuildingDestroyed(Index);
     }
 }

@@ -8,7 +8,6 @@ using Sirenix.Utilities;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace WaveFunctionCollapse
 {
@@ -161,7 +160,7 @@ namespace WaveFunctionCollapse
                         continue;
                     }
 
-                    waveFunction.LoadCells(chunk, defaultPrototypeInfoData);
+                    waveFunction.LoadCells(chunk, chunk.PrototypeInfoData);
                 }
 
                 foreach (Vector3 pos in positions)

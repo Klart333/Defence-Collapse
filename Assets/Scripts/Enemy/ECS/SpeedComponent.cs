@@ -17,3 +17,9 @@ public struct FlowFieldComponent : IComponentData
 
     public float UpdateTimer;
 }
+
+public struct AttackSpeedComponent : IComponentData
+{
+    public float AttackSpeed;
+    public float Timer;
+}

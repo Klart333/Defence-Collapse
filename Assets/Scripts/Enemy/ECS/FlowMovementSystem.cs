@@ -43,7 +43,7 @@ namespace DataStructures.Queue.ECS
         }
     }
 
-    [BurstCompile]
+    [BurstCompile, WithNone(typeof(AttackingComponent))]
     internal partial struct FlowMovementJob : IJobEntity
     {
         [ReadOnly]

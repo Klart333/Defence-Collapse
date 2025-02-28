@@ -16,12 +16,23 @@ public class DamageInstance
 
     public DamageInstance(DamageInstance damage)
     {
-        this.Source = damage.Source;
-        this.TargetHit = damage.TargetHit;
-        this.Damage = damage.Damage;
-        this.CritMultiplier = damage.CritMultiplier;
-        this.AttackPosition = damage.AttackPosition;
-        this.SpecialEffectSet = new HashSet<int>(damage.SpecialEffectSet);
+        Source = damage.Source;
+        TargetHit = damage.TargetHit;
+        Damage = damage.Damage;
+        CritMultiplier = damage.CritMultiplier;
+        AttackPosition = damage.AttackPosition;
+        SpecialEffectSet = new HashSet<int>(damage.SpecialEffectSet);
+    }
+    
+    public DamageInstance(float damage)
+    {
+        Damage = damage;
+        CritMultiplier = 2;
+        
+        AttackPosition = default;
+        SpecialEffectSet = null;
+        TargetHit = null;
+        Source = null;
     }
 
     public HashSet<int> SpecialEffectSet
@@ -32,10 +43,7 @@ public class DamageInstance
 
             return specialEffectSet;
         }
-        set
-        {
-            specialEffectSet = value;
-        }
+        set => specialEffectSet = value;
     }
 
     public float GetTotal()

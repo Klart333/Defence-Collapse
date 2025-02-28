@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using Effects;
 using System;
+using UnityEngine.Serialization;
 using WaveFunctionCollapse;
 
 public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
@@ -14,8 +15,9 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
     [SerializeField]
     private TowerData bombData;
 
+    [FormerlySerializedAs("normalData")]
     [SerializeField]
-    private NormalHouseData normalData;
+    private WallData wallData;
 
     [Title("Mesh Information")]
     [SerializeField]
@@ -44,7 +46,6 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
     public List<EffectModifier> ModifierEffects => modifierEffectsToSpawn;
     public TowerData BombData => bombData;
     public TowerData ArcherData => archerData;
-    public NormalHouseData NormalData => normalData;
 
     protected override void Awake()
     {

@@ -11,7 +11,7 @@ namespace Effects.ECS
 {
     public partial struct CollisionSystem : ISystem
     {
-        public static Dictionary<int, Action<Entity>> DamageDoneEvent;
+        public static readonly Dictionary<int, Action<Entity>> DamageDoneEvent = new Dictionary<int, Action<Entity>>();
             
         private EntityQuery collisionQuery;
         private NativeQueue<Entity> collisionQueue;
@@ -23,7 +23,6 @@ namespace Effects.ECS
                 .Build();
             
             collisionQueue = new NativeQueue<Entity>(Allocator.Persistent);
-            DamageDoneEvent = new Dictionary<int, Action<Entity>>();
         }
 
         public void OnUpdate(ref SystemState state)
@@ -63,6 +62,7 @@ namespace Effects.ECS
         public void OnDestroy(ref SystemState state)
         {
             collisionQueue.Dispose();
+            collisionQuery.Dispose();
         }
     }
     

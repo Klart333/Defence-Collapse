@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using DataStructures.Queue.ECS;
+using Pathfinding;
 using Sirenix.OdinInspector;
 using UnityEngine.Events;
 using UnityEngine;
@@ -56,9 +58,10 @@ public class Building : PooledMonoBehaviour, IBuildable
     private bool selected;
     private bool hovered;
 
-    public int BuildingGroupIndex { get; set; } = -1;
     public PrototypeData Prototype { get; private set; }
+    public int BuildingGroupIndex { get; set; } = -1;
     public Vector3Int Index { get; private set; }
+    public int Index2D { get; private set; }
     public int Importance => 1;
 
     private BuildingAnimator BuildingAnimator => buildingAnimator ??= FindAnyObjectByType<BuildingAnimator>();
@@ -261,9 +264,24 @@ public class Building : PooledMonoBehaviour, IBuildable
                 cornerColliders[i].gameObject.SetActive(false);
             }
         }
+
+        Index2D = PathManager.Instance.GetIndex(transform.position.x, transform.position.z);
+        AttackingSystem.DamageEvent.Add(Index2D, TakeDamage);
         
         BuildingHandler.AddBuilding(this).Forget(Debug.LogError);
         OnPlacedEvent?.Invoke();
+    }
+
+    private void TakeDamage(float damage)
+    {
+        BuildingHandler[this].TakeDamage(damage);
+    }
+
+    public void OnDestroyed()
+    {
+        AttackingSystem.DamageEvent.Remove(Index2D);
+        
+        ToggleIsBuildableVisual(true);
     }
 
     public void DisplayLevelUp()
@@ -271,17 +289,8 @@ public class Building : PooledMonoBehaviour, IBuildable
         
     }
 
-    public void DisplayDeath()
-    {
-        ToggleIsBuildableVisual(true);
-    }
-
     public void SetData(BuildingData data)
     {
-        return;
-        if (!data.Health.Alive)
-        {
-            DisplayDeath();
-        }
+        
     }
 }

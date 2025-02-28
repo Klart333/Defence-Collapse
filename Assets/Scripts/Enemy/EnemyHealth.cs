@@ -26,7 +26,6 @@ public class EnemyHealth : MonoBehaviour, IHealth
     private HealthComponent health;
 
     public HealthComponent Health => health;
-    public Vector3 OriginPosition => Health.OriginPosition;
     public IAttacker Attacker => attacker;
 
     private void OnEnable()
@@ -34,7 +33,7 @@ public class EnemyHealth : MonoBehaviour, IHealth
         animator = GetComponent<EnemyAnimator>();
         attacker = GetComponent<EnemyAttacker>();
 
-        health = new HealthComponent(Attacker.Stats, transform);
+        health = new HealthComponent(Attacker.Stats);
         health.OnDeath += HealthOnDeath;
 
         healthbar.Setup(this);
