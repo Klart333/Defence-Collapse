@@ -92,7 +92,7 @@ public class HealthComponent : IHealth
     
     private void Die(DamageInstance killingDamage)
     {
-        killingDamage.Source.OnUnitKill();
+        killingDamage.Source?.OnUnitKill();
 
         OnDeath?.Invoke();
     }

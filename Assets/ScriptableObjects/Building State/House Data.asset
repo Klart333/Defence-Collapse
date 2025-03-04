@@ -13,4 +13,20 @@ MonoBehaviour:
   m_Name: House Data
   m_EditorClassIdentifier: 
   IncomePerHouse: 1
-  MaxHealth: 10
+  Stats:
+    DamageMultiplier:
+      baseValue: 0
+    AttackSpeed:
+      baseValue: 0
+    MovementSpeed:
+      baseValue: 0
+    CritChance:
+      baseValue: 0
+    CritMultiplier:
+      baseValue: 0
+    Armor:
+      baseValue: 0
+    MaxHealth:
+      baseValue: 10
+    Healing:
+      baseValue: 0

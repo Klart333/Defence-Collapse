@@ -12,10 +12,11 @@ public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT 
 
     public HealthComponent Health { get; set; }
 
-    public BuildingData(BuildingHandler buildingHandler, Stats stats)
+    public BuildingData(BuildingHandler buildingHandler, Stats stats, Vector3Int index)
     {
         handler = buildingHandler;
         Health = new HealthComponent(stats);
+        Index = index;
     }
 
     public void OnBuildingChanged(BuildingCellInformation cellInfo, Building building)

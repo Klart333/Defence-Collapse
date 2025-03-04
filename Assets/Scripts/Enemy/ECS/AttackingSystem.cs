@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Burst;
 using Unity.Collections;
+using UnityEngine;
 
 namespace DataStructures.Queue.ECS
 {
@@ -23,6 +24,7 @@ namespace DataStructures.Queue.ECS
             new AttackingJob
             {
                 DamageQueue = damageQueue.AsParallelWriter(),
+                DeltaTime = SystemAPI.Time.DeltaTime,
             }.ScheduleParallel();
 
             state.Dependency.Complete();
@@ -32,6 +34,10 @@ namespace DataStructures.Queue.ECS
                 if (DamageEvent.TryGetValue(item.Index, out Action<float> action))
                 {
                     action.Invoke(item.Damage);
+                }
+                else
+                {
+                    Debug.Log($"Index: {item.Index} not found");
                 }
             }
         }
@@ -48,7 +54,7 @@ namespace DataStructures.Queue.ECS
     {
         public NativeQueue<DamageIndex>.ParallelWriter DamageQueue;
         
-        private float DeltaTime;
+        public float DeltaTime;
         
         [BurstCompile]
         public void Execute(AttackingAspect attackingAspect)

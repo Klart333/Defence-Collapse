@@ -84,13 +84,13 @@ public class BuildingHandler : SerializedMonoBehaviour
         {
             //Debug.Log("Please add all meshes to the list");
 
-            BuildingData wrongdata = new BuildingData(this, wallData.Stats);
+            BuildingData wrongdata = new BuildingData(this, wallData.Stats, building.Index);
             //wrongdata.SetState(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None}, building.Index, building.Prototype);
 
             return wrongdata;
         }
 
-        BuildingData data = new BuildingData(this, wallData.Stats);
+        BuildingData data = new BuildingData(this, wallData.Stats, building.Index);
         //data.SetState(cellInfo, building.Index, building.Prototype);
 
         return data;
@@ -150,7 +150,12 @@ public class BuildingHandler : SerializedMonoBehaviour
     public void BuildingDestroyed(Vector3Int buildingIndex)
     {
         Building building = GetBuilding(buildingIndex);
-
+        if (building == null)
+        {
+            Debug.Log("Building null at: " + buildingIndex);
+            return;
+        }
+        
         building.OnDestroyed();
         Events.OnBuildingDestroyed?.Invoke(building);
     }

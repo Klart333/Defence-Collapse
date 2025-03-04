@@ -1,4 +1,5 @@
-﻿using Unity.Mathematics;
+﻿using System;
+using Unity.Mathematics;
 using UnityEngine;
 
 public static class Math
@@ -16,7 +17,7 @@ public static class Math
 
     public static int GetMultiple(float x, float multiple)
     {
-        return Mathf.RoundToInt(x / multiple);
+        return (int)System.Math.Round(x / multiple, MidpointRounding.AwayFromZero);
     }
     
     public static int GetMultipleFloored(float x, float multiple)

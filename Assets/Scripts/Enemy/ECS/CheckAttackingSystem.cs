@@ -5,6 +5,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace DataStructures.Queue.ECS
 {
@@ -59,6 +60,7 @@ namespace DataStructures.Queue.ECS
         {
             int index = PathManager.GetIndex(transform.Position.x, transform.Position.z, CellScale, GridWidth);
 
+            //Debug.Log(Directions[index]);
             if (Directions[index] == byte.MaxValue)
             {
                 ECB.AddComponent(sortKey, entity, new AttackingComponent { Target = index });

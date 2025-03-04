@@ -62,7 +62,6 @@ namespace Effects.ECS
         public void OnDestroy(ref SystemState state)
         {
             collisionQueue.Dispose();
-            collisionQuery.Dispose();
         }
     }
     

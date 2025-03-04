@@ -54,6 +54,7 @@ public struct PathJob : IJob
             if (TargetIndexes[i])
             {
                 Distances[i] = 0;
+                Directions[i] = byte.MaxValue;
                 FrontierQueue.Enqueue(new IndexDistance(i, 0));
             }
             else
@@ -78,14 +79,7 @@ public struct PathJob : IJob
                 if (dist >= Distances[index]) continue;
                 
                 Distances[index] = dist;
-                if (dist > 0)
-                {
-                    Directions[index] = GetDirection(-NeighbourDirections[i]);
-                }
-                else
-                {
-                    Directions[index] = byte.MaxValue;
-                }
+                Directions[index] = GetDirection(-NeighbourDirections[i]);
                 FrontierQueue.Enqueue(new IndexDistance(index, dist));
             }
         }

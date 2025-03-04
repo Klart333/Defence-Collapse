@@ -157,8 +157,15 @@ namespace Pathfinding
 
             for (int i = 0; i < directions.Length; i++)
             {
-                Gizmos.color = Color.Lerp(Color.red, Color.black, distances[i] / (float)10000);
                 Vector3 pos = GetPos(i).ToXyZ(1);
+                if (directions[i] == byte.MaxValue)
+                {
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawWireCube(pos, Vector3.one * cellScale);
+                    continue;
+                }
+                
+                Gizmos.color = Color.Lerp(Color.red, Color.black, distances[i] / (float)10000);
                 float2 dir = ByteToDirection(directions[i]);
                 Gizmos.DrawLine(pos, pos + new Vector3(dir.x, 0, dir.y) * cellScale);
 

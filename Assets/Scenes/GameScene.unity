@@ -668,6 +668,7 @@ MonoBehaviour:
       Entry: 10
       Data: 0
   towerMeshData: {fileID: 11400000, guid: 6a80373d5d2a40444a8f9391c08a93a2, type: 2}
+  wallData: {fileID: 11400000, guid: 185ee242170670a449435143c8e04b14, type: 2}
 --- !u!4 &248058524 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1507636620937791777, guid: 7097ba7ba649e1f41bba232312bdcbd8,
@@ -1489,50 +1490,6 @@ MonoBehaviour:
   m_FlexibleWidth: 0
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!1 &386009926
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 386009927}
-  - component: {fileID: 386009928}
-  m_Layer: 0
-  m_Name: ColliderManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &386009927
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 386009926}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 883032810}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &386009928
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 386009926}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cce4fca0e11195947b0a2da6999dca5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &394431584
 GameObject:
   m_ObjectHideFlags: 0
@@ -4858,7 +4815,6 @@ Transform:
   - {fileID: 771210303}
   - {fileID: 2128825987}
   - {fileID: 1266994772}
-  - {fileID: 386009927}
   - {fileID: 1517621397}
   - {fileID: 2081155528}
   - {fileID: 347176551}
@@ -10178,7 +10134,7 @@ MonoBehaviour:
   shouldDestroyOnLoad: 1
   archerData: {fileID: 11400000, guid: 63d7b88ca2073ef4c9b83b155b57a4d4, type: 2}
   bombData: {fileID: 11400000, guid: bc87ce68c76001644bd5905c752db326, type: 2}
-  normalData: {fileID: 11400000, guid: 185ee242170670a449435143c8e04b14, type: 2}
+  wallData: {fileID: 11400000, guid: 185ee242170670a449435143c8e04b14, type: 2}
   towerMeshData: {fileID: 11400000, guid: 6a80373d5d2a40444a8f9391c08a93a2, type: 2}
   buildingPrototypes: {fileID: 0}
   canvas: {fileID: 1224394947}

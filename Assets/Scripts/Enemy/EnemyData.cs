@@ -11,11 +11,6 @@ public class EnemyData : SerializedScriptableObject
     [OdinSerialize, NonSerialized]
     public Stats Stats;
 
-    [Title("Hit Info")]
-    public LayerMask LayerMask;
-
-    public float AttackRadius;
-
     [Title("Attack")]
     [OdinSerialize, NonSerialized]
     public Attack BaseAttack;

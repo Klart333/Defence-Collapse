@@ -25,6 +25,9 @@ public class Building : PooledMonoBehaviour, IBuildable
     [Title("Collider")]
     [SerializeField]
     private Collider[] cornerColliders;
+
+    [SerializeField]
+    private Indexer indexer;
     
     [SerializeField]
     private BuildableCornerData buildableCornerData;
@@ -61,7 +64,6 @@ public class Building : PooledMonoBehaviour, IBuildable
     public PrototypeData Prototype { get; private set; }
     public int BuildingGroupIndex { get; set; } = -1;
     public Vector3Int Index { get; private set; }
-    public int Index2D { get; private set; }
     public int Importance => 1;
 
     private BuildingAnimator BuildingAnimator => buildingAnimator ??= FindAnyObjectByType<BuildingAnimator>();
@@ -105,6 +107,12 @@ public class Building : PooledMonoBehaviour, IBuildable
         selected = false;
         MeshRenderer.gameObject.layer = originalLayer;
 
+        for (int i = 0; i < indexer.Indexes.Count; i++)
+        {
+            int index = indexer.Indexes[i];
+            AttackingSystem.DamageEvent.Remove(index);
+        }
+        
         OnResetEvent?.Invoke();
     }
 
@@ -264,22 +272,38 @@ public class Building : PooledMonoBehaviour, IBuildable
                 cornerColliders[i].gameObject.SetActive(false);
             }
         }
-
-        Index2D = PathManager.Instance.GetIndex(transform.position.x, transform.position.z);
-        AttackingSystem.DamageEvent.Add(Index2D, TakeDamage);
+        
+        indexer.OnRebuilt += IndexerOnOnRebuilt;
         
         BuildingHandler.AddBuilding(this).Forget(Debug.LogError);
         OnPlacedEvent?.Invoke();
     }
 
+    private void IndexerOnOnRebuilt()
+    {
+        indexer.OnRebuilt -= IndexerOnOnRebuilt;
+        for (int i = 0; i < indexer.Indexes.Count; i++)
+        {
+            int index = indexer.Indexes[i];
+            AttackingSystem.DamageEvent.TryAdd(index, TakeDamage);
+        }
+    }
+
     private void TakeDamage(float damage)
     {
+        Debug.Log($"Taking {damage} damage");
         BuildingHandler[this].TakeDamage(damage);
     }
 
     public void OnDestroyed()
     {
-        AttackingSystem.DamageEvent.Remove(Index2D);
+        for (int i = 0; i < indexer.Indexes.Count; i++)
+        {
+            int index = indexer.Indexes[i];
+            AttackingSystem.DamageEvent.Remove(index);
+        }
+
+        indexer.enabled = false;
         
         ToggleIsBuildableVisual(true);
     }
