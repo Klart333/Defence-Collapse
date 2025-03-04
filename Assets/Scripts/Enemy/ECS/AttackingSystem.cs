@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Burst;
-using Unity.Collections;
 using UnityEngine;
+using System;
 
 namespace DataStructures.Queue.ECS
 {
@@ -18,7 +18,7 @@ namespace DataStructures.Queue.ECS
         {
             damageQueue = new NativeQueue<DamageIndex>(Allocator.Persistent);
         }
-
+        
         public void OnUpdate(ref SystemState state)
         {
             new AttackingJob
@@ -37,7 +37,7 @@ namespace DataStructures.Queue.ECS
                 }
                 else
                 {
-                    Debug.Log($"Index: {item.Index} not found");
+                    Debug.Log($"Trying to damage index: {item.Index}, but not found");
                 }
             }
         }

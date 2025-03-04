@@ -299,13 +299,10 @@ public class Building : PooledMonoBehaviour, IBuildable
     {
         for (int i = 0; i < indexer.Indexes.Count; i++)
         {
-            int index = indexer.Indexes[i];
-            AttackingSystem.DamageEvent.Remove(index);
+            StopAttackingSystem.KilledIndexes.Enqueue(indexer.Indexes[i]);
         }
-
-        indexer.enabled = false;
         
-        ToggleIsBuildableVisual(true);
+        gameObject.SetActive(false);
     }
 
     public void DisplayLevelUp()

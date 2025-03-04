@@ -34,6 +34,8 @@ namespace WaveFunctionCollapse
         [Title("Debug")]
         [SerializeField]
         private bool shouldRun = true;
+        
+        private BlobAssetReference<Collider> blobCollider;
 
         public WaveFunction WaveFunction => waveFunction;
 
@@ -41,6 +43,11 @@ namespace WaveFunctionCollapse
         {
             if (shouldRun)
                 _ = Run();
+        }
+
+        private void OnDisable()
+        {
+            blobCollider.Dispose();
         }
 
         public async UniTask Run()
@@ -123,7 +130,7 @@ namespace WaveFunctionCollapse
         private void CombineMeshes()
         {
             Mesh mesh = GetComponent<MeshCombiner>().CombineMeshes();
-            BlobAssetReference<Collider> blobCollider = MeshCollider.Create(mesh, new CollisionFilter
+            blobCollider = MeshCollider.Create(mesh, new CollisionFilter
             {
                 BelongsTo = 6,
                 CollidesWith = 6,

@@ -35,7 +35,9 @@ public abstract class PathSet<T> where T : struct
             Debug.LogError("Trying to remove non-registered target");
         }
 
+        Debug.Log("Removing target: " + target);
         target.OnIndexerRebuild -= SetIsDirty;
+        isDirty = true;
     }
     
     private void SetIsDirty() => isDirty = true;

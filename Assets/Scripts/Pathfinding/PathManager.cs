@@ -11,6 +11,7 @@ namespace Pathfinding
     public class PathManager : Singleton<PathManager>
     {
         public event Action GetPathInformation;
+        public event Action OnPathRebuilt;
 
         [Title("Flow Field")]
         [SerializeField]
@@ -144,6 +145,8 @@ namespace Pathfinding
 
             jobHandle = pathJob.Schedule();
             jobHandle.Complete();
+            
+            OnPathRebuilt?.Invoke();
         }
 
         #region Debug
