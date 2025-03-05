@@ -14,6 +14,9 @@ namespace Pathfinding
         [SerializeField]
         private bool getChildrenColliders;
 
+        [SerializeField]
+        private bool indexColliderCenter;
+
         private readonly List<Collider> colliders = new List<Collider>();
 
         private bool needsRebuilding = true;
@@ -65,7 +68,16 @@ namespace Pathfinding
 
             for (int i = 0; i < colliders.Count; i++)
             {
-                IndexerUtility.BuildColliderIndexes(colliders[i], Indexes);
+                if (indexColliderCenter)
+                {
+                    Vector2 pos = colliders[i].bounds.center.XZ();
+                    int index = PathManager.Instance.GetIndex(pos);
+                    Indexes.Add(index);
+                }
+                else
+                {
+                    IndexerUtility.BuildColliderIndexes(colliders[i], Indexes);
+                }
             }
 
             if (Indexes.Count == 0)

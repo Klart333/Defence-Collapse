@@ -216,12 +216,40 @@ public class BuildingManager : Singleton<BuildingManager>
 
     private void OnBuildingRepaired(Building building)
     {
-        this[building.Index] = new Cell(true, this[building.Index].Position, this[building.Index].PossiblePrototypes, true);
+        this[building.Index] = new Cell(true, this[building.Index].Position, this[building.Index].PossiblePrototypes);
     }
 
     private void OnBuildingDestroyed(Building building)
     {
-        this[building.Index] = new Cell(true, this[building.Index].Position, this[building.Index].PossiblePrototypes, false);
+        this[building.Index] = new Cell(false, this[building.Index].Position, prototypes);
+
+        List<Vector3Int> cellsToUpdate = new List<Vector3Int>();
+        for (int i = 0; i < WaveFunctionUtility.NeighbourDirections.Length; i++)
+        {
+            Vector3Int index = building.Index + new Vector3Int(WaveFunctionUtility.NeighbourDirections[i].x, 0, WaveFunctionUtility.NeighbourDirections[i].y);
+            if (this[index].Collapsed)
+            {
+                cellsToUpdate.Add(index);
+            }
+        }
+
+        allowedKeys = keyData.BuildingKeys;
+        MakeBuildable(cellsToUpdate);
+        
+        Propagate();
+
+        int tries = 1000;
+        while (cellsToCollapse.Any(x => !Cells[x.x, x.y, x.z].Collapsed) && tries-- > 0)
+        {
+            Iterate();
+        }
+
+        if (tries <= 0)
+        {
+            RevertQuery();
+            return;
+        }
+        Place();
     }
 
     #endregion

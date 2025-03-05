@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace DataStructures.Queue.ECS
 {
+    [UpdateAfter(typeof(CheckAttackingSystem))]
     public partial class StopAttackingSystem : SystemBase   
     {
         public static readonly Queue<int> KilledIndexes = new Queue<int>();
@@ -23,6 +24,7 @@ namespace DataStructures.Queue.ECS
         
         protected override void OnUpdate()
         {
+            Enabled = false;
             int count = KilledIndexes.Count;
             if (count <= 0)
             {
@@ -33,7 +35,6 @@ namespace DataStructures.Queue.ECS
             for (int i = 0; i < count; i++)
             {
                 indexes[i] = KilledIndexes.Dequeue();
-                Debug.Log("Killed Index: " + indexes[i]);
             }
                 
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
@@ -41,16 +42,14 @@ namespace DataStructures.Queue.ECS
             {
                 ECB = ecb.AsParallelWriter(),
                 KilledIndexes = indexes,
+                Length = count,
             }.ScheduleParallel();
                 
             Dependency.Complete();
             ecb.Playback(EntityManager);
             ecb.Dispose();
             indexes.Dispose();
-
-            Enabled = false;
         }
-
     }
     
     [BurstCompile]
@@ -71,6 +70,7 @@ namespace DataStructures.Queue.ECS
                 if (attackingComponent.Target == KilledIndexes[i])
                 {
                     ECB.RemoveComponent<AttackingComponent>(sortKey, entity);
+                    Debug.Log("Removing attacking component");
                 }
             }
         }

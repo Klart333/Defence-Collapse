@@ -9,6 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Linq;
 using System;
+using Unity.Mathematics;
 
 namespace WaveFunctionCollapse
 {
@@ -671,6 +672,14 @@ namespace WaveFunctionCollapse
 
     public static class WaveFunctionUtility
     {
+        public static readonly int2[] NeighbourDirections = new []
+        {
+            new int2(1, 0),
+            new int2(0, 1),
+            new int2(-1, 0),
+            new int2(0, -1),
+        };
+        
         public static float CalculateEntropy(Cell cell)
         {
             float totalWeight = 0;

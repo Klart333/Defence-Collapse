@@ -35,12 +35,15 @@ public class BuildingPlacer : MonoBehaviour
         Events.OnBuildingCanceled += OnBuildingCanceled;
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
         groundGenerator.OnMapGenerated += InitializeSpawnPlaces;
+        
+        Events.OnBuildingDestroyed += OnBuildingDestroyed;
     }
-
+    
     private void OnDisable()
     {
         Events.OnBuildingCanceled -= OnBuildingCanceled;
         groundGenerator.OnMapGenerated -= InitializeSpawnPlaces;
+        Events.OnBuildingDestroyed -= OnBuildingDestroyed;
     }
 
     private void Start()
@@ -117,7 +120,7 @@ public class BuildingPlacer : MonoBehaviour
             {
                 if (buildables.Count > 0 && InputManager.Instance.Fire.WasPerformedThisFrame())
                 {
-                    PlaceBuilding(type);
+                    PlaceBuilding();
                 }
                 continue;
             }
@@ -125,7 +128,7 @@ public class BuildingPlacer : MonoBehaviour
             DisablePlaces();
 
             BuildingManager.Instance.RevertQuery();
-            await UniTask.Delay(50);
+            await UniTask.NextFrame();
             if (!SquareIndex.HasValue) continue;
 
             queryIndex = SquareIndex.Value;
@@ -144,7 +147,7 @@ public class BuildingPlacer : MonoBehaviour
 
             if (!InputManager.Instance.Fire.WasPerformedThisFrame()) continue;
 
-            PlaceBuilding(type);
+            PlaceBuilding();
         }
 
         if (Canceled)
@@ -183,10 +186,21 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
     
-    private void PlaceBuilding(BuildingType buildingType)
+    private void PlaceBuilding()
     {
         spawnedSpawnPlaces[SpawnSquareIndex].OnPlaced();
         BuildingManager.Instance.Place();
+    }
+    
+    private void OnBuildingDestroyed(Building building)
+    {
+        for (int i = 0; i < spawnedSpawnPlaces.Count; i++)
+        {
+            if (spawnedSpawnPlaces[i].Index == building.Index)
+            {
+                spawnedSpawnPlaces[i].UnPlaced();
+            }
+        }
     }
 
     private void ShowUnablePlaces(List<Vector3> positions)

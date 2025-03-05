@@ -199,17 +199,18 @@ namespace Pathfinding
             return GetIndex(pos.x, pos.y, CellScale, GridWidth);
         }
 
-        private const float HALF_BUILDING_CELL = 0.0f;
+        private const float HALF_BUILDING_CELL = 0.25f;
+        private const float FULL_BUILDING_CELL = 0.5f;
         public Vector2 GetPos(int index)
         {
-            return new Vector2(index % GridWidth + HALF_BUILDING_CELL, Mathf.FloorToInt((float)index / GridWidth) + HALF_BUILDING_CELL) * CellScale;
+            return new Vector2(index % GridWidth - FULL_BUILDING_CELL, Mathf.FloorToInt((float)index / GridWidth) - FULL_BUILDING_CELL) * CellScale;
         }
 
         #region Static
 
         public static int GetIndex(float xPos, float zPos, float cellScale, int gridWidth)
         {
-            return Math.GetMultiple(xPos, cellScale) + Math.GetMultiple(zPos, cellScale) * gridWidth;
+            return Math.GetMultiple(xPos + HALF_BUILDING_CELL, cellScale) + Math.GetMultiple(zPos + HALF_BUILDING_CELL, cellScale) * gridWidth;
         }
 
         public static float2 ByteToDirection(byte directionByte)

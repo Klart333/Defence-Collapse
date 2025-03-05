@@ -59,4 +59,10 @@ public class PlaceSquare : MonoBehaviour
         Placed = true;
         gameObject.SetActive(false);
     }
+
+    public void UnPlaced()
+    {
+        Placed = false;
+        gameObject.SetActive(true);
+    }
 }
