@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Buildings.District;
 using Sirenix.OdinInspector;
@@ -6,7 +7,7 @@ using DG.Tweening;
 using UnityEngine;
 using TMPro;
 
-public class UIBuildingUpgrade : MonoBehaviour
+public class UIDistrictUpgrade : MonoBehaviour
 {
     [Title("Level Data")]
     [SerializeField]

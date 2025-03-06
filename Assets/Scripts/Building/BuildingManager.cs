@@ -221,8 +221,8 @@ public class BuildingManager : Singleton<BuildingManager>
 
     private void OnBuildingDestroyed(Building building)
     {
+        return;
         this[building.Index] = new Cell(false, this[building.Index].Position, prototypes);
-
         List<Vector3Int> cellsToUpdate = new List<Vector3Int>();
         for (int i = 0; i < WaveFunctionUtility.NeighbourDirections.Length; i++)
         {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using DataStructures.Queue.ECS;
 using Pathfinding;
@@ -24,7 +25,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     [Title("Collider")]
     [SerializeField]
-    private Collider[] cornerColliders;
+    private Hovered[] cornerColliders;
 
     [SerializeField]
     private Indexer indexer;
@@ -59,13 +60,13 @@ public class Building : PooledMonoBehaviour, IBuildable
     private bool purchasing = true;
     private bool highlighted;
     private bool selected;
-    private bool hovered;
 
     public PrototypeData Prototype { get; private set; }
     public int BuildingGroupIndex { get; set; } = -1;
     public Vector3Int Index { get; private set; }
     public int Importance => 1;
 
+    private bool Hovered => cornerColliders.Any(x => x.IsHovered);
     private BuildingAnimator BuildingAnimator => buildingAnimator ??= FindAnyObjectByType<BuildingAnimator>();
     public BuildingHandler BuildingHandler => buildingHandler ??= FindAnyObjectByType<BuildingHandler>();
     public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
@@ -103,7 +104,6 @@ public class Building : PooledMonoBehaviour, IBuildable
         BuildingGroupIndex = -1;
 
         purchasing = true;
-        hovered = false;
         selected = false;
         MeshRenderer.gameObject.layer = originalLayer;
 
@@ -117,21 +117,6 @@ public class Building : PooledMonoBehaviour, IBuildable
     }
 
     #region Highlight
-
-    private void OnMouseDown()
-    {
-        
-    }
-
-    private void OnMouseEnter()
-    {
-        hovered = true;
-    }
-
-    private void OnMouseExit()
-    {
-        hovered = false;
-    }
 
     public async UniTask Highlight(BuildingCellInformation cellInfo)
     {
@@ -192,6 +177,7 @@ public class Building : PooledMonoBehaviour, IBuildable
             return;
         }
 
+        bool hovered = Hovered;
         if (hovered && InputManager.Instance.GetShift)
         {
             BuildingHandler.HighlightGroup(this);
@@ -301,8 +287,15 @@ public class Building : PooledMonoBehaviour, IBuildable
         {
             StopAttackingSystem.KilledIndexes.Enqueue(indexer.Indexes[i]);
         }
+
+        GetComponent<PathTarget>().enabled = false;
+        for (int i = 0; i < indexer.Indexes.Count; i++)
+        {
+            int index = indexer.Indexes[i];
+            AttackingSystem.DamageEvent.Remove(index);
+        }
         
-        gameObject.SetActive(false);
+        ToggleIsBuildableVisual(true);
     }
 
     public void DisplayLevelUp()

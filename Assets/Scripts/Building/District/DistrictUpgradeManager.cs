@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Buildings.District;
 using UnityEngine;
 using Effects;
 using System;
-using UnityEngine.Serialization;
-using WaveFunctionCollapse;
 
-public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
+public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
 {
     [Title("State Data")]
     [SerializeField]
@@ -14,44 +13,29 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
 
     [SerializeField]
     private TowerData bombData;
-
-    [FormerlySerializedAs("normalData")]
-    [SerializeField]
-    private WallData wallData;
-
+    
     [Title("Mesh Information")]
     [SerializeField]
     private TowerMeshData towerMeshData;
-
-    [SerializeField]
-    private PrototypeInfoData buildingPrototypes;
 
     [Title("UI")]
     [SerializeField]
     private GameObject canvas;
 
-    [Title("UI", "Advancement")]
-    [SerializeField]
-    private GameObject advancementPanel;
-
     [Title("UI", "Upgrade")]
     [SerializeField]
-    private UIBuildingUpgrade buildingUpgrade;
+    private UIDistrictUpgrade districtUpgrade;
 
-    private List<EffectModifier> modifierEffectsToSpawn = new List<EffectModifier>();
-
-    private BuildingHandler buildingHandler;
-    private Building currentBuilding;
+    private readonly List<EffectModifier> modifierEffectsToSpawn = new List<EffectModifier>();
 
     public List<EffectModifier> ModifierEffects => modifierEffectsToSpawn;
-    public TowerData BombData => bombData;
     public TowerData ArcherData => archerData;
+    public TowerData BombData => bombData;
 
     protected override void Awake()
     {
         base.Awake();
 
-        buildingHandler = FindAnyObjectByType<BuildingHandler>();
         InputManager.Instance.Cancel.performed += Cancel_performed;
     }
 
@@ -63,46 +47,16 @@ public class BuildingUpgradeManager : Singleton<BuildingUpgradeManager>
         }
     }
 
-    public void OpenAdvancementMenu(Building building)
+    public void OpenUpgradeMenu(DistrictData district)
     {
-        currentBuilding = building;
-
         canvas.SetActive(true);
-        advancementPanel.SetActive(true);
-    }
-
-    public void OpenUpgradeMenu(Building building)
-    {
-        currentBuilding = building;
-
-        canvas.SetActive(true);
-        //buildingUpgrade.ShowUpgrades(buildingHandler[building]);
+        districtUpgrade.ShowUpgrades(district);
     }
 
     public void Close()
     {
-        currentBuilding.BuildingUI.OnMenuClosed();
-        currentBuilding = null;
-
         canvas.SetActive(false);
-        advancementPanel.SetActive(false);
-        buildingUpgrade.Close();
-    }
-
-    public void SelectAdvancementOption(TowerType towerType)
-    {
-        Debug.LogError("DEPRECATED");
-        (PrototypeData, BuildingCellInformation)? data = towerMeshData.GetInfo(towerType, buildingPrototypes.Prototypes);
-        if (data.HasValue)
-        {
-            //buildingHandler[currentBuilding].AdvanceState(data.Value.Item2, data.Value.Item1);
-        }
-        else
-        {
-            Debug.LogError("Wtf man");
-        }
-
-        Close();
+        districtUpgrade.Close();
     }
 
     #region Modifier Effects
@@ -123,7 +77,6 @@ public class EffectModifier
     public Sprite Icon;
 
     public string Description;
-
     public string Title;
 
     public EffectType EffectType;

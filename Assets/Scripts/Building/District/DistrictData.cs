@@ -1,11 +1,11 @@
-using System;
+using Object = UnityEngine.Object;
 using System.Collections.Generic;
-using System.Linq;
+using WaveFunctionCollapse;
 using Unity.Mathematics;
+using System.Linq;
 using UnityEngine;
 using Utility;
-using WaveFunctionCollapse;
-using Object = UnityEngine.Object;
+using System;
 
 namespace Buildings.District
 {
@@ -34,8 +34,8 @@ namespace Buildings.District
             
             State = districtType switch
             {
-                DistrictType.Archer => new ArcherState(this, BuildingUpgradeManager.Instance.ArcherData, statePosition, key),
-                DistrictType.Bomb => new BombState(this, BuildingUpgradeManager.Instance.BombData, statePosition, key),
+                DistrictType.Archer => new ArcherState(this, DistrictUpgradeManager.Instance.ArcherData, statePosition, key),
+                DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, statePosition, key),
                 //DistrictType.Church => expr,
                 //DistrictType.Farm => expr,
                 //DistrictType.Mine => expr,

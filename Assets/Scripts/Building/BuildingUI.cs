@@ -69,7 +69,7 @@ public class BuildingUI : MonoBehaviour
             return;
         }
 
-        BuildingUpgradeManager.Instance.OpenUpgradeMenu(building);
+        //DistrictUpgradeManager.Instance.OpenUpgradeMenu(building);
         inMenu = true;
     }
 
@@ -82,8 +82,6 @@ public class BuildingUI : MonoBehaviour
     {
         upgradablePanel.SetActive(false);
         inMenu = true;
-
-        BuildingUpgradeManager.Instance.OpenAdvancementMenu(building);
     }
 
     public void OnMenuClosed()

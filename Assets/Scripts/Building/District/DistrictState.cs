@@ -51,9 +51,20 @@ namespace Buildings.District
         private void OnDamageDone(Entity entity)
         {
             DamageComponent damage = entityManager.GetComponentData<DamageComponent>(entity);
+            PositionComponent transform = entityManager.GetComponentData<PositionComponent>(entity);
+            
             totalDamageDealt += damage.Damage;
-            
-            
+            lastDamageDone = new DamageInstance
+            {
+                Damage = damage.Damage,
+                AttackPosition = transform.Position,
+                Source = this,
+            };
+
+            if (damage.TriggerDamageDone)
+            {
+                Attack?.OnDoneDamage(this);
+            }
         }
 
         public void OnUnitDoneDamage(DamageInstance damageInstance)

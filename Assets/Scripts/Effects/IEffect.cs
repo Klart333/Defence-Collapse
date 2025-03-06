@@ -13,6 +13,7 @@ using System;
 // ReSharper disable ConvertToConstant.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
+// ReSharper disable CollectionNeverUpdated.Global
 
 namespace Effects
 {
@@ -366,7 +367,7 @@ namespace Effects
 
                 if (Effects.Count > 0)
                 {
-                    entityManager.AddComponentData(spawned, new DeathCallbackComponent{Key = DeathSystem.Key});
+                    entityManager.AddComponentData(spawned, new DeathCallbackComponent { Key = DeathSystem.Key });
                     DeathSystem.DeathCallbacks.Add(DeathSystem.Key++, OnColliderDestroyed);
                 }
                 
@@ -387,12 +388,13 @@ namespace Effects
             }
             
             void OnColliderDestroyed()
-            {
+            { 
                 unit.AttackPosition = targetPosition;
 
                 for (int i = 0; i < Effects.Count; i++)
                 {
                     Effects[i].Perform(unit);
+                    Debug.Log("Performing effect: " + Effects[i]);
                 }
             }
         }

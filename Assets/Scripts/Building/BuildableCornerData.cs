@@ -10,7 +10,7 @@ public class BuildableCornerData : SerializedScriptableObject
 {
     [Title("Dictionary")]
     public Dictionary<Mesh, BuildableCorners> BuildableDictionary;
-        
+    
     public bool IsCornerBuildable(MeshWithRotation meshRot, Vector2Int corner, out bool meshIsBuildable)
     {
         if (meshRot.Mesh == null || !BuildableDictionary.TryGetValue(meshRot.Mesh, out BuildableCorners buildableCorners))

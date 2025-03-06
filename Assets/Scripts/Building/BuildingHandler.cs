@@ -16,6 +16,9 @@ public class BuildingHandler : SerializedMonoBehaviour
     [SerializeField]
     private TowerMeshData towerMeshData;
     
+    [SerializeField]
+    private BuildableCornerData cornerData;
+    
     [Title("District")]
     [SerializeField]
     private IChunkWaveFunction districtGenerator;
@@ -113,12 +116,13 @@ public class BuildingHandler : SerializedMonoBehaviour
                 {
                     Building otherBuilding = group.Value[j];
                     if (!IsAdjacent(building, otherBuilding)) continue;
-                    if (++adjacenyCount < 2) continue;
+                    if (++adjacenyCount < 1) continue;
 
                     any = true;
                 }
 
                 if (!any) continue;
+                
                 Merge(groupToCheck, group.Key);
                 CheckMerge(group.Key);
                 return;
@@ -133,10 +137,22 @@ public class BuildingHandler : SerializedMonoBehaviour
         BuildingGroups.Remove(groupToMerge);
     }
 
-    private static bool IsAdjacent(Building building1, Building building2, float scale = 2)
+    private bool IsAdjacent(Building building1, Building building2)
     {
-        float distance = Vector3.Distance(building1.transform.position, building2.transform.position);
-        return distance <= scale;
+        Vector3Int indexDiff = building1.Index - building2.Index;
+        if (indexDiff.magnitude > 1)
+        {
+            //print("Diff: " + indexDiff + " has magnitude: " + indexDiff.magnitude);
+            return false;
+        }
+        
+        Vector2Int dir = indexDiff.z == 0 
+            ? new Vector2Int(indexDiff.x, 1)
+            : new Vector2Int(1, indexDiff.z);
+        Vector2Int otherDir = indexDiff.z == 0 
+            ? new Vector2Int(indexDiff.x, -1)
+            : new Vector2Int(-1, indexDiff.z);
+        return cornerData.IsCornerBuildable(building1.MeshRot, dir, out _) || cornerData.IsCornerBuildable(building1.MeshRot, otherDir, out _);
     }
 
     public void RemoveBuilding(Building building)
@@ -164,20 +180,6 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     #region Utility
 
-    public int GetHouseCount(int groupIndex) // OUTDATED
-    {
-        int total = 0;
-        foreach (var item in BuildingGroups[groupIndex])
-        {
-            if (towerMeshData.TowerMeshes.TryGetValue(item.Mesh, out var value))
-            {
-                total += value.HouseCount;
-            }
-        }
-
-        return total;
-    }
-
     public Building GetBuilding(Vector3Int buildingIndex)
     {
         foreach (List<Building> list in BuildingGroups.Values)
@@ -193,8 +195,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 
         return null;
     }
-
-
+    
     #endregion
 
     #region Visual
@@ -234,7 +235,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         unSelectedBuildings.Add(building);
         building.OnDeselected();
 
-        if (unSelectedBuildings.Count < BuildingGroups[selectedGroupIndex].Count)
+        if (BuildingGroups.ContainsKey(selectedGroupIndex) && unSelectedBuildings.Count < BuildingGroups[selectedGroupIndex].Count)
         {
             return;
         }
@@ -244,9 +245,9 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private void LowLightBuildings()
     {
-        if (selectedGroupIndex == -1) return;
+        if (selectedGroupIndex == -1 || !BuildingGroups.TryGetValue(selectedGroupIndex, out List<Building> group)) return;
 
-        foreach (var item in BuildingGroups[selectedGroupIndex])
+        foreach (var item in group)
         {
             item.Lowlight();
         }

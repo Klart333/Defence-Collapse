@@ -70,7 +70,6 @@ namespace DataStructures.Queue.ECS
                 if (attackingComponent.Target == KilledIndexes[i])
                 {
                     ECB.RemoveComponent<AttackingComponent>(sortKey, entity);
-                    Debug.Log("Removing attacking component");
                 }
             }
         }

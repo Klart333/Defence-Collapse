@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Buildings.District;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class UIUpgradeDisplay : MonoBehaviour
 {
@@ -21,9 +22,10 @@ public class UIUpgradeDisplay : MonoBehaviour
     [SerializeField]
     private string currentDescription;
 
+    [FormerlySerializedAs("buildingUpgrade")]
     [Title("References")]
     [SerializeField]
-    private UIBuildingUpgrade buildingUpgrade;
+    private UIDistrictUpgrade districtUpgrade;
 
     [SerializeField]
     private StupidButton button;
@@ -58,14 +60,14 @@ public class UIUpgradeDisplay : MonoBehaviour
             await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
         }
         
-        button.interactable = buildingUpgrade.CanPurchase(upgradeType);
+        button.interactable = districtUpgrade.CanPurchase(upgradeType);
     }
 
     public void ClickUpgrade()
     {
-        if (buildingUpgrade.CanPurchase(upgradeType))
+        if (districtUpgrade.CanPurchase(upgradeType))
         {
-            buildingUpgrade.UpgradeStat(upgradeType);
+            districtUpgrade.UpgradeStat(upgradeType);
         }
     }
 
@@ -83,7 +85,7 @@ public class UIUpgradeDisplay : MonoBehaviour
     {
         List<string> descriptions = new List<string>
         {
-            string.Format(description, buildingUpgrade.LevelData.GetIncrease(upgradeType, currentData.UpgradeData.GetStatLevel(upgradeType)))
+            string.Format(description, districtUpgrade.LevelData.GetIncrease(upgradeType, currentData.UpgradeData.GetStatLevel(upgradeType)))
         };
 
         float value = 0;
@@ -105,6 +107,6 @@ public class UIUpgradeDisplay : MonoBehaviour
         descriptions.Add(string.Format(currentDescription, value));
 
 
-        buildingUpgrade.DisplayUpgrade(upgradeName, descriptions, upgradeType);
+        districtUpgrade.DisplayUpgrade(upgradeName, descriptions, upgradeType);
     }
 }

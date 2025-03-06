@@ -87,7 +87,6 @@ GameObject:
   - component: {fileID: 6581211072198323029}
   - component: {fileID: 9181347496856605909}
   - component: {fileID: 1630893403848737158}
-  - component: {fileID: 3713628461818042149}
   - component: {fileID: 5369626395685876177}
   - component: {fileID: 5252059480578289724}
   m_Layer: 7
@@ -140,10 +139,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   cornerColliders:
-  - {fileID: 1529377245513779852}
-  - {fileID: 2408170063569003721}
-  - {fileID: 4163180899077471304}
-  - {fileID: 2084556700860403454}
+  - {fileID: 5931777562913067190}
+  - {fileID: 8944676343546969345}
+  - {fileID: 736923809719120093}
+  - {fileID: 214797666496279805}
   indexer: {fileID: 5369626395685876177}
   buildableCornerData: {fileID: 11400000, guid: 21c6865fe1599b64699908607cd7f257,
     type: 2}
@@ -213,20 +212,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d19daede777db0b479d2db98eb93b1a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3713628461818042149
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 324729412821989089}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c93fc61a79cb15745b3fb5796ba6e763, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canvas: {fileID: 5429308175008842897}
-  upgradablePanel: {fileID: 2251038230477287245}
 --- !u!114 &5369626395685876177
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -418,6 +403,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7082135663704458532}
   - component: {fileID: 2408170063569003721}
+  - component: {fileID: 8944676343546969345}
   m_Layer: 7
   m_Name: Collider_0100
   m_TagString: Untagged
@@ -461,6 +447,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8944676343546969345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2678547147568007577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74d2ab0b6225d6646b01c007f7c4af2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3149791769327098865
 GameObject:
   m_ObjectHideFlags: 0
@@ -471,6 +469,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2708924380895365549}
   - component: {fileID: 2084556700860403454}
+  - component: {fileID: 214797666496279805}
   m_Layer: 7
   m_Name: Collider_0001
   m_TagString: Untagged
@@ -514,6 +513,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &214797666496279805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3149791769327098865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74d2ab0b6225d6646b01c007f7c4af2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3365643104098513827
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,6 +535,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8556879449467807966}
   - component: {fileID: 1529377245513779852}
+  - component: {fileID: 5931777562913067190}
   m_Layer: 7
   m_Name: Collider_1000
   m_TagString: Untagged
@@ -567,6 +579,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5931777562913067190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3365643104098513827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74d2ab0b6225d6646b01c007f7c4af2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4606245760328191414
 GameObject:
   m_ObjectHideFlags: 0
@@ -665,6 +689,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1818440540231217832}
   - component: {fileID: 4163180899077471304}
+  - component: {fileID: 736923809719120093}
   m_Layer: 7
   m_Name: Collider_0010
   m_TagString: Untagged
@@ -708,6 +733,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &736923809719120093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5419505093758264542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74d2ab0b6225d6646b01c007f7c4af2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6566305659472034456
 GameObject:
   m_ObjectHideFlags: 0
@@ -918,7 +955,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3713628461818042149}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: BuildingUI, Assembly-CSharp
         m_MethodName: OnUpgradeClicked
         m_Mode: 1

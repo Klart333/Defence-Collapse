@@ -37,7 +37,7 @@ namespace DataStructures.Queue.ECS
                 }
                 else
                 {
-                    Debug.Log($"Trying to damage index: {item.Index}, but not found");
+                    //Debug.Log($"Trying to damage index: {item.Index}, but not found");
                 }
             }
         }

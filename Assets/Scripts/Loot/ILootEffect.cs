@@ -29,7 +29,7 @@ public class EffectLoot : ILootEffect
     public void Perform(int grade)
     {
         EffectModifier effect = new EffectModifier(Effect);
-        BuildingUpgradeManager.Instance.AddModifierEffect(effect);
+        DistrictUpgradeManager.Instance.AddModifierEffect(effect);
         LootManager.Instance.DisplayEffectGained(effect);
     }
 }

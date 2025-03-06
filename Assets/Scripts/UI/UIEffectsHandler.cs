@@ -44,7 +44,7 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void SpawnEffects()
     {
-        List<EffectModifier> effects = BuildingUpgradeManager.Instance.ModifierEffects;
+        List<EffectModifier> effects = DistrictUpgradeManager.Instance.ModifierEffects;
 
         for (int i = effects.Count - 1; i >= 0; i--)
         {
