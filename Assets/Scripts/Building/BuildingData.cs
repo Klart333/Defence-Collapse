@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Mathematics;
+using UnityEngine;
 using WaveFunctionCollapse;
 
 [System.Serializable]   
@@ -8,11 +9,11 @@ public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT 
 
     public BuildingCellInformation CellInformation {  get; private set; } 
     public PrototypeData Prototype { get; set; }
-    public Vector3Int Index { get; set; }
+    public int2 Index { get; set; }
 
     public HealthComponent Health { get; set; }
 
-    public BuildingData(BuildingHandler buildingHandler, Stats stats, Vector3Int index)
+    public BuildingData(BuildingHandler buildingHandler, Stats stats, int2 index)
     {
         handler = buildingHandler;
         Health = new HealthComponent(stats);

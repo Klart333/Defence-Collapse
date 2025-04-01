@@ -1,21 +1,22 @@
+using MeshCollider = Unity.Physics.MeshCollider;
+using Material = Unity.Physics.Material;
+using Collider = Unity.Physics.Collider;
+using Random = UnityEngine.Random;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
-using UnityEngine;
-using System;
+using Unity.Transforms;
 using Unity.Entities;
 using Unity.Physics;
-using Unity.Transforms;
-using Collider = Unity.Physics.Collider;
-using Material = Unity.Physics.Material;
-using MeshCollider = Unity.Physics.MeshCollider;
-using Random = UnityEngine.Random;
+using UnityEngine;
+using System;
 
 namespace WaveFunctionCollapse
 {
     public class GroundGenerator : MonoBehaviour
     {
         public event Action OnMapGenerated;
+        public event Action<Cell> OnCellCollapsed;
 
         [Title("Wave Function")]
         [SerializeField]
@@ -64,7 +65,8 @@ namespace WaveFunctionCollapse
             Stopwatch watch = Stopwatch.StartNew();
             while (!waveFunction.AllCollapsed)
             {
-                waveFunction.Iterate(); // Does not need to await
+                Cell collapsedCell = waveFunction.Iterate();
+                OnCellCollapsed?.Invoke(collapsedCell);
 
                 if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
 
@@ -117,9 +119,9 @@ namespace WaveFunctionCollapse
             void PlaceGround(int x, int z)
             {
                 int index = waveFunction.GetIndex(x, 0, z);
-                if (waveFunction.Cells[index].PossiblePrototypes.Contains(waveFunction.Prototypes[2 * 4]))
+                if (waveFunction.Cells[index].PossiblePrototypes.Contains(waveFunction.Prototypes[0]))
                 {
-                    waveFunction.SetCell(index, waveFunction.Prototypes[2 * 4]);
+                    waveFunction.SetCell(index, waveFunction.Prototypes[0]);
 
                     waveFunction.Propagate();
                 }

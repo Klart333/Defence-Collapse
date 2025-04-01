@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
+using Unity.Mathematics;
 using UnityEngine;
 using WaveFunctionCollapse;
 
@@ -40,7 +41,7 @@ public class GroundObjectPlacer : MonoBehaviour
             Vector3 position = Vector3.zero;
             if (data.SpawnOnGrid)
             {
-                position = GetRandomGridIndex(data.ObjectGridSize, out Vector3Int index);
+                position = GetRandomGridIndex(data.ObjectGridSize, out int2 index);
             }
 
             GameObject spawnedObject = data.Prefab.GetAtPosAndRot<PooledMonoBehaviour>(position, Quaternion.identity).gameObject;
@@ -48,11 +49,11 @@ public class GroundObjectPlacer : MonoBehaviour
         }
     }
 
-    private Vector3 GetRandomGridIndex(Vector2Int objectGridSize, out Vector3Int index)
+    private Vector3 GetRandomGridIndex(Vector2Int objectGridSize, out int2 index)
     {
-        int y = UnityEngine.Random.Range(1, BuildingManager.Instance.TopBuildableLayer + 1);
+        const int y = 0;
         int cellsWidth = BuildingManager.Instance.Cells.GetLength(0);
-        int cellsDepth = BuildingManager.Instance.Cells.GetLength(2);
+        int cellsDepth = BuildingManager.Instance.Cells.GetLength(1);
         int startX = UnityEngine.Random.Range(0, cellsWidth);
         int startZ = UnityEngine.Random.Range(0, cellsDepth);
         index = default;
@@ -74,9 +75,10 @@ public class GroundObjectPlacer : MonoBehaviour
                             break;
                         }
 
-                        Vector3Int cellIndex = new Vector3Int(xIndex, y, zIndex);
+                        int2 cellIndex = new int2(xIndex, zIndex);
 
                         Cell cell = BuildingManager.Instance[cellIndex];
+                        Debug.Log("Buildable: " + cell.Buildable);
                         if (!cell.Buildable)
                         {
                             valid = false;
@@ -90,7 +92,7 @@ public class GroundObjectPlacer : MonoBehaviour
                     continue;
                 }
 
-                index = new Vector3Int((startX + ex) % cellsWidth, y, (startZ + ze) % cellsDepth);
+                index = new int2((startX + ex) % cellsWidth, (startZ + ze) % cellsDepth);
                 Vector3 pos = BuildingManager.Instance[index].Position + new Vector3(1, 0, 1) * BuildingManager.Instance.CellSize;
                 return pos;
             }

@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using DataStructures.Queue.ECS;
 using Pathfinding;
 using Sirenix.OdinInspector;
+using Unity.Mathematics;
 using UnityEngine.Events;
 using UnityEngine;
 using WaveFunctionCollapse;
@@ -63,7 +64,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public PrototypeData Prototype { get; private set; }
     public int BuildingGroupIndex { get; set; } = -1;
-    public Vector3Int Index { get; private set; }
+    public int2 Index { get; private set; }
     public int Importance => 1;
 
     private bool Hovered => cornerColliders.Any(x => x.IsHovered);
@@ -125,7 +126,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         BuildingAnimator.BounceInOut(transform);
         MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2); // sure ?
 
-        BuildingUI.Highlight(cellInfo);
+        BuildingUI?.Highlight(cellInfo);
 
         await UniTask.NextFrame();
         highlighted = true;
@@ -133,7 +134,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void Lowlight()
     {
-        BuildingUI.Lowlight();
+        BuildingUI?.Lowlight();
 
         MeshRenderer.gameObject.layer = originalLayer;
         highlighted = false;
@@ -150,7 +151,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
         MeshRenderer.gameObject.layer = (int)Mathf.Log(selectedLayer.value, 2);
 
-        BuildingUI.OnSelected(cellInfo);
+        BuildingUI?.OnSelected(cellInfo);
         //buildingHandler[this].State.OnSelected(transform.position);
         selected = true;
     }
@@ -161,7 +162,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
         MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2); // sure ?
 
-        BuildingUI.OnDeselected();
+        BuildingUI?.OnDeselected();
         //buildingHandler.BuildingData[Index].State.OnDeselected();
         selected = false;
     }
@@ -191,7 +192,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void Setup(PrototypeData prototypeData, Vector3 scale)
     {
-        Vector3Int? nullableIndex = BuildingManager.Instance.GetIndex(transform.position);
+        int2? nullableIndex = BuildingManager.Instance.GetIndex(transform.position);
         if (!nullableIndex.HasValue) return;
         
         Index = nullableIndex.Value;

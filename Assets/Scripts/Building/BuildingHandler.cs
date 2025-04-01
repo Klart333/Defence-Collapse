@@ -5,12 +5,13 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
 using System.Linq;
+using Unity.Mathematics;
 using WaveFunctionCollapse;
 
 public class BuildingHandler : SerializedMonoBehaviour 
 {
     public Dictionary<int, List<Building>> BuildingGroups = new Dictionary<int, List<Building>>();
-    public Dictionary<Vector3Int, BuildingData> BuildingData = new Dictionary<Vector3Int, BuildingData>();
+    public Dictionary<int2, BuildingData> BuildingData = new Dictionary<int2, BuildingData>();
 
     [Title("Mesh Information")]
     [SerializeField]
@@ -139,19 +140,19 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private bool IsAdjacent(Building building1, Building building2)
     {
-        Vector3Int indexDiff = building1.Index - building2.Index;
-        if (indexDiff.magnitude > 1)
+        int2 indexDiff = building1.Index - building2.Index;
+        if (math.abs(indexDiff.x) + math.abs(indexDiff.y) > 1)
         {
             //print("Diff: " + indexDiff + " has magnitude: " + indexDiff.magnitude);
             return false;
         }
         
-        Vector2Int dir = indexDiff.z == 0 
+        Vector2Int dir = indexDiff.y == 0 
             ? new Vector2Int(indexDiff.x, 1)
-            : new Vector2Int(1, indexDiff.z);
-        Vector2Int otherDir = indexDiff.z == 0 
+            : new Vector2Int(1, indexDiff.y);
+        Vector2Int otherDir = indexDiff.y == 0 
             ? new Vector2Int(indexDiff.x, -1)
-            : new Vector2Int(-1, indexDiff.z);
+            : new Vector2Int(-1, indexDiff.y);
         return cornerData.IsCornerBuildable(building1.MeshRot, dir, out _) || cornerData.IsCornerBuildable(building1.MeshRot, otherDir, out _);
     }
 
@@ -163,7 +164,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         }
     }
 
-    public void BuildingDestroyed(Vector3Int buildingIndex)
+    public void BuildingDestroyed(int2 buildingIndex)
     {
         Building building = GetBuilding(buildingIndex);
         if (building == null)
@@ -180,13 +181,13 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     #region Utility
 
-    public Building GetBuilding(Vector3Int buildingIndex)
+    public Building GetBuilding(int2 buildingIndex)
     {
         foreach (List<Building> list in BuildingGroups.Values)
         {
             foreach (Building building in list)
             {
-                if (building.Index == buildingIndex)
+                if (math.all(building.Index == buildingIndex))
                 {
                     return building;
                 }
@@ -255,7 +256,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         unSelectedBuildings.Clear();
     }
 
-    public void DislpayLevelUp(Vector3Int index)
+    public void DislpayLevelUp(int2 index)
     {
         GetBuilding(index).DisplayLevelUp();
     }

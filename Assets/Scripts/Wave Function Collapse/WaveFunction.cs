@@ -70,7 +70,7 @@ namespace WaveFunctionCollapse
             return true;
         }
 
-        public void Iterate()
+        public Cell Iterate()
         {
             int index = GetLowestEntropyIndex();
 
@@ -78,6 +78,8 @@ namespace WaveFunctionCollapse
             SetCell(index, chosenPrototype);
 
             Propagate();
+
+            return cells[index];
         }
 
         public int GetLowestEntropyIndex()

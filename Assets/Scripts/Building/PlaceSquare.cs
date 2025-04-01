@@ -1,4 +1,5 @@
 using System;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class PlaceSquare : MonoBehaviour
@@ -17,7 +18,7 @@ public class PlaceSquare : MonoBehaviour
     private MaterialPropertyBlock block;
     
     public BuildingPlacer Placer { get; set; }
-    public Vector3Int Index { get; set; }
+    public int2 Index { get; set; }
     public int SquareIndex { get; set; }
     private bool Placed { get; set; }
 

@@ -5,6 +5,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using System.Linq;
 using DG.Tweening;
+using Unity.Mathematics;
 using WaveFunctionCollapse;
 
 public class BuildingPlacer : MonoBehaviour
@@ -27,7 +28,7 @@ public class BuildingPlacer : MonoBehaviour
     
     private bool manualCancel;
     private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
-    public Vector3Int? SquareIndex { get; set; }
+    public int2? SquareIndex { get; set; }
     public int SpawnSquareIndex { get; set; }
 
     private void OnEnable()
@@ -66,27 +67,24 @@ public class BuildingPlacer : MonoBehaviour
         await UniTask.WaitUntil(() => BuildingManager.Instance.Cells != null);
         
         targetScale = groundGenerator.WaveFunction.GridScale * BuildingManager.Instance.CellSize;
-        for (int z = 0; z < BuildingManager.Instance.Cells.GetLength(2); z++)
+        for (int z = 0; z < BuildingManager.Instance.Cells.GetLength(1) - 1; z++)
         {
-            for (int x = 0; x < BuildingManager.Instance.Cells.GetLength(0); x++)
+            for (int x = 0; x < BuildingManager.Instance.Cells.GetLength(0) - 1; x++)
             {
-                for (int y = 0; y < BuildingManager.Instance.Cells.GetLength(1); y++)
-                {
-                    if (!BuildingManager.Instance.Cells[x, y, z].Buildable
-                        || !BuildingManager.Instance.Cells[x + 1, y, z].Buildable
-                        || !BuildingManager.Instance.Cells[x, y, z + 1].Buildable
-                        || !BuildingManager.Instance.Cells[x + 1, y, z + 1].Buildable) continue;
+                if (!BuildingManager.Instance.Cells[x, z].Buildable
+                    || !BuildingManager.Instance.Cells[x + 1, z].Buildable
+                    || !BuildingManager.Instance.Cells[x, z + 1].Buildable
+                    || !BuildingManager.Instance.Cells[x + 1, z + 1].Buildable) continue;
                     
-                    Vector3 pos = BuildingManager.Instance.Cells[x, y, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
-                    PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
-                    placeSquare.Placer = this;
-                    placeSquare.Index = new Vector3Int(x, y, z);
-                    placeSquare.transform.localScale = targetScale * 0.95f;
-                    placeSquare.transform.SetParent(transform, true);
-                    placeSquare.gameObject.SetActive(false);
-                    placeSquare.SquareIndex = spawnedSpawnPlaces.Count;
-                    spawnedSpawnPlaces.Add(placeSquare);
-                }
+                Vector3 pos = BuildingManager.Instance.Cells[x, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
+                PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
+                placeSquare.Placer = this;
+                placeSquare.Index = new int2(x, z);
+                placeSquare.transform.localScale = targetScale * 0.95f;
+                placeSquare.transform.SetParent(transform, true);
+                placeSquare.gameObject.SetActive(false);
+                placeSquare.SquareIndex = spawnedSpawnPlaces.Count;
+                spawnedSpawnPlaces.Add(placeSquare);
             }
         }
 
@@ -108,15 +106,15 @@ public class BuildingPlacer : MonoBehaviour
         
         ToggleSpawnPlaces(true);
 
-        Vector3Int queryIndex = new Vector3Int();
-        Dictionary<Vector3Int, IBuildable> buildables = new Dictionary<Vector3Int, IBuildable>();
+        int2 queryIndex = new int2();
+        Dictionary<int2, IBuildable> buildables = new Dictionary<int2, IBuildable>();
         while (!Canceled)
         {
             await UniTask.Yield();
 
             if (!SquareIndex.HasValue) continue;
 
-            if (queryIndex == SquareIndex.Value)
+            if (math.all(queryIndex == SquareIndex.Value))
             {
                 if (buildables.Count > 0 && InputManager.Instance.Fire.WasPerformedThisFrame())
                 {
@@ -196,7 +194,7 @@ public class BuildingPlacer : MonoBehaviour
     {
         for (int i = 0; i < spawnedSpawnPlaces.Count; i++)
         {
-            if (spawnedSpawnPlaces[i].Index == building.Index)
+            if (math.all(spawnedSpawnPlaces[i].Index == building.Index))
             {
                 spawnedSpawnPlaces[i].UnPlaced();
             }

@@ -16,14 +16,10 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 1166723375247931700, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: 1453043773871479701, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: 6743973113291591290, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: -8421418420241044503, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: 2548554914412421104, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: -478882678752539408, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: -811618222592360774, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: 1417672982391099656, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
+    - {fileID: 8254687373856176130, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
+    - {fileID: 6015863633982791618, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
+    - {fileID: 5332504404861797108, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
+    - {fileID: 584684585022501903, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -32,7 +28,7 @@ MonoBehaviour:
     - Name: BuildableDictionary
       Entry: 7
       Data: 0|System.Collections.Generic.Dictionary`2[[UnityEngine.Mesh, UnityEngine.CoreModule],[BuildableCorners,
-        Assembly-CSharp]], mscorlib
+        Core]], mscorlib
     - Name: comparer
       Entry: 7
       Data: 1|System.Collections.Generic.ObjectEqualityComparer`1[[UnityEngine.Mesh,
@@ -42,112 +38,23 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 8
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 10
-      Data: 0
-    - Name: $v
-      Entry: 7
-      Data: 2|BuildableCorners, Assembly-CSharp
-    - Name: CornerDictionary
-      Entry: 7
-      Data: 3|System.Collections.Generic.Dictionary`2[[Corner, Assembly-CSharp],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Assembly-CSharp]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
       Data: 4
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
-      Entry: 3
+      Entry: 10
       Data: 0
     - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
       Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 10
-      Data: 1
-    - Name: $v
-      Entry: 7
-      Data: 5|BuildableCorners, Assembly-CSharp
+      Data: 2|BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 6|System.Collections.Generic.Dictionary`2[[Corner, Assembly-CSharp],[System.Boolean,
+      Data: 3|System.Collections.Generic.Dictionary`2[[Corner, Core],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 7|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Assembly-CSharp]],
+      Data: 4|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Core]],
         mscorlib
     - Name: 
       Entry: 12
@@ -226,195 +133,17 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 10
-      Data: 2
-    - Name: $v
-      Entry: 7
-      Data: 8|BuildableCorners, Assembly-CSharp
-    - Name: CornerDictionary
-      Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[Corner, Assembly-CSharp],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 10|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Assembly-CSharp]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
       Data: 1
     - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
       Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 10
-      Data: 3
-    - Name: $v
-      Entry: 7
-      Data: 11|BuildableCorners, Assembly-CSharp
+      Data: 5|BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 12|System.Collections.Generic.Dictionary`2[[Corner, Assembly-CSharp],[System.Boolean,
+      Data: 6|System.Collections.Generic.Dictionary`2[[Corner, Core],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 13|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Assembly-CSharp]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 10
-      Data: 4
-    - Name: $v
-      Entry: 7
-      Data: 14|BuildableCorners, Assembly-CSharp
-    - Name: CornerDictionary
-      Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[Corner, Assembly-CSharp],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 16|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Assembly-CSharp]],
+      Data: 7|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Core]],
         mscorlib
     - Name: 
       Entry: 12
@@ -448,7 +177,7 @@ MonoBehaviour:
       Data: 1
     - Name: $v
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -460,7 +189,7 @@ MonoBehaviour:
       Data: 2
     - Name: $v
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -493,106 +222,17 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 10
-      Data: 5
-    - Name: $v
-      Entry: 7
-      Data: 17|BuildableCorners, Assembly-CSharp
-    - Name: CornerDictionary
-      Entry: 7
-      Data: 18|System.Collections.Generic.Dictionary`2[[Corner, Assembly-CSharp],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 19|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Assembly-CSharp]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
       Data: 2
     - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
       Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 10
-      Data: 6
-    - Name: $v
-      Entry: 7
-      Data: 20|BuildableCorners, Assembly-CSharp
+      Data: 8|BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 21|System.Collections.Generic.Dictionary`2[[Corner, Assembly-CSharp],[System.Boolean,
+      Data: 9|System.Collections.Generic.Dictionary`2[[Corner, Core],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 22|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Assembly-CSharp]],
+      Data: 10|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Core]],
         mscorlib
     - Name: 
       Entry: 12
@@ -626,7 +266,7 @@ MonoBehaviour:
       Data: 1
     - Name: $v
       Entry: 5
-      Data: true
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -638,7 +278,7 @@ MonoBehaviour:
       Data: 2
     - Name: $v
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -671,17 +311,17 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 10
-      Data: 7
+      Data: 3
     - Name: $v
       Entry: 7
-      Data: 23|BuildableCorners, Assembly-CSharp
+      Data: 11|BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 24|System.Collections.Generic.Dictionary`2[[Corner, Assembly-CSharp],[System.Boolean,
+      Data: 12|System.Collections.Generic.Dictionary`2[[Corner, Core],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 25|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Assembly-CSharp]],
+      Data: 13|System.Collections.Generic.EnumEqualityComparer`1[[Corner, Core]],
         mscorlib
     - Name: 
       Entry: 12
@@ -703,7 +343,7 @@ MonoBehaviour:
       Data: 0
     - Name: $v
       Entry: 5
-      Data: true
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -715,7 +355,7 @@ MonoBehaviour:
       Data: 1
     - Name: $v
       Entry: 5
-      Data: true
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -739,7 +379,7 @@ MonoBehaviour:
       Data: 3
     - Name: $v
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 

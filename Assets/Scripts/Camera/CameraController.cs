@@ -1,98 +1,201 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
 {
-    [SerializeField]
-    private float flySpeed = 1;
+    [Title("Movement Settings")]
+    [SerializeField] 
+    private float moveSpeed = 5f;
+    
+    [SerializeField] 
+    private float fastMoveMultiplier = 2f;
+    
+    [Title("Rotation Settings")]
+    [SerializeField] 
+    private float rotationSpeed = 500f;
+    
+    [SerializeField] 
+    private float maxVerticalAngle = 80f;
+    
+    [Title("Zoom Settings")]
+    [SerializeField] 
+    private float zoomSensitivity = 1f;
+    
+    [SerializeField] 
+    private float minZoomDistance = 1f;
+    
+    [SerializeField] 
+    private float maxZoomDistance = 100f;
+    
+    [Title("Pan Settings")]
+    [SerializeField] 
+    private float panSensitivity = 0.5f;
+    
+    [SerializeField] 
+    private bool invertPan = false;
 
-    [SerializeField]
-    private float sensitivity = 1;
-
-    [SerializeField]
-    private float rotationSens = 500;
-
+    // Input actions
     private InputActions inputActions;
-    private InputAction scroll;
-    private InputAction up;
-    private InputAction down;
-    private InputAction move;
-    private Camera cam;
+    private InputAction moveAction;
+    private InputAction zoomAction;
+    private InputAction rotateAction;
+    private InputAction panAction;
+    private InputAction fastMoveAction;
+    
+    // Camera reference
+    private Camera controlledCamera;
+    private bool isPanning = false;
+    private Vector3 panStartPosition;
+    private Vector3 panCameraStartPosition;
 
-    private float zoom = 1;
+    private void Awake()
+    {
+        controlledCamera = GetComponent<Camera>();
+        InitializeInputActions();
+    }
+
+    private void InitializeInputActions()
+    {
+        inputActions = new InputActions();
+        
+        // Set up input actions
+        moveAction = inputActions.Player.Move;
+        zoomAction = inputActions.Player.Scroll;
+        rotateAction = inputActions.Player.Rotate;
+        panAction = inputActions.Player.Fire;
+        fastMoveAction = inputActions.Player.Shift;
+    }
 
     private void OnEnable()
     {
-        cam = Camera.main;
-        inputActions = new InputActions();
-
-        scroll = inputActions.Player.Scroll;
-        scroll.Enable();
-
-        move = inputActions.Player.Move;
-        move.Enable();
-
-        down = inputActions.Player.Down;
-        down.Enable();
-
-        up = inputActions.Player.Up;
-        up.Enable();
+        // Enable all actions
+        moveAction.Enable();
+        zoomAction.Enable();
+        rotateAction.Enable();
+        panAction.Enable();
+        fastMoveAction.Enable();
+        
+        // Subscribe to pan start/end events
+        panAction.started += StartPan;
+        panAction.canceled += EndPan;
     }
 
     private void OnDisable()
     {
-        scroll.Disable();
-        move.Disable();
-        up.Disable();
-        down.Disable();
+        // Disable all actions
+        moveAction.Disable();
+        zoomAction.Disable();
+        rotateAction.Disable();
+        panAction.Disable();
+        fastMoveAction.Disable();
+        
+        // Unsubscribe from events
+        panAction.started -= StartPan;
+        panAction.canceled -= EndPan;
     }
 
     private void Update()
     {
-        Vector2 movee = move.ReadValue<Vector2>() * (Time.deltaTime * flySpeed);
-
-        transform.position += Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up) * Vector3.forward * movee.y;
-        transform.position += transform.right * movee.x;
-
-        HandleScroll();
+        HandleMovement();
+        HandleZoom();
+        HandleRotation();
+        HandlePan();
     }
 
-    private void HandleScroll()
+    private void HandleMovement()
     {
-        float scrollDiff = scroll.ReadValue<Vector2>().y / -12.0f;
-        float moveDiff = (up.ReadValue<float>() - down.ReadValue<float>()) / 20.0f;
+        Vector2 moveInput = moveAction.ReadValue<Vector2>();
+        if (moveInput == Vector2.zero) return;
 
-        if (Mathf.Abs(scrollDiff) > 0.1f)
+        float speedMultiplier = fastMoveAction.IsPressed() ? fastMoveMultiplier : 1f;
+        float currentSpeed = moveSpeed * speedMultiplier * Time.deltaTime;
+
+        // Forward/back movement (relative to camera rotation)
+        Vector3 forwardMovement = transform.forward * (moveInput.y * currentSpeed);
+        // Left/right movement (relative to camera rotation)
+        Vector3 rightMovement = transform.right * (moveInput.x * currentSpeed);
+
+        // Move while keeping y position (unless moving up/down)
+        forwardMovement.y = 0;
+        rightMovement.y = 0;
+        
+        transform.position += forwardMovement + rightMovement;
+    }
+
+    private void HandleZoom()
+    {
+        float zoomInput = zoomAction.ReadValue<Vector2>().y;
+        if (Mathf.Abs(zoomInput) < 0.1f) return;
+
+        float zoomDirection = Mathf.Sign(zoomInput);
+        float zoomAmount = zoomSensitivity * zoomDirection * Time.deltaTime;
+
+        // Raycast-based zoom (towards what the camera is pointing at)
+        Ray ray = controlledCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            Vector3 mousePosition = Input.mousePosition;
-            Ray ray = cam.ScreenPointToRay(mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hitInfo))
-            {
-                Vector3 dir = (transform.position - hitInfo.point).normalized;
-                transform.position += dir * (scrollDiff * sensitivity * 0.01f);
-            }
-            else
-            {
-                transform.position += Vector3.up * (scrollDiff * sensitivity * 0.01f);
-            }
+            Vector3 directionToTarget = (transform.position - hit.point).normalized;
+            float currentDistance = Vector3.Distance(transform.position, hit.point);
+            float newDistance = Mathf.Clamp(currentDistance - zoomAmount, minZoomDistance, maxZoomDistance);
+            
+            transform.position = hit.point + directionToTarget * newDistance;
         }
-
-        if (Mathf.Abs(moveDiff) != 0)
+        else
         {
-            Vector3 mousePosition = Input.mousePosition;
-            Ray ray = cam.ScreenPointToRay(mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hitInfo))
-            {
-                transform.rotation = Quaternion.AngleAxis(moveDiff * rotationSens * Time.deltaTime, Vector3.up) * transform.rotation;
-
-                Vector3 dir = (transform.position - hitInfo.point);
-                Vector3 newPos = Quaternion.AngleAxis(moveDiff * rotationSens * Time.deltaTime, Vector3.up) * dir;
-                transform.position += newPos - dir;
-            }
-            else
-            {
-                transform.rotation = Quaternion.AngleAxis(moveDiff * rotationSens * Time.deltaTime, Vector3.up) * transform.rotation;
-            }
+            // Default zoom behavior when not pointing at anything
+            transform.position += transform.forward * zoomAmount;
         }
+    }
+
+    private void HandleRotation()
+    {
+        float rotateInput = rotateAction.ReadValue<float>();
+        if (rotateInput == 0) return;
+
+        Vector3 currentMousePoint = GetGroundIntersectionPoint();
+        if (currentMousePoint == Vector3.zero) return;
+
+        float rotationAmount = rotationSpeed * Time.deltaTime * (fastMoveAction.IsPressed() ? fastMoveMultiplier : 1f);
+        float yaw = rotateInput * rotationAmount;
+        
+        transform.RotateAround(currentMousePoint, Vector3.up, yaw);
+        //transform.LookAt(currentMousePoint);
+    }
+
+    private void StartPan(InputAction.CallbackContext obj)
+    {
+        isPanning = true;
+        panStartPosition = GetGroundIntersectionPoint();
+        panCameraStartPosition = transform.position;
+    }
+
+    private void EndPan(InputAction.CallbackContext obj)
+    {
+        isPanning = false;
+    }
+
+    private void HandlePan()
+    {
+        if (!isPanning) return;
+        
+        Vector3 currentMousePoint = GetGroundIntersectionPoint();
+        if (currentMousePoint == Vector3.zero) return;
+
+        Vector3 delta = panStartPosition - currentMousePoint;
+        transform.position += delta * 0.5f;
+    }
+    
+    private Vector3 GetGroundIntersectionPoint()
+    {
+        Ray ray = controlledCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+        
+        if (groundPlane.Raycast(ray, out float distance))
+        {
+            return ray.GetPoint(distance);
+        }
+        return Vector3.zero;
     }
 }

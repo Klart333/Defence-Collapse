@@ -16,13 +16,11 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 1166723375247931700, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: 6743973113291591290, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: 1453043773871479701, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: -8421418420241044503, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: 2548554914412421104, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: -478882678752539408, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
-    - {fileID: -811618222592360774, guid: 15684870f50fb434a896dfc6d2d8d2ef, type: 3}
+    - {fileID: 8254687373856176130, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
+    - {fileID: -6640059162581359784, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
+    - {fileID: 6015863633982791618, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
+    - {fileID: 5332504404861797108, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
+    - {fileID: 584684585022501903, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -34,7 +32,7 @@ MonoBehaviour:
         Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 26
+      Data: 13
     - Name: 
       Entry: 7
       Data: WaveFunctionCollapse.PrototypeData, Core
@@ -52,37 +50,34 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: -1
+      Data: 2000
     - Name: NegX
       Entry: 3
-      Data: 0
+      Data: 2000
     - Name: PosZ
       Entry: 3
-      Data: 1000
+      Data: 2000
     - Name: NegZ
       Entry: 3
-      Data: -1
+      Data: 2000
     - Name: PosY
       Entry: 3
-      Data: 5000
+      Data: -1
     - Name: NegY
       Entry: 3
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 3
+      Data: 20
     - Name: MaterialIndexes
       Entry: 7
       Data: 1|System.Int32[], mscorlib
     - Name: 
       Entry: 14
-      Data: 2
+      Data: 1
     - Name: 
       Entry: 3
       Data: 0
-    - Name: 
-      Entry: 3
-      Data: 1
     - Name: 
       Entry: 13
       Data: 
@@ -100,132 +95,6 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: Mesh
       Entry: 10
-      Data: 0
-    - Name: Rot
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 1000
-    - Name: NegX
-      Entry: 3
-      Data: -1
-    - Name: PosZ
-      Entry: 3
-      Data: 0
-    - Name: NegZ
-      Entry: 3
-      Data: -1
-    - Name: PosY
-      Entry: 3
-      Data: 5100
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 3
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 0
-    - Name: Rot
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 0
-    - Name: NegX
-      Entry: 3
-      Data: -1
-    - Name: PosZ
-      Entry: 3
-      Data: -1
-    - Name: NegZ
-      Entry: 3
-      Data: 1000
-    - Name: PosY
-      Entry: 3
-      Data: 5200
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 3
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 0
-    - Name: Rot
-      Entry: 3
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: -1
-    - Name: NegX
-      Entry: 3
-      Data: 1000
-    - Name: PosZ
-      Entry: 3
-      Data: -1
-    - Name: NegZ
-      Entry: 3
-      Data: 0
-    - Name: PosY
-      Entry: 3
-      Data: 5300
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 3
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
       Data: 1
     - Name: Rot
       Entry: 3
@@ -235,34 +104,31 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 2001
+      Data: 2000
     - Name: NegX
       Entry: 3
-      Data: 2
+      Data: 2000
     - Name: PosZ
       Entry: 3
-      Data: 1002
+      Data: 2000
     - Name: NegZ
       Entry: 3
-      Data: 2001
+      Data: 2000
     - Name: PosY
       Entry: 3
       Data: -1
     - Name: NegY
       Entry: 3
-      Data: 5000
+      Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.5
+      Data: 4
     - Name: MaterialIndexes
       Entry: 7
       Data: 2|System.Int32[], mscorlib
     - Name: 
       Entry: 14
-      Data: 2
-    - Name: 
-      Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 3
       Data: 1
@@ -283,132 +149,6 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: Mesh
       Entry: 10
-      Data: 1
-    - Name: Rot
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 1002
-    - Name: NegX
-      Entry: 3
-      Data: 2001
-    - Name: PosZ
-      Entry: 3
-      Data: 2
-    - Name: NegZ
-      Entry: 3
-      Data: 2001
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: 5100
-    - Name: Weight
-      Entry: 4
-      Data: 0.5
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 1
-    - Name: Rot
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2
-    - Name: NegX
-      Entry: 3
-      Data: 2001
-    - Name: PosZ
-      Entry: 3
-      Data: 2001
-    - Name: NegZ
-      Entry: 3
-      Data: 1002
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: 5200
-    - Name: Weight
-      Entry: 4
-      Data: 0.5
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 1
-    - Name: Rot
-      Entry: 3
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2001
-    - Name: NegX
-      Entry: 3
-      Data: 1002
-    - Name: PosZ
-      Entry: 3
-      Data: 2001
-    - Name: NegZ
-      Entry: 3
-      Data: 2
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: 5300
-    - Name: Weight
-      Entry: 4
-      Data: 0.5
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
       Data: 2
     - Name: Rot
       Entry: 3
@@ -421,10 +161,10 @@ MonoBehaviour:
       Data: 2001
     - Name: NegX
       Entry: 3
-      Data: 2001
+      Data: 2000
     - Name: PosZ
       Entry: 3
-      Data: 2001
+      Data: 2000
     - Name: NegZ
       Entry: 3
       Data: 2001
@@ -436,22 +176,151 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 12
+      Data: 1
     - Name: MaterialIndexes
       Entry: 7
       Data: 3|System.Int32[], mscorlib
     - Name: 
       Entry: 14
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 3
       Data: 1
+    - Name: 
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 2
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2000
+    - Name: NegX
+      Entry: 3
+      Data: 2001
+    - Name: PosZ
+      Entry: 3
+      Data: 2000
+    - Name: NegZ
+      Entry: 3
+      Data: 2001
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 2
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2000
+    - Name: NegX
+      Entry: 3
+      Data: 2001
+    - Name: PosZ
+      Entry: 3
+      Data: 2001
+    - Name: NegZ
+      Entry: 3
+      Data: 2000
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 2
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2001
+    - Name: NegX
+      Entry: 3
+      Data: 2000
+    - Name: PosZ
+      Entry: 3
+      Data: 2001
+    - Name: NegZ
+      Entry: 3
+      Data: 2000
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 3
     - Name: 
       Entry: 8
       Data: 
@@ -472,25 +341,25 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 2001
+      Data: 2000
     - Name: NegX
       Entry: 3
-      Data: 1000
+      Data: 2000
     - Name: PosZ
       Entry: 3
-      Data: 0
+      Data: 2001
     - Name: NegZ
       Entry: 3
       Data: 2001
     - Name: PosY
       Entry: 3
-      Data: 5001
+      Data: -1
     - Name: NegY
       Entry: 3
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 3
+      Data: 2
     - Name: MaterialIndexes
       Entry: 7
       Data: 4|System.Int32[], mscorlib
@@ -529,109 +398,25 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 0
+      Data: 2001
     - Name: NegX
       Entry: 3
       Data: 2001
     - Name: PosZ
       Entry: 3
-      Data: 1000
+      Data: 2000
     - Name: NegZ
       Entry: 3
-      Data: 2001
+      Data: 2000
     - Name: PosY
       Entry: 3
-      Data: 5101
+      Data: -1
     - Name: NegY
       Entry: 3
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 3
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 3
-    - Name: Rot
-      Entry: 3
       Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 1000
-    - Name: NegX
-      Entry: 3
-      Data: 2001
-    - Name: PosZ
-      Entry: 3
-      Data: 2001
-    - Name: NegZ
-      Entry: 3
-      Data: 0
-    - Name: PosY
-      Entry: 3
-      Data: 5201
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 3
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 3
-    - Name: Rot
-      Entry: 3
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2001
-    - Name: NegX
-      Entry: 3
-      Data: 0
-    - Name: PosZ
-      Entry: 3
-      Data: 2001
-    - Name: NegZ
-      Entry: 3
-      Data: 1000
-    - Name: PosY
-      Entry: 3
-      Data: 5301
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 3
     - Name: MaterialIndexes
       Entry: 9
       Data: 4
@@ -655,25 +440,25 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: -1
+      Data: 2001
     - Name: NegX
       Entry: 3
-      Data: 1002
+      Data: 2000
     - Name: PosZ
       Entry: 3
-      Data: 2
+      Data: 2000
     - Name: NegZ
       Entry: 3
-      Data: -1
+      Data: 2001
     - Name: PosY
       Entry: 3
       Data: -1
     - Name: NegY
       Entry: 3
-      Data: 5001
+      Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.5
+      Data: 1
     - Name: MaterialIndexes
       Entry: 7
       Data: 5|System.Int32[], mscorlib
@@ -712,25 +497,25 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 2
+      Data: 2000
     - Name: NegX
       Entry: 3
-      Data: -1
+      Data: 2001
     - Name: PosZ
       Entry: 3
-      Data: 1002
+      Data: 2000
     - Name: NegZ
       Entry: 3
-      Data: -1
+      Data: 2001
     - Name: PosY
       Entry: 3
       Data: -1
     - Name: NegY
       Entry: 3
-      Data: 5101
+      Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.5
+      Data: 1
     - Name: MaterialIndexes
       Entry: 9
       Data: 5
@@ -754,25 +539,25 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 1002
+      Data: 2000
     - Name: NegX
       Entry: 3
-      Data: -1
+      Data: 2001
     - Name: PosZ
       Entry: 3
-      Data: -1
+      Data: 2001
     - Name: NegZ
       Entry: 3
-      Data: 2
+      Data: 2000
     - Name: PosY
       Entry: 3
       Data: -1
     - Name: NegY
       Entry: 3
-      Data: 5201
+      Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.5
+      Data: 1
     - Name: MaterialIndexes
       Entry: 9
       Data: 5
@@ -796,394 +581,28 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: -1
-    - Name: NegX
-      Entry: 3
-      Data: 2
-    - Name: PosZ
-      Entry: 3
-      Data: -1
-    - Name: NegZ
-      Entry: 3
-      Data: 1002
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: 5301
-    - Name: Weight
-      Entry: 4
-      Data: 0.5
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 5
-    - Name: Rot
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 0
-    - Name: NegX
-      Entry: 3
-      Data: 1000
-    - Name: PosZ
-      Entry: 3
-      Data: -1
-    - Name: NegZ
-      Entry: 3
       Data: 2001
-    - Name: PosY
-      Entry: 3
-      Data: 5002
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 5
-    - Name: MaterialIndexes
-      Entry: 7
-      Data: 6|System.Int32[], mscorlib
-    - Name: 
-      Entry: 14
-      Data: 2
-    - Name: 
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 5
-    - Name: Rot
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: -1
     - Name: NegX
       Entry: 3
-      Data: 2001
-    - Name: PosZ
-      Entry: 3
-      Data: 1000
-    - Name: NegZ
-      Entry: 3
-      Data: 0
-    - Name: PosY
-      Entry: 3
-      Data: 5102
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 5
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 5
-    - Name: Rot
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 1000
-    - Name: NegX
-      Entry: 3
-      Data: 0
+      Data: 2000
     - Name: PosZ
       Entry: 3
       Data: 2001
     - Name: NegZ
       Entry: 3
-      Data: -1
-    - Name: PosY
-      Entry: 3
-      Data: 5202
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 5
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 5
-    - Name: Rot
-      Entry: 3
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2001
-    - Name: NegX
-      Entry: 3
-      Data: -1
-    - Name: PosZ
-      Entry: 3
-      Data: 0
-    - Name: NegZ
-      Entry: 3
-      Data: 1000
-    - Name: PosY
-      Entry: 3
-      Data: 5302
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 5
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 6
-    - Name: Rot
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2
-    - Name: NegX
-      Entry: 3
-      Data: 1002
-    - Name: PosZ
-      Entry: 3
-      Data: 2001
-    - Name: NegZ
-      Entry: 3
-      Data: -1
+      Data: 2000
     - Name: PosY
       Entry: 3
       Data: -1
     - Name: NegY
       Entry: 3
-      Data: 5002
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 7
-      Data: 7|System.Int32[], mscorlib
-    - Name: 
-      Entry: 14
-      Data: 2
-    - Name: 
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 6
-    - Name: Rot
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2001
-    - Name: NegX
-      Entry: 3
       Data: -1
-    - Name: PosZ
-      Entry: 3
-      Data: 1002
-    - Name: NegZ
-      Entry: 3
-      Data: 2
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: 5102
     - Name: Weight
       Entry: 4
       Data: 1
     - Name: MaterialIndexes
       Entry: 9
-      Data: 7
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 6
-    - Name: Rot
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 1002
-    - Name: NegX
-      Entry: 3
-      Data: 2
-    - Name: PosZ
-      Entry: 3
-      Data: -1
-    - Name: NegZ
-      Entry: 3
-      Data: 2001
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: 5202
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 7
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 6
-    - Name: Rot
-      Entry: 3
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: -1
-    - Name: NegX
-      Entry: 3
-      Data: 2001
-    - Name: PosZ
-      Entry: 3
-      Data: 2
-    - Name: NegZ
-      Entry: 3
-      Data: 1002
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: 5302
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 7
+      Data: 5
     - Name: 
       Entry: 8
       Data: 
@@ -1222,10 +641,10 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 100
+      Data: 1
     - Name: MaterialIndexes
       Entry: 7
-      Data: 8|System.Int32[], mscorlib
+      Data: 6|System.Int32[], mscorlib
     - Name: 
       Entry: 14
       Data: 0
@@ -1246,155 +665,17 @@ MonoBehaviour:
       Data: 
     - Name: SocketList
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[WaveFunctionCollapse.DicData, Core]],
+      Data: 7|System.Collections.Generic.List`1[[WaveFunctionCollapse.DicData, Core]],
         mscorlib
     - Name: 
       Entry: 12
-      Data: 5
+      Data: 2
     - Name: 
       Entry: 7
       Data: WaveFunctionCollapse.DicData, Core
     - Name: positions
       Entry: 7
-      Data: 10|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.35
-    - Name: 
-      Entry: 4
-      Data: 0.1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.45
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 1000
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 11|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.35
-    - Name: 
-      Entry: 4
-      Data: 0.1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.45
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 12|UnityEngine.Vector2[], UnityEngine.CoreModule
+      Data: 8|UnityEngine.Vector2[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 2
@@ -1403,7 +684,7 @@ MonoBehaviour:
       Data: UnityEngine.Vector2, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: -1
     - Name: 
       Entry: 4
       Data: 0
@@ -1415,7 +696,64 @@ MonoBehaviour:
       Data: UnityEngine.Vector2, UnityEngine.CoreModule
     - Name: 
       Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: socketname
+      Entry: 3
+      Data: 2000
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.DicData, Core
+    - Name: positions
+      Entry: 7
+      Data: 9|UnityEngine.Vector2[], UnityEngine.CoreModule
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Vector2, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
       Data: -1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Vector2, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Vector2, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
     - Name: 
       Entry: 4
       Data: 0
@@ -1435,144 +773,6 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 13|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.35
-    - Name: 
-      Entry: 4
-      Data: -0.1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.45
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 1002
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 14|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.35
-    - Name: 
-      Entry: 4
-      Data: -0.1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.45
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
       Entry: 13
       Data: 
     - Name: 
@@ -1580,935 +780,11 @@ MonoBehaviour:
       Data: 
     - Name: VerticalSocketList
       Entry: 7
-      Data: 15|System.Collections.Generic.List`1[[WaveFunctionCollapse.DicData, Core]],
+      Data: 10|System.Collections.Generic.List`1[[WaveFunctionCollapse.DicData, Core]],
         mscorlib
     - Name: 
       Entry: 12
-      Data: 12
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 16|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 6
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.4
-    - Name: 
-      Entry: 4
       Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.23
-    - Name: 
-      Entry: 4
-      Data: 0.07
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.07
-    - Name: 
-      Entry: 4
-      Data: 0.23
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0.4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5000
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 17|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 6
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -0.4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.07
-    - Name: 
-      Entry: 4
-      Data: -0.23
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.23
-    - Name: 
-      Entry: 4
-      Data: -0.07
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.4
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5100
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 18|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 6
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.4
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.23
-    - Name: 
-      Entry: 4
-      Data: -0.07
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.07
-    - Name: 
-      Entry: 4
-      Data: -0.23
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -0.4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5200
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 19|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 6
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0.4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.07
-    - Name: 
-      Entry: 4
-      Data: 0.23
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.23
-    - Name: 
-      Entry: 4
-      Data: 0.07
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.4
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5300
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 20|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 6
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.07
-    - Name: 
-      Entry: 4
-      Data: 0.25
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.25
-    - Name: 
-      Entry: 4
-      Data: 0.07
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.42
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0.42
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5001
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 21|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 6
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.25
-    - Name: 
-      Entry: 4
-      Data: -0.07
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.07
-    - Name: 
-      Entry: 4
-      Data: -0.25
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -0.42
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -0.42
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5101
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 22|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 6
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.07
-    - Name: 
-      Entry: 4
-      Data: -0.25
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.25
-    - Name: 
-      Entry: 4
-      Data: -0.07
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.42
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -0.42
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5201
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 23|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 6
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.25
-    - Name: 
-      Entry: 4
-      Data: 0.07
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.07
-    - Name: 
-      Entry: 4
-      Data: 0.25
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0.42
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.42
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5301
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 24|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5002
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 25|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5102
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 26|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5202
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.DicData, Core
-    - Name: positions
-      Entry: 7
-      Data: 27|UnityEngine.Vector2[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Vector2, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: -1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: socketname
-      Entry: 3
-      Data: 5302
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -2517,46 +793,10 @@ MonoBehaviour:
       Data: 
     - Name: NotAllowedForBottom
       Entry: 7
-      Data: 28|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
+      Data: 11|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 12
-    - Name: 
-      Entry: 3
-      Data: 7
-    - Name: 
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 3
-      Data: 5
-    - Name: 
-      Entry: 3
-      Data: 4
-    - Name: 
-      Entry: 3
-      Data: 16
-    - Name: 
-      Entry: 3
-      Data: 15
-    - Name: 
-      Entry: 3
-      Data: 14
-    - Name: 
-      Entry: 3
-      Data: 13
-    - Name: 
-      Entry: 3
-      Data: 24
-    - Name: 
-      Entry: 3
-      Data: 23
-    - Name: 
-      Entry: 3
-      Data: 22
-    - Name: 
-      Entry: 3
-      Data: 21
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -2565,7 +805,7 @@ MonoBehaviour:
       Data: 
     - Name: OnlyAllowedForBottom
       Entry: 7
-      Data: 29|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
+      Data: 12|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -2577,7 +817,7 @@ MonoBehaviour:
       Data: 
     - Name: NotAllowedForSides
       Entry: 7
-      Data: 30|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
+      Data: 13|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -2589,7 +829,7 @@ MonoBehaviour:
       Data: 
     - Name: MarchingTable
       Entry: 7
-      Data: 31|System.Collections.Generic.List`1[[WaveFunctionCollapse.PrototypeData,
+      Data: 14|System.Collections.Generic.List`1[[WaveFunctionCollapse.PrototypeData,
         Core, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]][], mscorlib
     - Name: 
       Entry: 12

@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beb9e761c9c7d41449d8780edcd6a54c, type: 3}
+  m_Name: Double Shot Modifier
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 21300000, guid: 589db224aea12884880200807e357d93, type: 3}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: LootEffects
+      Entry: 7
+      Data: 0|System.Collections.Generic.List`1[[ILootEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 1|EffectLoot, Core
+    - Name: Effect
+      Entry: 7
+      Data: 2|EffectModifier, Core
+    - Name: Icon
+      Entry: 10
+      Data: 0
+    - Name: Description
+      Entry: 1
+      Data: Triple the attack of the tower
+    - Name: Title
+      Entry: 1
+      Data: Triple Shot
+    - Name: EffectType
+      Entry: 3
+      Data: 1
+    - Name: Effects
+      Entry: 7
+      Data: 3|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 4|Effects.RepeatEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 0.35
+    - Name: Effects
+      Entry: 6
+      Data: 
+    - Name: repeatFrequency
+      Entry: 4
+      Data: 0.15
+    - Name: initialDelay
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  Grade: 0
