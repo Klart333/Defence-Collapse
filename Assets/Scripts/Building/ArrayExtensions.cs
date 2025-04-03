@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 public static class ArrayExtensions
@@ -30,6 +31,12 @@ public static class ArrayExtensions
     }
 
     public static bool IsInBounds<T>(this T[,] array, Vector2Int index)
+    {
+        return array.IsInBounds(index.x, index.y);
+    }
+    
+    
+    public static bool IsInBounds<T>(this T[,] array, int2 index)
     {
         return array.IsInBounds(index.x, index.y);
     }

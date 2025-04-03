@@ -1028,7 +1028,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.3420201, y: -0, z: -0, w: 0.9396927}
-  m_LocalPosition: {x: 15, y: 20, z: -11}
+  m_LocalPosition: {x: 7.686011, y: 6.7450294, z: -2.1322865}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1096,7 +1096,7 @@ MonoBehaviour:
   maxVerticalAngle: 80
   zoomSensitivity: 30
   minZoomDistance: 1
-  maxZoomDistance: 100
+  maxZoomDistance: 15
   panSensitivity: 1
   invertPan: 0
 --- !u!1 &332985429
@@ -5013,12 +5013,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waveFunction:
-    gridSizeX: 8
-    gridSizeY: 1
-    gridSizeZ: 8
     gridScale: {x: 2, y: 2, z: 2}
     materialData: {fileID: 11400000, guid: f205dbfe3ecf34f40bd110ce6d456c4a, type: 2}
-    prototypeInfo: {fileID: 11400000, guid: 58fb6f893a0db174cacd0d23f7e4cac6, type: 2}
+  chunkSize: {x: 8, y: 1, z: 8}
+  defaultPrototypeInfoData: {fileID: 11400000, guid: 58fb6f893a0db174cacd0d23f7e4cac6,
+    type: 2}
+  treePrototypeInfoData: {fileID: 11400000, guid: 38790537859011246b7943a338978337,
+    type: 2}
   chillTimeMs: 20
   maxMillisecondsPerFrame: 0.5
   shouldCombine: 1
@@ -9658,6 +9659,12 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1094137636702644890, guid: f8d6d4cb9e7edcc48afdf101345acab7,
         type: 3}
+      propertyPath: prototypeData
+      value: 
+      objectReference: {fileID: 11400000, guid: 38790537859011246b7943a338978337,
+        type: 2}
+    - target: {fileID: 1094137636702644890, guid: f8d6d4cb9e7edcc48afdf101345acab7,
+        type: 3}
       propertyPath: pieceWeights.Array.size
       value: 6
       objectReference: {fileID: 0}
@@ -9700,7 +9707,7 @@ PrefabInstance:
     - target: {fileID: 1094137636702644890, guid: f8d6d4cb9e7edcc48afdf101345acab7,
         type: 3}
       propertyPath: pieceWeights.Array.data[0].Weight
-      value: 5
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 1094137636702644890, guid: f8d6d4cb9e7edcc48afdf101345acab7,
         type: 3}

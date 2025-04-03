@@ -93,14 +93,14 @@ public class BuildingManager : Singleton<BuildingManager>
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
         buildingAnimator = GetComponent<BuildingAnimator>();
 
-        groundGenerator.OnMapGenerated += Load;
+        groundGenerator.OnChunkGenerated += Load;
         Events.OnBuildingDestroyed += OnBuildingDestroyed;
         Events.OnBuildingRepaired += OnBuildingRepaired;
     }
     
     private void OnDisable()
     {
-        groundGenerator.OnMapGenerated -= Load;
+        groundGenerator.OnChunkGenerated -= Load;
         Events.OnBuildingDestroyed += OnBuildingDestroyed;
         Events.OnBuildingRepaired += OnBuildingRepaired;
     }
@@ -119,7 +119,7 @@ public class BuildingManager : Singleton<BuildingManager>
 
     #region Loading
 
-    private void Load()
+    private void Load(Chunk chunk)
     {
         if (!LoadPrototypeData())
         {
@@ -127,15 +127,15 @@ public class BuildingManager : Singleton<BuildingManager>
             return;
         }
 
-        LoadCells();
+        LoadCells(chunk);
 
         OnLoaded?.Invoke();
     }
 
-    private void LoadCells()
+    private void LoadCells(Chunk chunk)
     {
-        Cells = new Cell[Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.x / cellSize), Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.z / cellSize)];
-        cellsBuilt = new bool[Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.x / cellSize), Mathf.RoundToInt(groundGenerator.WaveFunction.GridSize.z / cellSize)];
+        Cells = new Cell[Mathf.RoundToInt(chunk.width / cellSize), Mathf.RoundToInt(chunk.depth / cellSize)];
+        cellsBuilt = new bool[Mathf.RoundToInt(chunk.width / cellSize), Mathf.RoundToInt(chunk.depth / cellSize)];
         emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 1, Array.Empty<int>());
         unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 0, Array.Empty<int>());
         unbuildablePrototypeList = new List<PrototypeData> { unbuildablePrototype };
@@ -144,7 +144,7 @@ public class BuildingManager : Singleton<BuildingManager>
         {
             for (int x = 0; x < Cells.GetLength(0); x++)
             {
-                Vector3 pos = new Vector3(x * cellSize * groundGenerator.WaveFunction.GridScale.x, 0, y * cellSize * groundGenerator.WaveFunction.GridScale.z) - new Vector3(cellSize * groundGenerator.WaveFunction.GridScale.x, 0, cellSize * groundGenerator.WaveFunction.GridScale.z) / 2.0f;
+                Vector3 pos = new Vector3(x * cellSize * groundGenerator.ChunkWaveFunction.GridScale.x, 0, y * cellSize * groundGenerator.ChunkWaveFunction.GridScale.z) - new Vector3(cellSize * groundGenerator.ChunkWaveFunction.GridScale.x, 0, cellSize * groundGenerator.ChunkWaveFunction.GridScale.z) / 2.0f;
                 Cells[x, y] = new Cell(false, pos + transform.position, new List<PrototypeData> { emptyPrototype });
             }
         }
@@ -155,35 +155,32 @@ public class BuildingManager : Singleton<BuildingManager>
             {
                 int2 cellIndex = new int2(x, y);
                 int2 gridIndex = new int2(Mathf.FloorToInt(x * cellSize), Mathf.FloorToInt(y * cellSize));
-                SetCell(cellIndex, gridIndex); 
+                SetCellDependingOnGround(cellIndex, gridIndex); 
             }
         }
-    }
 
-    private void SetCell(int2 cellIndex, int2 gridIndex)
-    {
-        Vector3 cellPosition = Cells[cellIndex.x, cellIndex.y].Position;
-        if (gridIndex.y == Cells.GetLength(1) - 1) // Just put air at the top
-        {
-            Cells[cellIndex.x, cellIndex.y] = new Cell(true, cellPosition, unbuildablePrototypeList, false);
-            return;
-        }
-
-        Cell groundCell = groundGenerator.WaveFunction.GetCellAtIndexInverse(new Vector3Int(gridIndex.x, 0, gridIndex.y));
-        /*if (groundCell.PossiblePrototypes[0].MeshRot.Mesh is not null)
-        {
-            Debug.DrawLine(cellPosition, groundCell.Position, Color.red, 100, false);
-        }*/
+        return;
         
-        Vector2Int corner = new Vector2Int((int)Mathf.Sign(groundCell.Position.x - cellPosition.x), (int)Mathf.Sign(groundCell.Position.z - cellPosition.z));
-
-        if (!cellBuildableCornerData.IsCornerBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner, out _))
+        void SetCellDependingOnGround(int2 cellIndex, int2 gridIndex)
         {
-            Cells[cellIndex.x, cellIndex.y] = new Cell(
-                true,
-                cellPosition,
-                unbuildablePrototypeList,
-                false);
+            Vector3 cellPosition = Cells[cellIndex.x, cellIndex.y].Position;
+            if (gridIndex.y == Cells.GetLength(1) - 1) // Just put air at the top
+            {
+                Cells[cellIndex.x, cellIndex.y] = new Cell(true, cellPosition, unbuildablePrototypeList, false);
+                return;
+            }
+
+            Cell groundCell = chunk.Cells[gridIndex.x, 0, gridIndex.y];
+            Vector2Int corner = new Vector2Int((int)Mathf.Sign(groundCell.Position.x - cellPosition.x), (int)Mathf.Sign(groundCell.Position.z - cellPosition.z));
+
+            if (!cellBuildableCornerData.IsCornerBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner, out _))
+            {
+                Cells[cellIndex.x, cellIndex.y] = new Cell(
+                    true,
+                    cellPosition,
+                    unbuildablePrototypeList,
+                    false);
+            }
         }
     }
 
@@ -615,7 +612,7 @@ public class BuildingManager : Singleton<BuildingManager>
         for (int i = 0; i < marchDirections.Count; i++)
         {
             int2 marchIndex = new int2(index.x + marchDirections[i].x, index.y + marchDirections[i].y);
-            if (cellsBuilt[marchIndex.x, marchIndex.y])
+            if (cellsBuilt.IsInBounds(marchIndex) && cellsBuilt[marchIndex.x, marchIndex.y])
             {
                 marchedIndex += (int)Mathf.Pow(2, i);
             }
@@ -628,11 +625,11 @@ public class BuildingManager : Singleton<BuildingManager>
     {
         List<int2> surrounding = new List<int2>();
 
-        for (float x = min.x; x <= max.x; x += groundGenerator.WaveFunction.GridScale.x * cellSize)
+        for (float x = min.x; x <= max.x; x += groundGenerator.ChunkWaveFunction.GridScale.x * cellSize)
         {
-            for (float y = min.y; y <= max.y; y += groundGenerator.WaveFunction.GridScale.y)
+            for (float y = min.y; y <= max.y; y += groundGenerator.ChunkWaveFunction.GridScale.y)
             {
-                for (float z = min.z; z <= max.z; z += groundGenerator.WaveFunction.GridScale.z * cellSize)
+                for (float z = min.z; z <= max.z; z += groundGenerator.ChunkWaveFunction.GridScale.z * cellSize)
                 {
                     int2? index = GetIndex(new Vector3(x, y, z));
                     if (index.HasValue)
@@ -665,7 +662,7 @@ public class BuildingManager : Singleton<BuildingManager>
 
     public int2? GetIndex(Vector3 pos)
     {
-        int2 index = new int2(Math.GetMultiple(pos.x, groundGenerator.WaveFunction.GridScale.x * cellSize), Math.GetMultiple(pos.z, groundGenerator.WaveFunction.GridScale.z * cellSize));
+        int2 index = new int2(Math.GetMultiple(pos.x, groundGenerator.ChunkWaveFunction.GridScale.x * cellSize), Math.GetMultiple(pos.z, groundGenerator.ChunkWaveFunction.GridScale.z * cellSize));
         if (Cells.IsInBounds(index.x, index.y))
         {
             return index;
@@ -718,9 +715,9 @@ public class BuildingManager : Singleton<BuildingManager>
         {
             for (int x = 0; x < Cells.GetLength(0); x++)
             {
-                Vector3 pos = Cells[x, y].Position + new Vector3(groundGenerator.WaveFunction.GridScale.x * cellSize / 2.0f, 0, groundGenerator.WaveFunction.GridScale.z * cellSize / 2.0f);
+                Vector3 pos = Cells[x, y].Position + new Vector3(groundGenerator.ChunkWaveFunction.GridScale.x * cellSize / 2.0f, 0, groundGenerator.ChunkWaveFunction.GridScale.z * cellSize / 2.0f);
                 Gizmos.color = !cellsBuilt[x, y] ? Color.white : Color.magenta;
-                Gizmos.DrawWireCube(pos, new Vector3(groundGenerator.WaveFunction.GridScale.x * cellSize, groundGenerator.WaveFunction.GridScale.y, groundGenerator.WaveFunction.GridScale.z * cellSize) * 0.75f);
+                Gizmos.DrawWireCube(pos, new Vector3(groundGenerator.ChunkWaveFunction.GridScale.x * cellSize, groundGenerator.ChunkWaveFunction.GridScale.y, groundGenerator.ChunkWaveFunction.GridScale.z * cellSize) * 0.75f);
             }
         }
     }

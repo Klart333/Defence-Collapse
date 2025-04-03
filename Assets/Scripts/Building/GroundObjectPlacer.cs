@@ -78,7 +78,6 @@ public class GroundObjectPlacer : MonoBehaviour
                         int2 cellIndex = new int2(xIndex, zIndex);
 
                         Cell cell = BuildingManager.Instance[cellIndex];
-                        Debug.Log("Buildable: " + cell.Buildable);
                         if (!cell.Buildable)
                         {
                             valid = false;

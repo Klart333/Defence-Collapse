@@ -23,13 +23,13 @@ namespace Buildings
 
         private void OnEnable()
         {
-            groundGenerator.OnMapGenerated += OnMapGenerated;
+            groundGenerator.OnChunkGenerated += OnChunkGenerated;
             groundGenerator.OnCellCollapsed += OnCellCollapsed;
         }
 
         private void OnDisable()
         {
-            groundGenerator.OnMapGenerated -= OnMapGenerated;
+            groundGenerator.OnChunkGenerated -= OnChunkGenerated;
             groundGenerator.OnCellCollapsed -= OnCellCollapsed;
         }
 
@@ -41,11 +41,17 @@ namespace Buildings
             treeGrowers.Add(spawned); 
         }
 
-        private void OnMapGenerated()
+        private void OnChunkGenerated(Chunk chunk)
         {
             for (int i = 0; i < treeGrowers.Count; i++)
             {
+                if (treeGrowers[i].HasGrown)
+                {
+                    continue;
+                }
+                
                 treeGrowers[i].GrowTrees().Forget(Debug.LogError);
+                treeGrowers[i].HasGrown = true;
             }
         }
     }

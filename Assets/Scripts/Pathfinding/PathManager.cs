@@ -111,14 +111,6 @@ namespace Pathfinding
             }
         }
 
-        //private void LateUpdate()
-        //{
-        //    if (updateTimer == 0 && !jobHandle.IsCompleted)
-        //    {
-        //        jobHandle.Complete();
-        //    }
-        //}
-
         private async UniTask UpdateFlowField()
         {
             for (int i = 0; i < MovementCosts.Length; i++)

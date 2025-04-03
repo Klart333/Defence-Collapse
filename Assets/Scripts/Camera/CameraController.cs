@@ -133,20 +133,12 @@ public class CameraController : MonoBehaviour
         float zoomAmount = zoomSensitivity * zoomDirection * Time.deltaTime;
 
         // Raycast-based zoom (towards what the camera is pointing at)
-        Ray ray = controlledCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        if (Physics.Raycast(ray, out RaycastHit hit))
-        {
-            Vector3 directionToTarget = (transform.position - hit.point).normalized;
-            float currentDistance = Vector3.Distance(transform.position, hit.point);
-            float newDistance = Mathf.Clamp(currentDistance - zoomAmount, minZoomDistance, maxZoomDistance);
+        Vector3 groundPos = GetGroundIntersectionPoint();
+        Vector3 directionToTarget = (transform.position - groundPos).normalized;
+        float currentDistance = Vector3.Distance(transform.position, groundPos);
+        float newDistance = Mathf.Clamp(currentDistance - zoomAmount, minZoomDistance, maxZoomDistance);
             
-            transform.position = hit.point + directionToTarget * newDistance;
-        }
-        else
-        {
-            // Default zoom behavior when not pointing at anything
-            transform.position += transform.forward * zoomAmount;
-        }
+        transform.position = groundPos + directionToTarget * newDistance;
     }
 
     private void HandleRotation()

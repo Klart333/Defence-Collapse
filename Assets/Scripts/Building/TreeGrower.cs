@@ -24,6 +24,8 @@ namespace Buildings
         [SerializeField]
         private int raycastCount = 100;
         
+        public bool HasGrown { get; set; }
+        
         private void Start()
         {
             //GrowTrees();
@@ -52,12 +54,6 @@ namespace Buildings
                     SpawnTree(pos);
                     await UniTask.Delay(100);
                 }
-            }
-
-            if (positions.Count <= 0)
-            {
-                await UniTask.Delay(100);
-                GrowTrees().Forget(Debug.LogError);
             }
 
             return;
@@ -91,7 +87,6 @@ namespace Buildings
                 return null;
 
             int subMeshIndex = GetSubmeshIndex(mesh, hit.triangleIndex);
-            print("SubMeshIndex: " + subMeshIndex);
             if (subMeshIndex == -1) 
                 return null;
 

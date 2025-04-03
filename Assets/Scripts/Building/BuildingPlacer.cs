@@ -21,7 +21,7 @@ public class BuildingPlacer : MonoBehaviour
     private PlaceSquare placeSquarePrefab;
 
     private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
-    private readonly List<PlaceSquare> spawnedSpawnPlaces = new List<PlaceSquare>();
+    private readonly Dictionary<int2, PlaceSquare> spawnedSpawnPlaces = new Dictionary<int2, PlaceSquare>();
 
     private GroundGenerator groundGenerator;
     private Vector3 targetScale;
@@ -35,7 +35,7 @@ public class BuildingPlacer : MonoBehaviour
     {
         Events.OnBuildingCanceled += OnBuildingCanceled;
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
-        groundGenerator.OnMapGenerated += InitializeSpawnPlaces;
+        groundGenerator.OnChunkGenerated += InitializeSpawnPlaces;
         
         Events.OnBuildingDestroyed += OnBuildingDestroyed;
     }
@@ -43,7 +43,7 @@ public class BuildingPlacer : MonoBehaviour
     private void OnDisable()
     {
         Events.OnBuildingCanceled -= OnBuildingCanceled;
-        groundGenerator.OnMapGenerated -= InitializeSpawnPlaces;
+        groundGenerator.OnChunkGenerated -= InitializeSpawnPlaces;
         Events.OnBuildingDestroyed -= OnBuildingDestroyed;
     }
 
@@ -52,7 +52,7 @@ public class BuildingPlacer : MonoBehaviour
         Events.OnBuildingPurchased += BuildingPurchased;
     }
     
-    private void InitializeSpawnPlaces()
+    private void InitializeSpawnPlaces(Chunk chunk)
     {
         if (BuildingManager.Instance is null) return;
         
@@ -66,12 +66,14 @@ public class BuildingPlacer : MonoBehaviour
     {
         await UniTask.WaitUntil(() => BuildingManager.Instance.Cells != null);
         
-        targetScale = groundGenerator.WaveFunction.GridScale * BuildingManager.Instance.CellSize;
+        targetScale = groundGenerator.ChunkWaveFunction.GridScale * BuildingManager.Instance.CellSize;
         for (int z = 0; z < BuildingManager.Instance.Cells.GetLength(1) - 1; z++)
         {
             for (int x = 0; x < BuildingManager.Instance.Cells.GetLength(0) - 1; x++)
             {
-                if (!BuildingManager.Instance.Cells[x, z].Buildable
+                int2 index = new int2(x, z);
+                if (spawnedSpawnPlaces.ContainsKey(index)
+                    || !BuildingManager.Instance.Cells[x, z].Buildable
                     || !BuildingManager.Instance.Cells[x + 1, z].Buildable
                     || !BuildingManager.Instance.Cells[x, z + 1].Buildable
                     || !BuildingManager.Instance.Cells[x + 1, z + 1].Buildable) continue;
@@ -79,12 +81,12 @@ public class BuildingPlacer : MonoBehaviour
                 Vector3 pos = BuildingManager.Instance.Cells[x, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
                 PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
                 placeSquare.Placer = this;
-                placeSquare.Index = new int2(x, z);
+                placeSquare.Index = index;
                 placeSquare.transform.localScale = targetScale * 0.95f;
                 placeSquare.transform.SetParent(transform, true);
                 placeSquare.gameObject.SetActive(false);
                 placeSquare.SquareIndex = spawnedSpawnPlaces.Count;
-                spawnedSpawnPlaces.Add(placeSquare);
+                spawnedSpawnPlaces.Add(index, placeSquare);
             }
         }
 
@@ -163,9 +165,8 @@ public class BuildingPlacer : MonoBehaviour
 
     private void ToggleSpawnPlaces(bool enabled)
     {
-        for (int i = 0; i < spawnedSpawnPlaces.Count; i++)
+        foreach (PlaceSquare placeSquare in spawnedSpawnPlaces.Values)
         {
-            PlaceSquare placeSquare = spawnedSpawnPlaces[i];
             if (enabled)
             {
                 placeSquare.gameObject.SetActive(true);
@@ -186,18 +187,20 @@ public class BuildingPlacer : MonoBehaviour
     
     private void PlaceBuilding()
     {
-        spawnedSpawnPlaces[SpawnSquareIndex].OnPlaced();
+        if (!SquareIndex.HasValue)
+        {
+            return;
+        }
+        
+        spawnedSpawnPlaces[SquareIndex.Value].OnPlaced();
         BuildingManager.Instance.Place();
     }
     
     private void OnBuildingDestroyed(Building building)
     {
-        for (int i = 0; i < spawnedSpawnPlaces.Count; i++)
+        if (spawnedSpawnPlaces.TryGetValue(building.Index, out PlaceSquare square))
         {
-            if (math.all(spawnedSpawnPlaces[i].Index == building.Index))
-            {
-                spawnedSpawnPlaces[i].UnPlaced();
-            }
+            square.UnPlaced();
         }
     }
 

@@ -10,18 +10,32 @@ using Unity.Entities;
 using Unity.Physics;
 using UnityEngine;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Unity.Mathematics;
+using UnityEngine.Serialization;
+using Debug = UnityEngine.Debug;
 
 namespace WaveFunctionCollapse
 {
-    public class GroundGenerator : MonoBehaviour
+    public class GroundGenerator : MonoBehaviour, IChunkWaveFunction
     {
-        public event Action OnMapGenerated;
+        public event Action<Chunk> OnChunkGenerated;
         public event Action<Cell> OnCellCollapsed;
 
         [Title("Wave Function")]
         [SerializeField]
-        private WaveFunction waveFunction;
+        private ChunkWaveFunction waveFunction;
 
+        [SerializeField]
+        private Vector3Int chunkSize;
+        
+        [SerializeField]
+        private PrototypeInfoData defaultPrototypeInfoData;
+        
+        [SerializeField]
+        private PrototypeInfoData treePrototypeInfoData;
+        
         [Title("Settings")]
         [SerializeField]
         private int chillTimeMs;
@@ -38,34 +52,59 @@ namespace WaveFunctionCollapse
         
         private BlobAssetReference<Collider> blobCollider;
 
-        public WaveFunction WaveFunction => waveFunction;
-
+        public ChunkWaveFunction ChunkWaveFunction => waveFunction;
+        public Vector3 ChunkScale => Vector3.one;
+        
         private void Start()
         {
+            if (!waveFunction.Load(this))
+            {
+                return;
+            }
+            waveFunction.ParentTransform = transform;
+            
+            Chunk chunk = waveFunction.LoadChunk(int3.zero, chunkSize, defaultPrototypeInfoData, false);
+            
             if (shouldRun)
-                _ = Run();
+                LoadChunk(chunk).Forget(Debug.LogError);
+        }
+
+        private List<Chunk> LoadAdjacentChunks(Chunk chunk)
+        {
+            List<Chunk> chunks = new List<Chunk> { chunk };
+            
+
+            return chunks;
         }
 
         private void OnDisable()
         {
-            blobCollider.Dispose();
+            if (blobCollider.IsCreated)
+            {
+                blobCollider.Dispose();
+            }
         }
 
-        public async UniTask Run()
+        public async UniTask LoadChunk(Chunk chunk)
         {
-            waveFunction.ParentTransform = transform;
-            if (!waveFunction.Load())
+            await LoadAdjacentTrees(chunk);
+
+            await Run(chunk);
+
+            if (shouldCombine)
             {
-                return;
+                CombineMeshes();
             }
 
-            //await PredeterminePath();
-            await BottomBuildUp();
+            OnChunkGenerated?.Invoke(chunk);
+        }
 
+        private async Task Run(Chunk chunk)
+        {
             Stopwatch watch = Stopwatch.StartNew();
-            while (!waveFunction.AllCollapsed)
+            while (!chunk.AllCollapsed)
             {
-                Cell collapsedCell = waveFunction.Iterate();
+                Cell collapsedCell = waveFunction.Iterate(chunk);
                 OnCellCollapsed?.Invoke(collapsedCell);
 
                 if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
@@ -78,53 +117,26 @@ namespace WaveFunctionCollapse
 
                 watch.Restart();
             }
-
-            if (shouldCombine)
-            {
-                CombineMeshes();
-            }
-
-            OnMapGenerated?.Invoke();
         }
 
-        private async UniTask BottomBuildUp()
+        private async UniTask LoadAdjacentTrees(Chunk chunk)
         {
-            for (int x = 0; x < waveFunction.GridSize.x; x++)
-            for (int z = 0; z < waveFunction.GridSize.z; z++)
+            for (int x = -1; x <= 1; x++)
+            for (int z = -1; z <= 1; z++)
             {
-                if ((x == 0 || x == waveFunction.GridSize.x - 1) && (z == 0 || z == waveFunction.GridSize.z - 1))
-                {
-                    PlaceGround(x, z);
-                    await UniTask.Yield();
-                    continue;
-                }
-
-                if ((x != 0 && x != waveFunction.GridSize.x - 1) && (z != 0 && z != waveFunction.GridSize.z - 1))
+                if (x == 0 && z == 0 || x != 0 && z != 0)
                 {
                     continue;
                 }
-
-                if (Random.value < 0.8f)
+                
+                int3 chunkIndex = new int3(chunk.ChunkIndex.x + x * chunk.width * 2, 0, chunk.ChunkIndex.z + z * chunk.depth * 2);
+                if (waveFunction.Chunks.ContainsKey(chunkIndex))
                 {
                     continue;
                 }
-
-                PlaceGround(x, z);
-                await UniTask.Yield();
-            }
-        
-
-            return;
-
-            void PlaceGround(int x, int z)
-            {
-                int index = waveFunction.GetIndex(x, 0, z);
-                if (waveFunction.Cells[index].PossiblePrototypes.Contains(waveFunction.Prototypes[0]))
-                {
-                    waveFunction.SetCell(index, waveFunction.Prototypes[0]);
-
-                    waveFunction.Propagate();
-                }
+                
+                Chunk adjacent = waveFunction.LoadChunk(chunkIndex, chunkSize, treePrototypeInfoData, false); 
+                await Run(adjacent);
             }
         }
 
