@@ -24,7 +24,7 @@ namespace Buildings.District
         
         public int2 Index { get; set; }
 
-        public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction chunkWaveFunction, int key)
+        public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction<Chunk> chunkWaveFunction, int key)
         {
             UpgradeData = new UpgradeData(1, 1, 1);
             cellCount = chunks.Count;
@@ -63,7 +63,7 @@ namespace Buildings.District
             return max;
         }
 
-        private void GenerateCollider(IEnumerable<Chunk> chunks, IChunkWaveFunction chunkWaveFunction)
+        private void GenerateCollider(IEnumerable<Chunk> chunks, IChunkWaveFunction<Chunk> chunkWaveFunction)
         {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();

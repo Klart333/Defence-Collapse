@@ -126,4 +126,19 @@ public class MoneyManager : Singleton<MoneyManager>
     }
 
     #endregion
+
+    public void InsufficientFunds(int cost)
+    {
+        Debug.Log("Insufficient funds, " + (Money - cost));
+    }
+
+    #region Debug
+
+    [Button]
+    private void AddMoneyDebug(float money)
+    {
+        this.money += money;
+    }
+
+    #endregion
 }

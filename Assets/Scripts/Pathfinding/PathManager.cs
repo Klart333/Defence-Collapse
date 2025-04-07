@@ -23,10 +23,6 @@ namespace Pathfinding
         [SerializeField]
         private float updateFrequency = 1;
 
-        [Title("Portal")]
-        [SerializeField]
-        private GroundObjectData portalObjectData;
-
         public NativeArray<short> MovementCosts;
         public NativeArray<short> Units;
         

@@ -11,11 +11,11 @@ using UnityEngine;
 
 namespace WaveFunctionCollapse
 {
-    public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction
+    public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction<Chunk>
     {
         [Title("Wave Function")]
         [SerializeField]
-        private ChunkWaveFunction waveFunction;
+        private ChunkWaveFunction<Chunk> waveFunction;
 
         [SerializeField]
         private Vector3Int chunkSize;
@@ -61,7 +61,7 @@ namespace WaveFunctionCollapse
         private bool isUpdatingChunks;
         private bool isRunning;
 
-        public ChunkWaveFunction ChunkWaveFunction => waveFunction;
+        public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
         public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.GridScale.x, chunkSize.y * ChunkWaveFunction.GridScale.y, chunkSize.z * ChunkWaveFunction.GridScale.z);
         public Vector3Int ChunkSize => chunkSize;
 
@@ -179,7 +179,7 @@ namespace WaveFunctionCollapse
                     {
                         for (int i = 0; i < overrideChunk.AdjacentChunks.Length; i++)
                         {
-                            Chunk chunk = overrideChunk.AdjacentChunks[i];
+                            Chunk chunk = overrideChunk.AdjacentChunks[i] as Chunk;
                             if (chunk == null || overrideChunks.Contains(overrideChunk)) continue;
 
                             neighbours.Add(overrideChunk);
@@ -208,12 +208,12 @@ namespace WaveFunctionCollapse
             {
                 if (neighbourChunk.AdjacentChunks[i] == null) continue;
 
-                if (overrideChunks.Add(neighbourChunk.AdjacentChunks[i]))
+                if (overrideChunks.Add(neighbourChunk.AdjacentChunks[i] as Chunk))
                 {
                     neighbourChunk.AdjacentChunks[i].Clear(waveFunction.GameObjectPool);
                     if (depth > 0)
                     {
-                        ResetNeighbours(overrideChunks, neighbourChunk.AdjacentChunks[i], depth - 1);
+                        ResetNeighbours(overrideChunks, neighbourChunk.AdjacentChunks[i] as Chunk, depth - 1);
                     }
                 }
             }

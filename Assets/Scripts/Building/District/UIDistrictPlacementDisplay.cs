@@ -30,7 +30,7 @@ namespace Buildings.District
         private DistrictHandler districtHandler;
         
         [SerializeField]
-        private IChunkWaveFunction districtGenerator;
+        private IChunkWaveFunction<Chunk> districtGenerator;
         
         private Queue<DistrictPlacer> selectedPlacers = new Queue<DistrictPlacer>();
         private List<DistrictPlacer> spawnedPlacers = new List<DistrictPlacer>();
@@ -65,7 +65,7 @@ namespace Buildings.District
             Display(districtGenerator.ChunkWaveFunction);
         }
         
-        private void Display(ChunkWaveFunction chunkWaveFunction)
+        private void Display(ChunkWaveFunction<Chunk> chunkWaveFunction)
         {
             Vector3 scale = districtGenerator.ChunkScale * 0.75f;
 
@@ -180,7 +180,7 @@ namespace Buildings.District
             districtHandler.BuildDistrict(chunks, currentType);
         }
         
-        private static Bounds GetBounds(ChunkWaveFunction chunkWaveFunction)
+        private static Bounds GetBounds(ChunkWaveFunction<Chunk> chunkWaveFunction)
         {
             Vector2 min = Vector2.positiveInfinity;
             Vector2 max = Vector2.negativeInfinity;

@@ -33,9 +33,6 @@ public class CameraController : MonoBehaviour
     [SerializeField] 
     private float panSensitivity = 0.5f;
     
-    [SerializeField] 
-    private bool invertPan = false;
-
     // Input actions
     private InputActions inputActions;
     private InputAction moveAction;
@@ -44,11 +41,10 @@ public class CameraController : MonoBehaviour
     private InputAction panAction;
     private InputAction fastMoveAction;
     
-    // Camera reference
+    // Camera reference 
     private Camera controlledCamera;
     private bool isPanning = false;
     private Vector3 panStartPosition;
-    private Vector3 panCameraStartPosition;
 
     private void Awake()
     {
@@ -133,7 +129,7 @@ public class CameraController : MonoBehaviour
         float zoomAmount = zoomSensitivity * zoomDirection * Time.deltaTime;
 
         // Raycast-based zoom (towards what the camera is pointing at)
-        Vector3 groundPos = GetGroundIntersectionPoint();
+        Vector3 groundPos = Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
         Vector3 directionToTarget = (transform.position - groundPos).normalized;
         float currentDistance = Vector3.Distance(transform.position, groundPos);
         float newDistance = Mathf.Clamp(currentDistance - zoomAmount, minZoomDistance, maxZoomDistance);
@@ -146,7 +142,7 @@ public class CameraController : MonoBehaviour
         float rotateInput = rotateAction.ReadValue<float>();
         if (rotateInput == 0) return;
 
-        Vector3 currentMousePoint = GetGroundIntersectionPoint();
+        Vector3 currentMousePoint = Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
         if (currentMousePoint == Vector3.zero) return;
 
         float rotationAmount = rotationSpeed * Time.deltaTime * (fastMoveAction.IsPressed() ? fastMoveMultiplier : 1f);
@@ -159,8 +155,7 @@ public class CameraController : MonoBehaviour
     private void StartPan(InputAction.CallbackContext obj)
     {
         isPanning = true;
-        panStartPosition = GetGroundIntersectionPoint();
-        panCameraStartPosition = transform.position;
+        panStartPosition = Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
     }
 
     private void EndPan(InputAction.CallbackContext obj)
@@ -172,22 +167,10 @@ public class CameraController : MonoBehaviour
     {
         if (!isPanning) return;
         
-        Vector3 currentMousePoint = GetGroundIntersectionPoint();
+        Vector3 currentMousePoint = Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
         if (currentMousePoint == Vector3.zero) return;
 
         Vector3 delta = panStartPosition - currentMousePoint;
         transform.position += delta * 0.5f;
-    }
-    
-    private Vector3 GetGroundIntersectionPoint()
-    {
-        Ray ray = controlledCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
-        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
-        
-        if (groundPlane.Raycast(ray, out float distance))
-        {
-            return ray.GetPoint(distance);
-        }
-        return Vector3.zero;
     }
 }

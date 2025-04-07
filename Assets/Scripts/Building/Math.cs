@@ -44,4 +44,25 @@ public static class Math
         // Compute the interpolated value
         return oneMinusTSquared * a + 2f * oneMinusT * t * c + tSquared * b;
     }
+    
+    public static Vector3 GetGroundIntersectionPoint(Camera camera, Vector2 mousePosition)
+    {
+        Ray ray = camera.ScreenPointToRay(mousePosition);
+        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+        
+        if (groundPlane.Raycast(ray, out float distance))
+        {
+            return ray.GetPoint(distance);
+        }
+        return Vector3.zero;
+    }
+
+    public static Chunks.Adjacencies IntToAdjacency(int2 value)
+    {
+        if (value.x == 1) return Chunks.Adjacencies.East;
+        if (value.x == -1) return Chunks.Adjacencies.West;
+        if (value.y == 1) return Chunks.Adjacencies.North;
+        if (value.y == -1) return Chunks.Adjacencies.South;
+        return Chunks.Adjacencies.None;
+    }
 }

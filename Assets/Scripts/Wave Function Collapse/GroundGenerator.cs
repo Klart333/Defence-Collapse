@@ -1,40 +1,36 @@
 using MeshCollider = Unity.Physics.MeshCollider;
 using Material = Unity.Physics.Material;
 using Collider = Unity.Physics.Collider;
-using Random = UnityEngine.Random;
+using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using Sirenix.OdinInspector;
+using Unity.Mathematics;
 using System.Diagnostics;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Physics;
 using UnityEngine;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Unity.Mathematics;
-using UnityEngine.Serialization;
-using Debug = UnityEngine.Debug;
+using Chunks;
 
 namespace WaveFunctionCollapse
 {
-    public class GroundGenerator : MonoBehaviour, IChunkWaveFunction
+    public class GroundGenerator : MonoBehaviour, IChunkWaveFunction<Chunk>
     {
         public event Action<Chunk> OnChunkGenerated;
-        public event Action<Cell> OnCellCollapsed;
+        public event Action<Chunk> OnLockedChunkGenerated;
+        public event Action<ChunkIndex> OnCellCollapsed;
 
         [Title("Wave Function")]
         [SerializeField]
-        private ChunkWaveFunction waveFunction;
+        private ChunkWaveFunction<Chunk> waveFunction;
 
         [SerializeField]
         private Vector3Int chunkSize;
         
         [SerializeField]
         private PrototypeInfoData defaultPrototypeInfoData;
-        
-        [SerializeField]
-        private PrototypeInfoData treePrototypeInfoData;
         
         [Title("Settings")]
         [SerializeField]
@@ -46,14 +42,18 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private bool shouldCombine = true;
 
+        [Title("References")]
+        [SerializeField]
+        private ChunkMaskHandler chunkMaskHandler;
+        
         [Title("Debug")]
         [SerializeField]
         private bool shouldRun = true;
         
         private BlobAssetReference<Collider> blobCollider;
 
-        public ChunkWaveFunction ChunkWaveFunction => waveFunction;
-        public Vector3 ChunkScale => Vector3.one;
+        public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
+        public Vector3 ChunkScale => Vector3.one * 16;
         
         private void Start()
         {
@@ -64,17 +64,9 @@ namespace WaveFunctionCollapse
             waveFunction.ParentTransform = transform;
             
             Chunk chunk = waveFunction.LoadChunk(int3.zero, chunkSize, defaultPrototypeInfoData, false);
-            
+
             if (shouldRun)
                 LoadChunk(chunk).Forget(Debug.LogError);
-        }
-
-        private List<Chunk> LoadAdjacentChunks(Chunk chunk)
-        {
-            List<Chunk> chunks = new List<Chunk> { chunk };
-            
-
-            return chunks;
         }
 
         private void OnDisable()
@@ -87,7 +79,8 @@ namespace WaveFunctionCollapse
 
         public async UniTask LoadChunk(Chunk chunk)
         {
-            await LoadAdjacentTrees(chunk);
+            chunkMaskHandler.RemoveMask(chunk);
+            await LoadAdjacentChunks(chunk);
 
             await Run(chunk);
 
@@ -104,8 +97,8 @@ namespace WaveFunctionCollapse
             Stopwatch watch = Stopwatch.StartNew();
             while (!chunk.AllCollapsed)
             {
-                Cell collapsedCell = waveFunction.Iterate(chunk);
-                OnCellCollapsed?.Invoke(collapsedCell);
+                ChunkIndex index = waveFunction.Iterate(chunk);
+                OnCellCollapsed?.Invoke(index);
 
                 if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
 
@@ -119,7 +112,7 @@ namespace WaveFunctionCollapse
             }
         }
 
-        private async UniTask LoadAdjacentTrees(Chunk chunk)
+        private async UniTask LoadAdjacentChunks(Chunk chunk)
         {
             for (int x = -1; x <= 1; x++)
             for (int z = -1; z <= 1; z++)
@@ -129,14 +122,18 @@ namespace WaveFunctionCollapse
                     continue;
                 }
                 
-                int3 chunkIndex = new int3(chunk.ChunkIndex.x + x * chunk.width * 2, 0, chunk.ChunkIndex.z + z * chunk.depth * 2);
+                int3 chunkIndex = new int3(chunk.ChunkIndex.x + x, 0, chunk.ChunkIndex.z + z);
                 if (waveFunction.Chunks.ContainsKey(chunkIndex))
                 {
                     continue;
                 }
                 
-                Chunk adjacent = waveFunction.LoadChunk(chunkIndex, chunkSize, treePrototypeInfoData, false); 
+                Chunk adjacent = waveFunction.LoadChunk(chunkIndex, chunkSize, defaultPrototypeInfoData, false);
+                chunkMaskHandler.CreateMask(adjacent, Math.IntToAdjacency(new int2(-x, -z)));
+                waveFunction.Propagate();
                 await Run(adjacent);
+                
+                OnLockedChunkGenerated?.Invoke(adjacent);
             }
         }
 

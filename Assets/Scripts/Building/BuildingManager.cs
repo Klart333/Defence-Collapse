@@ -11,10 +11,14 @@ using UnityEditor;
 using Buildings;
 using System;
 
-public class BuildingManager : Singleton<BuildingManager> 
+public class BuildingManager : Singleton<BuildingManager>, IChunkWaveFunction<QueryMarchedChunk>
 {
-    public event Action OnLoaded;
+    public event Action<Chunk> OnLoaded;
 
+    [Title("Wave Function")]
+    [SerializeField]
+    private ChunkWaveFunction<QueryMarchedChunk> waveFunction;
+    
     [Title("Cells")]
     [SerializeField]
     private float cellSize = 1f; // Needs to be an exponent of 2, probably
@@ -34,7 +38,6 @@ public class BuildingManager : Singleton<BuildingManager>
     [SerializeField]
     private Path pathPrefab;
 
-    [FormerlySerializedAs("cellBuildableUtility")]
     [SerializeField]
     private BuildableCornerData cellBuildableCornerData;
 
@@ -42,13 +45,11 @@ public class BuildingManager : Singleton<BuildingManager>
     [SerializeField]
     private PooledMonoBehaviour unableToPlacePrefab;
 
-    [SerializeField]
-    private bool DebugPropagate;
-
-    [SerializeField, ShowIf(nameof(DebugPropagate)), Range(1, 1000)]
-    private int Speed;
-
     private bool[,] cellsBuilt;
+
+    public ChunkWaveFunction<QueryMarchedChunk> ChunkWaveFunction => waveFunction;
+    
+    public Vector3 ChunkScale => Vector3.one * cellSize;
 
     public Cell this[int2 index]
     {
@@ -68,23 +69,23 @@ public class BuildingManager : Singleton<BuildingManager>
     private readonly Dictionary<int2, IBuildable> spawnedMeshes = new Dictionary<int2, IBuildable>();
     private readonly List<(int2, Cell)> queryChangedCells = new List<(int2, Cell)>();
     private readonly List<int2> queryCollapsedAir = new List<int2>();
-    private readonly Stack<int2> cellStack = new Stack<int2>();
     
-    private List<PrototypeData> prototypes = new List<PrototypeData>();
     private List<int2> cellsToCollapse = new List<int2>();
-    private List<PrototypeData> unbuildablePrototypeList;
     private HashSet<short> allowedKeys;
 
-    private GroundGenerator groundGenerator;
     private BuildingAnimator buildingAnimator;
-    private PrototypeData emptyPrototype;
-    private PrototypeData unbuildablePrototype;
+    private GroundGenerator groundGenerator;
     private int2 queryIndex;
 
     private BuildingType currentBuildingType;
     
     private bool shouldRemoveQueryIndex;
-        
+    
+    private List<PrototypeData> unbuildablePrototypeList;
+    private List<PrototypeData> prototypes;
+    private PrototypeData emptyPrototype;
+    private Stack<int2> cellStack;
+
     public Cell[,] Cells { get; private set; }
     public float CellSize => cellSize;
 
@@ -93,14 +94,16 @@ public class BuildingManager : Singleton<BuildingManager>
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
         buildingAnimator = GetComponent<BuildingAnimator>();
 
-        groundGenerator.OnChunkGenerated += Load;
+        groundGenerator.OnChunkGenerated += LoadCells;
         Events.OnBuildingDestroyed += OnBuildingDestroyed;
         Events.OnBuildingRepaired += OnBuildingRepaired;
+
+        Load();
     }
     
     private void OnDisable()
     {
-        groundGenerator.OnChunkGenerated -= Load;
+        groundGenerator.OnChunkGenerated -= LoadCells;
         Events.OnBuildingDestroyed += OnBuildingDestroyed;
         Events.OnBuildingRepaired += OnBuildingRepaired;
     }
@@ -119,27 +122,22 @@ public class BuildingManager : Singleton<BuildingManager>
 
     #region Loading
 
-    private void Load(Chunk chunk)
+    private void Load()
     {
         if (!LoadPrototypeData())
         {
             Debug.LogError("No prototype data found");
             return;
         }
-
-        LoadCells(chunk);
-
-        OnLoaded?.Invoke();
     }
 
     private void LoadCells(Chunk chunk)
     {
-        Cells = new Cell[Mathf.RoundToInt(chunk.width / cellSize), Mathf.RoundToInt(chunk.depth / cellSize)];
-        cellsBuilt = new bool[Mathf.RoundToInt(chunk.width / cellSize), Mathf.RoundToInt(chunk.depth / cellSize)];
-        emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 1, Array.Empty<int>());
-        unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 0, Array.Empty<int>());
-        unbuildablePrototypeList = new List<PrototypeData> { unbuildablePrototype };
-
+        //waveFunction.LoadChunk(chunk.Position, chunk.ChunkSize, townPrototypeInfo);
+        
+        Cells = new Cell[Mathf.RoundToInt(chunk.Width / cellSize), Mathf.RoundToInt(chunk.Depth / cellSize)];
+        cellsBuilt = new bool[Mathf.RoundToInt(chunk.Width / cellSize), Mathf.RoundToInt(chunk.Depth / cellSize)];
+        
         for (int y = 0; y < Cells.GetLength(1); y++)
         {
             for (int x = 0; x < Cells.GetLength(0); x++)
@@ -158,6 +156,8 @@ public class BuildingManager : Singleton<BuildingManager>
                 SetCellDependingOnGround(cellIndex, gridIndex); 
             }
         }
+        
+        OnLoaded?.Invoke(chunk);
 
         return;
         
@@ -346,19 +346,15 @@ public class BuildingManager : Singleton<BuildingManager>
             shouldRemoveQueryIndex = true;
             cellsBuilt[queryIndex.x, queryIndex.y] = true;
         }
-        
-        switch (buildingType)
+
+        allowedKeys = buildingType switch
         {
-            case BuildingType.Building:
-                allowedKeys = keyData.BuildingKeys;
-                MakeBuildable(cellsToCollapse);
-                break;
-                
-            case BuildingType.Path:
-                allowedKeys = keyData.PathKeys;
-                MakeBuildable(cellsToCollapse);
-                break;
-        }
+            BuildingType.Building => keyData.BuildingKeys,
+            BuildingType.Path => keyData.PathKeys,
+            _ => allowedKeys
+        };
+        MakeBuildable(cellsToCollapse);
+
         Propagate();
 
         int tries = 1000;
@@ -619,26 +615,6 @@ public class BuildingManager : Singleton<BuildingManager>
         }
         
         return marchedIndex;
-    }
-    
-    private List<int2> GetAllCells(Vector3 min, Vector3 max)
-    {
-        List<int2> surrounding = new List<int2>();
-
-        for (float x = min.x; x <= max.x; x += groundGenerator.ChunkWaveFunction.GridScale.x * cellSize)
-        {
-            for (float y = min.y; y <= max.y; y += groundGenerator.ChunkWaveFunction.GridScale.y)
-            {
-                for (float z = min.z; z <= max.z; z += groundGenerator.ChunkWaveFunction.GridScale.z * cellSize)
-                {
-                    int2? index = GetIndex(new Vector3(x, y, z));
-                    if (index.HasValue)
-                        surrounding.Add(index.Value);
-                }
-            }
-        }
-
-        return surrounding;
     }
 
     private List<int2> GetSurroundingCells(Vector3 queryPosition)

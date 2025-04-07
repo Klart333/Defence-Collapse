@@ -35,29 +35,30 @@ public class MeshCombiner : MonoBehaviour
         {
             // Make a combiner for each (sub)mesh that is mapped to the right material.
             List<CombineInstance> combiners = new List<CombineInstance>();
-            foreach (MeshFilter filter in filters)
+            for (int j = 0; j < filters.Length; j++)
             {
-                if (filter.transform == transform) continue;
+                MeshFilter filter = filters[j];
 
                 // The filter doesn't know what materials are involved, get the renderer.
-                MeshRenderer renderer = filter.GetComponent<MeshRenderer>();  // <-- (Easy optimization is possible here, give it a try!)
-                if (renderer == null)
+                if (renderers[j] == null || filter.sharedMesh == null)
                 {
-                    Debug.LogError(filter.name + " has no MeshRenderer");
+                    //Debug.LogError(filter.name + " has no MeshRenderer");
                     continue;
                 }
 
                 // Let's see if their materials are the one we want right now.
-                Material[] localMaterials = renderer.sharedMaterials;
+                Material[] localMaterials = renderers[j].sharedMaterials;
                 for (int g = 0; g < localMaterials.Length; g++)
                 {
                     if (localMaterials[g] != materials[i])
                         continue;
                     // This submesh is the material we're looking for right now.
-                    CombineInstance ci = new CombineInstance();
-                    ci.mesh = filter.sharedMesh;
-                    ci.subMeshIndex = g;
-                    ci.transform = filter.transform.localToWorldMatrix;
+                    CombineInstance ci = new CombineInstance
+                    {
+                        mesh = filter.sharedMesh,
+                        subMeshIndex = g,
+                        transform = filter.transform.localToWorldMatrix
+                    };
                     combiners.Add(ci);
                 }
             }

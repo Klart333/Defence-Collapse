@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
-using System;
 
 namespace WaveFunctionCollapse
 {
@@ -604,7 +604,6 @@ namespace WaveFunctionCollapse
             UnityEngine.Debug.Log(transform.childCount);
         }
     }
-
     [System.Serializable]
     public struct DicData
     {

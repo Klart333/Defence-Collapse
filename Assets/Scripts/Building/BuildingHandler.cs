@@ -22,7 +22,7 @@ public class BuildingHandler : SerializedMonoBehaviour
     
     [Title("District")]
     [SerializeField]
-    private IChunkWaveFunction districtGenerator;
+    private IChunkWaveFunction<Chunk> districtGenerator;
     
     [Title("Data")]
     [SerializeField]

@@ -6,12 +6,13 @@ using Unity.Mathematics;
 using Unity.Collections;
 using UnityEngine;
 using System;
+using System.Linq;
 
 namespace WaveFunctionCollapse
 {
     
     [Serializable]
-    public class ChunkWaveFunction
+    public class ChunkWaveFunction<TChunk> where TChunk : IChunk, new()
     {
         [Title("Grid Size")]
         [SerializeField]
@@ -26,9 +27,9 @@ namespace WaveFunctionCollapse
 
         private PrototypeData emptyPrototype;
 
-        private IChunkWaveFunction handler;
+        private IChunkWaveFunction<TChunk> handler;
 
-        public Dictionary<int3, Chunk> Chunks { get; } = new Dictionary<int3, Chunk>();
+        public Dictionary<int3, TChunk> Chunks { get; } = new Dictionary<int3, TChunk>();
         public Stack<GameObject> GameObjectPool => gameObjectPool;
         public Transform ParentTransform { get; set; }
         public Vector3 GridScale => gridScale;
@@ -39,7 +40,7 @@ namespace WaveFunctionCollapse
             set => Chunks[index.Index][index.CellIndex] = value;
         }
 
-        public bool Load(IChunkWaveFunction handler)
+        public bool Load(IChunkWaveFunction<TChunk> handler)
         {
             this.handler = handler;
             Clear();
@@ -47,46 +48,60 @@ namespace WaveFunctionCollapse
             return true;
         }
 
-        public Chunk LoadChunk(Vector3 position, Vector3Int size, PrototypeInfoData prototypeInfo, bool useSideConstraints = true)
+        public TChunk LoadChunk(Vector3 position, Vector3Int size, PrototypeInfoData prototypeInfo, bool useSideConstraints = true)
         {
             int3 index = ChunkWaveUtility.GetDistrictIndex3(position, handler.ChunkScale);
-            Chunk[] adjacentChunks = GetAdjacentChunks(index);
-            Chunk chunk = new Chunk(size.x, size.y, size.z, index, position, adjacentChunks, gridScale, useSideConstraints);
+            TChunk[] adjacentChunks = GetAdjacentChunks(index);
+            TChunk chunk = new TChunk();
+            chunk.Construct(size.x, size.y, size.z, index, position, adjacentChunks.Cast<IChunk>().ToArray(), gridScale, useSideConstraints);
             Chunks.Add(index, chunk);
             LoadCells(chunk, prototypeInfo);
             return chunk;
         }
         
-        public Chunk LoadChunk(int3 index, Vector3Int size, PrototypeInfoData prototypeInfo, bool useSideConstraints = true)
+        public TChunk LoadChunk(int3 index, Vector3Int size, PrototypeInfoData prototypeInfo, bool useSideConstraints = true)
         {
             Vector3 position = ChunkWaveUtility.GetPosition(index, handler.ChunkScale);
-            Chunk[] adjacentChunks = GetAdjacentChunks(index);
-            Chunk chunk = new Chunk(size.x, size.y, size.z, index, position, adjacentChunks, gridScale, useSideConstraints);
-            Chunks.Add(index, chunk);
+            TChunk[] adjacentChunks = GetAdjacentChunks(index);
+            TChunk chunk = new TChunk();
+            chunk.Construct(size.x, size.y, size.z, index, position, adjacentChunks.Cast<IChunk>().ToArray(), gridScale, useSideConstraints);            Chunks.Add(index, chunk);
             LoadCells(chunk, prototypeInfo);
             return chunk;
         }
 
-        public void LoadCells(Chunk chunk, PrototypeInfoData prototypeInfo)
+        public TChunk LoadChunk(int3 index, TChunk chunk)
+        {
+            TChunk[] adjacentChunks = GetAdjacentChunks(index);
+            Chunks.Add(index, chunk);
+            return chunk;
+        }
+
+        public void LoadCells(TChunk chunk, PrototypeInfoData prototypeInfo)
         {
             chunk.LoadCells(prototypeInfo, gridScale, cellStack);
             for (int i = 0; i < chunk.AdjacentChunks.Length; i++)
             {
-                if (chunk.AdjacentChunks[i] == null || chunk.AdjacentChunks[i].IsClear || chunk.AdjacentChunks[i].AllCollapsed) continue;
-
+                if (chunk.AdjacentChunks[i] == null || chunk.AdjacentChunks[i].IsClear) continue;
+                
                 Direction oppositeDirection = WaveFunctionUtility.OppositeDirection(i);
+                if (chunk.AdjacentChunks[i].AllCollapsed)
+                {
+                    chunk.AdjacentChunks[i].AdjacentChunks[(int)oppositeDirection] = chunk;
+                    continue;
+                }
+                
                 chunk.AdjacentChunks[i].SetAdjacentChunk(chunk, oppositeDirection, cellStack);
             }
         }
 
-        private Chunk[] GetAdjacentChunks(int3 index)
+        private TChunk[] GetAdjacentChunks(int3 index)
         {
-            Chunk[] adjacentChunks = new Chunk[6];
+            TChunk[] adjacentChunks = new TChunk[6];
 
             for (int i = 0; i < 6; i++)
             {
                 int3 adjacentIndex = index + ChunkWaveUtility.Directions[i];
-                if (Chunks.TryGetValue(adjacentIndex, out Chunk chunk))
+                if (Chunks.TryGetValue(adjacentIndex, out TChunk chunk))
                 {
                     adjacentChunks[i] = chunk;
                 }
@@ -95,10 +110,10 @@ namespace WaveFunctionCollapse
             return adjacentChunks;
         }
 
-        public void RemoveChunk(int3 chunkIndex, out List<Chunk> neighbours)
+        public void RemoveChunk(int3 chunkIndex, out List<TChunk> neighbours)
         {
-            neighbours = new List<Chunk>();
-            if (!Chunks.TryGetValue(chunkIndex, out Chunk chunk))
+            neighbours = new List<TChunk>();
+            if (!Chunks.TryGetValue(chunkIndex, out TChunk chunk))
             {
                 Debug.LogError("Chunk to remove not found");
                 return;
@@ -110,7 +125,7 @@ namespace WaveFunctionCollapse
 
                 int oppositeDirection = (int)WaveFunctionUtility.OppositeDirection(i);
                 chunk.AdjacentChunks[i].AdjacentChunks[oppositeDirection] = null;
-                neighbours.Add(chunk.AdjacentChunks[i]);
+                neighbours.Add((TChunk)chunk.AdjacentChunks[i]);
             }
 
             chunk.Clear(gameObjectPool);
@@ -130,7 +145,7 @@ namespace WaveFunctionCollapse
             return this[index];
         }
         
-        public Cell Iterate(Chunk chunk)
+        public ChunkIndex Iterate(TChunk chunk)
         {
             ChunkIndex index = GetLowestEntropyIndex(chunk);
 
@@ -139,7 +154,7 @@ namespace WaveFunctionCollapse
             SetCell(index, chosenPrototype);
 
             Propagate();
-            return this[index];
+            return index;
         }
 
         public ChunkIndex GetLowestEntropyIndex()
@@ -147,7 +162,7 @@ namespace WaveFunctionCollapse
             float lowestEntropy = 10000;
             ChunkIndex index = new ChunkIndex();
 
-            foreach (Chunk chunk in Chunks.Values)
+            foreach (TChunk chunk in Chunks.Values)
             {
                 for (int x = 0; x < chunk.Cells.GetLength(0); x++)
                 for (int y = 0; y < chunk.Cells.GetLength(1); y++)
@@ -173,7 +188,7 @@ namespace WaveFunctionCollapse
             return index;
         }
         
-        public ChunkIndex GetLowestEntropyIndex(Chunk chunk)
+        public ChunkIndex GetLowestEntropyIndex(TChunk chunk)
         {
             float lowestEntropy = 10000;
             ChunkIndex index = new ChunkIndex();
@@ -298,7 +313,7 @@ namespace WaveFunctionCollapse
 
         public void Clear()
         {
-            foreach (Chunk chunk in Chunks.Values)
+            foreach (TChunk chunk in Chunks.Values)
             {
                 chunk.Clear(gameObjectPool);
             }
@@ -308,7 +323,7 @@ namespace WaveFunctionCollapse
 
         public bool AllCollapsed()
         {
-            foreach (Chunk chunk in Chunks.Values)
+            foreach (TChunk chunk in Chunks.Values)
             {
                 if (!chunk.AllCollapsed)
                 {
@@ -319,9 +334,9 @@ namespace WaveFunctionCollapse
             return true;
         }
         
-        public bool AllCollapsed(List<Chunk> chunks)
+        public bool AllCollapsed(List<TChunk> chunks)
         {
-            foreach (Chunk chunk in chunks)
+            foreach (TChunk chunk in chunks)
             {
                 if (!chunk.AllCollapsed)
                 {
@@ -356,56 +371,58 @@ namespace WaveFunctionCollapse
     }
 
     [Serializable]
-    public class Chunk
+    public class Chunk : IChunk
     {
 #if UNITY_EDITOR
         [FormerlySerializedAs("position")]
         [SerializeField, Sirenix.OdinInspector.ReadOnly]
         private Vector3 editorOnlyPosition;
 #endif
-
+        public event Action OnCleared;
+        
         // KEEP A SEPARATE ARRAY OF SPAWNED MESHES SO THAT I CAN DO VISUAL STUFF
         
         // In the Following order: Right, Left, Up, Down, Forward, Backward
-        public readonly Chunk[] AdjacentChunks;
-        public readonly Cell[,,] Cells;
+        public IChunk[] AdjacentChunks { get; private set; }
+        public Cell[,,] Cells { get; private set; }
 
-        [NonSerialized]
-        public List<GameObject> SpawnedMeshes = new List<GameObject>();
+        public List<GameObject> SpawnedMeshes { get; } = new List<GameObject>();
 
-        public readonly Vector3 Position;
-
-        public readonly int width;
-        public readonly int height;
-        public readonly int depth;
-
+        public Vector3 Position { get; private set;}
+        public int Width { get; private set;}
+        public int Height { get; private set;}
+        public int Depth { get; private set;}
         public int3 ChunkIndex { get; set; }
         public bool IsRemoved { get; set; }
         public bool UseSideConstraints { get; private set; }
         public bool IsClear { get; private set; } = true;
         public PrototypeInfoData PrototypeInfoData { get; set; }
-
+        
+        public Vector3Int ChunkSize => new Vector3Int(Width, Height, Depth);
+        
         public Cell this[int3 index]
         {
             get => Cells[index.x, index.y, index.z];
             set => Cells[index.x, index.y, index.z] = value;
         }
 
-        public Chunk(int _width, int _height, int _depth, int3 chunkIndex, Vector3 position, Chunk[] adjacentChunks, Vector3 gridScale, bool sideConstraints)
+        public IChunk Construct(int _width, int _height, int _depth, int3 chunkIndex, Vector3 position, IChunk[] adjacentChunks, Vector3 gridScale, bool sideConstraints)
         {
             Position = position;
             AdjacentChunks = adjacentChunks;
-            width = _width;
-            height = _height;
-            depth = _depth;
+            Width = _width;
+            Height = _height;
+            Depth = _depth;
             ChunkIndex = chunkIndex;
             UseSideConstraints = sideConstraints;
 
-            Cells = new Cell[width, height, depth];
+            Cells = new Cell[Width, Height, Depth];
 
 #if UNITY_EDITOR
             editorOnlyPosition = position;
 #endif
+
+            return this;
         }
 
         public bool AllCollapsed
@@ -434,9 +451,9 @@ namespace WaveFunctionCollapse
             PrototypeInfoData = prototypeInfoData;
             IsClear = false;
 
-            for (int z = 0; z < depth; z++)
-            for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++)
+            for (int z = 0; z < Depth; z++)
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
             {
                 int3 index = new int3(x, y, z);
                 Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z);
@@ -503,9 +520,9 @@ namespace WaveFunctionCollapse
         }
 
         private bool IsWithinBounds(int3 index) =>
-            index.x >= 0 && index.x < width &&
-            index.y >= 0 && index.y < height &&
-            index.z >= 0 && index.z < depth;
+            index.x >= 0 && index.x < Width &&
+            index.y >= 0 && index.y < Height &&
+            index.z >= 0 && index.z < Depth;
 
         /// <summary>
         /// Gets the directions of the index that are invalid
@@ -549,16 +566,16 @@ namespace WaveFunctionCollapse
             return direction switch
             {
                 0 => new int3(0, index.y, index.z), // Right
-                1 => new int3(width - 1, index.y, index.z), // Left
+                1 => new int3(Width - 1, index.y, index.z), // Left
                 2 => new int3(index.x, 0, index.z), // Up
-                3 => new int3(index.x, height - 1, index.z), // Down
+                3 => new int3(index.x, Height - 1, index.z), // Down
                 4 => new int3(index.x, index.y, 0), // Forward
-                5 => new int3(index.x, index.y, depth - 1), // Backward
+                5 => new int3(index.x, index.y, Depth - 1), // Backward
                 _ => throw new ArgumentOutOfRangeException(nameof(direction), "Invalid direction index")
             };
         }
 
-        public void SetAdjacentChunk(Chunk chunk, Direction direction, Stack<ChunkIndex> cellStack)
+        public void SetAdjacentChunk(IChunk chunk, Direction direction, Stack<ChunkIndex> cellStack)
         {
             int index = (int)direction;
             if (AdjacentChunks[index] != null && !AdjacentChunks[index].ChunkIndex.Equals(chunk.ChunkIndex))
@@ -573,12 +590,12 @@ namespace WaveFunctionCollapse
 
         private void UpdateCellsAlongSide(Direction sideDirection, Stack<ChunkIndex> cellStack)
         {
-            int startX = sideDirection == Direction.Right ? width - 1 : 0;
-            int maxX = sideDirection == Direction.Left ? 1 : width;
-            int startY = sideDirection == Direction.Up ? height - 1 : 0;
-            int maxY = sideDirection == Direction.Down ? 1 : height;
-            int startZ = sideDirection == Direction.Forward ? depth - 1 : 0;
-            int maxZ = sideDirection == Direction.Backward ? 1 : depth;
+            int startX = sideDirection == Direction.Right ? Width - 1 : 0;
+            int maxX = sideDirection == Direction.Left ? 1 : Width;
+            int startY = sideDirection == Direction.Up ? Height - 1 : 0;
+            int maxY = sideDirection == Direction.Down ? 1 : Height;
+            int startZ = sideDirection == Direction.Forward ? Depth - 1 : 0;
+            int maxZ = sideDirection == Direction.Backward ? 1 : Depth;
 
             for (int z = startZ; z < maxZ; z++)
             for (int y = startY; y < maxY; y++)
@@ -587,6 +604,16 @@ namespace WaveFunctionCollapse
                 int3 index = new int3(x, y, z);
                 bool isBottom = AdjacentChunks[3] == null && y == 0;
                 List<PrototypeData> prots = new List<PrototypeData>(isBottom ? PrototypeInfoData.Prototypes : PrototypeInfoData.NotBottomPrototypes);
+                if (UseSideConstraints)
+                {
+                    ConstrainBySides(index, prots);
+                }
+
+                Cells[x, y, z] = new Cell(false, this[index].Position, prots);
+            }
+            
+            void ConstrainBySides(int3 index, List<PrototypeData> prots)
+            {
                 List<Direction> directions = GetInvalidAdjacentSides(index, cellStack);
                 bool changed = false;
                 foreach (Direction direction in directions)
@@ -604,8 +631,6 @@ namespace WaveFunctionCollapse
                 {
                     cellStack.Push(new ChunkIndex(ChunkIndex, index));
                 }
-
-                Cells[x, y, z] = new Cell(false, this[index].Position, prots);
             }
         }
 
@@ -619,7 +644,39 @@ namespace WaveFunctionCollapse
                 pool.Push(SpawnedMeshes[i]);
                 SpawnedMeshes.RemoveAt(i);
             }
+            
+            OnCleared?.Invoke();
         }
+
+        /// <remarks>Does not use height</remarks>>
+        public bool ContainsPoint(Vector3 point, Vector3 scale)
+        {
+            return point.x < Position.x + Width * scale.x && point.x > Position.x
+                && point.z < Position.z + Depth * scale.z && point.z > Position.z;
+        }
+    }
+
+    public interface IChunk
+    {
+        public PrototypeInfoData PrototypeInfoData { get; }
+        public List<GameObject> SpawnedMeshes { get; }
+        public IChunk[] AdjacentChunks { get; }
+        public bool AllCollapsed { get; }
+        public int3 ChunkIndex { get; }
+        public Cell[,,] Cells { get; }
+        public bool IsRemoved { set; }
+        public bool IsClear { get; }
+        public Cell this[int3 index]
+        {
+            get => Cells[index.x, index.y, index.z];
+            set => Cells[index.x, index.y, index.z] = value;
+        }
+
+        public IChunk Construct(int _width, int _height, int _depth, int3 chunkIndex, Vector3 position, IChunk[] adjacentChunks, Vector3 gridScale, bool sideConstraints);
+        public void Clear(Stack<GameObject> pool);
+        public List<ChunkIndex> GetAdjacentCells(int3 cellIndex, out List<Direction> directions);
+        public void SetAdjacentChunk(IChunk chunk, Direction oppositeDirection, Stack<ChunkIndex> cellStack);
+        public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Stack<ChunkIndex> cellStack);
     }
 
     public static class ChunkWaveUtility
@@ -655,9 +712,9 @@ namespace WaveFunctionCollapse
         }
     }
 
-    public interface IChunkWaveFunction
+    public interface IChunkWaveFunction<TChunk> where TChunk : IChunk, new()
     {
-        public ChunkWaveFunction ChunkWaveFunction { get; }
+        public ChunkWaveFunction<TChunk> ChunkWaveFunction { get; }
         public Vector3 ChunkScale { get; }
     }
 }

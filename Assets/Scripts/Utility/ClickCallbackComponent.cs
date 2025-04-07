@@ -7,7 +7,7 @@ namespace Utility
     {
         public event Action OnClick;
 
-        private void OnMouseDown()
+        public void OnMouseDown()
         {
             OnClick?.Invoke();
         }

@@ -1,11 +1,10 @@
-using System;
+using Random = UnityEngine.Random;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Sirenix.OdinInspector;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using WaveFunctionCollapse;
 
-namespace Buildings
+namespace Chunks
 {
     public class TreeGrower : PooledMonoBehaviour
     {
@@ -25,13 +24,10 @@ namespace Buildings
         private int raycastCount = 100;
         
         public bool HasGrown { get; set; }
+        public Cell Cell { get; set; }
         
-        private void Start()
-        {
-            //GrowTrees();
-        }
+        //private List<PooledMonoBehaviour> spawnedTrees = new List<PooledMonoBehaviour>();
 
-        [Button]
         public async UniTask GrowTrees()
         {
             Vector3 offset = raycastArea.ToXyZ(1).MultiplyByAxis(transform.localScale) / 2.0f;
@@ -76,6 +72,7 @@ namespace Buildings
         {
             PooledMonoBehaviour tree = trees[Random.Range(0, trees.Length)];
             tree.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.AngleAxis(Random.value * 360, Vector3.up));
+            //spawnedTrees.Add(tree);
         }
 
         private static Material GetHitMaterial(Ray ray)
@@ -113,6 +110,16 @@ namespace Buildings
             return -1;
         }
 
+        public void Clear()
+        {
+            //for (int i = 0; i < spawnedTrees.Count; i++)
+            //{
+            //    spawnedTrees[i].gameObject.SetActive(false);
+            //}
+            //
+            //spawnedTrees.Clear();
+        }
+        
         private void OnDrawGizmosSelected()
         {
             Gizmos.DrawWireCube(transform.position + Vector3.up, raycastArea.ToXyZ(1).MultiplyByAxis(transform.localScale));

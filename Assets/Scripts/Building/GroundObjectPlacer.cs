@@ -24,7 +24,7 @@ public class GroundObjectPlacer : MonoBehaviour
         BuildingManager.Instance.OnLoaded -= PlaceObjects;
     }
 
-    private void PlaceObjects()
+    private void PlaceObjects(Chunk chunk) // MAKE WORK WITH CHUNKS!!!
     {
         for (int i = 0; i < groundObjectDatas.Length; i++)
         {
@@ -97,7 +97,7 @@ public class GroundObjectPlacer : MonoBehaviour
             }
         }
 
-        Debug.LogError("Could not find SpawnPoint");
+        Debug.Log("Could not find SpawnPoint");
         return Vector3.zero;
     }
 }
