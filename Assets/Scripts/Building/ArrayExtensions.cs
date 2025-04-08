@@ -19,6 +19,11 @@ public static class ArrayExtensions
     {
         return array.IsInBounds(index.x, index.y, index.z);
     }
+    
+    public static bool IsInBounds<T>(this T[,,] array, int3 index)
+    {
+        return array.IsInBounds(index.x, index.y, index.z);
+    }
 
     public static bool IsInBounds<T>(this T[,] array, int x, int y)
     {

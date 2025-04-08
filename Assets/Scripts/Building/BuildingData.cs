@@ -9,11 +9,11 @@ public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT 
 
     public BuildingCellInformation CellInformation {  get; private set; } 
     public PrototypeData Prototype { get; set; }
-    public int2 Index { get; set; }
+    public ChunkIndex Index { get; set; }
 
     public HealthComponent Health { get; set; }
 
-    public BuildingData(BuildingHandler buildingHandler, Stats stats, int2 index)
+    public BuildingData(BuildingHandler buildingHandler, Stats stats, ChunkIndex index)
     {
         handler = buildingHandler;
         Health = new HealthComponent(stats);

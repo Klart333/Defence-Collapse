@@ -16,15 +16,22 @@ namespace WaveFunctionCollapse
         private Vector3 editorOnlyPosition;
 #endif
         public event Action OnCleared;
+                
+        private PrototypeData unbuildablePrototype;
+        private List<PrototypeData> unbuildablePrototypeList;
         
-        // KEEP A SEPARATE ARRAY OF SPAWNED MESHES SO THAT I CAN DO VISUAL STUFF
+        public readonly List<(int3, Cell)> QueryChangedCells = new List<(int3, Cell)>();
+        public readonly List<int3> QueryCollapsedAir = new List<int3>();
         
+        private int3 queryIndex;
+        private bool shouldRemoveQueryIndex;
+
         // In the Following order: Right, Left, Up, Down, Forward, Backward
         public IChunk[] AdjacentChunks { get; private set; }
+        public IQueryWaveFunction Handler { get; set; }
         public Cell[,,] Cells { get; private set; }
-
+        public bool[,,] BuiltCells { get; private set; }
         public List<GameObject> SpawnedMeshes { get; } = new List<GameObject>();
-
         public Vector3 Position { get; private set;}
         public int Width { get; private set;}
         public int Height { get; private set;}
@@ -36,14 +43,14 @@ namespace WaveFunctionCollapse
         public PrototypeInfoData PrototypeInfoData { get; set; }
         
         public Vector3Int ChunkSize => new Vector3Int(Width, Height, Depth);
-        
+
         public Cell this[int3 index]
         {
             get => Cells[index.x, index.y, index.z];
             set => Cells[index.x, index.y, index.z] = value;
         }
 
-        public IChunk Construct(int _width, int _height, int _depth, int3 chunkIndex, Vector3 position, IChunk[] adjacentChunks, Vector3 gridScale, bool sideConstraints)
+        public IChunk Construct(int _width, int _height, int _depth, int3 chunkIndex, Vector3 position, IChunk[] adjacentChunks, bool sideConstraints)
         {
             Position = position;
             AdjacentChunks = adjacentChunks;
@@ -54,7 +61,11 @@ namespace WaveFunctionCollapse
             UseSideConstraints = sideConstraints;
 
             Cells = new Cell[Width, Height, Depth];
-
+            BuiltCells = new bool[Width, Height, Depth];
+            
+            unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 0, Array.Empty<int>());
+            unbuildablePrototypeList = new List<PrototypeData> { unbuildablePrototype };
+            
 #if UNITY_EDITOR
             editorOnlyPosition = position;
 #endif
@@ -85,6 +96,11 @@ namespace WaveFunctionCollapse
 
         public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Stack<ChunkIndex> cellStack)
         {
+            throw new System.NotImplementedException();
+        }
+        
+        public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Chunk groundChunk, BuildableCornerData cellBuildableCornerData, Vector3 offset)
+        {
             PrototypeInfoData = prototypeInfoData;
             IsClear = false;
 
@@ -92,37 +108,38 @@ namespace WaveFunctionCollapse
             for (int y = 0; y < Height; y++)
             for (int x = 0; x < Width; x++)
             {
-                int3 index = new int3(x, y, z);
-                Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z);
-
-                bool isBottom = AdjacentChunks[3] == null && y == 0;
-                List<PrototypeData> prots = new List<PrototypeData>(isBottom ? prototypeInfoData.Prototypes : prototypeInfoData.NotBottomPrototypes);
-                if (UseSideConstraints)
-                {
-                    ConstrainBySides(index, prots);
-                }
-
-                Cells[x, y, z] = new Cell(false, pos + Position, prots);
+                Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z) * 2 - offset;
+                Cells[x, y, z] = new Cell(false, Position + pos, new List<PrototypeData> { PrototypeData.Empty });
             }
-
-            void ConstrainBySides(int3 index, List<PrototypeData> prots)
+            
+            for (int z = 0; z < Depth; z++)
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
             {
-                List<Direction> directions = GetInvalidAdjacentSides(index, cellStack);
-                bool changed = false;
-                foreach (Direction direction in directions)
-                {
-                    for (int i = prots.Count - 1; i >= 0; i--)
-                    {
-                        if (prots[i].DirectionToKey(direction) == -1) continue;
+                int3 cellIndex = new int3(x, y, z);
+                int3 gridIndex = new int3(Mathf.FloorToInt(x * gridScale.x), 0, Mathf.FloorToInt(z * gridScale.z));
+                SetCellDependingOnGround(cellIndex, gridIndex); 
+            }
+            
+            void SetCellDependingOnGround(int3 cellIndex, int3 groundIndex)
+            {
+                Vector3 cellPosition = Cells[cellIndex.x, cellIndex.y, cellIndex.z].Position;
 
-                        prots.RemoveAtSwapBack(i);
-                        changed = true;
-                    }
-                }   
-                    
-                if (changed)
+                if (!groundChunk.Cells.IsInBounds(groundIndex.x, 0, groundIndex.z))
                 {
-                    cellStack.Push(new ChunkIndex(ChunkIndex, index));
+                    Debug.LogError("Not in bounds: " + groundIndex + ", cell: " + cellIndex);
+                    return;
+                }
+                Cell groundCell = groundChunk.Cells[groundIndex.x, 0, groundIndex.z];
+                Vector2Int corner = new Vector2Int((int)Mathf.Sign(groundCell.Position.x - cellPosition.x), (int)Mathf.Sign(groundCell.Position.z - cellPosition.z));
+
+                if (!cellBuildableCornerData.IsCornerBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner, out _))
+                {
+                    Cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(
+                        true,
+                        cellPosition,
+                        unbuildablePrototypeList,
+                        false);
                 }
             }
         }
@@ -284,5 +301,97 @@ namespace WaveFunctionCollapse
             
             OnCleared?.Invoke();
         }
+
+        /// <remarks>Does not use height</remarks>>
+        public bool ContainsPoint(Vector3 point, Vector3 scale)
+        {
+            return point.x < Position.x + Width * scale.x && point.x > Position.x 
+                && point.z < Position.z + Depth * scale.z && point.z > Position.z;
+        }
+        
+        #region Query
+
+        public void Place()
+        {
+            UncollapseAir();
+
+            shouldRemoveQueryIndex = false;
+            QueryChangedCells.Clear();
+        }
+        
+        private void UncollapseAir()
+        {
+            for (int i = 0; i < QueryCollapsedAir.Count; i++)
+            {
+                int3 index = QueryCollapsedAir[i];
+                bool fixedit = false;
+                for (int g = 0; g < QueryChangedCells.Count; g++)
+                {
+                    if (!index.Equals(QueryChangedCells[g].Item1)) continue;
+                
+                    fixedit = true;
+                    int3 changedIndex = QueryChangedCells[g].Item1;
+                    if (QueryChangedCells[g].Item2.Collapsed)
+                    {
+                        Handler.SetCell(new ChunkIndex(ChunkIndex,  changedIndex), QueryChangedCells[g].Item2.PossiblePrototypes[0], QueryCollapsedAir, false);
+                    }
+                    else
+                    {
+                        this[changedIndex] = QueryChangedCells[g].Item2;
+                    }
+                    break;
+                }
+            
+                if (!fixedit)
+                {
+                    this[index] = new Cell(false, this[index].Position, new List<PrototypeData> { PrototypeData.Empty });
+                }
+            }
+            QueryCollapsedAir.Clear();
+        }
+        
+        public void RevertQuery()
+        {
+            for (int i = 0; i < QueryChangedCells.Count; i++)
+            {
+                int3 index = QueryChangedCells[i].Item1;
+                if (QueryChangedCells[i].Item2.Collapsed)
+                {
+                    Handler.SetCell(new ChunkIndex(ChunkIndex, index), QueryChangedCells[i].Item2.PossiblePrototypes[0], QueryCollapsedAir, false);
+                }
+                else
+                {
+                    this[index] = QueryChangedCells[i].Item2;
+                }
+            }
+
+            if (shouldRemoveQueryIndex)
+            {
+                shouldRemoveQueryIndex = false;
+                BuiltCells[queryIndex.x, queryIndex.y, queryIndex.z] = false;
+            }
+        
+            QueryChangedCells.Clear();
+            QueryCollapsedAir.Clear();
+        }
+
+
+        public void Query(int3 queryIndex)
+        {
+            this.queryIndex = queryIndex;
+            
+            if (BuiltCells[queryIndex.x, queryIndex.y, queryIndex.z])
+            {
+                shouldRemoveQueryIndex = false;
+            }
+            else
+            {
+                shouldRemoveQueryIndex = true;
+                BuiltCells[queryIndex.x, queryIndex.y, queryIndex.z] = true;
+            }
+        }
+        
+        #endregion
+        
     }
 }

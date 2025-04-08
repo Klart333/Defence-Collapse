@@ -1,6 +1,7 @@
 using System;
 using Unity.Mathematics;
 using UnityEngine;
+using WaveFunctionCollapse;
 
 public class PlaceSquare : MonoBehaviour
 {
@@ -18,7 +19,7 @@ public class PlaceSquare : MonoBehaviour
     private MaterialPropertyBlock block;
     
     public BuildingPlacer Placer { get; set; }
-    public int2 Index { get; set; }
+    public ChunkIndex Index { get; set; }
     public int SquareIndex { get; set; }
     private bool Placed { get; set; }
 

@@ -682,6 +682,14 @@ namespace WaveFunctionCollapse
             new int2(0, -1),
         };
         
+        public static readonly List<int2> MarchDirections = new List<int2>
+        {
+            new int2(-1, -1),
+            new int2(0, -1),
+            new int2(0, 0), 
+            new int2(-1, 0),
+        };
+        
         public static float CalculateEntropy(Cell cell)
         {
             float totalWeight = 0;
@@ -718,6 +726,39 @@ namespace WaveFunctionCollapse
 
                 affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
                 changed = true;
+            }
+        }
+        
+        public static void Constrain(Cell changedCell, Cell affectedCell, Direction direction, HashSet<short> allowedKeys, out bool changed)
+        {
+            changed = false;
+            if (affectedCell.Collapsed) return;
+
+            HashSet<short> validKeys = new HashSet<short>();
+            for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
+            {
+                validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
+            }
+
+            var oppositeDirection = OppositeDirection(direction);
+            for (int i = affectedCell.PossiblePrototypes.Count - 1; i >= 0; i--)
+            {
+                PrototypeData prot = affectedCell.PossiblePrototypes[i];
+                if (!prot.Keys.Any(allowedKeys.Contains)) // Could be pre-calculated based on prototype
+                {
+                    affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
+                    continue;
+                }
+
+                if (CheckValidSocket(prot.DirectionToKey(oppositeDirection), validKeys)) continue;
+
+                affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
+                changed = true;
+            }
+            
+            if (affectedCell.PossiblePrototypes.Count == 0)
+            {
+                affectedCell.PossiblePrototypes.Add(PrototypeData.Empty);
             }
         }
 

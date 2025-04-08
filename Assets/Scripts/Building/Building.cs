@@ -64,7 +64,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public PrototypeData Prototype { get; private set; }
     public int BuildingGroupIndex { get; set; } = -1;
-    public int2 Index { get; private set; }
+    public ChunkIndex Index { get; private set; }
     public int Importance => 1;
 
     private bool Hovered => cornerColliders.Any(x => x.IsHovered);
@@ -192,7 +192,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void Setup(PrototypeData prototypeData, Vector3 scale)
     {
-        int2? nullableIndex = BuildingManager.Instance.GetIndex(transform.position);
+        ChunkIndex? nullableIndex = BuildingManager.Instance.GetIndex(transform.position);
         if (!nullableIndex.HasValue) return;
         
         Index = nullableIndex.Value;
@@ -234,6 +234,12 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void ToggleIsBuildableVisual(bool isQueried)
     {
+        if (Prototype.MeshRot.Mesh == null)
+        {
+            Debug.Log("Placing air");
+            return;
+        }
+        
         if (isQueried)
         {
             MeshRenderer.SetMaterials(transparentMaterials);

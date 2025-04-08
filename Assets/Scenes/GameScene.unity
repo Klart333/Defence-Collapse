@@ -594,12 +594,12 @@ MonoBehaviour:
       Data: 
     - Name: BuildingData
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[Unity.Mathematics.int2, Unity.Mathematics],[BuildingData,
-        Core]], mscorlib
+      Data: 2|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.ChunkIndex,
+        Core],[BuildingData, Core]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[Unity.Mathematics.int2,
-        Unity.Mathematics]], mscorlib
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[WaveFunctionCollapse.ChunkIndex,
+        Core]], mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -1098,7 +1098,6 @@ MonoBehaviour:
   minZoomDistance: 1
   maxZoomDistance: 40
   panSensitivity: 1
-  invertPan: 0
 --- !u!1 &332985429
 GameObject:
   m_ObjectHideFlags: 0
@@ -3608,7 +3607,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shouldDestroyOnLoad: 1
-  cellSize: 0.5
+  waveFunction:
+    gridScale: {x: 0.5, y: 0.5, z: 0.5}
+    materialData: {fileID: 11400000, guid: 64f0dca35d7079143abbf4da786afcf2, type: 2}
   townPrototypeInfo: {fileID: 11400000, guid: 02f9ef3e110b83748bc36550093a3e44, type: 2}
   keyData: {fileID: 11400000, guid: 0d5537a423659514aa3f257234abfd92, type: 2}
   buildingPrefab: {fileID: 9181347496856605909, guid: b8bcd53eb944bfd439964e02af899b2e,
@@ -3619,8 +3620,6 @@ MonoBehaviour:
     type: 2}
   unableToPlacePrefab: {fileID: -7155613184035295475, guid: 37457fca56525af4bab8884b7e239b05,
     type: 3}
-  DebugPropagate: 0
-  Speed: 45
 --- !u!114 &771210306
 MonoBehaviour:
   m_ObjectHideFlags: 0

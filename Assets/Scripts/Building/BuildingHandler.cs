@@ -11,7 +11,7 @@ using WaveFunctionCollapse;
 public class BuildingHandler : SerializedMonoBehaviour 
 {
     public Dictionary<int, List<Building>> BuildingGroups = new Dictionary<int, List<Building>>();
-    public Dictionary<int2, BuildingData> BuildingData = new Dictionary<int2, BuildingData>();
+    public Dictionary<ChunkIndex, BuildingData> BuildingData = new Dictionary<ChunkIndex, BuildingData>();
 
     [Title("Mesh Information")]
     [SerializeField]
@@ -35,7 +35,7 @@ public class BuildingHandler : SerializedMonoBehaviour
     private int groupIndexCounter;
     private bool chilling;
 
-    public BuildingData this[Building building] => BuildingData.GetValueOrDefault(building.Index);  // I like this way too much
+    public BuildingData this[Building building] => BuildingData.GetValueOrDefault(building.Index); 
 
     #region Handling Groups
 
@@ -140,7 +140,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private bool IsAdjacent(Building building1, Building building2)
     {
-        int2 indexDiff = building1.Index - building2.Index;
+        int2 indexDiff = building1.Index.CellIndex.xz - building2.Index.CellIndex.xz;
         if (math.abs(indexDiff.x) + math.abs(indexDiff.y) > 1)
         {
             //print("Diff: " + indexDiff + " has magnitude: " + indexDiff.magnitude);
@@ -164,7 +164,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         }
     }
 
-    public void BuildingDestroyed(int2 buildingIndex)
+    public void BuildingDestroyed(ChunkIndex buildingIndex)
     {
         Building building = GetBuilding(buildingIndex);
         if (building == null)
@@ -181,13 +181,13 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     #region Utility
 
-    public Building GetBuilding(int2 buildingIndex)
+    public Building GetBuilding(ChunkIndex buildingIndex)
     {
         foreach (List<Building> list in BuildingGroups.Values)
         {
             foreach (Building building in list)
             {
-                if (math.all(building.Index == buildingIndex))
+                if (building.Index.Equals(buildingIndex))
                 {
                     return building;
                 }
@@ -256,7 +256,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         unSelectedBuildings.Clear();
     }
 
-    public void DislpayLevelUp(int2 index)
+    public void DislpayLevelUp(ChunkIndex index)
     {
         GetBuilding(index).DisplayLevelUp();
     }

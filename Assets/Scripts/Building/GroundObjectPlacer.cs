@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
@@ -24,7 +26,7 @@ public class GroundObjectPlacer : MonoBehaviour
         BuildingManager.Instance.OnLoaded -= PlaceObjects;
     }
 
-    private void PlaceObjects(Chunk chunk) // MAKE WORK WITH CHUNKS!!!
+    private void PlaceObjects(QueryMarchedChunk chunk) // MAKE WORK WITH CHUNKS!!!
     {
         for (int i = 0; i < groundObjectDatas.Length; i++)
         {
@@ -35,13 +37,18 @@ public class GroundObjectPlacer : MonoBehaviour
     private void PlaceData(GroundObjectData data)
     {
         int amount = Mathf.RoundToInt(data.SpawnAmountRange.Random());
+        int3[] keys = Array.Empty<int3>();
+        if (data.SpawnOnGrid)
+        {
+            keys = BuildingManager.Instance.ChunkWaveFunction.Chunks.Keys.ToArray();
+        }
 
         for (int i = 0; i < amount; i++)
         {
             Vector3 position = Vector3.zero;
             if (data.SpawnOnGrid)
             {
-                position = GetRandomGridIndex(data.ObjectGridSize, out int2 index);
+                position = GetRandomGridIndex(data.ObjectGridSize, keys, out ChunkIndex index);
             }
 
             GameObject spawnedObject = data.Prefab.GetAtPosAndRot<PooledMonoBehaviour>(position, Quaternion.identity).gameObject;
@@ -49,11 +56,14 @@ public class GroundObjectPlacer : MonoBehaviour
         }
     }
 
-    private Vector3 GetRandomGridIndex(Vector2Int objectGridSize, out int2 index)
+    private Vector3 GetRandomGridIndex(Vector2Int objectGridSize, int3[] keys, out ChunkIndex index)
     {
+        int3 chunkIndex = keys[UnityEngine.Random.Range(0, keys.Length)];
+        QueryMarchedChunk chunk = BuildingManager.Instance.ChunkWaveFunction.Chunks[chunkIndex];
+        
         const int y = 0;
-        int cellsWidth = BuildingManager.Instance.Cells.GetLength(0);
-        int cellsDepth = BuildingManager.Instance.Cells.GetLength(1);
+        int cellsWidth = chunk.Width;
+        int cellsDepth = chunk.Depth;
         int startX = UnityEngine.Random.Range(0, cellsWidth);
         int startZ = UnityEngine.Random.Range(0, cellsDepth);
         index = default;
@@ -74,10 +84,8 @@ public class GroundObjectPlacer : MonoBehaviour
                             valid = false;
                             break;
                         }
-
-                        int2 cellIndex = new int2(xIndex, zIndex);
-
-                        Cell cell = BuildingManager.Instance[cellIndex];
+                        
+                        Cell cell = chunk.Cells[xIndex, y, zIndex];
                         if (!cell.Buildable)
                         {
                             valid = false;
@@ -91,8 +99,8 @@ public class GroundObjectPlacer : MonoBehaviour
                     continue;
                 }
 
-                index = new int2((startX + ex) % cellsWidth, (startZ + ze) % cellsDepth);
-                Vector3 pos = BuildingManager.Instance[index].Position + new Vector3(1, 0, 1) * BuildingManager.Instance.CellSize;
+                index = new ChunkIndex(chunkIndex, new int3((startX + ex) % cellsWidth, 0, (startZ + ze) % cellsDepth) );
+                Vector3 pos = chunk[index.CellIndex].Position + new Vector3(BuildingManager.Instance.ChunkScale.x, 0, BuildingManager.Instance.ChunkScale.z);
                 return pos;
             }
         }

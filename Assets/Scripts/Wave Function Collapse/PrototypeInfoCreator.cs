@@ -636,7 +636,9 @@ namespace WaveFunctionCollapse
         {
             PosX, NegX, PosY, NegY, PosZ, NegZ
         };
-        
+
+        public static PrototypeData Empty { get; set; } = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 1, Array.Empty<int>());
+
         public readonly short DirectionToKey(Direction direction) => direction switch 
         {
             Direction.Right => PosX,
@@ -705,27 +707,6 @@ namespace WaveFunctionCollapse
             //sb.Append("Weight: ").Append(Weight);
             sb.Append("}"); 
             return sb.ToString();
-        }
-    }
-
-    public static class ListExtensions
-    {
-        public static bool LooseEquals<T>(this List<T> vec1, List<T> vec2)
-        {
-            if (vec1.Count != vec2.Count)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < vec2.Count; i++)
-            {
-                if (!vec1.Contains(vec2[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 

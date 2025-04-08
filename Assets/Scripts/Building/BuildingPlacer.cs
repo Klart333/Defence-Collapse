@@ -21,29 +21,31 @@ public class BuildingPlacer : MonoBehaviour
     private PlaceSquare placeSquarePrefab;
 
     private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
-    private readonly Dictionary<int2, PlaceSquare> spawnedSpawnPlaces = new Dictionary<int2, PlaceSquare>();
+    private readonly Dictionary<ChunkIndex, PlaceSquare> spawnedSpawnPlaces = new Dictionary<ChunkIndex, PlaceSquare>();
 
     private GroundGenerator groundGenerator;
     private Vector3 targetScale;
     
     private bool manualCancel;
     private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
-    public int2? SquareIndex { get; set; }
+    public ChunkIndex? SquareIndex { get; set; }
     public int SpawnSquareIndex { get; set; }
 
-    private void OnEnable()
+    private async void OnEnable()
     {
         Events.OnBuildingCanceled += OnBuildingCanceled;
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
-        groundGenerator.OnChunkGenerated += InitializeSpawnPlaces;
         
         Events.OnBuildingDestroyed += OnBuildingDestroyed;
+        
+        await UniTask.WaitUntil(() => BuildingManager.Instance != null);
+        BuildingManager.Instance.OnLoaded += InitializeSpawnPlaces;
     }
     
     private void OnDisable()
     {
         Events.OnBuildingCanceled -= OnBuildingCanceled;
-        groundGenerator.OnChunkGenerated -= InitializeSpawnPlaces;
+        BuildingManager.Instance.OnLoaded -= InitializeSpawnPlaces;
         Events.OnBuildingDestroyed -= OnBuildingDestroyed;
     }
 
@@ -52,44 +54,32 @@ public class BuildingPlacer : MonoBehaviour
         Events.OnBuildingPurchased += BuildingPurchased;
     }
     
-    private void InitializeSpawnPlaces(Chunk chunk)
+    private void InitializeSpawnPlaces(QueryMarchedChunk chunk)
     {
-        if (BuildingManager.Instance is null) return;
-        
-        InitalizeSpawnPlacesAsync().Forget(ex =>
+        targetScale = groundGenerator.ChunkWaveFunction.GridScale.MultiplyByAxis(BuildingManager.Instance.ChunkWaveFunction.GridScale);
+        for (int x = 0; x < chunk.Width - 1; x++)
         {
-            Debug.LogError($"Async function failed: {ex}");
-        });
-    }
-
-    private async UniTask InitalizeSpawnPlacesAsync()
-    {
-        await UniTask.WaitUntil(() => BuildingManager.Instance.Cells != null);
-        
-        targetScale = groundGenerator.ChunkWaveFunction.GridScale * BuildingManager.Instance.CellSize;
-        for (int z = 0; z < BuildingManager.Instance.Cells.GetLength(1) - 1; z++)
-        {
-            for (int x = 0; x < BuildingManager.Instance.Cells.GetLength(0) - 1; x++)
+            for (int z = 0; z < chunk.Depth - 1; z++)
             {
-                int2 index = new int2(x, z);
-                if (spawnedSpawnPlaces.ContainsKey(index)
-                    || !BuildingManager.Instance.Cells[x, z].Buildable
-                    || !BuildingManager.Instance.Cells[x + 1, z].Buildable
-                    || !BuildingManager.Instance.Cells[x, z + 1].Buildable
-                    || !BuildingManager.Instance.Cells[x + 1, z + 1].Buildable) continue;
-                    
-                Vector3 pos = BuildingManager.Instance.Cells[x, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
+                ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
+                if (spawnedSpawnPlaces.ContainsKey(chunkIndex)
+                    || !chunk.Cells[x, 0, z].Buildable
+                    || !chunk.Cells[x + 1, 0, z].Buildable
+                    || !chunk.Cells[x, 0, z + 1].Buildable
+                    || !chunk.Cells[x + 1, 0, z + 1].Buildable) continue;
+
+                Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
                 PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
                 placeSquare.Placer = this;
-                placeSquare.Index = index;
+                placeSquare.Index = chunkIndex;
                 placeSquare.transform.localScale = targetScale * 0.95f;
                 placeSquare.transform.SetParent(transform, true);
                 placeSquare.gameObject.SetActive(false);
                 placeSquare.SquareIndex = spawnedSpawnPlaces.Count;
-                spawnedSpawnPlaces.Add(index, placeSquare);
+                spawnedSpawnPlaces.Add(chunkIndex, placeSquare);
+            
             }
         }
-
     }
     
     private void OnBuildingCanceled()
@@ -108,15 +98,15 @@ public class BuildingPlacer : MonoBehaviour
         
         ToggleSpawnPlaces(true);
 
-        int2 queryIndex = new int2();
-        Dictionary<int2, IBuildable> buildables = new Dictionary<int2, IBuildable>();
+        ChunkIndex queryIndex = new ChunkIndex();
+        Dictionary<ChunkIndex, IBuildable> buildables = new Dictionary<ChunkIndex, IBuildable>();
         while (!Canceled)
         {
             await UniTask.Yield();
 
             if (!SquareIndex.HasValue) continue;
 
-            if (math.all(queryIndex == SquareIndex.Value))
+            if (queryIndex.Equals(SquareIndex.Value))
             {
                 if (buildables.Count > 0 && InputManager.Instance.Fire.WasPerformedThisFrame())
                 {
@@ -134,14 +124,14 @@ public class BuildingPlacer : MonoBehaviour
             queryIndex = SquareIndex.Value;
             buildables = BuildingManager.Instance.Query(queryIndex, type);
             
-            foreach (var item in buildables)
+            foreach (IBuildable item in buildables.Values)
             {
-                item.Value.ToggleIsBuildableVisual(true);
+                item.ToggleIsBuildableVisual(true);
             }
             
             if (buildables.Count == 0) 
             {
-                ShowUnablePlaces(BuildingManager.Instance.GetCellsToCollapse(queryIndex, type).Select(x => BuildingManager.Instance.GetPos(x) + Vector3.up * BuildingManager.Instance.CellSize / 2.0f).ToList());
+                ShowUnablePlaces(BuildingManager.Instance.GetCellsToCollapse(queryIndex).Select(x => BuildingManager.Instance.GetPos(new ChunkIndex(queryIndex.Index, x)) + Vector3.up * BuildingManager.Instance.ChunkScale.y / 2.0f).ToList());
                 continue;
             }
 

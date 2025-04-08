@@ -53,7 +53,7 @@ namespace WaveFunctionCollapse
         private BlobAssetReference<Collider> blobCollider;
 
         public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
-        public Vector3 ChunkScale => Vector3.one * 16;
+        public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.GridScale.x, chunkSize.y * ChunkWaveFunction.GridScale.y, chunkSize.z * ChunkWaveFunction.GridScale.z);
         
         private void Start()
         {
