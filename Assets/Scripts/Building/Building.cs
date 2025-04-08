@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using Cysharp.Threading.Tasks;
 using DataStructures.Queue.ECS;
-using Pathfinding;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
-using Unity.Mathematics;
-using UnityEngine.Events;
-using UnityEngine;
 using WaveFunctionCollapse;
+using UnityEngine.Events;
+using System.Linq;
+using Pathfinding;
+using UnityEngine;
 
 public class Building : PooledMonoBehaviour, IBuildable
 {
@@ -51,14 +50,13 @@ public class Building : PooledMonoBehaviour, IBuildable
     
     private List<Material> transparentMaterials = new List<Material>();
 
-    private BuildingHandler buildingHandler;
     private BuildingAnimator buildingAnimator;
+    private BuildingHandler buildingHandler;
     private MeshRenderer meshRenderer;
     private BuildingUI buildingUI;
 
-    private int originalLayer;
-    
     private bool purchasing = true;
+    private int originalLayer;
     private bool highlighted;
     private bool selected;
 
@@ -234,19 +232,17 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void ToggleIsBuildableVisual(bool isQueried)
     {
-        if (Prototype.MeshRot.Mesh == null)
-        {
-            Debug.Log("Placing air");
-            return;
-        }
-        
         if (isQueried)
         {
             MeshRenderer.SetMaterials(transparentMaterials);
         }
         else
         {
-            MeshRenderer.SetMaterials(materialData.GetMaterials(Prototype.MaterialIndexes));
+            if (Prototype.MaterialIndexes != null)
+            {
+                MeshRenderer.SetMaterials(materialData.GetMaterials(Prototype.MaterialIndexes));
+            }
+            
             Place();
         }
     }

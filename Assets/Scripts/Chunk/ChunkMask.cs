@@ -17,6 +17,8 @@ namespace Chunks
 
         private MaterialPropertyBlock block;
 
+        public Adjacencies Adjacencies { get; private set; }
+        
         private void OnEnable()
         {
             block = new MaterialPropertyBlock();
@@ -51,6 +53,7 @@ namespace Chunks
 
         public void SetAdjacencies(Adjacencies adjacencies)
         {
+            Adjacencies = adjacencies;
             block.SetFloat(North, (adjacencies & Adjacencies.North) > 0 ? 1 : 0);
             block.SetFloat(South, (adjacencies & Adjacencies.South) > 0 ? 1 : 0);
             block.SetFloat(East, (adjacencies & Adjacencies.East) > 0 ? 1 : 0);

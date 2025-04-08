@@ -23,6 +23,10 @@ namespace Chunks
         [SerializeField]
         private float fadeOut = 0.5f;
         
+        [Title("Edge Threshold")]
+        [SerializeField]
+        private float distanceThreshold = 4f;
+        
         private readonly Dictionary<IChunk, ChunkMask> masks = new Dictionary<IChunk, ChunkMask>();
 
         private void OnEnable()
@@ -58,6 +62,32 @@ namespace Chunks
         public bool IsMasked(Chunk chunk, Cell cell)
         {
             if (!masks.TryGetValue(chunk, out ChunkMask mask))
+            {
+                return false;
+            }
+
+            Vector3 relativePosition = (cell.Position + groundGenerator.ChunkWaveFunction.GridScale / 2.0f) - chunk.Position;
+
+            if ((mask.Adjacencies & Adjacencies.North) > 0 
+                && groundGenerator.ChunkScale.z - relativePosition.z < distanceThreshold)
+            {
+                return false;
+            }
+            
+            if ((mask.Adjacencies & Adjacencies.South) > 0 
+                && relativePosition.z < distanceThreshold)
+            {
+                return false;
+            }
+            
+            if ((mask.Adjacencies & Adjacencies.East) > 0 
+                && groundGenerator.ChunkScale.x - relativePosition.x < distanceThreshold)
+            {
+                return false;
+            }
+            
+            if ((mask.Adjacencies & Adjacencies.West) > 0 
+                && relativePosition.x < distanceThreshold)
             {
                 return false;
             }

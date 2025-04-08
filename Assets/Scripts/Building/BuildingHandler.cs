@@ -84,7 +84,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private BuildingData CreateData(Building building)
     {
-        if (!towerMeshData.TowerMeshes.TryGetValue(building.Prototype.MeshRot.Mesh, out BuildingCellInformation cellInfo))
+        if (building.Prototype.MeshRot.Mesh != null && !towerMeshData.TowerMeshes.TryGetValue(building.Prototype.MeshRot.Mesh, out BuildingCellInformation cellInfo))
         {
             //Debug.Log("Please add all meshes to the list");
 
