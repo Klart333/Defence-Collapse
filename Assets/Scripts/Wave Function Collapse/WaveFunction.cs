@@ -661,17 +661,7 @@ namespace WaveFunctionCollapse
             return sb.ToString();
         }
     }
-
-    public enum Direction
-    {
-        Right,
-        Left,
-        Up,
-        Down,
-        Forward,
-        Backward
-    }
-
+    
     public static class WaveFunctionUtility
     {
         public static readonly int2[] NeighbourDirections = new []

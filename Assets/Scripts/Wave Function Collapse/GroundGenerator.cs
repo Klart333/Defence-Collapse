@@ -1,6 +1,7 @@
 using MeshCollider = Unity.Physics.MeshCollider;
 using Material = Unity.Physics.Material;
 using Collider = Unity.Physics.Collider;
+using System.Collections.Generic;
 using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
@@ -12,8 +13,8 @@ using Unity.Entities;
 using Unity.Physics;
 using UnityEngine;
 using System;
-using System.Collections.Generic;
 using Chunks;
+using Enemy;
 
 namespace WaveFunctionCollapse
 {
@@ -46,6 +47,16 @@ namespace WaveFunctionCollapse
         [Title("References")]
         [SerializeField]
         private ChunkMaskHandler chunkMaskHandler;
+
+        [Title("Enemy Spawning")]
+        [SerializeField]
+        private EnemySpawnHandler enemySpawnHandler; 
+        
+        [SerializeField]
+        private int fullTreeIndex = 1;
+        
+        [SerializeField]
+        private int enemyGateIndex = 1;
         
         [Title("Debug")]
         [SerializeField]
@@ -140,6 +151,8 @@ namespace WaveFunctionCollapse
                 Chunk adjacent = waveFunction.LoadChunk(chunkIndex, chunkSize, defaultPrototypeInfoData, false);
                 chunkMaskHandler.CreateMask(adjacent, Math.IntToAdjacency(new int2(-x, -z)));
                 adjacentChunks.Add(adjacent);
+                
+                SetEnemySpawn(adjacent, DirectionUtility.Int2ToDirection(new int2(-x, -z)));
             }
 
             waveFunction.Propagate();
@@ -149,7 +162,54 @@ namespace WaveFunctionCollapse
                 OnLockedChunkGenerated?.Invoke(adjacentChunks[i]);
             }
         }
-        
+
+        private void SetEnemySpawn(Chunk chunk, Direction direction)
+        {
+            if (direction == Direction.Right)
+            {
+                int x = chunk.Width - 1;
+                float middle = (chunk.Depth - 1) / 2.0f;
+                for (int z = 1; z < chunk.Depth - 1; z++)
+                {
+                    List<PrototypeData> prots;
+                    if (Mathf.Abs(middle - z) <= 1)
+                    {
+                        prots = new List<PrototypeData>
+                        {
+                            defaultPrototypeInfoData.Prototypes[enemyGateIndex], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 1], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 2], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 3]
+                        };
+                    }
+                    else
+                    {
+                        prots = new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[fullTreeIndex] };
+                    }
+
+                    chunk.Cells[x, 0, z] = new Cell(false, chunk.Cells[x, 0, z].Position, prots);
+                    ChunkIndex index = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
+                    waveFunction.CellStack.Push(index);
+                }
+
+                Vector3 pos = (chunk.Cells[x, 0, Mathf.FloorToInt(middle)].Position + chunk.Cells[x, 0, Mathf.CeilToInt(middle)].Position) / 2.0f;
+                enemySpawnHandler.SetEnemySpawn(pos, chunk.ChunkIndex);
+            }
+            
+            if (direction == Direction.Left)
+            {
+                int x = 0;
+                float middle = (chunk.Depth - 1) / 2.0f;
+                for (int z = 1; z < chunk.Depth - 1; z++)
+                {
+                    List<PrototypeData> prots = Mathf.Abs(middle - z) <= 1 
+                        ? new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[enemyGateIndex], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 1], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 2], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 3] } 
+                        : new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[fullTreeIndex] };
+                    
+                    chunk.Cells[x, 0, z] = new Cell(false, chunk.Cells[x, 0, z].Position, prots);
+                    ChunkIndex index = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
+                    waveFunction.CellStack.Push(index);
+                }
+            }
+        }
+
         private void CombineMeshes()
         {
             Mesh mesh = GetComponent<MeshCombiner>().CombineMeshes();

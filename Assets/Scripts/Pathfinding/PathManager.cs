@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using Unity.Jobs;
 using System;
+using WaveFunctionCollapse;
 
 namespace Pathfinding
 {
@@ -196,11 +197,7 @@ namespace Pathfinding
 
         #region Static
 
-        public static int GetIndex(float xPos, float zPos, float cellScale, int gridWidth)
-        {
-            return Math.GetMultiple(xPos + HALF_BUILDING_CELL, cellScale) + Math.GetMultiple(zPos + HALF_BUILDING_CELL, cellScale) * gridWidth;
-        }
-
+        
         public static float2 ByteToDirection(byte directionByte)
         {
             float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees
@@ -211,6 +208,11 @@ namespace Pathfinding
         {
             float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees
             return new float3(math.cos(angleRad), y, math.sin(angleRad));
+        }
+        
+        public static int GetIndex(float xPos, float zPos, float cellScale, int gridWidth)
+        {
+            return Math.GetMultiple(xPos + HALF_BUILDING_CELL, cellScale) + Math.GetMultiple(zPos + HALF_BUILDING_CELL, cellScale) * gridWidth;
         }
 
         #endregion

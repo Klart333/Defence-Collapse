@@ -6,21 +6,8 @@ using UnityEngine;
 
 namespace Enemy
 {
-    public class Portal : PooledMonoBehaviour
+    public class EnemySpawnPoint : PooledMonoBehaviour
     {
-        [Title("Portal")]
-        [SerializeField]
-        private LayerMask regularMask;
-
-        [SerializeField]
-        private LayerMask hoverMask;
-
-        [SerializeField]
-        private MeshRenderer[] renderers;
-
-        [SerializeField]
-        private GameObject unlockCanvas;
-
         [Title("Spawning")]
         [SerializeField]
         private SpawnDataUtility spawnDataUtility;
@@ -34,10 +21,7 @@ namespace Enemy
 
         private int spawnLevel;
         private int waveLevel;
-        private bool hovered;
         
-        public bool Locked { get; private set; } = true;
-
         private void Awake()
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -53,56 +37,16 @@ namespace Enemy
             base.OnDisable();
             
             Events.OnWaveStarted -= OnWaveStarted;
-        }
-
-        private void Update()
-        {
-            if (unlockCanvas.activeSelf && !hovered && InputManager.Instance.GetFire && !InputManager.Instance.MouseOverUI())
+            
+            foreach (Entity entity in entities)
             {
-                unlockCanvas.SetActive(false);
+                entityManager.DestroyEntity(entity);
             }
-        }
-
-        private void OnMouseEnter()
-        {
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                renderers[i].gameObject.layer = (int)Mathf.Log(hoverMask.value, 2);
-            }
-
-            hovered = true;
-        }
-
-        private void OnMouseExit()
-        {
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                renderers[i].gameObject.layer = (int)Mathf.Log(regularMask.value, 2);
-            }
-
-            hovered = false;
-        }
-
-        private void OnMouseDown()
-        {
-            if (!Locked)
-            {
-                return;
-            }
-
-            unlockCanvas.SetActive(true);
-        }
-
-        public void Unlock()
-        {
-            Locked = false;
-            unlockCanvas.SetActive(false);
         }
 
         private void OnWaveStarted()
         {
             waveLevel++;
-            if (Locked) return;
 
             if (spawnLevel % spawnerFrequency == 0)
             {
@@ -128,7 +72,7 @@ namespace Enemy
                 typeof(SpawnPointComponent),
             };
         
-             var entity = entityManager.CreateEntity(componentTypes);
+            var entity = entityManager.CreateEntity(componentTypes);
             entityManager.SetComponentData(entity, new LocalTransform
             {
                 Position = transform.position,

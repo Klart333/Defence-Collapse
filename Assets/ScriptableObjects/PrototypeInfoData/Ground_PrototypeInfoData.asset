@@ -19,9 +19,9 @@ MonoBehaviour:
     - {fileID: 8254687373856176130, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
     - {fileID: -6640059162581359784, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
     - {fileID: 6015863633982791618, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
+    - {fileID: 3953289173884318016, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
     - {fileID: 5332504404861797108, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
     - {fileID: 584684585022501903, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
-    - {fileID: 3953289173884318016, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
     - {fileID: -3676194533806895147, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
@@ -124,7 +124,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 4
+      Data: 0.8
     - Name: MaterialIndexes
       Entry: 7
       Data: 2|System.Int32[], mscorlib
@@ -343,13 +343,13 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 2001
+      Data: 1002
     - Name: NegX
       Entry: 3
-      Data: 2000
+      Data: 1002
     - Name: PosZ
       Entry: 3
-      Data: 1002
+      Data: 2
     - Name: NegZ
       Entry: 3
       Data: 2
@@ -361,7 +361,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 1
+      Data: 2
     - Name: MaterialIndexes
       Entry: 7
       Data: 4|System.Int32[], mscorlib
@@ -400,55 +400,13 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
+      Data: 2
+    - Name: NegX
+      Entry: 3
+      Data: 2
+    - Name: PosZ
+      Entry: 3
       Data: 1002
-    - Name: NegX
-      Entry: 3
-      Data: 2
-    - Name: PosZ
-      Entry: 3
-      Data: 2000
-    - Name: NegZ
-      Entry: 3
-      Data: 2001
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 3
-    - Name: Rot
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2000
-    - Name: NegX
-      Entry: 3
-      Data: 2001
-    - Name: PosZ
-      Entry: 3
-      Data: 2
     - Name: NegZ
       Entry: 3
       Data: 1002
@@ -460,49 +418,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: Mesh
-      Entry: 10
-      Data: 3
-    - Name: Rot
-      Entry: 3
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
       Data: 2
-    - Name: NegX
-      Entry: 3
-      Data: 1002
-    - Name: PosZ
-      Entry: 3
-      Data: 2001
-    - Name: NegZ
-      Entry: 3
-      Data: 2000
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 1
     - Name: MaterialIndexes
       Entry: 9
       Data: 4
@@ -526,13 +442,13 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 1002
+      Data: 2001
     - Name: NegX
       Entry: 3
       Data: 2000
     - Name: PosZ
       Entry: 3
-      Data: 2000
+      Data: 1002
     - Name: NegZ
       Entry: 3
       Data: 2
@@ -553,10 +469,10 @@ MonoBehaviour:
       Data: 2
     - Name: 
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 13
       Data: 
@@ -583,7 +499,7 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 2000
+      Data: 1002
     - Name: NegX
       Entry: 3
       Data: 2
@@ -592,7 +508,7 @@ MonoBehaviour:
       Data: 2000
     - Name: NegZ
       Entry: 3
-      Data: 1002
+      Data: 2001
     - Name: PosY
       Entry: 3
       Data: -1
@@ -628,13 +544,13 @@ MonoBehaviour:
       Data: 2000
     - Name: NegX
       Entry: 3
-      Data: 1002
+      Data: 2001
     - Name: PosZ
       Entry: 3
       Data: 2
     - Name: NegZ
       Entry: 3
-      Data: 2000
+      Data: 1002
     - Name: PosY
       Entry: 3
       Data: -1
@@ -670,10 +586,10 @@ MonoBehaviour:
       Data: 2
     - Name: NegX
       Entry: 3
-      Data: 2000
+      Data: 1002
     - Name: PosZ
       Entry: 3
-      Data: 1002
+      Data: 2001
     - Name: NegZ
       Entry: 3
       Data: 2000
@@ -712,10 +628,10 @@ MonoBehaviour:
       Data: 1002
     - Name: NegX
       Entry: 3
-      Data: 1002
+      Data: 2000
     - Name: PosZ
       Entry: 3
-      Data: 2
+      Data: 2000
     - Name: NegZ
       Entry: 3
       Data: 2
@@ -727,7 +643,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 2
+      Data: 1
     - Name: MaterialIndexes
       Entry: 7
       Data: 6|System.Int32[], mscorlib
@@ -736,10 +652,10 @@ MonoBehaviour:
       Data: 2
     - Name: 
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -766,13 +682,13 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 2
+      Data: 2000
     - Name: NegX
       Entry: 3
       Data: 2
     - Name: PosZ
       Entry: 3
-      Data: 1002
+      Data: 2000
     - Name: NegZ
       Entry: 3
       Data: 1002
@@ -784,7 +700,91 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 5
+    - Name: Rot
+      Entry: 3
       Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2000
+    - Name: NegX
+      Entry: 3
+      Data: 1002
+    - Name: PosZ
+      Entry: 3
+      Data: 2
+    - Name: NegZ
+      Entry: 3
+      Data: 2000
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: Mesh
+      Entry: 10
+      Data: 5
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2
+    - Name: NegX
+      Entry: 3
+      Data: 2000
+    - Name: PosZ
+      Entry: 3
+      Data: 1002
+    - Name: NegZ
+      Entry: 3
+      Data: 2000
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
     - Name: MaterialIndexes
       Entry: 9
       Data: 6
