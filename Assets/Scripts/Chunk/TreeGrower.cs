@@ -41,13 +41,13 @@ namespace Chunks
                 if (!CheckCollisionWithTrees(pos.XZ())) continue;
 
                 Ray ray = new Ray(pos, Vector3.down);
-                Material mat = GetHitMaterial(ray);
+                Material mat = GetHitMaterial(ray, out RaycastHit hit);
 
                 if (mat == treeMaterial)
                 {
                     pos.y = 0;
                     positions.Add(pos.XZ());
-                    SpawnTree(pos);
+                    SpawnTree(hit.point);
                     await UniTask.Delay(100);
                 }
             }
@@ -75,9 +75,9 @@ namespace Chunks
             //spawnedTrees.Add(tree);
         }
 
-        private static Material GetHitMaterial(Ray ray)
+        private static Material GetHitMaterial(Ray ray, out RaycastHit hit)
         {
-            if (!Physics.Raycast(ray, out RaycastHit hit, 3)) 
+            if (!Physics.Raycast(ray, out hit, 3)) 
                 return null;
 
             if (hit.collider is not MeshCollider { sharedMesh: { } mesh }) 

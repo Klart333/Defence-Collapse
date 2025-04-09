@@ -306,8 +306,8 @@ namespace WaveFunctionCollapse
         public bool ContainsPoint(Vector3 point, Vector3 scale)
         {
             Vector3 min = Position - scale / 2.0f;
-            return point.x <= min.x + Width * scale.x && point.x >= min.x 
-                && point.z <= min.z + Depth * scale.z && point.z >= min.z;
+            return point.x < min.x + Width * scale.x && point.x >= min.x 
+                && point.z < min.z + Depth * scale.z && point.z >= min.z;
         }
         
         #region Query
@@ -377,7 +377,7 @@ namespace WaveFunctionCollapse
         }
 
 
-        public void Query(int3 queryIndex)
+        public void SetBuiltCells(int3 queryIndex)
         {
             this.queryIndex = queryIndex;
             

@@ -74,7 +74,7 @@ namespace Chunks
         }
 
 
-        private void OnChunkGenerated(Chunk chunk)
+        private async void OnChunkGenerated(Chunk chunk)
         {
             foreach (KeyValuePair<Chunk,List<TreeGrower>> kvp in treeGrowersByChunk)
             {
@@ -88,6 +88,7 @@ namespace Chunks
                 
                     grower.GrowTrees().Forget(Debug.LogError);
                     grower.HasGrown = true;
+                    await UniTask.Yield();
                 }
             }
             

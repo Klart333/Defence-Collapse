@@ -20,8 +20,8 @@ public class BuildingPlacer : MonoBehaviour
     [SerializeField]
     private PlaceSquare placeSquarePrefab;
 
-    private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
     private readonly Dictionary<ChunkIndex, PlaceSquare> spawnedSpawnPlaces = new Dictionary<ChunkIndex, PlaceSquare>();
+    private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
 
     private GroundGenerator groundGenerator;
     private Vector3 targetScale;
@@ -62,14 +62,82 @@ public class BuildingPlacer : MonoBehaviour
             for (int z = 0; z < chunk.Depth - 1; z++)
             {
                 ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
-                if (!IsValid(chunkIndex, x, z)) continue;
+                if (spawnedSpawnPlaces.ContainsKey(chunkIndex) 
+                           || !chunk.Cells[x,     0, z].Buildable
+                           || !chunk.Cells[x + 1, 0, z].Buildable
+                           || !chunk.Cells[x,     0, z + 1].Buildable
+                           || !chunk.Cells[x + 1, 0, z + 1].Buildable) continue;
+
+                Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
+                SpawnSquare(pos, chunkIndex);
+            }
+        }
+
+        Dictionary<int3,QueryMarchedChunk> chunks = BuildingManager.Instance.ChunkWaveFunction.Chunks;
+        CheckIntersection(chunk);
+        if (chunks.TryGetValue(chunk.ChunkIndex - new int3(0, 0, 1), out QueryMarchedChunk bottomChunk))
+            CheckIntersection(bottomChunk);
+        if (chunks.TryGetValue(chunk.ChunkIndex - new int3(1, 0, 0), out QueryMarchedChunk leftChunk))
+            CheckIntersection(leftChunk);
+        if (chunks.TryGetValue(chunk.ChunkIndex - new int3(1, 0, 1), out QueryMarchedChunk bottomLeftChunk))
+            CheckIntersection(bottomLeftChunk); 
+
+        void CheckIntersection(QueryMarchedChunk chunk)
+        {
+            // Top
+            if (chunks.TryGetValue(chunk.ChunkIndex + new int3(0, 0, 1), out QueryMarchedChunk topChunk))
+            {
+                int z = chunk.Depth - 1;
+                for (int x = 0; x < chunk.Width - 1; x++)
+                {
+                    ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
+                    if (spawnedSpawnPlaces.ContainsKey(chunkIndex) 
+                        || !chunk.Cells[x,     0, z].Buildable
+                        || !chunk.Cells[x + 1, 0, z].Buildable
+                        || !topChunk.Cells[x,     0, 0].Buildable
+                        || !topChunk.Cells[x + 1, 0, 0].Buildable) continue;
+
+                    Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
+                    SpawnSquare(pos, chunkIndex);
+                }
+            }
+
+            // Right
+            if (chunks.TryGetValue(chunk.ChunkIndex + new int3(1, 0, 0), out QueryMarchedChunk rightChunk))
+            {
+                int x = chunk.Width - 1;
+                for (int z = 0; z < chunk.Depth - 1; z++)
+                {
+                    ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
+                    if (spawnedSpawnPlaces.ContainsKey(chunkIndex) 
+                        || !chunk.Cells[x, 0, z].Buildable
+                        || !chunk.Cells[x, 0, z + 1].Buildable
+                        || !rightChunk.Cells[0, 0, z].Buildable
+                        || !rightChunk.Cells[0, 0, z + 1].Buildable) continue;
+
+                    Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
+                    SpawnSquare(pos, chunkIndex);
+                }
+            }
+            
+            // Top Right
+            if (chunks.TryGetValue(chunk.ChunkIndex + new int3(1, 0, 1), out QueryMarchedChunk topRightChunk) 
+                && topChunk != null && rightChunk != null)
+            {
+                int x = chunk.Width - 1;
+                int z = chunk.Depth - 1;
+                ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
+                if (spawnedSpawnPlaces.ContainsKey(chunkIndex) 
+                    || !chunk.Cells[x, 0, z].Buildable
+                    || !rightChunk.Cells[0, 0, z].Buildable
+                    || !topChunk.Cells[x, 0, 0].Buildable
+                    || !topRightChunk.Cells[0, 0, 0].Buildable) return;
 
                 Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
                 SpawnSquare(pos, chunkIndex);
             }
         }
         
-
         void SpawnSquare(Vector3 pos, ChunkIndex chunkIndex)
         {
             PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
@@ -80,19 +148,6 @@ public class BuildingPlacer : MonoBehaviour
             placeSquare.gameObject.SetActive(false);
             placeSquare.SquareIndex = spawnedSpawnPlaces.Count;
             spawnedSpawnPlaces.Add(chunkIndex, placeSquare);
-        }
-
-        bool IsValid(ChunkIndex chunkIndex, int x, int z)
-        {
-            if (spawnedSpawnPlaces.ContainsKey(chunkIndex))
-            {
-                return false;
-            }
-            
-            return    chunk.Cells[x,     0, z].Buildable
-                   && chunk.Cells[x + 1, 0, z].Buildable
-                   && chunk.Cells[x,     0, z + 1].Buildable
-                   && chunk.Cells[x + 1, 0, z + 1].Buildable;
         }
     }
     
@@ -145,7 +200,7 @@ public class BuildingPlacer : MonoBehaviour
             
             if (buildables.Count == 0) 
             {
-                ShowUnablePlaces(BuildingManager.Instance.GetCellsToCollapse(queryIndex).Select(x => BuildingManager.Instance.GetPos(new ChunkIndex(queryIndex.Index, x)) + Vector3.up * BuildingManager.Instance.ChunkScale.y / 2.0f).ToList());
+                ShowUnablePlaces(BuildingManager.Instance.GetCellsToCollapse(queryIndex).Select(x => BuildingManager.Instance.GetPos(x) + Vector3.up * BuildingManager.Instance.ChunkScale.y / 2.0f).ToList());
                 continue;
             }
 

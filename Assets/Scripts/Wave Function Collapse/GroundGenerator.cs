@@ -12,6 +12,7 @@ using Unity.Entities;
 using Unity.Physics;
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 using Chunks;
 
 namespace WaveFunctionCollapse
@@ -82,11 +83,18 @@ namespace WaveFunctionCollapse
             chunkMaskHandler.RemoveMask(chunk);
             await LoadAdjacentChunks(chunk);
 
+            waveFunction.Propagate();
             await Run(chunk);
 
             if (shouldCombine)
             {
+                await UniTask.DelayFrame(5);
                 CombineMeshes();
+                
+                foreach (Chunk chunkToClear in waveFunction.Chunks.Values)
+                {
+                    chunkToClear.ClearSpawnedMeshes(waveFunction.GameObjectPool);
+                }
             }
 
             OnChunkGenerated?.Invoke(chunk);
@@ -114,6 +122,7 @@ namespace WaveFunctionCollapse
 
         private async UniTask LoadAdjacentChunks(Chunk chunk)
         {
+            List<Chunk> adjacentChunks = new List<Chunk>();
             for (int x = -1; x <= 1; x++)
             for (int z = -1; z <= 1; z++)
             {
@@ -130,14 +139,17 @@ namespace WaveFunctionCollapse
                 
                 Chunk adjacent = waveFunction.LoadChunk(chunkIndex, chunkSize, defaultPrototypeInfoData, false);
                 chunkMaskHandler.CreateMask(adjacent, Math.IntToAdjacency(new int2(-x, -z)));
-                waveFunction.Propagate();
-                await Run(adjacent);
-                
-                OnLockedChunkGenerated?.Invoke(adjacent);
+                adjacentChunks.Add(adjacent);
+            }
+
+            waveFunction.Propagate();
+            for (int i = 0; i < adjacentChunks.Count; i++)
+            {
+                await Run(adjacentChunks[i]);
+                OnLockedChunkGenerated?.Invoke(adjacentChunks[i]);
             }
         }
-
-
+        
         private void CombineMeshes()
         {
             Mesh mesh = GetComponent<MeshCombiner>().CombineMeshes();

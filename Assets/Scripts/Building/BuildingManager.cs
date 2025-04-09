@@ -55,13 +55,13 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     private readonly Dictionary<ChunkIndex, IBuildable> querySpawnedBuildings = new Dictionary<ChunkIndex, IBuildable>();
     private readonly Dictionary<ChunkIndex, IBuildable> spawnedMeshes = new Dictionary<ChunkIndex, IBuildable>();
 
+    private List<QueryMarchedChunk> queriedChunks = new List<QueryMarchedChunk>();
     private HashSet<short> allowedKeys;
 
-    private Vector3? gridScale;
     private BuildingAnimator buildingAnimator;
     private GroundGenerator groundGenerator;
-    private QueryMarchedChunk queriedChunk;
     private ChunkIndex queryIndex;
+    private Vector3? gridScale;
     
     private void OnEnable()
     {
@@ -167,8 +167,10 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     public void Place()
     {
         Events.OnBuildingBuilt?.Invoke(querySpawnedBuildings.Values);
-        
-        queriedChunk.Place();
+        foreach (QueryMarchedChunk chunk in queriedChunks)
+        {
+            chunk.Place();
+        }
         
         foreach (KeyValuePair<ChunkIndex, IBuildable> item in querySpawnedBuildings)
         {
@@ -185,7 +187,10 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
     public void RevertQuery()
     {
-        queriedChunk?.RevertQuery();
+        foreach (QueryMarchedChunk chunk in queriedChunks)
+        {
+            chunk.RevertQuery();
+        }
         
         foreach (IBuildable item in querySpawnedBuildings.Values)
         {
@@ -201,7 +206,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
             RevertQuery();
         }
 
-        List<int3> cellsToCollapse = GetCellsToCollapse(queryIndex);
+        List<ChunkIndex> cellsToCollapse = GetCellsToCollapse(queryIndex);
         if (cellsToCollapse.Count <= 0) return querySpawnedBuildings;
         
         allowedKeys = buildingType switch
@@ -211,18 +216,18 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
             _ => allowedKeys
         };
         
-        queriedChunk = waveFunction.Chunks[queryIndex.Index];
-        queriedChunk.Query(queryIndex.CellIndex);
-        MakeBuildable(cellsToCollapse, queriedChunk);
+        queriedChunks = GetChunks(cellsToCollapse);
+        waveFunction.Chunks[queryIndex.Index].SetBuiltCells(queryIndex.CellIndex);
+        MakeBuildable(cellsToCollapse);
 
         waveFunction.Propagate(allowedKeys);
 
         int tries = 1000;
-        while (cellsToCollapse.Any(x => !queriedChunk[x].Collapsed) && tries-- > 0)
+        while (cellsToCollapse.Any(x => !waveFunction[x].Collapsed) && tries-- > 0)
         {
-            ChunkIndex index = waveFunction.GetLowestEntropyIndex(cellsToCollapse, queriedChunk);
+            ChunkIndex index = waveFunction.GetLowestEntropyIndex(cellsToCollapse);
             PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index]);
-            SetCell(index, chosenPrototype, queriedChunk.QueryCollapsedAir);
+            SetCell(index, chosenPrototype, waveFunction.Chunks[index.Index].QueryCollapsedAir);
 
             waveFunction.Propagate(allowedKeys);
         }
@@ -234,40 +239,56 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
         return querySpawnedBuildings;
     }
-    
-    
-    private void MakeBuildable(List<int3> cellsToCollapse, QueryMarchedChunk chunk) 
+
+    private List<QueryMarchedChunk> GetChunks(List<ChunkIndex> cellsToCollapse)
+    {
+        List<QueryMarchedChunk> chunks = new List<QueryMarchedChunk> {waveFunction.Chunks[cellsToCollapse[0].Index]};
+        for (int i = 1; i < cellsToCollapse.Count; i++)
+        {
+            QueryMarchedChunk chunk = waveFunction.Chunks[cellsToCollapse[i].Index];
+            if (!chunks.Contains(chunk))
+            {
+                chunks.Add(chunk);
+            }
+        }
+
+        return chunks;
+    }
+
+    private void MakeBuildable(List<ChunkIndex> cellsToCollapse) 
     {
         for (int i = 0; i < cellsToCollapse.Count; i++)
         {
-            int3 index = cellsToCollapse[i];
-            if (!chunk[index].Buildable) continue;
+            ChunkIndex index = cellsToCollapse[i];
+            QueryMarchedChunk chunk = waveFunction.Chunks[index.Index];
+            if (!waveFunction[index].Buildable) continue;
 
-            int marchedIndex = GetMarchIndex(index, chunk);
-            chunk.QueryChangedCells.Add((index, chunk[index]));
+            int marchedIndex = GetMarchIndex(index);
+            chunk.QueryChangedCells.Add((index.CellIndex, chunk[index.CellIndex]));
                 
-            chunk[index] = new Cell(false, 
-                chunk[index].Position, 
+            chunk[index.CellIndex] = new Cell(false, 
+                chunk[index.CellIndex].Position, 
                 new List<PrototypeData>(townPrototypeInfo.MarchingTable[marchedIndex]));
 
-            chunk.GetAdjacentCells(index, out _).ForEach(x => waveFunction.CellStack.Push(x));
+            chunk.GetAdjacentCells(index.CellIndex, out _).ForEach(x => waveFunction.CellStack.Push(x));
 
-            ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, index);
-            if (spawnedMeshes.TryGetValue(chunkIndex, out IBuildable buildable))
+            if (spawnedMeshes.TryGetValue(index, out IBuildable buildable))
             {
                 buildable.gameObject.SetActive(false);
-                spawnedMeshes.Remove(chunkIndex);
+                spawnedMeshes.Remove(index);
             }
         }
     }
     
-    private int GetMarchIndex(int3 index, QueryMarchedChunk chunk)
+    private int GetMarchIndex(ChunkIndex index)
     {
         int marchedIndex = 0;
+        Vector3 pos = waveFunction[index].Position + GridScale / 2.0f;
         for (int i = 0; i < 4; i++)
         {
-            int3 marchIndex = new int3(index.x + WaveFunctionUtility.MarchDirections[i].x, index.y, index.z + WaveFunctionUtility.MarchDirections[i].y);
-            if (chunk.BuiltCells.IsInBounds(marchIndex) && chunk.BuiltCells[marchIndex.x, marchIndex.y, marchIndex.z])
+            Vector3 marchPos = pos + new Vector3(WaveFunctionUtility.MarchDirections[i].x * GridScale.x, 0, WaveFunctionUtility.MarchDirections[i].y * GridScale.z);
+            ChunkIndex? chunk = GetIndex(marchPos);
+            if (chunk.HasValue && waveFunction.Chunks[chunk.Value.Index].BuiltCells[chunk.Value.CellIndex.x, chunk.Value.CellIndex.y, chunk.Value.CellIndex.z])
             {
                 marchedIndex += (int)Mathf.Pow(2, i);
             }
@@ -276,21 +297,19 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         return marchedIndex;
     }
 
-    public List<int3> GetCellsToCollapse(ChunkIndex queryIndex)
+    public List<ChunkIndex> GetCellsToCollapse(ChunkIndex queryIndex)
     {
-        queryIndex = new ChunkIndex(queryIndex.Index, queryIndex.CellIndex + new int3(1, 0, 1));
-        return GetSurroundingCells(waveFunction[queryIndex].Position + new Vector3(0.1f, 0, 0.1f), waveFunction.Chunks[queryIndex.Index]);
+        return GetSurroundingCells(waveFunction[queryIndex].Position + new Vector3(GridScale.x + 0.1f, 0, GridScale.z + 0.1f));
     }
 
-    private List<int3> GetSurroundingCells(Vector3 queryPosition, QueryMarchedChunk chunk)
+    private List<ChunkIndex> GetSurroundingCells(Vector3 queryPosition)
     {
-        List<int3> surrounding = new List<int3>();
-
+        List<ChunkIndex> surrounding = new List<ChunkIndex>();
         for (int x = -1; x <= 1; x += 2)
         {
             for (int z = -1; z <= 1; z += 2)
             {
-                int3? index = GetIndex(queryPosition + new Vector3(waveFunction.GridScale.x * x, 0, z * waveFunction.GridScale.z), chunk);
+                ChunkIndex? index = GetIndex(queryPosition + new Vector3(waveFunction.GridScale.x * x, 0, z * waveFunction.GridScale.z));
                 if (index.HasValue) 
                 {
                     surrounding.Add(index.Value);
@@ -299,8 +318,6 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         }
 
         return surrounding;
-
-        
     }
     
     public int3? GetIndex(Vector3 pos, IChunk chunk)

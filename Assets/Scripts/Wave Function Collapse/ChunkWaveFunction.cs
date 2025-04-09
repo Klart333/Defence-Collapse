@@ -155,7 +155,7 @@ namespace WaveFunctionCollapse
             ChunkIndex index = GetLowestEntropyIndex(chunk);
 
             PrototypeData chosenPrototype = Collapse(this[index]);
-            //Debug.Log("Collapsing: " + index + "\n ChosenPrototype: " + chosenPrototype);
+            //Debug.Log("Collapsing: " + index.CellIndex + "\n ChosenPrototype: " + chosenPrototype);
             SetCell(index, chosenPrototype);
 
             Propagate();
@@ -220,13 +220,13 @@ namespace WaveFunctionCollapse
             return index;
         }
         
-        public ChunkIndex GetLowestEntropyIndex(List<int3> cells, IChunk chunk)
+        public ChunkIndex GetLowestEntropyIndex(List<ChunkIndex> indexes)
         {
             float lowestEntropy = 10000;
             ChunkIndex index = new ChunkIndex();
-            for (int i = 0; i < cells.Count; i++)
+            for (int i = 0; i < indexes.Count; i++)
             {
-                Cell cell = chunk[cells[i]];
+                Cell cell = this[indexes[i]];
                 if (cell.Collapsed)
                 {
                     continue;
@@ -236,7 +236,7 @@ namespace WaveFunctionCollapse
                 if (cellEntropy >= lowestEntropy) continue;
 
                 lowestEntropy = cellEntropy;
-                index = new ChunkIndex(chunk.ChunkIndex, cells[i]);
+                index = indexes[i];
             }
             return index;
         }
@@ -513,6 +513,10 @@ namespace WaveFunctionCollapse
                 {
                     ConstrainBySides(index, prots);
                 }
+                else
+                {
+                    GetInvalidAdjacentSides(index, cellStack); // Still needs to update in case adjacent chunk is collapsed
+                }
 
                 Cells[x, y, z] = new Cell(false, pos + Position, prots);
             }
@@ -687,14 +691,19 @@ namespace WaveFunctionCollapse
         {
             IsClear = true;
 
+            ClearSpawnedMeshes(pool);
+            
+            OnCleared?.Invoke();
+        }
+
+        public void ClearSpawnedMeshes(Stack<GameObject> pool)
+        {
             for (int i = SpawnedMeshes.Count - 1; i >= 0; i--)
             {
                 SpawnedMeshes[i].SetActive(false);
                 pool.Push(SpawnedMeshes[i]);
                 SpawnedMeshes.RemoveAt(i);
             }
-            
-            OnCleared?.Invoke();
         }
 
         /// <remarks>Does not use height</remarks>>

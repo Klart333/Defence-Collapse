@@ -88,15 +88,6 @@ public class MeshCombiner : MonoBehaviour
         GetComponent<MeshCollider>().sharedMesh = finalMesh;
         GetComponent<MeshRenderer>().materials = materials.ToArray();
 
-        for (int i = 0; i < renderers.Length; i++)
-        {
-            if (renderers[i].transform == transform)
-            {
-                continue;
-            }
-            Destroy(renderers[i].gameObject);
-        }
-
         return finalMesh;
     }
 }
