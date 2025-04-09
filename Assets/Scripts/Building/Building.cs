@@ -190,8 +190,12 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void Setup(PrototypeData prototypeData, Vector3 scale)
     {
-        ChunkIndex? nullableIndex = BuildingManager.Instance.GetIndex(transform.position);
-        if (!nullableIndex.HasValue) return;
+        ChunkIndex? nullableIndex = BuildingManager.Instance.GetIndex(transform.position + scale / 2.0f);
+        if (!nullableIndex.HasValue)
+        {
+            Debug.LogError("Could not find chunk index");
+            return;
+        }
         
         Index = nullableIndex.Value;
         Prototype = GetPrototype(prototypeData);
@@ -204,7 +208,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         {
             transparentMaterials.Add(transparentGreen);
         }
-
+        
         transform.localScale = scale;
     }
 

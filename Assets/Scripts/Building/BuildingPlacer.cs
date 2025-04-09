@@ -62,23 +62,37 @@ public class BuildingPlacer : MonoBehaviour
             for (int z = 0; z < chunk.Depth - 1; z++)
             {
                 ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
-                if (spawnedSpawnPlaces.ContainsKey(chunkIndex)
-                    || !chunk.Cells[x, 0, z].Buildable
-                    || !chunk.Cells[x + 1, 0, z].Buildable
-                    || !chunk.Cells[x, 0, z + 1].Buildable
-                    || !chunk.Cells[x + 1, 0, z + 1].Buildable) continue;
+                if (!IsValid(chunkIndex, x, z)) continue;
 
                 Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
-                PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
-                placeSquare.Placer = this;
-                placeSquare.Index = chunkIndex;
-                placeSquare.transform.localScale = targetScale * 0.95f;
-                placeSquare.transform.SetParent(transform, true);
-                placeSquare.gameObject.SetActive(false);
-                placeSquare.SquareIndex = spawnedSpawnPlaces.Count;
-                spawnedSpawnPlaces.Add(chunkIndex, placeSquare);
-            
+                SpawnSquare(pos, chunkIndex);
             }
+        }
+        
+
+        void SpawnSquare(Vector3 pos, ChunkIndex chunkIndex)
+        {
+            PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
+            placeSquare.Placer = this;
+            placeSquare.Index = chunkIndex;
+            placeSquare.transform.localScale = targetScale * 0.95f;
+            placeSquare.transform.SetParent(transform, true);
+            placeSquare.gameObject.SetActive(false);
+            placeSquare.SquareIndex = spawnedSpawnPlaces.Count;
+            spawnedSpawnPlaces.Add(chunkIndex, placeSquare);
+        }
+
+        bool IsValid(ChunkIndex chunkIndex, int x, int z)
+        {
+            if (spawnedSpawnPlaces.ContainsKey(chunkIndex))
+            {
+                return false;
+            }
+            
+            return    chunk.Cells[x,     0, z].Buildable
+                   && chunk.Cells[x + 1, 0, z].Buildable
+                   && chunk.Cells[x,     0, z + 1].Buildable
+                   && chunk.Cells[x + 1, 0, z + 1].Buildable;
         }
     }
     

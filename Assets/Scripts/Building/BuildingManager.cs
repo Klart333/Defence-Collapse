@@ -4,10 +4,10 @@ using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
 using UnityEngine;
+using System.Linq;
 using UnityEditor;
 using Buildings;
 using System;
-using System.Linq;
 
 public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 {
@@ -42,13 +42,22 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     public ChunkWaveFunction<QueryMarchedChunk> ChunkWaveFunction => waveFunction;
     
     public Vector3 ChunkScale => groundGenerator.ChunkScale;
-    public Vector3 GridScale => waveFunction.GridScale;
+
+    public Vector3 GridScale
+    {
+        get
+        {
+            gridScale ??= waveFunction.GridScale.MultiplyByAxis(groundGenerator.ChunkWaveFunction.GridScale);
+            return gridScale.Value;
+        }
+    }
     
     private readonly Dictionary<ChunkIndex, IBuildable> querySpawnedBuildings = new Dictionary<ChunkIndex, IBuildable>();
     private readonly Dictionary<ChunkIndex, IBuildable> spawnedMeshes = new Dictionary<ChunkIndex, IBuildable>();
 
     private HashSet<short> allowedKeys;
 
+    private Vector3? gridScale;
     private BuildingAnimator buildingAnimator;
     private GroundGenerator groundGenerator;
     private QueryMarchedChunk queriedChunk;
@@ -93,16 +102,16 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     {
         int3 index = chunk.ChunkIndex;
         QueryMarchedChunk queryChunk = new QueryMarchedChunk().Construct(
-            Mathf.FloorToInt(chunk.Width / GridScale.x),
+            Mathf.FloorToInt(chunk.Width / waveFunction.GridScale.x),
             1,
-            Mathf.FloorToInt(chunk.Depth / GridScale.z),
+            Mathf.FloorToInt(chunk.Depth / waveFunction.GridScale.z),
             index,
             chunk.Position,
             waveFunction.GetAdjacentChunks(index).ToArray<IChunk>(),
             false) as QueryMarchedChunk;
         
         queryChunk.Handler = this;
-        Vector3 offset = new Vector3(groundGenerator.ChunkWaveFunction.GridScale.x * GridScale.x / 2.0f, 0, groundGenerator.ChunkWaveFunction.GridScale.z * GridScale.z / 2.0f);
+        Vector3 offset = new Vector3(GridScale.x / 2.0f, 0, GridScale.z / 2.0f);
         queryChunk.LoadCells(townPrototypeInfo, GridScale, chunk, cellBuildableCornerData, offset);
         waveFunction.LoadChunk(index, queryChunk);
         
@@ -281,8 +290,8 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         {
             for (int z = -1; z <= 1; z += 2)
             {
-                int3? index = GetIndex(queryPosition + GridScale.x * x * Vector3.right + Vector3.forward * z * GridScale.z, chunk);
-                if (index.HasValue)
+                int3? index = GetIndex(queryPosition + new Vector3(waveFunction.GridScale.x * x, 0, z * waveFunction.GridScale.z), chunk);
+                if (index.HasValue) 
                 {
                     surrounding.Add(index.Value);
                 }
@@ -297,8 +306,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     public int3? GetIndex(Vector3 pos, IChunk chunk)
     {
         pos -= chunk.Position;
-        int3 index = new int3(Math.GetMultiple(pos.x, groundGenerator.ChunkWaveFunction.GridScale.x * GridScale.x), 0,
-            Math.GetMultiple(pos.z, groundGenerator.ChunkWaveFunction.GridScale.z *  GridScale.z));
+        int3 index = new int3(Math.GetMultiple(pos.x, GridScale.x), 0, Math.GetMultiple(pos.z, GridScale.z));
         if (chunk.Cells.IsInBounds(index))
         {
             return index;
@@ -328,7 +336,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
     #endregion
 
-    #region Core
+    #region Set Cell
     
     public void SetCell(ChunkIndex index, PrototypeData chosenPrototype, List<int3> queryCollapsedAir, bool query = true)
     {
@@ -364,7 +372,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
             building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
         }
 
-        building.Setup(prototypeData, GridScale);
+        building.Setup(prototypeData, waveFunction.GridScale);
 
         if (animate) buildingAnimator.Animate(building);
 
@@ -399,7 +407,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
                 {
                     Vector3 pos = chunk.Cells[x, 0, y].Position;
                     Gizmos.color = !chunk.BuiltCells[x, 0, y] ? Color.white : Color.magenta;
-                    Gizmos.DrawWireCube(pos, GridScale.MultiplyByAxis(groundGenerator.ChunkWaveFunction.GridScale) * 0.9f);
+                    Gizmos.DrawWireCube(pos, GridScale * 0.9f);
                 }
             }
         }

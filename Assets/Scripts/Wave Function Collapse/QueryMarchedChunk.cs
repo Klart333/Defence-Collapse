@@ -108,7 +108,7 @@ namespace WaveFunctionCollapse
             for (int y = 0; y < Height; y++)
             for (int x = 0; x < Width; x++)
             {
-                Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z) * 2 - offset;
+                Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z) - offset;
                 Cells[x, y, z] = new Cell(false, Position + pos, new List<PrototypeData> { PrototypeData.Empty });
             }
             
@@ -117,7 +117,7 @@ namespace WaveFunctionCollapse
             for (int x = 0; x < Width; x++)
             {
                 int3 cellIndex = new int3(x, y, z);
-                int3 gridIndex = new int3(Mathf.FloorToInt(x * gridScale.x), 0, Mathf.FloorToInt(z * gridScale.z));
+                int3 gridIndex = new int3(Mathf.FloorToInt(x * gridScale.x / 2.0f), 0, Mathf.FloorToInt(z * gridScale.z / 2.0f));
                 SetCellDependingOnGround(cellIndex, gridIndex); 
             }
             
@@ -305,8 +305,9 @@ namespace WaveFunctionCollapse
         /// <remarks>Does not use height</remarks>>
         public bool ContainsPoint(Vector3 point, Vector3 scale)
         {
-            return point.x < Position.x + Width * scale.x && point.x > Position.x 
-                && point.z < Position.z + Depth * scale.z && point.z > Position.z;
+            Vector3 min = Position - scale / 2.0f;
+            return point.x <= min.x + Width * scale.x && point.x >= min.x 
+                && point.z <= min.z + Depth * scale.z && point.z >= min.z;
         }
         
         #region Query

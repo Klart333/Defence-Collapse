@@ -1,10 +1,10 @@
-﻿using Sirenix.OdinInspector;
+﻿using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using Unity.Jobs;
 using System;
-using Cysharp.Threading.Tasks;
 
 namespace Pathfinding
 {

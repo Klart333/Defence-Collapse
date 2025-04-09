@@ -63,7 +63,7 @@ namespace WaveFunctionCollapse
             }
             waveFunction.ParentTransform = transform;
             
-            Chunk chunk = waveFunction.LoadChunk(int3.zero, chunkSize, defaultPrototypeInfoData, false);
+            Chunk chunk = waveFunction.LoadChunk(transform.position, chunkSize, defaultPrototypeInfoData, false);
 
             if (shouldRun)
                 LoadChunk(chunk).Forget(Debug.LogError);
