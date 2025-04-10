@@ -80,7 +80,7 @@ namespace WaveFunctionCollapse
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.R))
             {
                 foreach (Chunk chunk in waveFunction.Chunks.Values)
                 {

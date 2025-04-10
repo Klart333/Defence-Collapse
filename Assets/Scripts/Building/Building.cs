@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DataStructures.Queue.ECS;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
@@ -105,12 +106,6 @@ public class Building : PooledMonoBehaviour, IBuildable
         purchasing = true;
         selected = false;
         MeshRenderer.gameObject.layer = originalLayer;
-
-        for (int i = 0; i < indexer.Indexes.Count; i++)
-        {
-            int index = indexer.Indexes[i];
-            AttackingSystem.DamageEvent.Remove(index);
-        }
         
         OnResetEvent?.Invoke();
     }
@@ -272,20 +267,16 @@ public class Building : PooledMonoBehaviour, IBuildable
         OnPlacedEvent?.Invoke();
     }
 
-    private void IndexerOnOnRebuilt()
+    private async void IndexerOnOnRebuilt()
     {
         indexer.OnRebuilt -= IndexerOnOnRebuilt;
+        await UniTask.WaitUntil(() => BuildingHandler[this] != null).TimeoutWithoutException(TimeSpan.FromSeconds(1));
+        
         for (int i = 0; i < indexer.Indexes.Count; i++)
         {
             int index = indexer.Indexes[i];
-            AttackingSystem.DamageEvent.TryAdd(index, TakeDamage);
+            AttackingSystem.DamageEvent.TryAdd(index, BuildingHandler[this].TakeDamage);
         }
-    }
-
-    private void TakeDamage(float damage)
-    {
-        //Debug.Log($"Taking {damage} damage");
-        BuildingHandler[this].TakeDamage(damage);
     }
 
     public void OnDestroyed()

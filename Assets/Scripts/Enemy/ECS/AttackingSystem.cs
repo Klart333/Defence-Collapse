@@ -29,6 +29,7 @@ namespace DataStructures.Queue.ECS
 
             state.Dependency.Complete();
 
+            HashSet<int> failedAttacks = new HashSet<int>();
             while (damageQueue.TryDequeue(out DamageIndex item))
             {
                 if (DamageEvent.TryGetValue(item.Index, out Action<float> action))
@@ -37,8 +38,14 @@ namespace DataStructures.Queue.ECS
                 }
                 else
                 {
-                    //Debug.Log($"Trying to damage index: {item.Index}, but not found");
+                    Debug.Log($"Trying to damage index: {item.Index}, but not found");
+                    failedAttacks.Add(item.Index);
                 }
+            }
+
+            foreach (int failedAttack in failedAttacks)
+            {
+                StopAttackingSystem.KilledIndexes.Enqueue(failedAttack);
             }
         }
 
@@ -66,7 +73,7 @@ namespace DataStructures.Queue.ECS
             attackingAspect.AttackSpeedComponent.ValueRW.Timer = 0;
 
             float damage = attackingAspect.DamageComponent.ValueRO.Damage;
-            DamageQueue.Enqueue(new DamageIndex{Damage = damage, Index = attackingAspect.AttackingComponent.ValueRO.Target});
+            DamageQueue.Enqueue(new DamageIndex { Damage = damage, Index = attackingAspect.AttackingComponent.ValueRO.Target });
         }
     }
     

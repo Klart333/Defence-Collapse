@@ -13,18 +13,8 @@ namespace DataStructures.Queue.ECS
     {
         public static readonly Queue<int> KilledIndexes = new Queue<int>();
         
-        protected override async void OnCreate()
-        {
-            base.OnCreate();
-            Enabled = false;
-
-            await UniTask.WaitUntil(() => PathManager.Instance != null);
-            PathManager.Instance.OnPathRebuilt += () => Enabled = true;
-        }
-        
         protected override void OnUpdate()
         {
-            Enabled = false;
             int count = KilledIndexes.Count;
             if (count <= 0)
             {

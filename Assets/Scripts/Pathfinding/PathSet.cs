@@ -69,6 +69,8 @@ public class BoolPathSet : PathSet<bool>
             for (int i = 0; i < target.TargetIndexes.Count; i++)
             {
                 int index = target.TargetIndexes[i];
+                if (index < 0 || index >= targetArray.Length) continue;
+
                 TargetIndexes.Add(index);
                 targetArray[index] = true;
             }

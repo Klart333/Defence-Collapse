@@ -31,7 +31,7 @@ public class AttackVisualEffect : PooledMonoBehaviour
     public AttackVisualEffect Spawn(Vector3 pos, Quaternion rot, float scale, float lifetime = 1)
     {
         AttackVisualEffect gm = GetAtPosAndRot<AttackVisualEffect>(pos, rot);
-        gm.transform.localScale = gm.transform.localScale * scale;
+        gm.transform.localScale *= scale;
         gm.Delay.Lifeime = lifetime;
 
         return gm;

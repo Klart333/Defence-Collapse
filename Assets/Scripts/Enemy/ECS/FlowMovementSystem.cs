@@ -1,11 +1,11 @@
-using Pathfinding;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
-using UnityEngine;
+using Pathfinding;
+using Gameplay;
 
 namespace DataStructures.Queue.ECS
 {
@@ -16,7 +16,6 @@ namespace DataStructures.Queue.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            
         }
 
         public void OnUpdate(ref SystemState state)
@@ -30,7 +29,7 @@ namespace DataStructures.Queue.ECS
             
             new FlowMovementJob
             {
-                DeltaTime = deltaTime,
+                DeltaTime = deltaTime * GameSpeedManager.Instance.GameSpeed,
                 CellScale = PathManager.Instance.CellScale,
                 GridWidth = PathManager.Instance.GridWidth,
                 Directions = PathManager.Instance.Directions.AsReadOnly(),

@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
+using WaveFunctionCollapse;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -10,8 +11,19 @@ namespace Pathfinding
 {
     public class PathManager : Singleton<PathManager>
     {
+        public static readonly int2[] NeighbourDirections =
+        {
+            new int2(1, 0),
+            new int2(1, 1),
+            new int2(0, 1),
+            new int2(-1, 1),
+            new int2(-1, 0),
+            new int2(-1, -1),
+            new int2(0, -1),
+            new int2(1, -1),
+        };
+
         public event Action GetPathInformation;
-        public event Action OnPathRebuilt;
 
         [Title("Flow Field")]
         [SerializeField]
@@ -20,22 +32,23 @@ namespace Pathfinding
         [SerializeField]
         private float cellScale;
 
+        [Title("Reference")]
         [SerializeField]
-        private float updateFrequency = 1;
+        private GroundGenerator groundGenerator;
 
         public NativeArray<short> MovementCosts;
         public NativeArray<short> Units;
         
-        private NativePriorityQueue<PathJob.IndexDistance> PathJobQueue;
-        private NativeArray<int2> neighbourDirections;
         private NativeArray<bool> notWalkableIndexes;
         private NativeArray<bool> targetIndexes;
+
         private NativeArray<byte> directions;
         private NativeArray<int> distances;
 
         private JobHandle jobHandle;
 
-        private float updateTimer;
+        private bool waitingForData;
+        private int arrayLength;
 
         public float GridWorldHeight => GridHeight * CellScale;
         public float GridWorldWidth => GridWidth * CellScale;
@@ -50,17 +63,16 @@ namespace Pathfinding
 
         private void OnEnable()
         {
-            int length = gridSize.x * gridSize.y;
-            neighbourDirections = new NativeArray<int2>(new[] { new int2(1, 0), new int2(1, 1), new int2(0, 1), new int2(-1, 1), new int2(-1, 0), new int2(-1, -1), new int2(0, -1), new int2(1, -1), }, Allocator.Persistent);
-            PathJobQueue = new NativePriorityQueue<PathJob.IndexDistance>(1024, Allocator.Persistent);
-            notWalkableIndexes = new NativeArray<bool>(length, Allocator.Persistent);
-            MovementCosts = new NativeArray<short>(length, Allocator.Persistent);
-            targetIndexes = new NativeArray<bool>(length, Allocator.Persistent);
-            directions = new NativeArray<byte>(length, Allocator.Persistent);
-            distances = new NativeArray<int>(length, Allocator.Persistent);
-            Units = new NativeArray<short>(length, Allocator.Persistent);
+            arrayLength = gridSize.x * gridSize.y;
+            
+            notWalkableIndexes = new NativeArray<bool>(arrayLength, Allocator.Persistent);
+            MovementCosts = new NativeArray<short>(arrayLength, Allocator.Persistent);
+            targetIndexes = new NativeArray<bool>(arrayLength, Allocator.Persistent);
+            directions = new NativeArray<byte>(arrayLength, Allocator.Persistent);
+            distances = new NativeArray<int>(arrayLength, Allocator.Persistent);
+            Units = new NativeArray<short>(arrayLength, Allocator.Persistent);
 
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < arrayLength; i++)
             {
                 MovementCosts[i] = 100;
             }
@@ -73,15 +85,15 @@ namespace Pathfinding
 
             PathPathSet = new ShortPathSet(MovementCosts, -94);
             GetPathInformation += PathPathSet.RebuildTargetHashSet;
+            
+            groundGenerator.OnLockedChunkGenerated += OnChunkGenerated;
         }
 
         private void OnDisable()
         {
-            neighbourDirections.Dispose();
             notWalkableIndexes.Dispose();
             MovementCosts.Dispose();
             targetIndexes.Dispose();
-            PathJobQueue.Dispose();
             directions.Dispose();
             distances.Dispose();
             Units.Dispose();
@@ -89,26 +101,26 @@ namespace Pathfinding
             GetPathInformation -= BlockerPathSet.RebuildTargetHashSet;
             GetPathInformation -= TargetPathSet.RebuildTargetHashSet;
             GetPathInformation -= PathPathSet.RebuildTargetHashSet;
+            
+            groundGenerator.OnLockedChunkGenerated -= OnChunkGenerated;
         }
 
         private void Update()
         {
-            updateTimer += Time.deltaTime;
-            if (updateTimer >= updateFrequency)
+            if (!waitingForData)
             {
-                if (!jobHandle.IsCompleted)
-                {
-                    Debug.Log("Not Completed...");
-                    jobHandle.Complete();
-                }
-
-                updateTimer = 0;
                 UpdateFlowField().Forget(Debug.LogError);
             }
         }
-
+        
+        private void OnChunkGenerated(Chunk chunk)
+        {
+            
+        }
+        
         private async UniTask UpdateFlowField()
         {
+            waitingForData = true;
             for (int i = 0; i < MovementCosts.Length; i++)
             {
                 MovementCosts[i] -= Units[i];
@@ -118,23 +130,18 @@ namespace Pathfinding
             GetPathInformation?.Invoke();
             await UniTask.DelayFrame(2);
 
-            PathJob pathJob = new PathJob()
+            new PathJob
             {
-                Directions = directions,
-                Distances = distances,
+                NotWalkableIndexes = notWalkableIndexes.AsReadOnly(),
                 MovementCosts = MovementCosts.AsReadOnly(),
                 TargetIndexes = targetIndexes.AsReadOnly(),
-                NotWalkableIndexes = notWalkableIndexes.AsReadOnly(),
-                NeighbourDirections = neighbourDirections.AsReadOnly(),
+                ArrayLength = arrayLength,
+                Directions = directions,
                 GridWidth = gridSize.x,
-                ArrayLength = distances.Length,
-                FrontierQueue = PathJobQueue,
-            };
-
-            jobHandle = pathJob.Schedule();
-            jobHandle.Complete();
-            
-            OnPathRebuilt?.Invoke();
+                Distances = distances,
+                BatchSize = gridSize.x,
+            }.Schedule(arrayLength, gridSize.x).Complete();
+            waitingForData = false;
         }
 
         #region Debug

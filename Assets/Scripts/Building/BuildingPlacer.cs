@@ -211,6 +211,7 @@ public class BuildingPlacer : MonoBehaviour
 
         if (Canceled)
         {
+            SquareIndex = null;
             ToggleSpawnPlaces(false);
             DisablePlaces();
             BuildingManager.Instance.RevertQuery();
