@@ -284,7 +284,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void TakeDamage(float damage)
     {
-        Debug.Log($"Taking {damage} damage");
+        //Debug.Log($"Taking {damage} damage");
         BuildingHandler[this].TakeDamage(damage);
     }
 

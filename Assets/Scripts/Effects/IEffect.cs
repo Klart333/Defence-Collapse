@@ -394,7 +394,7 @@ namespace Effects
                 for (int i = 0; i < Effects.Count; i++)
                 {
                     Effects[i].Perform(unit);
-                    Debug.Log("Performing effect: " + Effects[i]);
+                    //Debug.Log("Performing effect: " + Effects[i]);
                 }
             }
         }

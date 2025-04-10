@@ -5,6 +5,7 @@ using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
+using UnityEngine;
 
 namespace DataStructures.Queue.ECS
 {
@@ -67,8 +68,9 @@ namespace DataStructures.Queue.ECS
             flowField.Forward = math.normalize(flowField.Forward + direction * (flowField.TurnSpeed * DeltaTime));
             flowField.Up = math.normalize(flowField.Up + flowField.TargetUp * flowField.TurnSpeed * DeltaTime * 5);
             transform.Rotation = quaternion.LookRotation(flowField.Forward, flowField.Up);
-            
-            transform.Position += transform.Forward() * speed.Speed * DeltaTime;
+
+            float3 movement = transform.Forward() * speed.Speed * DeltaTime;
+            transform.Position += movement;
         }
     }
 }

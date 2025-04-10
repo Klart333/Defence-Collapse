@@ -59,7 +59,6 @@ namespace DataStructures.Queue.ECS
         public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in FlowFieldComponent flowField, in LocalTransform transform)
         {
             int index = PathManager.GetIndex(transform.Position.x, transform.Position.z, CellScale, GridWidth);
-
             if (Directions[index] == byte.MaxValue)
             {
                 ECB.AddComponent(sortKey, entity, new AttackingComponent { Target = index });

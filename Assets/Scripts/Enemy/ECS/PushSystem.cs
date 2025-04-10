@@ -1,10 +1,10 @@
-using Unity.Burst;
-using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Entities;
+using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine.SocialPlatforms;
+using Unity.Entities;
+using Unity.Burst;
+using UnityEngine;
 
 namespace DataStructures.Queue.ECS
 {
@@ -70,24 +70,24 @@ namespace DataStructures.Queue.ECS
                 RefRO<LocalTransform> enemyTransform = TransformLookup.GetRefRO(enemy);
                 float2 enemyPosition = new float2(enemyTransform.ValueRO.Position.x, enemyTransform.ValueRO.Position.z);
                 float distSq = math.distancesq(pusherPosition, enemyPosition);
+                
+                if (distSq is > 0.0225f or 0) continue; // 0.15 * 0.15
+                
+                float3 desiredForward = math.normalize(transform.Position - enemyTransform.ValueRO.Position);
+                desiredForward.y = 0;
+                float3 currentForward = flowField.Forward;
 
-                if (distSq < 0.0225f) // 0.15 * 0.15
-                {
-                    float3 desiredForward = math.normalize(transform.Position - enemyTransform.ValueRO.Position);
-                    float3 currentForward = flowField.Forward;
+                if (math.abs(math.dot(currentForward, desiredForward)) > 0.999f) return;
+                    
+                float3 rotationAxis = math.normalize(math.cross(currentForward, desiredForward));
+                float angle = math.acos(math.clamp(math.dot(currentForward, desiredForward), -1f, 1f));
+                angle = math.min(angle, PUSH_STRENGTH * DeltaTime);
+                quaternion rotation = quaternion.AxisAngle(rotationAxis, angle);
 
-                    if (math.abs(math.dot(currentForward, desiredForward)) < 0.999f)
-                    {
-                        float3 rotationAxis = math.normalize(math.cross(currentForward, desiredForward));
-                        float angle = math.acos(math.clamp(math.dot(currentForward, desiredForward), -1f, 1f));
-                        angle = math.min(angle, PUSH_STRENGTH * DeltaTime);
-                        quaternion rotation = quaternion.AxisAngle(rotationAxis, angle);
+                // Apply the rotation to the current forward direction
+                flowField.Forward = math.rotate(rotation, currentForward);
 
-                        // Apply the rotation to the current forward direction
-                        flowField.Forward = math.rotate(rotation, currentForward);
-                    }
-                    return;
-                }
+                return;
 
             } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
         }

@@ -47,7 +47,7 @@ namespace DataStructures.Queue.ECS
             RaycastInput input = new RaycastInput()
             {
                 Start = transform.Position + new float3(0, 1, 0),
-                End = new float3(transform.Position.x, 0, transform.Position.z),
+                End = transform.Position.XyZ(-0.5f),
                 Filter = new CollisionFilter()
                 {
                     BelongsTo = 6,

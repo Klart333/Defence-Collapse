@@ -171,18 +171,9 @@ namespace WaveFunctionCollapse
                 float middle = (chunk.Depth - 1) / 2.0f;
                 for (int z = 1; z < chunk.Depth - 1; z++)
                 {
-                    List<PrototypeData> prots;
-                    if (Mathf.Abs(middle - z) <= 1)
-                    {
-                        prots = new List<PrototypeData>
-                        {
-                            defaultPrototypeInfoData.Prototypes[enemyGateIndex], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 1], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 2], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 3]
-                        };
-                    }
-                    else
-                    {
-                        prots = new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[fullTreeIndex] };
-                    }
+                    List<PrototypeData> prots = Mathf.Abs(middle - z) <= 1
+                        ? new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[enemyGateIndex], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 1], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 2], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 3] }
+                        : new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[fullTreeIndex] };
 
                     chunk.Cells[x, 0, z] = new Cell(false, chunk.Cells[x, 0, z].Position, prots);
                     ChunkIndex index = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
@@ -190,7 +181,7 @@ namespace WaveFunctionCollapse
                 }
 
                 Vector3 pos = (chunk.Cells[x, 0, Mathf.FloorToInt(middle)].Position + chunk.Cells[x, 0, Mathf.CeilToInt(middle)].Position) / 2.0f;
-                enemySpawnHandler.SetEnemySpawn(pos, chunk.ChunkIndex);
+                enemySpawnHandler.SetEnemySpawn(pos + Vector3.right * 2, chunk.ChunkIndex);
             }
             
             if (direction == Direction.Left)

@@ -124,6 +124,9 @@ MonoBehaviour:
     - Name: Radius
       Entry: 4
       Data: 0.3
+    - Name: Lifetime
+      Entry: 4
+      Data: 0
     - Name: TriggerDamageDone
       Entry: 5
       Data: false
@@ -163,9 +166,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  LayerMask:
-    serializedVersion: 2
-    m_Bits: 128
-  AttackRadius: 0.2
   LootProbability:
   - 0.01
+  UnlockedThreshold: 0
+  CreditCost: 1

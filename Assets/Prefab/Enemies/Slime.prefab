@@ -11,8 +11,6 @@ GameObject:
   - component: {fileID: 4542743195278680505}
   - component: {fileID: 8778970936724990204}
   - component: {fileID: 9031087238719494386}
-  - component: {fileID: 653367872700333559}
-  - component: {fileID: 6431643350246984369}
   m_Layer: 9
   m_Name: Slime
   m_TagString: Untagged
@@ -67,37 +65,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deathLength: 1
   cachedAnimator: {fileID: 0}
---- !u!114 &653367872700333559
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4542743195278680511}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f280eac3c681de84d90582ff11259c56, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackData: {fileID: 11400000, guid: c8bfacc1bcdea154b880d1537efa84c6, type: 2}
---- !u!114 &6431643350246984369
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4542743195278680511}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f4d7599838c8af4a9d45b513169d557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyData: {fileID: 11400000, guid: c8bfacc1bcdea154b880d1537efa84c6, type: 2}
-  damageNumber: {fileID: 113033579351757082, guid: f03daa4315a134d4d94e833ba3733de0,
-    type: 3}
-  hitParticle: {fileID: 542933246792631625, guid: 021a2f7a2c5bc4449b4c64a66a050e8c,
-    type: 3}
-  healthbar: {fileID: 0}
 --- !u!1 &8119019412388548127
 GameObject:
   m_ObjectHideFlags: 0

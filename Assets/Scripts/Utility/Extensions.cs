@@ -8,6 +8,11 @@ public static class Extensions
         return new Vector2(v.x, v.z);
     }
     
+    public static float3 XyZ(this float3 v, float y = 0)
+    {
+        return new float3(v.x, y, v.z);
+    }
+    
     public static Vector3 ToVector3(this Vector2Int v)
     {
         return new Vector3(v.x, 0, v.y);

@@ -37,7 +37,14 @@ namespace Enemy
             base.OnDisable();
             
             Events.OnWaveStarted -= OnWaveStarted;
-            
+
+#if UNITY_EDITOR
+            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode &&
+                UnityEditor.EditorApplication.isPlaying)
+            {
+                return;
+            }
+#endif
             foreach (Entity entity in entities)
             {
                 entityManager.DestroyEntity(entity);

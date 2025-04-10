@@ -5,7 +5,6 @@ using Unity.Mathematics;
 using UnityEngine;
 using Unity.Jobs;
 using System;
-using WaveFunctionCollapse;
 
 namespace Pathfinding
 {

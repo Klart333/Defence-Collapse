@@ -48,8 +48,15 @@ namespace Pathfinding.ECS
         public void Execute(in LocalTransform transform)
         {
             int index = PathManager.GetIndex(transform.Position.x, transform.Position.z, CellScale, GridWidth);
-            MovementCosts[index]++;
-            Units[index]++;
+            if (MovementCosts[index] < short.MaxValue)
+            {
+                MovementCosts[index]++;
+            }
+            
+            if (Units[index] < short.MaxValue)
+            {
+                Units[index]++;
+            }
         }
     }
 }
