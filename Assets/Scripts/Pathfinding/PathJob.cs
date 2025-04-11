@@ -77,7 +77,6 @@ public struct PathJob : IJob
         }
     }
 
-
     private void GetNeighbours(int2 chunkIndex, int gridIndex, NativeArray<PathIndex> array)
     {
         int x = gridIndex % GridWidth;

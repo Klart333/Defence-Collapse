@@ -19,7 +19,6 @@ namespace Pathfinding.ECS
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            return;
             Entity pathBlobberEntity = SystemAPI.GetSingletonEntity<PathBlobber>();
             PathBlobber pathBlobber = SystemAPI.GetComponent<PathBlobber>(pathBlobberEntity);
 
