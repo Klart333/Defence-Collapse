@@ -11,7 +11,7 @@ namespace DataStructures.Queue.ECS
     [UpdateAfter(typeof(CheckAttackingSystem))]
     public partial class StopAttackingSystem : SystemBase   
     {
-        public static readonly Queue<int> KilledIndexes = new Queue<int>();
+        public static readonly Queue<PathIndex> KilledIndexes = new Queue<PathIndex>();
         
         protected override void OnUpdate()
         {
@@ -21,7 +21,7 @@ namespace DataStructures.Queue.ECS
                 return;
             }
             
-            NativeArray<int> indexes = new NativeArray<int>(count, Allocator.TempJob);
+            NativeArray<PathIndex> indexes = new NativeArray<PathIndex>(count, Allocator.TempJob);
             for (int i = 0; i < count; i++)
             {
                 indexes[i] = KilledIndexes.Dequeue();
@@ -46,7 +46,7 @@ namespace DataStructures.Queue.ECS
     public partial struct StopAttackingJob : IJobEntity
     {
         [ReadOnly]
-        public NativeArray<int> KilledIndexes;
+        public NativeArray<PathIndex> KilledIndexes;
 
         public EntityCommandBuffer.ParallelWriter ECB;
         
@@ -57,7 +57,7 @@ namespace DataStructures.Queue.ECS
         {
             for (int i = 0; i < Length; i++)
             {
-                if (attackingComponent.Target == KilledIndexes[i])
+                if (attackingComponent.Target.Equals(KilledIndexes[i]))
                 {
                     ECB.RemoveComponent<AttackingComponent>(sortKey, entity);
                 }

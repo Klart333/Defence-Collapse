@@ -6,6 +6,9 @@ using Unity.Mathematics;
 using UnityEngine;
 using Unity.Jobs;
 using System;
+using System.Collections.Generic;
+using Pathfinding.ECS;
+using Unity.Entities;
 
 namespace Pathfinding
 {
@@ -35,69 +38,62 @@ namespace Pathfinding
         [Title("Reference")]
         [SerializeField]
         private GroundGenerator groundGenerator;
-
-        public NativeArray<short> MovementCosts;
-        public NativeArray<short> Units;
         
-        private NativeArray<bool> notWalkableIndexes;
-        private NativeArray<bool> targetIndexes;
+        private readonly Dictionary<int, int2> listIndexToChunkIndex = new Dictionary<int, int2>();
+        private BlobAssetReference<PathChunkArray> pathChunks;
+        private NativeHashMap<int2, int> chunkIndexToListIndex;
 
-        private NativeArray<byte> directions;
-        private NativeArray<int> distances;
+        private EntityManager entityManager;
+        private Entity blobEntity;
 
-        private JobHandle jobHandle;
-
-        private bool waitingForData;
         private int arrayLength;
+        private int chunkAmount;
+        private int jobStartIndex;
 
-        public float GridWorldHeight => GridHeight * CellScale;
-        public float GridWorldWidth => GridWidth * CellScale;
-        public NativeArray<byte> Directions => directions;
+        public float GridWorldHeight => gridSize.y * CellScale;
+        public float GridWorldWidth => gridSize.x * CellScale;
         public float CellScale => cellScale;
-        public int GridHeight => gridSize.y;
-        public int GridWidth => gridSize.x;
 
         public BoolPathSet BlockerPathSet { get; private set; }
         public BoolPathSet TargetPathSet { get; private set; }
-        public ShortPathSet PathPathSet { get; private set; }
+        public IntPathSet PathPathSet { get; private set; }
 
         private void OnEnable()
         {
             arrayLength = gridSize.x * gridSize.y;
             
-            notWalkableIndexes = new NativeArray<bool>(arrayLength, Allocator.Persistent);
-            MovementCosts = new NativeArray<short>(arrayLength, Allocator.Persistent);
-            targetIndexes = new NativeArray<bool>(arrayLength, Allocator.Persistent);
-            directions = new NativeArray<byte>(arrayLength, Allocator.Persistent);
-            distances = new NativeArray<int>(arrayLength, Allocator.Persistent);
-            Units = new NativeArray<short>(arrayLength, Allocator.Persistent);
-
-            for (int i = 0; i < arrayLength; i++)
+            chunkIndexToListIndex = new NativeHashMap<int2, int>(1000, Allocator.Persistent);
+            
+            chunkAmount = 0;
+            chunkIndexToListIndex.Add(int2.zero, chunkAmount);    
+            listIndexToChunkIndex.Add(chunkAmount, int2.zero);
+            pathChunks = CreatePathChunks(++chunkAmount);
+            
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            blobEntity = entityManager.CreateEntity();
+            entityManager.AddComponentData(blobEntity, new PathBlobber
             {
-                MovementCosts[i] = 100;
-            }
-
-            BlockerPathSet = new BoolPathSet(notWalkableIndexes);
+                PathBlob = pathChunks,
+                ChunkIndexToListIndex = chunkIndexToListIndex.AsReadOnly(),
+            });
+            
+            BlockerPathSet = new BoolPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].NotWalkableIndexes);
             GetPathInformation += BlockerPathSet.RebuildTargetHashSet;
 
-            TargetPathSet = new BoolPathSet(targetIndexes);
+            TargetPathSet = new BoolPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].TargetIndexes);
             GetPathInformation += TargetPathSet.RebuildTargetHashSet;
 
-            PathPathSet = new ShortPathSet(MovementCosts, -94);
+            PathPathSet = new IntPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].MovementCosts, -94);
             GetPathInformation += PathPathSet.RebuildTargetHashSet;
             
             groundGenerator.OnLockedChunkGenerated += OnChunkGenerated;
         }
-
+        
         private void OnDisable()
         {
-            notWalkableIndexes.Dispose();
-            MovementCosts.Dispose();
-            targetIndexes.Dispose();
-            directions.Dispose();
-            distances.Dispose();
-            Units.Dispose();
-
+            chunkIndexToListIndex.Dispose();
+            pathChunks.Dispose();
+            
             GetPathInformation -= BlockerPathSet.RebuildTargetHashSet;
             GetPathInformation -= TargetPathSet.RebuildTargetHashSet;
             GetPathInformation -= PathPathSet.RebuildTargetHashSet;
@@ -107,66 +103,105 @@ namespace Pathfinding
 
         private void Update()
         {
-            if (!waitingForData)
-            {
-                UpdateFlowField().Forget(Debug.LogError);
-            }
+            UpdateFlowField();
         }
         
         private void OnChunkGenerated(Chunk chunk)
         {
+            chunkIndexToListIndex.Add(chunk.ChunkIndex.xz, chunkAmount);
+            listIndexToChunkIndex.Add(chunkAmount, chunk.ChunkIndex.xz);
+            pathChunks.Dispose();
+            pathChunks = CreatePathChunks(++chunkAmount);
             
+            entityManager.AddComponentData(blobEntity, new PathBlobber
+            {
+                PathBlob = pathChunks,
+                ChunkIndexToListIndex = chunkIndexToListIndex.AsReadOnly(),
+            });
         }
         
-        private async UniTask UpdateFlowField()
+        private BlobAssetReference<PathChunkArray> CreatePathChunks(int chunkAmount)
         {
-            waitingForData = true;
-            for (int i = 0; i < MovementCosts.Length; i++)
+            var builder = new BlobBuilder(Allocator.Temp);
+            ref PathChunkArray pathChunkArray = ref builder.ConstructRoot<PathChunkArray>();
+
+            BlobBuilderArray<PathChunk> arrayBuilder = builder.Allocate(
+                ref pathChunkArray.PathChunks,
+                chunkAmount
+            );
+
+            for (int i = 0; i < chunkAmount; i++)
             {
-                MovementCosts[i] -= Units[i];
-                Units[i] = 0;
+                ref PathChunk pathChunk = ref arrayBuilder[i];
+                BuildPathChunk(ref pathChunk, i);
             }
             
-            GetPathInformation?.Invoke();
-            await UniTask.DelayFrame(2);
+            BlobAssetReference<PathChunkArray> result = builder.CreateBlobAssetReference<PathChunkArray>(Allocator.Persistent);
+            builder.Dispose();
+            return result;
+            
+            void BuildPathChunk(ref PathChunk pathChunk, int index)
+            {
+                pathChunk.ChunkIndex = listIndexToChunkIndex[index];
+                builder.Allocate(ref pathChunk.Units, arrayLength);
+                builder.Allocate(ref pathChunk.Distances, arrayLength);
+                builder.Allocate(ref pathChunk.Directions, arrayLength);
+                builder.Allocate(ref pathChunk.TargetIndexes, arrayLength);
+                builder.Allocate(ref pathChunk.NotWalkableIndexes, arrayLength);
+                BlobBuilderArray<int> movements = builder.Allocate(ref pathChunk.MovementCosts, arrayLength);
 
+                for (int i = 0; i < arrayLength; i++)
+                {
+                    movements[i] = 100;
+                }
+            }
+        }
+        
+        private void UpdateFlowField()
+        {
+            GetPathInformation?.Invoke();
+            
             new PathJob
             {
-                NotWalkableIndexes = notWalkableIndexes.AsReadOnly(),
-                MovementCosts = MovementCosts.AsReadOnly(),
-                TargetIndexes = targetIndexes.AsReadOnly(),
+                PathChunks = pathChunks,
+                ChunkIndexToListIndex = chunkIndexToListIndex.AsReadOnly(),
+                Start = jobStartIndex,
                 ArrayLength = arrayLength,
-                Directions = directions,
                 GridWidth = gridSize.x,
-                Distances = distances,
-                BatchSize = gridSize.x,
-            }.Schedule(arrayLength, gridSize.x).Complete();
-            waitingForData = false;
+                GridHeight = gridSize.y,
+                ChunkAmount = chunkAmount,
+            }.Schedule().Complete();
+
+            jobStartIndex = (jobStartIndex + 1) % chunkAmount;
         }
 
         #region Debug
 
         private void OnDrawGizmosSelected()
         {
-            if (directions.Length <= 0)
+            if (!pathChunks.IsCreated)
             {
                 return;
             }
-
-            for (int i = 0; i < directions.Length; i++)
+            
+            for (int i = 0; i < chunkAmount; i++)
             {
-                Vector3 pos = GetPos(i).ToXyZ(1);
-                if (directions[i] == byte.MaxValue)
+                ref PathChunk pathChunk = ref pathChunks.Value.PathChunks[i];
+                for (int j = 0; j < arrayLength; j++)
                 {
-                    Gizmos.color = Color.green;
-                    Gizmos.DrawWireCube(pos, Vector3.one * cellScale);
-                    continue;
-                }
+                    PathIndex index = new PathIndex(pathChunk.ChunkIndex, j);
+                    Vector3 pos = (Vector3)GetPos(index) + Vector3.up * 0.1f;
+                    if (pathChunk.Directions[j] == byte.MaxValue)
+                    {
+                        Gizmos.color = Color.green;
+                        Gizmos.DrawWireCube(pos, Vector3.one * cellScale);
+                        continue;
+                    }
                 
-                Gizmos.color = Color.Lerp(Color.red, Color.black, distances[i] / (float)10000);
-                float2 dir = ByteToDirection(directions[i]);
-                Gizmos.DrawLine(pos, pos + new Vector3(dir.x, 0, dir.y) * cellScale);
-
+                    Gizmos.color = Color.Lerp(Color.red, Color.black, pathChunk.Distances[j] / (float)10000);
+                    float2 dir = ByteToDirection(pathChunk.Directions[j]);
+                    Gizmos.DrawLine(pos, pos + new Vector3(dir.x, 0, dir.y) * cellScale);
+                }
             }
         }
 
@@ -183,27 +218,14 @@ namespace Pathfinding
         {
             return pos is { x: > 0, y: > 0 } && pos.x < GridWorldWidth && pos.y < GridWorldHeight;
         }
-
-        public int GetIndex(float xPos, float zPos)
-        {
-            return GetIndex(xPos, zPos, CellScale, GridWidth);
-        }
-
-        public int GetIndex(Vector2 pos)
-        {
-            return GetIndex(pos.x, pos.y, CellScale, GridWidth);
-        }
-
+        
+        #region Static
+        
         private const float HALF_BUILDING_CELL = 0.25f;
         private const float FULL_BUILDING_CELL = 0.5f;
-        public Vector2 GetPos(int index)
-        {
-            return new Vector2(index % GridWidth - FULL_BUILDING_CELL, Mathf.FloorToInt((float)index / GridWidth) - FULL_BUILDING_CELL) * CellScale;
-        }
-
-        #region Static
-
-        
+        private const float CHUNK_SIZE = 16;
+        private const float CELL_SCALE = 0.5f;
+        private const int GRID_WIDTH = 32; // Also change GetNeighbours inside PathJob
         public static float2 ByteToDirection(byte directionByte)
         {
             float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees
@@ -216,13 +238,88 @@ namespace Pathfinding
             return new float3(math.cos(angleRad), y, math.sin(angleRad));
         }
         
-        public static int GetIndex(float xPos, float zPos, float cellScale, int gridWidth)
+        public static float3 ChunkIndexToWorld(int2 chunkIndex)
         {
-            return Math.GetMultiple(xPos + HALF_BUILDING_CELL, cellScale) + Math.GetMultiple(zPos + HALF_BUILDING_CELL, cellScale) * gridWidth;
+            return new float3(chunkIndex.x * CHUNK_SIZE, 0, chunkIndex.y * CHUNK_SIZE);
+        }
+        
+        public static float3 GetPos(PathIndex index)
+        {
+            float3 chunkPos = ChunkIndexToWorld(index.ChunkIndex);
+            float3 gridPos = new float3(index.GridIndex % GRID_WIDTH - FULL_BUILDING_CELL, 0, Mathf.FloorToInt((float)index.GridIndex / GRID_WIDTH) - FULL_BUILDING_CELL) * CELL_SCALE;
+            
+            return chunkPos + gridPos;
+        }
+        
+        public static PathIndex GetIndex(float xPos, float zPos)
+        {
+            // Find which chunk the position is in
+            int chunkX = Math.GetMultipleFloored(xPos + FULL_BUILDING_CELL, CHUNK_SIZE);
+            int chunkZ = Math.GetMultipleFloored(zPos + FULL_BUILDING_CELL, CHUNK_SIZE);
+            int2 chunkIndex = new int2(chunkX, chunkZ);
+        
+            // Calculate position relative to the chunk's origin
+            float localX = xPos - chunkX * CHUNK_SIZE;
+            float localZ = zPos - chunkZ * CHUNK_SIZE;
+        
+            // Find grid indices within the chunk
+            int gridX = Math.GetMultiple(localX + HALF_BUILDING_CELL, CELL_SCALE);
+            int gridZ = Math.GetMultiple(localZ + HALF_BUILDING_CELL, CELL_SCALE);
+        
+            // Convert 2D grid index to 1D
+            int targetIndex = gridZ * GRID_WIDTH + gridX;
+        
+            return new PathIndex(chunkIndex, targetIndex);
         }
 
         #endregion
 
         #endregion
+    }
+
+    public readonly struct PathIndex : IEquatable<PathIndex>
+    {
+        public readonly int2 ChunkIndex;
+        public readonly int GridIndex;
+
+        public PathIndex(int2 chunkIndex, int gridIndex)
+        {
+            ChunkIndex = chunkIndex;
+            GridIndex = gridIndex;
+        }
+
+        public bool Equals(PathIndex other)
+        {
+            return ChunkIndex.Equals(other.ChunkIndex) && GridIndex.Equals(other.GridIndex);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathIndex other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ChunkIndex, GridIndex);
+        }
+    }
+
+    public struct PathChunkArray
+    {
+        public BlobArray<PathChunk> PathChunks;
+    }
+    
+    public struct PathChunk
+    {
+        public BlobArray<int> MovementCosts;
+        public BlobArray<short> Units;
+        
+        public BlobArray<bool> NotWalkableIndexes;
+        public BlobArray<bool> TargetIndexes;
+        
+        public BlobArray<byte> Directions;
+        public BlobArray<int> Distances;
+        
+        public int2 ChunkIndex;
     }
 }

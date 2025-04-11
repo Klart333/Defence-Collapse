@@ -25,7 +25,7 @@ namespace Pathfinding
         [SerializeField]
         private Indexer indexer;
 
-        public List<int> TargetIndexes => indexer.Indexes;
+        public List<PathIndex> TargetIndexes => indexer.Indexes;
 
         private void OnValidate()
         {

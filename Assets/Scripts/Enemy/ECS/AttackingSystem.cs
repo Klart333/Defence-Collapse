@@ -4,12 +4,13 @@ using Unity.Entities;
 using Unity.Burst;
 using UnityEngine;
 using System;
+using Pathfinding;
 
 namespace DataStructures.Queue.ECS
 {
     public partial struct AttackingSystem : ISystem
     {
-        public static readonly Dictionary<int, Action<float>> DamageEvent = new Dictionary<int, Action<float>>();
+        public static readonly Dictionary<PathIndex, Action<float>> DamageEvent = new Dictionary<PathIndex, Action<float>>();
         
         private NativeQueue<DamageIndex> damageQueue;
 
@@ -29,7 +30,7 @@ namespace DataStructures.Queue.ECS
 
             state.Dependency.Complete();
 
-            HashSet<int> failedAttacks = new HashSet<int>();
+            HashSet<PathIndex> failedAttacks = new HashSet<PathIndex>();
             while (damageQueue.TryDequeue(out DamageIndex item))
             {
                 if (DamageEvent.TryGetValue(item.Index, out Action<float> action))
@@ -38,12 +39,11 @@ namespace DataStructures.Queue.ECS
                 }
                 else
                 {
-                    Debug.Log($"Trying to damage index: {item.Index}, but not found");
                     failedAttacks.Add(item.Index);
                 }
             }
 
-            foreach (int failedAttack in failedAttacks)
+            foreach (PathIndex failedAttack in failedAttacks)
             {
                 StopAttackingSystem.KilledIndexes.Enqueue(failedAttack);
             }
@@ -80,6 +80,6 @@ namespace DataStructures.Queue.ECS
     public struct DamageIndex
     {
         public float Damage;
-        public int Index;
+        public PathIndex Index;
     }
 }

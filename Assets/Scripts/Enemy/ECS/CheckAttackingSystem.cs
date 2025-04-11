@@ -1,4 +1,5 @@
 using Pathfinding;
+using Pathfinding.ECS;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -14,19 +15,22 @@ namespace DataStructures.Queue.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            
+            state.RequireForUpdate<PathBlobber>();
         }
 
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            Entity pathBlobberEntity = SystemAPI.GetSingletonEntity<PathBlobber>();
+            PathBlobber pathBlobber = SystemAPI.GetComponent<PathBlobber>(pathBlobberEntity);
             
+            var ecb = new EntityCommandBuffer(Allocator.TempJob);
+
             new CheckAttackingJob
             {
                 ECB = ecb.AsParallelWriter(),
-                CellScale = PathManager.Instance.CellScale,
-                GridWidth = PathManager.Instance.GridWidth,
-                Directions = PathManager.Instance.Directions.AsReadOnly(),
+                PathChunks = pathBlobber.PathBlob,
+                ChunkIndexToListIndex = pathBlobber.ChunkIndexToListIndex,
             }.ScheduleParallel();
             
             state.Dependency.Complete(); 
@@ -46,20 +50,17 @@ namespace DataStructures.Queue.ECS
     {
         public EntityCommandBuffer.ParallelWriter ECB;
 
-        [ReadOnly]
-        public float CellScale;
-
-        [ReadOnly]
-        public int GridWidth;
+        public BlobAssetReference<PathChunkArray> PathChunks;
         
         [ReadOnly, NativeDisableContainerSafetyRestriction]
-        public NativeArray<byte>.ReadOnly Directions;
+        public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
         
         [BurstCompile]
         public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in FlowFieldComponent flowField, in LocalTransform transform)
         {
-            int index = PathManager.GetIndex(transform.Position.x, transform.Position.z, CellScale, GridWidth);
-            if (Directions[index] == byte.MaxValue)
+            PathIndex index = PathManager.GetIndex(transform.Position.x, transform.Position.z);
+            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[index.ChunkIndex]];
+            if (valuePathChunk.Directions[index.GridIndex] == byte.MaxValue)
             {
                 ECB.AddComponent(sortKey, entity, new AttackingComponent { Target = index });
             }
@@ -68,6 +69,6 @@ namespace DataStructures.Queue.ECS
 
     public struct AttackingComponent : IComponentData
     {
-        public int Target;
+        public PathIndex Target;
     }
 }

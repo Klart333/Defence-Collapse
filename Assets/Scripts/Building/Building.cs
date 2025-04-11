@@ -274,7 +274,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         
         for (int i = 0; i < indexer.Indexes.Count; i++)
         {
-            int index = indexer.Indexes[i];
+            PathIndex index = indexer.Indexes[i];
             AttackingSystem.DamageEvent.TryAdd(index, BuildingHandler[this].TakeDamage);
         }
     }
@@ -289,7 +289,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         GetComponent<PathTarget>().enabled = false;
         for (int i = 0; i < indexer.Indexes.Count; i++)
         {
-            int index = indexer.Indexes[i];
+            PathIndex index = indexer.Indexes[i];
             AttackingSystem.DamageEvent.Remove(index);
         }
         

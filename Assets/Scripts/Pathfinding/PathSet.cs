@@ -1,122 +1,131 @@
-﻿using System;
-using System.Collections.Generic;
-using Unity.Collections;
+﻿using System.Collections.Generic;
+using Unity.Mathematics;
+using Unity.Entities;
 using UnityEngine;
+using System;
 
-public abstract class PathSet<T> where T : struct
+namespace Pathfinding
 {
-    protected PathSet(NativeArray<T> targetArray)
+    public abstract class PathSet<T> where T : struct
     {
-        this.targetArray = targetArray;
-    }
-    
-    protected readonly HashSet<IPathTarget> targets = new HashSet<IPathTarget>();
-    protected NativeArray<T> targetArray;
-
-    protected readonly HashSet<int> TargetIndexes = new HashSet<int>();
-
-    protected bool isDirty = false;
-
-    public void Register(IPathTarget target)
-    {
-        if (!targets.Add(target))
-        {
-            Debug.LogError("Trying to add same target again");
-            return;
-        }
-
-        target.OnIndexerRebuild += SetIsDirty;
-    }
-
-    public void Unregister(IPathTarget target)
-    {
-        if (!targets.Remove(target))
-        {
-            Debug.LogError("Trying to remove non-registered target");
-        }
-
-        target.OnIndexerRebuild -= SetIsDirty;
-        isDirty = true;
-    }
-    
-    private void SetIsDirty() => isDirty = true;
-
-    public abstract void RebuildTargetHashSet();
-}
-
-public class BoolPathSet : PathSet<bool>
-{
-    public BoolPathSet(NativeArray<bool> targetArray) : base(targetArray)
-    {
-    }
-
-    public override void RebuildTargetHashSet()
-    {
-        if (!isDirty)
-        {
-            return;
-        }
-
-        isDirty = false;
-        foreach (var index in TargetIndexes)
-        {
-            targetArray[index] = false;
-        }
+        public delegate ref BlobArray<T> RefFunc<in T1, out TResult>(T1 arg);
         
-        TargetIndexes.Clear();
-        foreach (var target in targets)
+        protected PathSet(RefFunc<int2, BlobArray<T>> targetArray)
         {
-            for (int i = 0; i < target.TargetIndexes.Count; i++)
-            {
-                int index = target.TargetIndexes[i];
-                if (index < 0 || index >= targetArray.Length) continue;
+            this.targetArray = targetArray;
+        }
 
-                TargetIndexes.Add(index);
-                targetArray[index] = true;
+        protected readonly HashSet<IPathTarget> targets = new HashSet<IPathTarget>();
+        protected readonly HashSet<PathIndex> TargetIndexes = new HashSet<PathIndex>();
+        protected readonly RefFunc<int2, BlobArray<T>> targetArray;
+
+        protected bool isDirty;
+
+        public void Register(IPathTarget target)
+        {
+            if (!targets.Add(target))
+            {
+                Debug.LogError("Trying to add same target again");
+                return;
             }
-        }
-    }
-}
-public class ShortPathSet : PathSet<short>
-{
-    public ShortPathSet(NativeArray<short> targetArray, int value) : base(targetArray)
-    {
-        this.value = value;
-    }
 
-    private readonly int value;
-
-    public override void RebuildTargetHashSet()
-    {
-        if (!isDirty)
-        {
-            return;
+            target.OnIndexerRebuild += SetIsDirty;
         }
 
-        isDirty = false;
-        foreach (var index in TargetIndexes)
+        public void Unregister(IPathTarget target)
         {
-            targetArray[index] = (short)(targetArray[index] - value);
-        }
-        
-        TargetIndexes.Clear();
-        foreach (var target in targets)
-        {
-            for (int i = 0; i < target.TargetIndexes.Count; i++)
+            if (!targets.Remove(target))
             {
-                int index = target.TargetIndexes[i];
-                if (TargetIndexes.Add(index))
+                Debug.LogError("Trying to remove non-registered target");
+            }
+
+            target.OnIndexerRebuild -= SetIsDirty;
+            isDirty = true;
+        }
+
+        private void SetIsDirty() => isDirty = true;
+
+        public abstract void RebuildTargetHashSet();
+    }
+
+    public class BoolPathSet : PathSet<bool>
+    {
+        public BoolPathSet(RefFunc<int2, BlobArray<bool>> targetArray) : base(targetArray)
+        {
+        }
+
+        public override void RebuildTargetHashSet()
+        {
+            if (!isDirty)
+            {
+                return;
+            }
+
+            isDirty = false;
+            foreach (PathIndex index in TargetIndexes)
+            {
+                ref BlobArray<bool> blobArray = ref targetArray.Invoke(index.ChunkIndex);
+                blobArray[index.GridIndex] = false;
+            }
+
+            TargetIndexes.Clear();
+            foreach (IPathTarget target in targets)
+            {
+                for (int i = 0; i < target.TargetIndexes.Count; i++)
                 {
-                    targetArray[index] = (short)(targetArray[index] + value);
+                    PathIndex index = target.TargetIndexes[i];
+                    if (!TargetIndexes.Add(index)) continue;
+
+                    ref BlobArray<bool> blobArray = ref targetArray.Invoke(index.ChunkIndex);
+                    blobArray[index.GridIndex] = true;
                 }
             }
         }
     }
-}
 
-public interface IPathTarget
-{
-    public event Action OnIndexerRebuild;
+    public class IntPathSet : PathSet<int>
+    {
+        public IntPathSet(RefFunc<int2, BlobArray<int>> targetArray, int value) : base(targetArray)
+        {
+            this.value = value;
+        }
 
-    public List<int> TargetIndexes { get; }
+        private readonly int value;
+
+        public override void RebuildTargetHashSet()
+        {
+            if (!isDirty)
+            {
+                return;
+            }
+
+            isDirty = false;
+            foreach (PathIndex index in TargetIndexes)
+            {
+                ref BlobArray<int> blobArray = ref targetArray.Invoke(index.ChunkIndex);
+                blobArray[index.GridIndex] = (short)(blobArray[index.GridIndex] - value);
+            }
+
+            TargetIndexes.Clear();
+            foreach (var target in targets)
+            {
+                for (int i = 0; i < target.TargetIndexes.Count; i++)
+                {
+                    PathIndex index = target.TargetIndexes[i];
+                    if (!TargetIndexes.Add(index)) continue;
+
+                    ref BlobArray<int> blobArray = ref targetArray.Invoke(index.ChunkIndex);
+                    blobArray[index.GridIndex] += value;
+                }
+            }
+        }
+    }
+
+    public interface IPathTarget
+    {
+        public event Action OnIndexerRebuild;
+
+        public List<PathIndex> TargetIndexes { get; }
+    }
+
 }

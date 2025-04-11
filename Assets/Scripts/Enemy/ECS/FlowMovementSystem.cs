@@ -6,6 +6,7 @@ using Unity.Entities;
 using Unity.Burst;
 using Pathfinding;
 using Gameplay;
+using Pathfinding.ECS;
 
 namespace DataStructures.Queue.ECS
 {
@@ -16,23 +17,21 @@ namespace DataStructures.Queue.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<PathBlobber>();
         }
 
         public void OnUpdate(ref SystemState state)
         {
-            if (PathManager.Instance == null)
-            {
-                return;
-            }
+            Entity pathBlobberEntity = SystemAPI.GetSingletonEntity<PathBlobber>();
+            PathBlobber pathBlobber = SystemAPI.GetComponent<PathBlobber>(pathBlobberEntity);
             
             float deltaTime = SystemAPI.Time.DeltaTime;
             
             new FlowMovementJob
             {
                 DeltaTime = deltaTime * GameSpeedManager.Instance.GameSpeed,
-                CellScale = PathManager.Instance.CellScale,
-                GridWidth = PathManager.Instance.GridWidth,
-                Directions = PathManager.Instance.Directions.AsReadOnly(),
+                PathChunks = pathBlobber.PathBlob,
+                ChunkIndexToListIndex = pathBlobber.ChunkIndexToListIndex,
             }.ScheduleParallel();
         }
 
@@ -48,21 +47,18 @@ namespace DataStructures.Queue.ECS
     {
         [ReadOnly]
         public float DeltaTime;
-
-        [ReadOnly]
-        public float CellScale;
-
-        [ReadOnly]
-        public int GridWidth;
+        
+        public BlobAssetReference<PathChunkArray> PathChunks;
         
         [ReadOnly, NativeDisableContainerSafetyRestriction]
-        public NativeArray<byte>.ReadOnly Directions;
+        public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
 
         [BurstCompile]
         private void Execute(in SpeedComponent speed, ref FlowFieldComponent flowField, ref LocalTransform transform)
         {
-            int index = PathManager.GetIndex(transform.Position.x, transform.Position.z, CellScale, GridWidth);
-            float3 direction = PathManager.ByteToDirectionFloat3(Directions[index], flowField.Forward.y);
+            PathIndex index = PathManager.GetIndex(transform.Position.x, transform.Position.z);
+            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[index.ChunkIndex]];
+            float3 direction = PathManager.ByteToDirectionFloat3(valuePathChunk.Directions[index.GridIndex], flowField.Forward.y);
             
             flowField.Forward = math.normalize(flowField.Forward + direction * (flowField.TurnSpeed * DeltaTime));
             flowField.Up = math.normalize(flowField.Up + flowField.TargetUp * flowField.TurnSpeed * DeltaTime * 5);

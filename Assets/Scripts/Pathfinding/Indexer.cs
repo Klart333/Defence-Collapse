@@ -21,7 +21,7 @@ namespace Pathfinding
 
         private bool needsRebuilding = true;
 
-        public List<int> Indexes { get; } = new List<int>();
+        public List<PathIndex> Indexes { get; } = new List<PathIndex>();
 
         private void OnValidate()
         {
@@ -71,7 +71,7 @@ namespace Pathfinding
                 if (indexColliderCenter)
                 {
                     Vector2 pos = colliders[i].bounds.center.XZ();
-                    int index = PathManager.Instance.GetIndex(pos);
+                    PathIndex index = PathManager.GetIndex(pos.x, pos.y);
                     Indexes.Add(index);
                 }
                 else
@@ -82,7 +82,7 @@ namespace Pathfinding
 
             if (Indexes.Count == 0)
             {
-                Vector2 pos = transform.position;
+                Vector2 pos = transform.position.XZ();
                 if (PathManager.Instance.CheckIfValid(pos))
                 {
                     //Indexes.Add(PathManager.Instance.GetIndex(pos));
@@ -106,7 +106,7 @@ namespace Pathfinding
             Gizmos.color = Color.blue;
             for (int i = 0; i < Indexes.Count; i++)
             {
-                Gizmos.DrawCube(PathManager.Instance.GetPos(Indexes[i]).ToXyZ(1), Vector3.one * 0.5f * PathManager.Instance.CellScale);
+                Gizmos.DrawCube(PathManager.GetPos(Indexes[i]), Vector3.one * 0.5f * PathManager.Instance.CellScale);
             }
         }
     }
@@ -121,7 +121,7 @@ namespace Pathfinding
     
     public static class IndexerUtility
     {
-        public static void BuildColliderIndexes(Collider collider, List<int> indexes)
+        public static void BuildColliderIndexes(Collider collider, List<PathIndex> indexes)
         {
             float xMin = Mathf.Max(0, collider.bounds.min.x);
             float xMax = Mathf.Min(PathManager.Instance.GridWorldWidth, collider.bounds.max.x);
@@ -165,7 +165,7 @@ namespace Pathfinding
                             float zDistance = zPos * 2 - zMax - zMin + 1;
                             if (xDistance * xDistance + zDistance * zDistance <= xRange * zRange)
                             {
-                                indexes.Add(PathManager.Instance.GetIndex(xPos, zPos));
+                                indexes.Add(PathManager.GetIndex(xPos, zPos));
                             }
 
                             break;
@@ -177,7 +177,7 @@ namespace Pathfinding
                             // Check if the point lies within the rectangle's bounds in local space
                             if (Mathf.Abs(localPoint.x) <= boxSize.x / 2 && Mathf.Abs(localPoint.z) <= boxSize.z / 2)
                             {
-                                indexes.Add(PathManager.Instance.GetIndex(xPos, zPos));
+                                indexes.Add(PathManager.GetIndex(xPos, zPos));
                             }
 
                             break;
@@ -189,7 +189,7 @@ namespace Pathfinding
                             // Check if the closest point is effectively the same as the original point (inside the mesh)
                             if (Vector3.Distance(point, closestPoint) < 0.01f)
                             {
-                                indexes.Add(PathManager.Instance.GetIndex(xPos, zPos));
+                                indexes.Add(PathManager.GetIndex(xPos, zPos));
                             }
 
                             break;
