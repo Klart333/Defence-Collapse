@@ -26,5 +26,17 @@ namespace WaveFunctionCollapse
                 _ => throw new ArgumentOutOfRangeException(nameof(dir), dir, null)
             };
         }
+        
+        public static int2 DirectionToInt2(Direction dir)
+        {
+            return dir switch
+            {
+                Direction.Right => new int2(1, 0),
+                Direction.Left => new int2(-1, 0),
+                Direction.Forward => new int2(0, 1),
+                Direction.Backward => new int2(0, 1),
+                _ => throw new ArgumentOutOfRangeException(nameof(dir), dir, null)
+            };
+        }
     }
 }

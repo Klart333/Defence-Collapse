@@ -151,8 +151,13 @@ namespace WaveFunctionCollapse
                 Chunk adjacent = waveFunction.LoadChunk(chunkIndex, chunkSize, defaultPrototypeInfoData, false);
                 chunkMaskHandler.CreateMask(adjacent, Math.IntToAdjacency(new int2(-x, -z)));
                 adjacentChunks.Add(adjacent);
+
+                if (enemySpawnHandler.ShouldSetSpawnPoint(chunkIndex, out int difficulty))
+                {
+                    SetEnemySpawn(adjacent, DirectionUtility.Int2ToDirection(new int2(-x, -z)), difficulty);
+                }
+
                 
-                SetEnemySpawn(adjacent, DirectionUtility.Int2ToDirection(new int2(-x, -z)));
             }
 
             waveFunction.Propagate();
@@ -163,42 +168,34 @@ namespace WaveFunctionCollapse
             }
         }
 
-        private void SetEnemySpawn(Chunk chunk, Direction direction)
+        private void SetEnemySpawn(Chunk chunk, Direction direction, int difficulty)
         {
-            if (direction == Direction.Right)
+            float middle = (chunk.Depth - 1) / 2.0f;
+
+            bool isHorizontal = direction is Direction.Right or Direction.Left;
+            int edge = isHorizontal 
+                ? direction == Direction.Right ? chunk.Width - 1 : 0
+                : direction == Direction.Forward ? chunk.Depth - 1 : 0;
+
+            int end = isHorizontal ? chunk.Depth : chunk.Width;
+            for (int i = 2; i < end - 2; i++)
             {
-                int x = chunk.Width - 1;
-                float middle = (chunk.Depth - 1) / 2.0f;
-                for (int z = 1; z < chunk.Depth - 1; z++)
-                {
-                    List<PrototypeData> prots = Mathf.Abs(middle - z) <= 1
-                        ? new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[enemyGateIndex], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 1], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 2], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 3] }
-                        : new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[fullTreeIndex] };
-
-                    chunk.Cells[x, 0, z] = new Cell(false, chunk.Cells[x, 0, z].Position, prots);
-                    ChunkIndex index = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
-                    waveFunction.CellStack.Push(index);
-                }
-
-                Vector3 pos = (chunk.Cells[x, 0, Mathf.FloorToInt(middle)].Position + chunk.Cells[x, 0, Mathf.CeilToInt(middle)].Position) / 2.0f;
-                enemySpawnHandler.SetEnemySpawn(pos + Vector3.right * 2, chunk.ChunkIndex);
-            }
+                int x = isHorizontal ? edge : i;
+                int z = isHorizontal ? i : edge;
             
-            if (direction == Direction.Left)
-            {
-                int x = 0;
-                float middle = (chunk.Depth - 1) / 2.0f;
-                for (int z = 1; z < chunk.Depth - 1; z++)
-                {
-                    List<PrototypeData> prots = Mathf.Abs(middle - z) <= 1 
-                        ? new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[enemyGateIndex], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 1], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 2], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 3] } 
-                        : new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[fullTreeIndex] };
-                    
-                    chunk.Cells[x, 0, z] = new Cell(false, chunk.Cells[x, 0, z].Position, prots);
-                    ChunkIndex index = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
-                    waveFunction.CellStack.Push(index);
-                }
+                List<PrototypeData> prots = Mathf.Abs(middle - (isHorizontal ? z : x)) <= 1
+                    ? new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[enemyGateIndex], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 1], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 2], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 3] }
+                    : new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[fullTreeIndex] };
+
+                chunk.Cells[x, 0, z] = new Cell(false, chunk.Cells[x, 0, z].Position, prots);
+                ChunkIndex index = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
+                waveFunction.CellStack.Push(index);
             }
+
+            Vector3 pos = isHorizontal
+                ? (chunk.Cells[edge, 0, Mathf.FloorToInt(middle)].Position + chunk.Cells[edge, 0, Mathf.CeilToInt(middle)].Position) / 2.0f
+                : (chunk.Cells[Mathf.FloorToInt(middle), 0, edge].Position + chunk.Cells[Mathf.CeilToInt(middle), 0, edge].Position) / 2.0f;
+            enemySpawnHandler.SetEnemySpawn(pos - (Vector3)DirectionUtility.DirectionToInt2(direction).XyZ(), chunk.ChunkIndex, difficulty);
         }
 
         private void CombineMeshes()
