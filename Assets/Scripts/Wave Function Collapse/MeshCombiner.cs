@@ -3,14 +3,10 @@ using UnityEngine;
 
 public class MeshCombiner : MonoBehaviour
 {
-    private MeshFilter meshFilter;
-
-    private void Start()
-    {
-        meshFilter = GetComponent<MeshFilter>();
-    }
-
-    public Mesh CombineMeshes()
+    [SerializeField]
+    private PooledMonoBehaviour meshPrefab;
+    
+    public Mesh CombineMeshes(out GameObject spawned)
     {
         // All our children (and us)
         MeshFilter[] filters = GetComponentsInChildren<MeshFilter>(false);
@@ -20,9 +16,6 @@ public class MeshCombiner : MonoBehaviour
         MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>(false); // <-- you can optimize this
         foreach (MeshRenderer meshRenderer in renderers)
         {
-            if (meshRenderer.transform == transform)
-                continue;
-
             Material[] localMats = meshRenderer.sharedMaterials;
             foreach (Material localMat in localMats)
                 if (!materials.Contains(localMat))
@@ -82,11 +75,11 @@ public class MeshCombiner : MonoBehaviour
         }
         Mesh finalMesh = new Mesh();
         finalMesh.CombineMeshes(finalCombiners.ToArray(), false);
-        meshFilter.sharedMesh = finalMesh;
-        //Debug.Log("Final mesh has " + submeshes.Count + " materials.");
-
-        GetComponent<MeshCollider>().sharedMesh = finalMesh;
-        GetComponent<MeshRenderer>().materials = materials.ToArray();
+        
+        spawned = meshPrefab.GetAtPosAndRot<PooledMonoBehaviour>(Vector3.zero, Quaternion.identity).gameObject;
+        spawned.GetComponent<MeshFilter>().sharedMesh = finalMesh;
+        spawned.GetComponent<MeshCollider>().sharedMesh = finalMesh;
+        spawned.GetComponent<MeshRenderer>().materials = materials.ToArray();
 
         return finalMesh;
     }

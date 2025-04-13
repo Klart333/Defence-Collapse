@@ -44,10 +44,13 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private bool debug;
 
-        private bool ShouldAwait => awaitEveryFrame > 0;
-
         private readonly Queue<List<IBuildable>> buildQueue = new Queue<List<IBuildable>>();
 
+        private Vector3 offset;
+
+        private bool isUpdatingChunks;
+
+        
         private readonly Vector2Int[] corners =
         {
             new Vector2Int(-1, -1),
@@ -56,13 +59,10 @@ namespace WaveFunctionCollapse
             new Vector2Int(-1, 1),
         };
 
-        private Vector3 offset;
-
-        private bool isUpdatingChunks;
-        private bool isRunning;
-
-        public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
         public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.GridScale.x, chunkSize.y * ChunkWaveFunction.GridScale.y, chunkSize.z * ChunkWaveFunction.GridScale.z);
+        public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
+        private bool ShouldAwait => awaitEveryFrame > 0;
+        public bool IsGenerating {get; private set;}
         public Vector3Int ChunkSize => chunkSize;
 
         private void OnEnable()
@@ -246,9 +246,9 @@ namespace WaveFunctionCollapse
 
         public async UniTask Run()
         {
-            if (isRunning) return;
+            if (IsGenerating) return;
 
-            isRunning = true;
+            IsGenerating = true;
             Stopwatch watch = Stopwatch.StartNew();
             int frameCount = 0;
             while (!waveFunction.AllCollapsed())
@@ -270,7 +270,7 @@ namespace WaveFunctionCollapse
                 watch.Restart();
             }
 
-            isRunning = false;
+            IsGenerating = false;
         }
 
         #region Debug

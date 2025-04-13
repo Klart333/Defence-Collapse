@@ -1,6 +1,7 @@
 using Random = UnityEngine.Random;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using WaveFunctionCollapse;
 
@@ -26,8 +27,17 @@ namespace Chunks
         public bool HasGrown { get; set; }
         public Cell Cell { get; set; }
         
-        //private List<PooledMonoBehaviour> spawnedTrees = new List<PooledMonoBehaviour>();
+        private readonly List<PooledMonoBehaviour> spawnedTrees = new List<PooledMonoBehaviour>();
 
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            
+            spawnedTrees.Clear();
+            HasGrown = false;
+        }
+
+        [Button]
         public async UniTask GrowTrees()
         {
             Vector3 offset = raycastArea.ToXyZ(1).MultiplyByAxis(transform.localScale) / 2.0f;
@@ -43,13 +53,11 @@ namespace Chunks
                 Ray ray = new Ray(pos, Vector3.down);
                 Material mat = GetHitMaterial(ray, out RaycastHit hit);
 
-                if (mat == treeMaterial)
-                {
-                    pos.y = 0;
-                    positions.Add(pos.XZ());
-                    SpawnTree(hit.point);
-                    await UniTask.Delay(100);
-                }
+                if (mat != treeMaterial) continue;
+                
+                positions.Add(pos.XZ());
+                SpawnTree(hit.point);
+                await UniTask.Delay(100);
             }
 
             return;
@@ -70,9 +78,9 @@ namespace Chunks
         
         private void SpawnTree(Vector3 pos)
         {
-            PooledMonoBehaviour tree = trees[Random.Range(0, trees.Length)];
-            tree.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.AngleAxis(Random.value * 360, Vector3.up));
-            //spawnedTrees.Add(tree);
+            PooledMonoBehaviour treePrefab = trees[Random.Range(0, trees.Length)];
+            PooledMonoBehaviour spawned = treePrefab.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.AngleAxis(Random.value * 360, Vector3.up));
+            spawnedTrees.Add(spawned);
         }
 
         private static Material GetHitMaterial(Ray ray, out RaycastHit hit)
@@ -110,14 +118,14 @@ namespace Chunks
             return -1;
         }
 
-        public void Clear()
+        public void ClearTrees()
         {
-            //for (int i = 0; i < spawnedTrees.Count; i++)
-            //{
-            //    spawnedTrees[i].gameObject.SetActive(false);
-            //}
-            //
-            //spawnedTrees.Clear();
+            for (int i = 0; i < spawnedTrees.Count; i++)
+            {
+                spawnedTrees[i].gameObject.SetActive(false);
+            }
+            
+            spawnedTrees.Clear();
         }
         
         private void OnDrawGizmosSelected()

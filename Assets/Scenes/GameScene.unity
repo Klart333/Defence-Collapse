@@ -518,6 +518,8 @@ MonoBehaviour:
   - {fileID: 6015863633982791618, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
   - {fileID: 5332504404861797108, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
   - {fileID: 584684585022501903, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
+  - {fileID: 3953289173884318016, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
+  - {fileID: -3676194533806895147, guid: 7fcb418392cc1ff4483bea8617b81517, type: 3}
 --- !u!1 &231546244
 GameObject:
   m_ObjectHideFlags: 0
@@ -1220,6 +1222,96 @@ MonoBehaviour:
   groundGenerator: {fileID: 1024001993}
   spawnPointPrefab: {fileID: 4454381110423590850, guid: c53a219438839dd45a1e2dd1a32dab2c,
     type: 3}
+  shouldSpawnCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.2
+      inSlope: 0.08763102
+      outSlope: 0.08763102
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.036764704
+    - serializedVersion: 3
+      time: 19.981628
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  minimumSpawnsCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 2
+      inSlope: Infinity
+      outSlope: Infinity
+      tangentMode: 103
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 10
+      value: 3
+      inSlope: Infinity
+      outSlope: Infinity
+      tangentMode: 103
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  maximumSpawnsCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 2
+      inSlope: Infinity
+      outSlope: Infinity
+      tangentMode: 103
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 3
+      inSlope: Infinity
+      outSlope: Infinity
+      tangentMode: 103
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 3
+      value: 4
+      inSlope: Infinity
+      outSlope: Infinity
+      tangentMode: 103
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &347176550
 GameObject:
   m_ObjectHideFlags: 0
@@ -5031,9 +5123,6 @@ GameObject:
   - component: {fileID: 1024001987}
   - component: {fileID: 1024001993}
   - component: {fileID: 1024001991}
-  - component: {fileID: 1024001990}
-  - component: {fileID: 1024001989}
-  - component: {fileID: 1024001992}
   m_Layer: 6
   m_Name: Ground Generator
   m_TagString: Untagged
@@ -5056,58 +5145,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2112620416}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &1024001989
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1024001986}
-  m_Mesh: {fileID: 0}
---- !u!23 &1024001990
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1024001986}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials: []
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &1024001991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5120,28 +5157,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecb3fb0f6786a354597d3006e67cd820, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!64 &1024001992
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1024001986}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
+  meshPrefab: {fileID: 2397449573411233267, guid: 4a67db02a953fb640a0dd47f944da414,
+    type: 3}
 --- !u!114 &1024001993
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5160,8 +5177,8 @@ MonoBehaviour:
   chunkSize: {x: 8, y: 1, z: 8}
   defaultPrototypeInfoData: {fileID: 11400000, guid: 58fb6f893a0db174cacd0d23f7e4cac6,
     type: 2}
-  chillTimeMs: 20
-  maxMillisecondsPerFrame: 0.1
+  chillTimeMs: 10
+  maxMillisecondsPerFrame: 0.5
   shouldCombine: 1
   chunkMaskHandler: {fileID: 629965934}
   enemySpawnHandler: {fileID: 342113231}
@@ -9820,12 +9837,12 @@ PrefabInstance:
     - target: {fileID: 1094137636702644890, guid: f8d6d4cb9e7edcc48afdf101345acab7,
         type: 3}
       propertyPath: pieceWeights.Array.data[0].Weight
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1094137636702644890, guid: f8d6d4cb9e7edcc48afdf101345acab7,
         type: 3}
       propertyPath: pieceWeights.Array.data[1].Weight
-      value: 0.2
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 1431122937029065482, guid: f8d6d4cb9e7edcc48afdf101345acab7,
         type: 3}

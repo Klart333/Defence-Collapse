@@ -21,6 +21,12 @@ namespace Enemy
 
         [SerializeField]
         private AnimationCurve shouldSpawnCurve;
+
+        [SerializeField]
+        private AnimationCurve minimumSpawnsCurve;
+        
+        [SerializeField]
+        private AnimationCurve maximumSpawnsCurve;
         
         private readonly Dictionary<int3, List<EnemySpawnPoint>>  spawnPoints = new Dictionary<int3, List<EnemySpawnPoint>>();
         private Random random;
@@ -61,13 +67,22 @@ namespace Enemy
                 spawnPoints.Add(chunkIndex, new List<EnemySpawnPoint> { spawned });
             }
         }
+        
+        public int GetMaxSpawns(int difficulty) => (int)System.Math.Round(maximumSpawnsCurve.Evaluate(difficulty), MidpointRounding.AwayFromZero);
 
         public bool ShouldSetSpawnPoint(int3 chunkIndex, out int difficulty)
         {
-            int distance = chunkIndex.x + chunkIndex.y;
+            int distance = Mathf.Abs(chunkIndex.x) + Mathf.Abs(chunkIndex.y);
             difficulty = distance;
 
             return random.NextDouble() <= shouldSpawnCurve.Evaluate(difficulty);
+        }
+
+        public bool ShouldForceSpawnPoint(int index, int max, int amountSpawned, int difficulty)
+        {
+            int minimum = (int)System.Math.Round(minimumSpawnsCurve.Evaluate(difficulty), MidpointRounding.AwayFromZero);
+            int pointsLeft = max - index;
+            return pointsLeft + amountSpawned < minimum;
         }
     }
 }

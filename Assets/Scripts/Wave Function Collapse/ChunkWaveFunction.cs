@@ -137,6 +137,27 @@ namespace WaveFunctionCollapse
             chunk.IsRemoved = true;
             Chunks.Remove(chunkIndex);
         }
+        
+        public void RemoveChunk(int3 chunkIndex)
+        {
+            if (!Chunks.TryGetValue(chunkIndex, out TChunk chunk))
+            {
+                Debug.LogError("Chunk to remove not found");
+                return;
+            }
+
+            for (int i = 0; i < chunk.AdjacentChunks.Length; i++)
+            {
+                if (chunk.AdjacentChunks[i] == null) continue;
+
+                int oppositeDirection = (int)WaveFunctionUtility.OppositeDirection(i);
+                chunk.AdjacentChunks[i].AdjacentChunks[oppositeDirection] = null;
+            }
+
+            chunk.Clear(gameObjectPool);
+            chunk.IsRemoved = true;
+            Chunks.Remove(chunkIndex);
+        }
 
         public Cell Iterate()
         {
@@ -776,6 +797,7 @@ namespace WaveFunctionCollapse
     {
         public ChunkWaveFunction<TChunk> ChunkWaveFunction { get; }
         public Vector3 ChunkScale { get; }
+        public bool IsGenerating { get; }
     }
 
     public interface IQueryWaveFunction : IChunkWaveFunction<QueryMarchedChunk>

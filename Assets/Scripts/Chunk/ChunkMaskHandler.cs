@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using Pathfinding;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Chunks
@@ -27,7 +27,7 @@ namespace Chunks
         [SerializeField]
         private float distanceThreshold = 4f;
         
-        private readonly Dictionary<IChunk, ChunkMask> masks = new Dictionary<IChunk, ChunkMask>();
+        private readonly Dictionary<int3, ChunkMask> masks = new Dictionary<int3, ChunkMask>();
 
         private void OnEnable()
         {
@@ -45,28 +45,29 @@ namespace Chunks
             ChunkMask mask = maskPrefab.GetAtPosAndRot<ChunkMask>(position, Quaternion.identity);
             mask.SetAdjacencies(defaultAdjacencies);
             mask.FadeIn(fadeIn);
-            masks.Add(chunk, mask);
+            masks.Add(chunk.ChunkIndex, mask);
         }
 
         public void RemoveMask(Chunk chunk)
         {
-            if (!masks.TryGetValue(chunk, out ChunkMask mask))
+            if (!masks.TryGetValue(chunk.ChunkIndex, out ChunkMask mask))
             {
                 return;
             }
 
             mask.FadeOut(fadeOut);
-            masks.Remove(chunk);
+            masks.Remove(chunk.ChunkIndex);
         }
 
-        public bool IsMasked(Chunk chunk, Cell cell)
+        public bool IsMasked(int3 chunkIndex, Cell cell)
         {
-            if (!masks.TryGetValue(chunk, out ChunkMask mask))
+            if (!masks.TryGetValue(chunkIndex, out ChunkMask mask))
             {
                 return false;
             }
 
-            Vector3 relativePosition = (cell.Position + groundGenerator.ChunkWaveFunction.GridScale / 2.0f) - chunk.Position;
+            Vector3 chunkPos = groundGenerator.ChunkWaveFunction.Chunks[chunkIndex].Position;
+            Vector3 relativePosition = (cell.Position + groundGenerator.ChunkWaveFunction.GridScale / 2.0f) - chunkPos;
 
             if ((mask.Adjacencies & Adjacencies.North) > 0 
                 && groundGenerator.ChunkScale.z - relativePosition.z < distanceThreshold)
@@ -97,9 +98,9 @@ namespace Chunks
 
         private void OnChunksGenerated(Chunk chunk)
         {
-            foreach (KeyValuePair<IChunk, ChunkMask> kvp in masks)
+            foreach (KeyValuePair<int3, ChunkMask> kvp in masks)
             {
-                Adjacencies adjacencies = GetAdjacencies(kvp.Key);
+                Adjacencies adjacencies = GetAdjacencies(groundGenerator.ChunkWaveFunction.Chunks[kvp.Key]);
                 kvp.Value.SetAdjacencies(adjacencies);
             }
         }
@@ -114,7 +115,7 @@ namespace Chunks
 
             bool IsValid(IChunk adjacentChunk)
             {
-                return adjacentChunk != null && !masks.ContainsKey(adjacentChunk);
+                return adjacentChunk != null && !masks.ContainsKey(adjacentChunk.ChunkIndex);
             }
         }
     }

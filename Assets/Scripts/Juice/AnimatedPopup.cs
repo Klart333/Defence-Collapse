@@ -16,7 +16,7 @@ namespace Juice
         [SerializeField]
         private bool readScale = false;
         
-        private void Start()
+        private void OnEnable()
         {
             Vector3 endValue = readScale ? transform.localScale : Vector3.one;
             

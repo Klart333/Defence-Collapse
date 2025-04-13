@@ -18,7 +18,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 123
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1695970915118675022
 Transform:
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 347fc546b6357c04382f80013ed6797c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPoolSize: 10
+  initialPoolSize: 100
 --- !u!114 &-4702208124317981368
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -7,7 +7,7 @@ public class Pool : MonoBehaviour
 {
     // Note: Some methods are numbered, this is for clarity on how the main steps for how spawning the objects works
 
-    public static readonly Dictionary<PooledMonoBehaviour, Pool> dictionaryPools = new Dictionary<PooledMonoBehaviour, Pool>(); // The List of Main Pools
+    private static readonly Dictionary<PooledMonoBehaviour, Pool> dictionaryPools = new Dictionary<PooledMonoBehaviour, Pool>(); // The List of Main Pools
 
     // Dictionaries are basically Lists but with keys (and i hate them)
     // The advantage of a dictionary is in going through the list and checking for a specific element, lookup time, where a list has to compare every item individually, the dictionary uses a hash lookup algorithm, which is fancy words for magic    
@@ -21,6 +21,7 @@ public class Pool : MonoBehaviour
     // But the main reason is for communication and exposing the intent more explicitly
 
     private PooledMonoBehaviour poolPrefab; // The prefab this Pool handles, Assigned in GetPool
+    private int index = 0;
 
     public static Pool GetPool(PooledMonoBehaviour prefab) // 3. Called from PooledMonoBehaviour.Get<T>, here we get the Pool that handles the prefab in question
     {
@@ -56,14 +57,15 @@ public class Pool : MonoBehaviour
     {
         for (int i = 0; i < poolPrefab.InitialPoolSize; i++) // We specify how big the pool of the prefab this script handles, and create that many disabled gameobjects, ready to be enabled whenever we want
         {
-            var pooledObject = Instantiate(poolPrefab); 
-            pooledObject.gameObject.name += " " + i; // Helps keeping track
-
-            pooledObject.OnReturnToPool += AddObjectToAvailableQueue; 
-
-            pooledObject.transform.SetParent(this.transform, false); // Organises the disabled objects
+            var pooledObject = Instantiate(poolPrefab, transform, false); 
+            pooledObject.gameObject.name += $" {index + i}"; // Helps keeping track
+            
+            pooledObject.OnReturnToPool += AddObjectToAvailableQueue;
+            
             pooledObject.gameObject.SetActive(false); // Here it when it goes into the pool, through PooledMonoBehaviour
         }
+
+        index += poolPrefab.InitialPoolSize;
     }
     
     /// <summary>

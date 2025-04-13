@@ -52,6 +52,8 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         }
     }
     
+    public bool IsGenerating { get; private set; }
+    
     private readonly Dictionary<ChunkIndex, IBuildable> querySpawnedBuildings = new Dictionary<ChunkIndex, IBuildable>();
     private readonly Dictionary<ChunkIndex, IBuildable> spawnedMeshes = new Dictionary<ChunkIndex, IBuildable>();
 
@@ -222,6 +224,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
         waveFunction.Propagate(allowedKeys);
 
+        IsGenerating = true;
         int tries = 1000;
         while (cellsToCollapse.Any(x => !waveFunction[x].Collapsed) && tries-- > 0)
         {
@@ -231,6 +234,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
             waveFunction.Propagate(allowedKeys);
         }
+        IsGenerating = false;
 
         if (tries <= 0)
         {
@@ -377,7 +381,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         spawnedMeshes[index] = spawned;
     }
     
-    private IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, bool animate = true)
+    private IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, bool animate = false)
     {
         IBuildable building;
         if (prototypeData.MeshRot.Mesh != null && prototypeData.MeshRot.Mesh.name.Contains("Path")) // Not my best work

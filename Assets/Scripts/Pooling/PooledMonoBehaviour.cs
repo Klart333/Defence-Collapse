@@ -13,15 +13,16 @@ public class PooledMonoBehaviour : MonoBehaviour
 
     public event Action<PooledMonoBehaviour> OnReturnToPool; // Takes a PooledMonoBehaviour as an argument so that we know what object to return
 
-    public int InitialPoolSize { get { return initialPoolSize; } }
+    public int InitialPoolSize => initialPoolSize;
 
 
     private DisableAfterDelay delay;
-    public DisableAfterDelay Delay
+
+    protected DisableAfterDelay Delay
     {
         get
         {
-            if (delay == null)
+            if (!delay)
             {
                 delay = GetComponent<DisableAfterDelay>();
             }

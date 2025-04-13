@@ -21,7 +21,6 @@ namespace Chunks
         private void OnEnable()
         {
             groundGenerator.OnLockedChunkGenerated += SetupLockedChunk; 
-            groundGenerator.OnChunkGenerated += RemoveLockedChunk;
             
             cam = Camera.main;
         }
@@ -29,7 +28,6 @@ namespace Chunks
         private void OnDisable()
         {
             groundGenerator.OnLockedChunkGenerated -= SetupLockedChunk;
-            groundGenerator.OnChunkGenerated -= RemoveLockedChunk;
         }
 
         private void Update()
@@ -55,25 +53,20 @@ namespace Chunks
 
             void OnUnlockerOnOnChunkUnlocked()
             {
+                unlocker.gameObject.SetActive(false);
+                unlockers.Remove(chunk);
                 UnlockChunk(chunk);
                 
                 unlocker.OnChunkUnlocked -= OnUnlockerOnOnChunkUnlocked;
             }
         }
-        
-        private void RemoveLockedChunk(Chunk chunk)
-        {
-            if (unlockers.TryGetValue(chunk, out ChunkUnlocker unlocker))
-            {
-                unlocker.gameObject.SetActive(false);
-                unlockers.Remove(chunk);
-            }
-        }
 
         public void UnlockChunk(Chunk chunk)
         {
-            //chunk.Clear(groundGenerator.ChunkWaveFunction.GameObjectPool);
-            groundGenerator.LoadChunk(chunk).Forget(Debug.LogError);
+            groundGenerator.ChunkWaveFunction.RemoveChunk(chunk.ChunkIndex, out _);
+            Chunk newChunk = groundGenerator.ChunkWaveFunction.LoadChunk(chunk.ChunkIndex, chunk.ChunkSize, groundGenerator.DefaultPrototypeInfoData, false);
+            
+            groundGenerator.LoadChunk(newChunk).Forget(Debug.LogError);
         }
     }
 }

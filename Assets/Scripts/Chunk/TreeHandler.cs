@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using WaveFunctionCollapse;
 using UnityEngine;
 using System.Linq;
+using System.Threading.Tasks;
 using Sirenix.OdinInspector;
+using Unity.Mathematics;
 
 namespace Chunks
 {
@@ -23,7 +26,13 @@ namespace Chunks
         [SerializeField]
         private Mesh[] groundTreeMeshes;
         
-        private readonly Dictionary<Chunk, List<TreeGrower>> treeGrowersByChunk = new Dictionary<Chunk, List<TreeGrower>>();
+        private readonly Dictionary<int3, List<TreeGrower>> treeGrowersByChunk = new Dictionary<int3, List<TreeGrower>>();
+        private HashSet<Mesh> groundTreeMeshSet = new HashSet<Mesh>();
+
+        private void Awake()
+        {
+            groundTreeMeshSet = groundTreeMeshes.ToHashSet();
+        }
 
         private void OnEnable()
         {
@@ -40,20 +49,20 @@ namespace Chunks
         private void OnCellCollapsed(ChunkIndex chunkIndex)
         {
             Cell cell = groundGenerator.ChunkWaveFunction[chunkIndex];
-            if (!groundTreeMeshes.Contains(cell.PossiblePrototypes[0].MeshRot.Mesh)) return;
+            if (!groundTreeMeshSet.Contains(cell.PossiblePrototypes[0].MeshRot.Mesh)) return;
             
             TreeGrower spawned = treeGrowerPrefab.GetAtPosAndRot<TreeGrower>(cell.Position, Quaternion.identity);
             spawned.Cell = cell;
 
             Chunk chunk = groundGenerator.ChunkWaveFunction.Chunks[chunkIndex.Index];
 
-            if (treeGrowersByChunk.TryGetValue(chunk, out List<TreeGrower> value))
+            if (treeGrowersByChunk.TryGetValue(chunk.ChunkIndex, out List<TreeGrower> value))
             {
                 value.Add(spawned);
             }
             else
             {
-                treeGrowersByChunk.Add(chunk, new List<TreeGrower>{ spawned });
+                treeGrowersByChunk.Add(chunk.ChunkIndex, new List<TreeGrower> { spawned });
                 chunk.OnCleared += ChunkCleared;
             }
             return;
@@ -62,21 +71,26 @@ namespace Chunks
             {
                 chunk.OnCleared -= ChunkCleared;
 
-                List<TreeGrower> growers = treeGrowersByChunk[chunk];
+                if (!treeGrowersByChunk.TryGetValue(chunkIndex.Index, out List<TreeGrower> growers)) return;
+                
                 for (int i = 0; i < growers.Count; i++)
                 {
-                    growers[i].Clear();
+                    growers[i].ClearTrees();
                     growers[i].gameObject.SetActive(false);
                 }
                 
-                treeGrowersByChunk.Remove(chunk);
+                treeGrowersByChunk.Remove(chunk.ChunkIndex);
             }
         }
 
-
-        private async void OnChunkGenerated(Chunk chunk)
+        private void OnChunkGenerated(Chunk chunk)
         {
-            foreach (KeyValuePair<Chunk,List<TreeGrower>> kvp in treeGrowersByChunk)
+            GrowTrees(chunk.ChunkIndex).Forget(Debug.LogError);
+        }
+
+        private async UniTask GrowTrees(int3 chunkIndex)
+        {
+            foreach (KeyValuePair<int3, List<TreeGrower>> kvp in treeGrowersByChunk)
             {
                 for (int i = 0; i < kvp.Value.Count; i++)
                 {
@@ -85,13 +99,21 @@ namespace Chunks
                     {
                         continue;
                     }
-                
+            
                     grower.GrowTrees().Forget(Debug.LogError);
                     grower.HasGrown = true;
                     await UniTask.Yield();
                 }
             }
             
+            if (treeGrowersByChunk.TryGetValue(chunkIndex, out List<TreeGrower> value))
+            {
+                foreach (TreeGrower grower in value)
+                {
+                    grower.gameObject.SetActive(false);
+                }
+                treeGrowersByChunk.Remove(chunkIndex);
+            }
         }
     }
 }
