@@ -7,6 +7,7 @@ using Unity.Collections;
 using UnityEngine;
 using System;
 using System.Linq;
+using Pathfinding;
 
 namespace WaveFunctionCollapse
 {
@@ -438,6 +439,11 @@ namespace WaveFunctionCollapse
         {
             return HashCode.Combine(Index, CellIndex);
         }
+
+        //public static implicit operator ChunkIndex(PathIndex pathIndex)
+        //{
+        //    return new ChunkIndex(pathIndex.ChunkIndex.XyZ(0), pathIndex.GridIndex);
+        //}
     }
 
     [Serializable]

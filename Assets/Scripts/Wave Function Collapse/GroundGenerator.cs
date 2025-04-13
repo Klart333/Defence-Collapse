@@ -274,7 +274,7 @@ namespace WaveFunctionCollapse
             Vector3 pos = isHorizontal
                 ? (chunk.Cells[edge, 0, Mathf.FloorToInt(middle)].Position + chunk.Cells[edge, 0, Mathf.CeilToInt(middle)].Position) / 2.0f
                 : (chunk.Cells[Mathf.FloorToInt(middle), 0, edge].Position + chunk.Cells[Mathf.CeilToInt(middle), 0, edge].Position) / 2.0f;
-            enemySpawnHandler.SetEnemySpawn(pos - (Vector3)DirectionUtility.DirectionToInt2(direction).XyZ(), chunk.ChunkIndex, difficulty);
+            enemySpawnHandler.SetEnemySpawn(pos - (Vector3)DirectionUtility.DirectionToInt2(direction).XyZ(0.0f), chunk.ChunkIndex, difficulty);
         }
 
         private void CombineMeshes(int3 chunkIndex)

@@ -14,15 +14,16 @@ namespace Buildings.District
         public event Action<DistrictData> OnClicked;
         public event Action OnLevelup;
 
+        private readonly MeshCollider meshCollider;
+        
         private readonly int cellCount;
-        private MeshCollider meshCollider;
         
         public UpgradeData UpgradeData { get; private set; }
-        public Vector3 Position { get; private set; }
-        public DistrictState State { get; }
         public HashSet<Chunk> DistrictChunks { get; set; } 
+        public DistrictState State { get; }
+        public Vector3 Position { get; }
         
-        public int2 Index { get; set; }
+        public ChunkIndex Index { get; set; }
 
         public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction<Chunk> chunkWaveFunction, int key)
         {
@@ -30,7 +31,7 @@ namespace Buildings.District
             cellCount = chunks.Count;
             DistrictChunks = chunks;
 
-            Vector3 statePosition = new Vector3(position.x, GetHighestPos(chunks), position.z); 
+            Vector3 statePosition = new Vector3(position.x, 0, position.z); 
             
             State = districtType switch
             {
@@ -43,27 +44,52 @@ namespace Buildings.District
             };
 
             Position = position;
-            GenerateCollider(chunks, chunkWaveFunction);
+            DistrictUtility.GenerateCollider(chunks, chunkWaveFunction, Position, InvokeOnClicked, ref meshCollider);
 
             Events.OnWaveStarted += OnWaveStarted;
             State.OnStateEntered();
         }
 
-        private float GetHighestPos(IEnumerable<Chunk> chunks)
+        public void Destroy()
         {
-            float max = float.MinValue;
-            foreach (Chunk chunk in chunks)
+            Events.OnWaveStarted -= OnWaveStarted;
+            if (meshCollider != null)
             {
-                if (chunk.Position.y > max)
-                {
-                    max = chunk.Position.y;
-                }
+                Object.Destroy(meshCollider);
             }
-
-            return max;
         }
 
-        private void GenerateCollider(IEnumerable<Chunk> chunks, IChunkWaveFunction<Chunk> chunkWaveFunction)
+        private void InvokeOnClicked()
+        {
+            if (CameraController.IsDragging || UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
+            
+            OnClicked?.Invoke(this);
+        }
+        
+        
+        private void OnWaveStarted()
+        {
+            State.OnWaveStart(cellCount);
+        }
+
+        public void LevelUp()
+        {
+            OnLevelup?.Invoke();
+        }
+
+        public void Update()
+        {
+            State.Update();
+        }
+    
+    }
+
+    public static class DistrictUtility
+    {
+        public static void GenerateCollider(IEnumerable<Chunk> chunks, IChunkWaveFunction<Chunk> chunkWaveFunction, Vector3 pos, Action action, ref MeshCollider meshCollider)
         {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
@@ -77,7 +103,7 @@ namespace Buildings.District
             foreach (Chunk chunk in chunks)
             {
                 // Assuming each chunk has a position and contains 2x2x2 cells
-                Vector3 chunkPosition = chunk.Position - Position;
+                Vector3 chunkPosition = chunk.Position - pos;
                 for (int x = 0; x < 2; x++)
                 for (int y = 0; y < 2; y++)
                 for (int z = 0; z < 2; z++)
@@ -127,10 +153,10 @@ namespace Buildings.District
             mesh.RecalculateBounds();
 
             meshCollider = new GameObject("District Collider").AddComponent<MeshCollider>();
-            meshCollider.transform.position = Position;
+            meshCollider.transform.position = pos;
             meshCollider.sharedMesh = mesh;
             
-            meshCollider.gameObject.AddComponent<ClickCallbackComponent>().OnClick += () => OnClicked?.Invoke(this);
+            meshCollider.gameObject.AddComponent<ClickCallbackComponent>().OnClick += action;
             return;
             
             // Helper function to add a vertex if it doesn't already exist
@@ -140,12 +166,10 @@ namespace Buildings.District
                 {
                     return index; // Return the existing index if the vertex is already in the list
                 }
-                else
-                {
-                    vertices.Add(vertex); // Add the vertex to the list
-                    vertexIndices[vertex] = vertices.Count - 1; // Store its index
-                    return vertices.Count - 1; // Return the new index
-                }
+
+                vertices.Add(vertex); // Add the vertex to the list
+                vertexIndices[vertex] = vertices.Count - 1; // Store its index
+                return vertices.Count - 1; // Return the new index
             }
 
             // Helper function to add a quad (two triangles) to the triangles list
@@ -163,26 +187,5 @@ namespace Buildings.District
             }
         }
 
-        ~DistrictData()
-        {
-            Events.OnWaveStarted -= OnWaveStarted;
-            Object.Destroy(meshCollider);
-        }
-
-        private void OnWaveStarted()
-        {
-            State.OnWaveStart(cellCount);
-        }
-
-        public void LevelUp()
-        {
-            OnLevelup?.Invoke();
-        }
-
-        public void Update()
-        {
-            State.Update();
-        }
-    
     }
 }

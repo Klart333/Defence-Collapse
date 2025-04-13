@@ -47,6 +47,18 @@ public class PlaceSquare : MonoBehaviour
         Placer.SpawnSquareIndex = SquareIndex;
     }
 
+    private void OnMouseUpAsButton()
+    {
+        if (CameraController.IsDragging)
+        {
+            return;
+        }
+        
+        Placer.SquareIndex = Index;
+        Placer.SpawnSquareIndex = SquareIndex;
+        Placer.SquareWasPressed = true;
+    }
+
     private void OnMouseExit()
     {
         if (Placed) return;

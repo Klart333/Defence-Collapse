@@ -64,8 +64,13 @@ namespace Buildings.District
             meshRenderer.SetPropertyBlock(block);
         }
         
-        private void OnMouseDown()
+        private void OnMouseUpAsButton()
         {
+            if (CameraController.IsDragging)
+            {
+                return;
+            }
+            
             OnSelected?.Invoke(this);
         }
 

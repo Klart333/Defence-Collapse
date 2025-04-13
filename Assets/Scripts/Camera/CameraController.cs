@@ -1,10 +1,14 @@
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
 {
+    public static bool IsDragging;
+    
     [Title("Movement Settings")]
     [SerializeField] 
     private float moveSpeed = 5f;
@@ -33,18 +37,21 @@ public class CameraController : MonoBehaviour
     [SerializeField] 
     private float panSensitivity = 0.5f;
     
+    private const float startDraggingThreshold = 64; // 8^2 px
+    
     // Input actions
+    private InputAction fastMoveAction;
     private InputActions inputActions;
+    private InputAction rotateAction;
     private InputAction moveAction;
     private InputAction zoomAction;
-    private InputAction rotateAction;
     private InputAction panAction;
-    private InputAction fastMoveAction;
     
-    // Camera reference 
     private Camera controlledCamera;
-    private bool isPanning = false;
     private Vector3 panStartPosition;
+    private Vector2 panStartScreenPosition;
+
+    private bool isPressed; 
 
     private void Awake()
     {
@@ -154,23 +161,44 @@ public class CameraController : MonoBehaviour
 
     private void StartPan(InputAction.CallbackContext obj)
     {
-        isPanning = true;
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+        
+        isPressed = true;
         panStartPosition = Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
+        panStartScreenPosition = Mouse.current.position.ReadValue();
     }
 
-    private void EndPan(InputAction.CallbackContext obj)
+    private async void EndPan(InputAction.CallbackContext obj)
     {
-        isPanning = false;
+        isPressed = false;
+        if (!IsDragging)
+        {
+            return;
+        }
+        
+        await UniTask.WaitForEndOfFrame();
+        IsDragging = false;
     }
 
     private void HandlePan()
     {
-        if (!isPanning) return;
+        if (!isPressed) return;
+
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        if (!IsDragging && (panStartScreenPosition - mousePosition).sqrMagnitude < startDraggingThreshold)
+        {
+            return;
+        }
         
-        Vector3 currentMousePoint = Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
+        Vector3 currentMousePoint = Math.GetGroundIntersectionPoint(controlledCamera, mousePosition);
         if (currentMousePoint == Vector3.zero) return;
 
         Vector3 delta = panStartPosition - currentMousePoint;
+        
+        IsDragging = true;
         transform.position += delta * 0.5f;
     }
 }

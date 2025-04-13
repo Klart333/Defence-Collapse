@@ -23,7 +23,7 @@ namespace Buildings.District
 
         private float totalDamageDealt;
         
-        public virtual Attack Attack { get; }
+        public abstract Attack Attack { get; }
         public DamageInstance LastDamageDone => lastDamageDone;
         public Stats Stats => stats;
         public Vector3 OriginPosition { get; protected set; }
@@ -180,8 +180,10 @@ namespace Buildings.District
         private readonly TowerData bombData;
         private GameObject rangeIndicator;
 
-        private float attackCooldownTimer = 0;
+        private float attackCooldownTimer = 0;        
 
+        public override Attack Attack => attack;
+        
         public BombState(DistrictData districtData, TowerData bombData, Vector3 position, int key) : base(districtData, position, key)
         {
             this.bombData = bombData;
@@ -198,8 +200,6 @@ namespace Buildings.District
             entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = position });
             entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = Range });
         }
-
-        public override Attack Attack => attack;
         
         public override void OnStateEntered()
         {

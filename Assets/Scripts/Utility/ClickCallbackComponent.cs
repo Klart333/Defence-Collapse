@@ -6,8 +6,8 @@ namespace Utility
     public class ClickCallbackComponent : MonoBehaviour
     {
         public event Action OnClick;
-
-        public void OnMouseDown()
+        
+        private void OnMouseUpAsButton()
         {
             OnClick?.Invoke();
         }

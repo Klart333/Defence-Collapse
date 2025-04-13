@@ -26,6 +26,7 @@ public class BuildingPlacer : MonoBehaviour
     private GroundGenerator groundGenerator;
     private Vector3 targetScale;
     
+    public bool SquareWasPressed { get; set; }
     private bool manualCancel;
     private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
     public ChunkIndex? SquareIndex { get; set; }
@@ -164,6 +165,7 @@ public class BuildingPlacer : MonoBehaviour
     private async UniTask PlacingTower(BuildingType type)
     {
         manualCancel = false;
+        SquareWasPressed = false;
         
         ToggleSpawnPlaces(true);
 
@@ -177,7 +179,7 @@ public class BuildingPlacer : MonoBehaviour
 
             if (queryIndex.Equals(SquareIndex.Value))
             {
-                if (buildables.Count > 0 && InputManager.Instance.Fire.WasPerformedThisFrame())
+                if (buildables.Count > 0 && SquareWasPressed)
                 {
                     PlaceBuilding();
                 }
@@ -204,7 +206,7 @@ public class BuildingPlacer : MonoBehaviour
                 continue;
             }
 
-            if (!InputManager.Instance.Fire.WasPerformedThisFrame()) continue;
+            if (!SquareWasPressed) continue;
 
             PlaceBuilding();
         }
@@ -252,6 +254,7 @@ public class BuildingPlacer : MonoBehaviour
             return;
         }
         
+        SquareWasPressed = false;
         spawnedSpawnPlaces[SquareIndex.Value].OnPlaced();
         BuildingManager.Instance.Place();
     }
