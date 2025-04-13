@@ -19,6 +19,9 @@ namespace Chunks
         [SerializeField]
         private GroundGenerator groundGenerator;
         
+        [SerializeField]
+        private ProtoypeMeshes protoypeMeshes;
+        
         [Title("Tree")]
         [SerializeField]
         private TreeGrower treeGrowerPrefab;
@@ -49,7 +52,7 @@ namespace Chunks
         private void OnCellCollapsed(ChunkIndex chunkIndex)
         {
             Cell cell = groundGenerator.ChunkWaveFunction[chunkIndex];
-            if (!groundTreeMeshSet.Contains(cell.PossiblePrototypes[0].MeshRot.Mesh)) return;
+            if (!groundTreeMeshSet.Contains(protoypeMeshes[cell.PossiblePrototypes[0].MeshRot.MeshIndex])) return;
             
             TreeGrower spawned = treeGrowerPrefab.GetAtPosAndRot<TreeGrower>(cell.Position, Quaternion.identity);
             spawned.Cell = cell;

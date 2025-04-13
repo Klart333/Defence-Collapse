@@ -93,9 +93,11 @@ namespace WaveFunctionCollapse
             }
 
             MeshFilter[] meshes = GetComponentsInChildren<MeshFilter>();
+            prototypeData.PrototypeMeshes = new List<Mesh>(); 
             for (int i = 0; i < meshes.Length; i++)
             {
                 Mesh mesh = meshes[i].sharedMesh;
+                prototypeData.PrototypeMeshes.Add(mesh);
                 List<Vector3> posXs = new List<Vector3>();
                 List<Vector3> negXs = new List<Vector3>();
                 List<Vector3> posYs = new List<Vector3>();
@@ -133,12 +135,12 @@ namespace WaveFunctionCollapse
                 // Need to rotate the vertical too
                 List<PrototypeData> prots = new List<PrototypeData>
                 {
-                    new PrototypeData(new MeshWithRotation(mesh, 0), posX, negX, posY[0], negY[0], posZ, negZ, pieceWeights[i].Weight, matIndexes),
+                    new PrototypeData(new MeshWithRotation(i, 0), posX, negX, posY[0], negY[0], posZ, negZ, pieceWeights[i].Weight, matIndexes),
                 };
 
-                int copies = AddIfUnique(prots, new PrototypeData(new MeshWithRotation(mesh, 1), posZ, negZ, posY[1], negY[1], negX, posX, pieceWeights[i].Weight, matIndexes)) ? 0 : 1;
-                copies += AddIfUnique(prots, new PrototypeData(new MeshWithRotation(mesh, 2), negX, posX, posY[2], negY[2], negZ, posZ, pieceWeights[i].Weight, matIndexes)) ? 0 : 1;
-                copies += AddIfUnique(prots, new PrototypeData(new MeshWithRotation(mesh, 3), negZ, posZ, posY[3], negY[3], posX, negX, pieceWeights[i].Weight, matIndexes)) ? 0 : 1;
+                int copies = AddIfUnique(prots, new PrototypeData(new MeshWithRotation(i, 1), posZ, negZ, posY[1], negY[1], negX, posX, pieceWeights[i].Weight, matIndexes)) ? 0 : 1;
+                copies += AddIfUnique(prots, new PrototypeData(new MeshWithRotation(i, 2), negX, posX, posY[2], negY[2], negZ, posZ, pieceWeights[i].Weight, matIndexes)) ? 0 : 1;
+                copies += AddIfUnique(prots, new PrototypeData(new MeshWithRotation(i, 3), negZ, posZ, posY[3], negY[3], posX, negX, pieceWeights[i].Weight, matIndexes)) ? 0 : 1;
 
                 float extraWeight = 1.0f / (1.0f - (copies / 4.0f));
                 if (extraWeight > 1)
@@ -186,7 +188,7 @@ namespace WaveFunctionCollapse
             }
 
             // Empty
-            PrototypeData air = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, pieceWeights[meshes.Length].Weight, System.Array.Empty<int>());
+            PrototypeData air = new PrototypeData(new MeshWithRotation(-1, 0), -1, -1, -1, -1, -1, -1, pieceWeights[meshes.Length].Weight, System.Array.Empty<int>());
             prototypeData.Prototypes.Add(air);
 
             if (useMCode && !useMCodeHeight)
@@ -416,10 +418,10 @@ namespace WaveFunctionCollapse
         {
             if (Debug)
             {
-                UnityEngine.Debug.Log("Mesh: " + prots[0].MeshRot.Mesh.name);
+                UnityEngine.Debug.Log("Mesh: " + prototypeData.PrototypeMeshes[prots[0].MeshRot.MeshIndex].name);
             }
 
-            string code = prots[0].MeshRot.Mesh.name[^4..]; 
+            string code =  prototypeData.PrototypeMeshes[prots[0].MeshRot.MeshIndex].name[^4..]; 
             
             for (int i = 0; i < prots.Count; i++)
             {
@@ -637,7 +639,7 @@ namespace WaveFunctionCollapse
             PosX, NegX, PosY, NegY, PosZ, NegZ
         };
 
-        public static PrototypeData Empty { get; set; } = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 1, Array.Empty<int>());
+        public static PrototypeData Empty { get; set; } = new PrototypeData(new MeshWithRotation(-1, 0), -1, -1, -1, -1, -1, -1, 1, Array.Empty<int>());
 
         public readonly short DirectionToKey(Direction direction) => direction switch 
         {
@@ -693,14 +695,14 @@ namespace WaveFunctionCollapse
                    PosY == data.PosY &&
                    NegY == data.NegY &&
                    Mathf.Approximately(Weight, data.Weight) &&
-                   MeshRot.Mesh == data.MeshRot.Mesh;
+                   MeshRot.MeshIndex == data.MeshRot.MeshIndex;
         }
         
         public override string ToString()
         {
             var sb = new System.Text.StringBuilder();
             sb.Append("PrototypeData { ");
-            sb.Append("MeshRot: { Mesh: ").Append(MeshRot.Mesh != null ? MeshRot.Mesh.name : "null").Append(", Rotation: ").Append(MeshRot.Rot).Append(" }, ");
+            sb.Append("MeshRot: { Mesh: ").Append(MeshRot.MeshIndex).Append(", Rotation: ").Append(MeshRot.Rot).Append(" }, ");
             //sb.Append("PosX: ").Append(PosX).Append(", NegX: ").Append(NegX).Append(", ");
             //sb.Append("PosY: ").Append(PosY).Append(", NegY: ").Append(NegY).Append(", ");
             //sb.Append("PosZ: ").Append(PosZ).Append(", NegZ: ").Append(NegZ).Append(", ");

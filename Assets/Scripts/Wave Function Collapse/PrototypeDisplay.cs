@@ -22,9 +22,15 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private TextMeshPro negZ;
 
+        [SerializeField]
+        private ProtoypeMeshes protoypeMeshes;
+        
         public void Setup(PrototypeData prototype)
         {
-            mesh.GetComponent<MeshFilter>().mesh = prototype.MeshRot.Mesh;
+            if (prototype.MeshRot.MeshIndex != -1)
+            {
+                mesh.GetComponent<MeshFilter>().mesh = protoypeMeshes[prototype.MeshRot.MeshIndex];
+            }
             mesh.transform.rotation = Quaternion.Euler(0, 90 * prototype.MeshRot.Rot, 0);
 
             posX.text = GetString(prototype.PosX);

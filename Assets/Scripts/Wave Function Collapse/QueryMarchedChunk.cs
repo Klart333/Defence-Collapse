@@ -63,7 +63,7 @@ namespace WaveFunctionCollapse
             Cells = new Cell[Width, Height, Depth];
             BuiltCells = new bool[Width, Height, Depth];
             
-            unbuildablePrototype = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 0, Array.Empty<int>());
+            unbuildablePrototype = new PrototypeData(new MeshWithRotation(-1, 0), -1, -1, -1, -1, -1, -1, 0, Array.Empty<int>());
             unbuildablePrototypeList = new List<PrototypeData> { unbuildablePrototype };
             
 #if UNITY_EDITOR

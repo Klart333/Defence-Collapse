@@ -7,7 +7,7 @@ using UnityEngine;
 namespace WaveFunctionCollapse
 {
     [InlineEditor]
-    [CreateAssetMenu(fileName = "New PrototypeInfoData", menuName = "PrototypeInfoData", order = 0)]
+    [CreateAssetMenu(fileName = "New PrototypeInfoData", menuName = "WFC/PrototypeInfoData", order = 0)]
     public class PrototypeInfoData : SerializedScriptableObject
     {
         [OdinSerialize] 
@@ -30,6 +30,9 @@ namespace WaveFunctionCollapse
 
         [OdinSerialize]
         public List<PrototypeData>[] MarchingTable { get; set; }
+        
+        [OdinSerialize]
+        public List<Mesh> PrototypeMeshes { get; set; } = new List<Mesh>();
 
 #if UNITY_EDITOR
         public void Clear()
@@ -54,7 +57,6 @@ namespace WaveFunctionCollapse
             UnityEditor.AssetDatabase.SaveAssets();
         }
 #endif
-
         
         [SerializeField, ReadOnly]
         private List<PrototypeData> notBottomPrototypes;

@@ -22,6 +22,9 @@ namespace WaveFunctionCollapse
         [Title("Mesh")]
         [SerializeField]
         private MaterialData materialData;
+        
+        [SerializeField]
+        private ProtoypeMeshes protoypeMeshes;
 
         private readonly Stack<GameObject> gameObjectPool = new Stack<GameObject>();
 
@@ -29,6 +32,7 @@ namespace WaveFunctionCollapse
 
         private IChunkWaveFunction<TChunk> handler;
 
+        public ProtoypeMeshes ProtoypeMeshes => protoypeMeshes; 
         public Stack<ChunkIndex> CellStack { get; } = new Stack<ChunkIndex>();
         public Dictionary<int3, TChunk> Chunks { get; } = new Dictionary<int3, TChunk>();
         public Stack<GameObject> GameObjectPool => gameObjectPool;
@@ -333,7 +337,7 @@ namespace WaveFunctionCollapse
 
         private GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1)
         {
-            if (prototypeData.MeshRot.Mesh == null)
+            if (prototypeData.MeshRot.MeshIndex == -1)
             {
                 return null;
             }
@@ -352,16 +356,17 @@ namespace WaveFunctionCollapse
 
         private GameObject GetPoolObject(PrototypeData prototypeData)
         {
+            Mesh mesh = protoypeMeshes[prototypeData.MeshRot.MeshIndex];
             if (gameObjectPool.TryPop(out GameObject gameObject))
             {
                 gameObject.SetActive(true);
-                gameObject.GetComponent<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
+                gameObject.GetComponent<MeshFilter>().mesh = mesh;
                 gameObject.GetComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
                 return gameObject;
             }
 
-            var gm = new GameObject(prototypeData.MeshRot.Mesh.name);
-            gm.AddComponent<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
+            var gm = new GameObject(mesh.name);
+            gm.AddComponent<MeshFilter>().mesh = mesh;
             gm.AddComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
             return gm;
         }

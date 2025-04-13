@@ -10,6 +10,7 @@ using UnityEngine;
 using System.Linq;
 using System;
 using Unity.Mathematics;
+using UnityEngine.Serialization;
 
 namespace WaveFunctionCollapse
 {
@@ -37,6 +38,9 @@ namespace WaveFunctionCollapse
         [Title("Prototypes")]
         [SerializeField]
         private PrototypeInfoData prototypeInfo;
+        
+        [SerializeField]
+        private ProtoypeMeshes prototypeMeshes;
 
         private readonly List<PrototypeData> bottomPrototypes = new List<PrototypeData>();
         private readonly List<GameObject> spawnedPossibilites = new List<GameObject>();
@@ -394,7 +398,7 @@ namespace WaveFunctionCollapse
 
         private void LoadCells()
         {
-            emptyPrototype = new PrototypeData(new MeshWithRotation(null, 0), -1, -1, -1, -1, -1, -1, 20, Array.Empty<int>());
+            emptyPrototype = new PrototypeData(new MeshWithRotation(-1, 0), -1, -1, -1, -1, -1, -1, 20, Array.Empty<int>());
 
             for (int z = 0; z < gridSizeZ; z++)
             for (int y = 0; y < gridSizeY; y++)
@@ -448,13 +452,13 @@ namespace WaveFunctionCollapse
 
         private GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1)
         {
-            if (prototypeData.MeshRot.Mesh is null)
+            if (prototypeData.MeshRot.MeshIndex == -1)
             {
                 return null;
             }
 
             GameObject gm = new GameObject();
-            gm.AddComponent<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
+            gm.AddComponent<MeshFilter>().mesh = prototypeMeshes.Meshes[prototypeData.MeshRot.MeshIndex];
             gm.AddComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
 
             gm.transform.position = position;
@@ -550,7 +554,7 @@ namespace WaveFunctionCollapse
                 int removed = 0;
                 for (int g = 0; g < cells[i].PossiblePrototypes.Count; g++)
                 {
-                    if (cells[i].PossiblePrototypes[g].MeshRot.Mesh == null)
+                    if (cells[i].PossiblePrototypes[g].MeshRot.MeshIndex == -1)
                     {
                         removed++;
                         continue;
@@ -580,18 +584,19 @@ namespace WaveFunctionCollapse
     [Serializable]
     public struct MeshWithRotation : IEquatable<MeshWithRotation>
     {
-        public Mesh Mesh;
+        [FormerlySerializedAs("Mesh")]
+        public int MeshIndex;
         public int Rot;
 
-        public MeshWithRotation(Mesh mesh, int rot)
+        public MeshWithRotation(int meshIndex, int rot)
         {
-            Mesh = mesh;
+            MeshIndex = meshIndex;
             Rot = rot;
         }
 
         public bool Equals(MeshWithRotation other)
         {
-            return Equals(Mesh, other.Mesh) && Rot == other.Rot;
+            return Equals(MeshIndex, other.MeshIndex) && Rot == other.Rot;
         }
 
         public override bool Equals(object obj)
@@ -601,7 +606,7 @@ namespace WaveFunctionCollapse
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Mesh, Rot);
+            return HashCode.Combine(MeshIndex, Rot);
         }
     }
 

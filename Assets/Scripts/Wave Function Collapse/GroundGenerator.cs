@@ -13,7 +13,6 @@ using Unity.Entities;
 using Unity.Physics;
 using UnityEngine;
 using System;
-using System.Linq;
 using Chunks;
 using Enemy;
 
@@ -63,6 +62,9 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private bool shouldRun = true;
         
+        [SerializeField]
+        private bool compilePrototypeMeshes = true;
+        
         private readonly Dictionary<int3, GameObject> spawnedChunks = new Dictionary<int3, GameObject>();
         private readonly Dictionary<int3, Entity> spawnedChunkColliders = new Dictionary<int3, Entity>();
         private readonly HashSet<int3> generatedChunks = new HashSet<int3>();
@@ -76,8 +78,16 @@ namespace WaveFunctionCollapse
         public PrototypeInfoData DefaultPrototypeInfoData => defaultPrototypeInfoData;
         public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.GridScale.x, chunkSize.y * ChunkWaveFunction.GridScale.y, chunkSize.z * ChunkWaveFunction.GridScale.z);
         
-        private void Start()
+        private async void Start()
         {
+            if (compilePrototypeMeshes)
+            {
+                //waveFunction.ProtoypeMeshes.CompilePrototypes();
+                waveFunction.ProtoypeMeshes.CompileData();
+
+                await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
+            }
+            
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             if (!waveFunction.Load(this))

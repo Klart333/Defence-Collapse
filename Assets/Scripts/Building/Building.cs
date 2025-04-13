@@ -16,6 +16,9 @@ public class Building : PooledMonoBehaviour, IBuildable
     private MaterialData materialData;
     
     [SerializeField]
+    private ProtoypeMeshes protoypeMeshes;
+    
+    [SerializeField]
     private Material transparentGreen;
 
     [SerializeField]
@@ -54,7 +57,6 @@ public class Building : PooledMonoBehaviour, IBuildable
     private BuildingAnimator buildingAnimator;
     private BuildingHandler buildingHandler;
     private MeshRenderer meshRenderer;
-    private BuildingUI buildingUI;
 
     private bool purchasing = true;
     private int originalLayer;
@@ -70,9 +72,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     private BuildingAnimator BuildingAnimator => buildingAnimator ??= FindAnyObjectByType<BuildingAnimator>();
     public BuildingHandler BuildingHandler => buildingHandler ??= FindAnyObjectByType<BuildingHandler>();
     public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
-    public BuildingUI BuildingUI => buildingUI ??= GetComponentInChildren<BuildingUI>();
     public MeshWithRotation MeshRot => Prototype.MeshRot;
-    public Mesh Mesh => Prototype.MeshRot.Mesh;
 
     private void Awake()
     {
@@ -119,16 +119,12 @@ public class Building : PooledMonoBehaviour, IBuildable
         BuildingAnimator.BounceInOut(transform);
         MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2); // sure ?
 
-        BuildingUI?.Highlight(cellInfo);
-
         await UniTask.NextFrame();
         highlighted = true;
     }
 
     public void Lowlight()
     {
-        BuildingUI?.Lowlight();
-
         MeshRenderer.gameObject.layer = originalLayer;
         highlighted = false;
     }
@@ -144,7 +140,6 @@ public class Building : PooledMonoBehaviour, IBuildable
 
         MeshRenderer.gameObject.layer = (int)Mathf.Log(selectedLayer.value, 2);
 
-        BuildingUI?.OnSelected(cellInfo);
         //buildingHandler[this].State.OnSelected(transform.position);
         selected = true;
     }
@@ -155,7 +150,6 @@ public class Building : PooledMonoBehaviour, IBuildable
 
         MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2); // sure ?
 
-        BuildingUI?.OnDeselected();
         //buildingHandler.BuildingData[Index].State.OnDeselected();
         selected = false;
     }
@@ -177,7 +171,7 @@ public class Building : PooledMonoBehaviour, IBuildable
             BuildingHandler.HighlightGroup(this);
         }
 
-        if (highlighted && !hovered && !buildingUI.InMenu)
+        if (highlighted && !hovered)
         {
             BuildingHandler.LowlightGroup(this);
         }
@@ -195,7 +189,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         Index = nullableIndex.Value;
         Prototype = GetPrototype(prototypeData);
 
-        GetComponentInChildren<MeshFilter>().mesh = Mesh;
+        GetComponentInChildren<MeshFilter>().mesh = protoypeMeshes.Meshes[Prototype.MeshRot.MeshIndex];
         MeshRenderer.SetMaterials(materialData.GetMaterials(Prototype.MaterialIndexes));
 
         transparentMaterials = new List<Material>();
@@ -250,7 +244,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     {
         for (int i = 0; i < cornerColliders.Length; i++)
         {
-            if (MeshRot.Mesh != null && buildableCornerData.BuildableDictionary.TryGetValue(MeshRot.Mesh, out BuildableCorners cornerData))
+            if (MeshRot.MeshIndex != -1 && buildableCornerData.BuildableDictionary.TryGetValue(protoypeMeshes[MeshRot.MeshIndex], out BuildableCorners cornerData))
             {
                 bool value = cornerData.CornerDictionary[BuildableCornerData.VectorToCorner(corners[i].x, corners[i].y)];
                 cornerColliders[i].gameObject.SetActive(value);

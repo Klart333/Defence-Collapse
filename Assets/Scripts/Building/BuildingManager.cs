@@ -21,6 +21,9 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     [SerializeField]
     private PrototypeInfoData townPrototypeInfo;
 
+    [SerializeField]
+    private ProtoypeMeshes prototypeMeshes;
+    
     [Title("Keys")]
     [SerializeField]
     private PrototypeKeyData keyData;
@@ -383,15 +386,10 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     
     private IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, bool animate = false)
     {
-        IBuildable building;
-        if (prototypeData.MeshRot.Mesh != null && prototypeData.MeshRot.Mesh.name.Contains("Path")) // Not my best work
-        {
-            building = pathPrefab.GetAtPosAndRot<Path>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
-        }
-        else
-        {
-            building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
-        }
+        bool isPath = prototypeData.MeshRot.MeshIndex != -1 && prototypeMeshes[prototypeData.MeshRot.MeshIndex].name.Contains("Path");
+        IBuildable building = isPath // Not my best work, but can't use currentBuildingType
+            ? pathPrefab.GetAtPosAndRot<Path>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0))
+            : buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0)); 
 
         building.Setup(prototypeData, waveFunction.GridScale);
 

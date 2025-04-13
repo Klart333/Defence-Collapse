@@ -11,9 +11,12 @@ public class BuildableCornerData : SerializedScriptableObject
     [Title("Dictionary")]
     public Dictionary<Mesh, BuildableCorners> BuildableDictionary;
     
+    [SerializeField]
+    private ProtoypeMeshes protoypeMeshes;
+
     public bool IsCornerBuildable(MeshWithRotation meshRot, Vector2Int corner, out bool meshIsBuildable)
     {
-        if (meshRot.Mesh == null || !BuildableDictionary.TryGetValue(meshRot.Mesh, out BuildableCorners buildableCorners))
+        if (meshRot.MeshIndex == -1 || !BuildableDictionary.TryGetValue(protoypeMeshes.Meshes[meshRot.MeshIndex], out BuildableCorners buildableCorners))
         {
             meshIsBuildable = false;
             return false;

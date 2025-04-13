@@ -13,6 +13,9 @@ namespace Buildings
         private MaterialData materialData;
 
         [SerializeField]
+        private ProtoypeMeshes protoypeMeshes;
+        
+        [SerializeField]
         private Material transparentGreen;
 
         [Title("Events")]
@@ -52,7 +55,7 @@ namespace Buildings
         {
             PrototypeData = prototypeData;
 
-            GetComponentInChildren<MeshFilter>().mesh = prototypeData.MeshRot.Mesh;
+            GetComponentInChildren<MeshFilter>().mesh = protoypeMeshes[prototypeData.MeshRot.MeshIndex];
             MeshRenderer.SetMaterials(materialData.GetMaterials(PrototypeData.MaterialIndexes));
 
             transparentMaterials = new List<Material>();
@@ -72,7 +75,7 @@ namespace Buildings
             }
             else
             {
-                MeshCollider.sharedMesh = PrototypeData.MeshRot.Mesh;
+                MeshCollider.sharedMesh = protoypeMeshes[PrototypeData.MeshRot.MeshIndex];
                 MeshRenderer.SetMaterials(materialData.GetMaterials(PrototypeData.MaterialIndexes));
 
                 OnPlacedEvent?.Invoke();

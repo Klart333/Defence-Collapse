@@ -20,6 +20,9 @@ public class BuildingHandler : SerializedMonoBehaviour
     [SerializeField]
     private BuildableCornerData cornerData;
     
+    [SerializeField]
+    private ProtoypeMeshes protoypeMeshes;
+    
     [Title("District")]
     [SerializeField]
     private IChunkWaveFunction<Chunk> districtGenerator;
@@ -68,13 +71,13 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private void UpdateData(BuildingData buildingData, Building building)
     {
-        if (building.Prototype.MeshRot.Mesh is null) // Full
+        if (building.Prototype.MeshRot.MeshIndex == -1) // Full
         {
             buildingData.OnBuildingChanged(new BuildingCellInformation { HouseCount = 4, TowerType = TowerType.None }, building);
             return; 
         }
         
-        if (!towerMeshData.TowerMeshes.TryGetValue(building.Prototype.MeshRot.Mesh, out BuildingCellInformation cellInfo))
+        if (!towerMeshData.TowerMeshes.TryGetValue(protoypeMeshes.Meshes[building.Prototype.MeshRot.MeshIndex], out BuildingCellInformation cellInfo))
         {
             buildingData.OnBuildingChanged(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None }, building);
         }
@@ -84,7 +87,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private BuildingData CreateData(Building building)
     {
-        if (building.Prototype.MeshRot.Mesh != null && !towerMeshData.TowerMeshes.TryGetValue(building.Prototype.MeshRot.Mesh, out BuildingCellInformation cellInfo))
+        if (building.Prototype.MeshRot.MeshIndex != -1 && !towerMeshData.TowerMeshes.TryGetValue(protoypeMeshes.Meshes[building.Prototype.MeshRot.MeshIndex], out BuildingCellInformation cellInfo))
         {
             //Debug.Log("Please add all meshes to the list");
 
