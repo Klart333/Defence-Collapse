@@ -16,6 +16,8 @@ namespace Effects.ECS
         public void OnUpdate(ref SystemState state)
         {
             new PositionJob().ScheduleParallel();
+            
+            state.CompleteDependency();
         }
 
         [BurstCompile]

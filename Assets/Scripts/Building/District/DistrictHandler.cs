@@ -45,8 +45,7 @@ namespace Buildings.District
                 Debug.LogError("Could not find PrototypeInfoData for DistrictType: " + districtType);
                 return;
             }
-            
-            Vector3 position = GetAveragePosition();
+
             
             HashSet<Chunk> neighbours = new HashSet<Chunk>();
             List<Chunk> addedChunks = new List<Chunk>();
@@ -57,7 +56,15 @@ namespace Buildings.District
                 chunk.Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
                 districtGenerator.ChunkWaveFunction.LoadCells(chunk, prototypeInfo);
 
-                const int height = 1;
+                int height = districtType switch
+                {
+                    DistrictType.Archer => 1,
+                    DistrictType.Bomb => 2,
+                    DistrictType.Mine => 0,
+                    //DistrictType.Church => expr,
+                    //DistrictType.Farm => expr,
+                    _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
+                };
                 for (int j = 0; j < height; j++) // Assumes that the chunks are not stacked vertically already
                 {
                     int heightLevel = 1 + j;
@@ -73,7 +80,7 @@ namespace Buildings.District
                 districtGenerator.ChunkWaveFunction.LoadCells(chunk, chunk.PrototypeInfoData);
             }
             
-            DistrictData districtData = GetDistrictData(districtType, chunks, position);
+            DistrictData districtData = GetDistrictData(districtType, chunks);
             uniqueDistricts.Add(districtData);
             
             foreach (Chunk chunk in chunks)
@@ -86,16 +93,7 @@ namespace Buildings.District
             return;
 
 
-            Vector3 GetAveragePosition()
-            {
-                Vector3 vector3 = Vector3.zero;
-                foreach (Chunk chunk in chunks)
-                {
-                    vector3 += chunk.Position;
-                }
-                vector3 /= chunks.Count;
-                return vector3;
-            }
+            
         }
         
         private static void GetNeighbours(HashSet<Chunk> chunks, Chunk chunk, HashSet<Chunk> neighbours, int depth)
@@ -115,10 +113,22 @@ namespace Buildings.District
             }
         }
 
-        private DistrictData GetDistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position)
+        private DistrictData GetDistrictData(DistrictType districtType, HashSet<Chunk> chunks)
         {
+            Vector3 position = GetAveragePosition();
             DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator, districtKey++);
             return districtData;
+            
+            Vector3 GetAveragePosition()
+            {
+                Vector3 vector3 = Vector3.zero;
+                foreach (Chunk chunk in chunks)
+                {
+                    vector3 += chunk.Position;
+                }
+                vector3 /= chunks.Count;
+                return vector3;
+            }
         }
 
         public bool IsBuilt(Chunk chunk)

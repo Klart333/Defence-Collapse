@@ -44,10 +44,16 @@ namespace WaveFunctionCollapse
                     if (prot.MeshRot.MeshIndex >= protoypeInfos[i].PrototypeMeshes.Count) continue;
                     
                     int meshIndex = meshesToIndex[protoypeInfos[i].PrototypeMeshes[prot.MeshRot.MeshIndex]];
-                    protoypeInfos[i].Prototypes[j] = new PrototypeData(
+                    PrototypeData prototypeData = new PrototypeData(
                         new MeshWithRotation(meshIndex, prot.MeshRot.Rot),
                         prot.PosX, prot.NegX, prot.PosY, prot.NegY, prot.PosZ, prot.NegZ,
                         prot.Weight, prot.MaterialIndexes);
+#if UNITY_EDITOR
+                    prototypeData.Name_EditorOnly = Meshes[meshIndex].name;
+#endif
+                        
+                    protoypeInfos[i].Prototypes[j] = prototypeData;
+                        
                 }
                 
                 for (int j = 0; j < protoypeInfos[i].MarchingTable.Length; j++)
@@ -59,10 +65,14 @@ namespace WaveFunctionCollapse
                         if (prot.MeshRot.MeshIndex >= protoypeInfos[i].PrototypeMeshes.Count) continue;
 
                         int meshIndex = meshesToIndex[protoypeInfos[i].PrototypeMeshes[prot.MeshRot.MeshIndex]];
-                        protoypeInfos[i].MarchingTable[j][k] = new PrototypeData(
+                        PrototypeData prototypeData = new PrototypeData(
                             new MeshWithRotation(meshIndex, prot.MeshRot.Rot),
                             prot.PosX, prot.NegX, prot.PosY, prot.NegY, prot.PosZ, prot.NegZ,
                             prot.Weight, prot.MaterialIndexes);
+#if UNITY_EDITOR
+                        prototypeData.Name_EditorOnly = Meshes[meshIndex].name;
+#endif
+                        protoypeInfos[i].MarchingTable[j][k] = prototypeData;
                     }
                 }
                 

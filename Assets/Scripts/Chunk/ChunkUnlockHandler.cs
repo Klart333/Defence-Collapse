@@ -32,8 +32,17 @@ namespace Chunks
 
         private void Update()
         {
-            Vector3 point = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
+            if (groundGenerator.IsGenerating)
+            {
+                foreach (ChunkUnlocker unlocker in unlockers.Values)
+                {
+                    unlocker.SetShowing(false);
+                }
 
+                return;
+            }
+            
+            Vector3 point = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
             foreach (KeyValuePair<Chunk, ChunkUnlocker> kvp in unlockers)
             {
                 kvp.Value.SetShowing(kvp.Key.ContainsPoint(point, Vector3.one * 2));

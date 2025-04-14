@@ -2,87 +2,120 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
-using WaveFunctionCollapse;
 
-[InlineEditor]
-[CreateAssetMenu(fileName = "Buildable", menuName = "Town/Buildable Corner Data")]
-public class BuildableCornerData : SerializedScriptableObject
+namespace WaveFunctionCollapse
 {
-    [Title("Dictionary")]
-    public Dictionary<Mesh, BuildableCorners> BuildableDictionary;
-    
-    [SerializeField]
-    private ProtoypeMeshes protoypeMeshes;
-
-    public bool IsCornerBuildable(MeshWithRotation meshRot, Vector2Int corner, out bool meshIsBuildable)
+    [InlineEditor]
+    [CreateAssetMenu(fileName = "Buildable", menuName = "Town/Buildable Corner Data")]
+    public class BuildableCornerData : SerializedScriptableObject
     {
-        if (meshRot.MeshIndex == -1 || !BuildableDictionary.TryGetValue(protoypeMeshes.Meshes[meshRot.MeshIndex], out BuildableCorners buildableCorners))
+        [Title("Dictionary")]
+        public Dictionary<Mesh, BuildableCorners> BuildableDictionary;
+        
+        [Title("References")]
+        [SerializeField]
+        private ProtoypeMeshes protoypeMeshes;
+
+        public bool IsCornerBuildable(MeshWithRotation meshRot, Vector2Int corner, out bool meshIsBuildable)
         {
-            meshIsBuildable = false;
-            return false;
+            if (meshRot.MeshIndex == -1 || !BuildableDictionary.TryGetValue(protoypeMeshes.Meshes[meshRot.MeshIndex], out BuildableCorners buildableCorners))
+            {
+                meshIsBuildable = false;
+                return false;
+            }
+
+            meshIsBuildable = true;
+            Corner rotatedCorner = RotateCorner(meshRot.Rot, corner);
+            return buildableCorners.CornerDictionary[rotatedCorner].Buildable;
         }
 
-        meshIsBuildable = true;
-        Corner rotatedCorner = RotateCorner(meshRot.Rot, corner);
-        return buildableCorners.CornerDictionary[rotatedCorner];
-    }
-
-    public static Corner RotateCorner(int rot, Vector2Int corner)
-    {
-        float angle = rot * 90 * Mathf.Deg2Rad;
-        int x = -Mathf.RoundToInt(corner.x * Mathf.Cos(angle) - corner.y * Mathf.Sin(angle));
-        int y = -Mathf.RoundToInt(corner.x * Mathf.Sin(angle) + corner.y * Mathf.Cos(angle));
-
-        return VectorToCorner(x, y);
-    }
-
-    public static Corner VectorToCorner(int x, int y)
-    {
-        return (x, y) switch
+        public static Corner RotateCorner(int rot, Vector2Int corner)
         {
-            (1, 1) => Corner.TopRight,
-            (-1, 1) => Corner.TopLeft,
-            (1, -1) => Corner.BottomRight,
-            (-1, -1) => Corner.BottomLeft,
-            _ => throw new NotImplementedException(),
+            float angle = rot * 90 * Mathf.Deg2Rad;
+            int x = -Mathf.RoundToInt(corner.x * Mathf.Cos(angle) - corner.y * Mathf.Sin(angle));
+            int y = -Mathf.RoundToInt(corner.x * Mathf.Sin(angle) + corner.y * Mathf.Cos(angle));
+
+            return VectorToCorner(x, y);
+        }
+
+        public static Corner VectorToCorner(int x, int y)
+        {
+            return (x, y) switch
+            {
+                (1, 1) => Corner.TopRight,
+                (-1, 1) => Corner.TopLeft,
+                (1, -1) => Corner.BottomRight,
+                (-1, -1) => Corner.BottomLeft,
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        public void Clear()
+        {
+            BuildableDictionary.Clear();   
+        }
+
+    #if UNITY_EDITOR
+        [Button]
+        public void Save()
+        {
+            UnityEditor.EditorUtility.SetDirty(this);
+            UnityEditor.AssetDatabase.SaveAssets();
+        }
+        
+    #endif
+    }
+
+    [System.Serializable]
+    public class BuildableCorners
+    {
+        [InlineProperty]
+        public Dictionary<Corner, CornerData> CornerDictionary = new Dictionary<Corner, CornerData>() 
+        {
+            { Corner.TopLeft, new CornerData() },
+            { Corner.TopRight, new CornerData() },
+            { Corner.BottomLeft, new CornerData() },
+            { Corner.BottomRight, new CornerData() },
         };
     }
-
-    public void Clear()
+        
+    [InlineProperty]    
+    [System.Serializable]
+    public struct CornerData
     {
-        BuildableDictionary.Clear();   
+        [InlineProperty]
+        public bool Buildable;
+        [InlineProperty, ShowIf(nameof(Buildable))]
+        public GroundType GroundType;
+
+        public CornerData(bool buildable)
+        {
+            Buildable = buildable;
+            GroundType = GroundType.Grass;
+        }
+        
+        public static implicit operator bool(CornerData cornerData)
+        {
+            return cornerData.Buildable;
+        }
+        
+        public static implicit operator CornerData(bool buildable)
+        {
+            return new CornerData(buildable);
+        }
     }
 
-#if UNITY_EDITOR
-    [Button]
-    public void Save()
+    public enum GroundType
     {
-        UnityEditor.EditorUtility.SetDirty(this);
-        UnityEditor.AssetDatabase.SaveAssets();
+        Grass, 
+        Crystal,
     }
-    
-#endif
-}
 
-
-
-[System.Serializable]
-public class BuildableCorners
-{
-    [SerializeField]
-    public Dictionary<Corner, bool> CornerDictionary = new Dictionary<Corner, bool>() 
+    public enum Corner
     {
-        { Corner.TopLeft, false },
-        { Corner.TopRight, false },
-        { Corner.BottomLeft, false },
-        { Corner.BottomRight, false },
-    };
-}
-
-public enum Corner
-{
-    TopLeft, 
-    TopRight, 
-    BottomLeft, 
-    BottomRight,
+        TopLeft, 
+        TopRight, 
+        BottomLeft, 
+        BottomRight,
+    }
 }

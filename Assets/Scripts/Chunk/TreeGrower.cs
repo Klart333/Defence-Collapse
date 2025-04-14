@@ -1,3 +1,4 @@
+using System;
 using Random = UnityEngine.Random;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
@@ -79,43 +80,9 @@ namespace Chunks
         private void SpawnTree(Vector3 pos)
         {
             PooledMonoBehaviour treePrefab = trees[Random.Range(0, trees.Length)];
-            PooledMonoBehaviour spawned = treePrefab.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.AngleAxis(Random.value * 360, Vector3.up));
+            Quaternion rot = Quaternion.AngleAxis(Random.value * 360, Vector3.up);
+            PooledMonoBehaviour spawned = treePrefab.GetAtPosAndRot<PooledMonoBehaviour>(pos, rot);
             spawnedTrees.Add(spawned);
-        }
-
-        private static Material GetHitMaterial(Ray ray, out RaycastHit hit)
-        {
-            if (!Physics.Raycast(ray, out hit, 3)) 
-                return null;
-
-            if (hit.collider is not MeshCollider { sharedMesh: { } mesh }) 
-                return null;
-
-            int subMeshIndex = GetSubmeshIndex(mesh, hit.triangleIndex);
-            if (subMeshIndex == -1) 
-                return null;
-
-            return hit.collider.TryGetComponent<Renderer>(out var renderer) && subMeshIndex < renderer.sharedMaterials.Length 
-                ? renderer.sharedMaterials[subMeshIndex] 
-                : null;
-        }
-
-        private static int GetSubmeshIndex(Mesh mesh, int triangleIndex)
-        {
-            int baseIndex = 0;
-
-            for (int i = 0; i < mesh.subMeshCount; i++)
-            {
-                int[] triangles = mesh.GetTriangles(i);
-                int triangleCount = triangles.Length / 3;
-
-                if (triangleIndex < baseIndex + triangleCount)
-                    return i;
-
-                baseIndex += triangleCount;
-            }
-
-            return -1;
         }
 
         public void ClearTrees()
@@ -132,5 +99,63 @@ namespace Chunks
         {
             Gizmos.DrawWireCube(transform.position + Vector3.up, raycastArea.ToXyZ(1).MultiplyByAxis(transform.localScale));
         }
+        
+        #region Static 
+        
+        private static readonly Dictionary<Collider, Renderer> ColliderToRenderers = new Dictionary<Collider, Renderer>();
+        public static Material GetHitMaterial(Ray ray, out RaycastHit hit)
+        {
+            if (!Physics.Raycast(ray, out hit, 3, 1 << LayerMask.NameToLayer("Ground"))) 
+                return null;
+
+            if (hit.collider is not MeshCollider { sharedMesh: { } mesh }) 
+                return null;
+
+            int subMeshIndex = GetSubmeshIndex(mesh, hit.triangleIndex);
+            if (subMeshIndex == -1) 
+                return null;
+
+            if (!ColliderToRenderers.TryGetValue(hit.collider, out Renderer renderer))
+            {
+                if (!hit.collider.TryGetComponent(out renderer))
+                {
+                    return null;
+                }
+                
+                ColliderToRenderers.Add(hit.collider, renderer);
+            }
+            
+            return subMeshIndex < renderer.sharedMaterials.Length 
+                ? renderer.sharedMaterials[subMeshIndex] 
+                : null;
+        }
+
+        private static readonly Dictionary<Tuple<Mesh, int>, int> SavedSubMeshIndexes = new Dictionary<Tuple<Mesh, int>, int>();
+        private static int GetSubmeshIndex(Mesh mesh, int triangleIndex)
+        {
+            if (SavedSubMeshIndexes.TryGetValue(new Tuple<Mesh, int>(mesh, triangleIndex), out int index))
+            {
+                return index;
+            }
+            
+            int baseIndex = 0;
+            for (int i = 0; i < mesh.subMeshCount; i++)
+            {
+                int[] triangles = mesh.GetTriangles(i);
+                int triangleCount = triangles.Length / 3;
+
+                if (triangleIndex < baseIndex + triangleCount)
+                {
+                    SavedSubMeshIndexes.Add(new Tuple<Mesh, int>(mesh, triangleIndex), i);
+                    return i;
+                }
+
+                baseIndex += triangleCount;
+            }
+
+            return -1;
+        }
+        
+        #endregion
     }
 }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using TMPro;
+using WaveFunctionCollapse;
 
 namespace Chunks
 {

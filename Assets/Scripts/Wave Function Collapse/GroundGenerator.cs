@@ -15,6 +15,7 @@ using UnityEngine;
 using System;
 using Chunks;
 using Enemy;
+using UnityEngine.Assertions;
 
 namespace WaveFunctionCollapse
 {
@@ -57,6 +58,10 @@ namespace WaveFunctionCollapse
         
         [SerializeField]
         private int enemyGateIndex = 1;
+
+        [Title("Crystal")]
+        [SerializeField]
+        private int[] crystalCornerIndexes;
         
         [Title("Debug")]
         [SerializeField]
@@ -97,7 +102,8 @@ namespace WaveFunctionCollapse
             waveFunction.ParentTransform = transform;
             
             Chunk chunk = waveFunction.LoadChunk(transform.position, chunkSize, defaultPrototypeInfoData, false);
-
+            SetCrystalInCenter(chunk);
+            
             if (shouldRun)
                 LoadChunk(chunk).Forget(Debug.LogError);
         }
@@ -128,7 +134,7 @@ namespace WaveFunctionCollapse
             generatedChunks.Add(chunk.ChunkIndex);
             RemoveUnreferencedChunks();
 
-            IsGenerating = true;
+            IsGenerating = false;
         }
 
         private void RemoveUnreferencedChunks()
@@ -287,6 +293,30 @@ namespace WaveFunctionCollapse
             enemySpawnHandler.SetEnemySpawn(pos - (Vector3)DirectionUtility.DirectionToInt2(direction).XyZ(0.0f), chunk.ChunkIndex, difficulty);
         }
 
+        private void SetCrystalInCenter(Chunk chunk)
+        {
+            float middle = (chunk.Depth - 1) / 2.0f;
+            int start = Mathf.FloorToInt(middle);
+            int end = Mathf.CeilToInt(middle);
+            Assert.AreNotEqual(start, end);
+
+            int index = 0;
+            for (int x = start; x <= end; x++)
+            {
+                for (int z = start; z <= end; z++)
+                {
+                    List<PrototypeData> prots = new List<PrototypeData>
+                    {
+                        defaultPrototypeInfoData.Prototypes[crystalCornerIndexes[index++]]
+                    };
+                    
+                    chunk.Cells[x, 0, z] = new Cell(false, chunk.Cells[x, 0, z].Position, prots);
+                    ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
+                    waveFunction.CellStack.Push(chunkIndex);
+                }
+            }    
+        }
+        
         private void CombineMeshes(int3 chunkIndex)
         {
             Mesh mesh = GetComponent<MeshCombiner>().CombineMeshes(out GameObject spawnedMesh);

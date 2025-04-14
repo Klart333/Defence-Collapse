@@ -189,7 +189,9 @@ public class Building : PooledMonoBehaviour, IBuildable
         Index = nullableIndex.Value;
         Prototype = GetPrototype(prototypeData);
 
-        GetComponentInChildren<MeshFilter>().mesh = protoypeMeshes.Meshes[Prototype.MeshRot.MeshIndex];
+        GetComponentInChildren<MeshFilter>().mesh = Prototype.MeshRot.MeshIndex != -1
+         ? protoypeMeshes.Meshes[Prototype.MeshRot.MeshIndex] 
+         : null;
         MeshRenderer.SetMaterials(materialData.GetMaterials(Prototype.MaterialIndexes));
 
         transparentMaterials = new List<Material>();
@@ -246,7 +248,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         {
             if (MeshRot.MeshIndex != -1 && buildableCornerData.BuildableDictionary.TryGetValue(protoypeMeshes[MeshRot.MeshIndex], out BuildableCorners cornerData))
             {
-                bool value = cornerData.CornerDictionary[BuildableCornerData.VectorToCorner(corners[i].x, corners[i].y)];
+                bool value = cornerData.CornerDictionary[BuildableCornerData.VectorToCorner(corners[i].x, corners[i].y)].Buildable;
                 cornerColliders[i].gameObject.SetActive(value);
             }
             else

@@ -123,6 +123,8 @@ public class Stat
         modifiers.Clear();
         OnValueChanged?.Invoke();
     }
+    
+    public static implicit operator float(Stat stat) => stat.Value;
 }
 
 [Serializable]

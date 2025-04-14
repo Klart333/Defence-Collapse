@@ -289,7 +289,7 @@ namespace WaveFunctionCollapse
             bool botRight = (topRight && botLeft && prot.NegZ == -1) || prot.NegZ == rightBuildableCode + 1000;
             BuildableCorners corner = new BuildableCorners()
             {
-                CornerDictionary = new Dictionary<Corner, bool>()
+                CornerDictionary = new Dictionary<Corner, CornerData>()
                 {
                     {Corner.TopLeft, topLeft}, 
                     {Corner.TopRight, topRight}, 
@@ -498,16 +498,30 @@ namespace WaveFunctionCollapse
 
         [TitleGroup("Util", Order = -45)]
         [Button]
-        public void CreateWeights()
+        public void CreateWeights(bool resetValues = false)
         {
+            var oldWeights = new List<StupidWeightThing>(pieceWeights);
             pieceWeights = new List<StupidWeightThing>();
 
             for (int i = 0; i < transform.childCount; i++)
             {
                 pieceWeights.Add(new StupidWeightThing(transform.GetChild(i).name, 1));
             }
-
             pieceWeights.Add(new StupidWeightThing("Air", 1));
+
+            if (resetValues) return;
+            
+            for (int i = 0; i < pieceWeights.Count; i++)
+            {
+                for (int j = 0; j < oldWeights.Count; j++)
+                {
+                    if (string.Equals(pieceWeights[i].Name, oldWeights[j].Name))
+                    {
+                        pieceWeights[i] = oldWeights[j];
+                    }   
+                }
+                
+            }
         }
 
         private void Reset()
@@ -622,6 +636,11 @@ namespace WaveFunctionCollapse
     [System.Serializable]
     public struct PrototypeData : System.IEquatable<PrototypeData>
     {
+#if UNITY_EDITOR
+        [ReadOnly]
+        public string Name_EditorOnly;
+#endif
+        
         public MeshWithRotation MeshRot;
 
         public short PosX;
@@ -664,6 +683,9 @@ namespace WaveFunctionCollapse
             NegZ = negZ;
 
             Weight = weight;
+#if UNITY_EDITOR
+            Name_EditorOnly = "";
+#endif
         }
         
         public static bool operator ==(PrototypeData p1, PrototypeData p2)

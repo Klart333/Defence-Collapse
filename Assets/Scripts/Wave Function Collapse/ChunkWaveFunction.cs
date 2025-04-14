@@ -469,15 +469,16 @@ namespace WaveFunctionCollapse
 
         public List<GameObject> SpawnedMeshes { get; } = new List<GameObject>();
 
-        public Vector3 Position { get; private set;}
-        public int Width { get; private set;}
-        public int Height { get; private set;}
-        public int Depth { get; private set;}
-        public int3 ChunkIndex { get; set; }
-        public bool IsRemoved { get; set; }
+        public PrototypeInfoData PrototypeInfoData { get; set; }
         public bool UseSideConstraints { get; private set; }
         public bool IsClear { get; private set; } = true;
-        public PrototypeInfoData PrototypeInfoData { get; set; }
+        public Vector3 Position { get; private set;}
+        public GroundType GroundType { get; set; }
+        public int Height { get; private set;}
+        public int Depth { get; private set;}
+        public int Width { get; private set;}
+        public int3 ChunkIndex { get; set; }
+        public bool IsRemoved { get; set; }
         
         public Vector3Int ChunkSize => new Vector3Int(Width, Height, Depth);
         

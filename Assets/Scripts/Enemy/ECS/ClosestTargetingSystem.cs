@@ -1,3 +1,4 @@
+using Gameplay;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -26,7 +27,8 @@ namespace DataStructures.Queue.ECS
             {
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
                 SpatialGrid = spatialGrid.AsReadOnly(),
-                CellSize = 1
+                CellSize = 1,
+                DeltaTime = SystemAPI.Time.DeltaTime * GameSpeedManager.Instance.GameSpeed,
             }.ScheduleParallel();
         }
 
@@ -46,19 +48,24 @@ namespace DataStructures.Queue.ECS
         [ReadOnly, NativeDisableContainerSafetyRestriction]
         public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
 
+        public float DeltaTime;
         public float CellSize;
 
         [BurstCompile]
-        public void Execute(in LocalTransform towerTransform, in RangeComponent rangeComponent, ref EnemyTargetComponent targetComponent)
+        public void Execute(EnemyTargetAspect enemyTargetAspect)
         {
-            float2 towerPosition = new float2(towerTransform.Position.x, towerTransform.Position.z);
-            // Get the grid cell of the tower
+            if (!enemyTargetAspect.ShouldFindTarget(DeltaTime))
+            {
+                return;
+            }
+            
+            float2 towerPosition = enemyTargetAspect.LocalTransform.ValueRO.Position.xz;
             int2 towerCell = HashGridUtility.GetCell(towerPosition, CellSize);
 
             // Calculate the number of cells to check based on the tower's range
-            int radiusCells = Mathf.CeilToInt(rangeComponent.Range / CellSize);
+            int radiusCells = Mathf.CeilToInt(enemyTargetAspect.RangeComponent.ValueRO.Range / CellSize);
 
-            float bestDistSq = rangeComponent.Range * rangeComponent.Range;
+            float bestDistSq = enemyTargetAspect.RangeComponent.ValueRO.Range * enemyTargetAspect.RangeComponent.ValueRO.Range;
             Entity bestEnemy = Entity.Null;
 
             // Iterate over nearby cells
@@ -89,7 +96,7 @@ namespace DataStructures.Queue.ECS
             }
 
             // Store the closest enemy for this tower
-            targetComponent.Target = bestEnemy;
+            enemyTargetAspect.EnemyTargetComponent.ValueRW.Target = bestEnemy;
         }
     }
     

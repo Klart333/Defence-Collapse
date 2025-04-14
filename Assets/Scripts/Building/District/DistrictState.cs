@@ -4,7 +4,10 @@ using Unity.Transforms;
 using Unity.Entities;
 using UnityEngine;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Effects.ECS;
+using WaveFunctionCollapse;
 
 namespace Buildings.District
 {
@@ -15,10 +18,11 @@ namespace Buildings.District
         
         public float Range { get; set; }
 
+        protected readonly List<Entity> spawnedEntities = new List<Entity>();
+        
         protected DamageInstance lastDamageDone;
         protected EntityManager entityManager;
         protected DistrictData districtData;
-        protected Entity spawnedEntity;
         protected Stats stats;
 
         private float totalDamageDealt;
@@ -46,7 +50,7 @@ namespace Buildings.District
         public abstract void OnSelected(Vector3 pos);
         public abstract void OnDeselected();
         public abstract void Die();
-        public abstract void OnWaveStart(int houseCount);
+        public abstract void OnWaveStart(int cellCount);
         
         private void OnDamageDone(Entity entity)
         {
@@ -87,13 +91,13 @@ namespace Buildings.District
     {
         private readonly Attack attack;
         private readonly TowerData archerData;
+        
         private GameObject rangeIndicator;
-
-        private float attackCooldownTimer = 0;
+        private bool selected;
         
         public override Attack Attack => attack;
 
-        public ArcherState(DistrictData districtData, TowerData archerData, Vector3 position, int key) : base(districtData, position, key)
+        public ArcherState(DistrictData districtData, TowerData archerData, IEnumerable<Chunk> chunks, Vector3 position, int key) : base(districtData, position, key)
         {
             this.archerData = archerData;
             Range = archerData.Range;
@@ -101,18 +105,34 @@ namespace Buildings.District
             attack = new Attack(archerData.BaseAttack);
             stats = new Stats(archerData.Stats);
 
-            ComponentType[] componentTypes = new ComponentType[3]
-            {
-                typeof(LocalTransform),
-                typeof(RangeComponent),
-                typeof(EnemyTargetComponent),
-            };
-
-            spawnedEntity = entityManager.CreateEntity(componentTypes);
-            entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = position });
-            entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = Range });
+            SpawnEntities(chunks);
         }
-        
+
+        private void SpawnEntities(IEnumerable<Chunk> chunks)
+        {
+            List<Chunk> perimeterChunks = DistrictUtility.GetTopPerimeter(chunks);
+            
+            foreach (Chunk chunk in perimeterChunks)
+            {
+                ComponentType[] componentTypes =
+                {
+                    typeof(LocalTransform),
+                    typeof(RangeComponent),
+                    typeof(EnemyTargetComponent),
+                    typeof(AttackSpeedComponent),
+                };
+            
+                Entity spawnedEntity = entityManager.CreateEntity(componentTypes);
+                entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = chunk.Position });
+                entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = Range }); // These could be made to blob assets, probably easier to change then
+                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent
+                {
+                    AttackSpeed = 1.0f / archerData.Stats.AttackSpeed.Value, 
+                });
+                spawnedEntities.Add(spawnedEntity);
+            }
+        }
+
         public override void OnStateEntered()
         {
 
@@ -120,35 +140,35 @@ namespace Buildings.District
 
         public override void OnSelected(Vector3 pos)
         {
+            if (selected) return;
+            
+            selected = true;
             rangeIndicator = archerData.RangeIndicator.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.identity).gameObject;
             rangeIndicator.transform.localScale = new Vector3(Range * 2.0f, 0.01f, Range * 2.0f);
         }
 
         public override void OnDeselected()
         {
+            selected = false;
             if (rangeIndicator != null)
             {
                 rangeIndicator.SetActive(false);
+                rangeIndicator = null;
             }
         }
 
         public override void Update()
         {
-            if (attackCooldownTimer <= 0)
+            for (int i = 0; i < spawnedEntities.Count; i++)
             {
-                Entity targetEntity = entityManager.GetComponentData<EnemyTargetComponent>(spawnedEntity).Target;
-                if (entityManager.Exists(targetEntity))
+                EnemyTargetAspect aspect = entityManager.GetAspect<EnemyTargetAspect>(spawnedEntities[i]);
+                if (aspect.CanAttack() && entityManager.Exists(aspect.EnemyTargetComponent.ValueRO.Target))
                 {
-                    PerformAttack(entityManager.GetComponentData<LocalTransform>(targetEntity).Position);
+                    aspect.RestTimer();
+                    OriginPosition = aspect.LocalTransform.ValueRO.Position;
+                    PerformAttack(entityManager.GetComponentData<LocalTransform>(aspect.EnemyTargetComponent.ValueRO.Target).Position);
+                    break;
                 }
-                else
-                {
-                    attackCooldownTimer = 0.1f;
-                }
-            }
-            else
-            {
-                attackCooldownTimer -= Time.deltaTime;
             }
         }
 
@@ -156,12 +176,11 @@ namespace Buildings.District
         {
             AttackPosition = targetPosition;
             attack.TriggerAttack(this);
-            attackCooldownTimer = 1.0f / stats.AttackSpeed.Value;
         }
 
-        public override void OnWaveStart(int houseCount)
+        public override void OnWaveStart(int cellCount)
         {
-            MoneyManager.Instance.AddMoney(houseCount * archerData.IncomePerHouse);
+            
         }
 
         public override void Die()
@@ -176,29 +195,44 @@ namespace Buildings.District
 
     public class BombState : DistrictState
     {
-        private readonly Attack attack;
         private readonly TowerData bombData;
+        private readonly Attack attack;
+        
         private GameObject rangeIndicator;
-
-        private float attackCooldownTimer = 0;        
-
+        private bool selected;
+        
         public override Attack Attack => attack;
         
-        public BombState(DistrictData districtData, TowerData bombData, Vector3 position, int key) : base(districtData, position, key)
+        public BombState(DistrictData districtData, TowerData bombData, IEnumerable<Chunk> chunks, Vector3 position, int key) : base(districtData, position, key)
         {
             this.bombData = bombData;
             Range = bombData.Range;
 
-            ComponentType[] componentTypes = new ComponentType[3]
+            SpawnEntities(chunks);
+        }
+
+        private void SpawnEntities(IEnumerable<Chunk> chunks)
+        {
+            List<Chunk> perimeterChunks = DistrictUtility.GetTopPerimeter(chunks); // Should probably reverse, so only inside cells shoot
+
+            int index = 0;
+            foreach (Chunk chunk in perimeterChunks)
             {
-                typeof(LocalTransform),
-                typeof(RangeComponent),
-                typeof(EnemyTargetComponent),
-            };
+                ComponentType[] componentTypes =
+                {
+                    typeof(LocalTransform),
+                    typeof(RangeComponent),
+                    typeof(EnemyTargetComponent),
+                    typeof(AttackSpeedComponent),
+                };
             
-            spawnedEntity = entityManager.CreateEntity(componentTypes);
-            entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = position });
-            entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = Range });
+                Entity spawnedEntity = entityManager.CreateEntity(componentTypes);
+                entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = chunk.Position });
+                // These could be made to blob assets, probably easier to change then
+                entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = Range });
+                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent { AttackSpeed = 1.0f / bombData.Stats.AttackSpeed.Value, Timer = 0.1f * index++});
+                spawnedEntities.Add(spawnedEntity);
+            }
         }
         
         public override void OnStateEntered()
@@ -208,12 +242,17 @@ namespace Buildings.District
 
         public override void OnSelected(Vector3 pos)
         {
+            if (selected) return;
+            
+            selected = true;
             rangeIndicator = bombData.RangeIndicator.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.identity).gameObject;
             rangeIndicator.transform.localScale = new Vector3(Range * 2.0f, 0.01f, Range * 2.0f);
         }
 
         public override void OnDeselected()
         {
+            selected = false;
+            
             if (rangeIndicator != null)
             {
                 rangeIndicator.SetActive(false);
@@ -222,21 +261,15 @@ namespace Buildings.District
 
         public override void Update()
         {
-            if (attackCooldownTimer <= 0)
+            for (int i = 0; i < spawnedEntities.Count; i++)
             {
-                Entity targetEntity = entityManager.GetComponentData<EnemyTargetComponent>(spawnedEntity).Target;
-                if (entityManager.Exists(targetEntity))
+                EnemyTargetAspect aspect = entityManager.GetAspect<EnemyTargetAspect>(spawnedEntities[i]);
+                if (aspect.CanAttack() && entityManager.Exists(aspect.EnemyTargetComponent.ValueRO.Target))
                 {
-                    PerformAttack(entityManager.GetComponentData<LocalTransform>(targetEntity).Position);
+                    PerformAttack(entityManager.GetComponentData<LocalTransform>(aspect.EnemyTargetComponent.ValueRO.Target).Position);
+                    
+                    aspect.AttackSpeedComponent.ValueRW.Timer = 0;
                 }
-                else
-                {
-                    attackCooldownTimer = 0.1f;
-                }
-            }
-            else
-            {
-                attackCooldownTimer -= Time.deltaTime;
             }
         }
 
@@ -244,12 +277,73 @@ namespace Buildings.District
         {
             AttackPosition = targetPosition;
             attack.TriggerAttack(this);
-            attackCooldownTimer = 1.0f / stats.AttackSpeed.Value;
         }
 
-        public override void OnWaveStart(int houseCount)
+        public override void OnWaveStart(int cellCount)
         {
-            MoneyManager.Instance.AddMoney(houseCount * bombData.IncomePerHouse);
+            
+        }
+
+        public override void Die()
+        {
+
+        }
+    }
+
+    #endregion
+
+    #region Mine
+
+    public class MineState : DistrictState
+    {
+        private readonly Attack attack;
+        private readonly TowerData mineData;
+
+        private float mineCooldown = 0;        
+
+        public override Attack Attack => attack;
+        
+        public MineState(DistrictData districtData, TowerData mineData, IEnumerable<Chunk> chunks, Vector3 position, int key) : base(districtData, position, key)
+        {
+            this.mineData = mineData;
+            attack = mineData.BaseAttack;
+        }
+        
+        public override void OnStateEntered()
+        {
+
+        }
+
+        public override void OnSelected(Vector3 pos)
+        {
+            
+        }
+
+        public override void OnDeselected()
+        {
+           
+        }
+
+        public override void Update()
+        {
+            if (mineCooldown <= 0)
+            {
+                
+            }
+            else
+            {
+                mineCooldown -= Time.deltaTime;
+            }
+        }
+
+        private void PerformAttack(float3 targetPosition)
+        {
+            
+        }
+
+        public override void OnWaveStart(int cellCount)
+        {
+            
         }
 
         public override void Die()

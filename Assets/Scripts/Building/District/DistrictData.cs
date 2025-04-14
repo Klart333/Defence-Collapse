@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using Utility;
 using System;
+using UnityEngine.InputSystem;
 
 namespace Buildings.District
 {
@@ -30,16 +31,14 @@ namespace Buildings.District
             UpgradeData = new UpgradeData(1, 1, 1);
             cellCount = chunks.Count;
             DistrictChunks = chunks;
-
-            Vector3 statePosition = new Vector3(position.x, 0, position.z); 
             
             State = districtType switch
             {
-                DistrictType.Archer => new ArcherState(this, DistrictUpgradeManager.Instance.ArcherData, statePosition, key),
-                DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, statePosition, key),
+                DistrictType.Archer => new ArcherState(this, DistrictUpgradeManager.Instance.ArcherData, chunks, position, key),
+                DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, chunks, position, key),
+                DistrictType.Mine => new MineState(this, DistrictUpgradeManager.Instance.MineData, chunks, position, key),
                 //DistrictType.Church => expr,
                 //DistrictType.Farm => expr,
-                //DistrictType.Mine => expr,
                 _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
             };
 
@@ -67,9 +66,18 @@ namespace Buildings.District
             }
             
             OnClicked?.Invoke(this);
+            State.OnSelected(Position);
+
+            InputManager.Instance.Cancel.performed += OnDeselected;
         }
-        
-        
+
+        private void OnDeselected(InputAction.CallbackContext obj)
+        {
+            InputManager.Instance.Cancel.performed -= OnDeselected;
+            State.OnDeselected();
+        }
+
+
         private void OnWaveStarted()
         {
             State.OnWaveStart(cellCount);
@@ -187,5 +195,34 @@ namespace Buildings.District
             }
         }
 
+        /// <summary>
+        /// Get Perimeter of chunks
+        /// </summary>
+        public static List<Chunk> GetTopPerimeter(IEnumerable<Chunk> chunks)
+        {
+            List<Chunk> convexHull = new List<Chunk>();
+
+            foreach (Chunk chunk in chunks)
+            {
+                if (chunk.AdjacentChunks[2] != null) continue; // Not-top chunks shouldn't shoot
+                
+                int adjacentChunks = 0;
+                for (int i = 0; i < 4; i++)
+                {
+                    int index = i > 1 ? i + 2 : i;
+                    if (chunk.AdjacentChunks[index] != null)
+                    {
+                        adjacentChunks++;
+                    }
+                }
+                
+                if (adjacentChunks < 4)
+                {
+                    convexHull.Add(chunk);
+                }
+            }
+
+            return convexHull;
+        }
     }
 }

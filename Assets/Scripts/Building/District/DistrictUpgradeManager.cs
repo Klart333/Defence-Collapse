@@ -13,6 +13,9 @@ public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
 
     [SerializeField]
     private TowerData bombData;
+
+    [SerializeField]
+    private TowerData mineData;
     
     [Title("Mesh Information")]
     [SerializeField]
@@ -31,6 +34,7 @@ public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
     public List<EffectModifier> ModifierEffects => modifierEffectsToSpawn;
     public TowerData ArcherData => archerData;
     public TowerData BombData => bombData;
+    public TowerData MineData => mineData; 
 
     protected override void Awake()
     {

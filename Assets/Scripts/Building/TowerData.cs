@@ -6,9 +6,6 @@ using UnityEngine;
 [InlineEditor, CreateAssetMenu(fileName = "New Tower Data", menuName = "Building/Tower Data")]
 public class TowerData : SerializedScriptableObject
 {
-    [Title("Economy")]
-    public int IncomePerHouse = 2;
-
     [TitleGroup("Stats")]
     [OdinSerialize, NonSerialized]
     public Stats Stats;

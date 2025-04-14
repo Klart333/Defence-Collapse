@@ -49,7 +49,6 @@ namespace WaveFunctionCollapse
         private Vector3 offset;
 
         private bool isUpdatingChunks;
-
         
         private readonly Vector2Int[] corners =
         {

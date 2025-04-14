@@ -2,6 +2,7 @@ using Unity.Mathematics;
 using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Buildings.District
 {
@@ -66,7 +67,7 @@ namespace Buildings.District
         
         private void OnMouseUpAsButton()
         {
-            if (CameraController.IsDragging)
+            if (CameraController.IsDragging || EventSystem.current.IsPointerOverGameObject())
             {
                 return;
             }

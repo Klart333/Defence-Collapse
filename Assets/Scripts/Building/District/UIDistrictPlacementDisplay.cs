@@ -31,9 +31,14 @@ namespace Buildings.District
         
         [SerializeField]
         private IChunkWaveFunction<Chunk> districtGenerator;
+
+        [Title("GroundType")]
+        [SerializeField]
+        private Material crystalMaterial;
         
         private Queue<DistrictPlacer> selectedPlacers = new Queue<DistrictPlacer>();
         private List<DistrictPlacer> spawnedPlacers = new List<DistrictPlacer>();
+        private readonly Dictionary<int3, GroundType> chunkGroupTypes = new Dictionary<int3, GroundType>();
         
         private DistrictType currentType;
         
@@ -122,7 +127,10 @@ namespace Buildings.District
             }
 
             bool sameHeight = selectedPlacer.Index.y == selectedPlacers.Peek().Index.y;            
-            bool canBuild = sameHeight && IsConnected(includedChunks) && DistrictHandler.CanBuildDistrict(width, depth, currentType);
+            bool canBuild = sameHeight 
+                            && IsConnected(includedChunks)
+                            && DistrictHandler.CanBuildDistrict(width, depth, currentType)
+                            && CheckDistrictRestrictions(currentType, includedChunks);
             
             confirmButton.SetActive(canBuild);
             Color color = canBuild ? Color.green : Color.red;
@@ -161,6 +169,45 @@ namespace Buildings.District
             }
             
             return chunks.Count == neighbours.Count;
+        }
+
+        public bool CheckDistrictRestrictions(DistrictType currentType, IEnumerable<int3> chunkIndexes)
+        {
+            return currentType switch
+            {
+                DistrictType.Mine => AllChunksOnCrystal(chunkIndexes),
+                _ => true,
+            };
+        }
+
+        public bool AllChunksOnCrystal(IEnumerable<int3> chunkIndexes)
+        {
+            bool valid = true;
+            foreach (int3 chunkIndex in chunkIndexes)
+            {
+                if (!chunkGroupTypes.TryGetValue(chunkIndex, out GroundType groundType))
+                {
+                    Chunk chunk = districtGenerator.ChunkWaveFunction.Chunks[chunkIndex];
+                    groundType = RaycastGroundType(chunk.Position);
+                    chunkGroupTypes.Add(chunkIndex, groundType);
+                }
+                
+                if (groundType is not GroundType.Crystal)
+                {
+                    valid = false;
+                    break;
+                }
+            }
+
+            return valid;
+        }
+
+        private GroundType RaycastGroundType(Vector3 rayPos)
+        {
+            Ray ray = new Ray(rayPos + new Vector3(0.1f, 1, 0.1f), Vector3.down);
+            Material mat = Chunks.TreeGrower.GetHitMaterial(ray, out _);
+
+            return mat == crystalMaterial ? GroundType.Crystal : GroundType.Grass;
         }
 
         public void PlacementConfirmed()
