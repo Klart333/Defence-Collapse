@@ -2,6 +2,6 @@ namespace Gameplay
 {
     public interface IGameSpeed
     {
-        public float GameSpeed { get; }
+        public float Value { get; }
     }
 }

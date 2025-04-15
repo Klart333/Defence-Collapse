@@ -17,6 +17,9 @@ namespace Buildings
         
         [SerializeField]
         private Material transparentGreen;
+        
+        [SerializeField]
+        private Transform meshTransform;
 
         [Title("Events")]
         [SerializeField]
@@ -36,6 +39,7 @@ namespace Buildings
         public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
         public MeshCollider MeshCollider => meshCollider ??= GetComponentInChildren<MeshCollider>();
         public MeshWithRotation MeshRot => PrototypeData.MeshRot;
+        public Transform MeshTransform => meshTransform;
 
         protected override void OnDisable()
         {

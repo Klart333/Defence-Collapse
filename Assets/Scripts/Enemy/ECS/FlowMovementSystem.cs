@@ -13,7 +13,6 @@ namespace DataStructures.Queue.ECS
     [UpdateInGroup(typeof(TransformSystemGroup))]
     public partial struct FlowMovementSystem : ISystem
     {
-        
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
@@ -29,7 +28,7 @@ namespace DataStructures.Queue.ECS
             
             new FlowMovementJob
             {
-                DeltaTime = deltaTime * GameSpeedManager.Instance.GameSpeed,
+                DeltaTime = deltaTime * GameSpeedManager.Instance.Value,
                 PathChunks = pathBlobber.PathBlob,
                 ChunkIndexToListIndex = pathBlobber.ChunkIndexToListIndex,
             }.ScheduleParallel();

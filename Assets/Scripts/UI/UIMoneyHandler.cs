@@ -1,3 +1,4 @@
+using System.Globalization;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -22,6 +23,6 @@ public class UIMoneyHandler : MonoBehaviour
 
     public void DisplayMoney(float amount)
     {
-        moneyAmount.text = amount.ToString();
+        moneyAmount.text = amount.ToString("N0");
     }
 }

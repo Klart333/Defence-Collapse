@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Pathfinding
@@ -19,9 +20,11 @@ namespace Pathfinding
 
         private readonly List<Collider> colliders = new List<Collider>();
 
-        private bool needsRebuilding = true;
+        public bool NeedsRebuilding { get; set; }
+        public int DelayFrames { get; set; }
 
         public List<PathIndex> Indexes { get; } = new List<PathIndex>();
+        public List<Collider> Colliders => colliders;
 
         private void OnValidate()
         {
@@ -47,22 +50,29 @@ namespace Pathfinding
             colliders.Clear();
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
+            if (DelayFrames > 0)
+            {
+                DelayFrames--;
+                return;
+            }
+        
             if (transform.hasChanged)
             {
-                needsRebuilding = true;
+                NeedsRebuilding = true;
             }
 
-            if (needsRebuilding)
+            if (NeedsRebuilding)
             {
-                needsRebuilding = false;
-                BuildIndexes();
+                BuildIndexes(); 
+                
+                NeedsRebuilding = false;
                 transform.hasChanged = false;
             }
         }
 
-        public void BuildIndexes()
+        private void BuildIndexes()
         {
             Indexes.Clear();
 
@@ -92,7 +102,7 @@ namespace Pathfinding
                     Debug.LogWarning($"Indexer {this} failed to build valid indexes", this);
                 }
             }
-
+            
             OnRebuilt?.Invoke();
         }
 

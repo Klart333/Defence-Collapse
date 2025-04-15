@@ -1,12 +1,11 @@
-using Pathfinding;
-using Pathfinding.ECS;
-using Unity.Burst;
-using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Entities;
+using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
+using Pathfinding.ECS;
+using Unity.Entities;
+using Unity.Burst;
+using Pathfinding;
 
 namespace DataStructures.Queue.ECS
 {

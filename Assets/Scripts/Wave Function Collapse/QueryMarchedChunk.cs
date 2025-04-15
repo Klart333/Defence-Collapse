@@ -375,8 +375,7 @@ namespace WaveFunctionCollapse
             QueryChangedCells.Clear();
             QueryCollapsedAir.Clear();
         }
-
-
+        
         public void SetBuiltCells(int3 queryIndex)
         {
             this.queryIndex = queryIndex;

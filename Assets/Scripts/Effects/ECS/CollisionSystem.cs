@@ -9,6 +9,7 @@ using Unity.Transforms;
 
 namespace Effects.ECS
 {
+    [UpdateAfter(typeof(EnemyHashGridSystem))]
     public partial struct CollisionSystem : ISystem
     {
         public static readonly Dictionary<int, Action<Entity>> DamageDoneEvent = new Dictionary<int, Action<Entity>>();
@@ -32,7 +33,7 @@ namespace Effects.ECS
                 return;
             }
             
-            NativeParallelMultiHashMap<int2, Entity> spatialGrid = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<EnemyHashGridSystem>().SpatialGrid;
+            NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
             new CollisionJob

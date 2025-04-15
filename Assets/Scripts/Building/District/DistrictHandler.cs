@@ -7,6 +7,7 @@ using Sirenix.Utilities;
 using Unity.Mathematics;
 using UnityEngine;
 using System;
+using Gameplay;
 
 namespace Buildings.District
 {
@@ -14,13 +15,12 @@ namespace Buildings.District
     {
         public event Action<DistrictData> OnDistrictCreated;
         
-        // NEEDS TO KEEP TRACK OF WHICH CELLS ARE PART OF A DISTRICT, AND WHAT TYPE
-        // CAN PROBABLY HANDLE THE COLLIDERS...
-        // NEEDS A REFERENCE TO THE BUILDING GROUP INDEX, WHEN CLICKING ON THE CITY THE DISTRICTS SHOULD BE SHOWN, FUTURE THING THO
-
         [Title("District")]
         [SerializeField]
         private DistrictGenerator districtGenerator;
+
+        [SerializeField]
+        private BuildingHandler buildingHandler;
         
         [OdinSerialize]
         private Dictionary<DistrictType, PrototypeInfoData> districtInfoData = new Dictionary<DistrictType, PrototypeInfoData>();
@@ -29,9 +29,34 @@ namespace Buildings.District
         private readonly List<DistrictData> uniqueDistricts = new List<DistrictData>();
 
         private int districtKey;
+        private bool inWave;
+
+        private void OnEnable()
+        {
+            Events.OnWaveStarted += OnWaveStarted;
+            Events.OnWaveEnded += OnWaveEnded;
+        }
+
+        private void OnDisable()
+        {
+            Events.OnWaveStarted -= OnWaveStarted;
+            Events.OnWaveEnded -= OnWaveEnded;
+        }
+
+        private void OnWaveEnded()
+        {
+            inWave = false;
+        }
+
+        private void OnWaveStarted()
+        {
+            inWave = true;
+        }
 
         private void Update()
         {
+            if (!inWave) return;
+            
             for (int i = 0; i < uniqueDistricts.Count; i++)
             {
                 uniqueDistricts[i].Update();
@@ -45,7 +70,6 @@ namespace Buildings.District
                 Debug.LogError("Could not find PrototypeInfoData for DistrictType: " + districtType);
                 return;
             }
-
             
             HashSet<Chunk> neighbours = new HashSet<Chunk>();
             List<Chunk> addedChunks = new List<Chunk>();
@@ -90,10 +114,6 @@ namespace Buildings.District
 
             OnDistrictCreated?.Invoke(districtData);
             districtGenerator.Run().Forget(Debug.LogError);
-            return;
-
-
-            
         }
         
         private static void GetNeighbours(HashSet<Chunk> chunks, Chunk chunk, HashSet<Chunk> neighbours, int depth)
@@ -115,20 +135,25 @@ namespace Buildings.District
 
         private DistrictData GetDistrictData(DistrictType districtType, HashSet<Chunk> chunks)
         {
-            Vector3 position = GetAveragePosition();
-            DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator, districtKey++);
-            return districtData;
-            
-            Vector3 GetAveragePosition()
+            Vector3 position = GetAveragePosition(chunks);
+            DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator, districtKey++, buildingHandler)
             {
-                Vector3 vector3 = Vector3.zero;
-                foreach (Chunk chunk in chunks)
-                {
-                    vector3 += chunk.Position;
-                }
-                vector3 /= chunks.Count;
-                return vector3;
+                GameSpeed = GameSpeedManager.Instance
+            };
+            return districtData;
+        }
+        
+        private Vector3 GetAveragePosition(IEnumerable<Chunk> chunks)
+        {
+            Vector3 vector3 = Vector3.zero;
+            int count = 0;
+            foreach (Chunk chunk in chunks)
+            {
+                count++;
+                vector3 += chunk.Position;
             }
+            vector3 /= count;
+            return vector3;
         }
 
         public bool IsBuilt(Chunk chunk)

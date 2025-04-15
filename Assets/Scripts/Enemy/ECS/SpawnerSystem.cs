@@ -1,8 +1,8 @@
-using Enemy;
-using Unity.Burst;
 using Unity.Collections;
-using Unity.Entities;
 using Unity.Transforms;
+using Unity.Entities;
+using Unity.Burst;
+using Enemy;
 
 namespace DataStructures.Queue.ECS
 {
@@ -12,7 +12,6 @@ namespace DataStructures.Queue.ECS
 
         public void OnCreate(ref SystemState state)
         {
-            // Create the query in OnCreate to avoid recreating it every frame
             spawnerQuery = SystemAPI.QueryBuilder()
                 .WithAspect<SpawnPointAspect>()
                 .Build();

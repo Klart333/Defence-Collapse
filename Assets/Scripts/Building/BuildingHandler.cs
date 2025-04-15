@@ -2,17 +2,13 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using Sirenix.OdinInspector;
+using WaveFunctionCollapse;
+using Unity.Mathematics;
 using UnityEngine;
 using System;
-using System.Linq;
-using Unity.Mathematics;
-using WaveFunctionCollapse;
 
 public class BuildingHandler : SerializedMonoBehaviour 
 {
-    public Dictionary<int, List<Building>> BuildingGroups = new Dictionary<int, List<Building>>();
-    public Dictionary<ChunkIndex, BuildingData> BuildingData = new Dictionary<ChunkIndex, BuildingData>();
-
     [Title("Mesh Information")]
     [SerializeField]
     private TowerMeshData towerMeshData;
@@ -31,15 +27,16 @@ public class BuildingHandler : SerializedMonoBehaviour
     [SerializeField]
     private WallData wallData;
 
+    public readonly Dictionary<int, List<Building>> BuildingGroups = new Dictionary<int, List<Building>>();
+    public readonly Dictionary<ChunkIndex, WallState> WallStates = new Dictionary<ChunkIndex, WallState>();
+
     private List<Building> buildingQueue = new List<Building>();
     private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
 
     private int selectedGroupIndex = -1;
     private int groupIndexCounter;
     private bool chilling;
-
-    public BuildingData this[Building building] => BuildingData.GetValueOrDefault(building.Index); 
-
+    
     #region Handling Groups
 
     public async UniTask AddBuilding(Building building)
@@ -53,13 +50,16 @@ public class BuildingHandler : SerializedMonoBehaviour
 
         for (int i = 0; i < buildingQueue.Count; i++)
         {
-            if (!BuildingData.ContainsKey(buildingQueue[i].Index))
-            {
-                BuildingData.Add(buildingQueue[i].Index, CreateData(buildingQueue[i]));
-                continue;
-            }
+            List<ChunkIndex> damageIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(buildingQueue[i].Index);
 
-            UpdateData(BuildingData[buildingQueue[i].Index], buildingQueue[i]);
+            for (int j = 0; j < damageIndexes.Count; j++)
+            {
+                ChunkIndex damageIndex = damageIndexes[j];
+                if (!WallStates.ContainsKey(damageIndex))
+                {
+                    WallStates.Add(damageIndex, CreateData(damageIndex));
+                }
+            }
         }
 
         BuildingGroups.Add(++groupIndexCounter, new List<Building>(buildingQueue));
@@ -69,36 +69,9 @@ public class BuildingHandler : SerializedMonoBehaviour
         CheckMerge(groupIndexCounter);
     }
 
-    private void UpdateData(BuildingData buildingData, Building building)
+    private WallState CreateData(ChunkIndex chunkIndex)
     {
-        if (building.Prototype.MeshRot.MeshIndex == -1) // Full
-        {
-            buildingData.OnBuildingChanged(new BuildingCellInformation { HouseCount = 4, TowerType = TowerType.None }, building);
-            return; 
-        }
-        
-        if (!towerMeshData.TowerMeshes.TryGetValue(protoypeMeshes.Meshes[building.Prototype.MeshRot.MeshIndex], out BuildingCellInformation cellInfo))
-        {
-            buildingData.OnBuildingChanged(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None }, building);
-        }
-
-        buildingData.OnBuildingChanged(cellInfo, building);
-    }
-
-    private BuildingData CreateData(Building building)
-    {
-        if (building.Prototype.MeshRot.MeshIndex != -1 && !towerMeshData.TowerMeshes.TryGetValue(protoypeMeshes.Meshes[building.Prototype.MeshRot.MeshIndex], out BuildingCellInformation cellInfo))
-        {
-            //Debug.Log("Please add all meshes to the list");
-
-            BuildingData wrongdata = new BuildingData(this, wallData.Stats, building.Index);
-            //wrongdata.SetState(new BuildingCellInformation { HouseCount = 1, TowerType = TowerType.None}, building.Index, building.Prototype);
-
-            return wrongdata;
-        }
-
-        BuildingData data = new BuildingData(this, wallData.Stats, building.Index);
-        //data.SetState(cellInfo, building.Index, building.Prototype);
+        WallState data = new WallState(this, wallData.Stats, chunkIndex);
 
         return data;
     }
@@ -166,6 +139,13 @@ public class BuildingHandler : SerializedMonoBehaviour
             list.Remove(building);
         }
     }
+    
+    public void BuildingTakeDamage(ChunkIndex index, float damage)
+    {
+        List<ChunkIndex> damageIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(index);
+        damage = damage / damageIndexes.Count;
+        
+    }
 
     public void BuildingDestroyed(ChunkIndex buildingIndex)
     {
@@ -177,7 +157,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         }
         
         building.OnDestroyed();
-        Events.OnBuildingDestroyed?.Invoke(building);
+        Events.OnBuildingDestroyed?.Invoke(buildingIndex);
     }
 
     #endregion
@@ -218,13 +198,13 @@ public class BuildingHandler : SerializedMonoBehaviour
         List<Building> buildings = BuildingGroups[building.BuildingGroupIndex];
         foreach (Building built in buildings)
         {
-            built.Highlight(BuildingData[built.Index].CellInformation).Forget(ex =>
+            built.Highlight(WallStates[built.Index].CellInformation).Forget(ex =>
             {
                 Debug.LogError($"Async function failed: {ex}");
             });;
         }
 
-        building.OnSelected(BuildingData[building.Index].CellInformation);
+        building.OnSelected(WallStates[building.Index].CellInformation);
 
         if (unSelectedBuildings.Contains(building))
         {

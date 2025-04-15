@@ -26,6 +26,9 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     [SerializeField]
     private LayerMask selectedLayer;
+    
+    [SerializeField]
+    private Transform meshTransform;
 
     [Title("Collider")]
     [SerializeField]
@@ -73,6 +76,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     public BuildingHandler BuildingHandler => buildingHandler ??= FindAnyObjectByType<BuildingHandler>();
     public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
     public MeshWithRotation MeshRot => Prototype.MeshRot;
+    public Transform MeshTransform => meshTransform;
 
     private void Awake()
     {
@@ -116,7 +120,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     {
         if (purchasing || highlighted) return;
 
-        BuildingAnimator.BounceInOut(transform);
+        BuildingAnimator.BounceInOut(meshTransform);
         MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2); // sure ?
 
         await UniTask.NextFrame();
@@ -135,7 +139,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
         if (highlighted)
         {
-            BuildingAnimator.BounceInOut(transform);
+            BuildingAnimator.BounceInOut(meshTransform);
         }
 
         MeshRenderer.gameObject.layer = (int)Mathf.Log(selectedLayer.value, 2);
@@ -158,8 +162,6 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void Update()
     {
-        BuildingHandler[this]?.Update(this);
-
         if (!InputManager.Instance.Fire.WasReleasedThisFrame())
         {
             return;
@@ -187,7 +189,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         }
         
         Index = nullableIndex.Value;
-        Prototype = GetPrototype(prototypeData);
+        Prototype = prototypeData;
 
         GetComponentInChildren<MeshFilter>().mesh = Prototype.MeshRot.MeshIndex != -1
          ? protoypeMeshes.Meshes[Prototype.MeshRot.MeshIndex] 
@@ -195,28 +197,12 @@ public class Building : PooledMonoBehaviour, IBuildable
         MeshRenderer.SetMaterials(materialData.GetMaterials(Prototype.MaterialIndexes));
 
         transparentMaterials = new List<Material>();
-        for (int i = 0; i < prototypeData.MaterialIndexes.Length; i++)
+        for (int i = 0; i < Prototype.MaterialIndexes.Length; i++)
         {
             transparentMaterials.Add(transparentGreen);
         }
         
         transform.localScale = scale;
-    }
-
-    private PrototypeData GetPrototype(PrototypeData newProt)
-    {
-        if (BuildingHandler[this] == null)
-        {
-            return newProt;
-        }
-
-        PrototypeData oldProt = BuildingHandler[this].Prototype;
-        if (oldProt == newProt)
-        {
-            return oldProt;
-        }
-
-        return newProt;
     }
 
     private void OnBuildingClicked(BuildingType arg0)
@@ -258,20 +244,21 @@ public class Building : PooledMonoBehaviour, IBuildable
         }
         
         indexer.OnRebuilt += IndexerOnOnRebuilt;
+        indexer.NeedsRebuilding = true;
+        indexer.DelayFrames = 1;
         
         BuildingHandler.AddBuilding(this).Forget(Debug.LogError);
         OnPlacedEvent?.Invoke();
     }
 
-    private async void IndexerOnOnRebuilt()
+    private void IndexerOnOnRebuilt()
     {
         indexer.OnRebuilt -= IndexerOnOnRebuilt;
-        await UniTask.WaitUntil(() => BuildingHandler[this] != null).TimeoutWithoutException(TimeSpan.FromSeconds(1));
         
         for (int i = 0; i < indexer.Indexes.Count; i++)
         {
             PathIndex index = indexer.Indexes[i];
-            AttackingSystem.DamageEvent.TryAdd(index, BuildingHandler[this].TakeDamage);
+            AttackingSystem.DamageEvent.TryAdd(index, (x) => BuildingHandler.BuildingTakeDamage(Index, x));
         }
     }
 
@@ -297,7 +284,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         
     }
 
-    public void SetData(BuildingData data)
+    public void SetData(WallState data)
     {
         
     }

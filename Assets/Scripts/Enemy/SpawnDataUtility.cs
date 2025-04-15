@@ -14,11 +14,14 @@ namespace Enemy
         [Title("Settings")]
         [SerializeField]
         private AnimationCurve targetWaveDuration;
+
+        [SerializeField]
+        private float startCredits = 5;
         
         public SpawnPointComponent GetSpawnPointData(int spawnPointLevel, int waveLevel)
         {
             float combinedWaveLevel = (spawnPointLevel + waveLevel) / 2.0f;
-            float credits = 5 + Mathf.Pow(combinedWaveLevel, 1.5f) * Random.Range(0.9f, 1.1f);
+            float credits = startCredits + Mathf.Pow(combinedWaveLevel, 1.5f) * Random.Range(0.9f, 1.1f);
             List<int> possibleEnemies = new List<int>();
 
             for (int i = 0; i < enemyUtility.Enemies.Count; i++)

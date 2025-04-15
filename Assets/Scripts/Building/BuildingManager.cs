@@ -127,15 +127,15 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
     #region Events
 
-    private void OnBuildingRepaired(Building building)
+    private void OnBuildingRepaired(ChunkIndex chunkIndex)
     {
-        waveFunction[building.Index] = new Cell(true, waveFunction[building.Index].Position, waveFunction[building.Index].PossiblePrototypes);
+        waveFunction[chunkIndex] = new Cell(true, waveFunction[chunkIndex].Position, waveFunction[chunkIndex].PossiblePrototypes);
     }
 
-    private void OnBuildingDestroyed(Building building)
+    private void OnBuildingDestroyed(ChunkIndex chunkIndex)
     {
         return;
-        //this[building.Index] = new Cell(false, this[building.Index].Position, prototypes);
+        //ChunkWaveFunction[chunkIndex] = new Cell(false, ChunkWaveFunction[chunkIndex].Position, prototypes);
         //List<ChunkIndex> cellsToUpdate = new List<ChunkIndex>();
         //for (int i = 0; i < WaveFunctionUtility.NeighbourDirections.Length; i++)
         //{
@@ -145,18 +145,18 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         //        cellsToUpdate.Add(index);
         //    }
         //}
-
+//
         //allowedKeys = keyData.BuildingKeys;
         //MakeBuildable(cellsToUpdate);
         //
         //Propagate();
-
+//
         //int tries = 1000;
         //while (cellsToCollapse.Any(x => !waveFunction[x].Collapsed) && tries-- > 0)
         //{
         //    Iterate();
         //}
-
+//
         //if (tries <= 0)
         //{
         //    RevertQuery();
@@ -405,6 +405,21 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     public Vector3 GetPos(ChunkIndex index)
     {
         return waveFunction[index].Position;
+    }
+
+    public List<ChunkIndex> GetSurroundingMarchedIndexes(ChunkIndex queryIndex)
+    {
+        List<ChunkIndex> surroundingCells = GetSurroundingCells(GetPos(queryIndex));
+        for (int i = surroundingCells.Count - 1; i >= 0; i--)
+        {
+            QueryMarchedChunk chunk = waveFunction.Chunks[surroundingCells[i].Index];
+            if (!chunk.BuiltCells[surroundingCells[i].CellIndex.x, surroundingCells[i].CellIndex.y, surroundingCells[i].CellIndex.z])
+            {
+                surroundingCells.RemoveAt(i);
+            }
+        }
+        
+        return surroundingCells;
     }
     
     #endregion

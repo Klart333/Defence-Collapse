@@ -118,6 +118,11 @@ public class MoneyManager : Singleton<MoneyManager>
         OnMoneyChanged?.Invoke(money);
     }
 
+    public void AddMoneyParticles(float amount, Vector3 position)
+    {
+        AddMoney(amount);
+    }
+
     public void RemoveMoney(float amount)
     {
         money -= amount;

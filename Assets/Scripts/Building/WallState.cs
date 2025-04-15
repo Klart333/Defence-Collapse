@@ -1,9 +1,7 @@
-﻿using Unity.Mathematics;
-using UnityEngine;
-using WaveFunctionCollapse;
+﻿using WaveFunctionCollapse;
 
 [System.Serializable]   
-public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT A DISTRICT
+public class WallState : IHealth
 {
     private BuildingHandler handler;
 
@@ -13,34 +11,11 @@ public class BuildingData : IHealth // CHANGE TO WALLDATA, IT TAKES DAMAGE, NOT 
 
     public HealthComponent Health { get; set; }
 
-    public BuildingData(BuildingHandler buildingHandler, Stats stats, ChunkIndex index)
+    public WallState(BuildingHandler buildingHandler, Stats stats, ChunkIndex index)
     {
         handler = buildingHandler;
         Health = new HealthComponent(stats);
         Index = index;
-    }
-
-    public void OnBuildingChanged(BuildingCellInformation cellInfo, Building building)
-    {
-        if (!CellInformation.Equals(cellInfo))
-        {
-            //UpdateState(cellInfo, building.Prototype);
-        }
-
-        building.SetData(this);
-    }
-
-    public void LevelUp()
-    {
-        handler.DislpayLevelUp(Index);
-    }
-
-    public void Update(Building building)
-    {
-        if (!Health.Alive)
-        {
-            return;
-        }
     }
     
     public void TakeDamage(DamageInstance damage, out DamageInstance damageDone)

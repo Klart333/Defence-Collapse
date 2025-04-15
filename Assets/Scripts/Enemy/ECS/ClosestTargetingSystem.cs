@@ -19,8 +19,7 @@ namespace DataStructures.Queue.ECS
 
         public void OnUpdate(ref SystemState state)
         {
-            // Get the spatial grid from the BuildSpatialGridSystem
-            NativeParallelMultiHashMap<int2, Entity> spatialGrid = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<EnemyHashGridSystem>().SpatialGrid;
+            NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
 
             // Create and schedule the job
             new ClosestTargetingJob
@@ -28,7 +27,7 @@ namespace DataStructures.Queue.ECS
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
                 SpatialGrid = spatialGrid.AsReadOnly(),
                 CellSize = 1,
-                DeltaTime = SystemAPI.Time.DeltaTime * GameSpeedManager.Instance.GameSpeed,
+                DeltaTime = SystemAPI.Time.DeltaTime * GameSpeedManager.Instance.Value,
             }.ScheduleParallel();
         }
 
@@ -45,7 +44,7 @@ namespace DataStructures.Queue.ECS
         [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
         
-        [ReadOnly, NativeDisableContainerSafetyRestriction]
+        [ReadOnly]
         public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
 
         public float DeltaTime;

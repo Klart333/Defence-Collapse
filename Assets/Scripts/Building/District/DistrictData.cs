@@ -1,42 +1,39 @@
 using Object = UnityEngine.Object;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 using WaveFunctionCollapse;
-using Unity.Mathematics;
 using System.Linq;
 using UnityEngine;
+using Gameplay;
 using Utility;
 using System;
-using UnityEngine.InputSystem;
 
 namespace Buildings.District
 {
-    public class DistrictData
+    public class DistrictData : IDisposable
     {
         public event Action<DistrictData> OnClicked;
         public event Action OnLevelup;
 
         private readonly MeshCollider meshCollider;
         
-        private readonly int cellCount;
-        
         public UpgradeData UpgradeData { get; private set; }
-        public HashSet<Chunk> DistrictChunks { get; set; } 
+        public Chunk[] DistrictChunks { get; } 
+        public IGameSpeed GameSpeed { get; set; }
+        public ChunkIndex Index { get; set; }
         public DistrictState State { get; }
         public Vector3 Position { get; }
-        
-        public ChunkIndex Index { get; set; }
 
-        public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction<Chunk> chunkWaveFunction, int key)
+        public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction<Chunk> chunkWaveFunction, int key, BuildingHandler buildingHandler)
         {
             UpgradeData = new UpgradeData(1, 1, 1);
-            cellCount = chunks.Count;
-            DistrictChunks = chunks;
+            DistrictChunks = chunks.ToArray();
             
             State = districtType switch
             {
-                DistrictType.Archer => new ArcherState(this, DistrictUpgradeManager.Instance.ArcherData, chunks, position, key),
-                DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, chunks, position, key),
-                DistrictType.Mine => new MineState(this, DistrictUpgradeManager.Instance.MineData, chunks, position, key),
+                DistrictType.Archer => new ArcherState(this, DistrictUpgradeManager.Instance.ArcherData, DistrictChunks, position, key),
+                DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, DistrictChunks, position, key),
+                DistrictType.Mine => new MineState(this, DistrictUpgradeManager.Instance.MineData, DistrictChunks, position, key),
                 //DistrictType.Church => expr,
                 //DistrictType.Farm => expr,
                 _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
@@ -47,15 +44,6 @@ namespace Buildings.District
 
             Events.OnWaveStarted += OnWaveStarted;
             State.OnStateEntered();
-        }
-
-        public void Destroy()
-        {
-            Events.OnWaveStarted -= OnWaveStarted;
-            if (meshCollider != null)
-            {
-                Object.Destroy(meshCollider);
-            }
         }
 
         private void InvokeOnClicked()
@@ -77,10 +65,9 @@ namespace Buildings.District
             State.OnDeselected();
         }
 
-
         private void OnWaveStarted()
         {
-            State.OnWaveStart(cellCount);
+            State.OnWaveStart();
         }
 
         public void LevelUp()
@@ -92,7 +79,17 @@ namespace Buildings.District
         {
             State.Update();
         }
-    
+
+        public void Dispose()
+        {
+            State?.Dispose();
+            
+            Events.OnWaveStarted -= OnWaveStarted;
+            if (meshCollider != null)
+            {
+                Object.Destroy(meshCollider);
+            }
+        }
     }
 
     public static class DistrictUtility
@@ -195,34 +192,18 @@ namespace Buildings.District
             }
         }
 
-        /// <summary>
-        /// Get Perimeter of chunks
-        /// </summary>
-        public static List<Chunk> GetTopPerimeter(IEnumerable<Chunk> chunks)
+        public static List<Chunk> GetTopChunks(IEnumerable<Chunk> chunks)
         {
-            List<Chunk> convexHull = new List<Chunk>();
-
+            List<Chunk> result = new List<Chunk>();
             foreach (Chunk chunk in chunks)
             {
-                if (chunk.AdjacentChunks[2] != null) continue; // Not-top chunks shouldn't shoot
-                
-                int adjacentChunks = 0;
-                for (int i = 0; i < 4; i++)
+                if (chunk.AdjacentChunks[2] == null)
                 {
-                    int index = i > 1 ? i + 2 : i;
-                    if (chunk.AdjacentChunks[index] != null)
-                    {
-                        adjacentChunks++;
-                    }
-                }
-                
-                if (adjacentChunks < 4)
-                {
-                    convexHull.Add(chunk);
+                    result.Add(chunk);
                 }
             }
-
-            return convexHull;
+            
+            return result;
         }
     }
 }

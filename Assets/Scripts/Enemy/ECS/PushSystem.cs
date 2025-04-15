@@ -4,11 +4,10 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
-using UnityEngine;
 
 namespace DataStructures.Queue.ECS
 {
-    [UpdateAfter(typeof(FlowMovementSystem))]
+    [UpdateAfter(typeof(EnemyHashGridSystem))]
     public partial struct PushSystem : ISystem
     {
         private ComponentLookup<LocalTransform> transformLookup;
@@ -21,7 +20,7 @@ namespace DataStructures.Queue.ECS
 
         public void OnUpdate(ref SystemState state)
         {
-            NativeParallelMultiHashMap<int2, Entity> spatialGrid = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<EnemyHashGridSystem>().SpatialGrid;
+            NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             transformLookup.Update(ref state);
             
             new PushJob
@@ -46,7 +45,7 @@ namespace DataStructures.Queue.ECS
         [ReadOnly, NativeDisableContainerSafetyRestriction]
         public ComponentLookup<LocalTransform> TransformLookup;
         
-        [ReadOnly, NativeDisableContainerSafetyRestriction]
+        [ReadOnly]
         public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
         
         [ReadOnly]

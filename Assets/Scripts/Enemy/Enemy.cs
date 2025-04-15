@@ -35,7 +35,7 @@ namespace Enemy
                 AddComponent(enemyEntity, new SpeedComponent { Speed = authoring.enemyData.Stats.MovementSpeed.BaseValue });
                 AddComponent(enemyEntity, new AttackSpeedComponent { AttackSpeed = 1.0f / authoring.enemyData.Stats.AttackSpeed.Value });
 
-                AddComponent(enemyEntity, new FlowFieldComponent()
+                AddComponent(enemyEntity, new FlowFieldComponent
                 {
                     Up = new float3(0, 1, 0),
                     TargetUp = new float3(0, 1, 0),

@@ -259,9 +259,9 @@ public class BuildingPlacer : MonoBehaviour
         BuildingManager.Instance.Place();
     }
     
-    private void OnBuildingDestroyed(Building building)
+    private void OnBuildingDestroyed(ChunkIndex chunkIndex)
     {
-        if (spawnedSpawnPlaces.TryGetValue(building.Index, out PlaceSquare square))
+        if (spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare square))
         {
             square.UnPlaced();
         }

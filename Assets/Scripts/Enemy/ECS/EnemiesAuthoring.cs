@@ -1,7 +1,6 @@
-using System.Collections.Generic;
-using Enemy;
 using Unity.Entities;
 using UnityEngine;
+using Enemy;
 
 namespace DataStructures.Queue.ECS
 {

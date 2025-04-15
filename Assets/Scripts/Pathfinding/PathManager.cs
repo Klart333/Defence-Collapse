@@ -346,6 +346,11 @@ namespace Pathfinding
         {
             return HashCode.Combine(ChunkIndex, GridIndex);
         }
+
+        public override string ToString()
+        {
+            return $"({ChunkIndex}, {GridIndex})";
+        }
     }
 
     public struct PathChunkArray

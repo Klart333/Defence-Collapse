@@ -3,37 +3,45 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
+using Effects.ECS;
+using System;
 
 namespace DataStructures.Queue.ECS
 {
-    [BurstCompile]
-    public partial class EnemyHashGridSystem : SystemBase
+    [BurstCompile, UpdateAfter(typeof(DeathSystem))]
+    public partial struct EnemyHashGridSystem : ISystem
     {
-        public NativeParallelMultiHashMap<int2, Entity> SpatialGrid;
-
         [BurstCompile]
-        protected override void OnCreate()
+        public void OnCreate(ref SystemState state)
         {
-            base.OnCreate();
-            
-            SpatialGrid = new NativeParallelMultiHashMap<int2, Entity>(20000, Allocator.Persistent);
+            var entity = state.EntityManager.CreateEntity();
+            state.EntityManager.AddComponentData(entity, new SpatialHashMapSingleton());
         }
-
+        
         [BurstCompile]
-        protected override void OnUpdate()
+        public void OnUpdate(ref SystemState state)
         {
-            SpatialGrid.Clear();
-            new BuildEnemyHashGridJob
+            int enemyCount = SystemAPI.GetSingletonRW<WaveStateComponent>().ValueRO.EnemyCount;
+            RefRW<SpatialHashMapSingleton> mapSingleton = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>();
+            mapSingleton.ValueRW.Value = new NativeParallelMultiHashMap<int2, Entity>(enemyCount * 2, state.WorldUpdateAllocator); // Double for loadfactor stuff
+            if (enemyCount == 0)
             {
-                SpatialGrid = SpatialGrid.AsParallelWriter(),
+                return;
+            }
+
+            state.Dependency = new BuildEnemyHashGridJob
+            {
+                SpatialGrid = mapSingleton.ValueRW.Value.AsParallelWriter(),
                 CellSize = 1,
-            }.ScheduleParallel();
+            }.ScheduleParallel(state.Dependency);
+            
+            //state.Dependency.Complete();
         }
 
         [BurstCompile]
-        protected override void OnDestroy()
+        public void OnDestroy(ref SystemState state)
         {
-            SpatialGrid.Dispose();
+            
         }
     }
     
@@ -41,6 +49,7 @@ namespace DataStructures.Queue.ECS
     [WithAll(typeof(FlowFieldComponent))]
     public partial struct BuildEnemyHashGridJob : IJobEntity
     {
+        [WriteOnly]
         public NativeParallelMultiHashMap<int2, Entity>.ParallelWriter SpatialGrid;
 
         public float CellSize;
@@ -53,6 +62,16 @@ namespace DataStructures.Queue.ECS
         }
     }
 
+    public struct SpatialHashMapSingleton : IComponentData, IDisposable
+    {
+        public NativeParallelMultiHashMap<int2, Entity> Value;
+
+        public void Dispose()
+        {
+            Value.Dispose();
+        }
+    }
+    
     public static class HashGridUtility
     {
         public static int2 GetCell(float2 position, float cellSize)

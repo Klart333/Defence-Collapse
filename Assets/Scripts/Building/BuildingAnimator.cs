@@ -40,7 +40,7 @@ public class BuildingAnimator : MonoBehaviour
     public void Animate(IBuildable building)
     {
         SpawnParticle(building);
-        BounceInOut(building.gameObject.transform);
+        BounceInOut(building.MeshTransform);
     }
 
     private void SpawnParticle(IBuildable building)
