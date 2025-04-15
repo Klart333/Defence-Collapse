@@ -74,14 +74,14 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         buildingAnimator = GetComponent<BuildingAnimator>();
 
         groundGenerator.OnChunkGenerated += LoadCells;
-        Events.OnBuildingDestroyed += OnBuildingDestroyed;
+        Events.OnChunkIndexDestroyed += OnChunkIndexDestroyed;
         Events.OnBuildingRepaired += OnBuildingRepaired;
     }
     
     private void OnDisable()
     {
         groundGenerator.OnChunkGenerated -= LoadCells;
-        Events.OnBuildingDestroyed += OnBuildingDestroyed;
+        Events.OnChunkIndexDestroyed += OnChunkIndexDestroyed;
         Events.OnBuildingRepaired += OnBuildingRepaired;
     }
 
@@ -132,9 +132,10 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         waveFunction[chunkIndex] = new Cell(true, waveFunction[chunkIndex].Position, waveFunction[chunkIndex].PossiblePrototypes);
     }
 
-    private void OnBuildingDestroyed(ChunkIndex chunkIndex)
+    private void OnChunkIndexDestroyed(ChunkIndex chunkIndex)
     {
-        return;
+        waveFunction.Chunks[chunkIndex.Index].BuiltCells[chunkIndex.CellIndex.x, chunkIndex.CellIndex.y, chunkIndex.CellIndex.z] = false;
+
         //ChunkWaveFunction[chunkIndex] = new Cell(false, ChunkWaveFunction[chunkIndex].Position, prototypes);
         //List<ChunkIndex> cellsToUpdate = new List<ChunkIndex>();
         //for (int i = 0; i < WaveFunctionUtility.NeighbourDirections.Length; i++)

@@ -116,7 +116,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     #region Highlight
 
-    public async UniTask Highlight(BuildingCellInformation cellInfo)
+    public async UniTask Highlight()
     {
         if (purchasing || highlighted) return;
 
@@ -133,7 +133,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         highlighted = false;
     }
 
-    public void OnSelected(BuildingCellInformation cellInfo)
+    public void OnSelected()
     {
         if (purchasing || selected) return;
 
@@ -277,15 +277,5 @@ public class Building : PooledMonoBehaviour, IBuildable
         }
         
         ToggleIsBuildableVisual(true);
-    }
-
-    public void DisplayLevelUp()
-    {
-        
-    }
-
-    public void SetData(WallState data)
-    {
-        
     }
 }

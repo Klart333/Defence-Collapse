@@ -17,10 +17,6 @@ public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
     [SerializeField]
     private TowerData mineData;
     
-    [Title("Mesh Information")]
-    [SerializeField]
-    private TowerMeshData towerMeshData;
-
     [Title("UI")]
     [SerializeField]
     private GameObject canvas;

@@ -37,7 +37,7 @@ public class BuildingPlacer : MonoBehaviour
         Events.OnBuildingCanceled += OnBuildingCanceled;
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
         
-        Events.OnBuildingDestroyed += OnBuildingDestroyed;
+        Events.OnChunkIndexDestroyed += OnBuildingDestroyed;
         
         await UniTask.WaitUntil(() => BuildingManager.Instance != null);
         BuildingManager.Instance.OnLoaded += InitializeSpawnPlaces;
@@ -47,7 +47,7 @@ public class BuildingPlacer : MonoBehaviour
     {
         Events.OnBuildingCanceled -= OnBuildingCanceled;
         BuildingManager.Instance.OnLoaded -= InitializeSpawnPlaces;
-        Events.OnBuildingDestroyed -= OnBuildingDestroyed;
+        Events.OnChunkIndexDestroyed -= OnBuildingDestroyed;
     }
 
     private void Start()

@@ -5,10 +5,7 @@ public class WallState : IHealth
 {
     private BuildingHandler handler;
 
-    public BuildingCellInformation CellInformation {  get; private set; } 
-    public PrototypeData Prototype { get; set; }
     public ChunkIndex Index { get; set; }
-
     public HealthComponent Health { get; set; }
 
     public WallState(BuildingHandler buildingHandler, Stats stats, ChunkIndex index)

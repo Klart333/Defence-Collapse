@@ -65,7 +65,7 @@ namespace Buildings.District
                 }
             }
             
-            Events.OnBuildingDestroyed += OnBuildingDestroyed;
+            Events.OnChunkIndexDestroyed += OnBuildingDestroyed;
         }
 
         private void OnBuildingDestroyed(ChunkIndex chunkIndex)
@@ -118,7 +118,7 @@ namespace Buildings.District
 
         public void Dispose()
         {
-            Events.OnBuildingDestroyed -= OnBuildingDestroyed;
+            Events.OnChunkIndexDestroyed -= OnBuildingDestroyed;
         }
     }
 
