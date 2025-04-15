@@ -40,9 +40,9 @@ namespace WaveFunctionCollapse
         public bool IsRemoved { get; set; }
         public bool UseSideConstraints { get; private set; }
         public bool IsClear { get; private set; } = true;
-        public PrototypeInfoData PrototypeInfoData { get; set; }
+        public PrototypeInfoData PrototypeInfoData { get; private set; }
         
-        public Vector3Int ChunkSize => new Vector3Int(Width, Height, Depth);
+        public int3 ChunkSize => new int3(Width, Height, Depth);
 
         public Cell this[int3 index]
         {

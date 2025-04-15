@@ -33,14 +33,21 @@ namespace Buildings.District
 
         private void OnEnable()
         {
+            Events.OnWallDestroyed += OnWallDestroyed;
             Events.OnWaveStarted += OnWaveStarted;
             Events.OnWaveEnded += OnWaveEnded;
         }
 
         private void OnDisable()
         {
+            Events.OnWallDestroyed += OnWallDestroyed;
             Events.OnWaveStarted -= OnWaveStarted;
             Events.OnWaveEnded -= OnWaveEnded;
+        }
+
+        private void OnWallDestroyed(ChunkIndex chunkIndex)
+        {
+            districtGenerator.RemoveChunks(chunkIndex).Forget(Debug.LogError);
         }
 
         private void OnWaveEnded()

@@ -74,14 +74,12 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         buildingAnimator = GetComponent<BuildingAnimator>();
 
         groundGenerator.OnChunkGenerated += LoadCells;
-        Events.OnChunkIndexDestroyed += OnChunkIndexDestroyed;
         Events.OnBuildingRepaired += OnBuildingRepaired;
     }
     
     private void OnDisable()
     {
         groundGenerator.OnChunkGenerated -= LoadCells;
-        Events.OnChunkIndexDestroyed += OnChunkIndexDestroyed;
         Events.OnBuildingRepaired += OnBuildingRepaired;
     }
 
@@ -132,38 +130,64 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         waveFunction[chunkIndex] = new Cell(true, waveFunction[chunkIndex].Position, waveFunction[chunkIndex].PossiblePrototypes);
     }
 
-    private void OnChunkIndexDestroyed(ChunkIndex chunkIndex)
+    
+    public void RemoveBuiltIndex(ChunkIndex chunkIndex)
     {
         waveFunction.Chunks[chunkIndex.Index].BuiltCells[chunkIndex.CellIndex.x, chunkIndex.CellIndex.y, chunkIndex.CellIndex.z] = false;
+    }
+    
+    public void OnIndexesDestroyed(List<ChunkIndex> chunkIndexes)
+    {
+        // Reset Indexes
+        for (int i = 0; i < chunkIndexes.Count; i++)
+        {
+            waveFunction[chunkIndexes[i]] = new Cell(false, waveFunction[chunkIndexes[i]].Position, new List<PrototypeData> { PrototypeData.Empty });
+            waveFunction.CellStack.Push(chunkIndexes[i]);
+        }
+        
+        // Get neighbours
+        HashSet<ChunkIndex> cellsToUpdate = new HashSet<ChunkIndex>();
+        int3 gridSize = waveFunction.Chunks[chunkIndexes[0].Index].ChunkSize;
+        for (int i = 0; i < chunkIndexes.Count; i++)
+        {
+            List<ChunkIndex> neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndexes[i], gridSize.x, gridSize.z);
+            for (int j = 0; j < neighbours.Count; j++)
+            {
+                if (!cellsToUpdate.Contains(neighbours[j])
+                    && waveFunction.Chunks.TryGetValue(neighbours[j].Index, out QueryMarchedChunk chunk)
+                    && chunk[neighbours[j].CellIndex].Collapsed
+                    && chunk[neighbours[j].CellIndex].Buildable)
+                {
+                    cellsToUpdate.Add(neighbours[j]);
+                }
+            }
+        }
+        Debug.Log("Neighbour count: " + cellsToUpdate.Count);
+        
+        // Do the thing
+        allowedKeys = keyData.BuildingKeys;
+        MakeBuildable(cellsToUpdate);
+        
+        waveFunction.Propagate(allowedKeys);
 
-        //ChunkWaveFunction[chunkIndex] = new Cell(false, ChunkWaveFunction[chunkIndex].Position, prototypes);
-        //List<ChunkIndex> cellsToUpdate = new List<ChunkIndex>();
-        //for (int i = 0; i < WaveFunctionUtility.NeighbourDirections.Length; i++)
-        //{
-        //    ChunkIndex index =  new ChunkIndex(building.Index.Index, new int3(WaveFunctionUtility.NeighbourDirections[i].x + building.Index.CellIndex.x, 0, WaveFunctionUtility.NeighbourDirections[i].y + building.Index.CellIndex.z) );
-        //    if (waveFunction[index].Collapsed)
-        //    {
-        //        cellsToUpdate.Add(index);
-        //    }
-        //}
-//
-        //allowedKeys = keyData.BuildingKeys;
-        //MakeBuildable(cellsToUpdate);
-        //
-        //Propagate();
-//
-        //int tries = 1000;
-        //while (cellsToCollapse.Any(x => !waveFunction[x].Collapsed) && tries-- > 0)
-        //{
-        //    Iterate();
-        //}
-//
-        //if (tries <= 0)
-        //{
-        //    RevertQuery();
-        //    return;
-        //}
-        //Place();
+        int tries = 1000;
+        IsGenerating = true;
+        while (cellsToUpdate.Any(x => !waveFunction[x].Collapsed) && tries-- > 0)
+        {
+            ChunkIndex index = waveFunction.GetLowestEntropyIndex(cellsToUpdate);
+            PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index]);
+            SetCell(index, chosenPrototype, waveFunction.Chunks[index.Index].QueryCollapsedAir);
+
+            waveFunction.Propagate(allowedKeys);
+        }
+        IsGenerating = false;
+
+        if (tries <= 0)
+        {
+            RevertQuery();
+            return;
+        }
+        Place();
     }
 
     #endregion
@@ -263,11 +287,10 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         return chunks;
     }
 
-    private void MakeBuildable(List<ChunkIndex> cellsToCollapse) 
+    private void MakeBuildable(IEnumerable<ChunkIndex> cellsToCollapse) 
     {
-        for (int i = 0; i < cellsToCollapse.Count; i++)
+        foreach (ChunkIndex index in cellsToCollapse)
         {
-            ChunkIndex index = cellsToCollapse[i];
             QueryMarchedChunk chunk = waveFunction.Chunks[index.Index];
             if (!waveFunction[index].Buildable) continue;
 
@@ -441,7 +464,11 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
                 for (int x = 0; x < chunk.Cells.GetLength(0); x++)
                 {
                     Vector3 pos = chunk.Cells[x, 0, y].Position;
-                    Gizmos.color = !chunk.BuiltCells[x, 0, y] ? Color.white : Color.magenta;
+                    Gizmos.color = chunk.BuiltCells[x, 0, y] && false 
+                        ? Color.magenta 
+                        : chunk.Cells[x, 0, y].Collapsed 
+                            ? Color.blue 
+                            : Color.white;
                     Gizmos.DrawWireCube(pos, GridScale * 0.9f);
                 }
             }

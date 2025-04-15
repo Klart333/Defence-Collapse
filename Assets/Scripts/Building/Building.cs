@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DataStructures.Queue.ECS;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
@@ -68,13 +67,13 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public PrototypeData Prototype { get; private set; }
     public int BuildingGroupIndex { get; set; } = -1;
-    public ChunkIndex Index { get; private set; }
+    public ChunkIndex ChunkIndex { get; private set; }
     public int Importance => 1;
 
-    private bool Hovered => cornerColliders.Any(x => x.IsHovered);
     private BuildingAnimator BuildingAnimator => buildingAnimator ??= FindAnyObjectByType<BuildingAnimator>();
     public BuildingHandler BuildingHandler => buildingHandler ??= FindAnyObjectByType<BuildingHandler>();
     public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
+    private bool Hovered => cornerColliders.Any(x => x.IsHovered);
     public MeshWithRotation MeshRot => Prototype.MeshRot;
     public Transform MeshTransform => meshTransform;
 
@@ -188,7 +187,7 @@ public class Building : PooledMonoBehaviour, IBuildable
             return;
         }
         
-        Index = nullableIndex.Value;
+        ChunkIndex = nullableIndex.Value;
         Prototype = prototypeData;
 
         GetComponentInChildren<MeshFilter>().mesh = Prototype.MeshRot.MeshIndex != -1
@@ -258,7 +257,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         for (int i = 0; i < indexer.Indexes.Count; i++)
         {
             PathIndex index = indexer.Indexes[i];
-            AttackingSystem.DamageEvent.TryAdd(index, (x) => BuildingHandler.BuildingTakeDamage(Index, x));
+            AttackingSystem.DamageEvent.TryAdd(index, (x) => BuildingHandler.BuildingTakeDamage(ChunkIndex, x));
         }
     }
 
@@ -269,13 +268,12 @@ public class Building : PooledMonoBehaviour, IBuildable
             StopAttackingSystem.KilledIndexes.Enqueue(indexer.Indexes[i]);
         }
 
-        GetComponent<PathTarget>().enabled = false;
         for (int i = 0; i < indexer.Indexes.Count; i++)
         {
             PathIndex index = indexer.Indexes[i];
             AttackingSystem.DamageEvent.Remove(index);
         }
         
-        ToggleIsBuildableVisual(true);
+        gameObject.SetActive(false);
     }
 }

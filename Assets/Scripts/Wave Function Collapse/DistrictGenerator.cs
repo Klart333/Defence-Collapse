@@ -45,6 +45,7 @@ namespace WaveFunctionCollapse
         private bool debug;
 
         private readonly Queue<List<IBuildable>> buildQueue = new Queue<List<IBuildable>>();
+        private readonly Dictionary<ChunkIndex, List<int3>> ChunkIndexToChunks = new Dictionary<ChunkIndex, List<int3>>();
 
         private Vector3 offset;
 
@@ -148,6 +149,14 @@ namespace WaveFunctionCollapse
                         else if (isBuildable)
                         {
                             positions.Add(pos);
+                            if (ChunkIndexToChunks.TryGetValue(buildable.ChunkIndex, out List<int3> list))
+                            {
+                                list.Add(index);
+                            }
+                            else
+                            {
+                                ChunkIndexToChunks.Add(buildable.ChunkIndex, new List<int3> { index });
+                            }
                         }
                     }
                 }
@@ -178,8 +187,7 @@ namespace WaveFunctionCollapse
                     {
                         for (int i = 0; i < overrideChunk.AdjacentChunks.Length; i++)
                         {
-                            Chunk chunk = overrideChunk.AdjacentChunks[i] as Chunk;
-                            if (chunk == null || overrideChunks.Contains(overrideChunk)) continue;
+                            if (overrideChunk.AdjacentChunks[i] is not Chunk || overrideChunks.Contains(overrideChunk)) continue;
 
                             neighbours.Add(overrideChunk);
                         }
@@ -241,6 +249,33 @@ namespace WaveFunctionCollapse
             }
 
             return count > 2 && minValid > 0;
+        }
+
+        public async UniTask RemoveChunks(ChunkIndex chunkIndex)
+        {
+            await UniTask.WaitWhile(() => IsGenerating);
+
+            if (!ChunkIndexToChunks.TryGetValue(chunkIndex, out List<int3> indexes))
+            {
+                return;
+            }
+
+            for (int i = 0; i < indexes.Count; i++)
+            {
+                HashSet<Chunk> neighbours = new HashSet<Chunk>();
+                waveFunction.RemoveChunk(indexes[i], out List<Chunk> neighbourChunks);
+                for (int j = 0; j < neighbourChunks.Count; j++)
+                {
+                    ResetNeighbours(neighbours, neighbourChunks[j], 1);
+                }
+                foreach (Chunk neighbour in neighbours)
+                {
+                    waveFunction.LoadCells(neighbour, neighbour.PrototypeInfoData);
+                }
+            }
+           
+            
+            Run().Forget(Debug.LogError);
         }
 
         public async UniTask Run()

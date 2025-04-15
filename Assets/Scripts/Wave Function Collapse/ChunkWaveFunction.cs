@@ -246,13 +246,13 @@ namespace WaveFunctionCollapse
             return index;
         }
         
-        public ChunkIndex GetLowestEntropyIndex(List<ChunkIndex> indexes)
+        public ChunkIndex GetLowestEntropyIndex(IEnumerable<ChunkIndex> indexes)
         {
             float lowestEntropy = 10000;
             ChunkIndex index = new ChunkIndex();
-            for (int i = 0; i < indexes.Count; i++)
+            foreach (ChunkIndex chunkIndex in indexes)
             {
-                Cell cell = this[indexes[i]];
+                Cell cell = this[chunkIndex];
                 if (cell.Collapsed)
                 {
                     continue;
@@ -262,7 +262,7 @@ namespace WaveFunctionCollapse
                 if (cellEntropy >= lowestEntropy) continue;
 
                 lowestEntropy = cellEntropy;
-                index = indexes[i];
+                index = chunkIndex;
             }
             return index;
         }
@@ -370,8 +370,7 @@ namespace WaveFunctionCollapse
             gm.AddComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
             return gm;
         }
-
-
+        
         public void Clear()
         {
             foreach (TChunk chunk in Chunks.Values)
@@ -407,17 +406,12 @@ namespace WaveFunctionCollapse
             
             return true;
         }
-
-        public int GetTotalCellCount()
-        {
-            return Chunks.Count * 8;
-        }
     }
 
-    public readonly struct ChunkIndex : IEquatable<ChunkIndex>
+    public struct ChunkIndex : IEquatable<ChunkIndex>
     {
-        public readonly int3 Index;
-        public readonly int3 CellIndex;
+        public int3 Index;
+        public int3 CellIndex;
 
         public ChunkIndex(int3 index, int3 cellIndex)
         {
@@ -444,11 +438,6 @@ namespace WaveFunctionCollapse
         {
             return HashCode.Combine(Index, CellIndex);
         }
-
-        //public static implicit operator ChunkIndex(PathIndex pathIndex)
-        //{
-        //    return new ChunkIndex(pathIndex.ChunkIndex.XyZ(0), pathIndex.GridIndex);
-        //}
     }
 
     [Serializable]
@@ -802,6 +791,38 @@ namespace WaveFunctionCollapse
         public static Vector3 GetPosition(int3 index, Vector3 handlerChunkScale)
         {
             return handlerChunkScale.MultiplyByAxis(index);
+        }
+        
+        public static List<ChunkIndex> GetNeighbouringChunkIndexes(ChunkIndex chunkIndex, int gridWidth, int gridHeight)
+        {
+            List<ChunkIndex> neighbours = new List<ChunkIndex>();
+            for (int i = 0; i < WaveFunctionUtility.NeighbourDirections.Length; i++)
+            {
+                ChunkIndex neighbour = new ChunkIndex(chunkIndex.Index, chunkIndex.CellIndex + WaveFunctionUtility.NeighbourDirections[i].XyZ(0));
+                if (neighbour.CellIndex.x < 0)
+                {
+                    neighbour.Index.x -= 1;
+                    neighbour.CellIndex.x = gridWidth - 1;
+                }
+                else if (neighbour.CellIndex.x >= gridWidth)
+                {
+                    neighbour.Index.x += 1;
+                    neighbour.CellIndex.x = 0;
+                }
+                
+                if (neighbour.CellIndex.z < 0)
+                {
+                    neighbour.Index.z -= 1;
+                    neighbour.CellIndex.z = gridHeight - 1;
+                }
+                else if (neighbour.CellIndex.z >= gridHeight)
+                {
+                    neighbour.Index.z += 1;
+                    neighbour.CellIndex.z = 0;
+                }
+                neighbours.Add(neighbour);
+            }
+            return neighbours;
         }
     }
 

@@ -34,6 +34,7 @@ namespace Buildings
         private MeshRenderer meshRenderer;
         
         public PrototypeData PrototypeData { get; private set; }
+        public ChunkIndex ChunkIndex { get; private set; }
         public int Importance => 0;
 
         public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
@@ -57,6 +58,14 @@ namespace Buildings
 
         public void Setup(PrototypeData prototypeData, Vector3 scale)
         {
+            ChunkIndex? nullableIndex = BuildingManager.Instance.GetIndex(transform.position + scale / 2.0f);
+            if (!nullableIndex.HasValue)
+            {
+                Debug.LogError("Could not find chunk index");
+                return;
+            }
+
+            ChunkIndex = nullableIndex.Value;
             PrototypeData = prototypeData;
 
             GetComponentInChildren<MeshFilter>().mesh = protoypeMeshes[prototypeData.MeshRot.MeshIndex];

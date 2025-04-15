@@ -48,7 +48,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 
         for (int i = 0; i < buildingQueue.Count; i++)
         {
-            List<ChunkIndex> damageIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(buildingQueue[i].Index);
+            List<ChunkIndex> damageIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(buildingQueue[i].ChunkIndex);
 
             for (int j = 0; j < damageIndexes.Count; j++)
             {
@@ -123,7 +123,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private bool IsAdjacent(Building building1, Building building2)
     {
-        int2 indexDiff = building1.Index.CellIndex.xz - building2.Index.CellIndex.xz;
+        int2 indexDiff = building1.ChunkIndex.CellIndex.xz - building2.ChunkIndex.CellIndex.xz;
         if (math.abs(indexDiff.x) + math.abs(indexDiff.y) > 1)
         {
             //print("Diff: " + indexDiff + " has magnitude: " + indexDiff.magnitude);
@@ -161,16 +161,24 @@ public class BuildingHandler : SerializedMonoBehaviour
     {
         WallStates.Remove(chunkIndex);
         
-        Events.OnChunkIndexDestroyed?.Invoke(chunkIndex);
+        BuildingManager.Instance.RemoveBuiltIndex(chunkIndex);
 
         if (!Buildings.TryGetValue(chunkIndex, out List<Building> buildings)) return;
         
+        
+        List<ChunkIndex> destroyedIndexes = new List<ChunkIndex>();
         for (int i = 0; i < buildings.Count; i++)
         {
-            if (BuildingManager.Instance.GetSurroundingMarchedIndexes(buildings[i].Index).Count > 0) continue;
+            if (BuildingManager.Instance.GetSurroundingMarchedIndexes(buildings[i].ChunkIndex).Count > 0) continue;
             
             buildings[i].OnDestroyed();
-            Events.OnWallDestroyed?.Invoke(buildings[i].Index);
+            destroyedIndexes.Add(buildings[i].ChunkIndex);
+            Events.OnWallDestroyed?.Invoke(buildings[i].ChunkIndex);
+        }
+
+        if (destroyedIndexes.Count > 0)
+        {
+            BuildingManager.Instance.OnIndexesDestroyed(destroyedIndexes);
         }
     }
 

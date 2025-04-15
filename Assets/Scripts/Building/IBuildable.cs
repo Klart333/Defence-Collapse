@@ -8,6 +8,7 @@ public interface IBuildable
     public MeshWithRotation MeshRot { get; }
     public GameObject gameObject { get; }
     public Transform MeshTransform { get; }
+    public ChunkIndex ChunkIndex { get; }
     
     public void Setup(PrototypeData prototypeData, Vector3 scale);
     public void ToggleIsBuildableVisual(bool value);
