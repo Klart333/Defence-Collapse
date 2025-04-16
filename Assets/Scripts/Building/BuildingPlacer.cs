@@ -26,18 +26,18 @@ public class BuildingPlacer : MonoBehaviour
     private GroundGenerator groundGenerator;
     private Vector3 targetScale;
     
-    public bool SquareWasPressed { get; set; }
     private bool manualCancel;
+    
     private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
+    public bool SquareWasPressed { get; set; }
     public ChunkIndex? SquareIndex { get; set; }
-    public int SpawnSquareIndex { get; set; }
 
     private async void OnEnable()
     {
         Events.OnBuildingCanceled += OnBuildingCanceled;
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
         
-        Events.OnWallDestroyed += OnBuildingDestroyed;
+        Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
         
         await UniTask.WaitUntil(() => BuildingManager.Instance != null);
         BuildingManager.Instance.OnLoaded += InitializeSpawnPlaces;
@@ -47,7 +47,7 @@ public class BuildingPlacer : MonoBehaviour
     {
         Events.OnBuildingCanceled -= OnBuildingCanceled;
         BuildingManager.Instance.OnLoaded -= InitializeSpawnPlaces;
-        Events.OnWallDestroyed -= OnBuildingDestroyed;
+        Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
     }
 
     private void Start()
@@ -259,7 +259,7 @@ public class BuildingPlacer : MonoBehaviour
         BuildingManager.Instance.Place();
     }
     
-    private void OnBuildingDestroyed(ChunkIndex chunkIndex)
+    private void OnBuiltIndexDestroyed(ChunkIndex chunkIndex)
     {
         if (spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare square))
         {

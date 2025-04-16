@@ -8,6 +8,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using System;
 using Gameplay;
+using UnityEngine.Assertions;
 
 namespace Buildings.District
 {
@@ -18,14 +19,15 @@ namespace Buildings.District
         [Title("District")]
         [SerializeField]
         private DistrictGenerator districtGenerator;
-
-        [SerializeField]
-        private BuildingHandler buildingHandler;
         
         [OdinSerialize]
         private Dictionary<DistrictType, PrototypeInfoData> districtInfoData = new Dictionary<DistrictType, PrototypeInfoData>();
     
+        [Title("Debug")]
+        [OdinSerialize, ReadOnly]
         private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
+
+        [OdinSerialize, ReadOnly]
         private readonly List<DistrictData> uniqueDistricts = new List<DistrictData>();
 
         private int districtKey;
@@ -33,21 +35,21 @@ namespace Buildings.District
 
         private void OnEnable()
         {
-            Events.OnWallDestroyed += OnWallDestroyed;
+            Events.OnWallsDestroyed += OnWallsDestroyed;
             Events.OnWaveStarted += OnWaveStarted;
             Events.OnWaveEnded += OnWaveEnded;
         }
 
         private void OnDisable()
         {
-            Events.OnWallDestroyed += OnWallDestroyed;
+            Events.OnWallsDestroyed += OnWallsDestroyed;
             Events.OnWaveStarted -= OnWaveStarted;
             Events.OnWaveEnded -= OnWaveEnded;
         }
 
-        private void OnWallDestroyed(ChunkIndex chunkIndex)
+        private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
         {
-            districtGenerator.RemoveChunks(chunkIndex).Forget(Debug.LogError);
+            districtGenerator.RemoveChunks(chunkIndexes).Forget(Debug.LogError);
         }
 
         private void OnWaveEnded()
@@ -93,14 +95,19 @@ namespace Buildings.District
                     DistrictType.Bomb => 2,
                     DistrictType.Mine => 0,
                     //DistrictType.Church => expr,
-                    //DistrictType.Farm => expr,
                     _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
                 };
+
+                ChunkIndex? buildingChunkIndex = BuildingManager.Instance.GetIndex(chunk.Position + BuildingManager.Instance.GridScale / 2.0f);
+                Assert.IsTrue(buildingChunkIndex.HasValue);
                 for (int j = 0; j < height; j++) // Assumes that the chunks are not stacked vertically already
                 {
                     int heightLevel = 1 + j;
-                    Vector3 pos = chunk.Position + Vector3.up * districtGenerator.ChunkScale.y * heightLevel; 
-                    addedChunks.Add(districtGenerator.ChunkWaveFunction.LoadChunk(pos, districtGenerator.ChunkSize, prototypeInfo));
+                    Vector3 pos = chunk.Position + Vector3.up * districtGenerator.ChunkScale.y * heightLevel;
+                    Chunk addChunk = districtGenerator.ChunkWaveFunction.LoadChunk(pos, districtGenerator.ChunkSize, prototypeInfo);
+                    addedChunks.Add(addChunk);
+                    
+                    districtGenerator.ChunkIndexToChunks[buildingChunkIndex.Value].Add(addChunk.ChunkIndex);
                 }
             }
             chunks.AddRange(addedChunks);
@@ -118,9 +125,22 @@ namespace Buildings.District
             {
                 districts.TryAdd(chunk.ChunkIndex.xz, districtData);
             }
-
+            
+            districtData.OnDisposed += DistrictDataOnOnDisposed;
+            
             OnDistrictCreated?.Invoke(districtData);
             districtGenerator.Run().Forget(Debug.LogError);
+            
+            void DistrictDataOnOnDisposed()
+            {
+                districtData.OnDisposed -= DistrictDataOnOnDisposed;
+                uniqueDistricts.Remove(districtData);
+            
+                foreach (Chunk chunk in chunks)
+                {
+                    districts.Remove(chunk.ChunkIndex.xz);
+                }
+            }
         }
         
         private static void GetNeighbours(HashSet<Chunk> chunks, Chunk chunk, HashSet<Chunk> neighbours, int depth)
@@ -143,7 +163,7 @@ namespace Buildings.District
         private DistrictData GetDistrictData(DistrictType districtType, HashSet<Chunk> chunks)
         {
             Vector3 position = GetAveragePosition(chunks);
-            DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator, districtKey++, buildingHandler)
+            DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator, districtKey++)
             {
                 GameSpeed = GameSpeedManager.Instance
             };

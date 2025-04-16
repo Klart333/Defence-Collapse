@@ -3,7 +3,9 @@ using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Buildings.District;
+using Sirenix.Serialization;
 using Sirenix.Utilities;
 using Unity.Mathematics;
 using UnityEditor;
@@ -11,7 +13,7 @@ using UnityEngine;
 
 namespace WaveFunctionCollapse
 {
-    public class DistrictGenerator : MonoBehaviour, IChunkWaveFunction<Chunk>
+    public class DistrictGenerator : SerializedMonoBehaviour, IChunkWaveFunction<Chunk>
     {
         [Title("Wave Function")]
         [SerializeField]
@@ -44,8 +46,10 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private bool debug;
 
+        [OdinSerialize, ReadOnly]
+        public readonly Dictionary<ChunkIndex, List<int3>> ChunkIndexToChunks = new Dictionary<ChunkIndex, List<int3>>();
+        
         private readonly Queue<List<IBuildable>> buildQueue = new Queue<List<IBuildable>>();
-        private readonly Dictionary<ChunkIndex, List<int3>> ChunkIndexToChunks = new Dictionary<ChunkIndex, List<int3>>();
 
         private Vector3 offset;
 
@@ -129,7 +133,7 @@ namespace WaveFunctionCollapse
                         {
                             if (districtHandler.IsBuilt(chunk))
                             {
-                                continue;
+                                //continue;
                             }
                             
                             if (isBuildable)
@@ -180,33 +184,63 @@ namespace WaveFunctionCollapse
                 await Run();
                 await UniTask.Yield();
 
-                while (CheckFailed(overrideChunks))
-                {
-                    HashSet<Chunk> neighbours = new HashSet<Chunk>();
-                    foreach (Chunk overrideChunk in overrideChunks)
-                    {
-                        for (int i = 0; i < overrideChunk.AdjacentChunks.Length; i++)
-                        {
-                            if (overrideChunk.AdjacentChunks[i] is not Chunk || overrideChunks.Contains(overrideChunk)) continue;
-
-                            neighbours.Add(overrideChunk);
-                        }
-                    }
-
-                    overrideChunks.AddRange(neighbours);
-
-                    foreach (Chunk chunk in overrideChunks)
-                    {
-                        chunk.Clear(waveFunction.GameObjectPool);
-                        waveFunction.LoadCells(chunk, defaultPrototypeInfoData);
-                    }
-
-                    await Run();
-                    await UniTask.Yield();
-                }
+                await IterativeFailChecks(overrideChunks);
             }
 
             isUpdatingChunks = false;
+        }
+
+        private async UniTask IterativeFailChecks(HashSet<Chunk> chunksToCollapse)
+        {
+            while (CheckFailed(chunksToCollapse))
+            {
+                HashSet<Chunk> neighbours = new HashSet<Chunk>();
+                foreach (Chunk overrideChunk in chunksToCollapse)
+                {
+                    for (int i = 0; i < overrideChunk.AdjacentChunks.Length; i++)
+                    {
+                        if (overrideChunk.AdjacentChunks[i] is not Chunk || chunksToCollapse.Contains(overrideChunk)) continue;
+
+                        neighbours.Add(overrideChunk);
+                    }
+                }
+
+                chunksToCollapse.AddRange(neighbours);
+
+                foreach (Chunk chunk in chunksToCollapse)
+                {
+                    chunk.Clear(waveFunction.GameObjectPool);
+                    waveFunction.LoadCells(chunk, defaultPrototypeInfoData);
+                }
+
+                await Run();
+                await UniTask.Yield();
+            }
+        }
+
+        private bool CheckFailed(IEnumerable<Chunk> overrideChunks)
+        {
+            int minValid = 2;
+            int count = 0;
+            foreach (Chunk chunk in overrideChunks)
+            {
+                count++;
+                foreach (Cell cell in chunk.Cells)
+                {
+                    if (cell.PossiblePrototypes[0].MeshRot.MeshIndex != -1)
+                    {
+                        minValid--;
+                        break;
+                    }
+                }
+
+                if (minValid <= 0)
+                {
+                    break;
+                }
+            }
+
+            return count > 2 && minValid > 0;
         }
 
         private void ResetNeighbours(HashSet<Chunk> overrideChunks, Chunk neighbourChunk, int depth)
@@ -226,61 +260,57 @@ namespace WaveFunctionCollapse
             }
         }
 
-        private bool CheckFailed(IEnumerable<Chunk> overrideChunks)
-        {
-            int minValid = 2;
-            int count = 0;
-            foreach (Chunk chunk in overrideChunks)
-            {
-                count++;
-                foreach (Cell cell in chunk.Cells)
-                {
-                    if (cell.PossiblePrototypes[0].MeshRot.MeshIndex != null)
-                    {
-                        minValid--;
-                        break;
-                    }
-                }
-
-                if (minValid <= 0)
-                {
-                    break;
-                }
-            }
-
-            return count > 2 && minValid > 0;
-        }
-
-        public async UniTask RemoveChunks(ChunkIndex chunkIndex)
+        public async UniTask RemoveChunks(List<ChunkIndex> chunkIndexes)
         {
             await UniTask.WaitWhile(() => IsGenerating);
 
-            if (!ChunkIndexToChunks.TryGetValue(chunkIndex, out List<int3> indexes))
+            Debug.Log("Removing " + chunkIndexes.Count + " chunks");
+            HashSet<Chunk> neighbours = new HashSet<Chunk>();
+            HashSet<int3> killIndexes = new HashSet<int3>();
+            for (int i = 0; i < chunkIndexes.Count; i++)
             {
-                return;
+                if (!ChunkIndexToChunks.TryGetValue(chunkIndexes[i], out List<int3> indexes))
+                {
+                    continue;
+                }
+                    
+                for (int j = indexes.Count - 1; j >= 0; j--)
+                {
+                    if (!waveFunction.Chunks.ContainsKey(indexes[j]))
+                    {
+                        indexes.RemoveAt(j);
+                        continue;
+                    }
+                    
+                    killIndexes.Add(indexes[j]);
+                    ResetNeighbours(neighbours, waveFunction.Chunks[indexes[j]], 1);
+                }
+                
+                ChunkIndexToChunks.Remove(chunkIndexes[i]);
             }
 
-            for (int i = 0; i < indexes.Count; i++)
+            foreach (int3 index in killIndexes)
             {
-                HashSet<Chunk> neighbours = new HashSet<Chunk>();
-                waveFunction.RemoveChunk(indexes[i], out List<Chunk> neighbourChunks);
-                for (int j = 0; j < neighbourChunks.Count; j++)
-                {
-                    ResetNeighbours(neighbours, neighbourChunks[j], 1);
-                }
-                foreach (Chunk neighbour in neighbours)
-                {
-                    waveFunction.LoadCells(neighbour, neighbour.PrototypeInfoData);
-                }
+                neighbours.Remove(waveFunction.Chunks[index]);
+                waveFunction.RemoveChunk(index);
             }
-           
             
-            Run().Forget(Debug.LogError);
+            foreach (Chunk neighbour in neighbours)
+            {
+                waveFunction.LoadCells(neighbour, neighbour.PrototypeInfoData);
+            }
+            
+            waveFunction.Propagate();
+            
+            await Run();
+            await UniTask.Yield();
+
+            IterativeFailChecks(neighbours).Forget(Debug.LogError);
         }
 
         public async UniTask Run()
         {
-            if (IsGenerating) return;
+            await UniTask.WaitWhile(() => IsGenerating);
 
             IsGenerating = true;
             Stopwatch watch = Stopwatch.StartNew();

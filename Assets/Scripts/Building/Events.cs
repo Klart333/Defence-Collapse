@@ -14,7 +14,8 @@ public static class Events
     public static UnityAction OnWaveStarted;
     public static UnityAction OnWaveEnded;
 
-    public static UnityAction<ChunkIndex> OnWallDestroyed;
+    public static UnityAction<ChunkIndex> OnBuiltIndexDestroyed;
+    public static UnityAction<List<ChunkIndex>> OnWallsDestroyed;
     public static UnityAction<ChunkIndex> OnBuildingRepaired;
 
     public static UnityAction<Vector3, Vector3> OnEnemyPathUpdated;

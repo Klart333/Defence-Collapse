@@ -44,7 +44,6 @@ public class PlaceSquare : MonoBehaviour
         block.SetColor(Color1, hoveredColor);
         meshRenderer.SetPropertyBlock(block);
         Placer.SquareIndex = Index;
-        Placer.SpawnSquareIndex = SquareIndex;
     }
 
     private void OnMouseUpAsButton()
@@ -55,7 +54,6 @@ public class PlaceSquare : MonoBehaviour
         }
         
         Placer.SquareIndex = Index;
-        Placer.SpawnSquareIndex = SquareIndex;
         Placer.SquareWasPressed = true;
     }
 

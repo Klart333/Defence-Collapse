@@ -254,10 +254,11 @@ public class Building : PooledMonoBehaviour, IBuildable
     {
         indexer.OnRebuilt -= IndexerOnOnRebuilt;
         
+        ChunkIndex chunkIndex = ChunkIndex;
         for (int i = 0; i < indexer.Indexes.Count; i++)
         {
             PathIndex index = indexer.Indexes[i];
-            AttackingSystem.DamageEvent.TryAdd(index, (x) => BuildingHandler.BuildingTakeDamage(ChunkIndex, x));
+            AttackingSystem.DamageEvent.TryAdd(index, x => BuildingHandler.BuildingTakeDamage(chunkIndex, x, index));
         }
     }
 

@@ -34,13 +34,16 @@ namespace Pathfinding
 
         public void Unregister(IPathTarget target)
         {
-            if (!targets.Remove(target))
+            if (targets.Remove(target))
+            {
+                isDirty = true;
+            }
+            else
             {
                 Debug.LogError("Trying to remove non-registered target");
             }
 
             target.OnIndexerRebuild -= SetIsDirty;
-            isDirty = true;
         }
 
         private void SetIsDirty() => isDirty = true;

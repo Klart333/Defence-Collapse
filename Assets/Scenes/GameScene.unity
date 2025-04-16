@@ -582,33 +582,16 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: BuildingGroups
-      Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[System.Int32, mscorlib],[System.Collections.Generic.List`1[[Building,
-        Core]], mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.Int32,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
+    - Name: districtGenerator
+      Entry: 10
       Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: BuildingData
+    - Name: Buildings
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.ChunkIndex,
-        Core],[WallState, Core]], mscorlib
+      Data: 0|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.ChunkIndex,
+        Core],[System.Collections.Generic.List`1[[Building, Core]], mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[WaveFunctionCollapse.ChunkIndex,
+      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[WaveFunctionCollapse.ChunkIndex,
         Core]], mscorlib
     - Name: 
       Entry: 8
@@ -622,13 +605,46 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: districtGenerator
-      Entry: 10
+    - Name: BuildingGroups
+      Entry: 7
+      Data: 2|System.Collections.Generic.Dictionary`2[[System.Int32, mscorlib],[System.Collections.Generic.List`1[[Building,
+        Core]], mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.Int32,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
       Data: 0
-  towerMeshData: {fileID: 11400000, guid: 6a80373d5d2a40444a8f9391c08a93a2, type: 2}
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: WallStates
+      Entry: 7
+      Data: 4|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.ChunkIndex,
+        Core],[WallState, Core]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 1
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   cornerData: {fileID: 11400000, guid: 21c6865fe1599b64699908607cd7f257, type: 2}
   protoypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
   wallData: {fileID: 11400000, guid: 185ee242170670a449435143c8e04b14, type: 2}
+  verbose: 1
 --- !u!1001 &238681183
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2136,8 +2152,40 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: districts
+      Entry: 7
+      Data: 2|System.Collections.Generic.Dictionary`2[[Unity.Mathematics.int2, Unity.Mathematics],[Buildings.District.DistrictData,
+        Core]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[Unity.Mathematics.int2,
+        Unity.Mathematics]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: uniqueDistricts
+      Entry: 7
+      Data: 4|System.Collections.Generic.List`1[[Buildings.District.DistrictData,
+        Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   districtGenerator: {fileID: 1551488502}
-  buildingHandler: {fileID: 0}
 --- !u!114 &491554923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7867,6 +7915,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d5d20223f71465f9505cda08efb26fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: ChunkIndexToChunks
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.ChunkIndex,
+        Core],[System.Collections.Generic.List`1[[Unity.Mathematics.int3, Unity.Mathematics]],
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[WaveFunctionCollapse.ChunkIndex,
+        Core]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   waveFunction:
     gridScale: {x: 0.25, y: 0.25, z: 0.25}
     materialData: {fileID: 11400000, guid: d607b7626b2ef464cbaa6473ec1fb6ef, type: 2}
@@ -7877,7 +7955,7 @@ MonoBehaviour:
   buildableCornerData: {fileID: 11400000, guid: 21c6865fe1599b64699908607cd7f257,
     type: 2}
   districtHandler: {fileID: 491554922}
-  awaitEveryFrame: 4
+  awaitEveryFrame: 100
   awaitTimeMs: 1
   maxMillisecondsPerFrame: 1
   debug: 0
@@ -9329,7 +9407,6 @@ MonoBehaviour:
   archerData: {fileID: 11400000, guid: 63d7b88ca2073ef4c9b83b155b57a4d4, type: 2}
   bombData: {fileID: 11400000, guid: bc87ce68c76001644bd5905c752db326, type: 2}
   mineData: {fileID: 11400000, guid: 61ff2f7cc3424844d9561d4d0f7828a4, type: 2}
-  towerMeshData: {fileID: 11400000, guid: 6a80373d5d2a40444a8f9391c08a93a2, type: 2}
   canvas: {fileID: 1224394947}
   districtUpgrade: {fileID: 1990388267}
 --- !u!1 &2108250015

@@ -7,6 +7,7 @@ using Unity.Entities;
 using UnityEngine;
 using Effects.ECS;
 using System;
+using Unity.Collections;
 using UnityEngine.Assertions;
 
 namespace Buildings.District
@@ -19,7 +20,6 @@ namespace Buildings.District
         public float Range { get; set; }
 
         protected readonly Dictionary<ChunkIndex, List<int>> cachedChunkIndexes = new Dictionary<ChunkIndex, List<int>>();
-        protected readonly HashSet<int3> destroyedIndexes = new HashSet<int3>();
         
         protected DamageInstance lastDamageDone;
         protected EntityManager entityManager;
@@ -65,25 +65,41 @@ namespace Buildings.District
                 }
             }
             
-            Events.OnWallDestroyed += OnBuildingDestroyed;
+            Events.OnWallsDestroyed += OnWallsDestroyed;
         }
 
-        private void OnBuildingDestroyed(ChunkIndex chunkIndex)
+        private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
         {
-            if (!cachedChunkIndexes.TryGetValue(chunkIndex, out List<int> indexes)) return;
-            
-            for (int i = 0; i < indexes.Count; i++)
+            HashSet<int3> destroyedIndexes = new HashSet<int3>();
+            for (int i = 0; i < chunkIndexes.Count; i++)
             {
-                destroyedIndexes.Add(Chunks[indexes[i]].ChunkIndex);
+                if (!cachedChunkIndexes.TryGetValue(chunkIndexes[i], out List<int> indexes)) continue;
+            
+                for (int j = indexes.Count - 1; j >= 0; j--)
+                {
+                    destroyedIndexes.Add(Chunks[indexes[j]].ChunkIndex);
+                    indexes.RemoveAtSwapBack(j);
+                }
+
+                if (indexes.Count == 0)
+                {
+                    cachedChunkIndexes.Remove(chunkIndexes[i]);
+                }
+            }
+
+            if (destroyedIndexes.Count > 0)
+            {
+                OnIndexesDestroyed(destroyedIndexes);
             }
         }
         
-        public abstract void OnStateEntered();
         public abstract void Update();
         public abstract void OnSelected(Vector3 pos);
+        public abstract void OnStateEntered();
         public abstract void OnDeselected();
-        public abstract void Die();
         public abstract void OnWaveStart();
+        protected abstract void OnIndexesDestroyed(HashSet<int3> destroyedIndexes);
+        public abstract void Die();
         
         private void OnDamageDone(Entity entity)
         {
@@ -118,7 +134,7 @@ namespace Buildings.District
 
         public void Dispose()
         {
-            Events.OnWallDestroyed -= OnBuildingDestroyed;
+            Events.OnWallsDestroyed -= OnWallsDestroyed;
         }
     }
 
@@ -126,8 +142,8 @@ namespace Buildings.District
 
     public class ArcherState : DistrictState
     {
-        private readonly List<Entity> spawnedEntities = new List<Entity>();
-        private readonly Dictionary<Entity, int3> entityIndexes = new Dictionary<Entity, int3>();
+        private readonly HashSet<Entity> spawnedEntities = new HashSet<Entity>();
+        private readonly Dictionary<int3, Entity> entityIndexes = new Dictionary<int3, Entity>();
         
         private readonly Attack attack;
         private readonly TowerData archerData;
@@ -173,7 +189,7 @@ namespace Buildings.District
                 });
                 spawnedEntities.Add(spawnedEntity);
                 
-                entityIndexes.Add(spawnedEntity, topChunks[i].ChunkIndex);
+                entityIndexes.Add(topChunks[i].ChunkIndex, spawnedEntity);
             }
         }
 
@@ -203,15 +219,9 @@ namespace Buildings.District
 
         public override void Update()
         {
-            for (int i = 0; i < spawnedEntities.Count; i++)
+            foreach (Entity entity in spawnedEntities)
             {
-                if (destroyedIndexes.Contains(entityIndexes[spawnedEntities[i]]))
-                {
-                    Debug.Log($"{entityIndexes[spawnedEntities[i]]} is destroyed");
-                    continue;
-                }
-                
-                EnemyTargetAspect aspect = entityManager.GetAspect<EnemyTargetAspect>(spawnedEntities[i]);
+                EnemyTargetAspect aspect = entityManager.GetAspect<EnemyTargetAspect>(entity);
                 if (aspect.CanAttack() && entityManager.Exists(aspect.EnemyTargetComponent.ValueRO.Target))
                 {
                     aspect.RestTimer();
@@ -233,6 +243,28 @@ namespace Buildings.District
             
         }
 
+        protected override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
+        {
+            NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(destroyedIndexes.Count, Allocator.Temp);
+            int index = 0;
+            foreach (int3 destroyedIndex in destroyedIndexes)
+            {
+                if (!entityIndexes.TryGetValue(destroyedIndex, out Entity entity)) continue;
+                
+                entitiesToDestroy[index++] = entity;
+                spawnedEntities.Remove(entity);
+            }
+            
+            entityManager.DestroyEntity(entitiesToDestroy);
+            
+            entitiesToDestroy.Dispose();
+
+            if (spawnedEntities.Count == 0)
+            {
+                districtData.Dispose();
+            }
+        }
+
         public override void Die()
         {
 
@@ -245,8 +277,8 @@ namespace Buildings.District
 
     public class BombState : DistrictState
     {
-        private readonly List<Entity> spawnedEntities = new List<Entity>();
-        private readonly Dictionary<Entity, int3> entityIndexes = new Dictionary<Entity, int3>();
+        private readonly HashSet<Entity> spawnedEntities = new HashSet<Entity>();
+        private readonly Dictionary<int3, Entity> entityIndexes = new Dictionary<int3, Entity>();
 
         private readonly TowerData bombData;
         private readonly Attack attack;
@@ -291,7 +323,7 @@ namespace Buildings.District
                     Timer = delay * i
                 });
                 spawnedEntities.Add(spawnedEntity);
-                entityIndexes.Add(spawnedEntity, topChunks[i].ChunkIndex);
+                entityIndexes.Add(topChunks[i].ChunkIndex, spawnedEntity);
             }
         }
         
@@ -321,14 +353,9 @@ namespace Buildings.District
 
         public override void Update()
         {
-            for (int i = 0; i < spawnedEntities.Count; i++)
+            foreach (Entity entity in spawnedEntities)
             {
-                if (destroyedIndexes.Contains(entityIndexes[spawnedEntities[i]]))
-                {
-                    continue;
-                }
-                
-                EnemyTargetAspect aspect = entityManager.GetAspect<EnemyTargetAspect>(spawnedEntities[i]);
+                EnemyTargetAspect aspect = entityManager.GetAspect<EnemyTargetAspect>(entity);
                 if (aspect.CanAttack() && entityManager.Exists(aspect.EnemyTargetComponent.ValueRO.Target))
                 {
                     PerformAttack(entityManager.GetComponentData<LocalTransform>(aspect.EnemyTargetComponent.ValueRO.Target).Position);
@@ -347,6 +374,28 @@ namespace Buildings.District
         public override void OnWaveStart()
         {
             
+        }
+        
+        protected override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
+        {
+            NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(destroyedIndexes.Count, Allocator.Temp);
+            int index = 0;
+            foreach (int3 destroyedIndex in destroyedIndexes)
+            {
+                if (!entityIndexes.TryGetValue(destroyedIndex, out Entity entity)) continue;
+                
+                entitiesToDestroy[index++] = entity;
+                spawnedEntities.Remove(entity);
+            }
+            
+            entityManager.DestroyEntity(entitiesToDestroy);
+            
+            entitiesToDestroy.Dispose();
+
+            if (spawnedEntities.Count == 0)
+            {
+                districtData.Dispose();
+            }
         }
 
         public override void Die()
@@ -420,10 +469,6 @@ namespace Buildings.District
             for (int i = 0; i < mineChunks.Count; i++)
             {
                 MineInstance instance = mineChunks[i];
-                if (destroyedIndexes.Contains(instance.ChunkIndex))
-                {
-                    continue;
-                }
                 
                 instance.Timer += Time.deltaTime * districtData.GameSpeed.Value;
                 if (mineChunks[i].Timer >= mineSpeed)
@@ -446,6 +491,25 @@ namespace Buildings.District
         public override void OnWaveStart()
         {
             
+        }
+
+        protected override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
+        {
+            foreach (int3 destroyedIndex in destroyedIndexes)
+            {
+                for (int i = 0; i < mineChunks.Count; i++)
+                {
+                    if (!math.all(mineChunks[i].ChunkIndex == destroyedIndex)) continue;
+                    
+                    mineChunks.RemoveAtSwapBack(i);
+                    break;
+                }
+            }
+            
+            if (mineChunks.Count == 0)
+            {
+                districtData.Dispose();
+            }
         }
 
         public override void Die()

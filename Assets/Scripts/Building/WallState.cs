@@ -1,4 +1,6 @@
-﻿using WaveFunctionCollapse;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
+using WaveFunctionCollapse;
 
 [System.Serializable]   
 public class WallState : IHealth
@@ -37,6 +39,6 @@ public class WallState : IHealth
     
     public void OnBuildingDeath()
     {
-        handler.BuildingDestroyed(Index);
+        handler.BuildingDestroyed(Index).Forget(Debug.LogError);
     }
 }

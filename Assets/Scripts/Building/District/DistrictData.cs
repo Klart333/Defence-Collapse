@@ -13,6 +13,7 @@ namespace Buildings.District
     public class DistrictData : IDisposable
     {
         public event Action<DistrictData> OnClicked;
+        public event Action OnDisposed;
         public event Action OnLevelup;
 
         private readonly MeshCollider meshCollider;
@@ -24,7 +25,7 @@ namespace Buildings.District
         public DistrictState State { get; }
         public Vector3 Position { get; }
 
-        public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction<Chunk> chunkWaveFunction, int key, BuildingHandler buildingHandler)
+        public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction<Chunk> chunkWaveFunction, int key)
         {
             UpgradeData = new UpgradeData(1, 1, 1);
             DistrictChunks = chunks.ToArray();
@@ -85,10 +86,12 @@ namespace Buildings.District
             State?.Dispose();
             
             Events.OnWaveStarted -= OnWaveStarted;
-            if (meshCollider != null)
+            if (meshCollider)
             {
                 Object.Destroy(meshCollider);
             }
+            
+            OnDisposed?.Invoke();
         }
     }
 

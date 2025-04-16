@@ -125,7 +125,7 @@ namespace WaveFunctionCollapse
             neighbours = new List<TChunk>();
             if (!Chunks.TryGetValue(chunkIndex, out TChunk chunk))
             {
-                Debug.LogError("Chunk to remove not found");
+                Debug.LogError($"Chunk {chunkIndex} to remove not found");
                 return;
             }
 

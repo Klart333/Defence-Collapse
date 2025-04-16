@@ -3,6 +3,7 @@ using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
 using Enemy;
+using Gameplay;
 
 namespace DataStructures.Queue.ECS
 {
@@ -33,7 +34,7 @@ namespace DataStructures.Queue.ECS
             new SpawnJob
             {
                 EnemyBuffer = enemyBuffer,
-                DeltaTime = SystemAPI.Time.DeltaTime,
+                DeltaTime = SystemAPI.Time.DeltaTime * GameSpeedManager.Instance.Value,
                 ECB = ecb.AsParallelWriter(),
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
             }.ScheduleParallel();

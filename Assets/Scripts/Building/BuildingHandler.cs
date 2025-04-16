@@ -6,6 +6,9 @@ using WaveFunctionCollapse;
 using Unity.Mathematics;
 using UnityEngine;
 using System;
+using DataStructures.Queue.ECS;
+using Pathfinding;
+using Unity.Collections;
 
 public class BuildingHandler : SerializedMonoBehaviour 
 {
@@ -23,6 +26,10 @@ public class BuildingHandler : SerializedMonoBehaviour
     [Title("Data")]
     [SerializeField]
     private WallData wallData;
+
+    [Title("Debug")]
+    [SerializeField]
+    private bool verbose = true;
 
     public readonly Dictionary<ChunkIndex, List<Building>> Buildings = new Dictionary<ChunkIndex, List<Building>>();
     public readonly Dictionary<int, List<Building>> BuildingGroups = new Dictionary<int, List<Building>>();
@@ -43,8 +50,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         if (chilling) return;
 
         chilling = true;
-        await Task.Yield();
-        chilling = false;
+        await UniTask.Yield();
 
         for (int i = 0; i < buildingQueue.Count; i++)
         {
@@ -74,6 +80,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         buildingQueue.Clear();
 
         CheckMerge(groupIndexCounter);
+        chilling = false;
     }
 
     private WallState CreateData(ChunkIndex chunkIndex)
@@ -141,31 +148,63 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     public void RemoveBuilding(Building building)
     {
-        if (BuildingGroups.TryGetValue(building.BuildingGroupIndex, out List<Building> list))
+        List<ChunkIndex> builtIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(building.ChunkIndex);
+        foreach (ChunkIndex chunkIndex in builtIndexes)
         {
-            list.Remove(building);
+            if (Buildings.TryGetValue(chunkIndex, out List<Building> buildings))
+            {
+                buildings.RemoveSwapBack(building);
+            }    
+        }
+        
+        if (!BuildingGroups.TryGetValue(building.BuildingGroupIndex, out List<Building> list)) return;
+        
+        list.RemoveSwapBack(building);
+        if (list.Count == 0)
+        {
+            BuildingGroups.Remove(building.BuildingGroupIndex);
         }
     }
     
-    public void BuildingTakeDamage(ChunkIndex index, float damage)
+    public void BuildingTakeDamage(ChunkIndex index, float damage, PathIndex pathIndex)
     {
+        if (verbose)
+        {
+            //Debug.Log($"Damaged {damage} at {index}");
+        }
+        
         List<ChunkIndex> damageIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(index);
         damage /= damageIndexes.Count;
+        bool didDamage = false;
         for (int i = 0; i < damageIndexes.Count; i++)
         {
-            WallStates[damageIndexes[i]].TakeDamage(damage);
+            if (WallStates.TryGetValue(damageIndexes[i], out WallState state))
+            {
+                state.TakeDamage(damage);
+                didDamage = true;
+            }
+        }
+
+        if (!didDamage)
+        {
+            AttackingSystem.DamageEvent.Remove(pathIndex);
+            StopAttackingSystem.KilledIndexes.Enqueue(pathIndex);
         }
     }
 
-    public void BuildingDestroyed(ChunkIndex chunkIndex)
+    public async UniTask BuildingDestroyed(ChunkIndex chunkIndex)
     {
+        BuildingManager.Instance.RevertQuery();
+        if (chilling)
+        {
+            await UniTask.WaitWhile(() => chilling);
+        }
+        
         WallStates.Remove(chunkIndex);
+        Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
         
-        BuildingManager.Instance.RemoveBuiltIndex(chunkIndex);
+        if (!Buildings.Remove(chunkIndex, out List<Building> buildings)) return;
 
-        if (!Buildings.TryGetValue(chunkIndex, out List<Building> buildings)) return;
-        
-        
         List<ChunkIndex> destroyedIndexes = new List<ChunkIndex>();
         for (int i = 0; i < buildings.Count; i++)
         {
@@ -173,12 +212,11 @@ public class BuildingHandler : SerializedMonoBehaviour
             
             buildings[i].OnDestroyed();
             destroyedIndexes.Add(buildings[i].ChunkIndex);
-            Events.OnWallDestroyed?.Invoke(buildings[i].ChunkIndex);
         }
 
         if (destroyedIndexes.Count > 0)
         {
-            BuildingManager.Instance.OnIndexesDestroyed(destroyedIndexes);
+            Events.OnWallsDestroyed?.Invoke(destroyedIndexes);
         }
     }
 

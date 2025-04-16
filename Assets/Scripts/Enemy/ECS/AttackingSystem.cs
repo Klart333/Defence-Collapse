@@ -8,19 +8,18 @@ using Pathfinding;
 
 namespace DataStructures.Queue.ECS
 {
-    public partial struct AttackingSystem : ISystem
+    public partial class AttackingSystem : SystemBase 
     {
         public static readonly Dictionary<PathIndex, Action<float>> DamageEvent = new Dictionary<PathIndex, Action<float>>();
         
         private NativeQueue<DamageIndex> damageQueue;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
             damageQueue = new NativeQueue<DamageIndex>(Allocator.Persistent);
         }
-        
-        public void OnUpdate(ref SystemState state)
+
+        protected override void OnUpdate()
         {
             new AttackingJob
             {
@@ -28,7 +27,7 @@ namespace DataStructures.Queue.ECS
                 DeltaTime = SystemAPI.Time.DeltaTime,
             }.ScheduleParallel();
 
-            state.Dependency.Complete();
+            Dependency.Complete();
 
             HashSet<PathIndex> failedAttacks = new HashSet<PathIndex>();
             while (damageQueue.TryDequeue(out DamageIndex item))
@@ -48,9 +47,8 @@ namespace DataStructures.Queue.ECS
                 StopAttackingSystem.KilledIndexes.Enqueue(failedAttack);
             }
         }
-
-        [BurstCompile]
-        public void OnDestroy(ref SystemState state)
+        
+        protected override void OnDestroy()
         {
             damageQueue.Dispose();
         }
