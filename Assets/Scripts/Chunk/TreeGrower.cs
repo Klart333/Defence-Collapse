@@ -39,7 +39,7 @@ namespace Chunks
         }
 
         [Button]
-        public async UniTask GrowTrees()
+        public async UniTaskVoid GrowTrees()
         {
             Vector3 offset = raycastArea.ToXyZ(1).MultiplyByAxis(transform.localScale) / 2.0f;
             Vector3 min = transform.position - offset;

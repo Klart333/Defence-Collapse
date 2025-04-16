@@ -149,6 +149,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         {
             waveFunction[chunkIndexes[i]] = new Cell(false, waveFunction[chunkIndexes[i]].Position, new List<PrototypeData> { PrototypeData.Empty });
             waveFunction.CellStack.Push(chunkIndexes[i]);
+            spawnedMeshes.Remove(chunkIndexes[i]);
         }
         
         // Get neighbours

@@ -88,10 +88,10 @@ namespace Chunks
 
         private void OnChunkGenerated(Chunk chunk)
         {
-            GrowTrees(chunk.ChunkIndex).Forget(Debug.LogError);
+            GrowTrees(chunk.ChunkIndex).Forget();
         }
 
-        private async UniTask GrowTrees(int3 chunkIndex)
+        private async UniTaskVoid GrowTrees(int3 chunkIndex)
         {
             foreach (KeyValuePair<int3, List<TreeGrower>> kvp in treeGrowersByChunk)
             {
@@ -103,7 +103,7 @@ namespace Chunks
                         continue;
                     }
             
-                    grower.GrowTrees().Forget(Debug.LogError);
+                    grower.GrowTrees().Forget();
                     grower.HasGrown = true;
                     await UniTask.Yield();
                 }

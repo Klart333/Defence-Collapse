@@ -57,11 +57,10 @@ namespace DataStructures.Queue.ECS
         [BurstCompile]
         public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in FlowFieldComponent flowField, in LocalTransform transform)
         {
-            PathIndex index = PathManager.GetIndex(transform.Position.x, transform.Position.z);
-            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[index.ChunkIndex]];
-            if (valuePathChunk.Directions[index.GridIndex] == byte.MaxValue)
+            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
+            if (valuePathChunk.Directions[flowField.PathIndex.GridIndex] == byte.MaxValue)
             {
-                ECB.AddComponent(sortKey, entity, new AttackingComponent { Target = index });
+                ECB.AddComponent(sortKey, entity, new AttackingComponent { Target = flowField.PathIndex });
             }
         }
     }

@@ -38,6 +38,8 @@ namespace Buildings.District
             Events.OnWallsDestroyed += OnWallsDestroyed;
             Events.OnWaveStarted += OnWaveStarted;
             Events.OnWaveEnded += OnWaveEnded;
+            
+            districtGenerator.OnDistrictChunkRemoved += OnDistrictChunkRemoved;
         }
 
         private void OnDisable()
@@ -45,11 +47,24 @@ namespace Buildings.District
             Events.OnWallsDestroyed += OnWallsDestroyed;
             Events.OnWaveStarted -= OnWaveStarted;
             Events.OnWaveEnded -= OnWaveEnded;
+            
+            districtGenerator.OnDistrictChunkRemoved -= OnDistrictChunkRemoved;
+        }
+
+        private void OnDistrictChunkRemoved(Chunk chunk)
+        {
+            foreach (DistrictData districtData in uniqueDistricts)
+            {
+                if (districtData.OnDistrictChunkRemoved(chunk))
+                {
+                    break;
+                }
+            }
         }
 
         private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
         {
-            districtGenerator.RemoveChunks(chunkIndexes).Forget(Debug.LogError);
+            districtGenerator.RemoveChunks(chunkIndexes).Forget();
         }
 
         private void OnWaveEnded()

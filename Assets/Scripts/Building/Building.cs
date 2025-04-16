@@ -115,7 +115,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     #region Highlight
 
-    public async UniTask Highlight()
+    public async UniTaskVoid Highlight()
     {
         if (purchasing || highlighted) return;
 
@@ -246,7 +246,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         indexer.NeedsRebuilding = true;
         indexer.DelayFrames = 1;
         
-        BuildingHandler.AddBuilding(this).Forget(Debug.LogError);
+        BuildingHandler.AddBuilding(this).Forget();
         OnPlacedEvent?.Invoke();
     }
 

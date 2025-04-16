@@ -1,20 +1,22 @@
 using System.Collections.Generic;
 using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
+using Sirenix.Serialization;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Buildings.District;
-using Sirenix.Serialization;
 using Sirenix.Utilities;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
+using System;
 
 namespace WaveFunctionCollapse
 {
     public class DistrictGenerator : SerializedMonoBehaviour, IChunkWaveFunction<Chunk>
     {
+        public event Action<Chunk> OnDistrictChunkRemoved;
+        
         [Title("Wave Function")]
         [SerializeField]
         private ChunkWaveFunction<Chunk> waveFunction;
@@ -106,11 +108,11 @@ namespace WaveFunctionCollapse
 
             if (!isUpdatingChunks)
             {
-                UpdateChunks().Forget(ex => { Debug.LogError($"Async function failed: {ex}"); });
+                UpdateChunks().Forget();
             }
         }
 
-        private async UniTask UpdateChunks()
+        private async UniTaskVoid UpdateChunks()
         {
             isUpdatingChunks = true;
 
@@ -120,49 +122,7 @@ namespace WaveFunctionCollapse
                 HashSet<Chunk> overrideChunks = new HashSet<Chunk>();
                 foreach (IBuildable buildable in buildables)
                 {
-                    for (int i = 0; i < corners.Length; i++)
-                    {
-                        bool isBuildable = buildableCornerData.IsCornerBuildable(buildable.MeshRot, corners[i], out bool meshIsBuildable);
-                        isBuildable |= buildable.MeshRot.MeshIndex == -1;
-                        if (!isBuildable && !meshIsBuildable) continue;
-
-                        Vector3 pos = buildable.gameObject.transform.position + new Vector3(corners[i].x * chunkSize.x * waveFunction.GridScale.x, 0, corners[i].y * chunkSize.z * waveFunction.GridScale.z) / -2.0f + offset;
-                        int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, ChunkScale);
-
-                        if (waveFunction.Chunks.TryGetValue(index, out Chunk chunk))
-                        {
-                            if (districtHandler.IsBuilt(chunk))
-                            {
-                                //continue;
-                            }
-                            
-                            if (isBuildable)
-                            {
-                                chunk.Clear(waveFunction.GameObjectPool);
-                                overrideChunks.Add(chunk);
-                            }
-                            else
-                            {
-                                waveFunction.RemoveChunk(chunk.ChunkIndex, out List<Chunk> neighbourChunks);
-                                for (int j = 0; j < neighbourChunks.Count; j++)
-                                {
-                                    ResetNeighbours(overrideChunks, neighbourChunks[j], 1);
-                                }
-                            }
-                        }
-                        else if (isBuildable)
-                        {
-                            positions.Add(pos);
-                            if (ChunkIndexToChunks.TryGetValue(buildable.ChunkIndex, out List<int3> list))
-                            {
-                                list.Add(index);
-                            }
-                            else
-                            {
-                                ChunkIndexToChunks.Add(buildable.ChunkIndex, new List<int3> { index });
-                            }
-                        }
-                    }
+                    HandleBuildable(buildable, overrideChunks, positions);
                 }
 
                 foreach (Chunk chunk in overrideChunks)
@@ -188,6 +148,64 @@ namespace WaveFunctionCollapse
             }
 
             isUpdatingChunks = false;
+
+            void HandleBuildable(IBuildable buildable, HashSet<Chunk> overrideChunks, List<Vector3> positions)
+            {
+                for (int i = 0; i < corners.Length; i++)
+                {
+                    bool isBuildable = buildableCornerData.IsCornerBuildable(buildable.MeshRot, corners[i], out bool meshIsBuildable);
+                    isBuildable |= buildable.MeshRot.MeshIndex == -1;
+                    if (!isBuildable && !meshIsBuildable) continue;
+
+                    Vector3 pos = buildable.gameObject.transform.position + new Vector3(corners[i].x * chunkSize.x * waveFunction.GridScale.x, 0, corners[i].y * chunkSize.z * waveFunction.GridScale.z) / -2.0f + offset;
+                    int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, ChunkScale);
+                    if (waveFunction.Chunks.TryGetValue(index, out Chunk chunk))
+                    {
+                        Queue<Chunk> chunkQueue = new Queue<Chunk>();
+                        chunkQueue.Enqueue(chunk);
+
+                        while (chunkQueue.TryDequeue(out chunk))
+                        {
+                            bool isDistrict = districtHandler.IsBuilt(chunk);
+                            if (isDistrict)
+                            {
+                                int3 aboveIndex = chunk.ChunkIndex + new int3(0, 1, 0);
+                                if (waveFunction.Chunks.TryGetValue(aboveIndex, out Chunk aboveChunk))
+                                {
+                                    chunkQueue.Enqueue(aboveChunk);
+                                }
+                            }
+                            
+                            if (isBuildable)
+                            {
+                                chunk.Clear(waveFunction.GameObjectPool);
+                                overrideChunks.Add(chunk);
+                            }
+                            else
+                            {
+                                OnDistrictChunkRemoved?.Invoke(chunk);
+                                waveFunction.RemoveChunk(chunk.ChunkIndex, out List<Chunk> neighbourChunks);
+                                for (int j = 0; j < neighbourChunks.Count; j++)
+                                {
+                                    ResetNeighbours(overrideChunks, neighbourChunks[j], 1);
+                                }
+                            }   
+                        }
+                    }
+                    else if (isBuildable)
+                    {
+                        positions.Add(pos);
+                        if (ChunkIndexToChunks.TryGetValue(buildable.ChunkIndex, out List<int3> list))
+                        {
+                            list.Add(index);
+                        }
+                        else
+                        {
+                            ChunkIndexToChunks.Add(buildable.ChunkIndex, new List<int3> { index });
+                        }
+                    }
+                }
+            }
         }
 
         private async UniTask IterativeFailChecks(HashSet<Chunk> chunksToCollapse)
@@ -260,11 +278,10 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public async UniTask RemoveChunks(List<ChunkIndex> chunkIndexes)
+        public async UniTaskVoid RemoveChunks(List<ChunkIndex> chunkIndexes)
         {
             await UniTask.WaitWhile(() => IsGenerating);
 
-            Debug.Log("Removing " + chunkIndexes.Count + " chunks");
             HashSet<Chunk> neighbours = new HashSet<Chunk>();
             HashSet<int3> killIndexes = new HashSet<int3>();
             for (int i = 0; i < chunkIndexes.Count; i++)

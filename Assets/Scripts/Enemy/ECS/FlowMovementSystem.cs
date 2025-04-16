@@ -49,21 +49,26 @@ namespace DataStructures.Queue.ECS
         
         public BlobAssetReference<PathChunkArray> PathChunks;
         
-        [ReadOnly, NativeDisableContainerSafetyRestriction]
+        [ReadOnly]
         public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
 
         [BurstCompile]
         private void Execute(in SpeedComponent speed, ref FlowFieldComponent flowField, ref LocalTransform transform)
         {
-            PathIndex index = PathManager.GetIndex(transform.Position.x, transform.Position.z);
-            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[index.ChunkIndex]];
-            float3 direction = PathManager.ByteToDirectionFloat3(valuePathChunk.Directions[index.GridIndex], flowField.Forward.y);
+            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
+            float3 direction = PathManager.ByteToDirectionFloat3(valuePathChunk.Directions[flowField.PathIndex.GridIndex], flowField.Forward.y);
             
             flowField.Forward = math.normalize(flowField.Forward + direction * (flowField.TurnSpeed * DeltaTime));
             flowField.Up = math.normalize(flowField.Up + flowField.TargetUp * flowField.TurnSpeed * DeltaTime * 5);
             transform.Rotation = quaternion.LookRotation(flowField.Forward, flowField.Up);
 
             float3 movement = transform.Forward() * speed.Speed * DeltaTime;
+            PathIndex movedPathIndex = PathManager.GetIndex(transform.Position.x, transform.Position.z);
+            if (!ChunkIndexToListIndex.ContainsKey(movedPathIndex.ChunkIndex))
+            {
+                return;
+            }
+            flowField.PathIndex = movedPathIndex;
             transform.Position += movement;
         }
     }

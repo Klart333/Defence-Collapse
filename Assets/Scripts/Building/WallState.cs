@@ -39,6 +39,6 @@ public class WallState : IHealth
     
     public void OnBuildingDeath()
     {
-        handler.BuildingDestroyed(Index).Forget(Debug.LogError);
+        handler.BuildingDestroyed(Index).Forget();
     }
 }

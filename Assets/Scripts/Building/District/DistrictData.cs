@@ -7,6 +7,9 @@ using UnityEngine;
 using Gameplay;
 using Utility;
 using System;
+using NUnit.Framework;
+using Unity.Collections;
+using Unity.Mathematics;
 
 namespace Buildings.District
 {
@@ -16,35 +19,120 @@ namespace Buildings.District
         public event Action OnDisposed;
         public event Action OnLevelup;
 
-        private readonly MeshCollider meshCollider;
-        
-        public UpgradeData UpgradeData { get; private set; }
-        public Chunk[] DistrictChunks { get; } 
+        protected readonly Dictionary<ChunkIndex, List<int3>> cachedChunkIndexes = new Dictionary<ChunkIndex, List<int3>>();
+
+        private MeshCollider meshCollider;
+
+        public Dictionary<int3, Chunk> DistrictChunks { get; } 
         public IGameSpeed GameSpeed { get; set; }
+        public UpgradeData UpgradeData { get; }
         public ChunkIndex Index { get; set; }
         public DistrictState State { get; }
         public Vector3 Position { get; }
+        
+        private IChunkWaveFunction<Chunk> waveFunction { get; }
 
         public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction<Chunk> chunkWaveFunction, int key)
         {
             UpgradeData = new UpgradeData(1, 1, 1);
-            DistrictChunks = chunks.ToArray();
+            DistrictChunks = new Dictionary<int3, Chunk>();
+            foreach (Chunk chunk in chunks)
+            {
+                if (chunk.AdjacentChunks[2] == null)
+                {
+                    DistrictChunks.Add(chunk.ChunkIndex, chunk);
+                }
+            }
             
             State = districtType switch
             {
-                DistrictType.Archer => new ArcherState(this, DistrictUpgradeManager.Instance.ArcherData, DistrictChunks, position, key),
-                DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, DistrictChunks, position, key),
-                DistrictType.Mine => new MineState(this, DistrictUpgradeManager.Instance.MineData, DistrictChunks, position, key),
+                DistrictType.Archer => new ArcherState(this, DistrictUpgradeManager.Instance.ArcherData, position, key),
+                DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, position, key),
+                DistrictType.Mine => new MineState(this, DistrictUpgradeManager.Instance.MineData, position, key),
                 //DistrictType.Church => expr,
                 //DistrictType.Farm => expr,
                 _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
             };
 
+            waveFunction = chunkWaveFunction;
             Position = position;
-            DistrictUtility.GenerateCollider(chunks, chunkWaveFunction, Position, InvokeOnClicked, ref meshCollider);
+            DistrictUtility.GenerateCollider(chunks, waveFunction, Position, InvokeOnClicked, ref meshCollider);
+            CreateChunkIndexCache(chunks);
 
             Events.OnWaveStarted += OnWaveStarted;
+            Events.OnWallsDestroyed += OnWallsDestroyed;
             State.OnStateEntered();
+        }
+
+        private void CreateChunkIndexCache(HashSet<Chunk> chunks)
+        {
+            foreach (Chunk chunk in chunks)
+            {
+                if (chunk.AdjacentChunks[2] != null)
+                {
+                    continue; // Remove if a state uses the below chunks in future
+                }
+                
+                ChunkIndex? index = BuildingManager.Instance.GetIndex(chunk.Position + BuildingManager.Instance.GridScale / 2.0f);
+                Assert.IsTrue(index.HasValue);
+                if (!cachedChunkIndexes.TryGetValue(index.Value, out List<int3> chunkIndex))
+                {
+                    cachedChunkIndexes.Add(index.Value, new List<int3> { chunk.ChunkIndex });
+                }
+                else
+                {
+                    chunkIndex.Add(chunk.ChunkIndex);
+                }
+            }
+        }
+
+        private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
+        {
+            HashSet<int3> destroyedIndexes = new HashSet<int3>();
+            for (int i = 0; i < chunkIndexes.Count; i++)
+            {
+                if (!cachedChunkIndexes.TryGetValue(chunkIndexes[i], out List<int3> indexes)) continue;
+            
+                for (int j = indexes.Count - 1; j >= 0; j--)
+                {
+                    if (DistrictChunks.TryGetValue(indexes[j], out Chunk chunk))
+                    {
+                        destroyedIndexes.Add(chunk.ChunkIndex);
+                    
+                        DistrictChunks.Remove(indexes[j]);
+                        indexes.RemoveAtSwapBack(j);
+                    }
+                    
+                }
+
+                if (indexes.Count == 0)
+                {
+                    cachedChunkIndexes.Remove(chunkIndexes[i]);
+                }
+            }
+
+            if (DistrictChunks.Count <= 0)
+            {
+                Dispose();
+            }
+            else if (destroyedIndexes.Count > 0)
+            {
+                State.OnIndexesDestroyed(destroyedIndexes);
+                DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction, Position, InvokeOnClicked, ref meshCollider);
+            }
+        }
+        
+        public bool OnDistrictChunkRemoved(Chunk chunk)
+        {
+            if (!DistrictChunks.ContainsKey(chunk.ChunkIndex))
+            {
+                return false;
+            }
+
+            State.OnIndexesDestroyed(new HashSet<int3> { chunk.ChunkIndex });
+            DistrictChunks.Remove(chunk.ChunkIndex);
+            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction, Position, InvokeOnClicked, ref meshCollider);
+            return true;
         }
 
         private void InvokeOnClicked()
@@ -83,12 +171,10 @@ namespace Buildings.District
 
         public void Dispose()
         {
-            State?.Dispose();
-            
             Events.OnWaveStarted -= OnWaveStarted;
             if (meshCollider)
             {
-                Object.Destroy(meshCollider);
+                Object.Destroy(meshCollider.gameObject);
             }
             
             OnDisposed?.Invoke();
@@ -160,11 +246,15 @@ namespace Buildings.District
             };
             mesh.RecalculateBounds();
 
-            meshCollider = new GameObject("District Collider").AddComponent<MeshCollider>();
+            if (!meshCollider)
+            {
+                meshCollider = new GameObject("District Collider").AddComponent<MeshCollider>();
+                meshCollider.gameObject.AddComponent<ClickCallbackComponent>().OnClick += action;
+            }
+
             meshCollider.transform.position = pos;
             meshCollider.sharedMesh = mesh;
             
-            meshCollider.gameObject.AddComponent<ClickCallbackComponent>().OnClick += action;
             return;
             
             // Helper function to add a vertex if it doesn't already exist

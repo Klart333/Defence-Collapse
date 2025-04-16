@@ -13,13 +13,11 @@ using UnityEngine.Assertions;
 namespace Buildings.District
 {
     [System.Serializable]
-    public abstract class DistrictState : IAttacker, IDisposable
+    public abstract class DistrictState : IAttacker
     {
         public event Action OnAttack;
         
         public float Range { get; set; }
-
-        protected readonly Dictionary<ChunkIndex, List<int>> cachedChunkIndexes = new Dictionary<ChunkIndex, List<int>>();
         
         protected DamageInstance lastDamageDone;
         protected EntityManager entityManager;
@@ -33,64 +31,17 @@ namespace Buildings.District
         public Stats Stats => stats;
         public Vector3 OriginPosition { get; protected set; }
         public Vector3 AttackPosition { get; set; }
-        public Chunk[] Chunks { get; }
         public int Key { get; set; }
 
-        protected DistrictState(DistrictData districtData, Vector3 position, int key, Chunk[] chunks)
+        protected DistrictState(DistrictData districtData, Vector3 position, int key)
         {
             this.districtData = districtData;
             OriginPosition = position;
-            Chunks = chunks;
 
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             Key = key;
             
             CollisionSystem.DamageDoneEvent.Add(key, OnDamageDone);
-
-            for (int i = 0; i < chunks.Length; i++)
-            {
-                if (chunks[i].AdjacentChunks[2] != null)
-                {
-                    continue; // Remove if a state uses the below chunks in future
-                }
-                ChunkIndex? index = BuildingManager.Instance.GetIndex(chunks[i].Position + BuildingManager.Instance.GridScale / 2.0f);
-                Assert.IsTrue(index.HasValue);
-                if (!cachedChunkIndexes.ContainsKey(index.Value))
-                {
-                    cachedChunkIndexes.Add(index.Value, new List<int>{i});
-                }
-                else
-                {
-                    cachedChunkIndexes[index.Value].Add(i);
-                }
-            }
-            
-            Events.OnWallsDestroyed += OnWallsDestroyed;
-        }
-
-        private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
-        {
-            HashSet<int3> destroyedIndexes = new HashSet<int3>();
-            for (int i = 0; i < chunkIndexes.Count; i++)
-            {
-                if (!cachedChunkIndexes.TryGetValue(chunkIndexes[i], out List<int> indexes)) continue;
-            
-                for (int j = indexes.Count - 1; j >= 0; j--)
-                {
-                    destroyedIndexes.Add(Chunks[indexes[j]].ChunkIndex);
-                    indexes.RemoveAtSwapBack(j);
-                }
-
-                if (indexes.Count == 0)
-                {
-                    cachedChunkIndexes.Remove(chunkIndexes[i]);
-                }
-            }
-
-            if (destroyedIndexes.Count > 0)
-            {
-                OnIndexesDestroyed(destroyedIndexes);
-            }
         }
         
         public abstract void Update();
@@ -98,7 +49,7 @@ namespace Buildings.District
         public abstract void OnStateEntered();
         public abstract void OnDeselected();
         public abstract void OnWaveStart();
-        protected abstract void OnIndexesDestroyed(HashSet<int3> destroyedIndexes);
+        public abstract void OnIndexesDestroyed(HashSet<int3> destroyedIndexes);
         public abstract void Die();
         
         private void OnDamageDone(Entity entity)
@@ -131,11 +82,6 @@ namespace Buildings.District
         {
 
         }
-
-        public void Dispose()
-        {
-            Events.OnWallsDestroyed -= OnWallsDestroyed;
-        }
     }
 
     #region Archer
@@ -153,7 +99,7 @@ namespace Buildings.District
         
         public override Attack Attack => attack;
 
-        public ArcherState(DistrictData districtData, TowerData archerData, Chunk[] chunks, Vector3 position, int key) : base(districtData, position, key, chunks)
+        public ArcherState(DistrictData districtData, TowerData archerData, Vector3 position, int key) : base(districtData, position, key)
         {
             this.archerData = archerData;
             Range = archerData.Range;
@@ -161,12 +107,12 @@ namespace Buildings.District
             attack = new Attack(archerData.BaseAttack);
             stats = new Stats(archerData.Stats);
 
-            SpawnEntities(chunks);
+            SpawnEntities();
         }
 
-        private void SpawnEntities(Chunk[] chunks)
+        private void SpawnEntities()
         {
-            List<Chunk> topChunks = DistrictUtility.GetTopChunks(chunks);
+            List<Chunk> topChunks = DistrictUtility.GetTopChunks(districtData.DistrictChunks.Values);
             ComponentType[] componentTypes =
             {
                 typeof(LocalTransform),
@@ -243,7 +189,7 @@ namespace Buildings.District
             
         }
 
-        protected override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
+        public override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
         {
             NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(destroyedIndexes.Count, Allocator.Temp);
             int index = 0;
@@ -258,11 +204,6 @@ namespace Buildings.District
             entityManager.DestroyEntity(entitiesToDestroy);
             
             entitiesToDestroy.Dispose();
-
-            if (spawnedEntities.Count == 0)
-            {
-                districtData.Dispose();
-            }
         }
 
         public override void Die()
@@ -288,19 +229,19 @@ namespace Buildings.District
         
         public override Attack Attack => attack;
         
-        public BombState(DistrictData districtData, TowerData bombData, Chunk[] chunks, Vector3 position, int key) : base(districtData, position, key, chunks)
+        public BombState(DistrictData districtData, TowerData bombData, Vector3 position, int key) : base(districtData, position, key)
         {
             this.bombData = bombData;
             Range = bombData.Range;
 
             stats = new Stats(bombData.Stats);
 
-            SpawnEntities(chunks);
+            SpawnEntities();
         }
 
-        private void SpawnEntities(IEnumerable<Chunk> chunks)
+        private void SpawnEntities()
         {
-            List<Chunk> topChunks = DistrictUtility.GetTopChunks(chunks); // Maybe edges shouldn't shoot?
+            List<Chunk> topChunks = DistrictUtility.GetTopChunks(districtData.DistrictChunks.Values); // Maybe edges shouldn't shoot?
             ComponentType[] componentTypes =
             {
                 typeof(LocalTransform),
@@ -376,7 +317,7 @@ namespace Buildings.District
             
         }
         
-        protected override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
+        public override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
         {
             NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(destroyedIndexes.Count, Allocator.Temp);
             int index = 0;
@@ -390,12 +331,7 @@ namespace Buildings.District
             
             entityManager.DestroyEntity(entitiesToDestroy);
             
-            entitiesToDestroy.Dispose();
-
-            if (spawnedEntities.Count == 0)
-            {
-                districtData.Dispose();
-            }
+            entitiesToDestroy.Dispose(); 
         }
 
         public override void Die()
@@ -430,21 +366,21 @@ namespace Buildings.District
 
         public override Attack Attack { get; }
         
-        public MineState(DistrictData districtData, TowerData mineData, Chunk[] chunks, Vector3 position, int key) : base(districtData, position, key, chunks)
+        public MineState(DistrictData districtData, TowerData mineData, Vector3 position, int key) : base(districtData, position, key)
         {
             this.mineData = mineData;
             
             stats = new Stats(mineData.Stats);
             Attack = new Attack(mineData.BaseAttack);
 
-            for (int i = 0; i < chunks.Length; i++)
+            foreach (Chunk chunk in districtData.DistrictChunks.Values)
             {
-                if (chunks[i].AdjacentChunks[2] != null)
+                if (chunk.AdjacentChunks[2] != null)
                 {
                     continue;
                 }
                 
-                mineChunks.Add(new MineInstance(chunks[i].Position, 0, chunks[i].ChunkIndex));
+                mineChunks.Add(new MineInstance(chunk.Position, 0, chunk.ChunkIndex));
             }
         }
         
@@ -493,7 +429,7 @@ namespace Buildings.District
             
         }
 
-        protected override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
+        public override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
         {
             foreach (int3 destroyedIndex in destroyedIndexes)
             {
@@ -504,11 +440,6 @@ namespace Buildings.District
                     mineChunks.RemoveAtSwapBack(i);
                     break;
                 }
-            }
-            
-            if (mineChunks.Count == 0)
-            {
-                districtData.Dispose();
             }
         }
 

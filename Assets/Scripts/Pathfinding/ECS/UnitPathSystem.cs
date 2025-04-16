@@ -62,7 +62,7 @@ namespace Pathfinding.ECS
         }
     }
     
-    [BurstCompile, WithAll(typeof(FlowFieldComponent))]
+    [BurstCompile]
     public partial struct UnitPathJob : IJobEntity
     {
         public BlobAssetReference<PathChunkArray> PathChunks;
@@ -71,20 +71,19 @@ namespace Pathfinding.ECS
         public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
 
         [BurstCompile]
-        public void Execute(in LocalTransform transform)
+        public void Execute(in LocalTransform transform, in FlowFieldComponent flowField)
         {
-            PathIndex index = PathManager.GetIndex(transform.Position.x, transform.Position.z);
-            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[index.ChunkIndex]];
+            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
             ref BlobArray<int> movementCosts = ref valuePathChunk.MovementCosts;
-            if (movementCosts[index.GridIndex] < int.MaxValue)
+            if (movementCosts[flowField.PathIndex.GridIndex] < int.MaxValue)
             {
-                movementCosts[index.GridIndex]++;
+                movementCosts[flowField.PathIndex.GridIndex]++;
             }
             
             ref BlobArray<short> units = ref valuePathChunk.Units;
-            if (units[index.GridIndex] < short.MaxValue)
+            if (units[flowField.PathIndex.GridIndex] < short.MaxValue)
             {
-                units[index.GridIndex]++;
+                units[flowField.PathIndex.GridIndex]++;
             }
         }
     }

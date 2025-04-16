@@ -75,7 +75,7 @@ namespace Chunks
             groundGenerator.ChunkWaveFunction.RemoveChunk(chunk.ChunkIndex, out _);
             Chunk newChunk = groundGenerator.ChunkWaveFunction.LoadChunk(chunk.ChunkIndex, chunk.ChunkSize, groundGenerator.DefaultPrototypeInfoData, false);
             
-            groundGenerator.LoadChunk(newChunk).Forget(Debug.LogError);
+            groundGenerator.LoadChunk(newChunk).Forget();
         }
     }
 }

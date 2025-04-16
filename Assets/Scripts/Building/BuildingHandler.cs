@@ -44,7 +44,7 @@ public class BuildingHandler : SerializedMonoBehaviour
     
     #region Handling Groups
 
-    public async UniTask AddBuilding(Building building)
+    public async UniTaskVoid AddBuilding(Building building)
     {
         buildingQueue.Add(building);
         if (chilling) return;
@@ -192,7 +192,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         }
     }
 
-    public async UniTask BuildingDestroyed(ChunkIndex chunkIndex)
+    public async UniTaskVoid BuildingDestroyed(ChunkIndex chunkIndex)
     {
         BuildingManager.Instance.RevertQuery();
         if (chilling)
@@ -239,7 +239,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         List<Building> buildings = BuildingGroups[building.BuildingGroupIndex];
         foreach (Building built in buildings)
         {
-            built.Highlight().Forget(Debug.LogError);
+            built.Highlight().Forget();
         }
 
         building.OnSelected();

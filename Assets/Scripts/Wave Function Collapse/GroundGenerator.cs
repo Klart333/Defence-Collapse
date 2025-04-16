@@ -83,7 +83,7 @@ namespace WaveFunctionCollapse
         public PrototypeInfoData DefaultPrototypeInfoData => defaultPrototypeInfoData;
         public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.GridScale.x, chunkSize.y * ChunkWaveFunction.GridScale.y, chunkSize.z * ChunkWaveFunction.GridScale.z);
         
-        private async void Start()
+        private async UniTaskVoid Start()
         {
             if (compilePrototypeMeshes)
             {
@@ -105,7 +105,7 @@ namespace WaveFunctionCollapse
             SetCrystalInCenter(chunk);
             
             if (shouldRun)
-                LoadChunk(chunk).Forget(Debug.LogError);
+                LoadChunk(chunk).Forget();
         }
 
         private void OnDisable()
@@ -116,7 +116,7 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public async UniTask LoadChunk(Chunk chunk)
+        public async UniTaskVoid LoadChunk(Chunk chunk)
         {
             IsGenerating = true;
             chunkMaskHandler.RemoveMask(chunk);

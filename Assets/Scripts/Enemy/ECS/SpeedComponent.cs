@@ -1,3 +1,4 @@
+using Pathfinding;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -9,6 +10,7 @@ public struct SpeedComponent : IComponentData
 
 public struct FlowFieldComponent : IComponentData
 {
+    public PathIndex PathIndex;
     public float TurnSpeed;
     public float3 Forward;
     public float3 Up;

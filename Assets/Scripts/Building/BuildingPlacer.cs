@@ -159,10 +159,10 @@ public class BuildingPlacer : MonoBehaviour
 
     private void BuildingPurchased(BuildingType buildingType)
     {
-        PlacingTower(buildingType).Forget(Debug.LogError);
+        PlacingTower(buildingType).Forget();
     }
 
-    private async UniTask PlacingTower(BuildingType type)
+    private async UniTaskVoid PlacingTower(BuildingType type)
     {
         manualCancel = false;
         SquareWasPressed = false;
