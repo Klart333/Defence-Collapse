@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Gameplay;
 using Sirenix.OdinInspector;
 using Unity.Entities;
 using Unity.Transforms;
@@ -45,6 +46,12 @@ namespace Enemy
                 return;
             }
 #endif
+
+            if (GameManager.Instance.IsGameOver)
+            {
+                return;
+            }
+            
             foreach (Entity entity in entities)
             {
                 entityManager.DestroyEntity(entity);

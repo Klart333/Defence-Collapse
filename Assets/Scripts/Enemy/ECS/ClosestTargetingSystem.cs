@@ -14,7 +14,11 @@ namespace DataStructures.Queue.ECS
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
-        { 
+        {
+            var queryBuilder = new EntityQueryBuilder(Allocator.Temp).WithAspect<EnemyTargetAspect>();
+            state.RequireForUpdate(state.GetEntityQuery(queryBuilder));
+            
+            queryBuilder.Dispose();
         }
 
         public void OnUpdate(ref SystemState state)

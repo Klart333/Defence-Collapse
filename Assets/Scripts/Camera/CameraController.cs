@@ -1,8 +1,8 @@
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
@@ -83,6 +83,8 @@ public class CameraController : MonoBehaviour
         // Subscribe to pan start/end events
         panAction.started += StartPan;
         panAction.canceled += EndPan;
+        
+        Events.OnGameReset += OnGameReset;
     }
 
     private void OnDisable()
@@ -97,6 +99,8 @@ public class CameraController : MonoBehaviour
         // Unsubscribe from events
         panAction.started -= StartPan;
         panAction.canceled -= EndPan;
+        
+        Events.OnGameReset -= OnGameReset;
     }
 
     private void Update()
@@ -200,5 +204,11 @@ public class CameraController : MonoBehaviour
         
         IsDragging = true;
         transform.position += delta * 0.5f;
+    }
+    
+    
+    private void OnGameReset()
+    {
+        IsDragging = false;
     }
 }

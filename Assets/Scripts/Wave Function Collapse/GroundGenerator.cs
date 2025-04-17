@@ -15,6 +15,7 @@ using UnityEngine;
 using System;
 using Chunks;
 using Enemy;
+using Unity.Collections;
 using UnityEngine.Assertions;
 
 namespace WaveFunctionCollapse
@@ -73,8 +74,8 @@ namespace WaveFunctionCollapse
         private readonly Dictionary<int3, GameObject> spawnedChunks = new Dictionary<int3, GameObject>();
         private readonly Dictionary<int3, Entity> spawnedChunkColliders = new Dictionary<int3, Entity>();
         private readonly HashSet<int3> generatedChunks = new HashSet<int3>();
-        
-        private BlobAssetReference<Collider> blobCollider;
+
+        private NativeList<BlobAssetReference<Collider>> spawnedColliders;
         
         private EntityManager entityManager;
 
@@ -85,6 +86,8 @@ namespace WaveFunctionCollapse
         
         private async UniTaskVoid Start()
         {
+            spawnedColliders = new NativeList<BlobAssetReference<Collider>>(Allocator.Persistent);
+                
             if (compilePrototypeMeshes)
             {
                 //waveFunction.ProtoypeMeshes.CompilePrototypes();
@@ -110,10 +113,19 @@ namespace WaveFunctionCollapse
 
         private void OnDisable()
         {
-            if (blobCollider.IsCreated)
+            if (spawnedColliders.IsCreated)
             {
-                blobCollider.Dispose();
+                foreach (BlobAssetReference<Collider> spawnedCollider in spawnedColliders)
+                {
+                    if (spawnedCollider.IsCreated)
+                    {
+                        spawnedCollider.Dispose();
+                    }
+                }
+            
+                spawnedColliders.Dispose();
             }
+           
         }
 
         public async UniTaskVoid LoadChunk(Chunk chunk)
@@ -322,7 +334,7 @@ namespace WaveFunctionCollapse
             Mesh mesh = GetComponent<MeshCombiner>().CombineMeshes(out GameObject spawnedMesh);
             spawnedChunks.Add(chunkIndex, spawnedMesh);
             
-            blobCollider = MeshCollider.Create(mesh, new CollisionFilter
+            BlobAssetReference<Collider> blobCollider = MeshCollider.Create(mesh, new CollisionFilter
             {
                 BelongsTo = 6,
                 CollidesWith = 6,
@@ -354,6 +366,8 @@ namespace WaveFunctionCollapse
             });
             
             spawnedChunkColliders.Add(chunkIndex, entity);
+            
+            spawnedColliders.Add(blobCollider);
         }
     }
 

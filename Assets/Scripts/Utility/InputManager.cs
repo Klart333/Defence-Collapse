@@ -10,6 +10,7 @@ public class InputManager : Singleton<InputManager>
     public InputAction Fire { get; private set; }
     public InputAction Shift { get; private set; }
     public InputAction Cancel {  get; private set; }
+    public InputAction Space {  get; private set; }
 
     public bool GetFire => Fire.IsPressed();
     public bool GetShift => Shift.IsPressed();
@@ -32,8 +33,11 @@ public class InputManager : Singleton<InputManager>
 
         Mouse = InputActions.Player.Mouse;
         Mouse.Enable();
+        
+        Space = InputActions.Player.Space;
+        Space.Enable();
     }
-
+    
     private void OnDisable()
     {
         Move.Disable();
@@ -41,6 +45,7 @@ public class InputManager : Singleton<InputManager>
         Shift.Disable();
         Cancel.Disable();
         Mouse.Disable();
+        Space.Disable();
     }
 
     public bool MouseOverUI()

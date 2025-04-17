@@ -23,6 +23,11 @@ public class Pool : MonoBehaviour
     private PooledMonoBehaviour poolPrefab; // The prefab this Pool handles, Assigned in GetPool
     private int index = 0;
 
+    public static void Clear()
+    {
+        dictionaryPools.Clear();
+    }
+    
     public static Pool GetPool(PooledMonoBehaviour prefab) // 3. Called from PooledMonoBehaviour.Get<T>, here we get the Pool that handles the prefab in question
     {
         if (dictionaryPools.TryGetValue(prefab, value: out Pool pool1)) // We search the dictionary for the Pool, if it's already there we return, otherwise see below

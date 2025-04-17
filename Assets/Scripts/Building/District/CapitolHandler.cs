@@ -26,27 +26,19 @@ namespace Buildings.District
         private async void OnEnable()
         {
             UIEvents.OnCapitolClicked += OnCapitolClicked;
-            Events.OnWaveStarted += OnWaveStarted;
+            Events.OnGameReset += OnGameReset;
             
             await UniTask.WaitUntil(() => InputManager.Instance != null);
             InputManager.Instance.Cancel.performed += OnCancel;
         }
-
+        
         private void OnDisable()
         {
             InputManager.Instance.Cancel.performed -= OnCancel;
             UIEvents.OnCapitolClicked -= OnCapitolClicked;
-            Events.OnWaveStarted -= OnWaveStarted;
+            Events.OnGameReset -= OnGameReset;
         }
         
-        private void OnWaveStarted()
-        {
-            if (displaying)
-            {
-                OnCancel(default);
-            }
-        }
-
         private void OnCapitolClicked()
         {
             if (displaying) return;
@@ -101,6 +93,11 @@ namespace Buildings.District
                 display.MineState.IsCapitol = false;
                 display.UpdateCapitolDisplay();
             }
+        }
+        
+        private void OnGameReset()
+        {
+            HasCapitol = false;
         }
     }
 }

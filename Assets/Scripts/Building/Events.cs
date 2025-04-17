@@ -18,6 +18,8 @@ public static class Events
     public static UnityAction<DistrictData> OnCapitolDestroyed;
 
     public static UnityAction<DistrictType> OnDistrictClicked;
+    
+    public static UnityAction OnGameReset;
 }
 
 public static class UIEvents

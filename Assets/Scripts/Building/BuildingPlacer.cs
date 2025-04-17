@@ -36,7 +36,8 @@ public class BuildingPlacer : MonoBehaviour
     {
         Events.OnBuildingCanceled += OnBuildingCanceled;
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
-        
+        Events.OnBuildingPurchased += BuildingPurchased;
+
         Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
         
         await UniTask.WaitUntil(() => BuildingManager.Instance != null);
@@ -45,16 +46,12 @@ public class BuildingPlacer : MonoBehaviour
     
     private void OnDisable()
     {
-        Events.OnBuildingCanceled -= OnBuildingCanceled;
         BuildingManager.Instance.OnLoaded -= InitializeSpawnPlaces;
         Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
+        Events.OnBuildingCanceled -= OnBuildingCanceled;
+        Events.OnBuildingPurchased -= BuildingPurchased;
     }
 
-    private void Start()
-    {
-        Events.OnBuildingPurchased += BuildingPurchased;
-    }
-    
     private void InitializeSpawnPlaces(QueryMarchedChunk chunk)
     {
         targetScale = groundGenerator.ChunkWaveFunction.GridScale.MultiplyByAxis(BuildingManager.Instance.ChunkWaveFunction.GridScale);
