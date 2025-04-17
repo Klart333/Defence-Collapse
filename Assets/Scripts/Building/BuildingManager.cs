@@ -74,7 +74,6 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         buildingAnimator = GetComponent<BuildingAnimator>();
 
         groundGenerator.OnChunkGenerated += LoadCells;
-        Events.OnBuildingRepaired += OnBuildingRepaired;
         Events.OnBuiltIndexDestroyed += RemoveBuiltIndex;
         Events.OnWallsDestroyed += OnIndexesDestroyed;
     }
@@ -82,11 +81,8 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     private void OnDisable()
     {
         groundGenerator.OnChunkGenerated -= LoadCells;
-        Events.OnBuildingRepaired += OnBuildingRepaired;
         Events.OnBuiltIndexDestroyed -= RemoveBuiltIndex;
         Events.OnWallsDestroyed -= OnIndexesDestroyed;
-        
-        Debug.Log($"SpawnedMeshes: {spawnedMeshes.Count}, Queries: {queriedChunks.Count}");
     }
 
     [Button]
@@ -131,12 +127,6 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
     #region Events
 
-    private void OnBuildingRepaired(ChunkIndex chunkIndex)
-    {
-        waveFunction[chunkIndex] = new Cell(true, waveFunction[chunkIndex].Position, waveFunction[chunkIndex].PossiblePrototypes);
-    }
-
-    
     public void RemoveBuiltIndex(ChunkIndex chunkIndex)
     {
         waveFunction.Chunks[chunkIndex.Index].BuiltCells[chunkIndex.CellIndex.x, chunkIndex.CellIndex.y, chunkIndex.CellIndex.z] = false;
@@ -159,7 +149,6 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         {
             GetNeighbours(chunkIndexes[i], 1);
         }
-        Debug.Log("Neighbour count: " + cellsToUpdate.Count);
         
         // Do the thing
         allowedKeys = keyData.BuildingKeys;

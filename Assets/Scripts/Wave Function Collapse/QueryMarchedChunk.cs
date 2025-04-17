@@ -146,8 +146,8 @@ namespace WaveFunctionCollapse
 
         public List<ChunkIndex> GetAdjacentCells(int3 index, out List<Direction> directions)
         {
-            List<ChunkIndex> adjacentCells = new List<ChunkIndex>();
-            directions = new List<Direction>();
+            List<ChunkIndex> adjacentCells = new List<ChunkIndex>(6);
+            directions = new List<Direction>(6);
 
             for (int i = 0; i < 6; i++)
             {

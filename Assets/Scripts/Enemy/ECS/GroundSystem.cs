@@ -8,7 +8,7 @@ using Unity.Burst;
 
 namespace DataStructures.Queue.ECS
 {
-    //[UpdateAfter(typeof(PhysicsSimulationGroup))]
+    [UpdateInGroup(typeof(PhysicsSimulationGroup))]
     public partial struct GroundSystem : ISystem
     {
         [BurstCompile]

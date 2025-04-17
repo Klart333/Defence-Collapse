@@ -6,7 +6,7 @@ using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 
-[BurstCompile/*(FloatPrecision.Low, FloatMode.Fast, OptimizeFor = OptimizeFor.Performance)*/]
+[BurstCompile(FloatPrecision.Low, FloatMode.Fast, OptimizeFor = OptimizeFor.Performance)]
 public struct PathJob : IJob
 {
     public BlobAssetReference<PathChunkArray> PathChunks;

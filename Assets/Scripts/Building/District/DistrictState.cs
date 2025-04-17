@@ -21,21 +21,22 @@ namespace Buildings.District
         
         protected DamageInstance lastDamageDone;
         protected EntityManager entityManager;
-        protected DistrictData districtData;
         protected Stats stats;
 
         private float totalDamageDealt;
         
-        public abstract Attack Attack { get; }
         public DamageInstance LastDamageDone => lastDamageDone;
         public Stats Stats => stats;
+        
         public Vector3 OriginPosition { get; protected set; }
         public Vector3 AttackPosition { get; set; }
+        public DistrictData DistrictData { get; }
+        public abstract Attack Attack { get; }
         public int Key { get; set; }
 
         protected DistrictState(DistrictData districtData, Vector3 position, int key)
         {
-            this.districtData = districtData;
+            DistrictData = districtData;
             OriginPosition = position;
 
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -112,7 +113,7 @@ namespace Buildings.District
 
         private void SpawnEntities()
         {
-            List<Chunk> topChunks = DistrictUtility.GetTopChunks(districtData.DistrictChunks.Values);
+            List<Chunk> topChunks = DistrictUtility.GetTopChunks(DistrictData.DistrictChunks.Values);
             ComponentType[] componentTypes =
             {
                 typeof(LocalTransform),
@@ -241,7 +242,7 @@ namespace Buildings.District
 
         private void SpawnEntities()
         {
-            List<Chunk> topChunks = DistrictUtility.GetTopChunks(districtData.DistrictChunks.Values); // Maybe edges shouldn't shoot?
+            List<Chunk> topChunks = DistrictUtility.GetTopChunks(DistrictData.DistrictChunks.Values); // Maybe edges shouldn't shoot?
             ComponentType[] componentTypes =
             {
                 typeof(LocalTransform),
@@ -363,7 +364,8 @@ namespace Buildings.District
         private readonly List<MineInstance> mineChunks = new List<MineInstance>();
         
         private readonly TowerData mineData;
-
+        
+        public bool IsCapitol { get; set; }
         public override Attack Attack { get; }
         
         public MineState(DistrictData districtData, TowerData mineData, Vector3 position, int key) : base(districtData, position, key)
@@ -406,7 +408,7 @@ namespace Buildings.District
             {
                 MineInstance instance = mineChunks[i];
                 
-                instance.Timer += Time.deltaTime * districtData.GameSpeed.Value;
+                instance.Timer += Time.deltaTime * DistrictData.GameSpeed.Value;
                 if (mineChunks[i].Timer >= mineSpeed)
                 {
                     OriginPosition = mineChunks[i].Position;

@@ -202,10 +202,7 @@ namespace Buildings.District
                 for (int y = 0; y < 2; y++)
                 for (int z = 0; z < 2; z++)
                 {
-                    if (chunk.Cells[x, y, z].PossiblePrototypes[0].Keys.All(s => s == -1))
-                    {
-                        continue;
-                    }
+                    if (AllInvalid(chunk, x, y, z)) continue;
 
                     // Calculate cell's bottom-left-front corner position
                     Vector3 cellPosition = chunkPosition + new Vector3(x, y, z).MultiplyByAxis(chunkWaveFunction.ChunkScale / 2) + offset;
@@ -282,6 +279,26 @@ namespace Buildings.District
                 triangles.Add(a);
                 triangles.Add(c);
                 triangles.Add(d);
+            }
+
+            bool AllInvalid(Chunk chunk, int x, int y, int z)
+            {
+                bool all = true;
+                foreach (short s in chunk.Cells[x, y, z].PossiblePrototypes[0].Keys)
+                {
+                    if (s != -1)
+                    {
+                        all = false;
+                        break;
+                    }
+                }
+
+                if (all)
+                {
+                    return true;
+                }
+
+                return false;
             }
         }
 

@@ -53,10 +53,12 @@ namespace Pathfinding.ECS
             int arrayLength = PathChunks.Value.PathChunks[0].Units.Length;
             for (int i = 0; i < chunksLength; i++)
             {
+                ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[i];
+
                 for (int j = 0; j < arrayLength; j++)
                 {
-                    PathChunks.Value.PathChunks[i].MovementCosts[i] -= PathChunks.Value.PathChunks[i].Units[i];
-                    PathChunks.Value.PathChunks[i].Units[j] = 0;
+                    valuePathChunk.MovementCosts[j] -= valuePathChunk.Units[j];
+                    valuePathChunk.Units[j] = 0;
                 }
             }
         }

@@ -739,7 +739,16 @@ namespace WaveFunctionCollapse
             for (int i = affectedCell.PossiblePrototypes.Count - 1; i >= 0; i--)
             {
                 PrototypeData prot = affectedCell.PossiblePrototypes[i];
-                if (!prot.Keys.Any(allowedKeys.Contains)) // Could be pre-calculated based on prototype
+                bool any = false;
+                foreach (short s in prot.Keys)
+                {
+                    if (!allowedKeys.Contains(s)) continue;
+                    
+                    any = true;
+                    break;
+                }
+
+                if (!any) // Could be pre-calculated based on prototype
                 {
                     affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
                     continue;

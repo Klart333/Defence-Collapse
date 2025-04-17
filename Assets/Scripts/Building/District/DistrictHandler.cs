@@ -32,6 +32,8 @@ namespace Buildings.District
 
         private int districtKey;
         private bool inWave;
+        
+        public List<DistrictData> Districts => uniqueDistricts;
 
         private void OnEnable()
         {
@@ -154,6 +156,11 @@ namespace Buildings.District
                 foreach (Chunk chunk in chunks)
                 {
                     districts.Remove(chunk.ChunkIndex.xz);
+                }
+
+                if (districtData.State is MineState { IsCapitol: true })
+                {
+                    Events.OnCapitolDestroyed?.Invoke(districtData);
                 }
             }
         }
