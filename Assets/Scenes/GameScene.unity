@@ -5561,9 +5561,9 @@ Canvas:
   m_GameObject: {fileID: 1001645613}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_RenderMode: 1
+  m_Camera: {fileID: 330585545}
+  m_PlaneDistance: 1
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -10512,6 +10512,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2114986767}
   - component: {fileID: 2114986766}
+  - component: {fileID: 2114986768}
   m_Layer: 0
   m_Name: MoneyManager
   m_TagString: Untagged
@@ -10535,6 +10536,7 @@ MonoBehaviour:
   startingMoney: 2000
   money: 0
   costData: {fileID: 11400000, guid: e7ff2e14ba349914883d3aeed3cecedb, type: 2}
+  particleHandler: {fileID: 2114986768}
 --- !u!4 &2114986767
 Transform:
   m_ObjectHideFlags: 0
@@ -10550,6 +10552,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 883032810}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2114986768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2114986765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67389516b79e48cbbe09f855b62a02d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  crystalPrefab: {fileID: 1869807821279177501, guid: e1eb9e5b22550824e95871d9adee1ba4,
+    type: 3}
+  UICrystalTarget: {fileID: 1284669906}
+  randomPositionDistance: 0.5
+  rotationStrength: 3
+  durationRange:
+    minValue: 0.7911767
+    maxValue: 1.25
+  spawnDuration:
+    minValue: 0.15294087
+    maxValue: 0.4411757
 --- !u!1 &2120069481
 GameObject:
   m_ObjectHideFlags: 0

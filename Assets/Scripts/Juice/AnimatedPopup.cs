@@ -18,12 +18,21 @@ namespace Juice
         private RangedFloat lifetime = new RangedFloat(0, 5);
 
         [SerializeField]
-        private bool readScale = false;
+        private bool useGameSpeed = true;
 
         [SerializeField]
-        private bool useGameSpeed = true;
+        private bool readScale = false;
+
+        [SerializeField, HideIf(nameof(readScale))]
+        private Vector3 targetScale = Vector3.one;
+        
+        [Title("Debug")]
+        [SerializeField]
+        private bool verbose;
         
         private IGameSpeed gameSpeed;
+        
+        public Tween PopupTween { get; private set; }
 
         private void Awake()
         {
@@ -32,13 +41,21 @@ namespace Juice
 
         private void OnEnable()
         {
-            Vector3 endValue = readScale ? transform.localScale : Vector3.one;
+            Vector3 endValue = readScale ? transform.localScale : targetScale;
             
-            transform.localScale = Vector3.one * 0.001f;
-            TweenerCore<Vector3, Vector3, VectorOptions> tween = transform.DOScale(endValue, lifetime.Random()).SetEase(easeType);
+            transform.localScale = Vector3.zero;
+            PopupTween = transform.DOScale(endValue, lifetime.Random()).SetEase(easeType);
             if (!useGameSpeed)
             {
-                tween.timeScale = 1.0f / gameSpeed.Value;
+                PopupTween.timeScale = 1.0f / gameSpeed.Value;
+            }
+        }
+
+        private void Update()
+        {
+            if (verbose)
+            {
+                Debug.Log(transform.localScale);
             }
         }
 

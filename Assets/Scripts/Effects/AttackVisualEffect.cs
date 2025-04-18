@@ -32,7 +32,7 @@ public class AttackVisualEffect : PooledMonoBehaviour
     {
         AttackVisualEffect gm = GetAtPosAndRot<AttackVisualEffect>(pos, rot);
         gm.transform.localScale *= scale;
-        gm.Delay.Lifeime = lifetime;
+        gm.Delay.Lifetime = lifetime;
 
         return gm;
     }

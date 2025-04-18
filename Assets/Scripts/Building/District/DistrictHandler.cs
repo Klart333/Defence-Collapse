@@ -81,7 +81,7 @@ namespace Buildings.District
 
         private void Update()
         {
-            if (!inWave) return;
+            if (!inWave || GameManager.Instance.IsGameOver) return;
             
             for (int i = 0; i < uniqueDistricts.Count; i++)
             {

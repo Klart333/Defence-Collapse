@@ -1,6 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using Juice;
 using UnityEngine;
 
 public class MoneyManager : Singleton<MoneyManager>
@@ -17,6 +18,10 @@ public class MoneyManager : Singleton<MoneyManager>
     [Title("Building Info")]
     [SerializeField]
     private BuildableCostData costData;
+    
+    [Title("Visual")]
+    [SerializeField]
+    private CrystalParticleHandler particleHandler;
 
     private Dictionary<BuildingType, int> AvailableBuildables = new Dictionary<BuildingType, int>();
 
@@ -120,7 +125,7 @@ public class MoneyManager : Singleton<MoneyManager>
 
     public void AddMoneyParticles(float amount, Vector3 position)
     {
-        AddMoney(amount);
+        particleHandler.CollectCrystals((int)amount, position).Forget();
     }
 
     public void RemoveMoney(float amount)

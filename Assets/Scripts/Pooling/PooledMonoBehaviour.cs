@@ -18,7 +18,7 @@ public class PooledMonoBehaviour : MonoBehaviour
 
     private DisableAfterDelay delay;
 
-    protected DisableAfterDelay Delay
+    public DisableAfterDelay Delay
     {
         get
         {
