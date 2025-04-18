@@ -6,6 +6,7 @@ using WaveFunctionCollapse;
 using Unity.Mathematics;
 using System.Linq;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 
 namespace Buildings.District
@@ -15,6 +16,9 @@ namespace Buildings.District
         [Title("Display")]
         [SerializeField]
         private GameObject confirmButton;
+
+        [SerializeField]
+        private TextMeshProUGUI costText;
         
         [SerializeField]
         private DistrictPlacer displayPrefab;
@@ -116,13 +120,15 @@ namespace Buildings.District
             int width = (int)bounds.Max.x - (int)bounds.Min.x + 1;
             int depth = (int)bounds.Max.y - (int)bounds.Min.y + 1;
 
-            HashSet<int3> includedChunks = new HashSet<int3>(); 
+            HashSet<int3> includedChunks = new HashSet<int3>();
+            int chunkCount = 0; // Only top chunks
             for (int i = 0; i < spawnedPlacers.Count; i++)
             {
                 int3 index = spawnedPlacers[i].Index;
                 if (bounds.Contains(new Vector2(index.x, index.z)))
                 {
                     includedChunks.Add(index);
+                    chunkCount++;
                 }
             }
 
@@ -131,10 +137,19 @@ namespace Buildings.District
                             && IsConnected(includedChunks)
                             && DistrictHandler.CanBuildDistrict(width, depth, currentType)
                             && CheckDistrictRestrictions(currentType, includedChunks);
-            
-            confirmButton.SetActive(canBuild);
-            Color color = canBuild ? Color.green : Color.red;
 
+            costText.gameObject.SetActive(canBuild);
+            if (canBuild)
+            {
+                bool canAfford = MoneyManager.Instance.CanPurchase(currentType, chunkCount, out float cost);
+                canBuild = canAfford;
+                costText.text = $"Cost: {cost:N0}g";
+            }
+
+            confirmButton.SetActive(canBuild);
+            
+            Color color = canBuild ? Color.green : Color.red;
+            costText.color = color;
             for (int i = 0; i < spawnedPlacers.Count; i++)
             {
                 int3 index = spawnedPlacers[i].Index;
@@ -330,6 +345,7 @@ namespace Buildings.District
             selectedPlacers.Clear();
 
             confirmButton.SetActive(false);
+            costText.gameObject.SetActive(false);
         }
         
         private struct Bounds

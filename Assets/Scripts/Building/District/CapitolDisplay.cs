@@ -2,6 +2,7 @@ using Sirenix.OdinInspector;
 using UnityEngine.UI;
 using UnityEngine;
 using DG.Tweening;
+using Gameplay;
 
 namespace Buildings.District
 {
@@ -21,6 +22,7 @@ namespace Buildings.District
         {
             Events.OnWaveStarted += OnWaveStarted;
             Events.OnWaveEnded += OnWaveEnded;
+            Events.OnGameReset += OnGameReset;
         }
 
         protected override void OnDisable()
@@ -34,6 +36,14 @@ namespace Buildings.District
         {
             Events.OnWaveStarted -= OnWaveStarted;
             Events.OnWaveEnded -= OnWaveEnded;
+            Events.OnGameReset -= OnGameReset;
+        }
+        
+        private void OnGameReset()
+        {
+            Events.OnWaveStarted -= OnWaveStarted;
+            Events.OnWaveEnded -= OnWaveEnded;
+            Events.OnGameReset -= OnGameReset;
         }
 
         private void OnWaveEnded()

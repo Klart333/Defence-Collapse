@@ -99,6 +99,7 @@ namespace Juice
             void SpawnedOnOnReturnToPool(PooledMonoBehaviour spawned)
             {
                 spawned.OnReturnToPool -= SpawnedOnOnReturnToPool;
+                spawned.DOKill();
                 MoneyManager.Instance.AddMoney(moneyShare);
             }
 

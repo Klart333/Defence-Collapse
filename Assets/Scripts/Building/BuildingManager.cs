@@ -200,6 +200,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     public void Place()
     {
         Events.OnBuildingBuilt?.Invoke(querySpawnedBuildings.Values);
+        
         foreach (QueryMarchedChunk chunk in queriedChunks)
         {
             chunk.Place();

@@ -1,7 +1,10 @@
 ﻿using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using Buildings.District;
+using Gameplay;
 using Juice;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class MoneyManager : Singleton<MoneyManager>
@@ -19,15 +22,16 @@ public class MoneyManager : Singleton<MoneyManager>
     [SerializeField]
     private BuildableCostData costData;
     
+    [Title("District Info")]
+    [SerializeField]
+    private DistrictCostUtility districtCostUtility;
+    
     [Title("Visual")]
     [SerializeField]
     private CrystalParticleHandler particleHandler;
 
     private Dictionary<BuildingType, int> AvailableBuildables = new Dictionary<BuildingType, int>();
-
-    private BuildingType currentBuildingType;
-
-    private bool purchasing = false;
+    
 
     public float Money => money;
 
@@ -39,39 +43,11 @@ public class MoneyManager : Singleton<MoneyManager>
             { BuildingType.Path, 0 },
         };
         money = startingMoney;
-
-        Events.OnBuildingClicked += TowerClicked;
-        Events.OnBuildingPurchased += StartPurchase;
-        Events.OnBuildingBuilt += BuilableBuilt;
-
-        Events.OnBuildingCanceled += CancelPurchasing;
     }
+    
+    #region Public
 
-    private void OnDisable()
-    {
-        Events.OnBuildingClicked -= TowerClicked;
-        Events.OnBuildingPurchased -= StartPurchase;
-        Events.OnBuildingBuilt -= BuilableBuilt;
-
-        Events.OnBuildingCanceled -= CancelPurchasing;
-    }
-
-    private void CancelPurchasing()
-    {
-        purchasing = false;
-    }
-
-    private void TowerClicked(BuildingType buildingType)
-    {
-        if (purchasing) return;
-
-        if (CanPurchase(buildingType))
-        {
-            Events.OnBuildingPurchased?.Invoke(buildingType);
-        }
-    }
-
-    private bool CanPurchase(BuildingType buildingType)
+    public bool CanPurchase(BuildingType buildingType)
     {
         if (AvailableBuildables[buildingType] > 0)
         {
@@ -83,34 +59,42 @@ public class MoneyManager : Singleton<MoneyManager>
             return true;
         }
 
+        Debug.Log("Tell player not enough money");
         return false;
     }
-
-    private void StartPurchase(BuildingType buildingType)
+    
+    
+    public bool CanPurchase(DistrictType districtType, int chunkAmount, out float cost)
     {
-        currentBuildingType = buildingType;
-        purchasing = true;
-    }
-
-    private void BuilableBuilt(IEnumerable<IBuildable> buildables)
-    {
-        if (AvailableBuildables[currentBuildingType] > 0)
+        cost = districtCostUtility.GetCost(districtType, chunkAmount);
+        if (Money >= cost)
         {
-            AvailableBuildables[currentBuildingType] -= 1;
+            return true;
+        }
+
+        InsufficientFunds(cost);
+        return false;
+    }
+    
+    public void Purchase(BuildingType buildingType)
+    {
+        if (AvailableBuildables[buildingType] > 0)
+        {
+            AvailableBuildables[buildingType] -= 1;
         }
         else
         {
-            RemoveMoney(costData.GetCost(currentBuildingType));
-        }
-
-        if (!CanPurchase(currentBuildingType))
-        {
-            Events.OnBuildingCanceled?.Invoke();
+            RemoveMoney(costData.GetCost(buildingType));
         }
     }
+    
+    public void Purchase(DistrictType districtType, int chunkAmount)
+    {
+        float cost = districtCostUtility.GetCost(districtType, chunkAmount);
 
-    #region Public
-
+        RemoveMoney(cost);
+    }
+    
     public void AddBuildable(BuildingType buildingType, int amount)
     {
         AvailableBuildables[buildingType] += amount;
@@ -135,12 +119,12 @@ public class MoneyManager : Singleton<MoneyManager>
         OnMoneyChanged?.Invoke(money);
     }
 
-    #endregion
-
-    public void InsufficientFunds(int cost)
+    public void InsufficientFunds(float cost)
     {
         Debug.Log("Insufficient funds, " + (Money - cost));
     }
+
+    #endregion
 
     #region Debug
 
@@ -151,4 +135,5 @@ public class MoneyManager : Singleton<MoneyManager>
     }
 
     #endregion
+
 }

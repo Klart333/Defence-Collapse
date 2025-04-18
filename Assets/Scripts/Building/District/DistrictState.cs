@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using DataStructures.Queue.ECS;
 using WaveFunctionCollapse;
+using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Entities;
 using UnityEngine;
 using Effects.ECS;
 using System;
-using Unity.Collections;
-using UnityEngine.Assertions;
 
 namespace Buildings.District
 {

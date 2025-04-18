@@ -470,7 +470,8 @@ namespace WaveFunctionCollapse
         public bool IsRemoved { get; set; }
         
         public Vector3Int ChunkSize => new Vector3Int(Width, Height, Depth);
-        
+
+        public bool IsTop => AdjacentChunks[2] == null;
         public Cell this[int3 index]
         {
             get => Cells[index.x, index.y, index.z];

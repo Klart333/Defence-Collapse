@@ -99,8 +99,14 @@ namespace Buildings.District
             
             HashSet<Chunk> neighbours = new HashSet<Chunk>();
             List<Chunk> addedChunks = new List<Chunk>();
+            int topChunkCount = 0;
             foreach (Chunk chunk in chunks)
             {
+                if (chunk.IsTop)
+                {
+                    topChunkCount++;
+                }
+                
                 GetNeighbours(chunks, chunk, neighbours, 1);
 
                 chunk.Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
@@ -145,6 +151,7 @@ namespace Buildings.District
             
             districtData.OnDisposed += DistrictDataOnOnDisposed;
             
+            MoneyManager.Instance.Purchase(districtType, topChunkCount);
             OnDistrictCreated?.Invoke(districtData);
             districtGenerator.Run().Forget(Debug.LogError);
             
@@ -219,7 +226,7 @@ namespace Buildings.District
                 DistrictType.Bomb => width >= 3 && depth >= 3,
                 DistrictType.Church => width >= 3 && depth >= 3,
                 DistrictType.Farm => width >= 2 && depth >= 2,
-                DistrictType.Mine => width >= 2 && depth >= 2,
+                DistrictType.Mine => width >= 1 && depth >= 1,
                 _ => throw new ArgumentOutOfRangeException(nameof(currentType), currentType, null)
             };
         }

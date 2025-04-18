@@ -25,7 +25,8 @@ public class BuildingPlacer : MonoBehaviour
 
     private GroundGenerator groundGenerator;
     private Vector3 targetScale;
-    
+
+    private bool placing;
     private bool manualCancel;
     
     private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
@@ -36,7 +37,7 @@ public class BuildingPlacer : MonoBehaviour
     {
         Events.OnBuildingCanceled += OnBuildingCanceled;
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
-        Events.OnBuildingPurchased += BuildingPurchased;
+        Events.OnBuildingClicked += BuildingClicked;
 
         Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
         
@@ -49,7 +50,7 @@ public class BuildingPlacer : MonoBehaviour
         BuildingManager.Instance.OnLoaded -= InitializeSpawnPlaces;
         Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
         Events.OnBuildingCanceled -= OnBuildingCanceled;
-        Events.OnBuildingPurchased -= BuildingPurchased;
+        Events.OnBuildingClicked -= BuildingClicked;
     }
 
     private void InitializeSpawnPlaces(QueryMarchedChunk chunk)
@@ -154,13 +155,16 @@ public class BuildingPlacer : MonoBehaviour
         manualCancel = true;
     }
 
-    private void BuildingPurchased(BuildingType buildingType)
+    private void BuildingClicked(BuildingType buildingType)
     {
         PlacingTower(buildingType).Forget();
     }
 
     private async UniTaskVoid PlacingTower(BuildingType type)
     {
+        if (placing) return;
+        
+        placing = true;
         manualCancel = false;
         SquareWasPressed = false;
         
@@ -178,7 +182,7 @@ public class BuildingPlacer : MonoBehaviour
             {
                 if (buildables.Count > 0 && SquareWasPressed)
                 {
-                    PlaceBuilding();
+                    PlaceBuilding(type);
                 }
                 continue;
             }
@@ -205,9 +209,10 @@ public class BuildingPlacer : MonoBehaviour
 
             if (!SquareWasPressed) continue;
 
-            PlaceBuilding();
+            PlaceBuilding(type);
         }
 
+        placing = false;
         if (Canceled)
         {
             SquareIndex = null;
@@ -244,16 +249,25 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
     
-    private void PlaceBuilding()
+    private bool PlaceBuilding(BuildingType buildingtype)
     {
+        SquareWasPressed = false;
         if (!SquareIndex.HasValue)
         {
-            return;
+            return false;
         }
         
-        SquareWasPressed = false;
+        if (!MoneyManager.Instance.CanPurchase(buildingtype))
+        {
+            //BuildingManager.Instance.RevertQuery();
+            return false;
+        }
+
+        MoneyManager.Instance.Purchase(buildingtype);
+        
         spawnedSpawnPlaces[SquareIndex.Value].OnPlaced();
         BuildingManager.Instance.Place();
+        return true;
     }
     
     private void OnBuiltIndexDestroyed(ChunkIndex chunkIndex)

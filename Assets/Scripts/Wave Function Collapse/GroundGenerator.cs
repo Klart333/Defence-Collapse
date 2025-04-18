@@ -177,7 +177,7 @@ namespace WaveFunctionCollapse
             }
         }
 
-        private async Task CombineChunk(Chunk chunk, bool subToEvent = true)
+        private async UniTask CombineChunk(Chunk chunk, bool subToEvent = true)
         {
             await UniTask.DelayFrame(5);
             CombineMeshes(chunk.ChunkIndex);

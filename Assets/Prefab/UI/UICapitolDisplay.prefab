@@ -374,7 +374,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef3bbd95e70a419e9943c30e466701ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPoolSize: 10
+  initialPoolSize: 1
   fillImage: {fileID: 575314064619264734}
   button: {fileID: 6463591713030511114}
 --- !u!114 &1257744352621694674
@@ -393,4 +393,7 @@ MonoBehaviour:
   lifetime:
     minValue: 0.50526345
     maxValue: 0.6210527
+  useGameSpeed: 1
   readScale: 1
+  targetScale: {x: 1, y: 1, z: 1}
+  verbose: 0

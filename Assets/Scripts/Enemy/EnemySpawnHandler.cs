@@ -30,10 +30,13 @@ namespace Enemy
         
         private readonly Dictionary<int3, List<EnemySpawnPoint>>  spawnPoints = new Dictionary<int3, List<EnemySpawnPoint>>();
         private Random random;
+        
+        public int WaveCount { get; private set; }
 
         private void OnEnable()
         {
             groundGenerator.OnChunkGenerated += OnChunkUnlocked;
+            Events.OnWaveStarted += OnWaveStarted;
             
             random = new Random(GameManager.Instance?.Seed ?? -1);
         }
@@ -41,6 +44,12 @@ namespace Enemy
         private void OnDisable()
         {
             groundGenerator.OnChunkGenerated -= OnChunkUnlocked;
+            Events.OnWaveStarted -= OnWaveStarted;
+        }
+
+        private void OnWaveStarted()
+        {
+            WaveCount++;
         }
 
         private void OnChunkUnlocked(Chunk chunk)
@@ -58,6 +67,8 @@ namespace Enemy
         public void SetEnemySpawn(Vector3 pos, int3 chunkIndex, int difficulty)
         {
             EnemySpawnPoint spawned = spawnPointPrefab.GetAtPosAndRot<EnemySpawnPoint>(pos, Quaternion.identity);
+            spawned.BaseDifficulty = difficulty;
+            spawned.EnemySpawnHandler = this;
             if (spawnPoints.TryGetValue(chunkIndex, out List<EnemySpawnPoint> list))
             {
                 list.Add(spawned);
@@ -72,7 +83,7 @@ namespace Enemy
 
         public bool ShouldSetSpawnPoint(int3 chunkIndex, out int difficulty)
         {
-            int distance = Mathf.Abs(chunkIndex.x) + Mathf.Abs(chunkIndex.y);
+            int distance = Mathf.Abs(chunkIndex.x) + Mathf.Abs(chunkIndex.z);
             difficulty = distance;
 
             return random.NextDouble() <= shouldSpawnCurve.Evaluate(difficulty);

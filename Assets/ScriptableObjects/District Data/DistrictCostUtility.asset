@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ff8266bdc7dda44793123bb57a2eda8, type: 3}
-  m_Name: Buildable Cost Data
+  m_Script: {fileID: 11500000, guid: 7e330bef3f874f2da27eb59de4f5acd1, type: 3}
+  m_Name: DistrictCostUtility
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -21,13 +21,13 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: BuildingCosts
+    - Name: districtPowerBases
       Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[BuildingType, Core],[System.Int32,
+      Data: 0|System.Collections.Generic.Dictionary`2[[DistrictType, Core],[System.Int32,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[BuildingType, Core]],
+      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[DistrictType, Core]],
         mscorlib
     - Name: 
       Entry: 12
@@ -40,7 +40,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 4
     - Name: 
       Entry: 7
       Data: 
@@ -49,7 +49,7 @@ MonoBehaviour:
       Data: 0
     - Name: $v
       Entry: 3
-      Data: 10
+      Data: 4
     - Name: 
       Entry: 8
       Data: 
@@ -62,6 +62,30 @@ MonoBehaviour:
     - Name: $v
       Entry: 3
       Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 4
+    - Name: $v
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 3
+      Data: 3
     - Name: 
       Entry: 8
       Data: 

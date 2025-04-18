@@ -21,8 +21,10 @@ namespace Enemy
         private EntityManager entityManager;
 
         private int spawnLevel;
-        private int waveLevel;
         
+        public int BaseDifficulty { get; set; }
+        public EnemySpawnHandler EnemySpawnHandler { get; set; }
+
         private void Awake()
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -38,6 +40,7 @@ namespace Enemy
             base.OnDisable();
             
             Events.OnWaveStarted -= OnWaveStarted;
+            spawnLevel = 0;
 
 #if UNITY_EDITOR
             if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode &&
@@ -60,9 +63,7 @@ namespace Enemy
 
         private void OnWaveStarted()
         {
-            waveLevel++;
-
-            if (spawnLevel % spawnerFrequency == 0)
+            if (spawnLevel % Mathf.Max(1, spawnerFrequency - BaseDifficulty) == 0)
             {
                 CreateEntity();
             }
@@ -70,7 +71,7 @@ namespace Enemy
             spawnLevel++;
             for (int i = 0; i < entities.Count; i++)
             {
-                SpawnPointComponent comp = spawnDataUtility.GetSpawnPointData(spawnLevel - i * spawnerFrequency / 2, waveLevel);
+                SpawnPointComponent comp = spawnDataUtility.GetSpawnPointData(BaseDifficulty * spawnLevel - i * spawnerFrequency / 2, EnemySpawnHandler.WaveCount);
                 comp.Timer = i * 5;
                 entityManager.SetComponentData(entities[i], comp);
                 entityManager.AddComponent<SpawningTag>(entities[i]);
