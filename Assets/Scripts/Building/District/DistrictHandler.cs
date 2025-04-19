@@ -222,12 +222,9 @@ namespace Buildings.District
         {
             return currentType switch
             {
-                DistrictType.Archer => width >= 2 && depth >= 2,
                 DistrictType.Bomb => width >= 3 && depth >= 3,
-                DistrictType.Church => width >= 3 && depth >= 3,
-                DistrictType.Farm => width >= 2 && depth >= 2,
-                DistrictType.Mine => width >= 1 && depth >= 1,
-                _ => throw new ArgumentOutOfRangeException(nameof(currentType), currentType, null)
+                DistrictType.Church => width >= 2 && depth >= 2,
+                _ => true
             };
         }
     }

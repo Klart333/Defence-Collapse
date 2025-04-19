@@ -16,7 +16,7 @@ public class LootManager : Singleton<LootManager> // Make a collect all loot but
     [SerializeField]
     private UILootHandler lootHandler;
 
-    private Dictionary<int, List<LootData>> GradedLootData = new Dictionary<int, List<LootData>>();
+    private readonly Dictionary<int, List<LootData>> GradedLootData = new Dictionary<int, List<LootData>>();
 
     protected override void Awake()
     {
@@ -24,13 +24,13 @@ public class LootManager : Singleton<LootManager> // Make a collect all loot but
 
         for (int i = 0; i < lootDatas.Count; i++)
         {
-            if (GradedLootData.TryGetValue(lootDatas[i].Grade, out var value))
+            if (GradedLootData.TryGetValue(lootDatas[i].Grade, out List<LootData> value))
             {
                 value.Add(lootDatas[i]);
             }
             else
             {
-                GradedLootData.Add(lootDatas[i].Grade, new List<LootData>() { lootDatas[i] });
+                GradedLootData.Add(lootDatas[i].Grade, new List<LootData> { lootDatas[i] });
             }
         }
     }
@@ -38,8 +38,8 @@ public class LootManager : Singleton<LootManager> // Make a collect all loot but
     public LootOrb SpawnLoot(Vector3 pos, float scale, int grade)
     {
         LootOrb loot = normalLoot.GetAtPosAndRot<LootOrb>(pos, Quaternion.identity);
-        loot.Grade = grade;
         loot.transform.localScale *= scale;
+        loot.Grade = grade;
 
         return loot;
     }

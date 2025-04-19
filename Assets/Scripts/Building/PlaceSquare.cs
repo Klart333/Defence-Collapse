@@ -18,10 +18,7 @@ public class PlaceSquare : MonoBehaviour
     
     private MaterialPropertyBlock block;
     
-    public BuildingPlacer Placer { get; set; }
-    public ChunkIndex Index { get; set; }
-    public int SquareIndex { get; set; }
-    private bool Placed { get; set; }
+    public bool Placed { get; set; }
 
     private void OnEnable()
     {
@@ -37,33 +34,20 @@ public class PlaceSquare : MonoBehaviour
         meshRenderer.SetPropertyBlock(block);
     }
 
-    private void OnMouseEnter()
+    public void OnHover()
     {
         if (Placed) return;
         
         block.SetColor(Color1, hoveredColor);
         meshRenderer.SetPropertyBlock(block);
-        Placer.SquareIndex = Index;
     }
 
-    private void OnMouseUpAsButton()
-    {
-        if (CameraController.IsDragging)
-        {
-            return;
-        }
-        
-        Placer.SquareIndex = Index;
-        Placer.SquareWasPressed = true;
-    }
-
-    private void OnMouseExit()
+    public void OnHoverExit()
     {
         if (Placed) return;
         
         block.SetColor(Color1, defaultColor);
         meshRenderer.SetPropertyBlock(block);
-        Placer.SquareIndex = null;
     }
 
     public void OnPlaced()

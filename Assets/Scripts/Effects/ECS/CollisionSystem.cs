@@ -10,32 +10,34 @@ using Unity.Transforms;
 namespace Effects.ECS
 {
     [UpdateAfter(typeof(EnemyHashGridSystem))]
-    public partial struct CollisionSystem : ISystem
+    public partial class CollisionSystem : SystemBase
     {
         public static readonly Dictionary<int, Action<Entity>> DamageDoneEvent = new Dictionary<int, Action<Entity>>();
             
         private EntityQuery collisionQuery;
         private NativeQueue<Entity> collisionQueue;
 
-        public void OnCreate(ref SystemState state) 
+        protected override void OnCreate()
         {
+            base.OnCreate();
+            
             collisionQuery = SystemAPI.QueryBuilder()
                 .WithAspect<ColliderAspect>()
                 .Build();
             
             collisionQueue = new NativeQueue<Entity>(Allocator.Persistent);
         }
-
-        public void OnUpdate(ref SystemState state)
+        
+        protected override void OnUpdate()
         {
             if (collisionQuery.IsEmpty)
             {
                 return;
             }
-            
+                         
             NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
-
+             
             new CollisionJob
             {
                 SpatialGrid = spatialGrid.AsReadOnly(),
@@ -45,25 +47,27 @@ namespace Effects.ECS
                 CellSize = 1,
                 ECB = ecb.AsParallelWriter(),
             }.ScheduleParallel();
-            
-            state.Dependency.Complete(); 
-            ecb.Playback(state.EntityManager);
+                         
+            Dependency.Complete(); 
+            ecb.Playback(EntityManager);
             ecb.Dispose();
-
+             
             while (collisionQueue.TryDequeue(out Entity entity))
             {
-                if (DamageDoneEvent.TryGetValue(state.EntityManager.GetComponentData<DamageComponent>(entity).Key, out var action))
+                if (DamageDoneEvent.TryGetValue(EntityManager.GetComponentData<DamageComponent>(entity).Key, out var action))
                 {
                     action.Invoke(entity);
                 }
             }
         }
 
-        [BurstCompile]
-        public void OnDestroy(ref SystemState state)
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             collisionQueue.Dispose();
         }
+
     }
     
     [BurstCompile]

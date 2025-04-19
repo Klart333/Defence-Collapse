@@ -8,11 +8,16 @@ public class MaterialData : ScriptableObject
     [Title("Materials")]
     public List<Material> Materials;
 
-    private Dictionary<int[], List<Material>> cachedMaterials = new Dictionary<int[], List<Material>>();
+    private readonly Dictionary<int[], List<Material>> cachedMaterials = new Dictionary<int[], List<Material>>();
 
     public List<Material> GetMaterials(int[] indexs)
     {
-        if (cachedMaterials.TryGetValue(indexs, out var value))
+        if (indexs == null)
+        {
+            return new List<Material>();
+        }
+        
+        if (cachedMaterials.TryGetValue(indexs, out List<Material> value))
         {
             return value;
         }

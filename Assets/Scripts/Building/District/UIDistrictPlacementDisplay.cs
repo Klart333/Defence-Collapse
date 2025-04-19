@@ -13,6 +13,8 @@ namespace Buildings.District
 {
     public class UIDistrictPlacementDisplay : SerializedMonoBehaviour
     {
+        public static bool Displaying = false; 
+        
         [Title("Display")]
         [SerializeField]
         private GameObject confirmButton;
@@ -49,6 +51,8 @@ namespace Buildings.District
         private async void OnEnable()
         {
             Events.OnDistrictClicked += OnDistrictClicked;
+            UIEvents.OnFocusChanged += HideAnimated;
+            Events.OnGameReset += OnGameReset;
 
             await UniTask.WaitUntil(() => InputManager.Instance != null);
             InputManager.Instance.Cancel.performed += CancelPerformed; 
@@ -56,8 +60,15 @@ namespace Buildings.District
 
         private void OnDisable()
         {
-            Events.OnDistrictClicked -= OnDistrictClicked;
             InputManager.Instance.Cancel.performed -= CancelPerformed; 
+            Events.OnDistrictClicked -= OnDistrictClicked;
+            UIEvents.OnFocusChanged -= HideAnimated;
+            Events.OnGameReset -= OnGameReset;
+        }
+
+        private void OnGameReset()
+        {
+            Displaying = false;
         }
         
         private void CancelPerformed(InputAction.CallbackContext obj)
@@ -67,17 +78,16 @@ namespace Buildings.District
 
         private void OnDistrictClicked(DistrictType districtType)
         {
+            UIEvents.OnFocusChanged?.Invoke();
+
+            Displaying = true;
             currentType = districtType;
-            
-            Hide();
-            
             Display(districtGenerator.ChunkWaveFunction);
         }
         
         private void Display(ChunkWaveFunction<Chunk> chunkWaveFunction)
         {
             Vector3 scale = districtGenerator.ChunkScale * 0.75f;
-
             Bounds bounds = GetBounds(chunkWaveFunction);
 
             float maxDistance = Vector2.Distance(bounds.Min, bounds.Max);
@@ -166,6 +176,11 @@ namespace Buildings.District
 
         private bool IsConnected(HashSet<int3> chunks)
         {
+            if (chunks.Count == 1)
+            {
+                return true;
+            }
+            
             HashSet<int3> neighbours = new HashSet<int3>();
             Stack<int3> frontier = new Stack<int3>();
             frontier.Push(chunks.First());
@@ -341,6 +356,7 @@ namespace Buildings.District
 
         private void Clear()
         {
+            Displaying = false;
             spawnedPlacers.Clear();
             selectedPlacers.Clear();
 

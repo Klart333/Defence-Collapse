@@ -26,5 +26,6 @@ public static class UIEvents
     public static UnityAction<UIEffectDisplay> OnBeginDrag;
     public static UnityAction<UIEffectDisplay> OnEndDrag;
     
+    public static UnityAction OnFocusChanged;
     public static UnityAction OnCapitolClicked;
 }

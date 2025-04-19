@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using Sirenix.OdinInspector;
@@ -6,10 +7,13 @@ using UnityEngine;
 using System.Linq;
 using DG.Tweening;
 using Unity.Mathematics;
+using UnityEngine.InputSystem;
 using WaveFunctionCollapse;
 
 public class BuildingPlacer : MonoBehaviour
 {
+    public static bool Displaying = false;
+    
     [Title("Placing")]
     [SerializeField]
     private LayerMask layerMask;
@@ -24,9 +28,11 @@ public class BuildingPlacer : MonoBehaviour
     private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
 
     private GroundGenerator groundGenerator;
+    private PlaceSquare hoveredSquare;
+    private PlaceSquare pressedSquare;
     private Vector3 targetScale;
+    private Camera cam;
 
-    private bool placing;
     private bool manualCancel;
     
     private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
@@ -35,22 +41,78 @@ public class BuildingPlacer : MonoBehaviour
 
     private async void OnEnable()
     {
-        Events.OnBuildingCanceled += OnBuildingCanceled;
+        cam = Camera.main;
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
-        Events.OnBuildingClicked += BuildingClicked;
-
-        Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
         
-        await UniTask.WaitUntil(() => BuildingManager.Instance != null);
+        Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
+        Events.OnBuildingCanceled += OnBuildingCanceled;
+        UIEvents.OnFocusChanged += OnBuildingCanceled;
+        Events.OnBuildingClicked += BuildingClicked;
+        
+        await UniTask.WaitUntil(() => BuildingManager.Instance != null && InputManager.Instance != null);
         BuildingManager.Instance.OnLoaded += InitializeSpawnPlaces;
+        InputManager.Instance.Fire.started += MouseOnDown;
+        InputManager.Instance.Fire.canceled += MouseOnUp;
     }
-    
+
     private void OnDisable()
     {
         BuildingManager.Instance.OnLoaded -= InitializeSpawnPlaces;
         Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
+        InputManager.Instance.Fire.started -= MouseOnDown;
+        InputManager.Instance.Fire.canceled -= MouseOnUp;
         Events.OnBuildingCanceled -= OnBuildingCanceled;
+        UIEvents.OnFocusChanged -= OnBuildingCanceled;
         Events.OnBuildingClicked -= BuildingClicked;
+    }
+
+    private void Update()
+    {
+        if (!Displaying || CameraController.IsDragging)
+        {
+            SquareIndex = null;
+            return;
+        }
+        Vector3 mousePoint = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
+        ChunkIndex? chunkIndex = BuildingManager.Instance.GetIndex(mousePoint);
+        if (!chunkIndex.HasValue)
+        {
+            SquareIndex = null;
+            return;
+        }
+
+        if (!spawnedSpawnPlaces.TryGetValue(chunkIndex.Value, out PlaceSquare placeSquare) || placeSquare.Placed)
+        {
+            hoveredSquare?.OnHoverExit();
+            hoveredSquare = null;
+            SquareIndex = null;
+            return;
+        }
+
+        if (hoveredSquare != placeSquare)
+        {
+            SquareWasPressed = false;
+            SquareIndex = chunkIndex;
+            
+            hoveredSquare?.OnHoverExit();
+            hoveredSquare = placeSquare;
+            hoveredSquare.OnHover();  
+        }
+    }
+    
+    private void MouseOnUp(InputAction.CallbackContext obj)
+    {
+        if (!CameraController.IsDragging 
+            && pressedSquare != null && pressedSquare == hoveredSquare
+            && !pressedSquare.Placed)
+        {
+            SquareWasPressed = true;
+        }
+    }
+
+    private void MouseOnDown(InputAction.CallbackContext obj)
+    {
+        pressedSquare = hoveredSquare;
     }
 
     private void InitializeSpawnPlaces(QueryMarchedChunk chunk)
@@ -140,12 +202,9 @@ public class BuildingPlacer : MonoBehaviour
         void SpawnSquare(Vector3 pos, ChunkIndex chunkIndex)
         {
             PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
-            placeSquare.Placer = this;
-            placeSquare.Index = chunkIndex;
             placeSquare.transform.localScale = targetScale * 0.95f;
             placeSquare.transform.SetParent(transform, true);
             placeSquare.gameObject.SetActive(false);
-            placeSquare.SquareIndex = spawnedSpawnPlaces.Count;
             spawnedSpawnPlaces.Add(chunkIndex, placeSquare);
         }
     }
@@ -157,14 +216,15 @@ public class BuildingPlacer : MonoBehaviour
 
     private void BuildingClicked(BuildingType buildingType)
     {
+        if (Displaying) return;
+
+        UIEvents.OnFocusChanged?.Invoke();
         PlacingTower(buildingType).Forget();
     }
 
     private async UniTaskVoid PlacingTower(BuildingType type)
     {
-        if (placing) return;
-        
-        placing = true;
+        Displaying = true;
         manualCancel = false;
         SquareWasPressed = false;
         
@@ -176,7 +236,12 @@ public class BuildingPlacer : MonoBehaviour
         {
             await UniTask.Yield();
 
-            if (!SquareIndex.HasValue) continue;
+            if (!SquareIndex.HasValue)
+            {
+                BuildingManager.Instance.RevertQuery();
+                queryIndex = default;
+                continue;
+            }
 
             if (queryIndex.Equals(SquareIndex.Value))
             {
@@ -188,7 +253,6 @@ public class BuildingPlacer : MonoBehaviour
             }
             
             DisablePlaces();
-
             BuildingManager.Instance.RevertQuery();
             await UniTask.NextFrame();
             if (!SquareIndex.HasValue) continue;
@@ -212,7 +276,7 @@ public class BuildingPlacer : MonoBehaviour
             PlaceBuilding(type);
         }
 
-        placing = false;
+        Displaying = false;
         if (Canceled)
         {
             SquareIndex = null;

@@ -137,7 +137,9 @@ namespace Buildings.District
 
         private void InvokeOnClicked()
         {
-            if (CameraController.IsDragging || UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            if (CameraController.IsDragging 
+                || UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()
+                || BuildingPlacer.Displaying || UIDistrictPlacementDisplay.Displaying)
             {
                 return;
             }
@@ -146,11 +148,18 @@ namespace Buildings.District
             State.OnSelected(Position);
 
             InputManager.Instance.Cancel.performed += OnDeselected;
+            UIEvents.OnFocusChanged += Deselect;
         }
 
         private void OnDeselected(InputAction.CallbackContext obj)
         {
+            Deselect();
+        }
+
+        private void Deselect()
+        {
             InputManager.Instance.Cancel.performed -= OnDeselected;
+            UIEvents.OnFocusChanged -= Deselect;
             State.OnDeselected();
         }
 

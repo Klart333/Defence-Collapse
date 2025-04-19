@@ -4,6 +4,7 @@ using Buildings.District;
 using UnityEngine;
 using Effects;
 using System;
+using Cysharp.Threading.Tasks;
 
 public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
 {
@@ -26,35 +27,65 @@ public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
     private UIDistrictUpgrade districtUpgrade;
 
     private readonly List<EffectModifier> modifierEffectsToSpawn = new List<EffectModifier>();
+    
+    private bool inOtherUI = false;
 
     public List<EffectModifier> ModifierEffects => modifierEffectsToSpawn;
     public TowerData ArcherData => archerData;
     public TowerData BombData => bombData;
-    public TowerData MineData => mineData; 
+    public TowerData MineData => mineData;
 
-    protected override void Awake()
+    private async void OnEnable()
     {
-        base.Awake();
-
+        UIEvents.OnFocusChanged += Close;    
+        Events.OnBuildingClicked += OpenOtherUI;
+        Events.OnDistrictClicked += OpenOtherUI;
+        
+        await UniTask.WaitUntil(() => InputManager.Instance != null);
         InputManager.Instance.Cancel.performed += Cancel_performed;
+    }
+
+    private void OnDisable()
+    {
+        InputManager.Instance.Cancel.performed -= Cancel_performed;
+        Events.OnBuildingClicked -= OpenOtherUI;
+        Events.OnDistrictClicked -= OpenOtherUI;
+        UIEvents.OnFocusChanged -= Close;
+    }
+    
+    private void OpenOtherUI(DistrictType arg0)
+    {
+        inOtherUI = true;
+    }
+
+    private void OpenOtherUI(BuildingType arg0)
+    {
+        inOtherUI = true;
     }
 
     private void Cancel_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        if (canvas.activeSelf)
-        {
-            Close();
-        }
+        inOtherUI = false;
+        Close();
     }
 
     public void OpenUpgradeMenu(DistrictData district)
     {
+        if (inOtherUI)
+        {
+            return;
+        }
+        
+        UIEvents.OnFocusChanged?.Invoke();
+        
         canvas.SetActive(true);
         districtUpgrade.ShowUpgrades(district);
     }
 
     public void Close()
     {
+        if (!canvas.activeSelf) return;
+
         canvas.SetActive(false);
         districtUpgrade.Close();
     }

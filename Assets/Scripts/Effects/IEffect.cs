@@ -323,12 +323,17 @@ namespace Effects
             float distance = Vector3.Distance(unit.OriginPosition, targetPosition) + Height;
             float lifetime = distance / UnitsPerSecond;
             
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             Entity colliderEntity = CreateEntity(unit.OriginPosition);
 
+            if (Effects.Count > 0)
+            {
+                entityManager.AddComponentData(colliderEntity, new DeathCallbackComponent { Key = DeathSystem.Key });
+                DeathSystem.DeathCallbacks.Add(DeathSystem.Key++, OnColliderDestroyed);
+            }
             
             Entity CreateEntity(Vector3 pos)
             {
-                EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
                 ComponentType[] componentTypes = {
                     typeof(RotateTowardsVelocityComponent),
@@ -365,12 +370,6 @@ namespace Effects
                     EndPosition = targetPosition,
                     Pivot = Vector3.Lerp(unit.OriginPosition, targetPosition, 0.5f) + Vector3.up * Height,
                 });
-
-                if (Effects.Count > 0)
-                {
-                    entityManager.AddComponentData(spawned, new DeathCallbackComponent { Key = DeathSystem.Key });
-                    DeathSystem.DeathCallbacks.Add(DeathSystem.Key++, OnColliderDestroyed);
-                }
                 
                 RenderMeshDescription desc = new RenderMeshDescription(
                     shadowCastingMode: ShadowCastingMode.Off,
@@ -428,31 +427,21 @@ namespace Effects
 
         public void Perform(IAttacker unit)
         {
-            if (MultiplierDictionary == null)
-            {
-                MultiplierDictionary = new Dictionary<IAttacker, float>();
-            }
+            MultiplierDictionary ??= new Dictionary<IAttacker, float>();
 
             if (!MultiplierDictionary.ContainsKey(unit))
             {
-                if (ShouldMultiply)
-                {
-                    MultiplierDictionary.Add(unit, EffectToStack.ModifierValue);
-                }
-                else
-                {
-                    MultiplierDictionary.Add(unit, ModifierValue);
-                }
+                MultiplierDictionary.Add(unit, ShouldMultiply ? EffectToStack.ModifierValue : ModifierValue);
             }
             else
             {
                 if (ShouldMultiply)
                 {
-                    MultiplierDictionary[unit] *= this.ModifierValue;
+                    MultiplierDictionary[unit] *= ModifierValue;
                 }
                 else
                 {
-                    MultiplierDictionary[unit] += this.ModifierValue;
+                    MultiplierDictionary[unit] += ModifierValue;
                 }
             }
 
