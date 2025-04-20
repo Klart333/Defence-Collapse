@@ -56,4 +56,9 @@ namespace Effects.ECS
 	{
 		public int Key;
 	}
+
+	public struct RandomComponent : IComponentData
+	{
+		public Random Random;
+	}
 }

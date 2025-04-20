@@ -1,9 +1,10 @@
 using Unity.Collections;
+using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
-using Enemy;
 using Gameplay;
+using Enemy;
 
 namespace DataStructures.Queue.ECS
 {
@@ -37,8 +38,10 @@ namespace DataStructures.Queue.ECS
                 DeltaTime = SystemAPI.Time.DeltaTime * GameSpeedManager.Instance.Value,
                 ECB = ecb.AsParallelWriter(),
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                MinRandomPosition = new float3(-0.5f, 0, -0.5f),
+                MaxRandomPosition = new float3(0.5f, 0, 0.5f),
             }.ScheduleParallel();
-            
+
             state.Dependency.Complete(); 
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
@@ -63,7 +66,10 @@ namespace DataStructures.Queue.ECS
         [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
         
-        public EntityCommandBuffer.ParallelWriter ECB; 
+        public EntityCommandBuffer.ParallelWriter ECB;
+
+        public float3 MinRandomPosition;
+        public float3 MaxRandomPosition;
         
         [BurstCompile]
         public void Execute([EntityIndexInChunk] int index, Entity entity, SpawnPointAspect spawnPointAspect)
@@ -81,8 +87,11 @@ namespace DataStructures.Queue.ECS
             Entity spawnedEntity = ECB.Instantiate(index, prefabEntity);
             
             LocalTransform prefabTransform = TransformLookup[prefabEntity];
+
+            float3 spawnPosition = spawnPointAspect.Transform.ValueRO.Position + spawnPointAspect.RandomComponent.ValueRW.Random.NextFloat3(MinRandomPosition, MaxRandomPosition);
+
             LocalTransform newTransform = LocalTransform.FromPositionRotationScale(
-                spawnPointAspect.Transform.ValueRO.Position,       
+                spawnPosition,       
                 prefabTransform.Rotation, 
                 prefabTransform.Scale     
             );

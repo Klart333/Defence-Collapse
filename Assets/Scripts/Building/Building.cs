@@ -237,13 +237,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     {
         for (int i = 0; i < cornerColliders.Length; i++)
         {
-            if (MeshRot.MeshIndex == -1)
-            {
-                cornerColliders[i].gameObject.SetActive(true);
-                continue;
-            }
-            
-            if (buildableCornerData.BuildableDictionary.TryGetValue(protoypeMeshes[MeshRot.MeshIndex], out BuildableCorners cornerData))
+            if (MeshRot.MeshIndex != -1 && buildableCornerData.BuildableDictionary.TryGetValue(protoypeMeshes[MeshRot.MeshIndex], out BuildableCorners cornerData))
             {
                 bool value = cornerData.CornerDictionary[BuildableCornerData.VectorToCorner(corners[i].x, corners[i].y)].Buildable;
                 cornerColliders[i].gameObject.SetActive(value);
