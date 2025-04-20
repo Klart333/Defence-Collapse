@@ -88,24 +88,15 @@ public class UIUpgradeDisplay : MonoBehaviour
             string.Format(description, districtUpgrade.LevelData.GetIncrease(upgradeType, currentData.UpgradeData.GetStatLevel(upgradeType)))
         };
 
-        float value = 0;
-        switch (upgradeType)
+        float value = upgradeType switch
         {
-            case LevelStat.AttackSpeed:
-                value = Mathf.RoundToInt(currentData.State.Stats.AttackSpeed.Value * 10f) / 10f;
-                break;
-            case LevelStat.Damage:
-                value = Mathf.RoundToInt(currentData.State.Stats.DamageMultiplier.Value * 10f) / 10f;
-                break;
-            case LevelStat.Range:
-                value = Mathf.RoundToInt(currentData.State.Range * 10f) / 10f;
-                break;
-            default:
-                break;
-        }
+            LevelStat.AttackSpeed => Mathf.RoundToInt(currentData.State.Stats.AttackSpeed.Value * 10) / 10f,
+            LevelStat.Damage => Mathf.RoundToInt(currentData.State.Stats.DamageMultiplier.Value * 10) / 10f,
+            LevelStat.Range => Mathf.RoundToInt(currentData.State.Range * 10) / 10f,
+            _ => 0
+        };
 
         descriptions.Add(string.Format(currentDescription, value));
-
 
         districtUpgrade.DisplayUpgrade(upgradeName, descriptions, upgradeType);
     }

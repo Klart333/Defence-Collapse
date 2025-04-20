@@ -53,6 +53,7 @@ public class UIDistrictUpgrade : MonoBehaviour
 
     private DistrictData currentData;
     private Canvas canvas;
+    private Camera cam;
 
     public LevelData LevelData => levelData;
 
@@ -72,7 +73,7 @@ public class UIDistrictUpgrade : MonoBehaviour
 
     private void Update()
     {
-        PositionRectTransform.PositionOnOverlayCanvas(canvas, transform as RectTransform, currentData.Position, new Vector2(0.25f, 0.5f));
+        PositionRectTransform.PositionOnOverlayCanvas(canvas, cam, transform as RectTransform, currentData.Position, new Vector2(0.25f, 0.5f));
     }
 
     #region UI
@@ -236,14 +237,13 @@ public class UpgradeData
 public static class PositionRectTransform // Chat gippity
 {
     // Function to position RectTransform on Overlay Canvas to align with world position
-    public static void PositionOnOverlayCanvas(Canvas canvas, RectTransform rectTransform, Vector3 worldPosition, Vector2 pivot)
+    public static void PositionOnOverlayCanvas(Canvas canvas, Camera cam, RectTransform rectTransform, Vector3 worldPosition, Vector2 pivot)
     {
         // Convert world position to screen space
-        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(Camera.main, worldPosition);
+        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(cam, worldPosition);
 
         // Convert screen space to canvas space
-        Vector2 canvasPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPoint, canvas.worldCamera, out canvasPos);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPoint, canvas.worldCamera, out Vector2 canvasPos);
 
         // Calculate offset based on pivot
         Vector2 pivotOffset = new Vector2(

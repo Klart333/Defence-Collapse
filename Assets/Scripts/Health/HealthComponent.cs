@@ -6,7 +6,7 @@ using System;
 public class HealthComponent : IHealth
 {
     public event Action OnDeath;
-    public event Action OnTakeDamage;
+    public event Action OnHealthChanged;
 
     public float CurrentHealth;
     public float MaxHealth;
@@ -33,7 +33,7 @@ public class HealthComponent : IHealth
         SetMaxHealth(Stats.MaxHealth.Value);
     }
 
-    public void SetMaxHealth(float maxHealth)
+    private void SetMaxHealth(float maxHealth)
     {
         float diff = maxHealth - MaxHealth;
 
@@ -57,10 +57,9 @@ public class HealthComponent : IHealth
 
         LastDamageTaken = damageDone;
         damageDone.TargetHit = this;
-
+        
         CurrentHealth -= damageDone.Damage;
-
-        OnTakeDamage?.Invoke();
+        OnHealthChanged?.Invoke();
 
         if (CurrentHealth <= 0)
         {
@@ -82,7 +81,7 @@ public class HealthComponent : IHealth
         }
 
         CurrentHealth -= damageDone.Damage;
-        OnTakeDamage?.Invoke();
+        OnHealthChanged?.Invoke();
 
         if (CurrentHealth <= 0)
         {
@@ -95,6 +94,12 @@ public class HealthComponent : IHealth
         killingDamage.Source?.OnUnitKill();
 
         OnDeath?.Invoke();
+    }
+
+    public void SetHealthToMax()
+    {
+        CurrentHealth = MaxHealth;
+        OnHealthChanged?.Invoke();
     }
 }
 

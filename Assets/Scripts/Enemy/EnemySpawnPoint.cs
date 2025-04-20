@@ -78,7 +78,6 @@ namespace Enemy
                 entityManager.SetComponentData(entities[i], comp);
                 entityManager.AddComponent<SpawningTag>(entities[i]);
             }
-
         }
         
         private void CreateEntity()

@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using UnityEngine.Assertions;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using WaveFunctionCollapse;
 using Sirenix.Utilities;
 using Unity.Mathematics;
 using UnityEngine;
-using System;
 using Gameplay;
-using UnityEngine.Assertions;
+using System;
+using UI;
 
 namespace Buildings.District
 {
@@ -22,7 +23,7 @@ namespace Buildings.District
         
         [OdinSerialize]
         private Dictionary<DistrictType, PrototypeInfoData> districtInfoData = new Dictionary<DistrictType, PrototypeInfoData>();
-    
+        
         [Title("Debug")]
         [OdinSerialize, ReadOnly]
         private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();

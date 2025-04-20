@@ -41,4 +41,9 @@ public class WallState : IHealth
     {
         handler.BuildingDestroyed(Index).Forget();
     }
+
+    public void OnWaveEnded()
+    {
+        Health.SetHealthToMax();
+    }
 }
