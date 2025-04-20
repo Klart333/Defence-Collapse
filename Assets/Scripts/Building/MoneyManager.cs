@@ -31,7 +31,8 @@ public class MoneyManager : Singleton<MoneyManager>
     private CrystalParticleHandler particleHandler;
 
     private Dictionary<BuildingType, int> AvailableBuildables = new Dictionary<BuildingType, int>();
-    
+
+    public int BuildingCost => costData.GetCost(BuildingType.Building);
 
     public float Money => money;
 

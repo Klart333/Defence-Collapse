@@ -96,9 +96,12 @@ namespace Buildings.District
             {
                 if (districtHandler.IsBuilt(chunk)) continue;
                     
+                int3 index = ChunkWaveUtility.GetDistrictIndex3(chunk.Position, districtGenerator.ChunkScale);
+                if (!CheckDistrictRestriction(currentType, index)) continue; 
+                
                 Vector3 pos = chunk.Position + Vector3.up;
                 DistrictPlacer spawned = displayPrefab.GetAtPosAndRot<DistrictPlacer>(pos, quaternion.identity);
-                spawned.Index = ChunkWaveUtility.GetDistrictIndex3(chunk.Position, districtGenerator.ChunkScale);
+                spawned.Index = index;
                 
                 spawned.transform.localScale = Vector3.zero;
                 float delay = scaledDelay * (Vector2.Distance(bounds.Min, chunk.Position.XZ()) / maxDistance);
@@ -142,12 +145,11 @@ namespace Buildings.District
                 }
             }
 
-            bool sameHeight = selectedPlacer.Index.y == selectedPlacers.Peek().Index.y;            
-            bool canBuild = sameHeight 
+            bool sameHeight = selectedPlacer.Index.y == selectedPlacers.Peek().Index.y;
+            bool canBuild = sameHeight
                             && IsConnected(includedChunks)
-                            && DistrictHandler.CanBuildDistrict(width, depth, currentType)
-                            && CheckDistrictRestrictions(currentType, includedChunks);
-
+                            && DistrictHandler.CanBuildDistrict(width, depth, currentType);
+            
             costText.gameObject.SetActive(canBuild);
             if (canBuild)
             {
@@ -201,35 +203,25 @@ namespace Buildings.District
             return chunks.Count == neighbours.Count;
         }
 
-        public bool CheckDistrictRestrictions(DistrictType currentType, IEnumerable<int3> chunkIndexes)
+        public bool CheckDistrictRestriction(DistrictType currentType, int3 chunkIndex)
         {
             return currentType switch
             {
-                DistrictType.Mine => AllChunksOnCrystal(chunkIndexes),
+                DistrictType.Mine => IsChunkOnCrystal(chunkIndex),
                 _ => true,
             };
         }
 
-        public bool AllChunksOnCrystal(IEnumerable<int3> chunkIndexes)
+        private bool IsChunkOnCrystal(int3 chunkIndex)
         {
-            bool valid = true;
-            foreach (int3 chunkIndex in chunkIndexes)
+            if (!chunkGroupTypes.TryGetValue(chunkIndex, out GroundType groundType))
             {
-                if (!chunkGroupTypes.TryGetValue(chunkIndex, out GroundType groundType))
-                {
-                    Chunk chunk = districtGenerator.ChunkWaveFunction.Chunks[chunkIndex];
-                    groundType = RaycastGroundType(chunk.Position);
-                    chunkGroupTypes.Add(chunkIndex, groundType);
-                }
-                
-                if (groundType is not GroundType.Crystal)
-                {
-                    valid = false;
-                    break;
-                }
+                Chunk chunk = districtGenerator.ChunkWaveFunction.Chunks[chunkIndex];
+                groundType = RaycastGroundType(chunk.Position);
+                chunkGroupTypes.Add(chunkIndex, groundType);
             }
 
-            return valid;
+            return groundType is GroundType.Crystal;
         }
 
         private GroundType RaycastGroundType(Vector3 rayPos)

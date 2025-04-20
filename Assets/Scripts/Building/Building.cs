@@ -19,6 +19,9 @@ public class Building : PooledMonoBehaviour, IBuildable
     
     [SerializeField]
     private Material transparentGreen;
+    
+    [SerializeField]
+    private Material transparentRed;
 
     [SerializeField]
     private LayerMask highlightedLayer;
@@ -54,7 +57,8 @@ public class Building : PooledMonoBehaviour, IBuildable
         new Vector2Int(-1, -1),
     };
     
-    private List<Material> transparentMaterials = new List<Material>();
+    private readonly List<Material> transparentMaterials = new List<Material>();
+    private readonly List<Material> transparentRemoveMaterials = new List<Material>();
 
     private BuildingAnimator buildingAnimator;
     private BuildingHandler buildingHandler;
@@ -195,10 +199,12 @@ public class Building : PooledMonoBehaviour, IBuildable
          : null;
         MeshRenderer.SetMaterials(materialData.GetMaterials(Prototype.MaterialIndexes));
 
-        transparentMaterials = new List<Material>();
+        transparentMaterials.Clear();
+        transparentRemoveMaterials.Clear();
         for (int i = 0; i < Prototype.MaterialIndexes.Length; i++)
         {
             transparentMaterials.Add(transparentGreen);
+            transparentRemoveMaterials.Add(transparentRed);
         }
         
         transform.localScale = scale;
@@ -210,11 +216,11 @@ public class Building : PooledMonoBehaviour, IBuildable
         BuildingHandler.LowlightGroup(this);
     }
 
-    public void ToggleIsBuildableVisual(bool isQueried)
+    public void ToggleIsBuildableVisual(bool isQueried, bool showRemoving)
     {
         if (isQueried)
         {
-            MeshRenderer.SetMaterials(transparentMaterials);
+            MeshRenderer.SetMaterials(showRemoving ? transparentRemoveMaterials : transparentMaterials);
         }
         else
         {
@@ -231,7 +237,13 @@ public class Building : PooledMonoBehaviour, IBuildable
     {
         for (int i = 0; i < cornerColliders.Length; i++)
         {
-            if (MeshRot.MeshIndex != -1 && buildableCornerData.BuildableDictionary.TryGetValue(protoypeMeshes[MeshRot.MeshIndex], out BuildableCorners cornerData))
+            if (MeshRot.MeshIndex == -1)
+            {
+                cornerColliders[i].gameObject.SetActive(true);
+                continue;
+            }
+            
+            if (buildableCornerData.BuildableDictionary.TryGetValue(protoypeMeshes[MeshRot.MeshIndex], out BuildableCorners cornerData))
             {
                 bool value = cornerData.CornerDictionary[BuildableCornerData.VectorToCorner(corners[i].x, corners[i].y)].Buildable;
                 cornerColliders[i].gameObject.SetActive(value);

@@ -58,7 +58,6 @@ public class DisableAfterDelay : MonoBehaviour
             transform.localScale = startScale;
         }
 
-        LifeLeft = Lifetime;
         StopAllCoroutines();
     }
 

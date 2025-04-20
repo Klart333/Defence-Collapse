@@ -27,6 +27,7 @@ public class BuildingPlacer : MonoBehaviour
     private readonly Dictionary<ChunkIndex, PlaceSquare> spawnedSpawnPlaces = new Dictionary<ChunkIndex, PlaceSquare>();
     private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
 
+    private BuildingHandler buildingHandler;
     private GroundGenerator groundGenerator;
     private PlaceSquare hoveredSquare;
     private PlaceSquare pressedSquare;
@@ -43,6 +44,7 @@ public class BuildingPlacer : MonoBehaviour
     {
         cam = Camera.main;
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
+        buildingHandler = FindFirstObjectByType<BuildingHandler>();
         
         Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
         Events.OnBuildingCanceled += OnBuildingCanceled;
@@ -81,7 +83,7 @@ public class BuildingPlacer : MonoBehaviour
             return;
         }
 
-        if (!spawnedSpawnPlaces.TryGetValue(chunkIndex.Value, out PlaceSquare placeSquare) || placeSquare.Placed)
+        if (!spawnedSpawnPlaces.TryGetValue(chunkIndex.Value, out PlaceSquare placeSquare))
         {
             hoveredSquare?.OnHoverExit();
             hoveredSquare = null;
@@ -103,8 +105,7 @@ public class BuildingPlacer : MonoBehaviour
     private void MouseOnUp(InputAction.CallbackContext obj)
     {
         if (!CameraController.IsDragging 
-            && pressedSquare != null && pressedSquare == hoveredSquare
-            && !pressedSquare.Placed)
+            && pressedSquare != null && pressedSquare == hoveredSquare)
         {
             SquareWasPressed = true;
         }
@@ -247,7 +248,14 @@ public class BuildingPlacer : MonoBehaviour
             {
                 if (buildables.Count > 0 && SquareWasPressed)
                 {
-                    PlaceBuilding(type);
+                    if (pressedSquare.Placed)
+                    {
+                        RemoveBuilding();
+                    }
+                    else
+                    {
+                        PlaceBuilding(type);
+                    }
                 }
                 continue;
             }
@@ -262,7 +270,7 @@ public class BuildingPlacer : MonoBehaviour
             
             foreach (IBuildable item in buildables.Values)
             {
-                item.ToggleIsBuildableVisual(true);
+                item.ToggleIsBuildableVisual(true, hoveredSquare.Placed);
             }
             
             if (buildables.Count == 0) 
@@ -272,8 +280,15 @@ public class BuildingPlacer : MonoBehaviour
             }
 
             if (!SquareWasPressed) continue;
-
-            PlaceBuilding(type);
+            
+            if (pressedSquare.Placed)
+            {
+                RemoveBuilding();
+            }
+            else
+            {
+                PlaceBuilding(type);
+            }
         }
 
         Displaying = false;
@@ -313,27 +328,39 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
     
-    private bool PlaceBuilding(BuildingType buildingtype)
+    private void PlaceBuilding(BuildingType buildingtype)
     {
         SquareWasPressed = false;
         if (!SquareIndex.HasValue)
         {
-            return false;
+            return;
         }
         
         if (!MoneyManager.Instance.CanPurchase(buildingtype))
         {
             //BuildingManager.Instance.RevertQuery();
-            return false;
+            return;
         }
 
         MoneyManager.Instance.Purchase(buildingtype);
         
         spawnedSpawnPlaces[SquareIndex.Value].OnPlaced();
         BuildingManager.Instance.Place();
-        return true;
     }
-    
+
+    private void RemoveBuilding()
+    {
+        SquareWasPressed = false;
+        if (!SquareIndex.HasValue)
+        {
+            return;
+        }
+        
+        MoneyManager.Instance.AddMoneyParticles(MoneyManager.Instance.BuildingCost, hoveredSquare.transform.position);
+        
+        buildingHandler.BuildingDestroyed(SquareIndex.Value).Forget();
+    }
+
     private void OnBuiltIndexDestroyed(ChunkIndex chunkIndex)
     {
         if (spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare square))

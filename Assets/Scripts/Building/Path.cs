@@ -19,6 +19,9 @@ namespace Buildings
         private Material transparentGreen;
         
         [SerializeField]
+        private Material transparentRed;
+        
+        [SerializeField]
         private Transform meshTransform;
 
         [Title("Events")]
@@ -29,6 +32,7 @@ namespace Buildings
         private UnityEvent OnResetEvent;
 
         private List<Material> transparentMaterials = new List<Material>();
+        private List<Material> transparentRemoveMaterials = new List<Material>();
 
         private MeshCollider meshCollider;
         private MeshRenderer meshRenderer;
@@ -71,20 +75,22 @@ namespace Buildings
             GetComponentInChildren<MeshFilter>().mesh = protoypeMeshes[prototypeData.MeshRot.MeshIndex];
             MeshRenderer.SetMaterials(materialData.GetMaterials(PrototypeData.MaterialIndexes));
 
-            transparentMaterials = new List<Material>();
+            transparentMaterials.Clear();
+            transparentRemoveMaterials.Clear();
             for (int i = 0; i < PrototypeData.MaterialIndexes.Length; i++)
             {
                 transparentMaterials.Add(transparentGreen);
+                transparentRemoveMaterials.Add(transparentRed);
             }
 
             MeshRenderer.transform.localScale = scale;
         }
 
-        public void ToggleIsBuildableVisual(bool value)
+        public void ToggleIsBuildableVisual(bool value, bool showRemoving)
         {
             if (value)
             {
-                MeshRenderer.SetMaterials(transparentMaterials);
+                MeshRenderer.SetMaterials(showRemoving ? transparentRemoveMaterials : transparentMaterials);
             }
             else
             {
