@@ -186,34 +186,36 @@ public class BuildingHandler : SerializedMonoBehaviour
         for (int i = 0; i < damageIndexes.Count; i++)
         {
             ChunkIndex damageIndex = damageIndexes[i];
-            if (WallStates.TryGetValue(damageIndex, out WallState state))
-            {
-                float startingHealth = state.Health.CurrentHealth;
-                state.TakeDamage(damage);
-                didDamage = true;
+            if (!WallStates.TryGetValue(damageIndex, out WallState state)) continue;
+            
+            float startingHealth = state.Health.CurrentHealth;
+            state.TakeDamage(damage);
+            didDamage = true;
 
-                if (state.Health.Alive && wallStatesWithHealth.Add(damageIndex))
-                {
-                    UIWallHealth wallHealth = wallHealthPrefab.Get<UIWallHealth>();
-                    wallHealth.transform.SetParent(canvasParent.transform, false);
-                    wallHealth.Setup(state, startingHealth, canvasParent);
-                    wallHealth.TweenFill();
-                    wallHealth.OnReturnToPool += WallHealthOnOnReturnToPool;
-
-                    void WallHealthOnOnReturnToPool(PooledMonoBehaviour obj)
-                    {
-                        wallHealth.OnReturnToPool -= WallHealthOnOnReturnToPool;
-                        wallStatesWithHealth.Remove(damageIndex); 
-                    }
-                }
-                
-            }
+            DisplayHealth(state, damageIndex, startingHealth);
         }
 
         if (!didDamage)
         {
             AttackingSystem.DamageEvent.Remove(pathIndex);
             StopAttackingSystem.KilledIndexes.Enqueue(pathIndex);
+        }
+
+        void DisplayHealth(WallState state, ChunkIndex damageIndex, float startingHealth)
+        {
+            if (!state.Health.Alive || !wallStatesWithHealth.Add(damageIndex)) return;
+            
+            UIWallHealth wallHealth = wallHealthPrefab.Get<UIWallHealth>();
+            wallHealth.transform.SetParent(canvasParent.transform, false);
+            wallHealth.Setup(state, startingHealth, canvasParent);
+            wallHealth.TweenFill();
+            wallHealth.OnReturnToPool += WallHealthOnOnReturnToPool;
+
+            void WallHealthOnOnReturnToPool(PooledMonoBehaviour obj)
+            {
+                wallHealth.OnReturnToPool -= WallHealthOnOnReturnToPool;
+                wallStatesWithHealth.Remove(damageIndex); 
+            }
         }
     }
 

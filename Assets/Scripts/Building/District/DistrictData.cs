@@ -139,7 +139,7 @@ namespace Buildings.District
         {
             if (CameraController.IsDragging 
                 || UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()
-                || BuildingPlacer.Displaying || UIDistrictPlacementDisplay.Displaying)
+                || BuildingPlacer.Displaying || PathPlacer.Displaying || UIDistrictPlacementDisplay.Displaying)
             {
                 return;
             }

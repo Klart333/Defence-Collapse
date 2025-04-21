@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using System.Threading.Tasks;
+using UnityEngine.InputSystem;
 using Sirenix.OdinInspector;
+using WaveFunctionCollapse;
+using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
 using DG.Tweening;
-using Unity.Mathematics;
-using UnityEngine.InputSystem;
-using WaveFunctionCollapse;
 
 public class BuildingPlacer : MonoBehaviour
 {
     public static bool Displaying = false;
     
     [Title("Placing")]
-    [SerializeField]
-    private LayerMask layerMask;
-
     [SerializeField]
     private PooledMonoBehaviour unableToPlacePrefab;
 
@@ -47,7 +42,6 @@ public class BuildingPlacer : MonoBehaviour
         buildingHandler = FindFirstObjectByType<BuildingHandler>();
         
         Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
-        Events.OnBuildingCanceled += OnBuildingCanceled;
         UIEvents.OnFocusChanged += OnBuildingCanceled;
         Events.OnBuildingClicked += BuildingClicked;
         
@@ -63,7 +57,6 @@ public class BuildingPlacer : MonoBehaviour
         Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
         InputManager.Instance.Fire.started -= MouseOnDown;
         InputManager.Instance.Fire.canceled -= MouseOnUp;
-        Events.OnBuildingCanceled -= OnBuildingCanceled;
         UIEvents.OnFocusChanged -= OnBuildingCanceled;
         Events.OnBuildingClicked -= BuildingClicked;
     }
@@ -217,13 +210,13 @@ public class BuildingPlacer : MonoBehaviour
 
     private void BuildingClicked(BuildingType buildingType)
     {
-        if (Displaying) return;
+        if (Displaying || buildingType is not BuildingType.Building) return;
 
         UIEvents.OnFocusChanged?.Invoke();
-        PlacingTower(buildingType).Forget();
+        PlacingTower().Forget();
     }
 
-    private async UniTaskVoid PlacingTower(BuildingType type)
+    private async UniTaskVoid PlacingTower()
     {
         Displaying = true;
         manualCancel = false;
@@ -254,7 +247,7 @@ public class BuildingPlacer : MonoBehaviour
                     }
                     else
                     {
-                        PlaceBuilding(type);
+                        PlaceBuilding();
                     }
                 }
                 continue;
@@ -266,7 +259,7 @@ public class BuildingPlacer : MonoBehaviour
             if (!SquareIndex.HasValue) continue;
 
             queryIndex = SquareIndex.Value;
-            buildables = BuildingManager.Instance.Query(queryIndex, type);
+            buildables = BuildingManager.Instance.Query(queryIndex);
             
             foreach (IBuildable item in buildables.Values)
             {
@@ -287,7 +280,7 @@ public class BuildingPlacer : MonoBehaviour
             }
             else
             {
-                PlaceBuilding(type);
+                PlaceBuilding();
             }
         }
 
@@ -328,7 +321,7 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
     
-    private void PlaceBuilding(BuildingType buildingtype)
+    private void PlaceBuilding()
     {
         SquareWasPressed = false;
         if (!SquareIndex.HasValue)
@@ -336,13 +329,13 @@ public class BuildingPlacer : MonoBehaviour
             return;
         }
         
-        if (!MoneyManager.Instance.CanPurchase(buildingtype))
+        if (!MoneyManager.Instance.CanPurchase(BuildingType.Building))
         {
             //BuildingManager.Instance.RevertQuery();
             return;
         }
 
-        MoneyManager.Instance.Purchase(buildingtype);
+        MoneyManager.Instance.Purchase(BuildingType.Building);
         
         spawnedSpawnPlaces[SquareIndex.Value].OnPlaced();
         BuildingManager.Instance.Place();

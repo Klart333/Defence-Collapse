@@ -307,7 +307,7 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public void Propagate(HashSet<short> allowedKeys = null)
+        public void Propagate()
         {
             while (CellStack.TryPop(out ChunkIndex chunkIndex))
             {
@@ -317,15 +317,7 @@ namespace WaveFunctionCollapse
                 for (int i = 0; i < neighbours.Count; i++)
                 {
                     Cell neighbour = this[neighbours[i]];
-                    bool changed;
-                    if (allowedKeys != null)
-                    {
-                        WaveFunctionUtility.Constrain(changedCell, neighbour, directions[i], allowedKeys, out changed);
-                    }
-                    else
-                    {
-                        WaveFunctionUtility.Constrain(changedCell, neighbour, directions[i], out changed);
-                    }
+                    WaveFunctionUtility.Constrain(changedCell, neighbour, directions[i], out bool changed);
 
                     if (changed)
                     {
@@ -832,11 +824,6 @@ namespace WaveFunctionCollapse
         public ChunkWaveFunction<TChunk> ChunkWaveFunction { get; }
         public Vector3 ChunkScale { get; }
         public bool IsGenerating { get; }
-    }
-
-    public interface IQueryWaveFunction : IChunkWaveFunction<QueryMarchedChunk>
-    {
-        public void SetCell(ChunkIndex index, PrototypeData chosenPrototype, List<int3> queryCollapsedAir, bool query = true);
     }
 }
 

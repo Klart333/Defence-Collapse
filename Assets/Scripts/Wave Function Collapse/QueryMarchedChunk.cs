@@ -99,7 +99,7 @@ namespace WaveFunctionCollapse
             throw new System.NotImplementedException();
         }
         
-        public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Chunk groundChunk, BuildableCornerData cellBuildableCornerData, Vector3 offset)
+        public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Chunk groundChunk, Vector3 offset, BuildableCornerData cellBuildableCornerData = null)
         {
             PrototypeInfoData = prototypeInfoData;
             IsClear = false;
@@ -133,7 +133,7 @@ namespace WaveFunctionCollapse
                 Cell groundCell = groundChunk.Cells[groundIndex.x, 0, groundIndex.z];
                 Vector2Int corner = new Vector2Int((int)Mathf.Sign(groundCell.Position.x - cellPosition.x), (int)Mathf.Sign(groundCell.Position.z - cellPosition.z));
 
-                if (!cellBuildableCornerData.IsCornerBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner, out _))
+                if (cellBuildableCornerData != null && !cellBuildableCornerData.IsCornerBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner, out _))
                 {
                     Cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(
                         true,

@@ -33,6 +33,7 @@ public class MoneyManager : Singleton<MoneyManager>
     private Dictionary<BuildingType, int> AvailableBuildables = new Dictionary<BuildingType, int>();
 
     public int BuildingCost => costData.GetCost(BuildingType.Building);
+    public float PathCost => costData.GetCost(BuildingType.Path);
 
     public float Money => money;
 

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using System;
+using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 
 namespace Pathfinding
@@ -35,26 +36,34 @@ namespace Pathfinding
             }
         }
 
-        private async void OnEnable()
+        private void OnEnable()
         {
             indexer ??= GetComponent<Indexer>();
-
             indexer.OnRebuilt += OnRebuilt;
 
+            if (PathManager.Instance == null)
+            {
+                WaitToRegister().Forget();
+            }
+            else
+            {
+                Register();
+            }
+        }
+
+        private async UniTaskVoid WaitToRegister()
+        {
             await UniTask.WaitUntil(() => PathManager.Instance != null);
+            Register();
+        }
+
+        private void Register()
+        {
             switch (targetType)
             {
-                case PathTargetType.Blocker:
-                    PathManager.Instance.BlockerPathSet.Register(this);
-                    break;
-                case PathTargetType.Target:
-                    PathManager.Instance.TargetPathSet.Register(this);
-                    break;
-                case PathTargetType.Path:
-                    PathManager.Instance.PathPathSet.Register(this);
-                    break;
-                default:
-                    break;
+                case PathTargetType.Blocker: PathManager.Instance.BlockerPathSet.Register(this); break;
+                case PathTargetType.Target: PathManager.Instance.TargetPathSet.Register(this); break;
+                case PathTargetType.Path: PathManager.Instance.PathPathSet.Register(this); break;
             }
         }
 
@@ -62,17 +71,9 @@ namespace Pathfinding
         {
             switch (targetType)
             {
-                case PathTargetType.Blocker:
-                    PathManager.Instance.BlockerPathSet.Unregister(this);
-                    break;
-                case PathTargetType.Target:
-                    PathManager.Instance.TargetPathSet.Unregister(this);
-                    break;
-                case PathTargetType.Path:
-                    PathManager.Instance.PathPathSet.Unregister(this);
-                    break;
-                default:
-                    break;
+                case PathTargetType.Blocker: PathManager.Instance.BlockerPathSet.Unregister(this); break;
+                case PathTargetType.Target: PathManager.Instance.TargetPathSet.Unregister(this); break;
+                case PathTargetType.Path: PathManager.Instance.PathPathSet.Unregister(this); break;
             }
 
             indexer.OnRebuilt -= OnRebuilt;
