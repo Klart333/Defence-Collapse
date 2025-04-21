@@ -116,7 +116,7 @@ namespace Buildings.District
                 int height = districtType switch
                 {
                     DistrictType.Archer => 1,
-                    DistrictType.Bomb => 2,
+                    DistrictType.Bomb => 0,
                     DistrictType.Mine => 0,
                     //DistrictType.Church => expr,
                     _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)

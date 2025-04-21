@@ -187,7 +187,7 @@ namespace UI
             float duration = diff / fillSpeed;
             fillImage.DOKill();
             
-            DOTween.To(x => fillImage.color = fillGradient.Evaluate(x), fillImage.fillAmount, percent, duration ).SetEase(fillEase);
+            DOTween.To(x => fillImage.color = fillGradient.Evaluate(1.0f - x), fillImage.fillAmount, percent, duration ).SetEase(fillEase);
             fillImage.DOFillAmount(percent, duration).SetEase(fillEase);
         }
     }

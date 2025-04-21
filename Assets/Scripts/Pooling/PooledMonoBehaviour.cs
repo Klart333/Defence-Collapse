@@ -44,7 +44,7 @@ public class PooledMonoBehaviour : MonoBehaviour
     
     public T GetAtPosAndRot<T>(Vector3 position, Quaternion rotation) where T : PooledMonoBehaviour // 1. This is the first step in spawning a prefab (kinda optional)
     {
-        var pooledObject = Get<T>(); // What this method does is takes the pooledObject from Get<T> and assign its position and rotation
+        T pooledObject = Get<T>(); // What this method does is takes the pooledObject from Get<T> and assign its position and rotation
 
         pooledObject.transform.position = position;
         pooledObject.transform.rotation = rotation;

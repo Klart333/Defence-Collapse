@@ -60,6 +60,7 @@ public class UIDistrictUpgrade : MonoBehaviour
     private void OnEnable()
     {
         canvas = GetComponentInParent<Canvas>();
+        cam = Camera.main;
 
         towerEffectsPanel.OnEffectAdded += AddEffectToTower;
         towerEffectsPanel.OnEffectRemoved += RemoveEffectFromTower;
@@ -160,8 +161,6 @@ public class UIDistrictUpgrade : MonoBehaviour
             case LevelStat.Range:
                 currentData.State.Range += levelData.GetIncrease(stat, currentData.State.Range);
                 break;
-            default:
-                break;
         }
         currentData.LevelUp();
 
@@ -200,36 +199,24 @@ public class UpgradeData
         Range = range;
     }
 
-    public int GetStatLevel(LevelStat levelStat) 
+    public int GetStatLevel(LevelStat levelStat)
     {
-        switch (levelStat)
+        return levelStat switch
         {
-            case LevelStat.AttackSpeed:
-                return Attackspeed;
-            case LevelStat.Damage:
-                return Damage;
-            case LevelStat.Range:
-                return Range;
-        }
-
-        return -1;
+            LevelStat.AttackSpeed => Attackspeed,
+            LevelStat.Damage => Damage,
+            LevelStat.Range => Range,
+            _ => -1
+        };
     }
 
     public void IncreaseStat(LevelStat stat, int increase)
     {
         switch (stat)
         {
-            case LevelStat.AttackSpeed:
-                Attackspeed += increase;
-                break;
-            case LevelStat.Damage:
-                Damage += increase;
-                break;
-            case LevelStat.Range:
-                Range += increase;
-                break;
-            default:
-                break;
+            case LevelStat.AttackSpeed: Attackspeed += increase; break;
+            case LevelStat.Damage: Damage += increase; break;
+            case LevelStat.Range: Range += increase; break;
         }
     }
 }

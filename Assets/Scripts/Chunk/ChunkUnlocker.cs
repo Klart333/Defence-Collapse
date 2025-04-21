@@ -14,12 +14,27 @@ namespace Chunks
 
         [SerializeField]
         private Transform graphicParent;
+
+        [SerializeField]
+        private Vector2 pivot;
+
+        private Camera cam;
         
         public int Cost { get; set; }
+        public Canvas Canvas { get; set; }
+        public Vector3 TargetPosition { get; set; }
 
         private void Awake()
         {
-            GetComponent<Canvas>().worldCamera = Camera.main;
+            cam = Camera.main;
+        }
+
+        private void Update()
+        {
+            if (graphicParent.gameObject.activeInHierarchy)
+            {
+                PositionRectTransform.PositionOnOverlayCanvas(Canvas, cam, transform as RectTransform, TargetPosition, pivot);
+            }
         }
 
         public void Unlock()

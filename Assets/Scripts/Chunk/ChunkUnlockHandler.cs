@@ -14,6 +14,9 @@ namespace Chunks
         [SerializeField]
         private GroundGenerator groundGenerator;
 
+        [SerializeField]
+        private Canvas canvas;
+
         private Camera cam;
         
         private readonly Dictionary<Chunk, ChunkUnlocker> unlockers = new Dictionary<Chunk, ChunkUnlocker>();
@@ -51,12 +54,15 @@ namespace Chunks
 
         private void SetupLockedChunk(Chunk chunk)
         {
-            Vector3 pos = chunk.Position + chunk.ChunkSize + Vector3.up * 2f;
-            ChunkUnlocker unlocker = unlockPrefab.GetAtPosAndRot<ChunkUnlocker>(pos, unlockPrefab.transform.rotation);
-            unlockers.Add(chunk, unlocker);
+            Vector3 pos = chunk.Position + chunk.ChunkSize + Vector3.up * 3f;
+            ChunkUnlocker unlocker = unlockPrefab.Get<ChunkUnlocker>();
+            unlocker.transform.SetParent(canvas.transform, false);
             unlocker.Cost = 50;
+            unlocker.Canvas = canvas;
+            unlocker.TargetPosition = pos;
             unlocker.DisplayCost();
             
+            unlockers.Add(chunk, unlocker);
             unlocker.OnChunkUnlocked += OnUnlockerOnOnChunkUnlocked;
             return;
 

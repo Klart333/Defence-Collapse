@@ -28,8 +28,6 @@ public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
 
     private readonly List<EffectModifier> modifierEffectsToSpawn = new List<EffectModifier>();
     
-    private bool inOtherUI = false;
-
     public List<EffectModifier> ModifierEffects => modifierEffectsToSpawn;
     public TowerData ArcherData => archerData;
     public TowerData BombData => bombData;
@@ -37,9 +35,7 @@ public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
 
     private async void OnEnable()
     {
-        UIEvents.OnFocusChanged += Close;    
-        Events.OnBuildingClicked += OpenOtherUI;
-        Events.OnDistrictClicked += OpenOtherUI;
+        UIEvents.OnFocusChanged += Close;
         
         await UniTask.WaitUntil(() => InputManager.Instance != null);
         InputManager.Instance.Cancel.performed += Cancel_performed;
@@ -48,34 +44,16 @@ public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
     private void OnDisable()
     {
         InputManager.Instance.Cancel.performed -= Cancel_performed;
-        Events.OnBuildingClicked -= OpenOtherUI;
-        Events.OnDistrictClicked -= OpenOtherUI;
         UIEvents.OnFocusChanged -= Close;
-    }
-    
-    private void OpenOtherUI(DistrictType arg0)
-    {
-        inOtherUI = true;
-    }
-
-    private void OpenOtherUI(BuildingType arg0)
-    {
-        inOtherUI = true;
     }
 
     private void Cancel_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        inOtherUI = false;
         Close();
     }
 
     public void OpenUpgradeMenu(DistrictData district)
     {
-        if (inOtherUI)
-        {
-            return;
-        }
-        
         UIEvents.OnFocusChanged?.Invoke();
         
         canvas.SetActive(true);
