@@ -205,7 +205,7 @@ namespace WaveFunctionCollapse
                         continue;
                     }
 
-                    float cellEntropy = y * 10;
+                    float cellEntropy = cell.Position.y * 10;
                     if (cellEntropy > lowestEntropy) continue;
 
                     cellEntropy += WaveFunctionUtility.CalculateEntropy(cell);
@@ -454,7 +454,6 @@ namespace WaveFunctionCollapse
         public bool UseSideConstraints { get; private set; }
         public bool IsClear { get; private set; } = true;
         public Vector3 Position { get; private set;}
-        public GroundType GroundType { get; set; }
         public int Height { get; private set;}
         public int Depth { get; private set;}
         public int Width { get; private set;}
@@ -549,7 +548,7 @@ namespace WaveFunctionCollapse
                         prots.RemoveAtSwapBack(i);
                         changed = true;
                     }
-                }   
+                }
                     
                 if (changed)
                 {

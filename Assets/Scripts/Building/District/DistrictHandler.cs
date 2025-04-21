@@ -9,7 +9,6 @@ using Unity.Mathematics;
 using UnityEngine;
 using Gameplay;
 using System;
-using UI;
 
 namespace Buildings.District
 {
@@ -116,7 +115,7 @@ namespace Buildings.District
                 int height = districtType switch
                 {
                     DistrictType.Archer => 1,
-                    DistrictType.Bomb => 0,
+                    DistrictType.Bomb => 1,
                     DistrictType.Mine => 0,
                     //DistrictType.Church => expr,
                     _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
@@ -154,6 +153,8 @@ namespace Buildings.District
             
             MoneyManager.Instance.Purchase(districtType, topChunkCount);
             OnDistrictCreated?.Invoke(districtData);
+            
+            districtGenerator.ChunkWaveFunction.Propagate();
             districtGenerator.Run().Forget(Debug.LogError);
             
             void DistrictDataOnOnDisposed()

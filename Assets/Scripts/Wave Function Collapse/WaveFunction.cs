@@ -723,57 +723,14 @@ namespace WaveFunctionCollapse
                 changed = true;
             }
         }
-        
-        public static void Constrain(Cell changedCell, Cell affectedCell, Direction direction, HashSet<short> allowedKeys, out bool changed)
-        {
-            changed = false;
-            if (affectedCell.Collapsed) return;
-
-            HashSet<short> validKeys = new HashSet<short>();
-            for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
-            {
-                validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
-            }
-
-            var oppositeDirection = OppositeDirection(direction);
-            for (int i = affectedCell.PossiblePrototypes.Count - 1; i >= 0; i--)
-            {
-                PrototypeData prot = affectedCell.PossiblePrototypes[i];
-                bool any = false;
-                foreach (short s in prot.Keys)
-                {
-                    if (!allowedKeys.Contains(s)) continue;
-                    
-                    any = true;
-                    break;
-                }
-
-                if (!any) // Could be pre-calculated based on prototype
-                {
-                    affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
-                    continue;
-                }
-
-                if (CheckValidSocket(prot.DirectionToKey(oppositeDirection), validKeys)) continue;
-
-                affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
-                changed = true;
-            }
-            
-            if (affectedCell.PossiblePrototypes.Count == 0)
-            {
-                affectedCell.PossiblePrototypes.Add(PrototypeData.Empty);
-            }
-        }
 
         public static bool CheckValidSocket(short key, HashSet<short> validKeys)
         {
             return key switch
             {
                 //>= 5000 => validKeys.Contains(key), // Ex. v0_0
-                >= 2000 or -1 => validKeys.Contains(key), // Ex. 0s
+                >= 2000 or -1 => validKeys.Contains(key), // Ex. 0s, v0_0, or -1
                 >= 1000 => validKeys.Contains((short)(key - 1000)), // Ex. 0f
-                //-1      => validKeys.Contains(key), // For the -1s case
                 _       => validKeys.Contains((short)(key + 1000)) // Ex. 0
             };
         }
