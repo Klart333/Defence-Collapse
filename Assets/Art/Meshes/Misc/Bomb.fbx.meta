@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: 0b2c1e7a6df61bb48bc91a3e96cfe6ed
+guid: 9493d9f7340f7b446be9a64bd52f15f6
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bomb_Mat
+    second: {fileID: 2100000, guid: e19d812d7f342954b99655172166fd9b, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -16,8 +21,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 

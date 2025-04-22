@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Buildings.District;
 using DG.Tweening;
+using Unity.Entities;
 using UnityEngine;
 
 namespace Gameplay
@@ -17,15 +18,22 @@ namespace Gameplay
         [SerializeField]
         private float slowDownDuration = 1.0f;
         
-        public float Value { get; private set; } = 1;
+        private Entity gameSpeedEntity;
+        private EntityManager entityManager;
         
         private bool updatingGameSpeed = false;
+        
+        public float Value { get; private set; } = 1;
 
         private async void OnEnable()
         {
             Events.OnCapitolDestroyed += OnCapitolDestroyed;
             Events.OnGameReset += OnGameReset;
-
+            
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            gameSpeedEntity = entityManager.CreateEntity(typeof(GameSpeedComponent));
+            entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
+            
             await UniTask.WaitUntil(() => InputManager.Instance != null);
             InputManager.Instance.Space.started += SpaceStarted;
             InputManager.Instance.Space.canceled += SpaceCanceled;
@@ -51,11 +59,13 @@ namespace Gameplay
         private void SpaceStarted(InputAction.CallbackContext obj)
         {
             Value *= speedySpeed;
+            entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
         }
 
         private void SpaceCanceled(InputAction.CallbackContext obj)
         {
             Value /= speedySpeed;
+            entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
         }
 
         private void OnCapitolDestroyed(DistrictData destroyedDistrict)
@@ -69,12 +79,14 @@ namespace Gameplay
             DOTween.To(() => Value, v => Value = v, targetSpeed, lerpDuration).SetEase(Ease.OutSine).SetUpdate(true).onComplete = () =>
             {
                 updatingGameSpeed = false;
+                entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
             };
         }
         
         public void SetGameSpeed(float targetSpeed)
         {
             Value = targetSpeed;
+            entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
         }
         
         private void OnGameReset()
@@ -82,5 +94,10 @@ namespace Gameplay
             Value = 1;
             DOTween.timeScale = 1;
         }
+    }
+
+    public struct GameSpeedComponent : IComponentData
+    {
+        public float Speed;
     }
 }

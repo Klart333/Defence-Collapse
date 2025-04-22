@@ -14,6 +14,7 @@ namespace DataStructures.Queue.ECS
 
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<GameSpeedComponent>();
             spawnerQuery = SystemAPI.QueryBuilder()
                 .WithAspect<SpawnPointAspect>()
                 .Build();
@@ -21,6 +22,7 @@ namespace DataStructures.Queue.ECS
             state.RequireForUpdate<EnemyDatabaseTag>();
         }
 
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             if (spawnerQuery.IsEmpty)
@@ -31,11 +33,13 @@ namespace DataStructures.Queue.ECS
             Entity enemyDatabase = SystemAPI.GetSingletonEntity<EnemyDatabaseTag>();
             NativeArray<ItemBufferElement> enemyBuffer = SystemAPI.GetBuffer<ItemBufferElement>(enemyDatabase).AsNativeArray();
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            
+            float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
 
             new SpawnJob
             {
                 EnemyBuffer = enemyBuffer,
-                DeltaTime = SystemAPI.Time.DeltaTime * GameSpeedManager.Instance.Value,
+                DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
                 ECB = ecb.AsParallelWriter(),
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
                 MinRandomPosition = new float3(-0.5f, 0, -0.5f),

@@ -46,7 +46,7 @@ public class UIStartWave : MonoBehaviour
         if (!CapitolHandler.HasCapitol)
         {
             Debug.Log("Tell player to place a capitol");
-            return;
+            //return;
         }
         
         Events.OnWaveStarted?.Invoke();

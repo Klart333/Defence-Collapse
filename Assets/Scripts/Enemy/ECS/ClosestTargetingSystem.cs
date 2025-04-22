@@ -15,15 +15,19 @@ namespace DataStructures.Queue.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<GameSpeedComponent>();
+            
             var queryBuilder = new EntityQueryBuilder(Allocator.Temp).WithAspect<EnemyTargetAspect>();
             state.RequireForUpdate(state.GetEntityQuery(queryBuilder));
             
             queryBuilder.Dispose();
         }
 
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
+            float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
 
             // Create and schedule the job
             new ClosestTargetingJob
@@ -31,7 +35,7 @@ namespace DataStructures.Queue.ECS
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
                 SpatialGrid = spatialGrid.AsReadOnly(),
                 CellSize = 1,
-                DeltaTime = SystemAPI.Time.DeltaTime * GameSpeedManager.Instance.Value,
+                DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
             }.ScheduleParallel();
         }
 

@@ -1,3 +1,4 @@
+using Gameplay;
 using Unity.Burst;
 using Unity.Entities;
 
@@ -8,15 +9,17 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            
+            state.RequireForUpdate<GameSpeedComponent>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
+        
             new ArchedMovementJob
             {
-                DeltaTime = SystemAPI.Time.DeltaTime,
+                DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
             }.ScheduleParallel();
         }
 

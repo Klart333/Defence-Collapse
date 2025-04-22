@@ -1,7 +1,7 @@
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
+using Unity.Burst;
+using Gameplay;
 
 namespace Effects.ECS
 {
@@ -10,17 +10,18 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            
+            state.RequireForUpdate<GameSpeedComponent>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
 
             new LifetimeJob
             {
-                DeltaTime = SystemAPI.Time.DeltaTime,
+                DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
                 ECB = ecb.AsParallelWriter(),
             }.ScheduleParallel();
             

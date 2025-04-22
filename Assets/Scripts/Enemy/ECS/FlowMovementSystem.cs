@@ -16,19 +16,22 @@ namespace DataStructures.Queue.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<GameSpeedComponent>();
             state.RequireForUpdate<PathBlobber>();
         }
 
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             Entity pathBlobberEntity = SystemAPI.GetSingletonEntity<PathBlobber>();
             PathBlobber pathBlobber = SystemAPI.GetComponent<PathBlobber>(pathBlobberEntity);
             
             float deltaTime = SystemAPI.Time.DeltaTime;
-            
+            float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
+
             new FlowMovementJob
             {
-                DeltaTime = deltaTime * GameSpeedManager.Instance.Value,
+                DeltaTime = deltaTime * gameSpeed,
                 PathChunks = pathBlobber.PathBlob,
                 ChunkIndexToListIndex = pathBlobber.ChunkIndexToListIndex,
             }.ScheduleParallel();

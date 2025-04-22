@@ -235,6 +235,7 @@ namespace Buildings.District
             Range = bombData.Range;
 
             stats = new Stats(bombData.Stats);
+            attack = new Attack(bombData.BaseAttack);
 
             SpawnEntities();
         }
@@ -289,6 +290,7 @@ namespace Buildings.District
             if (rangeIndicator != null)
             {
                 rangeIndicator.SetActive(false);
+                rangeIndicator = null;
             }
         }
 
@@ -299,9 +301,10 @@ namespace Buildings.District
                 EnemyTargetAspect aspect = entityManager.GetAspect<EnemyTargetAspect>(entity);
                 if (aspect.CanAttack() && entityManager.Exists(aspect.EnemyTargetComponent.ValueRO.Target))
                 {
+                    aspect.RestTimer();
+                    OriginPosition = aspect.LocalTransform.ValueRO.Position;
                     PerformAttack(entityManager.GetComponentData<LocalTransform>(aspect.EnemyTargetComponent.ValueRO.Target).Position);
-                    
-                    aspect.AttackSpeedComponent.ValueRW.Timer = 0;
+                    break;
                 }
             }
         }
@@ -331,7 +334,7 @@ namespace Buildings.District
             
             entityManager.DestroyEntity(entitiesToDestroy);
             
-            entitiesToDestroy.Dispose(); 
+            entitiesToDestroy.Dispose();
         }
 
         public override void Die()

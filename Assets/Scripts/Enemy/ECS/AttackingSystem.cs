@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Burst;
 using UnityEngine;
 using System;
+using Gameplay;
 using Pathfinding;
 
 namespace DataStructures.Queue.ECS
@@ -21,10 +22,12 @@ namespace DataStructures.Queue.ECS
 
         protected override void OnUpdate()
         {
+            float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
+
             new AttackingJob
             {
                 DamageQueue = damageQueue.AsParallelWriter(),
-                DeltaTime = SystemAPI.Time.DeltaTime,
+                DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
             }.ScheduleParallel();
 
             Dependency.Complete();
