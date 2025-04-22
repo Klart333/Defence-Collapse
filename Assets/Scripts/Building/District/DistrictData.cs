@@ -46,6 +46,7 @@ namespace Buildings.District
             
             State = districtType switch
             {
+                DistrictType.TownHall => new TownHallState(this, DistrictUpgradeManager.Instance.TownHallData, position, key),
                 DistrictType.Archer => new ArcherState(this, DistrictUpgradeManager.Instance.ArcherData, position, key),
                 DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, position, key),
                 DistrictType.Mine => new MineState(this, DistrictUpgradeManager.Instance.MineData, position, key),
@@ -61,7 +62,6 @@ namespace Buildings.District
 
             Events.OnWaveStarted += OnWaveStarted;
             Events.OnWallsDestroyed += OnWallsDestroyed;
-            State.OnStateEntered();
         }
 
         private void CreateChunkIndexCache(HashSet<Chunk> chunks)
@@ -180,6 +180,8 @@ namespace Buildings.District
 
         public void Dispose()
         {
+            State.Die();
+            
             Events.OnWaveStarted -= OnWaveStarted;
             if (meshCollider)
             {

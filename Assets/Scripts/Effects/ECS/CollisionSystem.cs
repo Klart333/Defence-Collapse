@@ -114,6 +114,9 @@ namespace Effects.ECS
             {
                 for (int x = minX; x <= maxX; x++)
                 {
+                    int2 cell = new int2(x, z);
+                    if (math.all(cell == centerCell)) continue;
+                    
                     // Fast approximate distance check
                     float cellDistX = math.abs(x + 0.5f - pos.x);
                     float cellDistZ = math.abs(z + 0.5f - pos.z);
@@ -121,8 +124,7 @@ namespace Effects.ECS
                     
                     if (cellDistX * cellDistX + cellDistZ * cellDistZ > radiusSq) continue;
                     
-                    int2 cell = new int2(x, z);
-                    if (!math.all(cell == centerCell) && CollideWithinCell(sortKey, entity, colliderAspect, cell, pos, radiusSq)) return;
+                    if (CollideWithinCell(sortKey, entity, colliderAspect, cell, pos, radiusSq)) return;
                 }
             }
         }

@@ -18,6 +18,9 @@ public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
     [SerializeField]
     private TowerData mineData;
     
+    [SerializeField]
+    private TowerData townHallData;
+    
     [Title("UI")]
     [SerializeField]
     private GameObject canvas;
@@ -32,6 +35,7 @@ public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
     public TowerData ArcherData => archerData;
     public TowerData BombData => bombData;
     public TowerData MineData => mineData;
+    public TowerData TownHallData => townHallData;
 
     private async void OnEnable()
     {

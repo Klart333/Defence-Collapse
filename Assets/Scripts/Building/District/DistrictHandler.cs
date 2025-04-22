@@ -114,10 +114,10 @@ namespace Buildings.District
 
                 int height = districtType switch
                 {
+                    DistrictType.TownHall => 0,
                     DistrictType.Archer => 1,
                     DistrictType.Bomb => 1,
                     DistrictType.Mine => 0,
-                    //DistrictType.Church => expr,
                     _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
                 };
 
@@ -156,6 +156,7 @@ namespace Buildings.District
             
             districtGenerator.ChunkWaveFunction.Propagate();
             districtGenerator.Run().Forget(Debug.LogError);
+            Events.OnDistrictBuilt?.Invoke(districtType);
             
             void DistrictDataOnOnDisposed()
             {
@@ -226,6 +227,7 @@ namespace Buildings.District
             {
                 DistrictType.Bomb => width >= 3 && depth >= 3,
                 DistrictType.Church => width >= 2 && depth >= 2,
+                DistrictType.TownHall => width is 2 && depth is 2,
                 _ => true
             };
         }

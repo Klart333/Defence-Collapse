@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e365721dcb580ea40b5bdb0b995bd4ec, type: 3}
-  m_Name: Archer Data
+  m_Name: Town Hall Data
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -41,7 +41,7 @@ MonoBehaviour:
       Data: 2|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0.2
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -116,7 +116,7 @@ MonoBehaviour:
       Data: 11|Effects.ArchedDamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
-      Data: 10
+      Data: 20
     - Name: LimitedHits
       Entry: 5
       Data: true
@@ -125,16 +125,16 @@ MonoBehaviour:
       Data: 1
     - Name: TriggerDamageDone
       Entry: 5
-      Data: true
+      Data: false
     - Name: Radius
       Entry: 4
-      Data: 0.35
+      Data: 0.6
     - Name: Height
       Entry: 4
-      Data: 0.3
+      Data: 0.5
     - Name: UnitsPerSecond
       Entry: 4
-      Data: 10
+      Data: 12
     - Name: Effects
       Entry: 7
       Data: 12|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
@@ -167,7 +167,7 @@ MonoBehaviour:
       Data: 2
     - Name: Scale
       Entry: 4
-      Data: 0.5
+      Data: 0.75
     - Name: 
       Entry: 8
       Data: 
@@ -192,6 +192,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  Range: 6
+  Range: 8
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}

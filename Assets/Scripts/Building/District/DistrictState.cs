@@ -8,6 +8,7 @@ using Unity.Entities;
 using UnityEngine;
 using Effects.ECS;
 using System;
+using System.Linq;
 
 namespace Buildings.District
 {
@@ -46,11 +47,14 @@ namespace Buildings.District
         
         public abstract void Update();
         public abstract void OnSelected(Vector3 pos);
-        public abstract void OnStateEntered();
         public abstract void OnDeselected();
-        public abstract void OnWaveStart();
         public abstract void OnIndexesDestroyed(HashSet<int3> destroyedIndexes);
         public abstract void Die();
+
+        public virtual void OnWaveStart()
+        {
+            
+        }
         
         private void OnDamageDone(Entity entity)
         {
@@ -84,35 +88,22 @@ namespace Buildings.District
         }
     }
 
-    #region Archer
+    #region Entity District State
 
-    public class ArcherState : DistrictState
+    public abstract class EntityDistrictState : DistrictState
     {
-        private readonly HashSet<Entity> spawnedEntities = new HashSet<Entity>();
-        private readonly Dictionary<int3, Entity> entityIndexes = new Dictionary<int3, Entity>();
+        protected readonly HashSet<Entity> spawnedEntities = new HashSet<Entity>();
+        protected readonly Dictionary<int3, Entity> entityIndexes = new Dictionary<int3, Entity>();
         
-        private readonly Attack attack;
-        private readonly TowerData archerData;
-
-        private GameObject rangeIndicator;
-        private bool selected;
-        
-        public override Attack Attack => attack;
-
-        public ArcherState(DistrictData districtData, TowerData archerData, Vector3 position, int key) : base(districtData, position, key)
+        protected EntityDistrictState(DistrictData districtData, Vector3 position, int key) : base(districtData, position, key)
         {
-            this.archerData = archerData;
-            Range = archerData.Range;
-
-            attack = new Attack(archerData.BaseAttack);
-            stats = new Stats(archerData.Stats);
-
-            SpawnEntities();
         }
-
-        private void SpawnEntities()
+        
+        protected abstract List<Chunk> GetEntityChunks();
+        
+        protected void SpawnEntities()
         {
-            List<Chunk> topChunks = DistrictUtility.GetTopChunks(DistrictData.DistrictChunks.Values);
+            List<Chunk> topChunks = GetEntityChunks();
             ComponentType[] componentTypes =
             {
                 typeof(LocalTransform),
@@ -122,26 +113,88 @@ namespace Buildings.District
             };
             
             int count = topChunks.Count;
-            float delay = (1.0f / archerData.Stats.AttackSpeed.Value) / count;
+            float delay = (1.0f / stats.AttackSpeed.Value) / count;
             for (int i = 0; i < count; i++)
             {
                 Entity spawnedEntity = entityManager.CreateEntity(componentTypes);
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = topChunks[i].Position });
-                entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = Range }); // These could be made to blob assets, probably easier to change then
+                // These could be made to blob assets, probably easier to change then
+                entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = Range });
                 entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent
                 {
-                    AttackSpeed = 1.0f / archerData.Stats.AttackSpeed.Value, 
+                    AttackSpeed = 1.0f / stats.AttackSpeed.Value, 
                     Timer = delay * i
                 });
                 spawnedEntities.Add(spawnedEntity);
-                
                 entityIndexes.Add(topChunks[i].ChunkIndex, spawnedEntity);
             }
         }
-
-        public override void OnStateEntered()
+        
+        protected void UpdateEntities()
         {
+            foreach (Entity entity in spawnedEntities)
+            {
+                EnemyTargetAspect aspect = entityManager.GetAspect<EnemyTargetAspect>(entity);
+                if (aspect.CanAttack() && entityManager.Exists(aspect.EnemyTargetComponent.ValueRO.Target))
+                {
+                    aspect.RestTimer();
+                    OriginPosition = aspect.LocalTransform.ValueRO.Position;
+                    PerformAttack(entityManager.GetComponentData<LocalTransform>(aspect.EnemyTargetComponent.ValueRO.Target).Position);
+                    break;
+                }
+            }
+        }
+        
+        protected void PerformAttack(float3 targetPosition)
+        {
+            AttackPosition = targetPosition;
+            Attack.TriggerAttack(this);
+        }
 
+        public override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
+        {
+            NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(destroyedIndexes.Count, Allocator.Temp);
+            int index = 0;
+            foreach (int3 destroyedIndex in destroyedIndexes)
+            {
+                if (!entityIndexes.TryGetValue(destroyedIndex, out Entity entity)) continue;
+                
+                entitiesToDestroy[index++] = entity;
+                spawnedEntities.Remove(entity);
+            }
+            
+            entityManager.DestroyEntity(entitiesToDestroy);
+            
+            entitiesToDestroy.Dispose();
+        }
+    }
+
+    #endregion
+
+    #region Archer
+
+    public class ArcherState : EntityDistrictState
+    {
+        private readonly TowerData archerData;
+
+        private GameObject rangeIndicator;
+        private bool selected;
+        
+        public override Attack Attack { get; }
+
+        public ArcherState(DistrictData districtData, TowerData archerData, Vector3 position, int key) : base(districtData, position, key)
+        {
+            this.archerData = archerData;
+            Range = archerData.Range;
+
+            stats = new Stats(archerData.Stats);
+            Attack = new Attack(archerData.BaseAttack);
+            SpawnEntities();
+        }
+
+        protected override List<Chunk> GetEntityChunks()
+        {
+            return DistrictData.DistrictChunks.Values.ToList();
         }
 
         public override void OnSelected(Vector3 pos)
@@ -165,45 +218,7 @@ namespace Buildings.District
 
         public override void Update()
         {
-            foreach (Entity entity in spawnedEntities)
-            {
-                EnemyTargetAspect aspect = entityManager.GetAspect<EnemyTargetAspect>(entity);
-                if (aspect.CanAttack() && entityManager.Exists(aspect.EnemyTargetComponent.ValueRO.Target))
-                {
-                    aspect.RestTimer();
-                    OriginPosition = aspect.LocalTransform.ValueRO.Position;
-                    PerformAttack(entityManager.GetComponentData<LocalTransform>(aspect.EnemyTargetComponent.ValueRO.Target).Position);
-                    break;
-                }
-            }
-        }
-
-        private void PerformAttack(float3 targetPosition)
-        {
-            AttackPosition = targetPosition;
-            attack.TriggerAttack(this);
-        }
-
-        public override void OnWaveStart()
-        {
-            
-        }
-
-        public override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
-        {
-            NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(destroyedIndexes.Count, Allocator.Temp);
-            int index = 0;
-            foreach (int3 destroyedIndex in destroyedIndexes)
-            {
-                if (!entityIndexes.TryGetValue(destroyedIndex, out Entity entity)) continue;
-                
-                entitiesToDestroy[index++] = entity;
-                spawnedEntities.Remove(entity);
-            }
-            
-            entityManager.DestroyEntity(entitiesToDestroy);
-            
-            entitiesToDestroy.Dispose();
+            UpdateEntities();
         }
 
         public override void Die()
@@ -216,18 +231,14 @@ namespace Buildings.District
 
     #region Bomb
 
-    public class BombState : DistrictState
+    public class BombState : EntityDistrictState
     {
-        private readonly HashSet<Entity> spawnedEntities = new HashSet<Entity>();
-        private readonly Dictionary<int3, Entity> entityIndexes = new Dictionary<int3, Entity>();
-
         private readonly TowerData bombData;
-        private readonly Attack attack;
 
         private GameObject rangeIndicator;
         private bool selected;
         
-        public override Attack Attack => attack;
+        public override Attack Attack { get; }
         
         public BombState(DistrictData districtData, TowerData bombData, Vector3 position, int key) : base(districtData, position, key)
         {
@@ -235,43 +246,14 @@ namespace Buildings.District
             Range = bombData.Range;
 
             stats = new Stats(bombData.Stats);
-            attack = new Attack(bombData.BaseAttack);
+            Attack = new Attack(bombData.BaseAttack);
 
             SpawnEntities();
         }
 
-        private void SpawnEntities()
+        protected override List<Chunk> GetEntityChunks()
         {
-            List<Chunk> topChunks = DistrictUtility.GetTopChunks(DistrictData.DistrictChunks.Values); // Maybe edges shouldn't shoot?
-            ComponentType[] componentTypes =
-            {
-                typeof(LocalTransform),
-                typeof(RangeComponent),
-                typeof(EnemyTargetComponent),
-                typeof(AttackSpeedComponent),
-            };
-            
-            int count = topChunks.Count;
-            float delay = (1.0f / bombData.Stats.AttackSpeed.Value) / count;
-            for (int i = 0; i < count; i++)
-            {
-                Entity spawnedEntity = entityManager.CreateEntity(componentTypes);
-                entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = topChunks[i].Position });
-                // These could be made to blob assets, probably easier to change then
-                entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = Range });
-                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent
-                {
-                    AttackSpeed = 1.0f / bombData.Stats.AttackSpeed.Value, 
-                    Timer = delay * i
-                });
-                spawnedEntities.Add(spawnedEntity);
-                entityIndexes.Add(topChunks[i].ChunkIndex, spawnedEntity);
-            }
-        }
-        
-        public override void OnStateEntered()
-        {
-
+            return DistrictData.DistrictChunks.Values.ToList();
         }
 
         public override void OnSelected(Vector3 pos)
@@ -296,55 +278,70 @@ namespace Buildings.District
 
         public override void Update()
         {
-            foreach (Entity entity in spawnedEntities)
-            {
-                EnemyTargetAspect aspect = entityManager.GetAspect<EnemyTargetAspect>(entity);
-                if (aspect.CanAttack() && entityManager.Exists(aspect.EnemyTargetComponent.ValueRO.Target))
-                {
-                    aspect.RestTimer();
-                    OriginPosition = aspect.LocalTransform.ValueRO.Position;
-                    PerformAttack(entityManager.GetComponentData<LocalTransform>(aspect.EnemyTargetComponent.ValueRO.Target).Position);
-                    break;
-                }
-            }
-        }
-
-        private void PerformAttack(float3 targetPosition)
-        {
-            AttackPosition = targetPosition;
-            attack.TriggerAttack(this);
-        }
-
-        public override void OnWaveStart()
-        {
-            
+            UpdateEntities();
         }
         
-        public override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
-        {
-            NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(destroyedIndexes.Count, Allocator.Temp);
-            int index = 0;
-            foreach (int3 destroyedIndex in destroyedIndexes)
-            {
-                if (!entityIndexes.TryGetValue(destroyedIndex, out Entity entity)) continue;
-                
-                entitiesToDestroy[index++] = entity;
-                spawnedEntities.Remove(entity);
-            }
-            
-            entityManager.DestroyEntity(entitiesToDestroy);
-            
-            entitiesToDestroy.Dispose();
-        }
-
         public override void Die()
         {
 
         }
     }
-
+    
     #endregion
 
+    #region Town Hall
+
+    public class TownHallState : EntityDistrictState
+    {
+        private TowerData townHallData;
+        
+        public override Attack Attack { get; }
+        
+        public TownHallState(DistrictData districtData, TowerData townHallData, Vector3 position, int key) : base(districtData, position, key)
+        {
+            this.townHallData = townHallData;
+            Range = townHallData.Range;
+
+            stats = new Stats(townHallData.Stats);
+            Attack = new Attack(townHallData.BaseAttack);
+            SpawnEntities();
+            
+            Events.OnWaveEnded += OnWaveEnded;
+        }
+
+        private void OnWaveEnded()
+        {
+            Debug.Log("10 points to grifflindor");
+        }
+
+        protected override List<Chunk> GetEntityChunks()
+        {
+            return new List<Chunk> { DistrictData.DistrictChunks.Values.First() };
+        }
+
+        public override void Update()
+        {
+            UpdateEntities();
+        }
+
+        public override void OnSelected(Vector3 pos)
+        {
+            
+        }
+
+        public override void OnDeselected()
+        {
+            
+        }
+
+        public override void Die()
+        {
+            Events.OnWaveEnded -= OnWaveEnded;
+        }
+    }
+
+    #endregion
+    
     #region Mine
 
     public class MineState : DistrictState
@@ -388,11 +385,6 @@ namespace Buildings.District
             }
         }
         
-        public override void OnStateEntered()
-        {
-
-        }
-
         public override void OnSelected(Vector3 pos)
         {
             

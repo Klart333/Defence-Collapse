@@ -3,6 +3,6 @@ public enum DistrictType
     Archer,
     Bomb,
     Church,
-    Farm,
+    TownHall,
     Mine,
 }
