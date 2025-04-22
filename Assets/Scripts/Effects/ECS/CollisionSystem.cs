@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace Effects.ECS
 {
@@ -44,7 +45,7 @@ namespace Effects.ECS
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
                 HealthLookup = SystemAPI.GetComponentLookup<HealthComponent>(true),
                 CollisionQueue = collisionQueue.AsParallelWriter(),
-                CellSize = 1,
+                //CellSize = 1,
                 ECB = ecb.AsParallelWriter(),
             }.ScheduleParallel();
                          
@@ -69,49 +70,76 @@ namespace Effects.ECS
         }
 
     }
-    
+
     [BurstCompile]
     public partial struct CollisionJob : IJobEntity
     {
         [ReadOnly]
         public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
-        
+
         [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
-        
+
         [ReadOnly]
         public ComponentLookup<HealthComponent> HealthLookup;
 
         public EntityCommandBuffer.ParallelWriter ECB;
-        
+
         public NativeQueue<Entity>.ParallelWriter CollisionQueue;
-        
-        [ReadOnly]
-        public float CellSize;
-        
+
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ColliderAspect colliderAspect)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ColliderAspect colliderAspect) // Cellsize = 1
         {
             if (colliderAspect.DamageComponent.ValueRO.LimitedHits <= 0)
             {
                 return;
             }
-            
-            int2 cell = HashGridUtility.GetCell(colliderAspect.PositionComponent.ValueRO.Position, CellSize);
+
+            // Pre-calculate values once
             float3 pos = colliderAspect.PositionComponent.ValueRO.Position;
-            float colliderRadius = colliderAspect.ColliderComponent.ValueRO.Radius;
+            float radius = colliderAspect.ColliderComponent.ValueRO.Radius;
+            float radiusSq = radius * radius;
+
+            // Calculate cell coordinates without division using reciprocal, (1.0f / 1)
+            int2 centerCell = new int2((int)pos.x, (int)pos.z);
+            if (CollideWithinCell(sortKey, entity, colliderAspect, centerCell, pos, radiusSq)) return;
+
+            int searchRadius = (int)radius;
+            int minX = centerCell.x - searchRadius;
+            int maxX = centerCell.x + searchRadius;
+            int minZ = centerCell.y - searchRadius;
+            int maxZ = centerCell.y + searchRadius;
             
-            if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) return;
-                
+            for (int z = minZ; z <= maxZ; z++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    // Fast approximate distance check
+                    float cellDistX = math.abs(x + 0.5f - pos.x);
+                    float cellDistZ = math.abs(z + 0.5f - pos.z);
+                    if (cellDistX > radius || cellDistZ > radius) continue;
+                    
+                    if (cellDistX * cellDistX + cellDistZ * cellDistZ > radiusSq) continue;
+                    
+                    int2 cell = new int2(x, z);
+                    if (!math.all(cell == centerCell) && CollideWithinCell(sortKey, entity, colliderAspect, cell, pos, radiusSq)) return;
+                }
+            }
+        }
+
+        private bool CollideWithinCell(int sortKey, Entity entity, ColliderAspect colliderAspect, int2 cell, float3 pos, float radiusSq)
+        {
+            if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) return false;
+
             do
             {
                 if (!TransformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform)) continue;
-                
+
                 float distSq = math.distancesq(pos, enemyTransform.Position);
 
-                if (distSq > colliderRadius * colliderRadius 
+                if (distSq > radiusSq
                     || !HealthLookup.TryGetComponent(enemy, out HealthComponent health)) continue;
-                
+
                 // COLLIDE
                 health.PendingDamage += colliderAspect.DamageComponent.ValueRO.Damage;
                 ECB.SetComponent(sortKey, enemy, health);
@@ -122,11 +150,13 @@ namespace Effects.ECS
                     colliderAspect.DamageComponent.ValueRW.LimitedHits--;
                     if (colliderAspect.DamageComponent.ValueRO.LimitedHits == 0)
                     {
-                        break;
+                        return true;
                     }
                 }
 
             } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
+
+            return false;
         }
     }
 }
