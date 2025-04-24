@@ -84,10 +84,15 @@ namespace WaveFunctionCollapse
         public PrototypeInfoData DefaultPrototypeInfoData => defaultPrototypeInfoData;
         public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.GridScale.x, chunkSize.y * ChunkWaveFunction.GridScale.y, chunkSize.z * ChunkWaveFunction.GridScale.z);
         
+#if UNITY_EDITOR
         private async UniTaskVoid Start()
+#else
+        private void Start()
+#endif
         {
             spawnedColliders = new NativeList<BlobAssetReference<Collider>>(Allocator.Persistent);
-                
+
+#if UNITY_EDITOR
             if (compilePrototypeMeshes)
             {
                 //waveFunction.ProtoypeMeshes.CompilePrototypes();
@@ -95,6 +100,7 @@ namespace WaveFunctionCollapse
 
                 await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
             }
+#endif
             
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 

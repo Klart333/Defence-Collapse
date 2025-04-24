@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &599034276049215481
+--- !u!1 &646029723766899945
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,47 +8,221 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8353690001287050665}
-  - component: {fileID: 7728070676928579676}
-  - component: {fileID: 7546064461385694758}
+  - component: {fileID: 1965940939440157871}
+  - component: {fileID: 7041384529709386302}
+  - component: {fileID: 2032514265292267729}
   m_Layer: 0
-  m_Name: TownHall_Top_Corner_Door_Mirrored
+  m_Name: TownHall_Bot_Corner_Door_Mirrored
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8353690001287050665
+--- !u!4 &1965940939440157871
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 599034276049215481}
+  m_GameObject: {fileID: 646029723766899945}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 10, y: 0, z: 0}
+  m_LocalPosition: {x: 4, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5033256175188453364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &7728070676928579676
+--- !u!33 &7041384529709386302
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 599034276049215481}
-  m_Mesh: {fileID: 3569093418923830602, guid: 6cfb0a0d40467f440b9083824d6aa2d8, type: 3}
---- !u!23 &7546064461385694758
+  m_GameObject: {fileID: 646029723766899945}
+  m_Mesh: {fileID: -2809995132296063752, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+--- !u!23 &2032514265292267729
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 599034276049215481}
-  m_Enabled: 1
+  m_GameObject: {fileID: 646029723766899945}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: bdf2cf62d583ada4c8ac75a3dcfbe07e, type: 2}
+  - {fileID: 2100000, guid: ac1417ac517397646b01f839dd61cf3f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &1477856434808608643
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2481943678602676223}
+  - component: {fileID: 3788250443470290539}
+  - component: {fileID: 4325982324622302720}
+  m_Layer: 0
+  m_Name: TownHall_Top_Corner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2481943678602676223
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477856434808608643}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 12, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5033256175188453364}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &3788250443470290539
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477856434808608643}
+  m_Mesh: {fileID: 8319303880502747943, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+--- !u!23 &4325982324622302720
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477856434808608643}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: bdf2cf62d583ada4c8ac75a3dcfbe07e, type: 2}
+  - {fileID: 2100000, guid: ac1417ac517397646b01f839dd61cf3f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2079788482865457097
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6085969156472232116}
+  - component: {fileID: 1009090692894270981}
+  - component: {fileID: 8193256742898920035}
+  m_Layer: 0
+  m_Name: TownHall_Bot_Side_Door
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6085969156472232116
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2079788482865457097}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 8, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5033256175188453364}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &1009090692894270981
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2079788482865457097}
+  m_Mesh: {fileID: -5857395458245632377, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+--- !u!23 &8193256742898920035
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2079788482865457097}
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -87,7 +261,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &877894001745499439
+--- !u!1 &3379320715147662342
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -95,9 +269,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1978758226457723893}
-  - component: {fileID: 8903455281304984276}
-  - component: {fileID: 6319550549303842325}
+  - component: {fileID: 244399888554060489}
+  - component: {fileID: 6638196479704940006}
+  - component: {fileID: 3677726414010610362}
   m_Layer: 0
   m_Name: TownHall_Bot_Corner_Door
   m_TagString: Untagged
@@ -105,13 +279,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1978758226457723893
+--- !u!4 &244399888554060489
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 877894001745499439}
+  m_GameObject: {fileID: 3379320715147662342}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
   m_LocalPosition: {x: 2, y: 0, z: 0}
@@ -120,22 +294,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5033256175188453364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &8903455281304984276
+--- !u!33 &6638196479704940006
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 877894001745499439}
-  m_Mesh: {fileID: 8016391864401015586, guid: 6cfb0a0d40467f440b9083824d6aa2d8, type: 3}
---- !u!23 &6319550549303842325
+  m_GameObject: {fileID: 3379320715147662342}
+  m_Mesh: {fileID: 8016391864401015586, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+--- !u!23 &3677726414010610362
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 877894001745499439}
-  m_Enabled: 1
+  m_GameObject: {fileID: 3379320715147662342}
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -151,8 +325,8 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ac1417ac517397646b01f839dd61cf3f, type: 2}
   - {fileID: 2100000, guid: bdf2cf62d583ada4c8ac75a3dcfbe07e, type: 2}
+  - {fileID: 2100000, guid: ac1417ac517397646b01f839dd61cf3f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -174,7 +348,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &2121507777551012296
+--- !u!1 &3712156843531758214
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -182,47 +356,47 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8005965156814274834}
-  - component: {fileID: 2131880141338317210}
-  - component: {fileID: 4052090390409688569}
+  - component: {fileID: 4800211935148481055}
+  - component: {fileID: 1971514668911991058}
+  - component: {fileID: 8787476873758888939}
   m_Layer: 0
-  m_Name: TownHall_Bot_Corner
+  m_Name: TownHall_Top_Corner_Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8005965156814274834
+--- !u!4 &4800211935148481055
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2121507777551012296}
+  m_GameObject: {fileID: 3712156843531758214}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 14, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5033256175188453364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &2131880141338317210
+--- !u!33 &1971514668911991058
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2121507777551012296}
-  m_Mesh: {fileID: -2509802257238429220, guid: 6cfb0a0d40467f440b9083824d6aa2d8, type: 3}
---- !u!23 &4052090390409688569
+  m_GameObject: {fileID: 3712156843531758214}
+  m_Mesh: {fileID: -3834751142576090236, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+--- !u!23 &8787476873758888939
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2121507777551012296}
-  m_Enabled: 1
+  m_GameObject: {fileID: 3712156843531758214}
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -238,8 +412,8 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ac1417ac517397646b01f839dd61cf3f, type: 2}
   - {fileID: 2100000, guid: bdf2cf62d583ada4c8ac75a3dcfbe07e, type: 2}
+  - {fileID: 2100000, guid: ac1417ac517397646b01f839dd61cf3f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -261,7 +435,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &5302704861461027069
+--- !u!1 &4476016926092148714
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -269,23 +443,23 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 795520674820741140}
-  - component: {fileID: 4335863108150766350}
-  - component: {fileID: 2148734514369844990}
+  - component: {fileID: 6004214495158046102}
+  - component: {fileID: 5006004109466776988}
+  - component: {fileID: 4141512502336284713}
   m_Layer: 0
-  m_Name: TownHall_Top_Corner
+  m_Name: TownHall_Bot_Side
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &795520674820741140
+--- !u!4 &6004214495158046102
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5302704861461027069}
+  m_GameObject: {fileID: 4476016926092148714}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
   m_LocalPosition: {x: 6, y: 0, z: 0}
@@ -294,22 +468,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5033256175188453364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &4335863108150766350
+--- !u!33 &5006004109466776988
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5302704861461027069}
-  m_Mesh: {fileID: 8319303880502747943, guid: 6cfb0a0d40467f440b9083824d6aa2d8, type: 3}
---- !u!23 &2148734514369844990
+  m_GameObject: {fileID: 4476016926092148714}
+  m_Mesh: {fileID: 6419233933794837348, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+--- !u!23 &4141512502336284713
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5302704861461027069}
-  m_Enabled: 1
+  m_GameObject: {fileID: 4476016926092148714}
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -325,7 +499,93 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
+  - {fileID: 2100000, guid: bdf2cf62d583ada4c8ac75a3dcfbe07e, type: 2}
   - {fileID: 2100000, guid: ac1417ac517397646b01f839dd61cf3f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5070901862428877223
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7859747217352268372}
+  - component: {fileID: 3419377905506214854}
+  - component: {fileID: 6058151924427630335}
+  m_Layer: 0
+  m_Name: TownHall_Top_Full
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7859747217352268372
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5070901862428877223}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 18, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5033256175188453364}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &3419377905506214854
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5070901862428877223}
+  m_Mesh: {fileID: -4485171987006073775, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+--- !u!23 &6058151924427630335
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5070901862428877223}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
   - {fileID: 2100000, guid: bdf2cf62d583ada4c8ac75a3dcfbe07e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -373,17 +633,22 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6085824506347938713}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8005965156814274834}
-  - {fileID: 1978758226457723893}
-  - {fileID: 5005103378579162180}
-  - {fileID: 795520674820741140}
-  - {fileID: 8066091166161349899}
-  - {fileID: 8353690001287050665}
+  - {fileID: 2182147458743288088}
+  - {fileID: 244399888554060489}
+  - {fileID: 1965940939440157871}
+  - {fileID: 6004214495158046102}
+  - {fileID: 6085969156472232116}
+  - {fileID: 8726012108270323901}
+  - {fileID: 2481943678602676223}
+  - {fileID: 4800211935148481055}
+  - {fileID: 1549724201580491811}
+  - {fileID: 7859747217352268372}
+  - {fileID: 2878442055760732563}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &875902803780718147
@@ -414,7 +679,6 @@ MonoBehaviour:
   onlyAllowedBottomIndexes: 00000000010000000200000003000000
   notAllowedSideIndexes: 
   moduleScale: {x: 2, y: 2, z: 2}
-  startKeyNumber: 20
   useVerticiesOutsideUnitCube: 0
   useMCode: 0
   useMCodeHeight: 0
@@ -425,20 +689,30 @@ MonoBehaviour:
   materialData: {fileID: 11400000, guid: d607b7626b2ef464cbaa6473ec1fb6ef, type: 2}
   pieceWeights:
   - Name: TownHall_Bot_Corner
-    Weight: 1
+    Weight: 0.1
   - Name: TownHall_Bot_Corner_Door
-    Weight: 1
+    Weight: 0.1
   - Name: TownHall_Bot_Corner_Door_Mirrored
-    Weight: 1
+    Weight: 0.1
+  - Name: TownHall_Bot_Side
+    Weight: 50
+  - Name: TownHall_Bot_Side_Door
+    Weight: 100
+  - Name: TownHall_Bot_Full
+    Weight: 100
   - Name: TownHall_Top_Corner
-    Weight: 1
+    Weight: 0.1
   - Name: TownHall_Top_Corner_Door
     Weight: 1
   - Name: TownHall_Top_Corner_Door_Mirrored
     Weight: 1
+  - Name: TownHall_Top_Full
+    Weight: 100
+  - Name: TownHall_Top_Side
+    Weight: 100
   - Name: Air
-    Weight: 1
---- !u!1 &6482503854734143107
+    Weight: 0.1
+--- !u!1 &7291606043554687011
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -446,47 +720,221 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8066091166161349899}
-  - component: {fileID: 1638651963208449637}
-  - component: {fileID: 4182496681580583469}
+  - component: {fileID: 2878442055760732563}
+  - component: {fileID: 8256038181422764730}
+  - component: {fileID: 8808443463294493444}
   m_Layer: 0
-  m_Name: TownHall_Top_Corner_Door
+  m_Name: TownHall_Top_Side
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8066091166161349899
+--- !u!4 &2878442055760732563
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6482503854734143107}
+  m_GameObject: {fileID: 7291606043554687011}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 8, y: 0, z: 0}
+  m_LocalPosition: {x: 20, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5033256175188453364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &1638651963208449637
+--- !u!33 &8256038181422764730
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6482503854734143107}
-  m_Mesh: {fileID: -3834751142576090236, guid: 6cfb0a0d40467f440b9083824d6aa2d8, type: 3}
---- !u!23 &4182496681580583469
+  m_GameObject: {fileID: 7291606043554687011}
+  m_Mesh: {fileID: -8037289638527258120, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+--- !u!23 &8808443463294493444
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6482503854734143107}
-  m_Enabled: 1
+  m_GameObject: {fileID: 7291606043554687011}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: bdf2cf62d583ada4c8ac75a3dcfbe07e, type: 2}
+  - {fileID: 2100000, guid: ac1417ac517397646b01f839dd61cf3f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &7398393117127047833
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1549724201580491811}
+  - component: {fileID: 6040821834001169954}
+  - component: {fileID: 6288793175029454901}
+  m_Layer: 0
+  m_Name: TownHall_Top_Corner_Door_Mirrored
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1549724201580491811
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7398393117127047833}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 16, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5033256175188453364}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &6040821834001169954
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7398393117127047833}
+  m_Mesh: {fileID: 3569093418923830602, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+--- !u!23 &6288793175029454901
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7398393117127047833}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: bdf2cf62d583ada4c8ac75a3dcfbe07e, type: 2}
+  - {fileID: 2100000, guid: ac1417ac517397646b01f839dd61cf3f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &7475452113829896131
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8726012108270323901}
+  - component: {fileID: 2719571989671016227}
+  - component: {fileID: 6951138864670583652}
+  m_Layer: 0
+  m_Name: TownHall_Bot_Full
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8726012108270323901
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7475452113829896131}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 10, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5033256175188453364}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &2719571989671016227
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7475452113829896131}
+  m_Mesh: {fileID: -937842765984775870, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+--- !u!23 &6951138864670583652
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7475452113829896131}
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -525,7 +973,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &9189024165722589461
+--- !u!1 &8453490829308459924
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -533,47 +981,47 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5005103378579162180}
-  - component: {fileID: 6972241988672615561}
-  - component: {fileID: 459859671171102915}
+  - component: {fileID: 2182147458743288088}
+  - component: {fileID: 3342119104843212445}
+  - component: {fileID: 285726601547245875}
   m_Layer: 0
-  m_Name: TownHall_Bot_Corner_Door_Mirrored
+  m_Name: TownHall_Bot_Corner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5005103378579162180
+--- !u!4 &2182147458743288088
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9189024165722589461}
+  m_GameObject: {fileID: 8453490829308459924}
   serializedVersion: 2
   m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
-  m_LocalPosition: {x: 4, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5033256175188453364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &6972241988672615561
+--- !u!33 &3342119104843212445
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9189024165722589461}
-  m_Mesh: {fileID: -2809995132296063752, guid: 6cfb0a0d40467f440b9083824d6aa2d8, type: 3}
---- !u!23 &459859671171102915
+  m_GameObject: {fileID: 8453490829308459924}
+  m_Mesh: {fileID: -2509802257238429220, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+--- !u!23 &285726601547245875
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9189024165722589461}
-  m_Enabled: 1
+  m_GameObject: {fileID: 8453490829308459924}
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -589,8 +1037,8 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ac1417ac517397646b01f839dd61cf3f, type: 2}
   - {fileID: 2100000, guid: bdf2cf62d583ada4c8ac75a3dcfbe07e, type: 2}
+  - {fileID: 2100000, guid: ac1417ac517397646b01f839dd61cf3f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

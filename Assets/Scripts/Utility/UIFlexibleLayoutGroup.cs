@@ -1,8 +1,6 @@
 ﻿using Sirenix.OdinInspector;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine;
 
 public class UIFlexibleLayoutGroup : MonoBehaviour
 {
@@ -50,17 +48,14 @@ public class UIFlexibleLayoutGroup : MonoBehaviour
 
         GridLayoutGroup layoutGroup = GetComponent<GridLayoutGroup>();
 
-        float x;
-        if (coloumns == 0)
-        {
-            x = (float)(layoutGroup.cellSize.x - layoutGroup.spacing.x);
-        }
-        else
-        {
-            x = (float)((width - (layoutGroup.padding.left + layoutGroup.padding.right)) / coloumns - layoutGroup.spacing.x);
-        }
+        float x = coloumns == 0
+            ? layoutGroup.cellSize.x - layoutGroup.spacing.x
+            : (width - (layoutGroup.padding.left + layoutGroup.padding.right)) / coloumns - layoutGroup.spacing.x / Mathf.Max(rows, 1);
 
-        float y = rows == 0 ? layoutGroup.cellSize.y - layoutGroup.spacing.y : (height - (layoutGroup.padding.top + layoutGroup.padding.bottom)) / rows - layoutGroup.spacing.y;
+        float y = rows == 0 
+            ? layoutGroup.cellSize.y - layoutGroup.spacing.y 
+            : (height - (layoutGroup.padding.top + layoutGroup.padding.bottom)) / rows - layoutGroup.spacing.y  / Mathf.Max(coloumns, 1);
+
         layoutGroup.cellSize = new Vector2(x, y);
 
         if (useElasticClamping)
@@ -88,14 +83,8 @@ public class UIFlexibleLayoutGroup : MonoBehaviour
 
         if (restrictToSquare)
         {
-            if (rows == 0)
-            {
-                layoutGroup.cellSize = new Vector2(layoutGroup.cellSize.x, layoutGroup.cellSize.x);
-            }
-            else if (coloumns == 0)
-            {
-                layoutGroup.cellSize = new Vector2(layoutGroup.cellSize.y, layoutGroup.cellSize.y);
-            }
+            float min = Mathf.Min(layoutGroup.cellSize.x, layoutGroup.cellSize.y);
+            layoutGroup.cellSize = new Vector2(min, min);
         }
     }
 }

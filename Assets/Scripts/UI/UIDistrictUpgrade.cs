@@ -1,18 +1,13 @@
-using System;
 using System.Collections.Generic;
-using Buildings.District;
 using Sirenix.OdinInspector;
+using Buildings.District;
 using UnityEngine.UI;
-using DG.Tweening;
 using UnityEngine;
+using DG.Tweening;
 using TMPro;
 
 public class UIDistrictUpgrade : MonoBehaviour
 {
-    [Title("Level Data")]
-    [SerializeField]
-    private LevelData levelData;
-
     [Title("Panel")]
     [SerializeField]
     private GameObject parentPanel;
@@ -32,7 +27,13 @@ public class UIDistrictUpgrade : MonoBehaviour
 
     [Title("Upgrade Displays")]
     [SerializeField]
-    private List<UIUpgradeDisplay> displays;
+    private UIUpgradeDisplay upgradeDisplayPrefab;
+    
+    [SerializeField]
+    private Transform upgradeDisplayParent;
+    
+    [SerializeField]
+    private UIFlexibleLayoutGroup flexibleLayoutGroup;
 
     [Title("Sections")]
     [SerializeField]
@@ -50,12 +51,12 @@ public class UIDistrictUpgrade : MonoBehaviour
 
     [SerializeField]
     private UIEffectsHandler towerEffectsPanel;
+    
+    private readonly List<UIUpgradeDisplay> spawnedDisplays = new List<UIUpgradeDisplay>();
 
-    private DistrictData currentData;
+    private DistrictData districtData;
     private Canvas canvas;
     private Camera cam;
-
-    public LevelData LevelData => levelData;
 
     private void OnEnable()
     {
@@ -74,7 +75,7 @@ public class UIDistrictUpgrade : MonoBehaviour
 
     private void Update()
     {
-        PositionRectTransform.PositionOnOverlayCanvas(canvas, cam, transform as RectTransform, currentData.Position, new Vector2(0.25f, 0.5f));
+        PositionRectTransform.PositionOnOverlayCanvas(canvas, cam, transform as RectTransform, districtData.Position, new Vector2(0.25f, 0.5f));
     }
 
     #region UI
@@ -92,133 +93,92 @@ public class UIDistrictUpgrade : MonoBehaviour
 
     public void ShowUpgrades(DistrictData districtData)
     {
-        currentData = districtData;
+        this.districtData = districtData;
 
         parentPanel.SetActive(true);
         ownedEffectsPanel.SpawnEffects();
         (ownedEffectsPanel.transform.parent as RectTransform).anchoredPosition = Vector2.zero;
 
         ShowSection(true);
-        DisplayStats();
+        
+        SpawnUpgradeDisplays(districtData);
     }
 
-    public void DisplayUpgrade(string upgradeName, List<string> descriptionStrings, LevelStat stat)
+    private void SpawnUpgradeDisplays(DistrictData districtData)
     {
-        upgradeTitleText.text = upgradeName;
-
-        for (int i = 0; i < descriptions.Length; i++)
+        for (int i = 0; i < districtData.UpgradeStats.Count; i++)
         {
-            if (i >= descriptionStrings.Count)
-            {
-                descriptions[i].text = "";
-                points[i].gameObject.SetActive(false);
-            }
-            else
-            {
-                descriptions[i].text = descriptionStrings[i];
-                points[i].gameObject.SetActive(true);
-            }
+            UIUpgradeDisplay spawned = upgradeDisplayPrefab.Get<UIUpgradeDisplay>();
+            spawned.DistrictUpgrade = this;
+            spawned.DisplayStat(districtData.UpgradeStats[i]);
+            spawned.transform.SetParent(upgradeDisplayParent, false);
+            spawnedDisplays.Add(spawned);
         }
 
-        costText.text = levelData.GetCost(stat, currentData.UpgradeData.GetStatLevel(stat)).ToString();
+        flexibleLayoutGroup.coloumns = districtData.UpgradeStats.Count;
+        flexibleLayoutGroup.CalculateNewBounds();
     }
 
-    private void DisplayStats()
+    public void DisplayUpgrade(UpgradeStat stat)
     {
-        for (int i = 0; i < displays.Count; i++)
-        {
-            displays[i].DisplayStat(currentData);
-        }
+        upgradeTitleText.text = stat.Name;
+
+        //for (int i = 0; i < descriptions.Length; i++)
+        //{
+        //    if (i >= descriptionStrings.Count)
+        //    {
+        //        descriptions[i].text = "";
+        //        points[i].gameObject.SetActive(false);
+        //    }
+        //    else
+        //    {
+        //        descriptions[i].text = descriptionStrings[i];
+        //        points[i].gameObject.SetActive(true);
+        //    }
+        //}
+
+        costText.text = $"Cost: {stat.GetCost()}";
     }
 
     public void Close()
     {
-        parentPanel.SetActive(false);
-
-        for (int i = 0; i < displays.Count; i++)
+        for (int i = 0; i < spawnedDisplays.Count; i++)
         {
-            displays[i].Close();
+            spawnedDisplays[i].gameObject.SetActive(false);
         }
+
+        parentPanel.SetActive(false);
     }
     #endregion
 
     #region Functionality
 
-    public void UpgradeStat(LevelStat stat)
+    public void UpgradeStat(UpgradeStat stat)
     {
-        MoneyManager.Instance.RemoveMoney(levelData.GetCost(stat, currentData.UpgradeData.GetStatLevel(stat)));
+        float cost = stat.GetCost();
+        MoneyManager.Instance.RemoveMoney(cost);
 
-        currentData.UpgradeData.IncreaseStat(stat, 1);
-
-        switch (stat)
-        {
-            case LevelStat.AttackSpeed:
-                currentData.State.Stats.AttackSpeed.BaseValue += levelData.GetIncrease(stat, currentData.State.Stats.AttackSpeed.Value);
-                break;
-            case LevelStat.Damage:
-                currentData.State.Stats.DamageMultiplier.BaseValue += levelData.GetIncrease(stat, currentData.State.Stats.DamageMultiplier.Value);
-                break;
-            case LevelStat.Range:
-                currentData.State.Range += levelData.GetIncrease(stat, currentData.State.Range);
-                break;
-        }
-        currentData.LevelUp();
-
-        DisplayStats();
+        stat.IncreaseLevel();
+        districtData.LevelUp();
     }
 
-    public bool CanPurchase(LevelStat stat)
+    public bool CanPurchase(UpgradeStat upgradeStat)
     {
-        return MoneyManager.Instance.Money >= levelData.GetCost(stat, currentData.UpgradeData.GetStatLevel(stat));
+        return MoneyManager.Instance.Money >= upgradeStat.GetCost();
     }
 
 
     private void AddEffectToTower(EffectModifier effectModifier)
     {
-        currentData.State.Attack.AddEffect(effectModifier.Effects, effectModifier.EffectType);
+        districtData.State.Attack.AddEffect(effectModifier.Effects, effectModifier.EffectType);
     }
 
     private void RemoveEffectFromTower(EffectModifier modifier)
     {
-        currentData.State.Attack.RemoveEffect(modifier.Effects, modifier.EffectType);
+        districtData.State.Attack.RemoveEffect(modifier.Effects, modifier.EffectType);
     }
 
     #endregion
-}
-
-public class UpgradeData
-{
-    public int Attackspeed;
-    public int Damage;
-    public int Range;
-
-    public UpgradeData(int speed, int damage, int range)
-    {
-        Attackspeed = speed;
-        Damage = damage;
-        Range = range;
-    }
-
-    public int GetStatLevel(LevelStat levelStat)
-    {
-        return levelStat switch
-        {
-            LevelStat.AttackSpeed => Attackspeed,
-            LevelStat.Damage => Damage,
-            LevelStat.Range => Range,
-            _ => -1
-        };
-    }
-
-    public void IncreaseStat(LevelStat stat, int increase)
-    {
-        switch (stat)
-        {
-            case LevelStat.AttackSpeed: Attackspeed += increase; break;
-            case LevelStat.Damage: Damage += increase; break;
-            case LevelStat.Range: Range += increase; break;
-        }
-    }
 }
 
 public static class PositionRectTransform // Chat gippity

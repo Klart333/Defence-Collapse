@@ -253,7 +253,12 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
     private void OnDrawGizmosSelected()
     {
-        if (!EditorApplication.isPlaying || waveFunction.Chunks == null || waveFunction.Chunks.Count == 0)
+#if UNITY_EDITOR
+        if (!EditorApplication.isPlaying) return;
+#endif
+
+        
+        if (waveFunction.Chunks == null || waveFunction.Chunks.Count == 0)
         {
             return;
         }

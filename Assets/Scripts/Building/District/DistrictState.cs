@@ -7,8 +7,8 @@ using Unity.Transforms;
 using Unity.Entities;
 using UnityEngine;
 using Effects.ECS;
-using System;
 using System.Linq;
+using System;
 
 namespace Buildings.District
 {
@@ -16,8 +16,6 @@ namespace Buildings.District
     public abstract class DistrictState : IAttacker
     {
         public event Action OnAttack;
-        
-        public float Range { get; set; }
         
         protected DamageInstance lastDamageDone;
         protected EntityManager entityManager;
@@ -28,6 +26,7 @@ namespace Buildings.District
         public DamageInstance LastDamageDone => lastDamageDone;
         public Stats Stats => stats;
         
+        public abstract List<UpgradeStat> UpgradeStats { get; }
         public Vector3 OriginPosition { get; protected set; }
         public Vector3 AttackPosition { get; set; }
         public DistrictData DistrictData { get; }
@@ -119,7 +118,7 @@ namespace Buildings.District
                 Entity spawnedEntity = entityManager.CreateEntity(componentTypes);
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = topChunks[i].Position });
                 // These could be made to blob assets, probably easier to change then
-                entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = Range });
+                entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = stats.Range.Value });
                 entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent
                 {
                     AttackSpeed = 1.0f / stats.AttackSpeed.Value, 
@@ -175,6 +174,8 @@ namespace Buildings.District
 
     public class ArcherState : EntityDistrictState
     {
+        public override List<UpgradeStat> UpgradeStats { get; } = new List<UpgradeStat>();
+        
         private readonly TowerData archerData;
 
         private GameObject rangeIndicator;
@@ -185,11 +186,23 @@ namespace Buildings.District
         public ArcherState(DistrictData districtData, TowerData archerData, Vector3 position, int key) : base(districtData, position, key)
         {
             this.archerData = archerData;
-            Range = archerData.Range;
 
-            stats = new Stats(archerData.Stats);
-            Attack = new Attack(archerData.BaseAttack);
+            CreateStats();
             SpawnEntities();
+            
+            Attack = new Attack(archerData.BaseAttack);
+        }
+
+        private void CreateStats()
+        {
+            stats = new Stats(archerData.Stats);
+            UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed as Stat, archerData.LevelDatas[0], "Attack Speed");
+            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier as Stat, archerData.LevelDatas[1], "Damge Multiplier");
+            UpgradeStat range = new UpgradeStat(stats.Range as Stat, archerData.LevelDatas[2], "Range");
+
+            UpgradeStats.Add(attackSpeed);
+            UpgradeStats.Add(damage);
+            UpgradeStats.Add(range);
         }
 
         protected override List<Chunk> GetEntityChunks()
@@ -203,7 +216,7 @@ namespace Buildings.District
             
             selected = true;
             rangeIndicator = archerData.RangeIndicator.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.identity).gameObject;
-            rangeIndicator.transform.localScale = new Vector3(Range * 2.0f, 0.01f, Range * 2.0f);
+            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
         }
 
         public override void OnDeselected()
@@ -238,17 +251,29 @@ namespace Buildings.District
         private GameObject rangeIndicator;
         private bool selected;
         
+        public override List<UpgradeStat> UpgradeStats { get; } = new List<UpgradeStat>();
         public override Attack Attack { get; }
         
         public BombState(DistrictData districtData, TowerData bombData, Vector3 position, int key) : base(districtData, position, key)
         {
             this.bombData = bombData;
-            Range = bombData.Range;
 
-            stats = new Stats(bombData.Stats);
-            Attack = new Attack(bombData.BaseAttack);
-
+            CreateStats();
             SpawnEntities();
+
+            Attack = new Attack(bombData.BaseAttack);
+        }
+        
+        private void CreateStats()
+        {
+            stats = new Stats(bombData.Stats);
+            UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed as Stat, bombData.LevelDatas[0], "Attack Speed");
+            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier as Stat, bombData.LevelDatas[1], "Damge Multiplier");
+            UpgradeStat range = new UpgradeStat(stats.Range as Stat, bombData.LevelDatas[2], "Range");
+
+            UpgradeStats.Add(attackSpeed);
+            UpgradeStats.Add(damage);
+            UpgradeStats.Add(range);
         }
 
         protected override List<Chunk> GetEntityChunks()
@@ -262,7 +287,7 @@ namespace Buildings.District
             
             selected = true;
             rangeIndicator = bombData.RangeIndicator.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.identity).gameObject;
-            rangeIndicator.transform.localScale = new Vector3(Range * 2.0f, 0.01f, Range * 2.0f);
+            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
         }
 
         public override void OnDeselected()
@@ -293,22 +318,32 @@ namespace Buildings.District
 
     public class TownHallState : EntityDistrictState
     {
-        private TowerData townHallData;
+        private readonly TowerData townHallData;
+        private GameObject rangeIndicator;
+        private bool selected;
         
+        public override List<UpgradeStat> UpgradeStats { get; } = new List<UpgradeStat>();
         public override Attack Attack { get; }
         
         public TownHallState(DistrictData districtData, TowerData townHallData, Vector3 position, int key) : base(districtData, position, key)
         {
             this.townHallData = townHallData;
-            Range = townHallData.Range;
 
-            stats = new Stats(townHallData.Stats);
-            Attack = new Attack(townHallData.BaseAttack);
+            CreateStats();
             SpawnEntities();
             
+            Attack = new Attack(townHallData.BaseAttack);
             Events.OnWaveEnded += OnWaveEnded;
         }
+        
+        private void CreateStats()
+        {
+            stats = new Stats(townHallData.Stats);
+            UpgradeStat townHall = new UpgradeStat(new Stat(1), townHallData.LevelDatas[0], "Level");
 
+            UpgradeStats.Add(townHall);
+        }
+        
         private void OnWaveEnded()
         {
             Debug.Log("10 points to grifflindor");
@@ -326,12 +361,21 @@ namespace Buildings.District
 
         public override void OnSelected(Vector3 pos)
         {
+            if (selected) return;
             
+            selected = true;
+            rangeIndicator = townHallData.RangeIndicator.GetAtPosAndRot<PooledMonoBehaviour>(pos, Quaternion.identity).gameObject;
+            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
         }
 
         public override void OnDeselected()
         {
-            
+            selected = false;
+            if (rangeIndicator != null)
+            {
+                rangeIndicator.SetActive(false);
+                rangeIndicator = null;
+            }
         }
 
         public override void Die()
@@ -364,14 +408,14 @@ namespace Buildings.District
         
         private readonly TowerData mineData;
         
-        public bool IsCapitol { get; set; }
+        public override List<UpgradeStat> UpgradeStats { get; } = new List<UpgradeStat>();
         public override Attack Attack { get; }
         
         public MineState(DistrictData districtData, TowerData mineData, Vector3 position, int key) : base(districtData, position, key)
         {
             this.mineData = mineData;
-            
-            stats = new Stats(mineData.Stats);
+
+            CreateStats();
             Attack = new Attack(mineData.BaseAttack);
 
             foreach (Chunk chunk in districtData.DistrictChunks.Values)
@@ -383,6 +427,16 @@ namespace Buildings.District
                 
                 mineChunks.Add(new MineInstance(chunk.Position, 0, chunk.ChunkIndex));
             }
+        }
+        
+        private void CreateStats()
+        {
+            stats = new Stats(mineData.Stats);
+            UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed as Stat, mineData.LevelDatas[0], "Mine Speed");
+            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier as Stat, mineData.LevelDatas[1], "Value Multiplier");
+
+            UpgradeStats.Add(attackSpeed);
+            UpgradeStats.Add(damage);
         }
         
         public override void OnSelected(Vector3 pos)

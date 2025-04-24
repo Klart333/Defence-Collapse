@@ -43,7 +43,7 @@ public class UIStartWave : MonoBehaviour
     
     public void StartWave()
     {
-        if (!CapitolHandler.HasCapitol)
+        if (false) // Maybe require townhall placed
         {
             Debug.Log("Tell player to place a capitol");
             //return;

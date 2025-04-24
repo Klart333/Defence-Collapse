@@ -165,7 +165,7 @@ GameObject:
   - component: {fileID: 6121943289490275116}
   - component: {fileID: 3676958435635716910}
   m_Layer: 0
-  m_Name: AttackSpeed
+  m_Name: UIUpgradeDisplay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -213,11 +213,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 199adc2ad45608d43af2869500067c38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  upgradeType: 0
-  upgradeName: Attack Speed
+  initialPoolSize: 3
   description: Increase attack rate by {0}/s
   currentDescription: 'Current Attack Speed: {0}/s'
-  buildingUpgrade: {fileID: 0}
   button: {fileID: 3676958435635716910}
 --- !u!114 &84079209217126947
 MonoBehaviour:
@@ -251,7 +249,7 @@ MonoBehaviour:
   m_PixelsPerUnitMultiplier: 1
 --- !u!95 &6121943289490275116
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -265,6 +263,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1

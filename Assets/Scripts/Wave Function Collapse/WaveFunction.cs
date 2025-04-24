@@ -523,6 +523,7 @@ namespace WaveFunctionCollapse
 
         #region Debug
 
+#if UNITY_EDITOR
         public void DrawGizmos()
         {
             if (!EditorApplication.isPlaying)
@@ -577,7 +578,7 @@ namespace WaveFunctionCollapse
 
             spawnedPossibilites.Clear();
         }
-
+#endif
         #endregion
     }
 

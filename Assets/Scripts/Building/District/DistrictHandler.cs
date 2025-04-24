@@ -168,7 +168,7 @@ namespace Buildings.District
                     districts.Remove(chunk.ChunkIndex.xz);
                 }
 
-                if (districtData.State is MineState { IsCapitol: true })
+                if (districtData.State is TownHallState)
                 {
                     Events.OnCapitolDestroyed?.Invoke(districtData);
                 }

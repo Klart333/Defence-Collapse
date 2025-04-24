@@ -4,9 +4,9 @@ using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
-
 namespace WaveFunctionCollapse
 {
+#if UNITY_EDITOR
     public class PrototypeInfoCreator : SerializedMonoBehaviour
     {
         [Title("Debug")]
@@ -32,9 +32,6 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private Vector3 moduleScale;
 
-        [SerializeField]
-        private short startKeyNumber;
-        
         [SerializeField]
         private bool useVerticiesOutsideUnitCube = false;
         
@@ -77,8 +74,8 @@ namespace WaveFunctionCollapse
         {
             Reset();
 
-            currentSideIndex = startKeyNumber;
-            currentTopIndex = startKeyNumber;
+            currentSideIndex = 0;
+            currentTopIndex = 0;
 
             prototypeData.MarchingTable = useMCode switch
             {
@@ -620,6 +617,7 @@ namespace WaveFunctionCollapse
             UnityEngine.Debug.Log(transform.childCount);
         }
     }
+#endif
     [System.Serializable]
     public struct DicData
     {

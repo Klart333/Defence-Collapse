@@ -59,13 +59,13 @@ namespace Gameplay
         private void SpaceStarted(InputAction.CallbackContext obj)
         {
             Value *= speedySpeed;
-            entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
+            entityManager.SetComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
         }
 
         private void SpaceCanceled(InputAction.CallbackContext obj)
         {
             Value /= speedySpeed;
-            entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
+            entityManager.SetComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
         }
 
         private void OnCapitolDestroyed(DistrictData destroyedDistrict)

@@ -1,50 +1,42 @@
-﻿using Cysharp.Threading.Tasks;
-using Sirenix.OdinInspector;
-using System;
-using System.Collections.Generic;
-using Buildings.District;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEngine.Serialization;
+using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
+using UnityEngine;
+using System;
 
-public class UIUpgradeDisplay : MonoBehaviour
+public class UIUpgradeDisplay : PooledMonoBehaviour
 {
-    [Title("Stat Type")]
-    [SerializeField]
-    private LevelStat upgradeType;
-
     [Title("Upgrade Info")]
-    [SerializeField]
-    private string upgradeName;
-
     [SerializeField]
     private string description;
 
     [SerializeField]
     private string currentDescription;
 
-    [FormerlySerializedAs("buildingUpgrade")]
     [Title("References")]
     [SerializeField]
-    private UIDistrictUpgrade districtUpgrade;
-
-    [SerializeField]
     private StupidButton button;
-
-    private DistrictData currentData;
+    
+    private UpgradeStat upgradeStat;
 
     private bool hoveredLastFrame = false;
+    
+    public UIDistrictUpgrade DistrictUpgrade { get; set; }
 
-    public void DisplayStat(DistrictData buildingData)
+    public void DisplayStat(UpgradeStat stat)
     {
-        currentData = buildingData;
+        upgradeStat = stat;
 
         UpdateButton();
 
         MoneyManager.Instance.OnMoneyChanged += UpdateTheButton;
     }
 
-    public void Close()
+    protected override void OnDisable()
     {
+        base.OnDisable();
+
         MoneyManager.Instance.OnMoneyChanged -= UpdateTheButton;
     }
 
@@ -60,14 +52,14 @@ public class UIUpgradeDisplay : MonoBehaviour
             await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
         }
         
-        button.interactable = districtUpgrade.CanPurchase(upgradeType);
+        button.interactable = DistrictUpgrade.CanPurchase(upgradeStat);
     }
 
     public void ClickUpgrade()
     {
-        if (districtUpgrade.CanPurchase(upgradeType))
+        if (DistrictUpgrade.CanPurchase(upgradeStat))
         {
-            districtUpgrade.UpgradeStat(upgradeType);
+            DistrictUpgrade.UpgradeStat(upgradeStat);
         }
     }
 
@@ -75,29 +67,9 @@ public class UIUpgradeDisplay : MonoBehaviour
     {
         if (!hoveredLastFrame && button.Hovered)
         {
-            DisplayUpgrade();
+            DistrictUpgrade.DisplayUpgrade(upgradeStat);
         }
 
         hoveredLastFrame = button.Hovered;
-    }
-
-    public void DisplayUpgrade()
-    {
-        List<string> descriptions = new List<string>
-        {
-            string.Format(description, districtUpgrade.LevelData.GetIncrease(upgradeType, currentData.UpgradeData.GetStatLevel(upgradeType)))
-        };
-
-        float value = upgradeType switch
-        {
-            LevelStat.AttackSpeed => Mathf.RoundToInt(currentData.State.Stats.AttackSpeed.Value * 10) / 10f,
-            LevelStat.Damage => Mathf.RoundToInt(currentData.State.Stats.DamageMultiplier.Value * 10) / 10f,
-            LevelStat.Range => Mathf.RoundToInt(currentData.State.Range * 10) / 10f,
-            _ => 0
-        };
-
-        descriptions.Add(string.Format(currentDescription, value));
-
-        districtUpgrade.DisplayUpgrade(upgradeName, descriptions, upgradeType);
     }
 }

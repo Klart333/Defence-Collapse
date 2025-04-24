@@ -356,6 +356,7 @@ namespace WaveFunctionCollapse
 
         #region Debug
 
+#if UNITY_EDITOR
         public void OnDrawGizmosSelected()
         {
             if (!EditorApplication.isPlaying || !debug)
@@ -373,7 +374,7 @@ namespace WaveFunctionCollapse
                 }
             }
         }
-
+#endif
         #endregion
     }
 }

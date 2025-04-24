@@ -2,9 +2,20 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
+using Gameplay;
+
+public interface IStat
+{
+    public event Action OnValueChanged;
+    public float Value { get; }
+
+    public void AddModifier(Modifier mod);
+    public void RemoveModifier(Modifier mod);
+    public void RemoveAllModifiers();
+}
 
 [Serializable, InlineProperty]
-public class Stat
+public class Stat : IStat
 {
     public event Action OnValueChanged;
 
@@ -23,105 +34,99 @@ public class Stat
     [SerializeField]
     private float baseValue;
 
-    private List<Modifier> modifiers = new List<Modifier>();
+    private HashSet<Modifier> modifiers = new HashSet<Modifier>();
+
+    private float value;
+    private bool isDirty = true;
+
+    private readonly Modifier.ModifierType[] ModifierTypes =
+    {
+        Modifier.ModifierType.Additive,
+        Modifier.ModifierType.Multiplicative,
+    };
 
     [ShowInInspector, ReadOnly]
     public float Value
     {
         get
         {
-            float val = BaseValue;
-            if (modifiers == null)
+            if (!isDirty)
             {
-                return val;
+                return value;
             }
+            
+            value = GetValue();
+            isDirty = false;
 
-            for (int i = 0; i < modifiers.Count; i++)
-            {
-                switch (modifiers[i].Type)
-                {
-                    case Modifier.ModifierType.Multiplicative:
-                        val *= modifiers[i].Value;
-                        break;
-                    case Modifier.ModifierType.Additive:
-                        val += modifiers[i].Value;
-                        break;
-                    default:
-                        break;
-                }
-            }
+            return value;
+        }
+    }
 
+    private float GetValue()
+    {
+        float val = BaseValue;
+        if (modifiers == null)
+        {
             return val;
         }
+
+        foreach (Modifier.ModifierType modifierType in ModifierTypes)
+        {
+            foreach (Modifier modifier in modifiers)
+            {
+                if (modifier.Type != modifierType)
+                {
+                    continue;
+                }
+                
+                val = modifier.Type switch
+                {
+                    Modifier.ModifierType.Multiplicative => val * modifier.Value,
+                    Modifier.ModifierType.Additive => val + modifier.Value,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
+        }
+
+        return val;
     }
 
     public Stat(float baseValue)
     {
-        this.BaseValue = baseValue;
+        BaseValue = baseValue;
     }
 
     public void AddModifier(Modifier mod)
     {
         modifiers.Add(mod);
 
-        modifiers.Sort((x, y) => x.Type.CompareTo(y.Type));
-
-        OnValueChanged?.Invoke();
-    }
-
-    public void AddModifier(float additiveValue)
-    {
-        bool added = false;
-        for (int i = 0; i < modifiers.Count; i++)
-        {
-            if (modifiers[i].Type == Modifier.ModifierType.Additive)
-            {
-                modifiers[i].Value += additiveValue;
-
-                added = true;
-                break;
-            }
-        }
-
-        if (!added)
-        {
-            AddModifier(new Modifier { Value = additiveValue, Type = Modifier.ModifierType.Additive });
-            return;
-        }
-
+        isDirty = true;
         OnValueChanged?.Invoke();
     }
 
     public void RemoveModifier(Modifier mod)
     {
-        if (!modifiers.Contains(mod))
+        if (!modifiers.Remove(mod))
         {
-            RemoveModifier(mod.Value, mod.Type);
+            Debug.LogError("Could not find modifier to remove");
             return;
         }
 
-        modifiers.Remove(mod);
-        modifiers.Sort((x, y) => x.Type.CompareTo(y.Type));
-
+        isDirty = true;
         OnValueChanged?.Invoke();
-    }
-
-    public void RemoveModifier(float value, Modifier.ModifierType type)
-    {
-        for (int i = 0; i < modifiers.Count; i++)
-        {
-            if (modifiers[i].Type == type && Mathf.Abs(modifiers[i].Value - value) < Mathf.Epsilon)
-            {
-                modifiers.RemoveAt(i);
-                return;
-            }
-        }
     }
 
     public void RemoveAllModifiers()
     {
         modifiers.Clear();
+
+        isDirty = true;
         OnValueChanged?.Invoke();
+    }
+
+    public void SetDirty()
+    {
+        isDirty = true;
     }
     
     public static implicit operator float(Stat stat) => stat.Value;
@@ -130,13 +135,87 @@ public class Stat
 [Serializable]
 public class Modifier
 {
+    public ModifierType Type;
+
+    public float Value;
+
     public enum ModifierType
     {
         Additive = 0,
         Multiplicative = 1,
     }
+}
 
-    public ModifierType Type;
+[Serializable, InlineProperty]
+public class UpgradeStat : IStat
+{
+    [Title("Stat")]
+    public Stat Stat = new Stat(1);
+    
+    [Title("Upgrade Settings")]
+    public string Name = "Stat Name";
 
-    public float Value;
+    public LevelData LevelData;
+
+    private Modifier increaseModifier;
+    
+    public int Level { get; private set; }
+    public event Action OnValueChanged;
+    public float Value => Stat.Value;
+
+    public UpgradeStat()
+    {
+        Stat.OnValueChanged += () => OnValueChanged?.Invoke();
+    }
+
+    public UpgradeStat(Stat stat, LevelData levelData, string name)
+    {
+        Stat = stat;
+        LevelData = levelData;
+        Name = name;
+        
+        Stat.OnValueChanged += () => OnValueChanged?.Invoke();
+    }
+    
+    public void AddModifier(Modifier mod)
+    {
+        Stat.AddModifier(mod);
+    }
+
+    public void RemoveModifier(Modifier mod)
+    {
+        Stat.RemoveModifier(mod);
+    }
+
+    public void RemoveAllModifiers()
+    {
+        Stat.RemoveAllModifiers();
+    }
+
+    public void IncreaseLevel()
+    {
+        if (increaseModifier == null)
+        {
+            increaseModifier = new Modifier
+            {
+                Type = Modifier.ModifierType.Additive
+            };
+
+            Stat.AddModifier(increaseModifier);
+        }
+        
+        increaseModifier.Value += GetIncrease();
+        Stat.SetDirty();
+        Level++;
+    }
+
+    public float GetCost()
+    {
+        return LevelData.GetCost(Level);
+    }
+    
+    public float GetIncrease()
+    {
+        return LevelData.GetIncrease(Level);
+    }
 }

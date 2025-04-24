@@ -53,12 +53,9 @@ namespace Effects
 
         public void Perform(IAttacker unit)
         {
-            if (ModifierDictionary == null)
-            {
-                ModifierDictionary = new Dictionary<IAttacker, Modifier>();
-            }
+            ModifierDictionary ??= new Dictionary<IAttacker, Modifier>();
 
-            if (!ModifierDictionary.ContainsKey(unit))
+            if (!ModifierDictionary.TryGetValue(unit, out Modifier value))
             {
                 ModifierDictionary.Add(unit, new Modifier
                 {
@@ -70,18 +67,18 @@ namespace Effects
             }
             else if (CanIncrease)
             {
-                ModifierDictionary[unit].Value += ModifierValue;
+                value.Value += ModifierValue;
             }
         }
 
         public void Revert(IAttacker unit)
         {
-            if (ModifierDictionary == null || !ModifierDictionary.ContainsKey(unit))
+            if (ModifierDictionary == null || !ModifierDictionary.TryGetValue(unit, out Modifier value))
             {
                 return;
             }
 
-            unit.Stats.RevertModifiedStat(StatType, ModifierDictionary[unit]);
+            unit.Stats.RevertModifiedStat(StatType, value);
 
             ModifierDictionary.Remove(unit);
         }
@@ -351,11 +348,8 @@ namespace Effects
                 entityManager.SetComponentData(spawned, new LifetimeComponent{Lifetime = lifetime});
                 entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
                 entityManager.SetComponentData(spawned, new LocalTransform{Position = pos, Scale = Scale});
+                entityManager.SetComponentData(spawned, new ColliderComponent { Radius = Radius, });
                 
-                entityManager.SetComponentData(spawned, new ColliderComponent
-                {
-                    Radius = Radius,
-                });
                 entityManager.SetComponentData(spawned, new DamageComponent
                 {
                     Damage = ModifierValue * unit.Stats.DamageMultiplier.Value,

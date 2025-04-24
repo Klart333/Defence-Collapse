@@ -247,6 +247,7 @@ namespace WaveFunctionCollapse
 
         #region Debug
 
+#if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
             if (!UnityEditor.EditorApplication.isPlaying || waveFunction.Chunks == null || waveFunction.Chunks.Count == 0)
@@ -272,7 +273,7 @@ namespace WaveFunctionCollapse
             }
 
         }
-
+#endif
         #endregion
     }
 }

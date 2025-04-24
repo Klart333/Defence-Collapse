@@ -1,35 +1,40 @@
-﻿using Sirenix.OdinInspector;
+﻿using Buildings.District;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
-public interface ILootEffect
+namespace Loot
 {
-    void Perform(int grade);
-}
-
-public class GoldLoot : ILootEffect
-{
-    [Title("Effect")]
-    public int Gold = 10;
-
-    [Title("Grade")]
-    public float GradeMultiplier = 1;
-
-    public void Perform(int grade)
+    public interface ILootEffect
     {
-        MoneyManager.Instance.AddMoney(Gold + Mathf.RoundToInt(Gold * grade * GradeMultiplier));
+        void Perform(int grade);
     }
-}
 
-
-public class EffectLoot : ILootEffect
-{
-    [Title("Effect")]
-    public EffectModifier Effect;
-
-    public void Perform(int grade)
+    [System.Serializable]
+    public class GoldLoot : ILootEffect
     {
-        EffectModifier effect = new EffectModifier(Effect);
-        DistrictUpgradeManager.Instance.AddModifierEffect(effect);
-        LootManager.Instance.DisplayEffectGained(effect);
+        [Title("Effect")]
+        public int Gold = 10;
+
+        [Title("Grade")]
+        public float GradeMultiplier = 1;
+
+        public void Perform(int grade)
+        {
+            MoneyManager.Instance.AddMoney(Gold + Mathf.RoundToInt(Gold * grade * GradeMultiplier));
+        }
+    }
+    
+    [System.Serializable]
+    public class EffectLoot : ILootEffect
+    {
+        [Title("Effect")]
+        public EffectModifier Effect;
+
+        public void Perform(int grade)
+        {
+            EffectModifier effect = new EffectModifier(Effect);
+            DistrictUpgradeManager.Instance.AddModifierEffect(effect);
+            LootManager.Instance.DisplayEffectGained(effect);
+        }
     }
 }

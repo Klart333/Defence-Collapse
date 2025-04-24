@@ -4,23 +4,22 @@ using System;
 [Serializable]
 public class Stats
 {
-    [Title("Damage")]
-    public Stat DamageMultiplier;
-
-    [Title("Attack Speed")]
-    public Stat AttackSpeed;
-    public Stat MovementSpeed;
+    [Title("Attacking")]
+    public IStat DamageMultiplier = new Stat(1);
+    public IStat AttackSpeed = new Stat(1);
+    public IStat Range = new Stat(1);
+    
+    [Title("Movement")]
+    public IStat MovementSpeed = new Stat(1);
 
     [Title("Crit")]
-    public Stat CritChance;
-    public Stat CritMultiplier;
+    public IStat CritChance = new Stat(0);
+    public IStat CritMultiplier = new Stat(2);
 
     [Title("Defense")]
-    public Stat Armor;
-    public Stat MaxHealth;
-
-    [Title("Healing")]
-    public Stat Healing;
+    public IStat Armor = new Stat(0);
+    public IStat MaxHealth = new Stat(10);
+    public IStat Healing = new Stat(0);
 
     public Stats()
     {
@@ -29,39 +28,35 @@ public class Stats
 
     public Stats(Stats copy)
     {
-        AttackSpeed = new Stat(copy.AttackSpeed.Value);
-        MaxHealth = new Stat(copy.MaxHealth.Value);
         DamageMultiplier = new Stat(copy.DamageMultiplier.Value);
-        Healing = new Stat(copy.Healing.Value);
-        Armor = new Stat(copy.Armor.Value);
+        AttackSpeed = new Stat(copy.AttackSpeed.Value);
+        Range = new Stat(copy.Range.Value);
+        
+        MovementSpeed = new Stat(copy.MovementSpeed.Value);
+        
         CritChance = new Stat(copy.CritChance.Value);
         CritMultiplier = new Stat(copy.CritMultiplier.Value);
-        MovementSpeed = new Stat(copy.MovementSpeed.Value);
+        
+        Armor = new Stat(copy.Armor.Value);
+        MaxHealth = new Stat(copy.MaxHealth.Value);
+        Healing = new Stat(copy.Healing.Value);
     }
 
-    public Stat Get(StatType statType)
+    public IStat Get(StatType statType)
     {
-        switch (statType)
+        return statType switch
         {
-            case StatType.DamageMultiplier:
-                return DamageMultiplier;
-            case StatType.AttackSpeed:
-                return AttackSpeed;
-            case StatType.MovementSpeed:
-                return MovementSpeed;
-            case StatType.CritChance:
-                return CritChance;
-            case StatType.CritMultiplier:
-                return CritMultiplier;
-            case StatType.Armor:
-                return Armor;
-            case StatType.MaxHealth:
-                return MaxHealth;
-            case StatType.Healing:
-                return Healing;
-            default:
-                return null;
-        }
+            StatType.DamageMultiplier => DamageMultiplier,
+            StatType.AttackSpeed => AttackSpeed,
+            StatType.Range => Range,
+            StatType.MovementSpeed => MovementSpeed,
+            StatType.CritChance => CritChance,
+            StatType.CritMultiplier => CritMultiplier,
+            StatType.Armor => Armor,
+            StatType.MaxHealth => MaxHealth,
+            StatType.Healing => Healing,
+            _ => null
+        };
     }
 
     public void ModifyStat(StatType statType, Modifier modifier)
@@ -92,16 +87,16 @@ public class Stats
 
 public enum StatType
 {
-    DamageMultiplier = 10,
-
-    AttackSpeed = 11,
-    MovementSpeed = 12,
+    DamageMultiplier,
+    AttackSpeed,
+    Range,
     
-    CritChance = 13,
-    CritMultiplier = 14,
+    MovementSpeed,
     
-    Armor = 15,
-    MaxHealth = 16,
+    CritChance,
+    CritMultiplier,
     
-    Healing = 17,
+    Armor,
+    MaxHealth,
+    Healing,
 }

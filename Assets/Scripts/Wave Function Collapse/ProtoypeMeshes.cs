@@ -15,11 +15,14 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private PrototypeInfoData[] protoypeInfos;
         
+        #if UNITY_EDITOR
         [SerializeField]
         private PrototypeInfoCreator[] protoypeInfoCreators;
+        #endif
         
         public Mesh this[int meshRotMeshIndex] => Meshes[meshRotMeshIndex];
 
+        #if UNITY_EDITOR
         [Button]
         public void CompileData()
         {
@@ -48,9 +51,7 @@ namespace WaveFunctionCollapse
                         new MeshWithRotation(meshIndex, prot.MeshRot.Rot),
                         prot.PosX, prot.NegX, prot.PosY, prot.NegY, prot.PosZ, prot.NegZ,
                         prot.Weight, prot.MaterialIndexes);
-#if UNITY_EDITOR
                     prototypeData.Name_EditorOnly = Meshes[meshIndex].name;
-#endif
                         
                     protoypeInfos[i].Prototypes[j] = prototypeData;
                         
@@ -69,24 +70,18 @@ namespace WaveFunctionCollapse
                             new MeshWithRotation(meshIndex, prot.MeshRot.Rot),
                             prot.PosX, prot.NegX, prot.PosY, prot.NegY, prot.PosZ, prot.NegZ,
                             prot.Weight, prot.MaterialIndexes);
-#if UNITY_EDITOR
                         prototypeData.Name_EditorOnly = Meshes[meshIndex].name;
-#endif
                         protoypeInfos[i].MarchingTable[j][k] = prototypeData;
                     }
                 }
                 
                 protoypeInfos[i].NotBottomPrototypes.Clear();
                 
-#if UNITY_EDITOR
                 UnityEditor.EditorUtility.SetDirty(protoypeInfos[i]);
-#endif
             }
             
-#if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
             UnityEditor.AssetDatabase.SaveAssets();
-#endif
         }
 
         [Button]
@@ -97,5 +92,6 @@ namespace WaveFunctionCollapse
                 protoypeInfoCreators[i].CreateInfo();
             }
         }
+        #endif
     }
 }

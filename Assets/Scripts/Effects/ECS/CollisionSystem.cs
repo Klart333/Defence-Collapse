@@ -95,13 +95,11 @@ namespace Effects.ECS
                 return;
             }
 
-            // Pre-calculate values once
             float3 pos = colliderAspect.PositionComponent.ValueRO.Position;
             float radius = colliderAspect.ColliderComponent.ValueRO.Radius;
             float radiusSq = radius * radius;
 
-            // Calculate cell coordinates without division using reciprocal, (1.0f / 1)
-            int2 centerCell = new int2((int)pos.x, (int)pos.z);
+            int2 centerCell = new int2((int)(pos.x + 0.5f), (int)(pos.z + 0.5f));
             if (CollideWithinCell(sortKey, entity, colliderAspect, centerCell, pos, radiusSq)) return;
 
             int searchRadius = (int)radius;

@@ -1,6 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
+using Gameplay;
 using UnityEngine;
 
 [InlineEditor, CreateAssetMenu(fileName = "New Tower Data", menuName = "Building/Tower Data")]
@@ -10,9 +11,9 @@ public class TowerData : SerializedScriptableObject
     [OdinSerialize, NonSerialized]
     public Stats Stats;
 
-    [Title("Range")]
-    public int Range = 8;
+    public LevelData[] LevelDatas;
 
+    [Title("Range")]
     public PooledMonoBehaviour RangeIndicator;
 
     [Title("Attack")]
@@ -26,6 +27,7 @@ public class TowerData : SerializedScriptableObject
         Stats = new Stats
         {
             AttackSpeed = new Stat(1),
+            Range = new Stat(8),
             MaxHealth = new Stat(10),
             DamageMultiplier = new Stat(1),
             MovementSpeed = new Stat(0),

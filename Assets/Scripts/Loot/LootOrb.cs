@@ -2,73 +2,76 @@ using DG.Tweening;
 using System;
 using UnityEngine;
 
-public class LootOrb : PooledMonoBehaviour
+namespace Loot
 {
-    [SerializeField]
-    private LayerMask normalLayer;
-
-    [SerializeField]
-    private LayerMask hoverLayer;
-
-    public int Grade {  get; set; }
-
-    private float scale;
-    private bool hovered;
-
-    private void OnEnable()
+    public class LootOrb : PooledMonoBehaviour
     {
-        scale = transform.localScale.x;
-    }
+        [SerializeField]
+        private LayerMask normalLayer;
 
-    protected override void OnDisable()
-    {
-        base.OnDisable();
+        [SerializeField]
+        private LayerMask hoverLayer;
 
-        Reset();
-    }
+        public int Grade { get; set; }
 
-    private void Reset()
-    {
-        Grade = -1;
-        hovered = false;
-        gameObject.layer = (int)Mathf.Log(normalLayer.value, 2);
+        private float scale;
+        private bool hovered;
 
-        transform.DORewind();
-    }
-
-    private void OnMouseEnter()
-    {
-        gameObject.layer = (int)Mathf.Log(hoverLayer.value, 2);
-        hovered = true;
-
-        transform.DORewind();
-        transform.DOScale(scale * 1.1f, 0.2f);
-    }
-
-    private void OnMouseExit() 
-    {
-        gameObject.layer = (int)Mathf.Log(normalLayer.value, 2);
-        hovered = false;
-
-        transform.DOKill();
-        transform.DOScale(scale, 0.2f);
-    }
-
-    private void Update()
-    {
-        if (hovered && InputManager.Instance.Fire.WasReleasedThisFrame())
+        private void OnEnable()
         {
-            Collect();
+            scale = transform.localScale.x;
         }
-    }
 
-    private void Collect()
-    {
-        int grade = Grade;
-        LootData loot = LootManager.Instance.GetLootData(ref grade);
+        protected override void OnDisable()
+        {
+            base.OnDisable();
 
-        loot.Perform(grade);
+            Reset();
+        }
 
-        gameObject.SetActive(false);
+        private void Reset()
+        {
+            Grade = -1;
+            hovered = false;
+            gameObject.layer = (int)Mathf.Log(normalLayer.value, 2);
+
+            transform.DORewind();
+        }
+
+        private void OnMouseEnter()
+        {
+            gameObject.layer = (int)Mathf.Log(hoverLayer.value, 2);
+            hovered = true;
+
+            transform.DORewind();
+            transform.DOScale(scale * 1.1f, 0.2f);
+        }
+
+        private void OnMouseExit()
+        {
+            gameObject.layer = (int)Mathf.Log(normalLayer.value, 2);
+            hovered = false;
+
+            transform.DOKill();
+            transform.DOScale(scale, 0.2f);
+        }
+
+        private void Update()
+        {
+            if (hovered && InputManager.Instance.Fire.WasReleasedThisFrame())
+            {
+                Collect();
+            }
+        }
+
+        private void Collect()
+        {
+            int grade = Grade;
+            LootData loot = LootManager.Instance.GetLootData(ref grade);
+
+            loot.Perform(grade);
+
+            gameObject.SetActive(false);
+        }
     }
 }

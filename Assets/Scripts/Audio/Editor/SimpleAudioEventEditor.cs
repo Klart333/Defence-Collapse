@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(SimpleAudioEvent))]
@@ -21,7 +22,7 @@ public class SimpleAudioEventEditor : Editor
     {
         DestroyImmediate(previewSource.gameObject); // We kill it to not leave any loose ends
     }
-
+    
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
@@ -36,3 +37,4 @@ public class SimpleAudioEventEditor : Editor
         EditorGUI.EndDisabledGroup();
     }
 }
+#endif

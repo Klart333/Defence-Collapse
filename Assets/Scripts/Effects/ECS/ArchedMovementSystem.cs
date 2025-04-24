@@ -12,7 +12,6 @@ namespace Effects.ECS
             state.RequireForUpdate<GameSpeedComponent>();
         }
 
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;

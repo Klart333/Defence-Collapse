@@ -2,14 +2,13 @@ using Object = UnityEngine.Object;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using WaveFunctionCollapse;
-using System.Linq;
+using Unity.Mathematics;
+using Unity.Collections;
+using Unity.Assertions;
 using UnityEngine;
 using Gameplay;
 using Utility;
 using System;
-using NUnit.Framework;
-using Unity.Collections;
-using Unity.Mathematics;
 
 namespace Buildings.District
 {
@@ -23,9 +22,9 @@ namespace Buildings.District
 
         private MeshCollider meshCollider;
 
+        public List<UpgradeStat> UpgradeStats => State.UpgradeStats;
         public Dictionary<int3, Chunk> DistrictChunks { get; } 
         public IGameSpeed GameSpeed { get; set; }
-        public UpgradeData UpgradeData { get; }
         public ChunkIndex Index { get; set; }
         public DistrictState State { get; }
         public Vector3 Position { get; }
@@ -34,7 +33,6 @@ namespace Buildings.District
 
         public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction<Chunk> chunkWaveFunction, int key)
         {
-            UpgradeData = new UpgradeData(1, 1, 1);
             DistrictChunks = new Dictionary<int3, Chunk>();
             foreach (Chunk chunk in chunks)
             {
