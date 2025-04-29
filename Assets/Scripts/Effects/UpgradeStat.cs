@@ -179,7 +179,7 @@ public class TownHallUpgradeStat : IUpgradeStat
     {
         bool placed = false;
         bool canceled = false;
-        Events.OnDistrictClicked?.Invoke(DistrictType.TownHall, 2 + Level);
+        Events.OnDistrictClicked?.Invoke(DistrictType.TownHall, 1 + Level);
         Events.OnDistrictBuilt += OnCapitolUpgradePlaced;
 
         UIEvents.OnFocusChanged += OnFocusChanged;

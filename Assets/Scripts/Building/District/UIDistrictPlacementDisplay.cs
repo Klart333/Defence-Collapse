@@ -162,18 +162,12 @@ namespace Buildings.District
             selectedPlacers.Enqueue(selectedPlacer);
             selectedPlacer.SetSelected();
 
-            switch (selectedPlacers.Count)
+            if (selectedPlacers.Count > 2)
             {
-                case 1:
-                    return;
-                case > 2:
-                {
-                    var removedPlacer = selectedPlacers.Dequeue();
-                    removedPlacer.Unselect();
-                    break;
-                }
+                var removedPlacer = selectedPlacers.Dequeue();
+                removedPlacer.Unselect();
             }
-    
+
             spawnedPlacers.Where(x => x.Selected && !selectedPlacers.Contains(x)).ForEach(x => x.Unselect());
             
             Bounds bounds = GetBounds(spawnedPlacers.Where(x => x.Selected));
