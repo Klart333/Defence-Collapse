@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine.InputSystem;
@@ -7,6 +8,7 @@ using Unity.Mathematics;
 using System.Linq;
 using DG.Tweening;
 using Gameplay.Money;
+using Sirenix.Utilities;
 using TMPro;
 using UnityEngine;
 
@@ -48,6 +50,7 @@ namespace Buildings.District
         private readonly Dictionary<int3, GroundType> chunkGroupTypes = new Dictionary<int3, GroundType>();
         
         private DistrictType currentType;
+        private int minRadius;
         
         private async void OnEnable()
         {
@@ -77,13 +80,22 @@ namespace Buildings.District
             HideAnimated();
         }
 
-        private void OnDistrictClicked(DistrictType districtType)
+        private void OnDistrictClicked(DistrictType districtType, int radius)
         {
             UIEvents.OnFocusChanged?.Invoke();
 
             Displaying = true;
             currentType = districtType;
-            Display(districtGenerator.ChunkWaveFunction);
+            minRadius = radius;
+            
+            if (districtType == DistrictType.TownHall)
+            {
+                DisplayTownHall(districtGenerator.ChunkWaveFunction);
+            }
+            else
+            {
+                Display(districtGenerator.ChunkWaveFunction);
+            }
         }
         
         private void Display(ChunkWaveFunction<Chunk> chunkWaveFunction)
@@ -95,6 +107,7 @@ namespace Buildings.District
             float scaledDelay = maxDelay * Mathf.Clamp01(maxDistance / maxDelayDistance);
             foreach (Chunk chunk in chunkWaveFunction.Chunks.Values)
             {
+                if (chunk.ChunkIndex.y != 0) continue;
                 if (districtHandler.IsBuilt(chunk)) continue;
                     
                 int3 index = ChunkWaveUtility.GetDistrictIndex3(chunk.Position, districtGenerator.ChunkScale);
@@ -110,6 +123,37 @@ namespace Buildings.District
                 spawnedPlacers.Add(spawned);
                     
                 spawned.OnSelected += PlacerOnOnSelected;
+            }
+        }
+        
+        private void DisplayTownHall(ChunkWaveFunction<Chunk> chunkWaveFunction)
+        {
+            Vector3 scale = districtGenerator.ChunkScale * 0.75f;
+            Bounds bounds = GetBounds(chunkWaveFunction);
+
+            float maxDistance = Vector2.Distance(bounds.Min, bounds.Max);
+            float scaledDelay = maxDelay * Mathf.Clamp01(maxDistance / maxDelayDistance);
+            foreach (Chunk chunk in chunkWaveFunction.Chunks.Values)
+            {
+                if (chunk.ChunkIndex.y != 0) continue;
+                int3 index = ChunkWaveUtility.GetDistrictIndex3(chunk.Position, districtGenerator.ChunkScale);
+                if (!CheckDistrictRestriction(currentType, index)) continue; 
+                
+                Vector3 pos = chunk.Position + Vector3.up;
+                DistrictPlacer spawned = displayPrefab.GetAtPosAndRot<DistrictPlacer>(pos, quaternion.identity);
+                spawned.Index = index;
+                
+                spawned.transform.localScale = Vector3.zero;
+                float delay = scaledDelay * (Vector2.Distance(bounds.Min, chunk.Position.XZ()) / maxDistance);
+                spawned.transform.DOScale(scale, 0.5f).SetEase(Ease.OutBounce).SetDelay(delay);
+                spawnedPlacers.Add(spawned);
+                    
+                spawned.OnSelected += PlacerOnOnSelected;
+                
+                if (districtHandler.IsTownHallBuilt(chunk))
+                {
+                    spawned.ForceSelected();
+                }
             }
         }
         
@@ -129,8 +173,10 @@ namespace Buildings.District
                     break;
                 }
             }
-
-            Bounds bounds = GetBounds(selectedPlacers);
+    
+            spawnedPlacers.Where(x => x.Selected && !selectedPlacers.Contains(x)).ForEach(x => x.Unselect());
+            
+            Bounds bounds = GetBounds(spawnedPlacers.Where(x => x.Selected));
             int width = (int)bounds.Max.x - (int)bounds.Min.x + 1;
             int depth = (int)bounds.Max.y - (int)bounds.Min.y + 1;
 
@@ -149,7 +195,8 @@ namespace Buildings.District
             bool sameHeight = selectedPlacer.Index.y == selectedPlacers.Peek().Index.y;
             bool canBuild = sameHeight
                             && IsConnected(includedChunks)
-                            && DistrictHandler.CanBuildDistrict(width, depth, currentType);
+                            && CanBuildDistrict(width, depth, currentType)
+                            && CheckSizeRestriction(includedChunks.Count, currentType);
             
             costText.gameObject.SetActive(canBuild);
             if (canBuild)
@@ -175,6 +222,26 @@ namespace Buildings.District
                     spawnedPlacers[i].Unselect();
                 }
             }
+        }
+
+        private bool CheckSizeRestriction(int chunkCount, DistrictType districtType)
+        {
+            return districtType switch
+            {
+                DistrictType.TownHall => chunkCount >= minRadius * minRadius,
+                _ => true,
+            };
+        }
+
+        public bool CanBuildDistrict(int width, int depth, DistrictType currentType)
+        {
+            return currentType switch
+            {
+                DistrictType.Bomb => width >= 3 && depth >= 3,
+                DistrictType.Church => width >= 2 && depth >= 2,
+                DistrictType.TownHall => width - minRadius == 0 && depth - minRadius == 0,
+                _ => true
+            };
         }
 
         private bool IsConnected(HashSet<int3> chunks)
@@ -235,12 +302,20 @@ namespace Buildings.District
 
         public void PlacementConfirmed()
         {
-            Bounds bounds = GetPositionBounds(selectedPlacers);
+            Bounds bounds = GetPositionBounds(spawnedPlacers.Where(x => x.Selected));
             
             HashSet<Chunk> chunks = new HashSet<Chunk>();
             foreach (Chunk chunk in districtGenerator.ChunkWaveFunction.Chunks.Values)
             {
-                if (bounds.Contains(chunk.Position.XZ()) && !districtHandler.IsBuilt(chunk))
+                if (!bounds.Contains(chunk.Position.XZ())) continue;
+                
+                bool valid = currentType switch
+                {
+                    DistrictType.TownHall => !districtHandler.IsBuilt(chunk, out DistrictData data) || data.State is TownHallState,
+                    _ => !districtHandler.IsBuilt(chunk),
+                };
+                    
+                if (valid)
                 {
                     chunks.Add(chunk);
                 }

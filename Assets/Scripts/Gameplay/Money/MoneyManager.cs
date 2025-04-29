@@ -29,6 +29,10 @@ namespace Gameplay.Money
         [SerializeField]
         private CrystalParticleHandler particleHandler;
 
+        [Title("Debug")]
+        [SerializeField]
+        private bool verbose = true;
+        
         private Dictionary<BuildingType, int> AvailableBuildables = new Dictionary<BuildingType, int>();
 
         public int BuildingCost => costData.GetCost(BuildingType.Building);
@@ -115,8 +119,13 @@ namespace Gameplay.Money
 
         public void RemoveMoney(float amount)
         {
+            if (verbose)
+            {
+                Debug.Log($"Removing {amount} money");
+            }
+            
             money -= amount;
-
+            
             OnMoneyChanged?.Invoke(money);
         }
 
@@ -130,7 +139,7 @@ namespace Gameplay.Money
         #region Debug
 
         [Button]
-        private void AddMoneyDebug(float money)
+        private void AddMoneyDebug(float money = 1000)
         {
             this.money += money;
         }

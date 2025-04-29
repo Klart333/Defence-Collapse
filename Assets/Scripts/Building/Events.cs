@@ -16,7 +16,7 @@ public static class Events
     public static UnityAction<ChunkIndex> OnBuiltIndexDestroyed;
     public static UnityAction<DistrictData> OnCapitolDestroyed;
 
-    public static UnityAction<DistrictType> OnDistrictClicked;
+    public static UnityAction<DistrictType, int> OnDistrictClicked;
     public static UnityAction<DistrictType> OnDistrictBuilt;
     
     public static UnityAction OnGameReset;
@@ -28,5 +28,4 @@ public static class UIEvents
     public static UnityAction<UIEffectDisplay> OnEndDrag;
     
     public static UnityAction OnFocusChanged;
-    public static UnityAction OnCapitolClicked;
 }

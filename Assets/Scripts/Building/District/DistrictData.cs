@@ -22,7 +22,7 @@ namespace Buildings.District
 
         private MeshCollider meshCollider;
 
-        public List<UpgradeStat> UpgradeStats => State.UpgradeStats;
+        public List<IUpgradeStat> UpgradeStats => State.UpgradeStats;
         public Dictionary<int3, Chunk> DistrictChunks { get; } 
         public IGameSpeed GameSpeed { get; set; }
         public ChunkIndex Index { get; set; }
@@ -49,7 +49,6 @@ namespace Buildings.District
                 DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, position, key),
                 DistrictType.Mine => new MineState(this, DistrictUpgradeManager.Instance.MineData, position, key),
                 //DistrictType.Church => expr,
-                //DistrictType.Farm => expr,
                 _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
             };
 
@@ -64,6 +63,7 @@ namespace Buildings.District
 
         private void CreateChunkIndexCache(HashSet<Chunk> chunks)
         {
+            cachedChunkIndexes.Clear();
             foreach (Chunk chunk in chunks)
             {
                 if (chunk.AdjacentChunks[2] != null)
@@ -84,6 +84,27 @@ namespace Buildings.District
             }
         }
 
+        public void ExpandDistrict(HashSet<Chunk> chunks) // To-do: Add callback to DistrictState in case of further merging
+        {
+            DistrictChunks.Clear();
+            foreach (Chunk chunk in chunks)
+            {
+                if (chunk.IsTop)
+                {
+                    DistrictChunks.Add(chunk.ChunkIndex, chunk);
+                }
+            }
+            
+            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction, Position, InvokeOnClicked, ref meshCollider);
+            CreateChunkIndexCache(chunks);
+
+            if (State is EntityDistrictState entityState)
+            {
+                entityState.RemoveEntities();
+                entityState.SpawnEntities();
+            }
+        }
+
         private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
         {
             HashSet<int3> destroyedIndexes = new HashSet<int3>();
@@ -93,14 +114,11 @@ namespace Buildings.District
             
                 for (int j = indexes.Count - 1; j >= 0; j--)
                 {
-                    if (DistrictChunks.TryGetValue(indexes[j], out Chunk chunk))
-                    {
-                        destroyedIndexes.Add(chunk.ChunkIndex);
+                    if (!DistrictChunks.TryGetValue(indexes[j], out Chunk chunk)) continue;
                     
-                        DistrictChunks.Remove(indexes[j]);
-                        indexes.RemoveAtSwapBack(j);
-                    }
-                    
+                    destroyedIndexes.Add(chunk.ChunkIndex);
+                    DistrictChunks.Remove(indexes[j]);
+                    indexes.RemoveAtSwapBack(j);
                 }
 
                 if (indexes.Count == 0)

@@ -27,7 +27,7 @@ namespace Buildings.District
         public DamageInstance LastDamageDone => lastDamageDone;
         public Stats Stats => stats;
         
-        public abstract List<UpgradeStat> UpgradeStats { get; }
+        public abstract List<IUpgradeStat> UpgradeStats { get; }
         public Vector3 OriginPosition { get; protected set; }
         public Vector3 AttackPosition { get; set; }
         public DistrictData DistrictData { get; }
@@ -93,7 +93,7 @@ namespace Buildings.District
     public abstract class EntityDistrictState : DistrictState
     {
         protected readonly HashSet<Entity> spawnedEntities = new HashSet<Entity>();
-        protected readonly Dictionary<int3, Entity> entityIndexes = new Dictionary<int3, Entity>();
+        protected readonly Dictionary<int2, Entity> entityIndexes = new Dictionary<int2, Entity>();
         private readonly World defaultWorld;
         
         protected EntityDistrictState(DistrictData districtData, Vector3 position, int key) : base(districtData, position, key)
@@ -103,7 +103,7 @@ namespace Buildings.District
         
         protected abstract List<Chunk> GetEntityChunks();
         
-        protected void SpawnEntities()
+        public void SpawnEntities()
         {
             List<Chunk> topChunks = GetEntityChunks();
             ComponentType[] componentTypes =
@@ -133,7 +133,7 @@ namespace Buildings.District
                     Timer = delay * i
                 });
                 spawnedEntities.Add(spawnedEntity);
-                entityIndexes.Add(topChunks[i].ChunkIndex, spawnedEntity);
+                entityIndexes.Add(topChunks[i].ChunkIndex.xz, spawnedEntity);
             }
 
             entities.Dispose();
@@ -179,6 +179,22 @@ namespace Buildings.District
             }
         }
         
+        public void RemoveEntities()
+        {
+            NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(spawnedEntities.Count, Allocator.Temp);
+            int index = 0;
+            foreach (Entity entity in spawnedEntities)
+            {
+                entitiesToDestroy[index++] = entity;
+            }
+            
+            entityManager.DestroyEntity(entitiesToDestroy);
+            
+            entityIndexes.Clear();
+            spawnedEntities.Clear();
+            entitiesToDestroy.Dispose();
+        }
+        
         protected void PerformAttack(float3 targetPosition)
         {
             AttackPosition = targetPosition;
@@ -191,7 +207,7 @@ namespace Buildings.District
             int index = 0;
             foreach (int3 destroyedIndex in destroyedIndexes)
             {
-                if (!entityIndexes.TryGetValue(destroyedIndex, out Entity entity)) continue;
+                if (!entityIndexes.TryGetValue(destroyedIndex.xz, out Entity entity)) continue;
                 
                 entitiesToDestroy[index++] = entity;
                 spawnedEntities.Remove(entity);
@@ -209,7 +225,7 @@ namespace Buildings.District
 
     public class ArcherState : EntityDistrictState
     {
-        public override List<UpgradeStat> UpgradeStats { get; } = new List<UpgradeStat>();
+        public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         
         private readonly TowerData archerData;
 
@@ -306,7 +322,7 @@ namespace Buildings.District
         private GameObject rangeIndicator;
         private bool selected;
         
-        public override List<UpgradeStat> UpgradeStats { get; } = new List<UpgradeStat>();
+        public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
         
         public BombState(DistrictData districtData, TowerData bombData, Vector3 position, int key) : base(districtData, position, key)
@@ -397,7 +413,7 @@ namespace Buildings.District
         private GameObject rangeIndicator;
         private bool selected;
         
-        public override List<UpgradeStat> UpgradeStats { get; } = new List<UpgradeStat>();
+        public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
         
         public TownHallState(DistrictData districtData, TowerData townHallData, Vector3 position, int key) : base(districtData, position, key)
@@ -423,7 +439,7 @@ namespace Buildings.District
         private void CreateStats()
         {
             stats = new Stats(townHallData.Stats);
-            UpgradeStat townHall = new UpgradeStat(new Stat(1), townHallData.LevelDatas[0],
+            TownHallUpgradeStat townHall = new TownHallUpgradeStat(new Stat(1), townHallData.LevelDatas[0],
                 "Level",
                 new string[] { "Increase Level by {0}", "Current Level: {0}" },
                 townHallData.UpgradeIcons[0]);
@@ -497,7 +513,7 @@ namespace Buildings.District
         
         private readonly TowerData mineData;
         
-        public override List<UpgradeStat> UpgradeStats { get; } = new List<UpgradeStat>();
+        public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
         
         public MineState(DistrictData districtData, TowerData mineData, Vector3 position, int key) : base(districtData, position, key)

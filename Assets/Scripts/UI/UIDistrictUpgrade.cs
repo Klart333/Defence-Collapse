@@ -1,11 +1,12 @@
-using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Buildings.District;
 using UnityEngine.UI;
+using Gameplay.Money;
 using UnityEngine;
 using DG.Tweening;
-using Gameplay.Money;
+using System;
 using TMPro;
 
 public class UIDistrictUpgrade : MonoBehaviour
@@ -139,7 +140,7 @@ public class UIDistrictUpgrade : MonoBehaviour
         DisplayUpgrade(districtData.UpgradeStats[0]);
     }
 
-    public void DisplayUpgrade(UpgradeStat stat)
+    public void DisplayUpgrade(IUpgradeStat stat)
     {
         upgradeTitleText.text = stat.Name;
 
@@ -173,18 +174,23 @@ public class UIDistrictUpgrade : MonoBehaviour
 
     #region Functionality
 
-    public void UpgradeStat(UpgradeStat stat)
+    public async UniTaskVoid UpgradeStat(IUpgradeStat stat)
     {
         float cost = stat.GetCost();
+        bool succeded = await stat.IncreaseLevel();
+        if (!succeded)
+        {
+            return;
+        }
+
         MoneyManager.Instance.RemoveMoney(cost);
 
-        stat.IncreaseLevel();
         districtData.LevelUp();
 
         DisplayUpgrade(stat);
     }
 
-    public bool CanPurchase(UpgradeStat upgradeStat)
+    public bool CanPurchase(IUpgradeStat upgradeStat)
     {
         return MoneyManager.Instance.Money >= upgradeStat.GetCost();
     }

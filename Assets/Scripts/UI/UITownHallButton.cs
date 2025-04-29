@@ -37,8 +37,7 @@ namespace UI
 
         public void OnClick()
         {
-            Events.OnDistrictClicked?.Invoke(DistrictType.TownHall);
+            Events.OnDistrictClicked?.Invoke(DistrictType.TownHall, 2);
         }
     }
-
 }

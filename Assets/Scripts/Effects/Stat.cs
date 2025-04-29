@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using Gameplay;
 using System;
 
 public interface IStat
@@ -159,87 +158,5 @@ public class Modifier
     {
         Additive = 0,
         Multiplicative = 1,
-    }
-}
-
-[Serializable, InlineProperty]
-public class UpgradeStat : IStat
-{
-    [Title("Stat")]
-    public Stat Stat = new Stat(1);
-    
-    [Title("Upgrade Settings")]
-    public string Name = "Stat Name";
-    
-    public string[] Descriptions;
-    
-    public Sprite Icon;
-    
-    public LevelData LevelData;
-
-    private Modifier increaseModifier;
-
-    public int Level { get; private set; } = 1;
-    public event Action OnValueChanged;
-    public float Value => Stat.Value;
-    public float BaseValue => Stat.BaseValue;
-
-    public UpgradeStat()
-    {
-        Stat.OnValueChanged += () => OnValueChanged?.Invoke();
-    }
-
-    public UpgradeStat(Stat stat, LevelData levelData, string name, string[] descriptions, Sprite icon)
-    {
-        Stat = stat;
-        LevelData = levelData;
-        Name = name;
-        Descriptions = descriptions;
-        Icon = icon;
-        
-        Stat.OnValueChanged += () => OnValueChanged?.Invoke();
-    }
-    
-    public void AddModifier(Modifier mod)
-    {
-        Stat.AddModifier(mod);
-    }
-
-    public void RemoveModifier(Modifier mod)
-    {
-        Stat.RemoveModifier(mod);
-    }
-
-    public void RemoveAllModifiers()
-    {
-        Stat.RemoveAllModifiers();
-    }
-
-    public void IncreaseLevel()
-    {
-        if (increaseModifier == null)
-        {
-            increaseModifier = new Modifier
-            {
-                Type = Modifier.ModifierType.Additive
-            };
-
-            Stat.AddModifier(increaseModifier);
-        }
-        
-        increaseModifier.Value += GetIncrease();
-        Stat.SetDirty();
-        Stat.InvokeValueChanged();
-        Level++;
-    }
-
-    public float GetCost()
-    {
-        return LevelData.GetCost(Level);
-    }
-    
-    public float GetIncrease()
-    {
-        return LevelData.GetIncrease(Level);
     }
 }

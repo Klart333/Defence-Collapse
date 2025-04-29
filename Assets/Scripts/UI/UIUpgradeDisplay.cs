@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine.Serialization;
-using Cysharp.Threading.Tasks;
-using Sirenix.OdinInspector;
-using UnityEngine;
-using System;
+﻿using Sirenix.OdinInspector;
 using Gameplay.Money;
 using UnityEngine.UI;
+using UnityEngine;
 
 public class UIUpgradeDisplay : PooledMonoBehaviour
 {
@@ -16,9 +12,9 @@ public class UIUpgradeDisplay : PooledMonoBehaviour
     [SerializeField]
     private Image iconImage;
     
-    private UpgradeStat upgradeStat;
+    private IUpgradeStat upgradeStat;
 
-    private bool hoveredLastFrame = false;
+    private bool hoveredLastFrame;
     
     public UIDistrictUpgrade DistrictUpgrade { get; set; }
     
@@ -44,7 +40,7 @@ public class UIUpgradeDisplay : PooledMonoBehaviour
         UpdateButton();
     }
 
-    public void DisplayStat(UpgradeStat stat)
+    public void DisplayStat(IUpgradeStat stat)
     {
         upgradeStat = stat;
         iconImage.sprite = upgradeStat.Icon;
@@ -63,7 +59,7 @@ public class UIUpgradeDisplay : PooledMonoBehaviour
     {
         if (DistrictUpgrade.CanPurchase(upgradeStat))
         {
-            DistrictUpgrade.UpgradeStat(upgradeStat);
+            DistrictUpgrade.UpgradeStat(upgradeStat).Forget();
         }
     }
 }

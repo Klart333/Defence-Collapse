@@ -3,6 +3,7 @@ using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 namespace Buildings.District
 {
@@ -27,7 +28,10 @@ namespace Buildings.District
 
         private MaterialPropertyBlock block;
         
-        private bool selected;
+        public bool Selected { get; private set; }
+
+        private bool locked;
+        private Color? lastColor;
 
         public int3 Index { get; set; }
 
@@ -43,7 +47,9 @@ namespace Buildings.District
         {
             base.OnDisable();
 
-            if (selected)
+            lastColor = null;
+            locked = false;
+            if (Selected)
             {
                 Unselect();
             }
@@ -51,7 +57,7 @@ namespace Buildings.District
         
         private void OnMouseEnter()
         {
-            if (selected) return;
+            lastColor = block.GetColor(Color1);
             
             block.SetColor(Color1, hoveredColor);
             meshRenderer.SetPropertyBlock(block);
@@ -59,9 +65,7 @@ namespace Buildings.District
 
         private void OnMouseExit()
         {
-            if (selected) return;
-            
-            block.SetColor(Color1, defaultColor);
+            block.SetColor(Color1, lastColor.GetValueOrDefault(defaultColor));
             meshRenderer.SetPropertyBlock(block);
         }
         
@@ -75,26 +79,40 @@ namespace Buildings.District
             OnSelected?.Invoke(this);
         }
 
+        public void ForceSelected()
+        {
+            SetSelected();
+            locked = true;
+        }
+
         public void SetSelected()
         {
-            selected = true;
+            if (locked) return;
+
+            Selected = true;
             
+            lastColor = selectedColor;
             block.SetColor(Color1, selectedColor);
             meshRenderer.SetPropertyBlock(block);
         }
         
         public void SetSelected(Color color)
         {
-            selected = true;
-            
+            if (locked) return;
+
+            Selected = true;
+            lastColor = color;
             block.SetColor(Color1, color);
             meshRenderer.SetPropertyBlock(block);
         }
 
         public void Unselect()
         {
-            selected = false;
+            if (locked) return;
+
+            Selected = false;
             
+            lastColor = null;
             block.SetColor(Color1, defaultColor);
             meshRenderer.SetPropertyBlock(block);
         }
