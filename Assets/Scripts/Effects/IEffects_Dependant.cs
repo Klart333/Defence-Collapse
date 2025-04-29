@@ -1,3 +1,4 @@
+using Gameplay.Money;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;

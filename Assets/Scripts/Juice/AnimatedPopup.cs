@@ -1,10 +1,7 @@
-using System;
 using Sirenix.OdinInspector;
 using DG.Tweening;
-using DG.Tweening.Core;
-using DG.Tweening.Plugins.Options;
-using Gameplay;
 using UnityEngine;
+using Gameplay;
 
 namespace Juice
 {
@@ -14,8 +11,8 @@ namespace Juice
         [SerializeField]
         private Ease easeType = Ease.Linear;
         
-        [SerializeField, MinMaxRange(0, 5)]
-        private RangedFloat lifetime = new RangedFloat(0, 5);
+        [SerializeField, MinMaxRange(0, 3)]
+        private RangedFloat lifetime = new RangedFloat(0, 3);
 
         [SerializeField]
         private bool useGameSpeed = true;

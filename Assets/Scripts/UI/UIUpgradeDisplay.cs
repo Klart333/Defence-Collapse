@@ -4,63 +4,29 @@ using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
+using Gameplay.Money;
+using UnityEngine.UI;
 
 public class UIUpgradeDisplay : PooledMonoBehaviour
 {
-    [Title("Upgrade Info")]
-    [SerializeField]
-    private string description;
-
-    [SerializeField]
-    private string currentDescription;
-
     [Title("References")]
     [SerializeField]
     private StupidButton button;
+
+    [SerializeField]
+    private Image iconImage;
     
     private UpgradeStat upgradeStat;
 
     private bool hoveredLastFrame = false;
     
     public UIDistrictUpgrade DistrictUpgrade { get; set; }
-
-    public void DisplayStat(UpgradeStat stat)
-    {
-        upgradeStat = stat;
-
-        UpdateButton();
-
-        MoneyManager.Instance.OnMoneyChanged += UpdateTheButton;
-    }
-
+    
     protected override void OnDisable()
     {
         base.OnDisable();
 
         MoneyManager.Instance.OnMoneyChanged -= UpdateTheButton;
-    }
-
-    private void UpdateTheButton(float _)
-    {
-        UpdateButton();
-    }
-
-    private async void UpdateButton()
-    {
-        if (button.interactable)
-        {
-            await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
-        }
-        
-        button.interactable = DistrictUpgrade.CanPurchase(upgradeStat);
-    }
-
-    public void ClickUpgrade()
-    {
-        if (DistrictUpgrade.CanPurchase(upgradeStat))
-        {
-            DistrictUpgrade.UpgradeStat(upgradeStat);
-        }
     }
 
     private void Update()
@@ -71,5 +37,33 @@ public class UIUpgradeDisplay : PooledMonoBehaviour
         }
 
         hoveredLastFrame = button.Hovered;
+    }
+    
+    private void UpdateTheButton(float _)
+    {
+        UpdateButton();
+    }
+
+    public void DisplayStat(UpgradeStat stat)
+    {
+        upgradeStat = stat;
+        iconImage.sprite = upgradeStat.Icon;
+
+        UpdateButton();
+
+        MoneyManager.Instance.OnMoneyChanged += UpdateTheButton;
+    }
+    
+    private void UpdateButton()
+    {
+        button.interactable = DistrictUpgrade.CanPurchase(upgradeStat);
+    }
+
+    public void ClickUpgrade()
+    {
+        if (DistrictUpgrade.CanPurchase(upgradeStat))
+        {
+            DistrictUpgrade.UpgradeStat(upgradeStat);
+        }
     }
 }

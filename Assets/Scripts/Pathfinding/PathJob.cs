@@ -87,18 +87,18 @@ public struct PathJob : IJob
             int2 dir = PathManager.NeighbourDirections[i];
             int2 neighbour = new int2(x + dir.x, y + dir.y);
 
-            array[i] = neighbour switch // Grid width / height = 32, // NO DIAGONALS BUT IT'S FINE
+            array[i] = neighbour switch // Grid width / height = 24, // NO DIAGONALS BUT IT'S FINE
             {
                 {x: < 0} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x - 1, chunkIndex.y)) 
-                    ? new PathIndex(new int2(chunkIndex.x - 1, chunkIndex.y), 31 + y * GridWidth )
+                    ? new PathIndex(new int2(chunkIndex.x - 1, chunkIndex.y), 23 + y * GridWidth )
                     : new PathIndex(default, -1),
-                {x: > 31} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x + 1, chunkIndex.y)) 
+                {x: > 23} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x + 1, chunkIndex.y)) 
                     ? new PathIndex(new int2(chunkIndex.x + 1, chunkIndex.y), 0 + y * GridWidth )
                     : new PathIndex(default, -1),
                 {y: < 0} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y - 1)) 
-                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y - 1), x + 31 * GridWidth  ) 
+                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y - 1), x + 23 * GridWidth  ) 
                     : new PathIndex(default, -1),
-                {y: > 31} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y + 1)) 
+                {y: > 23} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y + 1)) 
                     ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y + 1), x + 0 * GridWidth ) 
                     : new PathIndex(default, -1),
                 _ => new PathIndex(chunkIndex, neighbour.x + neighbour.y * GridWidth),

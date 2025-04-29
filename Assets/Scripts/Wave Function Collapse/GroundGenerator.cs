@@ -291,7 +291,7 @@ namespace WaveFunctionCollapse
                 : direction == Direction.Forward ? chunk.Depth - 1 : 0;
 
             int end = isHorizontal ? chunk.Depth : chunk.Width;
-            for (int i = 2; i < end - 2; i++)
+            for (int i = 1; i < end - 1; i++)
             {
                 int x = isHorizontal ? edge : i;
                 int z = isHorizontal ? i : edge;

@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using System;
 using Gameplay;
+using System;
 
 public interface IStat
 {
     public event Action OnValueChanged;
     public float Value { get; }
+    public float BaseValue { get; }
 
     public void AddModifier(Modifier mod);
     public void RemoveModifier(Modifier mod);
@@ -27,6 +28,7 @@ public class Stat : IStat
             if (Mathf.Approximately(baseValue, value)) return;
 
             baseValue = value;
+            isDirty = true;
             OnValueChanged?.Invoke();
         }
     }
@@ -50,6 +52,15 @@ public class Stat : IStat
     {
         get
         {
+#if UNITY_EDITOR
+            if (!UnityEditor.EditorApplication.isPlaying)
+            {
+                isDirty = true;
+                value = GetValue();
+                return value;
+            }
+#endif
+            
             if (!isDirty)
             {
                 return value;
@@ -62,7 +73,7 @@ public class Stat : IStat
         }
     }
 
-    private float GetValue()
+    public float GetValue()
     {
         float val = BaseValue;
         if (modifiers == null)
@@ -128,6 +139,11 @@ public class Stat : IStat
     {
         isDirty = true;
     }
+
+    public void InvokeValueChanged()
+    {
+        OnValueChanged?.Invoke();
+    }
     
     public static implicit operator float(Stat stat) => stat.Value;
 }
@@ -154,25 +170,32 @@ public class UpgradeStat : IStat
     
     [Title("Upgrade Settings")]
     public string Name = "Stat Name";
-
+    
+    public string[] Descriptions;
+    
+    public Sprite Icon;
+    
     public LevelData LevelData;
 
     private Modifier increaseModifier;
-    
-    public int Level { get; private set; }
+
+    public int Level { get; private set; } = 1;
     public event Action OnValueChanged;
     public float Value => Stat.Value;
+    public float BaseValue => Stat.BaseValue;
 
     public UpgradeStat()
     {
         Stat.OnValueChanged += () => OnValueChanged?.Invoke();
     }
 
-    public UpgradeStat(Stat stat, LevelData levelData, string name)
+    public UpgradeStat(Stat stat, LevelData levelData, string name, string[] descriptions, Sprite icon)
     {
         Stat = stat;
         LevelData = levelData;
         Name = name;
+        Descriptions = descriptions;
+        Icon = icon;
         
         Stat.OnValueChanged += () => OnValueChanged?.Invoke();
     }
@@ -206,6 +229,7 @@ public class UpgradeStat : IStat
         
         increaseModifier.Value += GetIncrease();
         Stat.SetDirty();
+        Stat.InvokeValueChanged();
         Level++;
     }
 

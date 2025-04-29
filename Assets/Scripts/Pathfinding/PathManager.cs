@@ -267,9 +267,9 @@ namespace Pathfinding
         
         private const float HALF_BUILDING_CELL = 0.25f;
         private const float FULL_BUILDING_CELL = 0.5f;
-        private const float CHUNK_SIZE = 16;
         private const float CELL_SCALE = 0.5f;
-        private const int GRID_WIDTH = 32; // Also change GetNeighbours inside PathJob
+        private const float CHUNK_SIZE = 12;
+        private const int GRID_WIDTH = 24; // Also change GetNeighbours inside PathJob
         public static float2 ByteToDirection(byte directionByte)
         {
             float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees

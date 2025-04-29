@@ -99,10 +99,10 @@ namespace Effects.ECS
             float radius = colliderAspect.ColliderComponent.ValueRO.Radius;
             float radiusSq = radius * radius;
 
-            int2 centerCell = new int2((int)(pos.x + 0.5f), (int)(pos.z + 0.5f));
+            int2 centerCell = new int2((int)pos.x, (int)pos.z);
             if (CollideWithinCell(sortKey, entity, colliderAspect, centerCell, pos, radiusSq)) return;
 
-            int searchRadius = (int)radius;
+            int searchRadius = (int)(radius + 0.5f);
             int minX = centerCell.x - searchRadius;
             int maxX = centerCell.x + searchRadius;
             int minZ = centerCell.y - searchRadius;

@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Buildings.District;
 using UnityEngine.UI;
 using UnityEngine;
 using DG.Tweening;
+using Gameplay.Money;
 using TMPro;
 
 public class UIDistrictUpgrade : MonoBehaviour
@@ -11,6 +13,9 @@ public class UIDistrictUpgrade : MonoBehaviour
     [Title("Panel")]
     [SerializeField]
     private GameObject parentPanel;
+    
+    [SerializeField]
+    private Vector2 pivot = new Vector2(0.5f, 0.5f);
 
     [Title("Upgrade")]
     [SerializeField]
@@ -26,6 +31,9 @@ public class UIDistrictUpgrade : MonoBehaviour
     private Image[] points;
 
     [Title("Upgrade Displays")]
+    [SerializeField]
+    private TextMeshProUGUI panelTitleText;
+    
     [SerializeField]
     private UIUpgradeDisplay upgradeDisplayPrefab;
     
@@ -75,7 +83,7 @@ public class UIDistrictUpgrade : MonoBehaviour
 
     private void Update()
     {
-        PositionRectTransform.PositionOnOverlayCanvas(canvas, cam, transform as RectTransform, districtData.Position, new Vector2(0.25f, 0.5f));
+        PositionRectTransform.PositionOnOverlayCanvas(canvas, cam, transform as RectTransform, districtData.Position, pivot);
     }
 
     #region UI
@@ -102,6 +110,15 @@ public class UIDistrictUpgrade : MonoBehaviour
         ShowSection(true);
         
         SpawnUpgradeDisplays(districtData);
+        panelTitleText.text = districtData.State switch
+        {
+            TownHallState => "Town Hall",
+            MineState => "Mine District",
+            BombState => "Bomb District",
+            ArcherState => "Archer District",
+
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 
     private void SpawnUpgradeDisplays(DistrictData districtData)
@@ -112,30 +129,33 @@ public class UIDistrictUpgrade : MonoBehaviour
             spawned.DistrictUpgrade = this;
             spawned.DisplayStat(districtData.UpgradeStats[i]);
             spawned.transform.SetParent(upgradeDisplayParent, false);
+            spawned.transform.SetSiblingIndex(i);
             spawnedDisplays.Add(spawned);
         }
-
+        
         flexibleLayoutGroup.coloumns = districtData.UpgradeStats.Count;
         flexibleLayoutGroup.CalculateNewBounds();
+        
+        DisplayUpgrade(districtData.UpgradeStats[0]);
     }
 
     public void DisplayUpgrade(UpgradeStat stat)
     {
         upgradeTitleText.text = stat.Name;
 
-        //for (int i = 0; i < descriptions.Length; i++)
-        //{
-        //    if (i >= descriptionStrings.Count)
-        //    {
-        //        descriptions[i].text = "";
-        //        points[i].gameObject.SetActive(false);
-        //    }
-        //    else
-        //    {
-        //        descriptions[i].text = descriptionStrings[i];
-        //        points[i].gameObject.SetActive(true);
-        //    }
-        //}
+        for (int i = 0; i < descriptions.Length; i++)
+        {
+            if (i >= stat.Descriptions.Length)
+            {
+                descriptions[i].text = "";
+                points[i].gameObject.SetActive(false);
+            }
+            else
+            {
+                descriptions[i].text = string.Format(stat.Descriptions[i], i == 1 ? stat.Value.ToString("N") : stat.GetIncrease().ToString("N"));
+                points[i].gameObject.SetActive(true);
+            }
+        }
 
         costText.text = $"Cost: {stat.GetCost()}";
     }
@@ -160,13 +180,14 @@ public class UIDistrictUpgrade : MonoBehaviour
 
         stat.IncreaseLevel();
         districtData.LevelUp();
+
+        DisplayUpgrade(stat);
     }
 
     public bool CanPurchase(UpgradeStat upgradeStat)
     {
         return MoneyManager.Instance.Money >= upgradeStat.GetCost();
     }
-
 
     private void AddEffectToTower(EffectModifier effectModifier)
     {

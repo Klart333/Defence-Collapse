@@ -2,8 +2,8 @@ using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Buildings.District;
-using DG.Tweening;
 using Unity.Entities;
+using DG.Tweening;
 using UnityEngine;
 
 namespace Gameplay
@@ -76,10 +76,13 @@ namespace Gameplay
         public void SetGameSpeed(float targetSpeed, float lerpDuration)
         {
             updatingGameSpeed = true;
-            DOTween.To(() => Value, v => Value = v, targetSpeed, lerpDuration).SetEase(Ease.OutSine).SetUpdate(true).onComplete = () =>
+            DOTween.To(() => Value, v =>
+            {
+                Value = v;
+                entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
+            }, targetSpeed, lerpDuration).SetEase(Ease.OutSine).SetUpdate(true).onComplete = () =>
             {
                 updatingGameSpeed = false;
-                entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
             };
         }
         

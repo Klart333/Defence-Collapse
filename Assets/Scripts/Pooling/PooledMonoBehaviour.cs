@@ -42,6 +42,15 @@ public class PooledMonoBehaviour : MonoBehaviour
         return pooledObject; // returns the gameobject, this is for accessing it and making adjustments after it has spawned
     }
     
+    public T GetDisabled<T>() where T : PooledMonoBehaviour 
+    {
+        Pool pool = Pool.GetPool(this);   
+
+        var pooledObject = pool.Get<T>(); 
+
+        return pooledObject; 
+    }
+    
     public T GetAtPosAndRot<T>(Vector3 position, Quaternion rotation) where T : PooledMonoBehaviour // 1. This is the first step in spawning a prefab (kinda optional)
     {
         T pooledObject = Get<T>(); // What this method does is takes the pooledObject from Get<T> and assign its position and rotation

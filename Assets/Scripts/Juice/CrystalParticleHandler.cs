@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Gameplay.Money;
 using Sirenix.OdinInspector;
 using Unity.Collections;
 using UnityEngine;

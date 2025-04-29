@@ -41,7 +41,7 @@ namespace Chunks
 
         public void CreateMask(Chunk chunk, Adjacencies defaultAdjacencies)
         {
-            Vector3 position = chunk.Position + Vector3.up * 0.2f;
+            Vector3 position = chunk.Position + new Vector3(-1f, 0.2f, -1f);
             ChunkMask mask = maskPrefab.GetAtPosAndRot<ChunkMask>(position, Quaternion.identity);
             mask.SetAdjacencies(defaultAdjacencies);
             mask.FadeIn(fadeIn);

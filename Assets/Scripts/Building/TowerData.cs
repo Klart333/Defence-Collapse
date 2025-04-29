@@ -12,6 +12,8 @@ public class TowerData : SerializedScriptableObject
     public Stats Stats;
 
     public LevelData[] LevelDatas;
+    
+    public Sprite[] UpgradeIcons;
 
     [Title("Range")]
     public PooledMonoBehaviour RangeIndicator;

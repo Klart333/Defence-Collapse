@@ -28,18 +28,18 @@ public class Stats
 
     public Stats(Stats copy)
     {
-        DamageMultiplier = new Stat(copy.DamageMultiplier.Value);
-        AttackSpeed = new Stat(copy.AttackSpeed.Value);
-        Range = new Stat(copy.Range.Value);
+        DamageMultiplier = new Stat(copy.DamageMultiplier.BaseValue);
+        AttackSpeed = new Stat(copy.AttackSpeed.BaseValue);
+        Range = new Stat(copy.Range.BaseValue);
         
-        MovementSpeed = new Stat(copy.MovementSpeed.Value);
+        MovementSpeed = new Stat(copy.MovementSpeed.BaseValue);
         
-        CritChance = new Stat(copy.CritChance.Value);
-        CritMultiplier = new Stat(copy.CritMultiplier.Value);
+        CritChance = new Stat(copy.CritChance.BaseValue);
+        CritMultiplier = new Stat(copy.CritMultiplier.BaseValue);
         
-        Armor = new Stat(copy.Armor.Value);
-        MaxHealth = new Stat(copy.MaxHealth.Value);
-        Healing = new Stat(copy.Healing.Value);
+        Armor = new Stat(copy.Armor.BaseValue);
+        MaxHealth = new Stat(copy.MaxHealth.BaseValue);
+        Healing = new Stat(copy.Healing.BaseValue);
     }
 
     public IStat Get(StatType statType)
