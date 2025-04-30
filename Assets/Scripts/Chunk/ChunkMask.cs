@@ -18,10 +18,14 @@ namespace Chunks
         private MaterialPropertyBlock block;
 
         public Adjacencies Adjacencies { get; private set; }
-        
-        private void OnEnable()
+
+        private void Awake()
         {
             block = new MaterialPropertyBlock();
+        }
+
+        private void OnEnable()
+        {
             block.SetColor(Color, UnityEngine.Color.cyan);
             meshRenderer.GetPropertyBlock(block);
         }

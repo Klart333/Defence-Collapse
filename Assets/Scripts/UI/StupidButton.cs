@@ -1,10 +1,14 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class StupidButton : Button
 {
     private static readonly int Normal = Animator.StringToHash("Normal");
+    
+    public UnityEvent OnHoverEvent;
 
     public bool Hovered { get; private set; }
 
@@ -27,5 +31,10 @@ public class StupidButton : Button
         base.OnPointerExit(eventData);
 
         Hovered = false;
+    }
+
+    public void InvokeHoverEvent()
+    {
+        OnHoverEvent.Invoke();
     }
 }

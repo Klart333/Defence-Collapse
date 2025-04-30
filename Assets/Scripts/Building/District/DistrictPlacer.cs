@@ -35,9 +35,13 @@ namespace Buildings.District
 
         public int3 Index { get; set; }
 
-        private void OnEnable()
+        private void Awake()
         {
             block = new MaterialPropertyBlock();
+        }
+
+        private void OnEnable()
+        {
             meshRenderer.GetPropertyBlock(block);
             block.SetColor(Color1, defaultColor);
             meshRenderer.SetPropertyBlock(block);

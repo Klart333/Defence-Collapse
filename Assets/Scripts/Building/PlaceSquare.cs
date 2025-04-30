@@ -20,6 +20,11 @@ public class PlaceSquare : MonoBehaviour
     
     public bool Placed { get; set; }
 
+    private void Awake()
+    {
+        block = new MaterialPropertyBlock();
+    }
+
     private void OnEnable()
     {
         if (Placed)
@@ -28,7 +33,6 @@ public class PlaceSquare : MonoBehaviour
             return;
         }
         
-        block = new MaterialPropertyBlock();
         meshRenderer.GetPropertyBlock(block);
         block.SetColor(Color1, defaultColor);
         meshRenderer.SetPropertyBlock(block);
