@@ -8,7 +8,8 @@ public class StupidButton : Button
 {
     private static readonly int Normal = Animator.StringToHash("Normal");
     
-    public UnityEvent OnHoverEvent;
+    public UnityEvent OnHoverEnter;
+    public UnityEvent OnHoverExit;
 
     public bool Hovered { get; private set; }
 
@@ -17,13 +18,17 @@ public class StupidButton : Button
         base.OnDisable();
 
         Hovered = false;
-        animator.SetTrigger(Normal);
+        if (animator != null)
+        {
+            animator.SetTrigger(Normal);
+        }
     }
     public override void OnPointerEnter(PointerEventData eventData)
     {
         base.OnPointerEnter(eventData);
 
         Hovered = true;
+        OnHoverEnter?.Invoke();
     }
 
     public override void OnPointerExit(PointerEventData eventData)
@@ -31,10 +36,11 @@ public class StupidButton : Button
         base.OnPointerExit(eventData);
 
         Hovered = false;
+        OnHoverExit?.Invoke();
     }
 
     public void InvokeHoverEvent()
     {
-        OnHoverEvent.Invoke();
+        OnHoverEnter.Invoke();
     }
 }

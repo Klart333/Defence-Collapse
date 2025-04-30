@@ -7,6 +7,17 @@ using UnityEngine;
 [InlineEditor, CreateAssetMenu(fileName = "New Tower Data", menuName = "Building/Tower Data")]
 public class TowerData : SerializedScriptableObject
 {
+    [Title("Display")]
+    [SerializeField]
+    private string districtName = "___ District";
+
+    [SerializeField]
+    private Sprite icon;
+    
+    [SerializeField]
+    [TextArea]
+    private string description;
+    
     [TitleGroup("Stats")]
     [OdinSerialize, NonSerialized]
     public Stats Stats;
@@ -21,6 +32,10 @@ public class TowerData : SerializedScriptableObject
     [Title("Attack")]
     [OdinSerialize, NonSerialized]
     public Attack BaseAttack;
+    
+    public string DistrictName => districtName;
+    public Sprite Icon => icon;
+    public string Description => description;
 
     [TitleGroup("Stats")]
     [Button]

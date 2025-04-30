@@ -10,8 +10,6 @@ namespace Juice
     [RequireComponent(typeof(GraphicPropertyOverrideRange))]
     public class UIShineController : MonoBehaviour
     {
-        private static readonly int CycleTime = Shader.PropertyToID("_CycleTime");
-
         [Title("Settings")]
         [SerializeField]
         private float waveSpeed = 5;

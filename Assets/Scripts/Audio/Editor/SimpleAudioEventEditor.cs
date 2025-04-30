@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(SimpleAudioEvent))]
-public class SimpleAudioEventEditor : Editor
+public class SimpleAudioEventEditor : UnityEditor.Editor
 {
     private AudioSource previewSource;
 

@@ -248,7 +248,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  OnHoverEvent:
+  OnHoverEnter:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 8670106875531858723}
@@ -263,6 +263,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3414993344289433440
 GameObject:
   m_ObjectHideFlags: 0

@@ -18,8 +18,9 @@ namespace Gameplay
         [SerializeField]
         private float slowDownDuration = 1.0f;
         
-        private Entity gameSpeedEntity;
         private EntityManager entityManager;
+        private Entity gameSpeedEntity;
+        private Tween slowDownTween;
         
         private bool updatingGameSpeed = false;
         
@@ -75,12 +76,19 @@ namespace Gameplay
         
         public void SetGameSpeed(float targetSpeed, float lerpDuration)
         {
+            if (slowDownTween != null && slowDownTween.IsActive())
+            {
+                slowDownTween.Kill();
+            }
+            
             updatingGameSpeed = true;
-            DOTween.To(() => Value, v =>
+            slowDownTween = DOTween.To(() => Value, v =>
             {
                 Value = v;
                 entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
-            }, targetSpeed, lerpDuration).SetEase(Ease.OutSine).SetUpdate(true).onComplete = () =>
+            }, targetSpeed, lerpDuration).SetEase(Ease.OutSine).SetUpdate(true);
+            
+            slowDownTween.onComplete = () =>
             {
                 updatingGameSpeed = false;
             };
