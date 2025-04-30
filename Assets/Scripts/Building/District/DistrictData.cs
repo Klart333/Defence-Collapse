@@ -151,7 +151,10 @@ namespace Buildings.District
                 return false;
             }
 
-            State.OnIndexesDestroyed(new HashSet<int3> { chunk.ChunkIndex });
+            HashSet<int3> destroyedIndexes = new HashSet<int3> { chunk.ChunkIndex };
+            State.OnIndexesDestroyed(destroyedIndexes);
+            OnChunksLost?.Invoke(destroyedIndexes);
+
             DistrictChunks.Remove(chunk.ChunkIndex);
             DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction, Position, InvokeOnClicked, ref meshCollider);
             return true;
