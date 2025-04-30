@@ -138,7 +138,7 @@ namespace WaveFunctionCollapse
             {
                 for (int z = -1; z <= 1; z += 2)
                 {
-                    ChunkIndex? index = this.GetIndex(queryPosition + new Vector3(ChunkWaveFunction.GridScale.x * x, 0, z * ChunkWaveFunction.GridScale.z));
+                    ChunkIndex? index = this.GetIndex(queryPosition + new Vector3(ChunkWaveFunction.CellSize.x * x, 0, z * ChunkWaveFunction.CellSize.z));
                     if (index.HasValue) 
                     {
                         surrounding.Add(index.Value);

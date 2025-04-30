@@ -65,7 +65,7 @@ namespace WaveFunctionCollapse
             new Vector2Int(-1, 1),
         };
 
-        public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.GridScale.x, chunkSize.y * ChunkWaveFunction.GridScale.y, chunkSize.z * ChunkWaveFunction.GridScale.z);
+        public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.CellSize.x, chunkSize.y * ChunkWaveFunction.CellSize.y, chunkSize.z * ChunkWaveFunction.CellSize.z);
         public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
         private bool ShouldAwait => awaitEveryFrame > 0;
         public bool IsGenerating {get; private set;}
@@ -73,7 +73,7 @@ namespace WaveFunctionCollapse
 
         private void OnEnable()
         {
-            offset = new Vector3(waveFunction.GridScale.x, 0, waveFunction.GridScale.z) / -2.0f;
+            offset = new Vector3(waveFunction.CellSize.x, 0, waveFunction.CellSize.z) / -2.0f;
 
             waveFunction.Load(this);
             Events.OnBuildingBuilt += OnBuildingBuilt;
@@ -157,7 +157,7 @@ namespace WaveFunctionCollapse
                     isBuildable |= buildable.MeshRot.MeshIndex == -1;
                     if (!isBuildable && !meshIsBuildable) continue;
 
-                    Vector3 pos = buildable.gameObject.transform.position + new Vector3(corners[i].x * chunkSize.x * waveFunction.GridScale.x, 0, corners[i].y * chunkSize.z * waveFunction.GridScale.z) / -2.0f + offset;
+                    Vector3 pos = buildable.gameObject.transform.position + new Vector3(corners[i].x * chunkSize.x * waveFunction.CellSize.x, 0, corners[i].y * chunkSize.z * waveFunction.CellSize.z) / -2.0f + offset;
                     int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, ChunkScale);
                     if (waveFunction.Chunks.TryGetValue(index, out Chunk chunk))
                     {
@@ -370,7 +370,7 @@ namespace WaveFunctionCollapse
                 {
                     Vector3 pos = cell.Position;
                     Gizmos.color = cell.Buildable ? Color.white : Color.red;
-                    Gizmos.DrawWireCube(pos, new Vector3(waveFunction.GridScale.x, waveFunction.GridScale.y, waveFunction.GridScale.z) * 0.75f);
+                    Gizmos.DrawWireCube(pos, new Vector3(waveFunction.CellSize.x, waveFunction.CellSize.y, waveFunction.CellSize.z) * 0.75f);
                 }
             }
         }

@@ -13,6 +13,11 @@ public static class Extensions
         return new float3(v.x, y, v.z);
     }
     
+    public static Vector3 XyZ(this Vector3 v, float y = 0)
+    {
+        return new Vector3(v.x, y, v.z);
+    }
+    
     public static float3 XyZ(this int2 v, float y = 0)
     {
         return new float3(v.x, y, v.y);

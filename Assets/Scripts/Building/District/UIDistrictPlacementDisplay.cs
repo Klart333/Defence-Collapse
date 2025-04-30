@@ -136,6 +136,8 @@ namespace Buildings.District
             foreach (Chunk chunk in chunkWaveFunction.Chunks.Values)
             {
                 if (chunk.ChunkIndex.y != 0) continue;
+                if (districtHandler.IsBuilt(chunk, out DistrictData data) && data.State is not TownHallState) continue;
+
                 int3 index = ChunkWaveUtility.GetDistrictIndex3(chunk.Position, districtGenerator.ChunkScale);
                 if (!CheckDistrictRestriction(currentType, index)) continue; 
                 

@@ -67,7 +67,7 @@ namespace Chunks
             }
 
             Vector3 chunkPos = groundGenerator.ChunkWaveFunction.Chunks[chunkIndex].Position;
-            Vector3 relativePosition = (cell.Position + groundGenerator.ChunkWaveFunction.GridScale / 2.0f) - chunkPos;
+            Vector3 relativePosition = (cell.Position + groundGenerator.ChunkWaveFunction.CellSize / 2.0f) - chunkPos;
 
             if ((mask.Adjacencies & Adjacencies.North) > 0 
                 && groundGenerator.ChunkScale.z - relativePosition.z < distanceThreshold)

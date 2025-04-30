@@ -112,7 +112,7 @@ public class BuildingPlacer : MonoBehaviour
 
     private void InitializeSpawnPlaces(QueryMarchedChunk chunk)
     {
-        targetScale = groundGenerator.ChunkWaveFunction.GridScale.MultiplyByAxis(BuildingManager.Instance.ChunkWaveFunction.GridScale);
+        targetScale = groundGenerator.ChunkWaveFunction.CellSize.MultiplyByAxis(BuildingManager.Instance.ChunkWaveFunction.CellSize);
         for (int x = 0; x < chunk.Width - 1; x++)
         {
             for (int z = 0; z < chunk.Depth - 1; z++)

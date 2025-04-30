@@ -37,7 +37,7 @@ namespace WaveFunctionCollapse
         public Dictionary<int3, TChunk> Chunks { get; } = new Dictionary<int3, TChunk>();
         public Stack<GameObject> GameObjectPool => gameObjectPool;
         public Transform ParentTransform { get; set; }
-        public Vector3 GridScale => gridScale;
+        public Vector3 CellSize => gridScale;
 
         public Cell this[ChunkIndex index]
         {
@@ -341,7 +341,7 @@ namespace WaveFunctionCollapse
             ParentTransform ??= new GameObject("Wave Function Parent").transform;
             gm.transform.SetParent(ParentTransform, true);
 
-            gm.transform.localScale = GridScale / 2 * scale;
+            gm.transform.localScale = CellSize / 2 * scale;
 
             return gm;
         }

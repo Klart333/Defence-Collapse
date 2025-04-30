@@ -82,7 +82,7 @@ namespace WaveFunctionCollapse
         public bool IsGenerating { get; private set; }
         public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
         public PrototypeInfoData DefaultPrototypeInfoData => defaultPrototypeInfoData;
-        public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.GridScale.x, chunkSize.y * ChunkWaveFunction.GridScale.y, chunkSize.z * ChunkWaveFunction.GridScale.z);
+        public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.CellSize.x, chunkSize.y * ChunkWaveFunction.CellSize.y, chunkSize.z * ChunkWaveFunction.CellSize.z);
         
 #if UNITY_EDITOR
         private async UniTaskVoid Start()

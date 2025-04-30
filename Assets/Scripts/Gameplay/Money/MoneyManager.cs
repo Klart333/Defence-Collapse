@@ -138,6 +138,14 @@ namespace Gameplay.Money
 
         #region Debug
 
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                AddMoneyDebug();
+            }
+        }
+
         [Button]
         private void AddMoneyDebug(float money = 1000)
         {

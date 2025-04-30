@@ -9,12 +9,15 @@ using UnityEngine;
 using Gameplay;
 using Utility;
 using System;
+using System.Linq;
 
 namespace Buildings.District
 {
     public class DistrictData : IDisposable
     {
         public event Action<DistrictData> OnClicked;
+        public event Action<HashSet<int3>> OnChunksLost;
+        
         public event Action OnDisposed;
         public event Action OnLevelup;
 
@@ -36,7 +39,7 @@ namespace Buildings.District
             DistrictChunks = new Dictionary<int3, Chunk>();
             foreach (Chunk chunk in chunks)
             {
-                if (chunk.AdjacentChunks[2] == null)
+                if (chunk.IsTop)
                 {
                     DistrictChunks.Add(chunk.ChunkIndex, chunk);
                 }
@@ -54,7 +57,7 @@ namespace Buildings.District
 
             waveFunction = chunkWaveFunction;
             Position = position;
-            DistrictUtility.GenerateCollider(chunks, waveFunction, Position, InvokeOnClicked, ref meshCollider);
+            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction, Position, InvokeOnClicked, ref meshCollider);
             CreateChunkIndexCache(chunks);
 
             Events.OnWaveStarted += OnWaveStarted;
@@ -89,6 +92,8 @@ namespace Buildings.District
             DistrictChunks.Clear();
             foreach (Chunk chunk in chunks)
             {
+                Debug.DrawLine(chunk.Position, chunk.Position + Vector3.up * 0.2f, Color.red, 10);
+                
                 if (chunk.IsTop)
                 {
                     DistrictChunks.Add(chunk.ChunkIndex, chunk);
@@ -133,6 +138,7 @@ namespace Buildings.District
             }
             else if (destroyedIndexes.Count > 0)
             {
+                OnChunksLost?.Invoke(destroyedIndexes);
                 State.OnIndexesDestroyed(destroyedIndexes);
                 DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction, Position, InvokeOnClicked, ref meshCollider);
             }
@@ -215,24 +221,29 @@ namespace Buildings.District
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             Dictionary<Vector3, int> vertexIndices = new Dictionary<Vector3, int>();
-            Vector3 offset = new Vector3(chunkWaveFunction.ChunkWaveFunction.GridScale.x, 0, chunkWaveFunction.ChunkWaveFunction.GridScale.z) / -2.0f;
+            Vector3 offset = new Vector3(chunkWaveFunction.ChunkWaveFunction.CellSize.x, 0, chunkWaveFunction.ChunkWaveFunction.CellSize.z) / -2.0f;
 
-            float chunkWidth = chunkWaveFunction.ChunkScale.x / 2;
-            float chunkHeight = chunkWaveFunction.ChunkScale.y / 2;
-            float chunkDepth = chunkWaveFunction.ChunkScale.z / 2;
+            float chunkWidth = chunkWaveFunction.ChunkScale.x;
+            float chunkHeight = chunkWaveFunction.ChunkScale.y;
+            float chunkDepth = chunkWaveFunction.ChunkScale.z;
             
             foreach (Chunk chunk in chunks)
             {
-                // Assuming each chunk has a position and contains 2x2x2 cells
-                Vector3 chunkPosition = chunk.Position - pos;
-                for (int x = 0; x < 2; x++)
-                for (int y = 0; y < 2; y++)
-                for (int z = 0; z < 2; z++)
+                if (chunk.AdjacentChunks.All(x => x != null && x.PrototypeInfoData == chunk.PrototypeInfoData))
                 {
-                    if (AllInvalid(chunk, x, y, z)) continue;
+                    continue;
+                }
+                
+                // Assuming each chunk has a position and contains 2x2x2 cells
+                Vector3 chunkPosition = chunk.Position - pos - chunkWaveFunction.ChunkWaveFunction.CellSize / 2.0f; 
+                //for (int x = 0; x < 2; x++)
+                //for (int y = 0; y < 2; y++)
+                //for (int z = 0; z < 2; z++)
+                //{
+                //    if (AllInvalid(chunk, x, y, z)) continue;
 
                     // Calculate cell's bottom-left-front corner position
-                    Vector3 cellPosition = chunkPosition + new Vector3(x, y, z).MultiplyByAxis(chunkWaveFunction.ChunkScale / 2) + offset;
+                    Vector3 cellPosition = chunkPosition;//+ new Vector3(x, y, z).MultiplyByAxis(chunkWaveFunction.ChunkScale / 2) + offset;
 
                     // Define the 8 corners of the 3D cell
                     Vector3 bottomLeftFront = new Vector3(cellPosition.x, cellPosition.y, cellPosition.z);
@@ -254,28 +265,39 @@ namespace Buildings.District
                     int topRightBackIndex = AddVertex(topRightBack);
                     int topLeftBackIndex = AddVertex(topLeftBack);
 
-                    // Generate triangles for all 6 faces of the 3D cell
-                    AddQuad(bottomLeftFrontIndex, bottomRightFrontIndex, topRightFrontIndex, topLeftFrontIndex);
-                    AddQuad(bottomRightBackIndex, bottomLeftBackIndex, topLeftBackIndex, topRightBackIndex);
-                    AddQuad(topLeftFrontIndex, topRightFrontIndex, topRightBackIndex, topLeftBackIndex);
-                    AddQuad(bottomRightFrontIndex, bottomLeftFrontIndex, bottomLeftBackIndex, bottomRightBackIndex);
-                    AddQuad(bottomLeftFrontIndex, bottomLeftBackIndex, topLeftBackIndex, topLeftFrontIndex);
-                    AddQuad(bottomRightBackIndex, bottomRightFrontIndex, topRightFrontIndex, topRightBackIndex);
-                }
+                    // Generate triangles for all 6 faces of the 3D cell with consistent winding order
+                    // Bottom face
+                    AddQuad(bottomLeftFrontIndex, bottomRightFrontIndex, bottomLeftBackIndex, bottomRightBackIndex);
+                    // Front face
+                    AddQuad(bottomLeftFrontIndex,topLeftFrontIndex, bottomRightFrontIndex, topRightFrontIndex );
+                    // Back face
+                    AddQuad(bottomRightBackIndex, topRightBackIndex, bottomLeftBackIndex, topLeftBackIndex);
+                    // Top face
+                    AddQuad(topLeftFrontIndex, topLeftBackIndex, topRightFrontIndex, topRightBackIndex);
+                    // Left face
+                    AddQuad(bottomLeftBackIndex, topLeftBackIndex, bottomLeftFrontIndex, topLeftFrontIndex);
+                    // Right face
+                    AddQuad(bottomRightFrontIndex, topRightFrontIndex, bottomRightBackIndex, topRightBackIndex);
+                //}
             }
+            
             Mesh mesh = new Mesh
             {
                 vertices = vertices.ToArray(),
                 triangles = triangles.ToArray()
             };
+            mesh.RecalculateNormals(); // Make sure to recalculate normals
             mesh.RecalculateBounds();
 
             if (!meshCollider)
             {
                 meshCollider = new GameObject("District Collider").AddComponent<MeshCollider>();
                 meshCollider.gameObject.AddComponent<ClickCallbackComponent>().OnClick += action;
+                meshCollider.gameObject.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                meshCollider.gameObject.AddComponent<MeshFilter>();
             }
 
+            meshCollider.gameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
             meshCollider.transform.position = pos;
             meshCollider.sharedMesh = mesh;
             
@@ -286,25 +308,25 @@ namespace Buildings.District
             {
                 if (vertexIndices.TryGetValue(vertex, out int index))
                 {
-                    return index; // Return the existing index if the vertex is already in the list
+                    return index;
                 }
 
-                vertices.Add(vertex); // Add the vertex to the list
-                vertexIndices[vertex] = vertices.Count - 1; // Store its index
-                return vertices.Count - 1; // Return the new index
+                vertices.Add(vertex);
+                vertexIndices[vertex] = vertices.Count - 1;
+                return vertices.Count - 1;
             }
 
             // Helper function to add a quad (two triangles) to the triangles list
             void AddQuad(int a, int b, int c, int d)
             {
-                // First triangle
+                // First triangle (counter-clockwise order)
                 triangles.Add(a);
                 triangles.Add(b);
                 triangles.Add(c);
 
-                // Second triangle
-                triangles.Add(a);
+                // Second triangle (counter-clockwise order)
                 triangles.Add(c);
+                triangles.Add(b);
                 triangles.Add(d);
             }
 
@@ -319,13 +341,7 @@ namespace Buildings.District
                         break;
                     }
                 }
-
-                if (all)
-                {
-                    return true;
-                }
-
-                return false;
+                return all;
             }
         }
 

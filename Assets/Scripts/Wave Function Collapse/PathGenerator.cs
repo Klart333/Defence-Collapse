@@ -50,7 +50,7 @@ namespace WaveFunctionCollapse
         {
             get
             {
-                gridScale ??= waveFunction.GridScale.MultiplyByAxis(groundGenerator.ChunkWaveFunction.GridScale);
+                gridScale ??= waveFunction.CellSize.MultiplyByAxis(groundGenerator.ChunkWaveFunction.CellSize);
                 return gridScale.Value;
             }
         }
@@ -72,9 +72,9 @@ namespace WaveFunctionCollapse
         {
             int3 index = chunk.ChunkIndex;
             QueryMarchedChunk queryChunk = new QueryMarchedChunk().Construct(
-                Mathf.FloorToInt(chunk.Width / waveFunction.GridScale.x),
+                Mathf.FloorToInt(chunk.Width / waveFunction.CellSize.x),
                 1,
-                Mathf.FloorToInt(chunk.Depth / waveFunction.GridScale.z),
+                Mathf.FloorToInt(chunk.Depth / waveFunction.CellSize.z),
                 index,
                 chunk.Position,
                 waveFunction.GetAdjacentChunks(index).ToArray<IChunk>(),
@@ -236,7 +236,7 @@ namespace WaveFunctionCollapse
         {
             Path building = pathPrefab.GetAtPosAndRot<Path>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
 
-            building.Setup(prototypeData, waveFunction.GridScale);
+            building.Setup(prototypeData, waveFunction.CellSize);
 
             if (animate) buildingAnimator.Animate(building);
 

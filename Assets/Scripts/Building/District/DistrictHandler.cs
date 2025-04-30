@@ -10,6 +10,7 @@ using Gameplay.Money;
 using UnityEngine;
 using Gameplay;
 using System;
+using System.Linq;
 
 namespace Buildings.District
 {
@@ -105,7 +106,8 @@ namespace Buildings.District
             int topChunkCount = 0;
             foreach (Chunk chunk in chunks)
             {
-                if (chunk.IsTop)
+                bool isTop = chunk.IsTop;
+                if (isTop)
                 {
                     topChunkCount++;
                 }
@@ -115,9 +117,11 @@ namespace Buildings.District
                 chunk.Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
                 districtGenerator.ChunkWaveFunction.LoadCells(chunk, prototypeInfo);
 
+                if (!isTop) continue;
+
                 int height = districtType switch
                 {
-                    DistrictType.TownHall => (townHallDistrict?.State as TownHallState)?.UpgradeStats[0].Level ?? 0,
+                    DistrictType.TownHall => (townHallDistrict?.State as TownHallState)?.UpgradeStats[0].Level - 1 ?? 0,
                     DistrictType.Archer => 1,
                     DistrictType.Bomb => 1,
                     DistrictType.Mine => 0,
@@ -129,11 +133,15 @@ namespace Buildings.District
                 for (int j = 0; j < height; j++) // Kinda assumes that the chunks are not stacked vertically already
                 {
                     int heightLevel = 1 + j;
-                    Vector3 pos = chunk.Position + Vector3.up * districtGenerator.ChunkScale.y * heightLevel;
+                    Vector3 pos = chunk.Position.XyZ(0) + Vector3.up * districtGenerator.ChunkScale.y * heightLevel;
                     int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, districtGenerator.ChunkScale);
-                    if (districtGenerator.ChunkWaveFunction.Chunks.ContainsKey(index)) continue;
+                    if (districtGenerator.ChunkWaveFunction.Chunks.TryGetValue(index, out Chunk existingChunk))
+                    {
+                        addedChunks.Add(existingChunk);
+                        continue;
+                    }
 
-                    Chunk addChunk = districtGenerator.ChunkWaveFunction.LoadChunk(index, districtGenerator.ChunkSize, prototypeInfo);
+                    Chunk addChunk = districtGenerator.ChunkWaveFunction.LoadChunk(pos, districtGenerator.ChunkSize, prototypeInfo);
                     addedChunks.Add(addChunk);
                     
                     districtGenerator.ChunkIndexToChunks[buildingChunkIndex.Value].Add(addChunk.ChunkIndex);
@@ -158,35 +166,7 @@ namespace Buildings.District
             }
             else
             {
-                DistrictData districtData = GetDistrictData(districtType, chunks);
-                uniqueDistricts.Add(districtData);
-                if (districtType == DistrictType.TownHall) townHallDistrict = districtData;
-                
-                foreach (Chunk chunk in chunks)
-                {
-                    districts.TryAdd(chunk.ChunkIndex.xz, districtData);
-                }
-            
-                MoneyManager.Instance.Purchase(districtType, topChunkCount);
-                OnDistrictCreated?.Invoke(districtData);
-                Action onDispose = null;
-                onDispose = () =>
-                {
-                    districtData.OnDisposed -= onDispose;
-                    uniqueDistricts.Remove(districtData);
-            
-                    foreach (Chunk chunk in chunks)
-                    {
-                        districts.Remove(chunk.ChunkIndex.xz);
-                    }
-
-                    if (districtData.State is TownHallState)
-                    {
-                        Events.OnCapitolDestroyed?.Invoke(districtData);
-                    }
-                };
-
-                districtData.OnDisposed += onDispose;
+                DistrictData districtData = GetDistrictData(districtType, chunks, topChunkCount);
             }
             
             districtGenerator.ChunkWaveFunction.Propagate();
@@ -225,14 +205,64 @@ namespace Buildings.District
             }
         }
 
-        private DistrictData GetDistrictData(DistrictType districtType, HashSet<Chunk> chunks)
+        private DistrictData GetDistrictData(DistrictType districtType, HashSet<Chunk> chunks, int topChunkCount)
         {
             Vector3 position = GetAveragePosition(chunks);
             DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator, districtKey++)
             {
                 GameSpeed = GameSpeedManager.Instance
             };
+            
+            uniqueDistricts.Add(districtData);
+            if (districtType == DistrictType.TownHall) townHallDistrict = districtData;
+                
+            foreach (Chunk chunk in chunks)
+            {
+                districts.TryAdd(chunk.ChunkIndex.xz, districtData);
+            }
+            
+            MoneyManager.Instance.Purchase(districtType, topChunkCount);
+            OnDistrictCreated?.Invoke(districtData);
+
+            districtData.OnDisposed += OnDispose;
+            districtData.OnChunksLost += OnChunksLost;
             return districtData;
+            
+            
+            void OnDispose()
+            {
+                districtData.OnDisposed -= OnDispose;
+                districtData.OnChunksLost -= OnChunksLost;
+                uniqueDistricts.Remove(districtData);
+
+                foreach (Chunk chunk in chunks)
+                {
+                    districts.Remove(chunk.ChunkIndex.xz);
+                }
+
+                if (districtData.State is TownHallState)
+                {
+                    Events.OnCapitolDestroyed?.Invoke(districtData);
+                }
+            }
+
+            void OnChunksLost(HashSet<int3> chunkIndexes)
+            {
+                List<int2> toRemove = new List<int2>(chunkIndexes.Count);
+                foreach (KeyValuePair<int2, DistrictData> kvp in districts)
+                {
+                    if (kvp.Value != districtData) continue;
+                    if (chunkIndexes.Any(chunkIndex => math.all(kvp.Key == chunkIndex.xz)))
+                    {
+                        toRemove.Add(kvp.Key);
+                    }
+                }
+
+                for (int i = 0; i < toRemove.Count; i++)
+                {
+                    districts.Remove(toRemove[i]);
+                }
+            }
         }
         
         private Vector3 GetAveragePosition(IEnumerable<Chunk> chunks)
