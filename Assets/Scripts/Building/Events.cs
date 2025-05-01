@@ -18,6 +18,7 @@ public static class Events
 
     public static UnityAction<DistrictType, int> OnDistrictClicked;
     public static UnityAction<DistrictType> OnDistrictBuilt;
+    public static UnityAction<TowerData> OnDistrictUnlocked;
     
     public static UnityAction OnGameReset;
 }

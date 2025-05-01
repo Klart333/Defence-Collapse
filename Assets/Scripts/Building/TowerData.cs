@@ -18,6 +18,9 @@ public class TowerData : SerializedScriptableObject
     [TextArea]
     private string description;
     
+    [SerializeField]
+    private DistrictType districtType;
+    
     [TitleGroup("Stats")]
     [OdinSerialize, NonSerialized]
     public Stats Stats;

@@ -1,9 +1,8 @@
 using Plugins.Animate_UI_Materials;
-using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using System;
 using DG.Tweening;
+using Gameplay;
 
 namespace Juice
 {
@@ -17,14 +16,21 @@ namespace Juice
         [SerializeField]
         private Ease easeType = Ease.Linear;
         
+        [Title("Additional Settings")]
+        [SerializeField]
+        private bool useGameSpeed = false;
+        
         private GraphicPropertyOverrideRange materialOverride;
         private Tween tween; 
+        
+        private IGameSpeed gameSpeed;
         
         private bool shining;
         
         private void Awake()
         {
             materialOverride = GetComponent<GraphicPropertyOverrideRange>();
+            gameSpeed = GameSpeedManager.Instance;
         }
 
         private void OnDisable()
@@ -47,6 +53,11 @@ namespace Juice
             float duration = 1.0f / waveSpeed;
             tween = DOTween.To(x => materialOverride.PropertyValue = x, 0.0f, 1.0f, duration).SetEase(easeType);
             tween.OnComplete(() => shining = false);
+            
+            if (!useGameSpeed)
+            {
+                tween.timeScale = 1.0f / gameSpeed.Value;
+            }
         }
     }
 }

@@ -11,6 +11,15 @@ namespace UI
         [SerializeField]
         private GameObject townHallButton;
 
+        private void Awake()
+        {
+            townHallButton.SetActive(true);
+            for (int i = 0; i < disabledFoldoutObjects.Length; i++)
+            {
+                disabledFoldoutObjects[i].SetActive(false);
+            }
+        }
+
         private void OnEnable()
         {
             Events.OnDistrictBuilt += OnDistrictBuilt;

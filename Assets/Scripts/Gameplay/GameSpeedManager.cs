@@ -19,6 +19,7 @@ namespace Gameplay
         private float slowDownDuration = 1.0f;
         
         private EntityManager entityManager;
+        private InputManager inputManager;
         private Entity gameSpeedEntity;
         private Tween slowDownTween;
         
@@ -26,7 +27,7 @@ namespace Gameplay
         
         public float Value { get; private set; } = 1;
 
-        private async void OnEnable()
+        private void OnEnable()
         {
             Events.OnCapitolDestroyed += OnCapitolDestroyed;
             Events.OnGameReset += OnGameReset;
@@ -35,9 +36,14 @@ namespace Gameplay
             gameSpeedEntity = entityManager.CreateEntity(typeof(GameSpeedComponent));
             entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
             
-            await UniTask.WaitUntil(() => InputManager.Instance != null);
-            InputManager.Instance.Space.started += SpaceStarted;
-            InputManager.Instance.Space.canceled += SpaceCanceled;
+            GetInputManager().Forget();
+        }
+
+        private async UniTaskVoid GetInputManager()
+        {
+            inputManager = await InputManager.Get();
+            inputManager.Space.started += SpaceStarted;
+            inputManager.Space.canceled += SpaceCanceled;
         }
 
         private void OnDisable()
@@ -45,8 +51,8 @@ namespace Gameplay
             Events.OnCapitolDestroyed -= OnCapitolDestroyed;
             Events.OnGameReset -= OnGameReset;
             
-            InputManager.Instance.Space.started -= SpaceStarted;
-            InputManager.Instance.Space.canceled -= SpaceCanceled;
+            inputManager.Space.started -= SpaceStarted;
+            inputManager.Space.canceled -= SpaceCanceled;
         }
 
         private void Update()
@@ -98,6 +104,7 @@ namespace Gameplay
         {
             Value = targetSpeed;
             entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
+            DOTween.timeScale = Value;
         }
         
         private void OnGameReset()
