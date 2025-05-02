@@ -12,8 +12,8 @@ namespace DataStructures.Queue.ECS
         {
             public override void Bake(EnemiesAuthoring authoring)
             {
-                var entity = GetEntity(TransformUsageFlags.Dynamic);
-                var buffer = AddBuffer<ItemBufferElement>(entity);
+                Entity entity = GetEntity(TransformUsageFlags.Dynamic);
+                DynamicBuffer<ItemBufferElement> buffer = AddBuffer<ItemBufferElement>(entity);
                 for (int i = 0; i < authoring.EnemyUtility.Enemies.Count; i++)
                 {
                     buffer.Add(new ItemBufferElement

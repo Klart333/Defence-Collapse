@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
-using Unity.Entities;
 using UnityEngine;
 
 namespace Enemy

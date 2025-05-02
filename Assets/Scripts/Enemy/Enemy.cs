@@ -33,6 +33,7 @@ namespace Enemy
             
                 Entity enemyEntity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent(enemyEntity, new SpeedComponent { Speed = authoring.enemyData.Stats.MovementSpeed.Value });
+                AddComponent(enemyEntity, new FresnelComponent { Value = 5f});
                 AddComponent(enemyEntity, new AttackSpeedComponent { AttackSpeed = 1.0f / authoring.enemyData.Stats.AttackSpeed.Value });
 
                 AddComponent(enemyEntity, new FlowFieldComponent

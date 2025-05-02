@@ -1,6 +1,7 @@
 using Pathfinding;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
 using UnityEngine;
 
 public struct SpeedComponent : IComponentData
@@ -24,4 +25,10 @@ public struct AttackSpeedComponent : IComponentData
 {
     public float AttackSpeed;
     public float Timer;
+}
+
+[MaterialProperty("_Strength")]
+public struct FresnelComponent : IComponentData
+{
+    public float Value;
 }
