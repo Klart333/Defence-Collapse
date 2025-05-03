@@ -6,6 +6,7 @@ using WaveFunctionCollapse;
 using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
+using System.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.Money;
 
@@ -36,7 +37,7 @@ public class BuildingPlacer : MonoBehaviour
     public bool SquareWasPressed { get; set; }
     public ChunkIndex? SquareIndex { get; set; }
 
-    private async void OnEnable()
+    private void OnEnable()
     {
         cam = Camera.main;
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
@@ -46,6 +47,11 @@ public class BuildingPlacer : MonoBehaviour
         UIEvents.OnFocusChanged += OnBuildingCanceled;
         Events.OnBuildingClicked += BuildingClicked;
         
+        AwaitManagers().Forget();
+    }
+
+    private async UniTaskVoid AwaitManagers()
+    {
         await UniTask.WaitUntil(() => BuildingManager.Instance != null && InputManager.Instance != null);
         BuildingManager.Instance.OnLoaded += InitializeSpawnPlaces;
         InputManager.Instance.Fire.started += MouseOnDown;

@@ -8,8 +8,7 @@ namespace WaveFunctionCollapse
     {
         public Dictionary<ChunkIndex, IBuildable> QuerySpawnedBuildings { get; }
         public Dictionary<ChunkIndex, IBuildable> SpawnedMeshes { get; }
-        public Vector3 GridScale { get; }
-        public PrototypeInfoData PrototypeInfo { get; }
+        public Vector3 CellSize { get; }
         
         public void SetCell(ChunkIndex index, PrototypeData chosenPrototype, List<int3> queryCollapsedAir, bool query = true)
         {
@@ -50,7 +49,7 @@ namespace WaveFunctionCollapse
             return chunks;
         }
         
-        public void MakeBuildable(IEnumerable<ChunkIndex> cellsToCollapse) 
+        public void MakeBuildable(IEnumerable<ChunkIndex> cellsToCollapse, PrototypeInfoData prototypeInfo) 
         {
             foreach (ChunkIndex index in cellsToCollapse)
             {
@@ -62,7 +61,7 @@ namespace WaveFunctionCollapse
                 
                 chunk[index.CellIndex] = new Cell(false, 
                     chunk[index.CellIndex].Position, 
-                    new List<PrototypeData>(PrototypeInfo.MarchingTable[marchedIndex]));
+                    new List<PrototypeData>(prototypeInfo.MarchingTable[marchedIndex]));
 
                 chunk.GetAdjacentCells(index.CellIndex, out _).ForEach(x => ChunkWaveFunction.CellStack.Push(x));
 
@@ -77,10 +76,10 @@ namespace WaveFunctionCollapse
         private int GetMarchIndex(ChunkIndex index)
         {
             int marchedIndex = 0;
-            Vector3 pos = ChunkWaveFunction[index].Position + GridScale / 2.0f;
+            Vector3 pos = ChunkWaveFunction[index].Position + CellSize / 2.0f;
             for (int i = 0; i < 4; i++)
             {
-                Vector3 marchPos = pos + new Vector3(WaveFunctionUtility.MarchDirections[i].x * GridScale.x, 0, WaveFunctionUtility.MarchDirections[i].y * GridScale.z);
+                Vector3 marchPos = pos + new Vector3(WaveFunctionUtility.MarchDirections[i].x * CellSize.x, 0, WaveFunctionUtility.MarchDirections[i].y * CellSize.z);
                 ChunkIndex? chunk = GetIndex(marchPos);
                 if (chunk.HasValue && ChunkWaveFunction.Chunks[chunk.Value.Index].BuiltCells[chunk.Value.CellIndex.x, chunk.Value.CellIndex.y, chunk.Value.CellIndex.z])
                 {
@@ -95,7 +94,7 @@ namespace WaveFunctionCollapse
         {
             foreach (QueryMarchedChunk chunk in ChunkWaveFunction.Chunks.Values)
             {
-                if (!chunk.ContainsPoint(pos, GridScale)) continue;
+                if (!chunk.ContainsPoint(pos, CellSize)) continue;
                 
                 int3? cellIndex = GetIndex(pos, chunk);
                 if (cellIndex.HasValue)
@@ -112,13 +111,18 @@ namespace WaveFunctionCollapse
         public int3? GetIndex(Vector3 pos, IChunk chunk)
         {
             pos -= chunk.Position;
-            int3 index = new int3(Math.GetMultiple(pos.x, GridScale.x), 0, Math.GetMultiple(pos.z, GridScale.z));
+            int3 index = new int3(Math.GetMultiple(pos.x, CellSize.x), 0, Math.GetMultiple(pos.z, CellSize.z));
             if (chunk.Cells.IsInBounds(index))
             {
                 return index;
             }
 
             return null;
+        }
+        
+        public int3? GetIndex(Vector3 pos, int3 chunkIndex)
+        {
+            return GetIndex(pos, ChunkWaveFunction.Chunks[chunkIndex]);
         }
         
         public Vector3 GetPos(ChunkIndex index)
@@ -128,7 +132,7 @@ namespace WaveFunctionCollapse
         
         public List<ChunkIndex> GetCellsToCollapse(ChunkIndex queryIndex)
         {
-            return GetSurroundingCells(ChunkWaveFunction[queryIndex].Position + new Vector3(GridScale.x + 0.1f, 0, GridScale.z + 0.1f));
+            return GetSurroundingCells(ChunkWaveFunction[queryIndex].Position + new Vector3(CellSize.x + 0.1f, 0, CellSize.z + 0.1f));
         }
 
         private List<ChunkIndex> GetSurroundingCells(Vector3 queryPosition)
@@ -170,7 +174,7 @@ namespace WaveFunctionCollapse
             Vector3 pos = ChunkWaveFunction[builtIndex].Position;
             for (int i = 0; i < 4; i++)
             {
-                Vector3 marchPos = pos - new Vector3(WaveFunctionUtility.MarchDirections[i].x * GridScale.x, 0, WaveFunctionUtility.MarchDirections[i].y * GridScale.z);
+                Vector3 marchPos = pos - new Vector3(WaveFunctionUtility.MarchDirections[i].x * CellSize.x, 0, WaveFunctionUtility.MarchDirections[i].y * CellSize.z);
                 ChunkIndex? chunk = this.GetIndex(marchPos);
                 if (chunk.HasValue)
                 {
@@ -194,9 +198,9 @@ namespace WaveFunctionCollapse
             return queryWaveFunction.GetChunks(cellsToCollapse);
         }
         
-        public static void MakeBuildable<T>(this T queryWaveFunction, IEnumerable<ChunkIndex> cellsToCollapse) where T : IQueryWaveFunction
+        public static void MakeBuildable<T>(this T queryWaveFunction, IEnumerable<ChunkIndex> cellsToCollapse, PrototypeInfoData protInfo) where T : IQueryWaveFunction
         {
-            queryWaveFunction.MakeBuildable(cellsToCollapse);
+            queryWaveFunction.MakeBuildable(cellsToCollapse, protInfo);
         }
         
         public static ChunkIndex? GetIndex<T>(this T queryWaveFunction, Vector3 pos) where T : IQueryWaveFunction
@@ -207,6 +211,11 @@ namespace WaveFunctionCollapse
         public static int3? GetIndex<T>(this T queryWaveFunction, Vector3 pos, IChunk chunk) where T : IQueryWaveFunction
         {
             return queryWaveFunction.GetIndex(pos, chunk);
+        }
+        
+        public static int3? GetIndex<T>(this T queryWaveFunction, Vector3 pos, int3 chunkIndex) where T : IQueryWaveFunction
+        {
+            return queryWaveFunction.GetIndex(pos, chunkIndex);
         }
         
         public static Vector3 GetPos<T>(this T queryWaveFunction, ChunkIndex index) where T : IQueryWaveFunction

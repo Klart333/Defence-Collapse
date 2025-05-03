@@ -22,8 +22,8 @@ namespace WaveFunctionCollapse
         
         public readonly List<(int3, Cell)> QueryChangedCells = new List<(int3, Cell)>();
         public readonly List<int3> QueryCollapsedAir = new List<int3>();
+        private readonly List<int3> queryBuiltCells = new List<int3>();
         
-        private int3 queryIndex;
         private bool shouldRemoveQueryIndex;
 
         // In the Following order: Right, Left, Up, Down, Forward, Backward
@@ -43,6 +43,8 @@ namespace WaveFunctionCollapse
         public PrototypeInfoData PrototypeInfoData { get; private set; }
         
         public int3 ChunkSize => new int3(Width, Height, Depth);
+        
+        public bool IsTop => AdjacentChunks[2] == null;
 
         public Cell this[int3 index]
         {
@@ -369,7 +371,10 @@ namespace WaveFunctionCollapse
             if (shouldRemoveQueryIndex)
             {
                 shouldRemoveQueryIndex = false;
-                BuiltCells[queryIndex.x, queryIndex.y, queryIndex.z] = false;
+                for (int i = 0; i < queryBuiltCells.Count; i++)
+                {
+                    BuiltCells[queryBuiltCells[i].x, queryBuiltCells[i].y, queryBuiltCells[i].z] = false;
+                }
             }
         
             QueryChangedCells.Clear();
@@ -378,7 +383,7 @@ namespace WaveFunctionCollapse
         
         public void SetBuiltCells(int3 queryIndex)
         {
-            this.queryIndex = queryIndex;
+            queryBuiltCells.Add(queryIndex);
             
             if (BuiltCells[queryIndex.x, queryIndex.y, queryIndex.z])
             {

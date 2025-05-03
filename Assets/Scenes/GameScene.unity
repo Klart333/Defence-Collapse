@@ -802,6 +802,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 215717711}
   m_CullTransparentMesh: 1
+--- !u!1 &224982835
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 224982836}
+  - component: {fileID: 224982837}
+  m_Layer: 0
+  m_Name: DistrictPlacer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &224982836
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224982835}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1531255970}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &224982837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224982835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35bee138f0644ff5910178cba2a52d52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  districtGenerator: {fileID: 1551488502}
+  buildingGenerator: {fileID: 771210304}
 --- !u!1 &226841345
 GameObject:
   m_ObjectHideFlags: 0
@@ -941,16 +987,15 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects:
-    - {fileID: 1551488502}
+    ReferencedUnityObjects: []
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
     - Name: districtGenerator
-      Entry: 10
-      Data: 0
+      Entry: 6
+      Data: 
     - Name: Buildings
       Entry: 7
       Data: 0|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.ChunkIndex,
@@ -3329,27 +3374,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d10500ea0b74910b8a6a6d5d3e5ba1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects:
-    - {fileID: 1551488502}
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes:
-    - Name: districtGenerator
-      Entry: 10
-      Data: 0
-  confirmButton: {fileID: 394431584}
-  costText: {fileID: 104919694}
-  displayPrefab: {fileID: 978640249978000162, guid: d2175c259b214fa4d9fb7894596e2573,
-    type: 3}
-  maxDelay: 0.75
-  maxDelayDistance: 20
-  districtHandler: {fileID: 491554922}
-  crystalMaterial: {fileID: 2100000, guid: c36a4497441bc1d48ad8c03477895bc7, type: 2}
 --- !u!114 &491554922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10268,6 +10292,7 @@ Transform:
   m_Children:
   - {fileID: 491554920}
   - {fileID: 1388225832}
+  - {fileID: 224982836}
   m_Father: {fileID: 1411626119}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1547800859

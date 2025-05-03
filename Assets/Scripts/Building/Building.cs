@@ -63,6 +63,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     private BuildingAnimator buildingAnimator;
     private BuildingHandler buildingHandler;
     private MeshRenderer meshRenderer;
+    private MeshFilter meshFilter;
 
     private bool purchasing = true;
     private int originalLayer;
@@ -77,6 +78,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     private BuildingAnimator BuildingAnimator => buildingAnimator ??= FindAnyObjectByType<BuildingAnimator>();
     public BuildingHandler BuildingHandler => buildingHandler ??= FindAnyObjectByType<BuildingHandler>();
     public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
+    public MeshFilter MeshFilter => meshFilter ??= GetComponentInChildren<MeshFilter>();
     private bool Hovered => cornerColliders.Any(x => x.IsHovered);
     public MeshWithRotation MeshRot => Prototype.MeshRot;
     public Transform MeshTransform => meshTransform;
@@ -193,10 +195,21 @@ public class Building : PooledMonoBehaviour, IBuildable
         
         ChunkIndex = nullableIndex.Value;
         Prototype = prototypeData;
+        transform.localScale = scale;
 
-        GetComponentInChildren<MeshFilter>().mesh = Prototype.MeshRot.MeshIndex != -1
-         ? protoypeMeshes.Meshes[Prototype.MeshRot.MeshIndex] 
-         : null;
+        if (Prototype.MeshRot.MeshIndex == -1)
+        {
+            MeshFilter.sharedMesh = null;
+            return;
+        }
+
+        if (Prototype.MaterialIndexes == null)
+        {
+            Debug.LogError("I'll just go kill myself");
+            return;
+        }
+
+        MeshFilter.sharedMesh = protoypeMeshes.Meshes[Prototype.MeshRot.MeshIndex];
         MeshRenderer.SetMaterials(materialData.GetMaterials(Prototype.MaterialIndexes));
 
         transparentMaterials.Clear();
@@ -206,8 +219,6 @@ public class Building : PooledMonoBehaviour, IBuildable
             transparentMaterials.Add(transparentGreen);
             transparentRemoveMaterials.Add(transparentRed);
         }
-        
-        transform.localScale = scale;
     }
 
     private void OnBuildingClicked(BuildingType arg0)

@@ -26,18 +26,18 @@ namespace Buildings.District
         private MeshCollider meshCollider;
 
         public List<IUpgradeStat> UpgradeStats => State.UpgradeStats;
-        public Dictionary<int3, Chunk> DistrictChunks { get; } 
+        public Dictionary<int3, QueryMarchedChunk> DistrictChunks { get; } 
         public IGameSpeed GameSpeed { get; set; }
         public ChunkIndex Index { get; set; }
         public DistrictState State { get; }
         public Vector3 Position { get; }
         
-        private IChunkWaveFunction<Chunk> waveFunction { get; }
+        private IChunkWaveFunction<QueryMarchedChunk> waveFunction { get; }
 
-        public DistrictData(DistrictType districtType, HashSet<Chunk> chunks, Vector3 position, IChunkWaveFunction<Chunk> chunkWaveFunction, int key)
+        public DistrictData(DistrictType districtType, HashSet<QueryMarchedChunk> chunks, Vector3 position, IChunkWaveFunction<QueryMarchedChunk> chunkWaveFunction, int key)
         {
-            DistrictChunks = new Dictionary<int3, Chunk>();
-            foreach (Chunk chunk in chunks)
+            DistrictChunks = new Dictionary<int3, QueryMarchedChunk>();
+            foreach (QueryMarchedChunk chunk in chunks)
             {
                 if (chunk.IsTop)
                 {
@@ -57,24 +57,24 @@ namespace Buildings.District
 
             waveFunction = chunkWaveFunction;
             Position = position;
-            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction, Position, InvokeOnClicked, ref meshCollider);
+            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction.ChunkScale, waveFunction.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
             CreateChunkIndexCache(chunks);
 
             Events.OnWaveStarted += OnWaveStarted;
             Events.OnWallsDestroyed += OnWallsDestroyed;
         }
 
-        private void CreateChunkIndexCache(HashSet<Chunk> chunks)
+        private void CreateChunkIndexCache(HashSet<QueryMarchedChunk> chunks)
         {
             cachedChunkIndexes.Clear();
-            foreach (Chunk chunk in chunks)
+            foreach (QueryMarchedChunk chunk in chunks)
             {
                 if (chunk.AdjacentChunks[2] != null)
                 {
                     continue; // Remove if a state uses the below chunks in future
                 }
                 
-                ChunkIndex? index = BuildingManager.Instance.GetIndex(chunk.Position + BuildingManager.Instance.GridScale / 2.0f);
+                ChunkIndex? index = BuildingManager.Instance.GetIndex(chunk.Position + BuildingManager.Instance.CellSize / 2.0f);
                 Assert.IsTrue(index.HasValue);
                 if (!cachedChunkIndexes.TryGetValue(index.Value, out List<int3> chunkIndex))
                 {
@@ -87,10 +87,10 @@ namespace Buildings.District
             }
         }
 
-        public void ExpandDistrict(HashSet<Chunk> chunks) // To-do: Add callback to DistrictState in case of further merging
+        public void ExpandDistrict(HashSet<QueryMarchedChunk> chunks) // To-do: Add callback to DistrictState in case of further merging
         {
             DistrictChunks.Clear();
-            foreach (Chunk chunk in chunks)
+            foreach (QueryMarchedChunk chunk in chunks)
             {
                 Debug.DrawLine(chunk.Position, chunk.Position + Vector3.up * 0.2f, Color.red, 10);
                 
@@ -100,7 +100,7 @@ namespace Buildings.District
                 }
             }
             
-            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction, Position, InvokeOnClicked, ref meshCollider);
+            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction.ChunkScale, waveFunction.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
             CreateChunkIndexCache(chunks);
 
             if (State is EntityDistrictState entityState)
@@ -119,7 +119,7 @@ namespace Buildings.District
             
                 for (int j = indexes.Count - 1; j >= 0; j--)
                 {
-                    if (!DistrictChunks.TryGetValue(indexes[j], out Chunk chunk)) continue;
+                    if (!DistrictChunks.TryGetValue(indexes[j], out QueryMarchedChunk chunk)) continue;
                     
                     destroyedIndexes.Add(chunk.ChunkIndex);
                     DistrictChunks.Remove(indexes[j]);
@@ -140,11 +140,11 @@ namespace Buildings.District
             {
                 OnChunksLost?.Invoke(destroyedIndexes);
                 State.OnIndexesDestroyed(destroyedIndexes);
-                DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction, Position, InvokeOnClicked, ref meshCollider);
+                DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction.ChunkScale, waveFunction.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
             }
         }
         
-        public bool OnDistrictChunkRemoved(Chunk chunk)
+        public bool OnDistrictChunkRemoved(IChunk chunk)
         {
             if (!DistrictChunks.ContainsKey(chunk.ChunkIndex))
             {
@@ -156,7 +156,7 @@ namespace Buildings.District
             OnChunksLost?.Invoke(destroyedIndexes);
 
             DistrictChunks.Remove(chunk.ChunkIndex);
-            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction, Position, InvokeOnClicked, ref meshCollider);
+            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction.ChunkScale, waveFunction.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
             return true;
         }
 
@@ -164,7 +164,7 @@ namespace Buildings.District
         {
             if (CameraController.IsDragging 
                 || UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()
-                || BuildingPlacer.Displaying || PathPlacer.Displaying || UIDistrictPlacementDisplay.Displaying)
+                || BuildingPlacer.Displaying || PathPlacer.Displaying || DistrictPlacer.Placing)
             {
                 return;
             }
@@ -219,18 +219,17 @@ namespace Buildings.District
 
     public static class DistrictUtility
     {
-        public static void GenerateCollider(IEnumerable<Chunk> chunks, IChunkWaveFunction<Chunk> chunkWaveFunction, Vector3 pos, Action action, ref MeshCollider meshCollider)
+        public static void GenerateCollider(IEnumerable<IChunk> chunks, Vector3 ChunkScale, Vector3 CellSize, Vector3 pos, Action action, ref MeshCollider meshCollider)
         {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             Dictionary<Vector3, int> vertexIndices = new Dictionary<Vector3, int>();
-            Vector3 offset = new Vector3(chunkWaveFunction.ChunkWaveFunction.CellSize.x, 0, chunkWaveFunction.ChunkWaveFunction.CellSize.z) / -2.0f;
 
-            float chunkWidth = chunkWaveFunction.ChunkScale.x;
-            float chunkHeight = chunkWaveFunction.ChunkScale.y;
-            float chunkDepth = chunkWaveFunction.ChunkScale.z;
+            float chunkWidth = ChunkScale.x;
+            float chunkHeight = ChunkScale.y;
+            float chunkDepth = ChunkScale.z;
             
-            foreach (Chunk chunk in chunks)
+            foreach (IChunk chunk in chunks)
             {
                 if (chunk.AdjacentChunks.All(x => x != null && x.PrototypeInfoData == chunk.PrototypeInfoData))
                 {
@@ -238,7 +237,7 @@ namespace Buildings.District
                 }
                 
                 // Assuming each chunk has a position and contains 2x2x2 cells
-                Vector3 chunkPosition = chunk.Position - pos - chunkWaveFunction.ChunkWaveFunction.CellSize / 2.0f; 
+                Vector3 chunkPosition = chunk.Position - pos - CellSize / 2.0f; 
 
                 // Define the 8 corners of the 3D cell
                 Vector3 bottomLeftFront = new Vector3(chunkPosition.x, chunkPosition.y, chunkPosition.z);
@@ -323,34 +322,6 @@ namespace Buildings.District
                 triangles.Add(b);
                 triangles.Add(d);
             }
-
-            bool AllInvalid(Chunk chunk, int x, int y, int z)
-            {
-                bool all = true;
-                foreach (short s in chunk.Cells[x, y, z].PossiblePrototypes[0].Keys)
-                {
-                    if (s != -1)
-                    {
-                        all = false;
-                        break;
-                    }
-                }
-                return all;
-            }
-        }
-
-        public static List<Chunk> GetTopChunks(IEnumerable<Chunk> chunks)
-        {
-            List<Chunk> result = new List<Chunk>();
-            foreach (Chunk chunk in chunks)
-            {
-                if (chunk.AdjacentChunks[2] == null)
-                {
-                    result.Add(chunk);
-                }
-            }
-            
-            return result;
         }
     }
 }

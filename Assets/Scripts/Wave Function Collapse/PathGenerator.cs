@@ -46,7 +46,7 @@ namespace WaveFunctionCollapse
         public Vector3 ChunkScale => groundGenerator.ChunkScale;
         public bool IsGenerating { get; private set; }
 
-        public Vector3 GridScale
+        public Vector3 CellSize
         {
             get
             {
@@ -81,8 +81,8 @@ namespace WaveFunctionCollapse
                 false) as QueryMarchedChunk;
 
             queryChunk.Handler = this;
-            Vector3 offset = new Vector3(GridScale.x / 2.0f, 0, GridScale.z / 2.0f);
-            queryChunk.LoadCells(townPrototypeInfo, GridScale, chunk, offset);
+            Vector3 offset = new Vector3(CellSize.x / 2.0f, 0, CellSize.z / 2.0f);
+            queryChunk.LoadCells(townPrototypeInfo, CellSize, chunk, offset);
             waveFunction.LoadChunk(index, queryChunk);
 
             OnLoaded?.Invoke(queryChunk);
@@ -102,7 +102,7 @@ namespace WaveFunctionCollapse
                 GetNeighbours(chunkIndexes[i], 1);
             }
 
-            this.MakeBuildable(cellsToUpdate);
+            this.MakeBuildable(cellsToUpdate, PrototypeInfo);
 
             waveFunction.Propagate();
 
@@ -207,7 +207,7 @@ namespace WaveFunctionCollapse
 
             queriedChunks = this.GetChunks(cellsToCollapse);
             waveFunction.Chunks[queryIndex.Index].SetBuiltCells(queryIndex.CellIndex);
-            this.MakeBuildable(cellsToCollapse);
+            this.MakeBuildable(cellsToCollapse, PrototypeInfo);
 
             waveFunction.Propagate();
 
@@ -267,7 +267,7 @@ namespace WaveFunctionCollapse
                             : chunk.Cells[x, 0, y].Collapsed
                                 ? Color.blue
                                 : Color.white;
-                        Gizmos.DrawWireCube(pos, GridScale * 0.9f);
+                        Gizmos.DrawWireCube(pos, CellSize * 0.9f);
                     }
                 }
             }

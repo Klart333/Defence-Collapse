@@ -82,7 +82,7 @@ namespace UI
             fillImage.fillAmount = startHealth / wallState.Health.MaxHealth;
             fillImage.color = fillGradient.Evaluate(fillImage.fillAmount);
             canvasGroup.DOFade(1, fadeInDuration).SetEase(fadeInEase);
-            targetPosition = BuildingManager.Instance.GetPos(wallState.Index) + BuildingManager.Instance.GridScale / 2.0f;
+            targetPosition = BuildingManager.Instance.GetPos(wallState.Index) + BuildingManager.Instance.CellSize / 2.0f;
             inDanger = wallState.Health.HealthPercentage < dangerThreshold;
             
             Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;

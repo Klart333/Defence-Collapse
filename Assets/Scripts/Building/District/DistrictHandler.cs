@@ -57,7 +57,7 @@ namespace Buildings.District
             districtGenerator.OnDistrictChunkRemoved -= OnDistrictChunkRemoved;
         }
 
-        private void OnDistrictChunkRemoved(Chunk chunk)
+        private void OnDistrictChunkRemoved(IChunk chunk)
         {
             foreach (DistrictData districtData in uniqueDistricts)
             {
@@ -93,7 +93,7 @@ namespace Buildings.District
             }
         }
 
-        public void BuildDistrict(HashSet<Chunk> chunks, DistrictType districtType)
+        public void BuildDistrict(HashSet<QueryMarchedChunk> chunks, DistrictType districtType)
         {
             if (!districtInfoData.TryGetValue(districtType, out PrototypeInfoData prototypeInfo))
             {
@@ -101,10 +101,10 @@ namespace Buildings.District
                 return;
             }
             
-            HashSet<Chunk> neighbours = new HashSet<Chunk>();
-            List<Chunk> addedChunks = new List<Chunk>();
+            HashSet<QueryMarchedChunk> neighbours = new HashSet<QueryMarchedChunk>();
+            List<QueryMarchedChunk> addedChunks = new List<QueryMarchedChunk>();
             int topChunkCount = 0;
-            foreach (Chunk chunk in chunks)
+            foreach (QueryMarchedChunk chunk in chunks)
             {
                 bool isTop = chunk.IsTop;
                 if (isTop)
@@ -128,20 +128,20 @@ namespace Buildings.District
                     _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
                 };
 
-                ChunkIndex? buildingChunkIndex = BuildingManager.Instance.GetIndex(chunk.Position + BuildingManager.Instance.GridScale / 2.0f);
+                ChunkIndex? buildingChunkIndex = BuildingManager.Instance.GetIndex(chunk.Position + BuildingManager.Instance.CellSize / 2.0f);
                 Assert.IsTrue(buildingChunkIndex.HasValue);
                 for (int j = 0; j < height; j++) // Kinda assumes that the chunks are not stacked vertically already
                 {
                     int heightLevel = 1 + j;
                     Vector3 pos = chunk.Position.XyZ(0) + Vector3.up * districtGenerator.ChunkScale.y * heightLevel;
                     int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, districtGenerator.ChunkScale);
-                    if (districtGenerator.ChunkWaveFunction.Chunks.TryGetValue(index, out Chunk existingChunk))
+                    if (districtGenerator.ChunkWaveFunction.Chunks.TryGetValue(index, out QueryMarchedChunk existingChunk))
                     {
                         addedChunks.Add(existingChunk);
                         continue;
                     }
 
-                    Chunk addChunk = districtGenerator.ChunkWaveFunction.LoadChunk(pos, districtGenerator.ChunkSize, prototypeInfo);
+                    QueryMarchedChunk addChunk = districtGenerator.ChunkWaveFunction.LoadChunk(pos, districtGenerator.ChunkSize, prototypeInfo);
                     addedChunks.Add(addChunk);
                     
                     districtGenerator.ChunkIndexToChunks[buildingChunkIndex.Value].Add(addChunk.ChunkIndex);
@@ -149,7 +149,7 @@ namespace Buildings.District
             }
             chunks.AddRange(addedChunks);
             
-            foreach (Chunk chunk in neighbours)
+            foreach (QueryMarchedChunk chunk in neighbours)
             {
                 chunk.Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
                 districtGenerator.ChunkWaveFunction.LoadCells(chunk, chunk.PrototypeInfoData);
@@ -157,7 +157,7 @@ namespace Buildings.District
 
             if (districtType == DistrictType.TownHall && CheckMerge(chunks, out DistrictData existingData))
             {
-                foreach (Chunk chunk in chunks)
+                foreach (QueryMarchedChunk chunk in chunks)
                 {
                     districts.TryAdd(chunk.ChunkIndex.xz, existingData);
                 }
@@ -174,9 +174,9 @@ namespace Buildings.District
             Events.OnDistrictBuilt?.Invoke(districtType);
         }
 
-        private bool CheckMerge(HashSet<Chunk> chunks, out DistrictData districtData)
+        private bool CheckMerge(HashSet<QueryMarchedChunk> chunks, out DistrictData districtData)
         {
-            foreach (Chunk chunk in chunks)
+            foreach (QueryMarchedChunk chunk in chunks)
             {
                 if (districts.TryGetValue(chunk.ChunkIndex.xz, out districtData))
                 {
@@ -188,16 +188,16 @@ namespace Buildings.District
             return false;
         }
 
-        private static void GetNeighbours(HashSet<Chunk> chunks, Chunk chunk, HashSet<Chunk> neighbours, int depth)
+        private static void GetNeighbours(HashSet<QueryMarchedChunk> chunks, IChunk chunk, HashSet<QueryMarchedChunk> neighbours, int depth)
         {
-            foreach (Chunk adjacentChunk in chunk.AdjacentChunks)
+            foreach (IChunk adjacentChunk in chunk.AdjacentChunks)
             {
                 if (adjacentChunk == null || chunks.Contains(adjacentChunk))
                 {
                     continue;
                 }
                     
-                neighbours.Add(adjacentChunk);
+                neighbours.Add(adjacentChunk as QueryMarchedChunk);
                 if (depth > 0)
                 {
                     GetNeighbours(chunks, adjacentChunk, neighbours, depth - 1);
@@ -205,7 +205,7 @@ namespace Buildings.District
             }
         }
 
-        private DistrictData GetDistrictData(DistrictType districtType, HashSet<Chunk> chunks, int topChunkCount)
+        private DistrictData GetDistrictData(DistrictType districtType, HashSet<QueryMarchedChunk> chunks, int topChunkCount)
         {
             Vector3 position = GetAveragePosition(chunks);
             DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator, districtKey++)
@@ -216,7 +216,7 @@ namespace Buildings.District
             uniqueDistricts.Add(districtData);
             if (districtType == DistrictType.TownHall) townHallDistrict = districtData;
                 
-            foreach (Chunk chunk in chunks)
+            foreach (QueryMarchedChunk chunk in chunks)
             {
                 districts.TryAdd(chunk.ChunkIndex.xz, districtData);
             }
@@ -235,7 +235,7 @@ namespace Buildings.District
                 districtData.OnChunksLost -= OnChunksLost;
                 uniqueDistricts.Remove(districtData);
 
-                foreach (Chunk chunk in chunks)
+                foreach (QueryMarchedChunk chunk in chunks)
                 {
                     districts.Remove(chunk.ChunkIndex.xz);
                 }
@@ -265,11 +265,11 @@ namespace Buildings.District
             }
         }
         
-        private Vector3 GetAveragePosition(IEnumerable<Chunk> chunks)
+        private Vector3 GetAveragePosition(IEnumerable<IChunk> chunks)
         {
             Vector3 vector3 = Vector3.zero;
             int count = 0;
-            foreach (Chunk chunk in chunks)
+            foreach (IChunk chunk in chunks)
             {
                 count++;
                 vector3 += chunk.Position;
@@ -278,19 +278,19 @@ namespace Buildings.District
             return vector3;
         }
 
-        public bool IsBuilt(Chunk chunk)
+        public bool IsBuilt(IChunk chunk)
         {
             int2 index = chunk.ChunkIndex.xz;
             return districts.TryGetValue(index, out _);
         }
         
-        public bool IsBuilt(Chunk chunk, out DistrictData districtData)
+        public bool IsBuilt(IChunk chunk, out DistrictData districtData)
         {
             int2 index = chunk.ChunkIndex.xz;
             return districts.TryGetValue(index, out districtData);
         }
         
-        public bool IsTownHallBuilt(Chunk chunk)
+        public bool IsTownHallBuilt(IChunk chunk)
         {
             int2 index = chunk.ChunkIndex.xz;
             return districts.TryGetValue(index, out DistrictData districtData) && districtData.State is TownHallState;

@@ -38,6 +38,11 @@ public static class Extensions
         return new Vector2Int((int)v.x, (int)v.z);
     }
     
+    public static Vector2Int ToVector2Int(this int2 v)
+    {
+        return new Vector2Int(v.x, v.y);
+    }
+    
     public static Vector3 ToXyZ(this Vector2 v, float y = 0)
     {
         return new Vector3(v.x, y, v.y);

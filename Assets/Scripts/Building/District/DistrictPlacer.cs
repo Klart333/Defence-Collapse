@@ -1,124 +1,175 @@
-using Unity.Mathematics;
 using System;
-using Sirenix.OdinInspector;
+using System.Collections.Generic;
+using System.Linq;
+using Cysharp.Threading.Tasks;
+using UnityEngine.InputSystem;
+using WaveFunctionCollapse;
+using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 
 namespace Buildings.District
 {
-    public class DistrictPlacer : PooledMonoBehaviour
+    public class DistrictPlacer : MonoBehaviour
     {
-        private static readonly int Color1 = Shader.PropertyToID("_BaseColor");
+        public static bool Placing;
         
-        public event Action<DistrictPlacer> OnSelected;
-
-        [Title("Display")]
         [SerializeField]
-        private MeshRenderer meshRenderer;
-    
-        [SerializeField]
-        private Color defaultColor = Color.white;
-    
-        [SerializeField]
-        private Color hoveredColor = Color.green;
-    
-        [SerializeField]
-        private Color selectedColor = Color.green;
-
-        private MaterialPropertyBlock block;
+        private DistrictGenerator districtGenerator;
         
-        public bool Selected { get; private set; }
+        [SerializeField]
+        private BuildingManager buildingGenerator;
+        
+        private readonly HashSet<ChunkIndex> buildingIndexes = new HashSet<ChunkIndex>();
+        private readonly HashSet<ChunkIndex> builtIndexes = new HashSet<ChunkIndex>();
+        
+        private int2[,] districtChunkIndexes;
+        
+        private InputManager inputManager;
+        private Vector3 offset;
+        private Camera cam;
 
-        private bool locked;
-        private Color? lastColor;
-
-        public int3 Index { get; set; }
-
-        private void Awake()
-        {
-            block = new MaterialPropertyBlock();
-        }
+        private int districtRadius;
 
         private void OnEnable()
         {
-            meshRenderer.GetPropertyBlock(block);
-            block.SetColor(Color1, defaultColor);
-            meshRenderer.SetPropertyBlock(block);
+            cam = Camera.main;
+            offset = new Vector3(districtGenerator.CellSize.x, 0, districtGenerator.CellSize.z) / -2.0f;
+
+            Events.OnDistrictClicked += DistrictClicked;
+
+            GetInput().Forget();
         }
 
-        protected override void OnDisable()
+        private async UniTaskVoid GetInput()
         {
-            base.OnDisable();
+            inputManager = await InputManager.Get();
+            inputManager.Fire.performed += FirePerformed;
+            inputManager.Cancel.performed += CancelPerformed;
+        }
 
-            lastColor = null;
-            locked = false;
-            if (Selected)
+        private void OnDisable()
+        {
+            Events.OnDistrictClicked -= DistrictClicked;
+            inputManager.Fire.performed -= FirePerformed;
+            inputManager.Cancel.performed -= CancelPerformed;
+        }
+
+        private void Update()
+        {
+            if (!Placing) return;
+
+            buildingIndexes.Clear();
+            builtIndexes.Clear();
+            Vector3 mousePos = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
+            for (int x = 0; x < districtRadius; x++)
             {
-                Unselect();
+                for (int z = 0; z < districtRadius; z++)
+                {
+                    Vector3 pos = mousePos + new Vector3(x * districtGenerator.ChunkScale.x, 0, z * districtGenerator.ChunkScale.z);
+                    Vector3 districtPos = pos + offset;//+ districtGenerator.CellSize.XyZ() * (districtRadius % 2 == 0 ? 0 : -.25f);
+                    districtChunkIndexes[x, z] = ChunkWaveUtility.GetDistrictIndex2(districtPos, districtGenerator.ChunkScale);
+                    districtPos = ChunkWaveUtility.GetPosition(districtChunkIndexes[x, z].XyZ(0), districtGenerator.ChunkScale);
+
+                    ChunkIndex? buildIndex = buildingGenerator.GetIndex(districtPos + buildingGenerator.CellSize * 0.5f);
+                    if (!buildIndex.HasValue)
+                    {
+                        Debug.LogError("Couldn't find building index"); // Handle exception
+                        continue;
+                    }
+                    buildingIndexes.Add(buildIndex.Value);
+
+                    Vector3 buildingCellPosition = buildingGenerator.GetPos(buildIndex.Value);
+                    Vector2 dir = (buildingCellPosition.XZ() - districtPos.XZ()).normalized;
+                    //Debug.DrawLine(buildingCellPosition, districtPos, Color.white, 0.1f);
+                    Debug.DrawRay(buildingCellPosition, dir, Color.white, 0.1f);
+                    //Debug.Log(dir); 
+                    builtIndexes.Add((dir.x, dir.y) switch
+                    {
+                        (x: < 0.1f, y: < 0.1f) => buildIndex.Value,
+                        (x: < 0.1f, y: > 0) => buildingGenerator.GetIndex(buildingCellPosition - Vector3.forward * buildingGenerator.CellSize.z).GetValueOrDefault(),
+                        (x: > 0, y: < 0.1f) => buildingGenerator.GetIndex(buildingCellPosition - Vector3.right * buildingGenerator.CellSize.z).GetValueOrDefault(),
+                        (x: > 0, y: > 0) => buildingGenerator.GetIndex(buildingCellPosition - buildingGenerator.CellSize).GetValueOrDefault(),
+                        _ => throw new ArgumentOutOfRangeException()
+                    });
+
+                    for (int i = 0; i < WaveFunctionUtility.DiagonalNeighbourDirections.Length; i++)
+                    {
+                        Vector3 neighbourPos = buildingCellPosition + buildingGenerator.CellSize.MultiplyByAxis(WaveFunctionUtility.DiagonalNeighbourDirections[i].XyZ(0));
+                        ChunkIndex? neighbourIndex = buildingGenerator.GetIndex(neighbourPos);
+                        if (!neighbourIndex.HasValue)
+                        {
+                            Debug.LogError("Couldn't find building index"); // Handle exception
+                            continue;
+                        }
+                        
+                        buildingIndexes.Add(neighbourIndex.Value);
+                    }
+                }
+            }
+
+            Dictionary<ChunkIndex, IBuildable> buildings = buildingGenerator.Query(buildingIndexes.ToList(), builtIndexes);
+            foreach (IBuildable buildable in buildings.Values)
+            {
+                buildable.ToggleIsBuildableVisual(true, false);
             }
         }
-        
-        private void OnMouseEnter()
+
+        private void DistrictClicked(DistrictType districtType, int radius)
         {
-            lastColor = block.GetColor(Color1);
+            UIEvents.OnFocusChanged?.Invoke();
             
-            block.SetColor(Color1, hoveredColor);
-            meshRenderer.SetPropertyBlock(block);
+            districtChunkIndexes = new int2[radius, radius];
+            districtRadius = radius;
+            Placing = true;
         }
 
-        private void OnMouseExit()
+        private void CancelPerformed(InputAction.CallbackContext obj)
         {
-            block.SetColor(Color1, lastColor.GetValueOrDefault(defaultColor));
-            meshRenderer.SetPropertyBlock(block);
+            Placing = false;
+            buildingGenerator.RevertQuery();
+        }
+
+        private void FirePerformed(InputAction.CallbackContext obj)
+        {
+            
         }
         
-        private void OnMouseUpAsButton()
+        
+        #region Debug
+
+        private void OnDrawGizmosSelected()
         {
-            if (CameraController.IsDragging || EventSystem.current.IsPointerOverGameObject())
+#if UNITY_EDITOR
+            if (!UnityEditor.EditorApplication.isPlaying || districtChunkIndexes == null) return;
+#endif
+
+            foreach (int2 chunkIndex in districtChunkIndexes)
             {
-                return;
+                Vector3 districtPos = ChunkWaveUtility.GetPosition(chunkIndex.XyZ(0), districtGenerator.ChunkScale) - offset;
+                Gizmos.color = Color.blue; 
+                Gizmos.DrawWireCube(districtPos + districtGenerator.CellSize * 0.5f, districtGenerator.ChunkScale * 0.95f);
             }
             
-            OnSelected?.Invoke(this);
-        }
-
-        public void ForceSelected()
-        {
-            SetSelected();
-            locked = true;
-        }
-
-        public void SetSelected()
-        {
-            if (locked) return;
-
-            Selected = true;
-            
-            lastColor = selectedColor;
-            block.SetColor(Color1, selectedColor);
-            meshRenderer.SetPropertyBlock(block);
-        }
+            foreach (QueryMarchedChunk chunk in buildingGenerator.ChunkWaveFunction.Chunks.Values)
+            {
+                for (int y = 0; y < chunk.Cells.GetLength(2); y++)
+                {
+                    for (int x = 0; x < chunk.Cells.GetLength(0); x++)
+                    {
+                        Vector3 pos = chunk.Cells[x, 0, y].Position;
+                        ChunkIndex index = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, y));
+                        Gizmos.color = builtIndexes.Contains(index) 
+                            ? Color.magenta
+                            : buildingIndexes.Contains(index)
+                                ? Color.red 
+                                : Color.black;
+                        Gizmos.DrawWireCube(pos + buildingGenerator.CellSize * 0.5f, buildingGenerator.CellSize * 0.95f);
+                    }
+                }
+            }
         
-        public void SetSelected(Color color)
-        {
-            if (locked) return;
-
-            Selected = true;
-            lastColor = color;
-            block.SetColor(Color1, color);
-            meshRenderer.SetPropertyBlock(block);
         }
 
-        public void Unselect()
-        {
-            if (locked) return;
-
-            Selected = false;
-            
-            lastColor = null;
-            block.SetColor(Color1, defaultColor);
-            meshRenderer.SetPropertyBlock(block);
-        }
+        #endregion
     }
 }

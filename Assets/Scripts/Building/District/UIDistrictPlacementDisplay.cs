@@ -26,7 +26,7 @@ namespace Buildings.District
         private TextMeshProUGUI costText;
         
         [SerializeField]
-        private DistrictPlacer displayPrefab;
+        private DistrictPlaceSquare displayPrefab;
 
         [SerializeField]
         private float maxDelay = 2f;
@@ -39,14 +39,14 @@ namespace Buildings.District
         private DistrictHandler districtHandler;
         
         [SerializeField]
-        private IChunkWaveFunction<Chunk> districtGenerator;
+        private IQueryWaveFunction districtGenerator;
 
         [Title("GroundType")]
         [SerializeField]
         private Material crystalMaterial;
         
-        private Queue<DistrictPlacer> selectedPlacers = new Queue<DistrictPlacer>();
-        private List<DistrictPlacer> spawnedPlacers = new List<DistrictPlacer>();
+        private Queue<DistrictPlaceSquare> selectedPlacers = new Queue<DistrictPlaceSquare>();
+        private List<DistrictPlaceSquare> spawnedPlacers = new List<DistrictPlaceSquare>();
         private readonly Dictionary<int3, GroundType> chunkGroupTypes = new Dictionary<int3, GroundType>();
         
         private DistrictType currentType;
@@ -88,24 +88,17 @@ namespace Buildings.District
             currentType = districtType;
             minRadius = radius;
             
-            if (districtType == DistrictType.TownHall)
-            {
-                DisplayTownHall(districtGenerator.ChunkWaveFunction);
-            }
-            else
-            {
-                Display(districtGenerator.ChunkWaveFunction);
-            }
+            Display(districtGenerator.ChunkWaveFunction);
         }
         
-        private void Display(ChunkWaveFunction<Chunk> chunkWaveFunction)
+        private void Display(ChunkWaveFunction<QueryMarchedChunk> chunkWaveFunction)
         {
             Vector3 scale = districtGenerator.ChunkScale * 0.75f;
-            Bounds bounds = GetBounds(chunkWaveFunction);
+            Bounds bounds = GetBounds(chunkWaveFunction.Chunks.Values);
 
             float maxDistance = Vector2.Distance(bounds.Min, bounds.Max);
             float scaledDelay = maxDelay * Mathf.Clamp01(maxDistance / maxDelayDistance);
-            foreach (Chunk chunk in chunkWaveFunction.Chunks.Values)
+            foreach (QueryMarchedChunk chunk in chunkWaveFunction.Chunks.Values)
             {
                 if (chunk.ChunkIndex.y != 0) continue;
                 if (districtHandler.IsBuilt(chunk)) continue;
@@ -114,7 +107,7 @@ namespace Buildings.District
                 if (!CheckDistrictRestriction(currentType, index)) continue; 
                 
                 Vector3 pos = chunk.Position + Vector3.up;
-                DistrictPlacer spawned = displayPrefab.GetAtPosAndRot<DistrictPlacer>(pos, quaternion.identity);
+                DistrictPlaceSquare spawned = displayPrefab.GetAtPosAndRot<DistrictPlaceSquare>(pos, quaternion.identity);
                 spawned.Index = index;
                 
                 spawned.transform.localScale = Vector3.zero;
@@ -126,40 +119,7 @@ namespace Buildings.District
             }
         }
         
-        private void DisplayTownHall(ChunkWaveFunction<Chunk> chunkWaveFunction)
-        {
-            Vector3 scale = districtGenerator.ChunkScale * 0.75f;
-            Bounds bounds = GetBounds(chunkWaveFunction);
-
-            float maxDistance = Vector2.Distance(bounds.Min, bounds.Max);
-            float scaledDelay = maxDelay * Mathf.Clamp01(maxDistance / maxDelayDistance);
-            foreach (Chunk chunk in chunkWaveFunction.Chunks.Values)
-            {
-                if (chunk.ChunkIndex.y != 0) continue;
-                if (districtHandler.IsBuilt(chunk, out DistrictData data) && data.State is not TownHallState) continue;
-
-                int3 index = ChunkWaveUtility.GetDistrictIndex3(chunk.Position, districtGenerator.ChunkScale);
-                if (!CheckDistrictRestriction(currentType, index)) continue; 
-                
-                Vector3 pos = chunk.Position + Vector3.up;
-                DistrictPlacer spawned = displayPrefab.GetAtPosAndRot<DistrictPlacer>(pos, quaternion.identity);
-                spawned.Index = index;
-                
-                spawned.transform.localScale = Vector3.zero;
-                float delay = scaledDelay * (Vector2.Distance(bounds.Min, chunk.Position.XZ()) / maxDistance);
-                spawned.transform.DOScale(scale, 0.5f).SetEase(Ease.OutBounce).SetDelay(delay);
-                spawnedPlacers.Add(spawned);
-                    
-                spawned.OnSelected += PlacerOnOnSelected;
-                
-                if (districtHandler.IsTownHallBuilt(chunk))
-                {
-                    spawned.ForceSelected();
-                }
-            }
-        }
-        
-        private void PlacerOnOnSelected(DistrictPlacer selectedPlacer)
+        private void PlacerOnOnSelected(DistrictPlaceSquare selectedPlacer)
         {
             selectedPlacers.Enqueue(selectedPlacer);
             selectedPlacer.SetSelected();
@@ -253,7 +213,7 @@ namespace Buildings.District
 
             while (frontier.TryPop(out int3 index))
             {
-                foreach (Chunk chunk in districtGenerator.ChunkWaveFunction.Chunks[index].AdjacentChunks)
+                foreach (IChunk chunk in districtGenerator.ChunkWaveFunction.Chunks[index].AdjacentChunks)
                 {
                     if (chunk is null) continue;
                     
@@ -280,7 +240,7 @@ namespace Buildings.District
         {
             if (!chunkGroupTypes.TryGetValue(chunkIndex, out GroundType groundType))
             {
-                Chunk chunk = districtGenerator.ChunkWaveFunction.Chunks[chunkIndex];
+                QueryMarchedChunk chunk = districtGenerator.ChunkWaveFunction.Chunks[chunkIndex];
                 groundType = RaycastGroundType(chunk.Position);
                 chunkGroupTypes.Add(chunkIndex, groundType);
             }
@@ -300,8 +260,8 @@ namespace Buildings.District
         {
             Bounds bounds = GetPositionBounds(spawnedPlacers.Where(x => x.Selected));
             
-            HashSet<Chunk> chunks = new HashSet<Chunk>();
-            foreach (Chunk chunk in districtGenerator.ChunkWaveFunction.Chunks.Values)
+            HashSet<QueryMarchedChunk> chunks = new HashSet<QueryMarchedChunk>();
+            foreach (QueryMarchedChunk chunk in districtGenerator.ChunkWaveFunction.Chunks.Values)
             {
                 if (!bounds.Contains(chunk.Position.XZ())) continue;
                 
@@ -321,12 +281,12 @@ namespace Buildings.District
             districtHandler.BuildDistrict(chunks, currentType);
         }
         
-        private static Bounds GetBounds(ChunkWaveFunction<Chunk> chunkWaveFunction)
+        private static Bounds GetBounds(IEnumerable<IChunk> chunks)
         {
             Vector2 min = Vector2.positiveInfinity;
             Vector2 max = Vector2.negativeInfinity;
             
-            foreach (Chunk chunk in chunkWaveFunction.Chunks.Values) 
+            foreach (IChunk chunk in chunks) 
             {
                 Vector3 pos = chunk.Position;
                 if (pos.x < min.x) min.x = pos.x;
@@ -342,10 +302,10 @@ namespace Buildings.District
             };
         }
         
-        private static Bounds GetBounds(IEnumerable<DistrictPlacer> placers)
+        private static Bounds GetBounds(IEnumerable<DistrictPlaceSquare> placers)
         {
             int minX = int.MaxValue, minZ = int.MaxValue, maxX = 0, maxZ = 0;
-            foreach (DistrictPlacer placer in placers)
+            foreach (DistrictPlaceSquare placer in placers)
             {
                 if (placer.Index.x < minX) minX = placer.Index.x;
                 if (placer.Index.x > maxX) maxX = placer.Index.x;
@@ -360,12 +320,12 @@ namespace Buildings.District
             };
         }
         
-        private static Bounds GetPositionBounds(IEnumerable<DistrictPlacer> placers)
+        private static Bounds GetPositionBounds(IEnumerable<DistrictPlaceSquare> placers)
         {
             Vector2 min = Vector2.positiveInfinity;
             Vector2 max = Vector2.negativeInfinity;
 
-            foreach (DistrictPlacer placer in placers)
+            foreach (DistrictPlaceSquare placer in placers)
             {
                 Vector3 pos = placer.transform.position;
                 if (pos.x < min.x) min.x = pos.x;

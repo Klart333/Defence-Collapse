@@ -42,7 +42,6 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
     private BuildingAnimator buildingAnimator;
     private GroundGenerator groundGenerator;
-    private ChunkIndex queryIndex;
     private Vector3? gridScale;
     
     public ChunkWaveFunction<QueryMarchedChunk> ChunkWaveFunction => waveFunction;
@@ -50,7 +49,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     public Vector3 ChunkScale => groundGenerator.ChunkScale;
     public bool IsGenerating { get; private set; }
     
-    public Vector3 GridScale
+    public Vector3 CellSize
     {
         get
         {
@@ -88,8 +87,8 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
             false) as QueryMarchedChunk;
         
         queryChunk.Handler = this;
-        Vector3 offset = new Vector3(GridScale.x / 2.0f, 0, GridScale.z / 2.0f);
-        queryChunk.LoadCells(townPrototypeInfo, GridScale, chunk, offset, cellBuildableCornerData);
+        Vector3 offset = new Vector3(CellSize.x / 2.0f, 0, CellSize.z / 2.0f);
+        queryChunk.LoadCells(townPrototypeInfo, CellSize, chunk, offset, cellBuildableCornerData);
         waveFunction.LoadChunk(index, queryChunk);
         
         OnLoaded?.Invoke(queryChunk);
@@ -109,7 +108,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
             GetNeighbours(chunkIndexes[i], 1);
         }
         
-        this.MakeBuildable(cellsToUpdate);
+        this.MakeBuildable(cellsToUpdate, PrototypeInfo);
         
         waveFunction.Propagate();
 
@@ -205,14 +204,23 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
     public Dictionary<ChunkIndex, IBuildable> Query(ChunkIndex queryIndex)
     {
+        List<ChunkIndex> cellsToCollapse = this.GetCellsToCollapse(queryIndex);
+        return Query(cellsToCollapse, new List<ChunkIndex> { queryIndex });
+    }
+    
+    public Dictionary<ChunkIndex, IBuildable> Query(List<ChunkIndex> cellsToCollapse, IEnumerable<ChunkIndex> builtIndexes)
+    {
         RevertQuery();
 
-        List<ChunkIndex> cellsToCollapse = this.GetCellsToCollapse(queryIndex);
         if (cellsToCollapse.Count <= 0) return QuerySpawnedBuildings;
-        
         queriedChunks = this.GetChunks(cellsToCollapse);
-        waveFunction.Chunks[queryIndex.Index].SetBuiltCells(queryIndex.CellIndex);
-        this.MakeBuildable(cellsToCollapse);
+
+        foreach (ChunkIndex builtIndex in builtIndexes)
+        {
+            waveFunction.Chunks[builtIndex.Index].SetBuiltCells(builtIndex.CellIndex);
+        }
+        
+        this.MakeBuildable(cellsToCollapse, PrototypeInfo);
 
         waveFunction.Propagate();
 
@@ -235,7 +243,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
         return QuerySpawnedBuildings;
     }
-    
+
     public IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, bool animate = false)
     {
         Building building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0)); 
@@ -256,7 +264,6 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 #if UNITY_EDITOR
         if (!EditorApplication.isPlaying) return;
 #endif
-
         
         if (waveFunction.Chunks == null || waveFunction.Chunks.Count == 0)
         {
@@ -270,12 +277,12 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
                 for (int x = 0; x < chunk.Cells.GetLength(0); x++)
                 {
                     Vector3 pos = chunk.Cells[x, 0, y].Position;
-                    Gizmos.color = chunk.BuiltCells[x, 0, y] && false 
+                    Gizmos.color = chunk.BuiltCells[x, 0, y] 
                         ? Color.magenta 
                         : chunk.Cells[x, 0, y].Collapsed 
                             ? Color.blue 
                             : Color.white;
-                    Gizmos.DrawWireCube(pos, GridScale * 0.9f);
+                    Gizmos.DrawWireCube(pos, CellSize * 0.9f);
                 }
             }
         }

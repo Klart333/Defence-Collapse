@@ -11,6 +11,6 @@ public interface IBuildable
     public ChunkIndex ChunkIndex { get; }
     
     public void Setup(PrototypeData prototypeData, Vector3 scale);
-    public void ToggleIsBuildableVisual(bool value, bool showRemoving);
+    public void ToggleIsBuildableVisual(bool isQueried, bool showRemoving);
 }
 

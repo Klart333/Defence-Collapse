@@ -101,11 +101,11 @@ namespace Buildings.District
             defaultWorld = World.DefaultGameObjectInjectionWorld;
         }
         
-        protected abstract List<Chunk> GetEntityChunks();
+        protected abstract List<QueryMarchedChunk> GetEntityChunks();
         
         public void SpawnEntities()
         {
-            List<Chunk> topChunks = GetEntityChunks();
+            List<QueryMarchedChunk> topChunks = GetEntityChunks();
             ComponentType[] componentTypes =
             {
                 typeof(LocalTransform),
@@ -274,7 +274,7 @@ namespace Buildings.District
             UpgradeStats.Add(range);
         }
 
-        protected override List<Chunk> GetEntityChunks()
+        protected override List<QueryMarchedChunk> GetEntityChunks()
         {
             return DistrictData.DistrictChunks.Values.ToList();
         }
@@ -365,7 +365,7 @@ namespace Buildings.District
             UpgradeStats.Add(range);
         }
 
-        protected override List<Chunk> GetEntityChunks()
+        protected override List<QueryMarchedChunk> GetEntityChunks()
         {
             return DistrictData.DistrictChunks.Values.ToList();
         }
@@ -452,9 +452,9 @@ namespace Buildings.District
             ResearchManager.Instance.AddResearchPoints(10 * UpgradeStats[0].Level);
         }
 
-        protected override List<Chunk> GetEntityChunks()
+        protected override List<QueryMarchedChunk> GetEntityChunks()
         {
-            return new List<Chunk> { DistrictData.DistrictChunks.Values.First() };
+            return new List<QueryMarchedChunk> { DistrictData.DistrictChunks.Values.First() };
         }
 
         public override void Update()
@@ -523,7 +523,7 @@ namespace Buildings.District
             CreateStats();
             Attack = new Attack(mineData.BaseAttack);
 
-            foreach (Chunk chunk in districtData.DistrictChunks.Values)
+            foreach (QueryMarchedChunk chunk in districtData.DistrictChunks.Values)
             {
                 if (chunk.AdjacentChunks[2] != null)
                 {

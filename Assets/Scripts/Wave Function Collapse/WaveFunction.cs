@@ -670,12 +670,24 @@ namespace WaveFunctionCollapse
     
     public static class WaveFunctionUtility
     {
-        public static readonly int2[] NeighbourDirections = new []
+        public static readonly int2[] NeighbourDirections =
         {
             new int2(1, 0),
             new int2(0, 1),
             new int2(-1, 0),
             new int2(0, -1),
+        };
+        
+        public static readonly int2[] DiagonalNeighbourDirections = 
+        {
+            new int2(1, 0),
+            new int2(0, 1),
+            new int2(-1, 0),
+            new int2(0, -1),
+            new int2(1, 1),
+            new int2(1, -1),
+            new int2(-1, 1),
+            new int2(-1, -1),
         };
         
         public static readonly List<int2> MarchDirections = new List<int2>
@@ -684,6 +696,14 @@ namespace WaveFunctionCollapse
             new int2(0, -1),
             new int2(0, 0), 
             new int2(-1, 0),
+        };
+        
+        public static readonly int2[] Corners =
+        {
+            new int2(-1, -1),
+            new int2(1, -1),
+            new int2(1, 1),
+            new int2(-1, 1),
         };
         
         public static float CalculateEntropy(Cell cell)
@@ -722,6 +742,11 @@ namespace WaveFunctionCollapse
 
                 affectedCell.PossiblePrototypes.RemoveAtSwapBack(i);
                 changed = true;
+            }
+
+            if (affectedCell.PossiblePrototypes.Count == 0)
+            {
+                affectedCell.PossiblePrototypes.Add(PrototypeData.Empty);
             }
         }
 
