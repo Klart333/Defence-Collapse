@@ -26,18 +26,18 @@ namespace Buildings.District
         private MeshCollider meshCollider;
 
         public List<IUpgradeStat> UpgradeStats => State.UpgradeStats;
-        public Dictionary<int3, QueryMarchedChunk> DistrictChunks { get; } 
+        public Dictionary<int3, QueryChunk> DistrictChunks { get; } 
         public IGameSpeed GameSpeed { get; set; }
         public ChunkIndex Index { get; set; }
         public DistrictState State { get; }
         public Vector3 Position { get; }
         
-        private IChunkWaveFunction<QueryMarchedChunk> waveFunction { get; }
+        private IChunkWaveFunction<QueryChunk> waveFunction { get; }
 
-        public DistrictData(DistrictType districtType, HashSet<QueryMarchedChunk> chunks, Vector3 position, IChunkWaveFunction<QueryMarchedChunk> chunkWaveFunction, int key)
+        public DistrictData(DistrictType districtType, HashSet<QueryChunk> chunks, Vector3 position, IChunkWaveFunction<QueryChunk> chunkWaveFunction, int key)
         {
-            DistrictChunks = new Dictionary<int3, QueryMarchedChunk>();
-            foreach (QueryMarchedChunk chunk in chunks)
+            DistrictChunks = new Dictionary<int3, QueryChunk>();
+            foreach (QueryChunk chunk in chunks)
             {
                 if (chunk.IsTop)
                 {
@@ -64,10 +64,10 @@ namespace Buildings.District
             Events.OnWallsDestroyed += OnWallsDestroyed;
         }
 
-        private void CreateChunkIndexCache(HashSet<QueryMarchedChunk> chunks)
+        private void CreateChunkIndexCache(HashSet<QueryChunk> chunks)
         {
             cachedChunkIndexes.Clear();
-            foreach (QueryMarchedChunk chunk in chunks)
+            foreach (QueryChunk chunk in chunks)
             {
                 if (chunk.AdjacentChunks[2] != null)
                 {
@@ -87,10 +87,10 @@ namespace Buildings.District
             }
         }
 
-        public void ExpandDistrict(HashSet<QueryMarchedChunk> chunks) // To-do: Add callback to DistrictState in case of further merging
+        public void ExpandDistrict(HashSet<QueryChunk> chunks) // To-do: Add callback to DistrictState in case of further merging
         {
             DistrictChunks.Clear();
-            foreach (QueryMarchedChunk chunk in chunks)
+            foreach (QueryChunk chunk in chunks)
             {
                 Debug.DrawLine(chunk.Position, chunk.Position + Vector3.up * 0.2f, Color.red, 10);
                 
@@ -119,7 +119,7 @@ namespace Buildings.District
             
                 for (int j = indexes.Count - 1; j >= 0; j--)
                 {
-                    if (!DistrictChunks.TryGetValue(indexes[j], out QueryMarchedChunk chunk)) continue;
+                    if (!DistrictChunks.TryGetValue(indexes[j], out QueryChunk chunk)) continue;
                     
                     destroyedIndexes.Add(chunk.ChunkIndex);
                     DistrictChunks.Remove(indexes[j]);

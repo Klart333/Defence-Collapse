@@ -47,19 +47,13 @@ public class BuildingAnimator : MonoBehaviour
     {
         var part = particle.GetAtPosAndRot<PooledMonoBehaviour>(building.gameObject.transform.position + Vector3.up * 0.5f, particle.transform.rotation);
         ParticleSystem psys = part.GetComponentInChildren<ParticleSystem>();
-        var shape = psys.shape;
-        var emission = psys.emission;
+        ParticleSystem.ShapeModule shape = psys.shape;
+        ParticleSystem.EmissionModule emission = psys.emission;
+        ParticleSystem.Burst burst = new ParticleSystem.Burst(0, 15);
 
-        int count = building.Importance switch
-        {
-            0 => 5,
-            1 => 15,
-            _ => throw new System.NotImplementedException(),
-        };
-        ParticleSystem.Burst burst = new ParticleSystem.Burst(0, count);
         emission.SetBurst(0, burst);
 
-        shape.meshRenderer = building.gameObject.GetComponentInChildren<MeshRenderer>();
+        shape.meshRenderer = building.MeshRenderer;
     }
 
     public void BounceInOut(Transform transform)

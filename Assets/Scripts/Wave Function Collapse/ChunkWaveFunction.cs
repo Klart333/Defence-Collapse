@@ -327,7 +327,7 @@ namespace WaveFunctionCollapse
             }
         }
 
-        private GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1)
+        public GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1)
         {
             if (prototypeData.MeshRot.MeshIndex == -1)
             {
@@ -739,6 +739,11 @@ namespace WaveFunctionCollapse
         public bool IsRemoved { set; }
         public bool IsClear { get; }
         public Vector3 Position { get; }
+        
+        public int Width { get; }
+        public int Height { get; }
+        public int Depth { get; }
+        
 
         public Cell this[int3 index]
         {
@@ -748,9 +753,94 @@ namespace WaveFunctionCollapse
 
         public IChunk Construct(int _width, int _height, int _depth, int3 chunkIndex, Vector3 position, IChunk[] adjacentChunks, bool sideConstraints);
         public void Clear(Stack<GameObject> pool);
-        public List<ChunkIndex> GetAdjacentCells(int3 cellIndex, out List<Direction> directions);
         public void SetAdjacentChunk(IChunk chunk, Direction oppositeDirection, Stack<ChunkIndex> cellStack);
         public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Stack<ChunkIndex> cellStack);
+        
+        
+        public List<ChunkIndex> GetAdjacentCells(int3 index, out List<Direction> directions)
+        {
+            List<ChunkIndex> adjacentCells = new List<ChunkIndex>(6);
+            directions = new List<Direction>(6);
+
+            for (int i = 0; i < 6; i++)
+            {
+                int3 neighborIndex = index + ChunkWaveUtility.Directions[i];
+
+                // Check if neighbor is within the bounds of the current chunk
+                if (IsWithinBounds(neighborIndex))
+                {
+                    adjacentCells.Add(new ChunkIndex(ChunkIndex, neighborIndex));
+                    directions.Add((Direction)i);
+                }
+                else
+                {
+                    // If on the edge, check for an adjacent chunk
+                    if (AdjacentChunks[i] == null) continue;
+
+                    int3 adjIndex = WrapIndexToAdjacentChunk(neighborIndex, i);
+                    adjacentCells.Add(new ChunkIndex(AdjacentChunks[i].ChunkIndex, adjIndex));
+                    directions.Add((Direction)i);
+                }
+            }
+
+            return adjacentCells;
+        }
+
+        private bool IsWithinBounds(int3 index) =>
+            index.x >= 0 && index.x < Width &&
+            index.y >= 0 && index.y < Height &&
+            index.z >= 0 && index.z < Depth;
+
+        /// <summary>
+        /// Gets the directions of the index that are invalid
+        /// </summary>
+        public List<Direction> GetInvalidAdjacentSides(int3 index, Stack<ChunkIndex> cellStack)
+        {
+            List<Direction> adjacentDirections = new List<Direction>();
+
+            for (int i = 0; i < 6; i++)
+            {
+                int3 neighborIndex = index + ChunkWaveUtility.Directions[i];
+                if (IsWithinBounds(neighborIndex)) continue;
+
+                if (AdjacentChunks[i] == null || AdjacentChunks[i].PrototypeInfoData != PrototypeInfoData)
+                {
+                    adjacentDirections.Add((Direction)i);
+                    continue;
+                }
+
+                if (AdjacentChunks[i].IsClear) continue;
+
+                int3 adjacentIndex = WrapIndexToAdjacentChunk(index, i);
+                Cell cell = AdjacentChunks[i][adjacentIndex];
+                if (!cell.Collapsed) continue;
+
+                if (cell.PossiblePrototypes[0].Keys[(int)WaveFunctionUtility.OppositeDirection(i)] == -1)
+                {
+                    adjacentDirections.Add((Direction)i);
+                }
+                else
+                {
+                    cellStack.Push(new ChunkIndex(AdjacentChunks[i].ChunkIndex, adjacentIndex));
+                }
+            }
+
+            return adjacentDirections;
+        }
+
+        private int3 WrapIndexToAdjacentChunk(int3 index, int direction)
+        {
+            return direction switch
+            {
+                0 => new int3(0, index.y, index.z), // Right
+                1 => new int3(Width - 1, index.y, index.z), // Left
+                2 => new int3(index.x, 0, index.z), // Up
+                3 => new int3(index.x, Height - 1, index.z), // Down
+                4 => new int3(index.x, index.y, 0), // Forward
+                5 => new int3(index.x, index.y, Depth - 1), // Backward
+                _ => throw new ArgumentOutOfRangeException(nameof(direction), "Invalid direction index")
+            };
+        }
     }
 
     public static class ChunkWaveUtility

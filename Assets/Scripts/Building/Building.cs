@@ -73,7 +73,6 @@ public class Building : PooledMonoBehaviour, IBuildable
     public PrototypeData Prototype { get; private set; }
     public int BuildingGroupIndex { get; set; } = -1;
     public ChunkIndex ChunkIndex { get; private set; }
-    public int Importance => 1;
 
     private BuildingAnimator BuildingAnimator => buildingAnimator ??= FindAnyObjectByType<BuildingAnimator>();
     public BuildingHandler BuildingHandler => buildingHandler ??= FindAnyObjectByType<BuildingHandler>();

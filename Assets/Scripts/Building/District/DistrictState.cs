@@ -101,11 +101,11 @@ namespace Buildings.District
             defaultWorld = World.DefaultGameObjectInjectionWorld;
         }
         
-        protected abstract List<QueryMarchedChunk> GetEntityChunks();
+        protected abstract List<QueryChunk> GetEntityChunks();
         
         public void SpawnEntities()
         {
-            List<QueryMarchedChunk> topChunks = GetEntityChunks();
+            List<QueryChunk> topChunks = GetEntityChunks();
             ComponentType[] componentTypes =
             {
                 typeof(LocalTransform),
@@ -274,7 +274,7 @@ namespace Buildings.District
             UpgradeStats.Add(range);
         }
 
-        protected override List<QueryMarchedChunk> GetEntityChunks()
+        protected override List<QueryChunk> GetEntityChunks()
         {
             return DistrictData.DistrictChunks.Values.ToList();
         }
@@ -365,7 +365,7 @@ namespace Buildings.District
             UpgradeStats.Add(range);
         }
 
-        protected override List<QueryMarchedChunk> GetEntityChunks()
+        protected override List<QueryChunk> GetEntityChunks()
         {
             return DistrictData.DistrictChunks.Values.ToList();
         }
@@ -452,9 +452,9 @@ namespace Buildings.District
             ResearchManager.Instance.AddResearchPoints(10 * UpgradeStats[0].Level);
         }
 
-        protected override List<QueryMarchedChunk> GetEntityChunks()
+        protected override List<QueryChunk> GetEntityChunks()
         {
-            return new List<QueryMarchedChunk> { DistrictData.DistrictChunks.Values.First() };
+            return new List<QueryChunk> { DistrictData.DistrictChunks.Values.First() };
         }
 
         public override void Update()
@@ -523,7 +523,7 @@ namespace Buildings.District
             CreateStats();
             Attack = new Attack(mineData.BaseAttack);
 
-            foreach (QueryMarchedChunk chunk in districtData.DistrictChunks.Values)
+            foreach (QueryChunk chunk in districtData.DistrictChunks.Values)
             {
                 if (chunk.AdjacentChunks[2] != null)
                 {

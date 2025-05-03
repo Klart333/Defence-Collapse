@@ -16,7 +16,7 @@ namespace WaveFunctionCollapse
             ChunkWaveFunction.CellStack.Push(index);
 
             IBuildable spawned = GenerateMesh(ChunkWaveFunction[index].Position, chosenPrototype);
-            if (spawned == null) 
+            if (spawned == null && queryCollapsedAir != null) 
             {
                 queryCollapsedAir.Add(index.CellIndex);
                 return;
@@ -34,16 +34,13 @@ namespace WaveFunctionCollapse
 
         public IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, bool animate = false);
         
-        public List<QueryMarchedChunk> GetChunks(List<ChunkIndex> cellsToCollapse)
+        public HashSet<QueryMarchedChunk> GetChunks(IEnumerable<ChunkIndex> cellsToCollapse)
         {
-            List<QueryMarchedChunk> chunks = new List<QueryMarchedChunk> {ChunkWaveFunction.Chunks[cellsToCollapse[0].Index]};
-            for (int i = 1; i < cellsToCollapse.Count; i++)
+            HashSet<QueryMarchedChunk> chunks = new HashSet<QueryMarchedChunk>();
+            foreach (ChunkIndex index in cellsToCollapse)
             {
-                QueryMarchedChunk chunk = ChunkWaveFunction.Chunks[cellsToCollapse[i].Index];
-                if (!chunks.Contains(chunk))
-                {
-                    chunks.Add(chunk);
-                }
+                QueryMarchedChunk chunk = ChunkWaveFunction.Chunks[index.Index];
+                chunks.Add(chunk);
             }
 
             return chunks;
@@ -193,7 +190,7 @@ namespace WaveFunctionCollapse
             queryWaveFunction.SetCell(index, prototypeData, queryCollapsedAir, query);
         }
         
-        public static List<QueryMarchedChunk> GetChunks<T>(this T queryWaveFunction, List<ChunkIndex> cellsToCollapse) where T : IQueryWaveFunction
+        public static HashSet<QueryMarchedChunk> GetChunks<T>(this T queryWaveFunction, IEnumerable<ChunkIndex> cellsToCollapse) where T : IQueryWaveFunction
         {
             return queryWaveFunction.GetChunks(cellsToCollapse);
         }

@@ -38,7 +38,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     public Dictionary<ChunkIndex, IBuildable> QuerySpawnedBuildings { get; } = new Dictionary<ChunkIndex, IBuildable>();
     public Dictionary<ChunkIndex, IBuildable> SpawnedMeshes  { get; } = new Dictionary<ChunkIndex, IBuildable>();
 
-    private List<QueryMarchedChunk> queriedChunks = new List<QueryMarchedChunk>();
+    private HashSet<QueryMarchedChunk> queriedChunks = new HashSet<QueryMarchedChunk>();
 
     private BuildingAnimator buildingAnimator;
     private GroundGenerator groundGenerator;
@@ -72,8 +72,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         groundGenerator.OnChunkGenerated -= LoadCells;
         Events.OnBuiltIndexDestroyed -= RemoveBuiltIndex;
     }
-
-
+    
     private void LoadCells(Chunk chunk)
     {
         int3 index = chunk.ChunkIndex;

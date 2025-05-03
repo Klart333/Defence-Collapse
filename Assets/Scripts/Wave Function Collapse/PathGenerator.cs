@@ -34,7 +34,7 @@ namespace WaveFunctionCollapse
         public Dictionary<ChunkIndex, IBuildable> QuerySpawnedBuildings { get; } = new Dictionary<ChunkIndex, IBuildable>();
         public Dictionary<ChunkIndex, IBuildable> SpawnedMeshes { get; } = new Dictionary<ChunkIndex, IBuildable>();
 
-        private List<QueryMarchedChunk> queriedChunks = new List<QueryMarchedChunk>();
+        private HashSet<QueryMarchedChunk> queriedChunks = new HashSet<QueryMarchedChunk>();
 
         private BuildingAnimator buildingAnimator;
         private GroundGenerator groundGenerator;

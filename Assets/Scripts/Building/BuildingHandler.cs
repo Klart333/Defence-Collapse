@@ -41,9 +41,9 @@ public class BuildingHandler : SerializedMonoBehaviour
     public readonly Dictionary<int, List<Building>> BuildingGroups = new Dictionary<int, List<Building>>();
     public readonly Dictionary<ChunkIndex, WallState> WallStates = new Dictionary<ChunkIndex, WallState>();
 
-    private List<Building> buildingQueue = new List<Building>();
-    private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
     private HashSet<ChunkIndex> wallStatesWithHealth = new HashSet<ChunkIndex>();
+    private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
+    private List<Building> buildingQueue = new List<Building>();
 
     private int selectedGroupIndex = -1;
     private int groupIndexCounter;

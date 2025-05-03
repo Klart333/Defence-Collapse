@@ -24,8 +24,6 @@ namespace WaveFunctionCollapse
         public readonly List<int3> QueryCollapsedAir = new List<int3>();
         private readonly List<int3> queryBuiltCells = new List<int3>();
         
-        private bool shouldRemoveQueryIndex;
-
         // In the Following order: Right, Left, Up, Down, Forward, Backward
         public IChunk[] AdjacentChunks { get; private set; }
         public IQueryWaveFunction Handler { get; set; }
@@ -98,7 +96,16 @@ namespace WaveFunctionCollapse
 
         public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Stack<ChunkIndex> cellStack)
         {
-            throw new System.NotImplementedException();
+            PrototypeInfoData = prototypeInfoData;
+            IsClear = false;
+
+            for (int z = 0; z < Depth; z++)
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+            {
+                Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z);
+                Cells[x, y, z] = new Cell(false, Position + pos, new List<PrototypeData> { PrototypeData.Empty });
+            }
         }
         
         public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Chunk groundChunk, Vector3 offset, BuildableCornerData cellBuildableCornerData = null)
@@ -318,8 +325,8 @@ namespace WaveFunctionCollapse
         {
             UncollapseAir();
 
-            shouldRemoveQueryIndex = false;
             QueryChangedCells.Clear();
+            queryBuiltCells.Clear();
         }
         
         private void UncollapseAir()
@@ -368,30 +375,20 @@ namespace WaveFunctionCollapse
                 }
             }
 
-            if (shouldRemoveQueryIndex)
+            for (int i = 0; i < queryBuiltCells.Count; i++)
             {
-                shouldRemoveQueryIndex = false;
-                for (int i = 0; i < queryBuiltCells.Count; i++)
-                {
-                    BuiltCells[queryBuiltCells[i].x, queryBuiltCells[i].y, queryBuiltCells[i].z] = false;
-                }
+                BuiltCells[queryBuiltCells[i].x, queryBuiltCells[i].y, queryBuiltCells[i].z] = false;
             }
-        
+            queryBuiltCells.Clear();
             QueryChangedCells.Clear();
             QueryCollapsedAir.Clear();
         }
         
         public void SetBuiltCells(int3 queryIndex)
         {
-            queryBuiltCells.Add(queryIndex);
-            
-            if (BuiltCells[queryIndex.x, queryIndex.y, queryIndex.z])
+            if (!BuiltCells[queryIndex.x, queryIndex.y, queryIndex.z])
             {
-                shouldRemoveQueryIndex = false;
-            }
-            else
-            {
-                shouldRemoveQueryIndex = true;
+                queryBuiltCells.Add(queryIndex);
                 BuiltCells[queryIndex.x, queryIndex.y, queryIndex.z] = true;
             }
         }

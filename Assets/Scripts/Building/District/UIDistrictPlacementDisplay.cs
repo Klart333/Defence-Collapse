@@ -39,7 +39,7 @@ namespace Buildings.District
         private DistrictHandler districtHandler;
         
         [SerializeField]
-        private IQueryWaveFunction districtGenerator;
+        private DistrictGenerator districtGenerator;
 
         [Title("GroundType")]
         [SerializeField]
@@ -91,14 +91,14 @@ namespace Buildings.District
             Display(districtGenerator.ChunkWaveFunction);
         }
         
-        private void Display(ChunkWaveFunction<QueryMarchedChunk> chunkWaveFunction)
+        private void Display(ChunkWaveFunction<QueryChunk> chunkWaveFunction)
         {
             Vector3 scale = districtGenerator.ChunkScale * 0.75f;
             Bounds bounds = GetBounds(chunkWaveFunction.Chunks.Values);
 
             float maxDistance = Vector2.Distance(bounds.Min, bounds.Max);
             float scaledDelay = maxDelay * Mathf.Clamp01(maxDistance / maxDelayDistance);
-            foreach (QueryMarchedChunk chunk in chunkWaveFunction.Chunks.Values)
+            foreach (QueryChunk chunk in chunkWaveFunction.Chunks.Values)
             {
                 if (chunk.ChunkIndex.y != 0) continue;
                 if (districtHandler.IsBuilt(chunk)) continue;
@@ -240,7 +240,7 @@ namespace Buildings.District
         {
             if (!chunkGroupTypes.TryGetValue(chunkIndex, out GroundType groundType))
             {
-                QueryMarchedChunk chunk = districtGenerator.ChunkWaveFunction.Chunks[chunkIndex];
+                QueryChunk chunk = districtGenerator.ChunkWaveFunction.Chunks[chunkIndex];
                 groundType = RaycastGroundType(chunk.Position);
                 chunkGroupTypes.Add(chunkIndex, groundType);
             }
@@ -260,8 +260,8 @@ namespace Buildings.District
         {
             Bounds bounds = GetPositionBounds(spawnedPlacers.Where(x => x.Selected));
             
-            HashSet<QueryMarchedChunk> chunks = new HashSet<QueryMarchedChunk>();
-            foreach (QueryMarchedChunk chunk in districtGenerator.ChunkWaveFunction.Chunks.Values)
+            HashSet<QueryChunk> chunks = new HashSet<QueryChunk>();
+            foreach (QueryChunk chunk in districtGenerator.ChunkWaveFunction.Chunks.Values)
             {
                 if (!bounds.Contains(chunk.Position.XZ())) continue;
                 
