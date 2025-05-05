@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using System;
 using Buildings.District;
+using Loot;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -46,8 +47,7 @@ public class UIEffectDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnDrag(PointerEventData eventData)
     {
         // Convert the drag delta to canvas scale
-        Vector2 position;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)canvas.transform, eventData.position, canvas.worldCamera, out position);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)canvas.transform, eventData.position, canvas.worldCamera, out Vector2 position);
         rectTransform.localPosition = position;
     }
 

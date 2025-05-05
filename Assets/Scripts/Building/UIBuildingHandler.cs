@@ -14,6 +14,6 @@ public class UIBuildingHandler : MonoBehaviour
 
     public void ClickDistrict(int type)
     {
-        Events.OnDistrictClicked?.Invoke((DistrictType)type, -1);
+        Events.OnDistrictClicked?.Invoke((DistrictType)type, 2);
     }
 }

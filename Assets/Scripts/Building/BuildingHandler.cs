@@ -18,10 +18,6 @@ public class BuildingHandler : SerializedMonoBehaviour
     [SerializeField]
     private ProtoypeMeshes protoypeMeshes;
     
-    [Title("District")]
-    [SerializeField]
-    private IChunkWaveFunction<Chunk> districtGenerator;
-    
     [Title("Data")]
     [SerializeField]
     private WallData wallData;
@@ -37,7 +33,7 @@ public class BuildingHandler : SerializedMonoBehaviour
     [SerializeField]
     private bool verbose = true;
 
-    public readonly Dictionary<ChunkIndex, List<Building>> Buildings = new Dictionary<ChunkIndex, List<Building>>();
+    public readonly Dictionary<ChunkIndex, HashSet<Building>> Buildings = new Dictionary<ChunkIndex, HashSet<Building>>();
     public readonly Dictionary<int, List<Building>> BuildingGroups = new Dictionary<int, List<Building>>();
     public readonly Dictionary<ChunkIndex, WallState> WallStates = new Dictionary<ChunkIndex, WallState>();
 
@@ -71,13 +67,13 @@ public class BuildingHandler : SerializedMonoBehaviour
                     WallStates.Add(damageIndex, CreateData(damageIndex));
                 }
 
-                if (Buildings.TryGetValue(damageIndex, out List<Building> buildings))
+                if (Buildings.TryGetValue(damageIndex, out HashSet<Building> buildings))
                 {
                     buildings.Add(buildingQueue[i]);
                 }
                 else
                 {
-                    Buildings.Add(damageIndex, new List<Building>(4) { buildingQueue[i] });
+                    Buildings.Add(damageIndex, new HashSet<Building>(4) { buildingQueue[i] });
                 }
             }
         }
@@ -158,9 +154,9 @@ public class BuildingHandler : SerializedMonoBehaviour
         List<ChunkIndex> builtIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(building.ChunkIndex);
         foreach (ChunkIndex chunkIndex in builtIndexes)
         {
-            if (Buildings.TryGetValue(chunkIndex, out List<Building> buildings))
+            if (Buildings.TryGetValue(chunkIndex, out HashSet<Building> buildings))
             {
-                buildings.RemoveSwapBack(building);
+                buildings.Remove(building);
             }    
         }
         
@@ -230,17 +226,17 @@ public class BuildingHandler : SerializedMonoBehaviour
         WallStates.Remove(chunkIndex);
         Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
         
-        if (!Buildings.Remove(chunkIndex, out List<Building> buildings)) return;
+        if (!Buildings.Remove(chunkIndex, out HashSet<Building> buildings)) return;
 
         List<ChunkIndex> destroyedIndexes = new List<ChunkIndex>();
-        for (int i = 0; i < buildings.Count; i++)
+        foreach (Building building in buildings)
         {
-            if (BuildingManager.Instance.GetSurroundingMarchedIndexes(buildings[i].ChunkIndex).Count > 0) continue;
+            if (BuildingManager.Instance.GetSurroundingMarchedIndexes(building.ChunkIndex).Count > 0) continue;
             
-            buildings[i].OnDestroyed();
-            destroyedIndexes.Add(buildings[i].ChunkIndex);
+            building.OnDestroyed();
+            destroyedIndexes.Add(building.ChunkIndex);
         }
-
+        
         if (destroyedIndexes.Count > 0)
         {
             Events.OnWallsDestroyed?.Invoke(destroyedIndexes);

@@ -46,7 +46,7 @@ namespace WaveFunctionCollapse
                 (-1, 1) => Corner.TopLeft,
                 (1, -1) => Corner.BottomRight,
                 (-1, -1) => Corner.BottomLeft,
-                _ => throw new NotImplementedException(),
+                _ => Corner.TopRight,
             };
         }
 

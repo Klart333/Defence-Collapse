@@ -20,13 +20,15 @@ namespace WaveFunctionCollapse
         private PrototypeData unbuildablePrototype;
         private List<PrototypeData> unbuildablePrototypeList;
         
-        public readonly List<(int3, Cell)> QueryChangedCells = new List<(int3, Cell)>();
+        public readonly List<Tuple<int3, Cell>> QueryChangedCells = new List<Tuple<int3, Cell>>();
+        public List<GameObject> SpawnedMeshes => throw new NotImplementedException();
+
+        public bool IsChunkQueryAdded { get; private set; } = true;
         
         // In the Following order: Right, Left, Up, Down, Forward, Backward
         public IChunk[] AdjacentChunks { get; private set; }
         public Cell[,,] Cells { get; private set; }
         public bool[,,] BuiltCells { get; private set; }
-        public List<GameObject> SpawnedMeshes { get; } = new List<GameObject>();
         public Vector3 Position { get; private set;}
         public int Width { get; private set;}
         public int Height { get; private set;}
@@ -35,7 +37,7 @@ namespace WaveFunctionCollapse
         public bool IsRemoved { get; set; }
         public bool UseSideConstraints { get; private set; }
         public bool IsClear { get; private set; } = true;
-        public PrototypeInfoData PrototypeInfoData { get; private set; }
+        public PrototypeInfoData PrototypeInfoData { get; set; }
         
         public int3 ChunkSize => new int3(Width, Height, Depth);
         
@@ -100,8 +102,43 @@ namespace WaveFunctionCollapse
             for (int y = 0; y < Height; y++)
             for (int x = 0; x < Width; x++)
             {
+                int3 index = new int3(x, y, z);
                 Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z);
-                Cells[x, y, z] = new Cell(false, Position + pos, new List<PrototypeData> { PrototypeData.Empty });
+
+                bool isBottom = AdjacentChunks[3] == null && y == 0;
+                List<PrototypeData> prots = new List<PrototypeData>(isBottom ? prototypeInfoData.Prototypes : prototypeInfoData.NotBottomPrototypes);
+                if (UseSideConstraints)
+                {
+                    ConstrainBySides(index, prots);
+                }
+                else
+                {
+                    (this as IChunk).GetInvalidAdjacentSides(index, cellStack); // Still needs to update in case adjacent chunk is collapsed
+                }
+
+                Cell cell = new Cell(false, pos + Position, prots);
+                Cells[x, y, z] = cell;
+            }
+
+            void ConstrainBySides(int3 index, List<PrototypeData> prots)
+            {
+                List<Direction> directions = (this as IChunk).GetInvalidAdjacentSides(index, cellStack);
+                bool changed = false;
+                foreach (Direction direction in directions)
+                {
+                    for (int i = prots.Count - 1; i >= 0; i--)
+                    {
+                        if (prots[i].DirectionToKey(direction) == -1) continue;
+
+                        prots.RemoveAtSwapBack(i);
+                        changed = true;
+                    }
+                }
+                    
+                if (changed)
+                {
+                    cellStack.Push(new ChunkIndex(ChunkIndex, index));
+                }
             }
         }
 
@@ -167,13 +204,6 @@ namespace WaveFunctionCollapse
         public void Clear(Stack<GameObject> pool)
         {
             IsClear = true;
-
-            for (int i = SpawnedMeshes.Count - 1; i >= 0; i--)
-            {
-                SpawnedMeshes[i].SetActive(false);
-                pool.Push(SpawnedMeshes[i]);
-                SpawnedMeshes.RemoveAt(i);
-            }
             
             OnCleared?.Invoke();
         }
@@ -188,33 +218,27 @@ namespace WaveFunctionCollapse
         
         #region Query
 
-        public void Place(Action<ChunkIndex, PrototypeData> setCell)
+        public void Place()
         {
-            for (int g = 0; g < QueryChangedCells.Count; g++)
-            {
-                int3 changedIndex = QueryChangedCells[g].Item1;
-                if (QueryChangedCells[g].Item2.Collapsed)
-                {
-                    setCell(new ChunkIndex(ChunkIndex,  changedIndex), QueryChangedCells[g].Item2.PossiblePrototypes[0]);
-                }
-                else
-                {
-                    this[changedIndex] = QueryChangedCells[g].Item2;
-                }
-            }
-
+            IsChunkQueryAdded = false;
             QueryChangedCells.Clear();
         }
         
-        
-        public void RevertQuery(Action<ChunkIndex, PrototypeData> setCell)
+        public void RevertQuery(Action<ChunkIndex, PrototypeData, bool> setCell, Action<int3> removeChunk)
         {
+            if (IsChunkQueryAdded)
+            {
+                removeChunk?.Invoke(ChunkIndex);
+                return;
+            }
+            
             for (int i = 0; i < QueryChangedCells.Count; i++)
             {
                 int3 index = QueryChangedCells[i].Item1;
                 if (QueryChangedCells[i].Item2.Collapsed)
                 {
-                    setCell.Invoke(new ChunkIndex(ChunkIndex, index), QueryChangedCells[i].Item2.PossiblePrototypes[0]);
+                    Debug.Log("Resetting cell to: " + QueryChangedCells[i].Item2.PossiblePrototypes[0].Name_EditorOnly);
+                    setCell.Invoke(new ChunkIndex(ChunkIndex, index), QueryChangedCells[i].Item2.PossiblePrototypes[0], false);
                 }
                 else
                 {
@@ -225,7 +249,37 @@ namespace WaveFunctionCollapse
             QueryChangedCells.Clear();
         }
         
-        #endregion
+        public void QueryClear()
+        {
+            for (int z = 0; z < Depth; z++)
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+            {
+                Cell cell = Cells[x, y, z];
+                QueryChangedCells.Add(Tuple.Create(new int3(x, y, z), cell));
+                
+                bool isBottom = AdjacentChunks[3] == null && y == 0;
+                List<PrototypeData> prots = new List<PrototypeData>(isBottom ? PrototypeInfoData.Prototypes : PrototypeInfoData.NotBottomPrototypes);
+                cell.PossiblePrototypes = new List<PrototypeData>( prots);
+                cell.Collapsed = false;
+                Cells[x, y, z] = cell;
+            }
+            
+            OnCleared?.Invoke();
+        }
         
+        public void QueryLoad(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Stack<ChunkIndex> cellStack)
+        {
+            for (int z = 0; z < Depth; z++)
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+            {
+                QueryChangedCells.Add(Tuple.Create(new int3(x, y, z), Cells[x, y, z]));
+            }
+            
+            LoadCells(prototypeInfoData, gridScale, cellStack);
+        }
+        
+        #endregion
     }
 }

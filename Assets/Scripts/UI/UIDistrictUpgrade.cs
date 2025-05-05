@@ -7,6 +7,7 @@ using Gameplay.Money;
 using UnityEngine;
 using DG.Tweening;
 using System;
+using Loot;
 using TMPro;
 
 public class UIDistrictUpgrade : MonoBehaviour

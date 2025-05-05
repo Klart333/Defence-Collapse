@@ -36,16 +36,9 @@ namespace Buildings.District
         public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
         public MeshFilter MeshFilter => meshFilter ??= GetComponentInChildren<MeshFilter>();
         
-        public void Setup(PrototypeData prototypeData, Vector3 scale)
+        public void Setup(PrototypeData prototypeData, ChunkIndex chunkIndex, Vector3 scale)
         {
-            ChunkIndex? nullableIndex = BuildingManager.Instance.GetIndex(transform.position + scale / 2.0f);
-            if (!nullableIndex.HasValue)
-            {
-                Debug.LogError("Could not find chunk index");
-                return;
-            }
-        
-            ChunkIndex = nullableIndex.Value;
+            ChunkIndex = chunkIndex;
             Prototype = prototypeData;
             transform.localScale = scale;
 

@@ -1,12 +1,14 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
-using UnityEngine.InputSystem;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
+using System.Linq;
 using UnityEngine;
+using System;
+using Sirenix.Utilities;
 
 namespace Buildings.District
 {
@@ -19,9 +21,16 @@ namespace Buildings.District
         
         [SerializeField]
         private BuildingManager buildingGenerator;
+        
+        [SerializeField]
+        private DistrictHandler districtHandler;
 
         [SerializeField]
         private Dictionary<DistrictType, PrototypeInfoData> districtInfoData = new Dictionary<DistrictType, PrototypeInfoData>();
+
+        [Title("Debug")]
+        [SerializeField]
+        private bool verbose = true;
         
         private readonly HashSet<ChunkIndex> buildingIndexes = new HashSet<ChunkIndex>();
         private readonly HashSet<ChunkIndex> builtIndexes = new HashSet<ChunkIndex>();
@@ -49,7 +58,7 @@ namespace Buildings.District
         private async UniTaskVoid GetInput()
         {
             inputManager = await InputManager.Get();
-            inputManager.Fire.performed += FirePerformed;
+            inputManager.Fire.canceled += FirePerformed;
             inputManager.Cancel.performed += CancelPerformed;
         }
 
@@ -62,27 +71,94 @@ namespace Buildings.District
 
         private void Update()
         {
-            if (!Placing) return;
-
-            GetChunkIndexes();
+            if (!Placing || EventSystem.current.IsPointerOverGameObject()) return;
             
-            Dictionary<ChunkIndex, IBuildable> buildings = buildingGenerator.Query(buildingIndexes.ToList(), builtIndexes);
-            foreach (IBuildable buildable in buildings.Values)
+            int2[,] lastDistrictChunkIndexes = new int2[districtChunkIndexes.GetLength(0), districtChunkIndexes.GetLength(1)];
+            for (int x = 0; x < districtChunkIndexes.GetLength(0); x++)
+            for (int y = 0; y < districtChunkIndexes.GetLength(1); y++)
             {
-                buildable.ToggleIsBuildableVisual(true, false);
+                lastDistrictChunkIndexes[x, y] = districtChunkIndexes[x, y];
             }
 
-            if (buildings.Count <= 0)
+            if (!GetChunkIndexes(out bool requireQueryWalls))
+            {
+                // Invalid, Place some red squares
+                SetInvalid();
+                return;
+            }
+            
+            if (ChunkIndexesAreIdentical(lastDistrictChunkIndexes, districtChunkIndexes))
+            {
+                return;
+            }
+
+            if (requireQueryWalls)
+            {
+                Dictionary<ChunkIndex, IBuildable> buildings = buildingGenerator.Query(buildingIndexes.ToList(), builtIndexes);
+                bool isValid = false;
+                foreach (IBuildable buildable in buildings.Values)
+                {
+                    buildable.ToggleIsBuildableVisual(true, false);
+                    if (buildable.MeshRot.MeshIndex != -1)
+                    {
+                        isValid = true;
+                    }
+                }
+
+                if (!isValid)
+                {
+                    SetInvalid();
+                    return;
+                }
+            }
+            
+            Dictionary<ChunkIndex, IBuildable> districts = districtGenerator.Query(districtChunkIndexes, 2, districtInfoData[districtType]);
+            if (districts == null)
+            {
+                CancelPlacement();
+                return;
+            }
+            
+            bool isDistrictValid = false;
+            foreach (IBuildable buildable in districts.Values)
+            {
+                buildable.ToggleIsBuildableVisual(true, false);
+                isDistrictValid |= buildable.MeshRot.MeshIndex != -1;
+            }
+
+            if (!isDistrictValid)
             {
                 isPlacementValid = false;
                 return;
             }
 
-            districtGenerator.Query(districtChunkIndexes, districtInfoData[districtType]);
+            isPlacementValid = true;
+
+            void SetInvalid()
+            {
+                isPlacementValid = false;
+                buildingGenerator.RevertQuery();
+                districtGenerator.RevertQuery();
+            }
         }
 
-        private void GetChunkIndexes()
+        private bool ChunkIndexesAreIdentical(int2[,] lastDistrictChunkIndexes, int2[,] districtChunkIndexes)
         {
+            for (int x = 0; x < districtChunkIndexes.GetLength(0); x++)
+            for (int y = 0; y < districtChunkIndexes.GetLength(1); y++)
+            {
+                if (!lastDistrictChunkIndexes[x, y].Equals(districtChunkIndexes[x, y]))
+                {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        private bool GetChunkIndexes(out bool requireQueryWalls)
+        {
+            requireQueryWalls = true;
             buildingIndexes.Clear();
             builtIndexes.Clear();
             Vector3 mousePos = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
@@ -90,59 +166,80 @@ namespace Buildings.District
             {
                 for (int z = 0; z < districtRadius; z++)
                 {
-                    Vector3 districtPos = GetDistrictIndex(x, z);
+                    if (!GetDistrictIndex(x, z, out Vector3 districtPos))
+                    {
+                        return false;
+                    }
 
                     ChunkIndex? buildIndex = buildingGenerator.GetIndex(districtPos + buildingGenerator.CellSize * 0.5f);
                     if (!buildIndex.HasValue)
                     {
-                        continue;
+                        if (verbose)
+                        {
+                            Debug.Log("Invalid, Can't find build index");
+                        }
+                        return false;
                     }
 
                     buildingIndexes.Add(buildIndex.Value);
-                    Vector3 buildingCellPosition = GetBuiltIndexes(buildIndex.Value, districtPos);
-
-                    GetAdjacentCells(buildingCellPosition);
+                    Vector3 buildingCellPosition = buildingGenerator.GetPos(buildIndex.Value);
+                    
+                    if (TryGetBuiltIndex(buildingCellPosition, buildIndex.Value, districtPos, out ChunkIndex builtIndex))
+                    {
+                        builtIndexes.Add(builtIndex);
+                        buildingIndexes.AddRange(buildingGenerator.GetCellsSurroundingMarchedIndex(builtIndex));
+                    }
+                    else
+                    {
+                        if (buildingGenerator.ChunkWaveFunction[builtIndex].Buildable)
+                        {
+                            continue;
+                        }
+    
+                        return false;
+                    }
                 }
             }
+            requireQueryWalls = builtIndexes.Count > 0;
+            return true;
 
-            Vector3 GetBuiltIndexes(ChunkIndex buildIndex, Vector3 districtPos)
+            bool TryGetBuiltIndex(Vector3 buildingCellPosition, ChunkIndex buildIndex, Vector3 districtPos, out ChunkIndex builtIndex)
             {
-                Vector3 buildingCellPosition = buildingGenerator.GetPos(buildIndex);
                 Vector2 dir = (buildingCellPosition.XZ() - districtPos.XZ()).normalized;
-                builtIndexes.Add((dir.x, dir.y) switch
+                builtIndex = (dir.x, dir.y) switch
                 {
                     (x: < 0.1f, y: < 0.1f) => buildIndex,
                     (x: < 0.1f, y: > 0) => buildingGenerator.GetIndex(buildingCellPosition - Vector3.forward * buildingGenerator.CellSize.z).GetValueOrDefault(),
                     (x: > 0, y: < 0.1f) => buildingGenerator.GetIndex(buildingCellPosition - Vector3.right * buildingGenerator.CellSize.z).GetValueOrDefault(),
                     (x: > 0, y: > 0) => buildingGenerator.GetIndex(buildingCellPosition - buildingGenerator.CellSize).GetValueOrDefault(),
                     _ => throw new ArgumentOutOfRangeException()
-                });
-                return buildingCellPosition;
+                };
+
+                if (!buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].QueryBuiltCells.Contains(builtIndex.CellIndex) 
+                    && buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z])
+                {
+                    return false;
+                }
+                
+                return true;
             }
 
-            Vector3 GetDistrictIndex(int x, int z)
+            bool GetDistrictIndex(int x, int z, out Vector3 districtPos)
             {
                 Vector3 pos = mousePos + new Vector3(x * districtGenerator.ChunkScale.x, 0, z * districtGenerator.ChunkScale.z);
-                Vector3 districtPos = pos + offset;//+ districtGenerator.CellSize.XyZ() * (districtRadius % 2 == 0 ? 0 : -.25f);
+                districtPos = pos + offset;//+ districtGenerator.CellSize.XyZ() * (districtRadius % 2 == 0 ? 0 : -.25f);
                 districtChunkIndexes[x, z] = ChunkWaveUtility.GetDistrictIndex2(districtPos, districtGenerator.ChunkScale);
-                districtPos = ChunkWaveUtility.GetPosition(districtChunkIndexes[x, z].XyZ(0), districtGenerator.ChunkScale);
-                return districtPos;
-            }
-            
-            void GetAdjacentCells(Vector3 buildingCellPosition)
-            {
-                for (int i = 0; i < WaveFunctionUtility.DiagonalNeighbourDirections.Length; i++)
+                if (districtHandler.IsBuilt(districtChunkIndexes[x, z]))
                 {
-                    Vector3 neighbourPos = buildingCellPosition + buildingGenerator.CellSize.MultiplyByAxis(WaveFunctionUtility.DiagonalNeighbourDirections[i].XyZ(0));
-                    ChunkIndex? neighbourIndex = buildingGenerator.GetIndex(neighbourPos);
-                    if (!neighbourIndex.HasValue)
+                    if (verbose)
                     {
-                        Debug.LogError("Couldn't find building index"); // Handle exception
-                        continue;
+                        Debug.Log("Invalid, District index is already built");
                     }
-                        
-                    buildingIndexes.Add(neighbourIndex.Value);
+                    return false;
                 }
+                
+                districtPos = ChunkWaveUtility.GetPosition(districtChunkIndexes[x, z].XyZ(0), districtGenerator.ChunkScale);
+                return true;
             }
         }
 
@@ -150,6 +247,7 @@ namespace Buildings.District
         {
             UIEvents.OnFocusChanged?.Invoke();
             
+            this.districtType = districtType;
             districtChunkIndexes = new int2[radius, radius];
             districtRadius = radius;
             Placing = true;
@@ -157,14 +255,32 @@ namespace Buildings.District
 
         private void CancelPerformed(InputAction.CallbackContext obj)
         {
-            Placing = false;
+            CancelPlacement();
+        }
+
+        private void CancelPlacement()
+        {
             buildingGenerator.RevertQuery();
+            districtGenerator.RevertQuery();
+            Placing = false;
         }
 
         private void FirePerformed(InputAction.CallbackContext obj)
         {
+            if (!Placing || !isPlacementValid)
+            {
+                return;
+            }
+            
+            HashSet<QueryChunk> chunks = districtGenerator.QueriedChunks;
+            districtHandler.AddBuiltDistrict(chunks, districtType);
+            districtGenerator.Place();
             buildingGenerator.Place();
-            Placing = false;
+
+            if (districtType == DistrictType.TownHall)
+            {
+                Placing = false;
+            }
         }
         
         #region Debug

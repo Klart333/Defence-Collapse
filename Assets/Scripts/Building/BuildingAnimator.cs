@@ -1,6 +1,9 @@
-﻿using DG.Tweening;
+﻿using System;
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using System.Collections.Generic;
+using Buildings;
+using Buildings.District;
 using UnityEngine;
 
 public class BuildingAnimator : MonoBehaviour
@@ -31,15 +34,19 @@ public class BuildingAnimator : MonoBehaviour
 
     public void AnimateBuiltBuilding(IEnumerable<IBuildable> buildings)
     {
-        foreach (var item in buildings)
+        foreach (IBuildable buildable in buildings)
         {
-            Animate(item);
+            Animate(buildable);
         }
     }
 
     public void Animate(IBuildable building)
     {
-        SpawnParticle(building);
+        if (building is Building or Path)
+        {
+            SpawnParticle(building);
+        }
+
         BounceInOut(building.MeshTransform);
     }
 

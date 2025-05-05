@@ -1,5 +1,6 @@
 using Sirenix.OdinInspector;
 using Buildings.District;
+using Loot;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;

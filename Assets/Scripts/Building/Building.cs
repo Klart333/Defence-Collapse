@@ -57,8 +57,8 @@ public class Building : PooledMonoBehaviour, IBuildable
         new Vector2Int(-1, -1),
     };
     
-    private readonly List<Material> transparentMaterials = new List<Material>();
     private readonly List<Material> transparentRemoveMaterials = new List<Material>();
+    private readonly List<Material> transparentMaterials = new List<Material>();
 
     private BuildingAnimator buildingAnimator;
     private BuildingHandler buildingHandler;
@@ -71,8 +71,8 @@ public class Building : PooledMonoBehaviour, IBuildable
     private bool selected;
 
     public PrototypeData Prototype { get; private set; }
-    public int BuildingGroupIndex { get; set; } = -1;
     public ChunkIndex ChunkIndex { get; private set; }
+    public int BuildingGroupIndex { get; set; } = -1;
 
     private BuildingAnimator BuildingAnimator => buildingAnimator ??= FindAnyObjectByType<BuildingAnimator>();
     public BuildingHandler BuildingHandler => buildingHandler ??= FindAnyObjectByType<BuildingHandler>();
@@ -125,7 +125,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         if (purchasing || highlighted) return;
 
         BuildingAnimator.BounceInOut(meshTransform);
-        MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2); // sure ?
+        MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2);
 
         await UniTask.NextFrame();
         highlighted = true;
@@ -183,16 +183,9 @@ public class Building : PooledMonoBehaviour, IBuildable
         }
     }
 
-    public void Setup(PrototypeData prototypeData, Vector3 scale)
+    public void Setup(PrototypeData prototypeData, ChunkIndex index, Vector3 scale)
     {
-        ChunkIndex? nullableIndex = BuildingManager.Instance.GetIndex(transform.position + scale / 2.0f);
-        if (!nullableIndex.HasValue)
-        {
-            Debug.LogError("Could not find chunk index");
-            return;
-        }
-        
-        ChunkIndex = nullableIndex.Value;
+        ChunkIndex = index;
         Prototype = prototypeData;
         transform.localScale = scale;
 

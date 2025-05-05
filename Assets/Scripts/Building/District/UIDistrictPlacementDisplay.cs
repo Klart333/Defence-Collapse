@@ -101,7 +101,7 @@ namespace Buildings.District
             foreach (QueryChunk chunk in chunkWaveFunction.Chunks.Values)
             {
                 if (chunk.ChunkIndex.y != 0) continue;
-                if (districtHandler.IsBuilt(chunk)) continue;
+                if (districtHandler.IsBuilt(chunk.ChunkIndex.xz)) continue;
                     
                 int3 index = ChunkWaveUtility.GetDistrictIndex3(chunk.Position, districtGenerator.ChunkScale);
                 if (!CheckDistrictRestriction(currentType, index)) continue; 
@@ -268,7 +268,7 @@ namespace Buildings.District
                 bool valid = currentType switch
                 {
                     DistrictType.TownHall => !districtHandler.IsBuilt(chunk, out DistrictData data) || data.State is TownHallState,
-                    _ => !districtHandler.IsBuilt(chunk),
+                    _ => !districtHandler.IsBuilt(chunk.ChunkIndex.xz),
                 };
                     
                 if (valid)

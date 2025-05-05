@@ -60,16 +60,9 @@ namespace Buildings
             OnResetEvent?.Invoke();
         }
 
-        public void Setup(PrototypeData prototypeData, Vector3 scale)
+        public void Setup(PrototypeData prototypeData, ChunkIndex index, Vector3 scale)
         {
-            ChunkIndex? nullableIndex = BuildingManager.Instance.GetIndex(transform.position + scale / 2.0f);
-            if (!nullableIndex.HasValue)
-            {
-                Debug.LogError("Could not find chunk index");
-                return;
-            }
-
-            ChunkIndex = nullableIndex.Value;
+            ChunkIndex = index;
             PrototypeData = prototypeData;
 
             GetComponentInChildren<MeshFilter>().mesh = protoypeMeshes[prototypeData.MeshRot.MeshIndex];

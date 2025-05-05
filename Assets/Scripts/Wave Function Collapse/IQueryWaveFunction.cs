@@ -10,18 +10,13 @@ namespace WaveFunctionCollapse
         public Dictionary<ChunkIndex, IBuildable> SpawnedMeshes { get; }
         public Vector3 CellSize { get; }
         
-        public void SetCell(ChunkIndex index, PrototypeData chosenPrototype, List<int3> queryCollapsedAir, bool query = true)
+        public void SetCell(ChunkIndex index, PrototypeData chosenPrototype, bool query = true)
         {
             ChunkWaveFunction[index] = new Cell(true, ChunkWaveFunction[index].Position, new List<PrototypeData> { chosenPrototype });
             ChunkWaveFunction.CellStack.Push(index);
 
-            IBuildable spawned = GenerateMesh(ChunkWaveFunction[index].Position, chosenPrototype);
-            if (spawned == null && queryCollapsedAir != null) 
-            {
-                queryCollapsedAir.Add(index.CellIndex);
-                return;
-            }
-
+            IBuildable spawned = GenerateMesh(ChunkWaveFunction[index].Position, index, chosenPrototype);
+            
             if (query)
             {
                 QuerySpawnedBuildings.Add(index, spawned);
@@ -32,7 +27,7 @@ namespace WaveFunctionCollapse
             SpawnedMeshes[index] = spawned;
         }
 
-        public IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, bool animate = false);
+        public IBuildable GenerateMesh(Vector3 position, ChunkIndex index, PrototypeData prototypeData, bool animate = false);
         
         public HashSet<QueryMarchedChunk> GetChunks(IEnumerable<ChunkIndex> cellsToCollapse)
         {
@@ -185,9 +180,9 @@ namespace WaveFunctionCollapse
 
     public static class IQueryWaveFunctionExtensions
     {
-        public static void SetCell<T>(this T queryWaveFunction, ChunkIndex index, PrototypeData prototypeData, List<int3> queryCollapsedAir, bool query = true) where T : IQueryWaveFunction
+        public static void SetCell<T>(this T queryWaveFunction, ChunkIndex index, PrototypeData prototypeData, bool query = true) where T : IQueryWaveFunction
         {
-            queryWaveFunction.SetCell(index, prototypeData, queryCollapsedAir, query);
+            queryWaveFunction.SetCell(index, prototypeData, query);
         }
         
         public static HashSet<QueryMarchedChunk> GetChunks<T>(this T queryWaveFunction, IEnumerable<ChunkIndex> cellsToCollapse) where T : IQueryWaveFunction

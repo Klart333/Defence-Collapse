@@ -6,11 +6,10 @@ using Sirenix.Serialization;
 using WaveFunctionCollapse;
 using Sirenix.Utilities;
 using Unity.Mathematics;
-using Gameplay.Money;
 using UnityEngine;
+using System.Linq;
 using Gameplay;
 using System;
-using System.Linq;
 
 namespace Buildings.District
 {
@@ -50,7 +49,7 @@ namespace Buildings.District
 
         private void OnDisable()
         {
-            Events.OnWallsDestroyed += OnWallsDestroyed;
+            Events.OnWallsDestroyed -= OnWallsDestroyed;
             Events.OnWaveStarted -= OnWaveStarted;
             Events.OnWaveEnded -= OnWaveEnded;
             
@@ -93,6 +92,31 @@ namespace Buildings.District
             }
         }
 
+        public void AddBuiltDistrict(HashSet<QueryChunk> chunks, DistrictType districtType)
+        {
+            if (!districtInfoData.TryGetValue(districtType, out PrototypeInfoData prototypeInfo))
+            {
+                Debug.LogError("Could not find PrototypeInfoData for DistrictType: " + districtType);
+                return;
+            }
+            
+            if (districtType == DistrictType.TownHall && CheckMerge(chunks, out DistrictData existingData))
+            {
+                foreach (QueryChunk chunk in chunks)
+                {
+                    districts.TryAdd(chunk.ChunkIndex.xz, existingData);
+                }
+                
+                existingData.ExpandDistrict(chunks);
+            }
+            else
+            {
+                GetDistrictData(districtType, chunks);
+            }
+            
+            Events.OnDistrictBuilt?.Invoke(districtType);
+        }
+
         public void BuildDistrict(HashSet<QueryChunk> chunks, DistrictType districtType)
         {
             if (!districtInfoData.TryGetValue(districtType, out PrototypeInfoData prototypeInfo))
@@ -103,14 +127,9 @@ namespace Buildings.District
             
             HashSet<QueryChunk> neighbours = new HashSet<QueryChunk>();
             List<QueryChunk> addedChunks = new List<QueryChunk>();
-            int topChunkCount = 0;
             foreach (QueryChunk chunk in chunks)
             {
                 bool isTop = chunk.IsTop;
-                if (isTop)
-                {
-                    topChunkCount++;
-                }
                 
                 GetNeighbours(chunks, chunk, neighbours, 1);
 
@@ -152,6 +171,7 @@ namespace Buildings.District
             foreach (QueryChunk chunk in neighbours)
             {
                 chunk.Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
+                districtGenerator.ClearChunkMeshes(chunk.ChunkIndex);
                 districtGenerator.ChunkWaveFunction.LoadCells(chunk, chunk.PrototypeInfoData);
             }
 
@@ -166,11 +186,11 @@ namespace Buildings.District
             }
             else
             {
-                DistrictData districtData = GetDistrictData(districtType, chunks, topChunkCount);
+                GetDistrictData(districtType, chunks);
             }
             
             districtGenerator.ChunkWaveFunction.Propagate();
-            districtGenerator.Run().Forget(Debug.LogError);
+            districtGenerator.Run(neighbours).Forget(Debug.LogError);
             Events.OnDistrictBuilt?.Invoke(districtType);
         }
 
@@ -205,7 +225,7 @@ namespace Buildings.District
             }
         }
 
-        private DistrictData GetDistrictData(DistrictType districtType, HashSet<QueryChunk> chunks, int topChunkCount)
+        private DistrictData GetDistrictData(DistrictType districtType, HashSet<QueryChunk> chunks)
         {
             Vector3 position = GetAveragePosition(chunks);
             DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator, districtKey++)
@@ -221,7 +241,6 @@ namespace Buildings.District
                 districts.TryAdd(chunk.ChunkIndex.xz, districtData);
             }
             
-            MoneyManager.Instance.Purchase(districtType, topChunkCount);
             OnDistrictCreated?.Invoke(districtData);
 
             districtData.OnDisposed += OnDispose;
@@ -278,10 +297,9 @@ namespace Buildings.District
             return vector3;
         }
 
-        public bool IsBuilt(IChunk chunk)
+        public bool IsBuilt(int2 chunkIndex2)
         {
-            int2 index = chunk.ChunkIndex.xz;
-            return districts.TryGetValue(index, out _);
+            return districts.TryGetValue(chunkIndex2, out _);
         }
         
         public bool IsBuilt(IChunk chunk, out DistrictData districtData)

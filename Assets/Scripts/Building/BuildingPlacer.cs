@@ -46,7 +46,8 @@ public class BuildingPlacer : MonoBehaviour
         Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
         UIEvents.OnFocusChanged += OnBuildingCanceled;
         Events.OnBuildingClicked += BuildingClicked;
-        
+        Events.OnBuiltIndexBuilt += OnBuildingBuilt;
+
         AwaitManagers().Forget();
     }
 
@@ -66,6 +67,7 @@ public class BuildingPlacer : MonoBehaviour
         InputManager.Instance.Fire.canceled -= MouseOnUp;
         UIEvents.OnFocusChanged -= OnBuildingCanceled;
         Events.OnBuildingClicked -= BuildingClicked;
+        Events.OnBuiltIndexBuilt -= OnBuildingBuilt;
     }
 
     private void Update()
@@ -344,10 +346,20 @@ public class BuildingPlacer : MonoBehaviour
 
         MoneyManager.Instance.Purchase(BuildingType.Building);
         
-        spawnedSpawnPlaces[SquareIndex.Value].OnPlaced();
         BuildingManager.Instance.Place();
     }
-
+    
+    private void OnBuildingBuilt(IEnumerable<ChunkIndex> indexes)
+    {
+        foreach (ChunkIndex chunkIndex in indexes)
+        {
+            if (spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare square))
+            {
+                square.OnPlaced();
+            }
+        }
+    }
+    
     private void RemoveBuilding()
     {
         SquareWasPressed = false;

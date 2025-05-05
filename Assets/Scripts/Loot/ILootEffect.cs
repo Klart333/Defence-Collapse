@@ -1,6 +1,7 @@
 ﻿using Buildings.District;
 using Gameplay.Money;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using UnityEngine;
 
 namespace Loot
@@ -29,7 +30,7 @@ namespace Loot
     public class EffectLoot : ILootEffect
     {
         [Title("Effect")]
-        public EffectModifier Effect;
+        public EffectModifier Effect = new EffectModifier();
 
         public void Perform(int grade)
         {

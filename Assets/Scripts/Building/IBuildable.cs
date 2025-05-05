@@ -10,7 +10,7 @@ public interface IBuildable
     public MeshRenderer MeshRenderer { get; }
     public ChunkIndex ChunkIndex { get; }
     
-    public void Setup(PrototypeData prototypeData, Vector3 scale);
+    public void Setup(PrototypeData prototypeData, ChunkIndex index, Vector3 scale);
     public void ToggleIsBuildableVisual(bool isQueried, bool showRemoving);
 }
 

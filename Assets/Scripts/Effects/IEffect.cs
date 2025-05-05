@@ -34,6 +34,7 @@ namespace Effects
 
     #region Increase Stat
 
+    [Serializable]
     public class IncreaseStatEffect : IEffect
     {
         [TitleGroup("Modifier")]
@@ -88,6 +89,7 @@ namespace Effects
 
     #region Timed Stat Increase
 
+    [Serializable]
     public class TimedStatIncreaseEffect : IEffect
     {
         [Title("Increase Amount")]
@@ -153,6 +155,7 @@ namespace Effects
 
     #region Temporary Increase Stat
 
+    [Serializable]
     public class TemporaryIncreaseStatEffect : IEffect
     {
         [TitleGroup("Modifier")]
@@ -215,6 +218,7 @@ namespace Effects
 
     #region Damage Collider
 
+    [Serializable]
     public class DamageColliderEffect : IEffect
     {
         [Title("Attack Damage")]
@@ -284,6 +288,7 @@ namespace Effects
 
     #region Arched Damage Collider
 
+    [Serializable]
     public class ArchedDamageColliderEffect : IEffect
     {
         [Title("Attack Damage")]
@@ -404,6 +409,7 @@ namespace Effects
 
     #region Stacking Effect
 
+    [Serializable]
     public class StackingEffectEffect : IEffect
     {
         [TitleGroup("Stat Increase")]
@@ -469,6 +475,7 @@ namespace Effects
 
     #region Damage Over Time On Damage
 
+    [Serializable]
     public class DamageOverTimeOnDamageEffect : IEffect
     {
         [TitleGroup("Percent Damage DOT'd")]
@@ -533,6 +540,7 @@ namespace Effects
 
     #region Random Bonus
 
+    [Serializable]
     public class RandomBonusEffect : IEffect
     {
         [TitleGroup("Modifier")]
@@ -602,6 +610,7 @@ namespace Effects
 
     #region Health Condition
 
+    [Serializable]
     public class HealthConditionalEffect : IEffect
     {
         [TitleGroup("Health Percent")]
@@ -670,6 +679,7 @@ namespace Effects
 
     #region Repeated Effect
 
+    [Serializable]
     public class RepeatEffect : IEffectHolder
     {
         [Title("Total Time")]
@@ -733,6 +743,7 @@ namespace Effects
 
     #region Status Effect
 
+    [Serializable]
     public class StatusEffectEffect : IEffect
     {
         [Title("Duration")]
@@ -775,6 +786,7 @@ namespace Effects
 
     #region Targeted Effect
 
+    [Serializable]
     public class OnDamageTargetedEffect : IEffectHolder
     {
         [Title("Nohting")]
@@ -830,6 +842,7 @@ namespace Effects
 
     #region Visual Effect
 
+    [Serializable]
     public class VisualEffectEffect : IEffect 
     {
         [Title("Effect Scale")]

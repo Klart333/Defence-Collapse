@@ -121,7 +121,7 @@ namespace WaveFunctionCollapse
                 }
                 else
                 {
-                    this.SetCell(index, chosenPrototype, waveFunction.Chunks[index.Index].QueryCollapsedAir);
+                    this.SetCell(index, chosenPrototype);
                 }
 
                 waveFunction.Propagate();
@@ -217,7 +217,7 @@ namespace WaveFunctionCollapse
             {
                 ChunkIndex index = waveFunction.GetLowestEntropyIndex(cellsToCollapse);
                 PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index]);
-                this.SetCell(index, chosenPrototype, waveFunction.Chunks[index.Index].QueryCollapsedAir);
+                this.SetCell(index, chosenPrototype);
 
                 waveFunction.Propagate();
             }
@@ -232,11 +232,11 @@ namespace WaveFunctionCollapse
             return QuerySpawnedBuildings;
         }
 
-        public IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, bool animate = false)
+        public IBuildable GenerateMesh(Vector3 position, ChunkIndex index, PrototypeData prototypeData, bool animate = false)
         {
             Path building = pathPrefab.GetAtPosAndRot<Path>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
 
-            building.Setup(prototypeData, waveFunction.CellSize);
+            building.Setup(prototypeData, index, waveFunction.CellSize);
 
             if (animate) buildingAnimator.Animate(building);
 

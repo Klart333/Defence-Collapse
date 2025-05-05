@@ -846,8 +846,97 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35bee138f0644ff5910178cba2a52d52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 11400000, guid: 245db626b31676a4183321c87b450a27, type: 2}
+    - {fileID: 11400000, guid: ab0696a35eef117499e0fdc29a15b776, type: 2}
+    - {fileID: 11400000, guid: 20071b5325a2e33418874ae5d70b303e, type: 2}
+    - {fileID: 11400000, guid: d94a6d5c1a8128544a4b6388e09ea944, type: 2}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: districtInfoData
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[DistrictType, Core],[WaveFunctionCollapse.PrototypeInfoData,
+        Core]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[DistrictType, Core]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 10
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 10
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 4
+    - Name: $v
+      Entry: 10
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   districtGenerator: {fileID: 1551488502}
   buildingGenerator: {fileID: 771210304}
+  districtHandler: {fileID: 491554922}
+  verbose: 1
 --- !u!1 &226841345
 GameObject:
   m_ObjectHideFlags: 0
@@ -993,13 +1082,11 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: districtGenerator
-      Entry: 6
-      Data: 
     - Name: Buildings
       Entry: 7
       Data: 0|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.ChunkIndex,
-        Core],[System.Collections.Generic.List`1[[Building, Core]], mscorlib]], mscorlib
+        Core],[System.Collections.Generic.HashSet`1[[Building, Core]], System.Core]],
+        mscorlib
     - Name: comparer
       Entry: 7
       Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[WaveFunctionCollapse.ChunkIndex,
@@ -1041,8 +1128,12 @@ MonoBehaviour:
       Data: 4|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.ChunkIndex,
         Core],[WallState, Core]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 1
+      Entry: 7
+      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[WaveFunctionCollapse.ChunkIndex,
+        Core]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -3338,7 +3429,6 @@ GameObject:
   m_Component:
   - component: {fileID: 491554920}
   - component: {fileID: 491554922}
-  - component: {fileID: 491554921}
   - component: {fileID: 491554923}
   m_Layer: 0
   m_Name: DistrictHandler
@@ -3362,18 +3452,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1531255970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &491554921
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 491554919}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d10500ea0b74910b8a6a6d5d3e5ba1b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &491554922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3781,8 +3859,7 @@ GameObject:
   m_Component:
   - component: {fileID: 558038931}
   - component: {fileID: 558038934}
-  - component: {fileID: 558038933}
-  - component: {fileID: 558038932}
+  - component: {fileID: 558038935}
   m_Layer: 0
   m_Name: Content
   m_TagString: Untagged
@@ -3809,49 +3886,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &558038932
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 558038930}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 8
-    m_Right: 8
-    m_Top: 8
-    m_Bottom: 8
-  m_ChildAlignment: 0
-  m_StartCorner: 0
-  m_StartAxis: 0
-  m_CellSize: {x: 328.1444, y: 100.29247}
-  m_Spacing: {x: 0, y: 8}
-  m_Constraint: 1
-  m_ConstraintCount: 1
---- !u!114 &558038933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 558038930}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5cc02e0135438034d8e665a17f64938f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rows: 3
-  coloumns: 1
-  useElasticClamping: 1
-  clampingX: 0
-  restrictToSquare: 0
-  CalculateOnStart: 1
-  useParentRect: 1
 --- !u!222 &558038934
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3860,6 +3894,32 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 558038930}
   m_CullTransparentMesh: 1
+--- !u!114 &558038935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 558038930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1001 &584802847
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10414,13 +10474,15 @@ MonoBehaviour:
   chunkSize: {x: 2, y: 2, z: 2}
   defaultPrototypeInfoData: {fileID: 11400000, guid: 75589cbb0f869c445a78f95abb2b55c3,
     type: 2}
+  districtPrefab: {fileID: 4891712406692202710, guid: ea2c81e28f33ed64686456e60407dfb8,
+    type: 3}
   buildableCornerData: {fileID: 11400000, guid: 21c6865fe1599b64699908607cd7f257,
     type: 2}
   districtHandler: {fileID: 491554922}
-  awaitEveryFrame: 100
+  awaitEveryFrame: 2
   awaitTimeMs: 1
   maxMillisecondsPerFrame: 1
-  debug: 0
+  debug: 1
 --- !u!1 &1568006375
 GameObject:
   m_ObjectHideFlags: 0
@@ -11113,7 +11175,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 491554921}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Buildings.District.UIDistrictDisplay, Core
         m_MethodName: PlacementConfirmed
         m_Mode: 1

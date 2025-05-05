@@ -6,7 +6,6 @@ using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
 using UnityEditor;
-using Buildings;
 using System;
 
 public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
@@ -39,6 +38,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     public Dictionary<ChunkIndex, IBuildable> SpawnedMeshes  { get; } = new Dictionary<ChunkIndex, IBuildable>();
 
     private HashSet<QueryMarchedChunk> queriedChunks = new HashSet<QueryMarchedChunk>();
+    private IEnumerable<ChunkIndex> queryBuiltIndexes;
 
     private BuildingAnimator buildingAnimator;
     private GroundGenerator groundGenerator;
@@ -123,10 +123,11 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
                 cell.PossiblePrototypes = new List<PrototypeData> { PrototypeData.Empty };
                 waveFunction[index] = cell;
                 cellsToUpdate.Remove(index);
+                QuerySpawnedBuildings.Remove(index);
             }
             else
             {
-                this.SetCell(index, chosenPrototype, waveFunction.Chunks[index.Index].QueryCollapsedAir);
+                this.SetCell(index, chosenPrototype);
             }
             
             waveFunction.Propagate();
@@ -164,6 +165,12 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     {
         Events.OnBuildingBuilt?.Invoke(QuerySpawnedBuildings.Values);
         
+        if (queryBuiltIndexes != null)
+        {
+            Events.OnBuiltIndexBuilt?.Invoke(queryBuiltIndexes);
+            queryBuiltIndexes = null;   
+        }
+        
         foreach (QueryMarchedChunk chunk in queriedChunks)
         {
             chunk.Place();
@@ -184,6 +191,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
     public void RevertQuery()
     {
+        queryBuiltIndexes = null;
         if (QuerySpawnedBuildings.Count == 0)
         {
             return;
@@ -213,8 +221,9 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
         if (cellsToCollapse.Count <= 0) return QuerySpawnedBuildings;
         queriedChunks = this.GetChunks(cellsToCollapse);
+        queryBuiltIndexes = builtIndexes;
 
-        foreach (ChunkIndex builtIndex in builtIndexes)
+        foreach (ChunkIndex builtIndex in queryBuiltIndexes)
         {
             waveFunction.Chunks[builtIndex.Index].SetBuiltCells(builtIndex.CellIndex);
         }
@@ -229,7 +238,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         {
             ChunkIndex index = waveFunction.GetLowestEntropyIndex(cellsToCollapse);
             PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index]);
-            this.SetCell(index, chosenPrototype, waveFunction.Chunks[index.Index].QueryCollapsedAir);
+            this.SetCell(index, chosenPrototype);
 
             waveFunction.Propagate();
         }
@@ -243,11 +252,11 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         return QuerySpawnedBuildings;
     }
 
-    public IBuildable GenerateMesh(Vector3 position, PrototypeData prototypeData, bool animate = false)
+    public IBuildable GenerateMesh(Vector3 position, ChunkIndex index, PrototypeData prototypeData, bool animate = false)
     {
         Building building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0)); 
 
-        building.Setup(prototypeData, waveFunction.CellSize);
+        building.Setup(prototypeData, index, waveFunction.CellSize);
 
         if (animate) buildingAnimator.Animate(building);
 
