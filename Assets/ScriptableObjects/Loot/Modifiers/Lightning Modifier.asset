@@ -55,7 +55,25 @@ MonoBehaviour:
       Data: 2
     - Name: 
       Entry: 7
-      Data: 4|Effects.DamageColliderEffect, Core
+      Data: 4|Effects.VisualEffectEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 1
+    - Name: AttackEffect
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 5|Effects.DelayedEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 1
+    - Name: Effect
+      Entry: 7
+      Data: 6|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 5
@@ -67,25 +85,22 @@ MonoBehaviour:
       Data: 1
     - Name: Radius
       Entry: 4
-      Data: 0.5
+      Data: 0.8
+    - Name: HasLifetime
+      Entry: 5
+      Data: false
     - Name: Lifetime
       Entry: 4
-      Data: 0.05
+      Data: 0.5
     - Name: TriggerDamageDone
       Entry: 5
       Data: false
     - Name: 
       Entry: 8
       Data: 
-    - Name: 
-      Entry: 7
-      Data: 5|Effects.VisualEffectEffect, Core
-    - Name: ModifierValue
+    - Name: delay
       Entry: 4
-      Data: 1
-    - Name: AttackEffect
-      Entry: 10
-      Data: 1
+      Data: 0.5
     - Name: 
       Entry: 8
       Data: 

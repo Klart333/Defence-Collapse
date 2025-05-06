@@ -8,7 +8,7 @@ public interface IAttacker
 
     // Position
     public Vector3 AttackPosition { get; set; }
-    public Vector3 OriginPosition { get; }
+    public Vector3 OriginPosition { get; set; }
 
     // Attack
     public DamageInstance LastDamageDone {  get; }

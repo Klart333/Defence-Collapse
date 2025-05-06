@@ -100,7 +100,14 @@ namespace Effects.ECS
             float radiusSq = radius * radius;
 
             int2 centerCell = new int2((int)pos.x, (int)pos.z);
-            if (CollideWithinCell(sortKey, entity, colliderAspect, centerCell, pos, radiusSq)) return;
+            if (CollideWithinCell(sortKey, entity, colliderAspect, centerCell, pos, radiusSq))
+            {
+                if (colliderAspect.DamageComponent.ValueRO.IsOneShot)
+                {
+                    ECB.AddComponent<DeathTag>(sortKey, entity);
+                }
+                return;
+            }
 
             int searchRadius = (int)(radius + 0.5f);
             int minX = centerCell.x - searchRadius;
@@ -124,6 +131,11 @@ namespace Effects.ECS
                     
                     if (CollideWithinCell(sortKey, entity, colliderAspect, cell, pos, radiusSq)) return;
                 }
+            }
+
+            if (colliderAspect.DamageComponent.ValueRO.IsOneShot)
+            {
+                ECB.AddComponent<DeathTag>(sortKey, entity);
             }
         }
 

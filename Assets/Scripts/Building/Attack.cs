@@ -79,8 +79,6 @@ public class Attack
             case EffectType.DoneDamage:
                 DoneDamageEffects.AddRange(effects);
                 break;
-            default:
-                break;
         }
     }
 

@@ -9,6 +9,9 @@ using Unity.Entities;
 using UnityEngine;
 using Effects.ECS;
 using System;
+using System.Threading.Tasks;
+using Gameplay;
+
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable ConvertToConstant.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -233,8 +236,12 @@ namespace Effects
         [Title("Collider")]
         public float Radius = 1;
 
+        [Title("LifeTime")]
+        public bool HasLifetime = true;
+        [ShowIf(nameof(HasLifetime))]
         public float Lifetime = 0.5f;
 
+        [Title("Callbacks")]
         public bool TriggerDamageDone = true;
 
         public void Perform(IAttacker unit)
@@ -248,6 +255,7 @@ namespace Effects
                 TriggerDamageDone = TriggerDamageDone,
                 LimitedHits = Hits,
                 HasLimitedHits = LimitedHits,
+                IsOneShot = !HasLifetime
             };
 
             ColliderComponent colliderComponent = new ColliderComponent
@@ -266,15 +274,18 @@ namespace Effects
                 typeof(DamageComponent),
                 typeof(ColliderComponent),
                 typeof(PositionComponent),
-                typeof(LifetimeComponent),
             };
 
             Entity spawned = entityManager.CreateEntity(componentTypes);
             entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
-            entityManager.SetComponentData(spawned, new LifetimeComponent{Lifetime = Lifetime});
             entityManager.SetComponentData(spawned, colliderComponent);
             entityManager.SetComponentData(spawned, dmgComponent);
 
+            if (HasLifetime)
+            {
+                entityManager.AddComponentData(spawned, new LifetimeComponent { Lifetime = Lifetime });
+            }
+            
             return spawned;
         }
 
@@ -696,7 +707,12 @@ namespace Effects
         [SerializeField]
         private float initialDelay = 0.0f;
 
-        public async void Perform(IAttacker unit)
+        public void Perform(IAttacker unit)
+        {
+            PerformAsync(unit).Forget();
+        }
+
+        private async UniTaskVoid PerformAsync(IAttacker unit)
         {
             float timer = repeatFrequency - initialDelay;
             float totalTimer = 0;
@@ -705,8 +721,9 @@ namespace Effects
             {
                 await UniTask.Yield();
 
-                totalTimer += Time.deltaTime;
-                timer += Time.deltaTime;
+                float delta = Time.deltaTime * GameSpeedManager.Instance.Value;
+                totalTimer += delta;
+                timer += delta;
 
                 if (timer >= repeatFrequency)
                 {
@@ -736,6 +753,57 @@ namespace Effects
                 ModifierValue = ModifierValue,
                 repeatFrequency = repeatFrequency
             };
+        }
+    }
+
+    #endregion
+    
+    #region Delayed Effect
+
+    [Serializable]
+    public class DelayedEffect : IEffect
+    {
+        [Title("Times Performed")]
+        [OdinSerialize]
+        public float ModifierValue { get; set; } = 1;
+
+        [Title("Effect")]
+        [OdinSerialize]
+        public IEffect Effect { get; set; }
+
+        [SerializeField]
+        private float delay = 0.5f;
+
+        public void Perform(IAttacker unit)
+        {
+            PeformAsync(unit).Forget();
+        }
+
+        private async UniTaskVoid PeformAsync(IAttacker unit)
+        {
+            Vector3 attackPos = unit.AttackPosition;
+            Vector3 originPos = unit.OriginPosition;
+            await UniTask.Delay(TimeSpan.FromSeconds(delay));
+
+            for (int i = 0; i < ModifierValue; i++)
+            {
+                Vector3 currentAttackPos = unit.AttackPosition;
+                Vector3 currentOriginPos = unit.OriginPosition;
+                unit.AttackPosition = attackPos;
+                unit.OriginPosition = originPos;
+                
+                Effect.Perform(unit);
+                
+                unit.AttackPosition = currentAttackPos;
+                unit.OriginPosition = currentOriginPos;
+
+                await UniTask.Yield();
+            }
+        }
+
+        public void Revert(IAttacker unit)
+        {
+            // Nah
         }
     }
 

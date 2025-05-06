@@ -12,6 +12,7 @@ namespace Effects.ECS
 	{
 		public bool TriggerDamageDone;
 		public bool HasLimitedHits;
+		public bool IsOneShot;
 		public byte LimitedHits;
 		public int Key;
 		public float Damage;

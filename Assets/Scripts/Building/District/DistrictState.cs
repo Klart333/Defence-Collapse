@@ -28,7 +28,7 @@ namespace Buildings.District
         public Stats Stats => stats;
         
         public abstract List<IUpgradeStat> UpgradeStats { get; }
-        public Vector3 OriginPosition { get; protected set; }
+        public Vector3 OriginPosition { get; set; }
         public Vector3 AttackPosition { get; set; }
         public DistrictData DistrictData { get; }
         public abstract Attack Attack { get; }
