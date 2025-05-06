@@ -277,7 +277,7 @@ namespace WaveFunctionCollapse
             return count > 2 && minValid > 0;
         }
 
-        private void ResetNeighbours(HashSet<QueryChunk> overrideChunks, QueryChunk neighbourChunk, int depth, bool query = false)
+        private void ResetNeighbours(HashSet<QueryChunk> overrideChunks, QueryChunk neighbourChunk, int depth)
         {
             for (int i = 0; i < neighbourChunk.AdjacentChunks.Length; i++)
             {
@@ -286,19 +286,12 @@ namespace WaveFunctionCollapse
                 if (!overrideChunks.Add(neighbourChunk.AdjacentChunks[i] as QueryChunk) 
                     || neighbourChunk.AdjacentChunks[i] is not QueryChunk adjacentChunk) continue;
 
-                if (query)
-                {
-                    adjacentChunk.QueryLoad(adjacentChunk.PrototypeInfoData, ChunkWaveFunction.CellSize, ChunkWaveFunction.CellStack);
-                }
-                else
-                {
-                    adjacentChunk.Clear(ChunkWaveFunction.GameObjectPool);
-                }
+                adjacentChunk.Clear(ChunkWaveFunction.GameObjectPool);
                 ClearChunkMeshes(adjacentChunk.ChunkIndex);
                 
                 if (depth > 0)
                 {
-                    ResetNeighbours(overrideChunks, neighbourChunk.AdjacentChunks[i] as QueryChunk, depth - 1, query);
+                    ResetNeighbours(overrideChunks, neighbourChunk.AdjacentChunks[i] as QueryChunk, depth - 1);
                 }
             }
         }
@@ -405,7 +398,6 @@ namespace WaveFunctionCollapse
         public void Place()
         {
             Events.OnBuildingBuilt?.Invoke(QuerySpawnedBuildings.Values);
-            Debug.Log("Place");
             foreach (QueryChunk chunk in queriedChunks)
             {
                 chunk.Place();
@@ -438,7 +430,6 @@ namespace WaveFunctionCollapse
                 ChunkWaveFunction.Chunks[keyValuePair.Key].PrototypeInfoData = keyValuePair.Value;
             }
             
-            Debug.Log("Reverting " + queriedChunks.Count(x => !x.IsChunkQueryAdded) + " chunks, (total: " + queriedChunks.Count);
             foreach (QueryChunk chunk in queriedChunks)
             {
                 chunk.RevertQuery(SetCell, ChunkWaveFunction.RemoveChunk);
@@ -485,7 +476,7 @@ namespace WaveFunctionCollapse
                     queriedChunks.Add(chunkAtIndex);
                 }
                 
-                ResetNeighbours(queriedChunks, chunkAtIndex, 2, true);
+                QueryResetNeighbours(queriedChunks, chunkAtIndex, 2);
             }
 
             waveFunction.Propagate();
@@ -514,6 +505,26 @@ namespace WaveFunctionCollapse
 
             return QuerySpawnedBuildings;
         }
+        
+        
+        private void QueryResetNeighbours(HashSet<QueryChunk> overrideChunks, QueryChunk neighbourChunk, int depth)
+        {
+            for (int i = 0; i < neighbourChunk.AdjacentChunks.Length; i++)
+            {
+                if (neighbourChunk.AdjacentChunks[i] == null 
+                    || neighbourChunk.AdjacentChunks[i] is not QueryChunk adjacentChunk) continue;
+
+                if (!overrideChunks.Add(adjacentChunk)) continue;
+
+                adjacentChunk.QueryLoad(adjacentChunk.PrototypeInfoData, ChunkWaveFunction.CellSize, ChunkWaveFunction.CellStack);
+                ClearChunkMeshes(adjacentChunk.ChunkIndex);
+                
+                if (depth > 0)
+                {
+                    QueryResetNeighbours(overrideChunks, adjacentChunk, depth - 1);
+                }
+            }
+        }
 
         public void ClearChunkMeshes(int3 chunkIndex)
         {
@@ -537,12 +548,10 @@ namespace WaveFunctionCollapse
             ChunkWaveFunction.CellStack.Push(index);
             if (chosenPrototype.MeshRot.MeshIndex == -1)
             {
-                Debug.Log("No Mesh Selected");
                 return;
             }
 
             IBuildable spawned = GenerateMesh(ChunkWaveFunction[index].Position, index, chosenPrototype);
-            Debug.Log("Spawned: " + chosenPrototype.Name_EditorOnly, spawned.gameObject);
 
             if (query) 
             {

@@ -31,10 +31,11 @@ namespace Enemy
                     return;
                 }
             
+                Stats stats = new Stats(authoring.enemyData.Stats);
                 Entity enemyEntity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponent(enemyEntity, new SpeedComponent { Speed = authoring.enemyData.Stats.MovementSpeed.Value });
+                AddComponent(enemyEntity, new SpeedComponent { Speed = stats.MovementSpeed.Value });
                 AddComponent(enemyEntity, new FresnelComponent { Value = 5f});
-                AddComponent(enemyEntity, new AttackSpeedComponent { AttackSpeed = 1.0f / authoring.enemyData.Stats.AttackSpeed.Value });
+                AddComponent(enemyEntity, new AttackSpeedComponent { AttackSpeed = 1.0f / stats.AttackSpeed.Value });
 
                 AddComponent(enemyEntity, new FlowFieldComponent
                 {
@@ -47,12 +48,12 @@ namespace Enemy
                 
                 AddComponent(enemyEntity, new Effects.ECS.HealthComponent
                 {
-                    Health = authoring.EnemyData.Stats.MaxHealth.Value,
+                    Health = stats.MaxHealth.Value,
                 });
                 
                 AddComponent(enemyEntity, new DamageComponent
                 {
-                    Damage = authoring.enemyData.Stats.DamageMultiplier.Value,
+                    Damage = stats.DamageMultiplier.Value,
                     HasLimitedHits = true,
                     LimitedHits = 5,
                     Key = -1,

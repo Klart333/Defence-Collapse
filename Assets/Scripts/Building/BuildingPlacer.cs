@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.Money;
+using InputCamera;
 
 public class BuildingPlacer : MonoBehaviour
 {
@@ -375,9 +376,15 @@ public class BuildingPlacer : MonoBehaviour
 
     private void OnBuiltIndexDestroyed(ChunkIndex chunkIndex)
     {
-        if (spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare square))
+        if (!spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare square)) return;
+        
+        if (Displaying)
         {
             square.UnPlaced();
+        }
+        else
+        {
+            square.Placed = false;
         }
     }
 

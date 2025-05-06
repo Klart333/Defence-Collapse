@@ -100,7 +100,7 @@ namespace Buildings.District
                 return;
             }
             
-            if (districtType == DistrictType.TownHall && CheckMerge(chunks, out DistrictData existingData))
+            if (CheckMerge(chunks, out DistrictData existingData))
             {
                 foreach (QueryChunk chunk in chunks)
                 {

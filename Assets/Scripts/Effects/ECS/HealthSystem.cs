@@ -40,16 +40,18 @@ namespace Effects.ECS
         public EntityCommandBuffer.ParallelWriter ECB;
         
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent component, ref FresnelComponent fresnel)
+        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent component)
         {
             if (component.PendingDamage <= 0)
             {
                 return;
             }
             
-            component.Health -= component.PendingDamage; // Process resistance
+            float damageTaken = component.PendingDamage;
+            component.Health -= damageTaken; // Process resistance
             component.PendingDamage = 0;
-            fresnel.Value = 1;
+            
+            ECB.AddComponent(index, entity, new DamageTakenComponent { DamageTaken = damageTaken });
             
             if (component.Health <= 0)
             {

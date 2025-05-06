@@ -271,16 +271,13 @@ namespace Buildings.District
             {
                 return;
             }
-            
-            HashSet<QueryChunk> chunks = districtGenerator.QueriedChunks;
+
+            PrototypeInfoData protInfo = districtInfoData[districtType];
+            HashSet<QueryChunk> chunks = districtGenerator.QueriedChunks.Where(x => x.PrototypeInfoData == protInfo).ToHashSet();
             districtHandler.AddBuiltDistrict(chunks, districtType);
             districtGenerator.Place();
             buildingGenerator.Place();
-
-            if (districtType == DistrictType.TownHall)
-            {
-                Placing = false;
-            }
+            Placing = false;
         }
         
         #region Debug

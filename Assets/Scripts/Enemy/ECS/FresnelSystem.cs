@@ -20,7 +20,9 @@ namespace DataStructures.Queue.ECS
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
             float deltaTime = SystemAPI.Time.DeltaTime * gameSpeed;
 
-            new FresnelJob
+            new ApplyFresnelJob().ScheduleParallel();
+            
+            new ResetFresnelJob
             {
                 FresnelIncrease = deltaTime * 10,
             }.ScheduleParallel();
@@ -32,9 +34,19 @@ namespace DataStructures.Queue.ECS
 
         }
     }
+    
+    [BurstCompile, WithAll(typeof(DamageTakenComponent))]
+    public partial struct ApplyFresnelJob : IJobEntity
+    {
+        [BurstCompile]
+        public void Execute(ref FresnelComponent fresnel)
+        {
+            fresnel.Value = 1;
+        }
+    }
 
     [BurstCompile]
-    public partial struct FresnelJob : IJobEntity
+    public partial struct ResetFresnelJob : IJobEntity
     {
         public float FresnelIncrease;
 

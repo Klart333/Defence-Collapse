@@ -10,6 +10,7 @@ using Gameplay;
 using Utility;
 using System;
 using System.Linq;
+using InputCamera;
 
 namespace Buildings.District
 {
@@ -69,7 +70,7 @@ namespace Buildings.District
             cachedChunkIndexes.Clear();
             foreach (QueryChunk chunk in chunks)
             {
-                if (chunk.AdjacentChunks[2] != null)
+                if (!chunk.IsTop)
                 {
                     continue; // Remove if a state uses the below chunks in future
                 }
@@ -89,14 +90,11 @@ namespace Buildings.District
 
         public void ExpandDistrict(HashSet<QueryChunk> chunks) // To-do: Add callback to DistrictState in case of further merging
         {
-            DistrictChunks.Clear();
             foreach (QueryChunk chunk in chunks)
             {
-                Debug.DrawLine(chunk.Position, chunk.Position + Vector3.up * 0.2f, Color.red, 10);
-                
                 if (chunk.IsTop)
                 {
-                    DistrictChunks.Add(chunk.ChunkIndex, chunk);
+                    DistrictChunks.TryAdd(chunk.ChunkIndex, chunk);
                 }
             }
             

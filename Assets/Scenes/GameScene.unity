@@ -936,7 +936,7 @@ MonoBehaviour:
   districtGenerator: {fileID: 1551488502}
   buildingGenerator: {fileID: 771210304}
   districtHandler: {fileID: 491554922}
-  verbose: 1
+  verbose: 0
 --- !u!1 &226841345
 GameObject:
   m_ObjectHideFlags: 0
@@ -10479,7 +10479,7 @@ MonoBehaviour:
   buildableCornerData: {fileID: 11400000, guid: 21c6865fe1599b64699908607cd7f257,
     type: 2}
   districtHandler: {fileID: 491554922}
-  awaitEveryFrame: 2
+  awaitEveryFrame: 100
   awaitTimeMs: 1
   maxMillisecondsPerFrame: 1
   debug: 1

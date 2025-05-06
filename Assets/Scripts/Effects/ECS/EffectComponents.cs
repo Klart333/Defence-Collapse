@@ -16,6 +16,11 @@ namespace Effects.ECS
 		public int Key;
 		public float Damage;
 	}
+	
+	public struct DamageTakenComponent : IComponentData
+	{
+		public float DamageTaken;
+	}
 
 	public struct PositionComponent : IComponentData
 	{

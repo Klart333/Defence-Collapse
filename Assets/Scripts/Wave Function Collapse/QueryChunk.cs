@@ -237,7 +237,6 @@ namespace WaveFunctionCollapse
                 int3 index = QueryChangedCells[i].Item1;
                 if (QueryChangedCells[i].Item2.Collapsed)
                 {
-                    Debug.Log("Resetting cell to: " + QueryChangedCells[i].Item2.PossiblePrototypes[0].Name_EditorOnly);
                     setCell.Invoke(new ChunkIndex(ChunkIndex, index), QueryChangedCells[i].Item2.PossiblePrototypes[0], false);
                 }
                 else

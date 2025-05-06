@@ -7,6 +7,7 @@ using Unity.Mathematics;
 using System.Linq;
 using DG.Tweening;
 using Gameplay.Money;
+using InputCamera;
 using UnityEngine;
 
 namespace Buildings

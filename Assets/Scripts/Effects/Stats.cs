@@ -5,21 +5,21 @@ using System;
 public class Stats
 {
     [Title("Attacking")]
-    public IStat DamageMultiplier = new Stat(1);
-    public IStat AttackSpeed = new Stat(1);
-    public IStat Range = new Stat(1);
+    public Stat DamageMultiplier = new Stat(1);
+    public Stat AttackSpeed = new Stat(1);
+    public Stat Range = new Stat(1);
     
     [Title("Movement")]
-    public IStat MovementSpeed = new Stat(1);
+    public Stat MovementSpeed = new Stat(1);
 
     [Title("Crit")]
-    public IStat CritChance = new Stat(0);
-    public IStat CritMultiplier = new Stat(2);
+    public Stat CritChance = new Stat(0);
+    public Stat CritMultiplier = new Stat(2);
 
     [Title("Defense")]
-    public IStat Armor = new Stat(0);
-    public IStat MaxHealth = new Stat(10);
-    public IStat Healing = new Stat(0);
+    public Stat Armor = new Stat(0);
+    public Stat MaxHealth = new Stat(10);
+    public Stat Healing = new Stat(0);
 
     public Stats()
     {
@@ -42,7 +42,7 @@ public class Stats
         Healing = new Stat(copy.Healing.BaseValue);
     }
 
-    public IStat Get(StatType statType)
+    public Stat Get(StatType statType)
     {
         return statType switch
         {
