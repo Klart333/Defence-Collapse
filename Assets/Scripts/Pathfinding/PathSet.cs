@@ -110,7 +110,7 @@ namespace Pathfinding
             }
 
             TargetIndexes.Clear();
-            foreach (var target in targets)
+            foreach (IPathTarget target in targets)
             {
                 for (int i = 0; i < target.TargetIndexes.Count; i++)
                 {
@@ -123,10 +123,47 @@ namespace Pathfinding
             }
         }
     }
+    
+    public class BytePathSet : PathSet<byte>
+    {
+        public BytePathSet(RefFunc<int2, BlobArray<byte>> targetArray) : base(targetArray)
+        {
+        }
+
+        public override void RebuildTargetHashSet()
+        {
+            if (!isDirty)
+            {
+                return;
+            }
+
+            isDirty = false;
+            foreach (PathIndex index in TargetIndexes)
+            {
+                ref BlobArray<byte> blobArray = ref targetArray.Invoke(index.ChunkIndex);
+                blobArray[index.GridIndex] = 0;
+            }
+
+            TargetIndexes.Clear();
+            foreach (IPathTarget target in targets)
+            {
+                for (int i = 0; i < target.TargetIndexes.Count; i++)
+                {
+                    PathIndex index = target.TargetIndexes[i];
+                    if (index.GridIndex < 0 || !TargetIndexes.Add(index)) continue;
+
+                    ref BlobArray<byte> blobArray = ref targetArray.Invoke(index.ChunkIndex);
+                    blobArray[index.GridIndex] = target.Importance;
+                }
+            }
+        }
+    }
 
     public interface IPathTarget
     {
         public event Action OnIndexerRebuild;
+        
+        public byte Importance { get;}
 
         public List<PathIndex> TargetIndexes { get; }
     }

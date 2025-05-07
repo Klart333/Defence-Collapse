@@ -64,6 +64,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     private BuildingHandler buildingHandler;
     private MeshRenderer meshRenderer;
     private MeshFilter meshFilter;
+    private PathTarget pathTarget;
 
     private bool purchasing = true;
     private int originalLayer;
@@ -73,7 +74,7 @@ public class Building : PooledMonoBehaviour, IBuildable
     public PrototypeData Prototype { get; private set; }
     public ChunkIndex ChunkIndex { get; private set; }
     public int BuildingGroupIndex { get; set; } = -1;
-
+    
     private BuildingAnimator BuildingAnimator => buildingAnimator ??= FindAnyObjectByType<BuildingAnimator>();
     public BuildingHandler BuildingHandler => buildingHandler ??= FindAnyObjectByType<BuildingHandler>();
     public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
@@ -81,10 +82,12 @@ public class Building : PooledMonoBehaviour, IBuildable
     private bool Hovered => cornerColliders.Any(x => x.IsHovered);
     public MeshWithRotation MeshRot => Prototype.MeshRot;
     public Transform MeshTransform => meshTransform;
+    public PathTarget PathTarget => pathTarget;
 
     private void Awake()
     {
         originalLayer = gameObject.layer;
+        pathTarget = GetComponent<PathTarget>();
     }
 
     private void OnEnable()

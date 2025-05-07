@@ -1,9 +1,11 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using UnityEngine;
 
 namespace Effects.ECS
 {
+    [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(CollisionSystem))]
     public partial struct HealthSystem : ISystem
     {
         [BurstCompile]

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Effects.ECS
 {
-    [UpdateAfter(typeof(EnemyHashGridSystem))]
+    [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(EnemyHashGridSystem))]
     public partial class CollisionSystem : SystemBase
     {
         public static readonly Dictionary<int, Action<Entity>> DamageDoneEvent = new Dictionary<int, Action<Entity>>();
@@ -37,7 +37,7 @@ namespace Effects.ECS
             }
                          
             NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
-            var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
              
             new CollisionJob
             {

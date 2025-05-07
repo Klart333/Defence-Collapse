@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
 using Juice;
+using Unity.Entities;
 
 namespace Gameplay.Money
 {
@@ -34,6 +35,9 @@ namespace Gameplay.Money
         private bool verbose = true;
         
         private Dictionary<BuildingType, int> AvailableBuildables = new Dictionary<BuildingType, int>();
+        
+        private EntityManager entityManager;
+        private Entity moneyEntity;
 
         public int BuildingCost => costData.GetCost(BuildingType.Building);
         public float PathCost => costData.GetCost(BuildingType.Path);
@@ -42,6 +46,10 @@ namespace Gameplay.Money
 
         private void OnEnable()
         {
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            moneyEntity = entityManager.CreateEntity(); 
+            entityManager.AddComponent<MoneyToAddComponent>(moneyEntity);
+            
             AvailableBuildables = new Dictionary<BuildingType, int>
             {
                 { BuildingType.Building, 0 },
@@ -49,7 +57,22 @@ namespace Gameplay.Money
             };
             money = startingMoney;
         }
-
+        
+        private void Update()
+        {
+            float amount = entityManager.GetComponentData<MoneyToAddComponent>(moneyEntity).Money;
+            if (amount > 0)
+            {
+                AddMoney(amount);
+                entityManager.SetComponentData(moneyEntity, new MoneyToAddComponent { Money = 0 });
+            }
+            
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                AddMoneyDebug();
+            }
+        }
+        
         #region Public
 
         public bool CanPurchase(BuildingType buildingType)
@@ -138,14 +161,6 @@ namespace Gameplay.Money
 
         #region Debug
 
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                AddMoneyDebug();
-            }
-        }
-
         [Button]
         private void AddMoneyDebug(float money = 1000)
         {
@@ -154,5 +169,10 @@ namespace Gameplay.Money
 
         #endregion
 
+    }
+
+    public struct MoneyToAddComponent : IComponentData
+    {
+        public float Money;
     }
 }

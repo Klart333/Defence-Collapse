@@ -1,0 +1,163 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beb9e761c9c7d41449d8780edcd6a54c, type: 3}
+  m_Name: Bomb Shot Modifier
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 21300000, guid: da4ac8e794c50814c900df24f09e9a0e, type: 3}
+    - {fileID: 8572661992280112000, guid: 22a69d5eac306bf44a5fc4d2fdb22a77, type: 3}
+    - {fileID: -849867405023671905, guid: 9493d9f7340f7b446be9a64bd52f15f6, type: 3}
+    - {fileID: 2100000, guid: e19d812d7f342954b99655172166fd9b, type: 2}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: LootEffects
+      Entry: 7
+      Data: 0|System.Collections.Generic.List`1[[Loot.ILootEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 1|Loot.EffectLoot, Core
+    - Name: Effect
+      Entry: 7
+      Data: 2|Loot.EffectModifier, Core
+    - Name: Icon
+      Entry: 10
+      Data: 0
+    - Name: Description
+      Entry: 1
+      Data: Add a bomb on attack.
+    - Name: Title
+      Entry: 1
+      Data: Bomb
+    - Name: EffectType
+      Entry: 3
+      Data: 0
+    - Name: Effects
+      Entry: 7
+      Data: 3|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 4|Effects.ArchedDamageColliderEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 0
+    - Name: LimitedHits
+      Entry: 5
+      Data: true
+    - Name: Hits
+      Entry: 3
+      Data: 1
+    - Name: TriggerDamageDone
+      Entry: 5
+      Data: false
+    - Name: Radius
+      Entry: 4
+      Data: 0.5
+    - Name: Height
+      Entry: 4
+      Data: 6.5
+    - Name: UnitsPerSecond
+      Entry: 4
+      Data: 3.5
+    - Name: Effects
+      Entry: 7
+      Data: 5|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 6|Effects.DamageColliderEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 10
+    - Name: LimitedHits
+      Entry: 5
+      Data: false
+    - Name: Hits
+      Entry: 3
+      Data: 1
+    - Name: Radius
+      Entry: 4
+      Data: 1.5
+    - Name: HasLifetime
+      Entry: 5
+      Data: false
+    - Name: Lifetime
+      Entry: 4
+      Data: 0
+    - Name: TriggerDamageDone
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 7|Effects.VisualEffectEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 0.2
+    - Name: AttackEffect
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Mesh
+      Entry: 10
+      Data: 2
+    - Name: Material
+      Entry: 10
+      Data: 3
+    - Name: Scale
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  Grade: 0

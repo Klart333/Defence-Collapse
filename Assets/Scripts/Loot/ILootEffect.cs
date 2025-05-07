@@ -1,7 +1,6 @@
-﻿using Buildings.District;
+﻿using Sirenix.OdinInspector;
+using Buildings.District;
 using Gameplay.Money;
-using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using UnityEngine;
 
 namespace Loot

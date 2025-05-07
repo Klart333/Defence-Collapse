@@ -1,11 +1,11 @@
-using Sirenix.OdinInspector;
-using System;
 using System.Collections.Generic;
-using Buildings.District;
-using Loot;
-using TMPro;
-using UnityEngine;
 using UnityEngine.EventSystems;
+using Sirenix.OdinInspector;
+using Buildings.District;
+using UnityEngine;
+using System;
+using TMPro;
+using Loot;
 
 public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -56,7 +56,7 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         emptyText.gameObject.SetActive(false);
 
-        var effect = Instantiate(effectDisplayPrefab, displayParent, displayParent);
+        UIEffectDisplay effect = Instantiate(effectDisplayPrefab, displayParent);
         effect.Display(effectModifier);
 
         spawnedDisplays.Add(effect);

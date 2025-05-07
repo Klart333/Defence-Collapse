@@ -26,6 +26,7 @@ namespace Pathfinding
         [SerializeField]
         private Indexer indexer;
 
+        public byte Importance { get; set; } = 1;
         public List<PathIndex> TargetIndexes => indexer.Indexes;
 
         private void OnValidate()
@@ -40,7 +41,7 @@ namespace Pathfinding
         {
             indexer ??= GetComponent<Indexer>();
             indexer.OnRebuilt += OnRebuilt;
-
+            
             if (PathManager.Instance == null)
             {
                 WaitToRegister().Forget();
@@ -49,6 +50,20 @@ namespace Pathfinding
             {
                 Register();
             }
+        }
+        
+        private void OnDisable()
+        {
+            Importance = 1;
+            
+            switch (targetType)
+            {
+                case PathTargetType.Blocker: PathManager.Instance.BlockerPathSet.Unregister(this); break;
+                case PathTargetType.Target: PathManager.Instance.TargetPathSet.Unregister(this); break;
+                case PathTargetType.Path: PathManager.Instance.PathPathSet.Unregister(this); break;
+            }
+
+            indexer.OnRebuilt -= OnRebuilt;
         }
 
         private async UniTaskVoid WaitToRegister()
@@ -65,18 +80,6 @@ namespace Pathfinding
                 case PathTargetType.Target: PathManager.Instance.TargetPathSet.Register(this); break;
                 case PathTargetType.Path: PathManager.Instance.PathPathSet.Register(this); break;
             }
-        }
-
-        private void OnDisable()
-        {
-            switch (targetType)
-            {
-                case PathTargetType.Blocker: PathManager.Instance.BlockerPathSet.Unregister(this); break;
-                case PathTargetType.Target: PathManager.Instance.TargetPathSet.Unregister(this); break;
-                case PathTargetType.Path: PathManager.Instance.PathPathSet.Unregister(this); break;
-            }
-
-            indexer.OnRebuilt -= OnRebuilt;
         }
 
         private void OnRebuilt()

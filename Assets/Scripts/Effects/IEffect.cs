@@ -26,6 +26,7 @@ namespace Effects
         public void Revert(IAttacker attacker);
 
         public float ModifierValue { get; set; }
+        public bool IsDamageEffect { get; } 
     }
 
     public interface IEffectHolder : IEffect 
@@ -55,6 +56,8 @@ namespace Effects
 
         private Dictionary<IAttacker, Modifier> ModifierDictionary;
 
+        public bool IsDamageEffect => false;
+        
         public void Perform(IAttacker unit)
         {
             ModifierDictionary ??= new Dictionary<IAttacker, Modifier>();
@@ -107,6 +110,8 @@ namespace Effects
         public float Time = 3;
 
         private Dictionary<IAttacker, Modifier> ModifierDictionary;
+
+        public bool IsDamageEffect => false;
 
         public async void Perform(IAttacker unit)
         {
@@ -176,9 +181,11 @@ namespace Effects
 
         private HashSet<IAttacker> unitsAttacking = new HashSet<IAttacker>();
 
+        public bool IsDamageEffect => false;
+
         public void Perform(IAttacker unit)
         {
-            if (unitsAttacking == null) unitsAttacking = new HashSet<IAttacker>();
+            unitsAttacking ??= new HashSet<IAttacker>();
 
             if (unitsAttacking.Contains(unit)) return;
 
@@ -199,7 +206,12 @@ namespace Effects
             unitsAttacking.Add(unit);
         }
 
-        public async void Revert(IAttacker unit)
+        public void Revert(IAttacker unit)
+        {
+            RevertAsync(unit).Forget();
+        }
+
+        private async UniTaskVoid RevertAsync(IAttacker unit)
         {
             if (unitsAttacking == null)
             {
@@ -243,6 +255,8 @@ namespace Effects
 
         [Title("Callbacks")]
         public bool TriggerDamageDone = true;
+
+        public bool IsDamageEffect => true;
 
         public void Perform(IAttacker unit)
         {
@@ -328,6 +342,8 @@ namespace Effects
         public Mesh Mesh;
         public Material Material;
         public float Scale = 1;
+
+        public bool IsDamageEffect => true;
 
         public void Perform(IAttacker unit)
         {
@@ -436,6 +452,8 @@ namespace Effects
 
         private Dictionary<IAttacker, float> MultiplierDictionary;
 
+        public bool IsDamageEffect => false;
+
         public void Perform(IAttacker unit)
         {
             MultiplierDictionary ??= new Dictionary<IAttacker, float>();
@@ -498,6 +516,8 @@ namespace Effects
 
         private const float tickRate = 0.2f;
         private const int EffectKey = 150;
+        
+        public bool IsDamageEffect => true;
 
         public async void Perform(IAttacker unit)
         {
@@ -568,15 +588,14 @@ namespace Effects
         public bool CanIncrease = true;
 
         private Dictionary<IAttacker, List<(StatType, Modifier)>> ModifierDictionary;
+        
+        public bool IsDamageEffect => false;
 
         public void Perform(IAttacker unit)
         {
-            if (ModifierDictionary == null)
-            {
-                ModifierDictionary = new Dictionary<IAttacker, List<(StatType, Modifier)>>();
-            }
+            ModifierDictionary ??= new Dictionary<IAttacker, List<(StatType, Modifier)>>();
 
-            if (!ModifierDictionary.ContainsKey(unit))
+            if (!ModifierDictionary.TryGetValue(unit, out List<(StatType, Modifier)> value))
             {
                 ModifierDictionary.Add(unit, new List<(StatType, Modifier)>());
 
@@ -597,7 +616,7 @@ namespace Effects
             }
             else if (CanIncrease)
             {
-                //ModifierDictionary[unit].Value += ModifierValue;
+                //value.Value += ModifierValue;
             }
         }
 
@@ -636,6 +655,8 @@ namespace Effects
         public bool TriggerOnce = true;
 
         private HashSet<IAttacker> TriggeredUnits;
+        
+        public bool IsDamageEffect => false;
 
         public void Perform(IAttacker unit)
         {
@@ -706,6 +727,8 @@ namespace Effects
 
         [SerializeField]
         private float initialDelay = 0.0f;
+        
+        public bool IsDamageEffect => false;
 
         public void Perform(IAttacker unit)
         {
@@ -774,6 +797,8 @@ namespace Effects
         [SerializeField]
         private float delay = 0.5f;
 
+        public bool IsDamageEffect => false;
+
         public void Perform(IAttacker unit)
         {
             PeformAsync(unit).Forget();
@@ -821,6 +846,8 @@ namespace Effects
         [InfoBox("Applies the effect to the user of the skill")]
         [SerializeField]
         private StatusEffect statusEffect;
+
+        public bool IsDamageEffect => false;
 
         public async void Perform(IAttacker unit)
         {
@@ -871,6 +898,8 @@ namespace Effects
         [ShowIf(nameof(UseDelay))]
         public float[] Delays;
 
+        public bool IsDamageEffect => false;
+
         public IEffectHolder Clone()
         {
             return new OnDamageTargetedEffect()
@@ -882,7 +911,12 @@ namespace Effects
             };
         }
 
-        public async void Perform(IAttacker attacker)
+        public void Perform(IAttacker attacker)
+        {
+            PerformAsync(attacker).Forget();
+        }
+
+        private async UniTaskVoid PerformAsync(IAttacker attacker)
         {
             Vector3 attackPosition = attacker.LastDamageDone.AttackPosition;
             for (int i = 0; i < Effects.Count; i++)
@@ -921,6 +955,8 @@ namespace Effects
         [AssetSelector]
         public AttackVisualEffect AttackEffect;
         
+        public bool IsDamageEffect => false;
+
         public void Perform(IAttacker unit)
         {
             Vector3 pos = unit.AttackPosition;

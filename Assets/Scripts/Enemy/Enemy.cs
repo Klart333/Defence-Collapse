@@ -59,6 +59,8 @@ namespace Enemy
                     Key = -1,
                     TriggerDamageDone = false,
                 });
+
+                AddComponent(enemyEntity, new MoneyOnDeathComponent { Amount = authoring.enemyData.CreditCost * 5});
             }
         }
     }

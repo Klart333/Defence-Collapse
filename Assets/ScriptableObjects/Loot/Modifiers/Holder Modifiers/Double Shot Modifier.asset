@@ -16,7 +16,7 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 21300000, guid: 589db224aea12884880200807e357d93, type: 3}
+    - {fileID: 21300000, guid: 0b0efe9ecb63e954db9a3e31ceff541c, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -24,25 +24,25 @@ MonoBehaviour:
     SerializationNodes:
     - Name: LootEffects
       Entry: 7
-      Data: 0|System.Collections.Generic.List`1[[ILootEffect, Core]], mscorlib
+      Data: 0|System.Collections.Generic.List`1[[Loot.ILootEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1|EffectLoot, Core
+      Data: 1|Loot.EffectLoot, Core
     - Name: Effect
       Entry: 7
-      Data: 2|EffectModifier, Core
+      Data: 2|Loot.EffectModifier, Core
     - Name: Icon
       Entry: 10
       Data: 0
     - Name: Description
       Entry: 1
-      Data: Triple the attack of the tower
+      Data: Double all attacks on district
     - Name: Title
       Entry: 1
-      Data: Triple Shot
+      Data: Double Shot
     - Name: EffectType
       Entry: 3
       Data: 1
@@ -57,13 +57,22 @@ MonoBehaviour:
       Data: 4|Effects.RepeatEffect, Core
     - Name: ModifierValue
       Entry: 4
-      Data: 0.35
+      Data: 0.15
     - Name: Effects
-      Entry: 6
+      Entry: 7
+      Data: 5|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
     - Name: repeatFrequency
       Entry: 4
-      Data: 0.15
+      Data: 0.1
     - Name: initialDelay
       Entry: 4
       Data: 0

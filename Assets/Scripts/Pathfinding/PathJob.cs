@@ -38,9 +38,9 @@ public struct PathJob : IJob
     {
         for (int i = 0; i < ArrayLength; i++)
         {
-            if (pathChunk.TargetIndexes[i])
+            if (pathChunk.TargetIndexes[i] != 0)
             {
-                pathChunk.Distances[i] = 0;
+                pathChunk.Distances[i] = pathChunk.TargetIndexes[i] * 50; // 100 is the weight of one tile
                 pathChunk.Directions[i] = byte.MaxValue;
                 continue;
             }
@@ -53,6 +53,7 @@ public struct PathJob : IJob
 
             int2 currentChunkIndex = pathChunk.ChunkIndex;
             GetNeighbours(currentChunkIndex, i, neighbours);
+            
             int shortestDistance = int.MaxValue;
             int dirIndex = 0;
             for (int j = 0; j < 8; j++)
@@ -64,7 +65,7 @@ public struct PathJob : IJob
                     ? ref pathChunk 
                     : ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[neighbourIndex.ChunkIndex]];
                 
-                int manhattanDist = j % 2 == 0 ? 10 : 14;
+                int manhattanDist = j % 2 == 0 ? 5 : 7;
                 int dist = neighbour.Distances[neighbourIndex.GridIndex] + neighbour.MovementCosts[neighbourIndex.GridIndex] * manhattanDist;
                 if (dist >= shortestDistance) continue;
                 

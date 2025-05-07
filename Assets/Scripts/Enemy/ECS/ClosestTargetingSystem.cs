@@ -17,10 +17,8 @@ namespace DataStructures.Queue.ECS
         {
             state.RequireForUpdate<GameSpeedComponent>();
             
-            var queryBuilder = new EntityQueryBuilder(Allocator.Temp).WithAspect<EnemyTargetAspect>();
-            state.RequireForUpdate(state.GetEntityQuery(queryBuilder));
-            
-            queryBuilder.Dispose();
+            EntityQuery query = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAspect<EnemyTargetAspect>().Build(ref state);
+            state.RequireForUpdate(query);
         }
 
         [BurstCompile]

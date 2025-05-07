@@ -1,6 +1,6 @@
-using Gameplay.Money;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using Gameplay.Money;
 using UnityEngine;
 
 namespace Effects
@@ -13,6 +13,8 @@ namespace Effects
         [OdinSerialize]
         public float ModifierValue { get; set; } = 1;
         
+        public bool IsDamageEffect => false;
+        
         public void Perform(IAttacker unit)
         {
             Vector3 pos = unit.OriginPosition;
@@ -21,7 +23,7 @@ namespace Effects
 
         public void Revert(IAttacker unit)
         {
-            MoneyManager.Instance.RemoveMoney(ModifierValue * unit.Stats.DamageMultiplier.Value);
+            
         }
     }
 

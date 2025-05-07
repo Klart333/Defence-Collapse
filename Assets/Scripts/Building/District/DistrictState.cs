@@ -1,29 +1,33 @@
 ﻿using System.Collections.Generic;
 using DataStructures.Queue.ECS;
 using WaveFunctionCollapse;
+using Gameplay.Research;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Entities;
-using UnityEngine;
-using Effects.ECS;
 using System.Linq;
+using Effects.ECS;
+using UnityEngine;
+using Effects;
 using System;
-using Gameplay.Research;
 
 namespace Buildings.District
 {
-    [System.Serializable]
+    [Serializable]
     public abstract class DistrictState : IAttacker
     {
         public event Action OnAttack;
         
+        protected readonly HashSet<Entity> spawnedEntities = new HashSet<Entity>();
+        protected readonly Dictionary<int2, Entity> entityIndexes = new Dictionary<int2, Entity>();
+
         protected DamageInstance lastDamageDone;
         protected EntityManager entityManager;
         protected Stats stats;
 
         private float totalDamageDealt;
-        
+
         public DamageInstance LastDamageDone => lastDamageDone;
         public Stats Stats => stats;
         
@@ -48,7 +52,23 @@ namespace Buildings.District
         public abstract void Update();
         public abstract void OnSelected(Vector3 pos);
         public abstract void OnDeselected();
-        public abstract void OnIndexesDestroyed(HashSet<int3> destroyedIndexes);
+
+        public virtual void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
+        {
+            NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(destroyedIndexes.Count, Allocator.Temp);
+            int index = 0;
+            foreach (int3 destroyedIndex in destroyedIndexes)
+            {
+                if (!entityIndexes.TryGetValue(destroyedIndex.xz, out Entity entity)) continue;
+                
+                entitiesToDestroy[index++] = entity;
+                spawnedEntities.Remove(entity);
+            }
+            
+            entityManager.DestroyEntity(entitiesToDestroy);
+            
+            entitiesToDestroy.Dispose();
+        }
         public abstract void Die();
 
         public virtual void OnWaveStart()
@@ -86,22 +106,13 @@ namespace Buildings.District
         {
 
         }
-    }
 
-    #region Entity District State
+        #region Entities
 
-    public abstract class EntityDistrictState : DistrictState
-    {
-        protected readonly HashSet<Entity> spawnedEntities = new HashSet<Entity>();
-        protected readonly Dictionary<int2, Entity> entityIndexes = new Dictionary<int2, Entity>();
-        private readonly World defaultWorld;
-        
-        protected EntityDistrictState(DistrictData districtData, Vector3 position, int key) : base(districtData, position, key)
+        protected virtual List<QueryChunk> GetEntityChunks()
         {
-            defaultWorld = World.DefaultGameObjectInjectionWorld;
+            return DistrictData.DistrictChunks.Values.ToList();
         }
-        
-        protected abstract List<QueryChunk> GetEntityChunks();
         
         public void SpawnEntities()
         {
@@ -118,11 +129,11 @@ namespace Buildings.District
             float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
             float delay = attackSpeedValue / count;
             
-            NativeArray<Entity> entities = new NativeArray<Entity>(count, Allocator.Temp);
             Entity srcEntity = entityManager.CreateEntity(componentTypes);
             entityManager.SetComponentData(srcEntity, new RangeComponent { Range = stats.Range.Value });
             
-            entityManager.Instantiate(srcEntity, entities);
+            NativeArray<Entity> entities = entityManager.Instantiate(srcEntity, count, Allocator.Temp);
+            
             for (int i = 0; i < count; i++)
             {
                 Entity spawnedEntity = entities[i];
@@ -135,7 +146,7 @@ namespace Buildings.District
                 spawnedEntities.Add(spawnedEntity);
                 entityIndexes.Add(topChunks[i].ChunkIndex.xz, spawnedEntity);
             }
-
+            
             entities.Dispose();
             stats.Range.OnValueChanged += RangeChanged;
             stats.AttackSpeed.OnValueChanged += AttackSpeedChanged;
@@ -164,7 +175,7 @@ namespace Buildings.District
             }
         }
 
-        protected void UpdateEntities()
+        protected virtual void UpdateEntities(bool shouldAttack = true)
         {
             foreach (Entity entity in spawnedEntities)
             {
@@ -173,7 +184,15 @@ namespace Buildings.District
                 {
                     aspect.RestTimer();
                     OriginPosition = aspect.LocalTransform.ValueRO.Position;
-                    PerformAttack(entityManager.GetComponentData<LocalTransform>(aspect.EnemyTargetComponent.ValueRO.Target).Position);
+                    float3 targetPosition = entityManager.GetComponentData<LocalTransform>(aspect.EnemyTargetComponent.ValueRO.Target).Position;
+                    if (shouldAttack)
+                    {
+                        PerformAttack(targetPosition);
+                    }
+                    else
+                    {
+                        AttackPosition = targetPosition;
+                    }
                     break;
                 }
             }
@@ -195,35 +214,18 @@ namespace Buildings.District
             entitiesToDestroy.Dispose();
         }
         
-        protected void PerformAttack(float3 targetPosition)
+        protected virtual void PerformAttack(float3 targetPosition)
         {
             AttackPosition = targetPosition;
             Attack.TriggerAttack(this);
         }
-
-        public override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
-        {
-            NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(destroyedIndexes.Count, Allocator.Temp);
-            int index = 0;
-            foreach (int3 destroyedIndex in destroyedIndexes)
-            {
-                if (!entityIndexes.TryGetValue(destroyedIndex.xz, out Entity entity)) continue;
-                
-                entitiesToDestroy[index++] = entity;
-                spawnedEntities.Remove(entity);
-            }
-            
-            entityManager.DestroyEntity(entitiesToDestroy);
-            
-            entitiesToDestroy.Dispose();
-        }
+        
+        #endregion
     }
-
-    #endregion
-
+    
     #region Archer
 
-    public class ArcherState : EntityDistrictState
+    public class ArcherState : DistrictState
     {
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         
@@ -256,15 +258,15 @@ namespace Buildings.District
         private void CreateStats()
         {
             stats = new Stats(archerData.Stats);
-            UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed as Stat, archerData.LevelDatas[0],
+            UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed, archerData.LevelDatas[0],
                 "Attack Speed",
                 new string[] { "Increase Attack Speed by {0}/s", "Current Attack Speed: {0}/s" },
                 archerData.UpgradeIcons[0]);
-            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier as Stat, archerData.LevelDatas[1],
+            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier, archerData.LevelDatas[1],
                 "Damge Multiplier",
                 new string[] { "Increase Damage Multiplier by {0}x", "Current Damage Multiplier: {0}x" },
                 archerData.UpgradeIcons[1]);
-            UpgradeStat range = new UpgradeStat(stats.Range as Stat, archerData.LevelDatas[2],
+            UpgradeStat range = new UpgradeStat(stats.Range, archerData.LevelDatas[2],
                 "Range",
                 new string[] { "Increase Range by {0}", "Current Range: {0}" },
                 archerData.UpgradeIcons[2]);
@@ -272,11 +274,6 @@ namespace Buildings.District
             UpgradeStats.Add(attackSpeed);
             UpgradeStats.Add(damage);
             UpgradeStats.Add(range);
-        }
-
-        protected override List<QueryChunk> GetEntityChunks()
-        {
-            return DistrictData.DistrictChunks.Values.ToList();
         }
 
         public override void OnSelected(Vector3 pos)
@@ -315,7 +312,7 @@ namespace Buildings.District
 
     #region Bomb
 
-    public class BombState : EntityDistrictState
+    public class BombState : DistrictState
     {
         private readonly TowerData bombData;
 
@@ -338,7 +335,7 @@ namespace Buildings.District
 
         private void RangeChanged()
         {
-            if (selected && rangeIndicator != null && rangeIndicator.activeSelf)
+            if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
             {
                 rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
             }
@@ -347,15 +344,15 @@ namespace Buildings.District
         private void CreateStats()
         {
             stats = new Stats(bombData.Stats);
-            UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed as Stat, bombData.LevelDatas[0],
+            UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed, bombData.LevelDatas[0],
                 "Attack Speed",
                 new string[] { "Increase Attack Speed by {0}/s", "Current Attack Speed: {0}/s" },
                 bombData.UpgradeIcons[0]);
-            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier as Stat, bombData.LevelDatas[1],
+            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier, bombData.LevelDatas[1],
                 "Damge Multiplier",
                 new string[] { "Increase Damage Multiplier by {0}x", "Current Damage Multiplier: {0}x" },
                 bombData.UpgradeIcons[1]);
-            UpgradeStat range = new UpgradeStat(stats.Range as Stat, bombData.LevelDatas[2],
+            UpgradeStat range = new UpgradeStat(stats.Range, bombData.LevelDatas[2],
                 "Range",
                 new string[] { "Increase Range by {0}", "Current Range: {0}" },
                 bombData.UpgradeIcons[2]);
@@ -364,12 +361,7 @@ namespace Buildings.District
             UpgradeStats.Add(damage);
             UpgradeStats.Add(range);
         }
-
-        protected override List<QueryChunk> GetEntityChunks()
-        {
-            return DistrictData.DistrictChunks.Values.ToList();
-        }
-
+        
         public override void OnSelected(Vector3 pos)
         {
             if (selected) return;
@@ -407,7 +399,7 @@ namespace Buildings.District
 
     #region Town Hall
 
-    public class TownHallState : EntityDistrictState
+    public class TownHallState : DistrictState
     {
         private readonly TowerData townHallData;
         private GameObject rangeIndicator;
@@ -430,7 +422,7 @@ namespace Buildings.District
 
         private void RangeChanged()
         {
-            if (selected && rangeIndicator != null && rangeIndicator.activeSelf)
+            if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
             {
                 rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
             }
@@ -493,7 +485,7 @@ namespace Buildings.District
     
     #region Mine
 
-    public class MineState : DistrictState
+    public sealed class MineState : DistrictState
     {
         private struct MineInstance
         {
@@ -512,6 +504,10 @@ namespace Buildings.District
         private readonly List<MineInstance> mineChunks = new List<MineInstance>();
         
         private readonly TowerData mineData;
+        private GameObject rangeIndicator;
+
+        private bool requireTargeting;
+        private bool selected;
         
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
@@ -532,16 +528,55 @@ namespace Buildings.District
                 
                 mineChunks.Add(new MineInstance(chunk.Position, 0, chunk.ChunkIndex));
             }
+            
+            Attack.OnEffectsAdded += AttackEffectsAdded;
+            stats.Range.OnValueChanged += RangeChanged;
         }
-        
+
+        private void RangeChanged()
+        {
+            if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
+            {
+                rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            }
+        }
+
+        private void AttackEffectsAdded(List<IEffect> effects)
+        {
+            if (requireTargeting) return;
+            if (!SearchEffects(effects)) return; 
+            
+            Attack.OnEffectsAdded -= AttackEffectsAdded;
+            requireTargeting = true;
+            SpawnEntities();
+        }
+
+        private bool SearchEffects(List<IEffect> effects)
+        {
+            foreach (IEffect effect in effects)
+            {
+                if (effect.IsDamageEffect)
+                {
+                    return true;
+                }
+                
+                if (effect is IEffectHolder holder && SearchEffects(holder.Effects))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void CreateStats()
         {
             stats = new Stats(mineData.Stats);
-            UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed as Stat, mineData.LevelDatas[0], 
+            UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed, mineData.LevelDatas[0], 
                 "Mine Speed",
                 new string[] { "Increase Mining speed by {0}/s", "Current Mining speed: {0}/s" },
                 mineData.UpgradeIcons[0]);
-            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier as Stat, mineData.LevelDatas[1], 
+            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier, mineData.LevelDatas[1], 
                 "Value Multiplier",
                 new string[] { "Increase Value Multiplier by {0}x", "Current Value Multiplier: {0}x" },
                 mineData.UpgradeIcons[1]);
@@ -550,18 +585,34 @@ namespace Buildings.District
             UpgradeStats.Add(damage);
         }
         
+        
         public override void OnSelected(Vector3 pos)
         {
+            if (!requireTargeting || selected) return;
             
+            selected = true;
+            rangeIndicator = mineData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
+            rangeIndicator.transform.position = pos;
+            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            rangeIndicator.gameObject.SetActive(true);
         }
 
         public override void OnDeselected()
         {
-           
+            if (!requireTargeting || rangeIndicator is null) return;
+            
+            selected = false;
+            rangeIndicator.SetActive(false);
+            rangeIndicator = null;
         }
 
         public override void Update()
         {
+            if (requireTargeting)
+            {
+                UpdateEntities(false);
+            }
+            
             float mineSpeed = 1.0f / stats.AttackSpeed.Value;
             for (int i = 0; i < mineChunks.Count; i++)
             {

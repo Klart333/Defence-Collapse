@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
-using Buildings.District;
-using UnityEngine;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using Loot;
 using UnityEngine.InputSystem;
+using Sirenix.OdinInspector;
+using UnityEngine;
+using Loot;
 
 namespace Buildings.District
 {
@@ -32,6 +30,12 @@ namespace Buildings.District
         [SerializeField]
         private UIDistrictUpgrade districtUpgrade;
 
+#if UNITY_EDITOR
+        [Title("Debug")]
+        [SerializeField]
+        private List<LootData> debugStartingLootDatas;
+#endif
+
         private readonly List<EffectModifier> modifierEffectsToSpawn = new List<EffectModifier>();
 
         public List<EffectModifier> ModifierEffects => modifierEffectsToSpawn;
@@ -40,10 +44,22 @@ namespace Buildings.District
         public TowerData MineData => mineData;
         public TowerData TownHallData => townHallData;
 
-        private async void OnEnable()
+        private void OnEnable()
         {
             UIEvents.OnFocusChanged += Close;
 
+#if UNITY_EDITOR
+            foreach (LootData lot in debugStartingLootDatas)
+            {
+                lot.AddModifierEditorOnly();
+            }
+#endif
+
+            GetInput().Forget();
+        }
+
+        private async UniTaskVoid GetInput()
+        {
             await UniTask.WaitUntil(() => InputManager.Instance != null);
             InputManager.Instance.Cancel.performed += Cancel_performed;
         }
@@ -59,10 +75,10 @@ namespace Buildings.District
             Close();
         }
 
-        public async void OpenUpgradeMenu(DistrictData district)
+        public async UniTaskVoid OpenUpgradeMenu(DistrictData district)
         {
             UIEvents.OnFocusChanged?.Invoke();
-            await Task.Yield();
+            await UniTask.Yield();
 
             canvas.SetActive(true);
             districtUpgrade.ShowUpgrades(district);

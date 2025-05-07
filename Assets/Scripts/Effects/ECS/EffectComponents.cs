@@ -63,6 +63,11 @@ namespace Effects.ECS
 		public int Key;
 	}
 
+	public struct MoneyOnDeathComponent : IComponentData
+	{
+		public float Amount;
+	}
+
 	public struct RandomComponent : IComponentData
 	{
 		public Random Random;

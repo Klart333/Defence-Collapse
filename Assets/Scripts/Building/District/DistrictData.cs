@@ -6,11 +6,11 @@ using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Assertions;
 using UnityEngine;
+using System.Linq;
+using InputCamera;
 using Gameplay;
 using Utility;
 using System;
-using System.Linq;
-using InputCamera;
 
 namespace Buildings.District
 {
@@ -101,11 +101,8 @@ namespace Buildings.District
             DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction.ChunkScale, waveFunction.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
             CreateChunkIndexCache(chunks);
 
-            if (State is EntityDistrictState entityState)
-            {
-                entityState.RemoveEntities();
-                entityState.SpawnEntities();
-            }
+            State.RemoveEntities();
+            State.SpawnEntities();
         }
 
         private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)

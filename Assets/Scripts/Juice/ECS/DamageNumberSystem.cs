@@ -162,7 +162,7 @@ namespace TextMeshDOTS.Authoring
             
             DynamicBuffer<CalliByte> calliByteBuffer = ECB.AddBuffer<CalliByte>(entityIndex, textEntity);
             CalliString calliString = new CalliString(calliByteBuffer);
-            if (calliString.Append(damageTaken.DamageTaken) == FormatError.Overflow)
+            if (calliString.Append(math.round(damageTaken.DamageTaken * 100) / 100f) == FormatError.Overflow)
             {
                 Debug.LogError("Damage overflowed fixedstring capacity");
             }
@@ -176,7 +176,7 @@ namespace TextMeshDOTS.Authoring
             ECB.SetComponent(entityIndex, textEntity, random);
             float lifeTime = 0.7f + random.Random.NextFloat(0.2f);
             ECB.SetComponent(entityIndex, textEntity, new LifetimeComponent { Lifetime = lifeTime });
-            ECB.SetComponent(entityIndex, textEntity, new FloatAwayComponent { Duration = lifeTime, Speed = 0.5f, Direction = math.normalize(random.Random.NextFloat3(-1, 1)) });
+            ECB.SetComponent(entityIndex, textEntity, new FloatAwayComponent { Duration = lifeTime, Speed = 0.5f, Direction = random.Random.NextFloat3Direction() });
 
             ECB.SetComponentEnabled(entityIndex, textEntity, ComponentType.ReadWrite<MaterialMeshInfo>(), false);
         }

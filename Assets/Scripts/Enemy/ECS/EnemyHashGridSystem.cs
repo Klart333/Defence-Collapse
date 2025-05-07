@@ -8,7 +8,7 @@ using System;
 
 namespace DataStructures.Queue.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(DeathSystem))]
+    [BurstCompile, UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(DeathSystem))]
     public partial struct EnemyHashGridSystem : ISystem
     {
         [BurstCompile]

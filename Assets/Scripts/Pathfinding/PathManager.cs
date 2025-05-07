@@ -55,7 +55,7 @@ namespace Pathfinding
         public float CellScale => cellScale;
 
         public BoolPathSet BlockerPathSet { get; private set; }
-        public BoolPathSet TargetPathSet { get; private set; }
+        public BytePathSet TargetPathSet { get; private set; }
         public IntPathSet PathPathSet { get; private set; }
 
         private void OnEnable()
@@ -80,7 +80,7 @@ namespace Pathfinding
             BlockerPathSet = new BoolPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].NotWalkableIndexes);
             GetPathInformation += BlockerPathSet.RebuildTargetHashSet;
 
-            TargetPathSet = new BoolPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].TargetIndexes);
+            TargetPathSet = new BytePathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].TargetIndexes);
             GetPathInformation += TargetPathSet.RebuildTargetHashSet;
 
             PathPathSet = new IntPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].MovementCosts, -94);
@@ -159,7 +159,7 @@ namespace Pathfinding
                     movementCosts[j] = oldChunk.MovementCosts[j];
                 }
                 
-                BlobBuilderArray<bool> targetIndexes = builder.Allocate(ref newChunk.TargetIndexes, arrayLength);
+                BlobBuilderArray<byte> targetIndexes = builder.Allocate(ref newChunk.TargetIndexes, arrayLength);
                 for (int j = 0; j < arrayLength; j++)
                 {
                     targetIndexes[j] = oldChunk.TargetIndexes[j];
@@ -195,7 +195,7 @@ namespace Pathfinding
 
                 for (int i = 0; i < arrayLength; i++)
                 {
-                    distances[i] = 10000000;
+                    distances[i] = 1000000;
                     movements[i] = 100;
                 }
             }
@@ -364,7 +364,7 @@ namespace Pathfinding
         public BlobArray<short> Units;
         
         public BlobArray<bool> NotWalkableIndexes;
-        public BlobArray<bool> TargetIndexes;
+        public BlobArray<byte> TargetIndexes;
         
         public BlobArray<byte> Directions;
         public BlobArray<int> Distances;

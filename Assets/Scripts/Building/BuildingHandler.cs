@@ -79,7 +79,12 @@ public class BuildingHandler : SerializedMonoBehaviour
         }
 
         BuildingGroups.Add(++groupIndexCounter, new List<Building>(buildingQueue));
-        buildingQueue.ForEach(build => build.BuildingGroupIndex = groupIndexCounter);
+        int count = buildingQueue.Count;
+        foreach (var build in buildingQueue)
+        {
+            build.BuildingGroupIndex = groupIndexCounter;
+            build.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 1);
+        }
         buildingQueue.Clear();
 
         CheckMerge(groupIndexCounter);
@@ -126,19 +131,21 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private void Merge(int groupToMerge, int targetGroup)
     {
-        BuildingGroups[groupToMerge].ForEach(building => building.BuildingGroupIndex = targetGroup);
         BuildingGroups[targetGroup].AddRange(BuildingGroups[groupToMerge]);
+        
+        int count = BuildingGroups[targetGroup].Count;
+        foreach (Building building in BuildingGroups[targetGroup])
+        {
+            building.BuildingGroupIndex = targetGroup;
+            building.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 1);
+        }
         BuildingGroups.Remove(groupToMerge);
     }
 
     private bool IsAdjacent(Building building1, Building building2)
     {
         int2 indexDiff = building1.ChunkIndex.CellIndex.xz - building2.ChunkIndex.CellIndex.xz;
-        if (math.abs(indexDiff.x) + math.abs(indexDiff.y) > 1)
-        {
-            //print("Diff: " + indexDiff + " has magnitude: " + indexDiff.magnitude);
-            return false;
-        }
+        if (math.abs(indexDiff.x) + math.abs(indexDiff.y) > 1) return false;
         
         Vector2Int dir = indexDiff.y == 0 
             ? new Vector2Int(indexDiff.x, 1)
@@ -160,12 +167,20 @@ public class BuildingHandler : SerializedMonoBehaviour
             }    
         }
         
-        if (!BuildingGroups.TryGetValue(building.BuildingGroupIndex, out List<Building> list)) return;
+        if (!BuildingGroups.TryGetValue(building.BuildingGroupIndex, out List<Building> builds)) return;
         
-        list.RemoveSwapBack(building);
-        if (list.Count == 0)
+        builds.RemoveSwapBack(building);
+        if (builds.Count == 0)
         {
             BuildingGroups.Remove(building.BuildingGroupIndex);
+        }
+        else
+        {
+            int count = builds.Count;
+            foreach (Building groupBuilding in builds)  
+            {
+                groupBuilding.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 1);
+            }
         }
     }
     

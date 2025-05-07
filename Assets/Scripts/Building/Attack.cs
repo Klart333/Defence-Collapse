@@ -8,6 +8,8 @@ using System;
 [System.Serializable]
 public class Attack
 {
+    public event Action<List<IEffect>> OnEffectsAdded;
+    
     [OdinSerialize, NonSerialized]
     public List<IEffect> Effects;
 
@@ -80,6 +82,8 @@ public class Attack
                 DoneDamageEffects.AddRange(effects);
                 break;
         }
+
+        OnEffectsAdded?.Invoke(effects);
     }
 
     public void RemoveEffect(List<IEffect> effects, EffectType effectType)
@@ -112,8 +116,6 @@ public class Attack
                 {
                     DoneDamageEffects.Remove(effect);
                 }
-                break;
-            default:
                 break;
         }
     }
