@@ -22,7 +22,23 @@ public class EnemyData : SerializedScriptableObject
     public int UnlockedThreshold = 0;
     
     public int CreditCost = 1;
+
+    [Title("OnDeath")]
+    [SerializeField]
+    private float moneyOnDeath = 5;
     
+    [SerializeField]
+    private bool explodeOnDeath = false;
+
+    [ShowIf(nameof(explodeOnDeath))]
+    [SerializeField]
+    private float explosionSize = 0.5f;
+    
+    
+    public bool ExplodeOnDeath => explodeOnDeath;
+    public float ExplosionSize => explosionSize;
+    public float MoneyOnDeath => moneyOnDeath;
+
     [TitleGroup("Stats")]
     [Button]
     public void InitStats()

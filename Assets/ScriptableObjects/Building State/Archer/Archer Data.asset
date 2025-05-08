@@ -177,6 +177,9 @@ MonoBehaviour:
     - Name: Scale
       Entry: 4
       Data: 0.5
+    - Name: TrailScaleFactor
+      Entry: 4
+      Data: 0.8
     - Name: 
       Entry: 8
       Data: 
@@ -211,6 +214,7 @@ MonoBehaviour:
 
     Cost:
     4*'
+  districtType: 0
   LevelDatas:
   - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
   - {fileID: 11400000, guid: be9eb149a4f2ff849adbc1c0154c32ff, type: 2}

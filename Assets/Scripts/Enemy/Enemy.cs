@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using VFX.ECS;
 
 namespace Enemy
 {
@@ -60,7 +61,12 @@ namespace Enemy
                     TriggerDamageDone = false,
                 });
 
-                AddComponent(enemyEntity, new MoneyOnDeathComponent { Amount = authoring.enemyData.CreditCost * 5});
+                AddComponent(enemyEntity, new MoneyOnDeathComponent { Amount = authoring.enemyData.MoneyOnDeath});
+
+                if (authoring.enemyData.ExplodeOnDeath)
+                {
+                    AddComponent(enemyEntity, new ExplosionOnDeathComponent { Size = authoring.enemyData.ExplosionSize });
+                }
             }
         }
     }

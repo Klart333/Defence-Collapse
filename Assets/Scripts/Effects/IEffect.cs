@@ -11,6 +11,8 @@ using Effects.ECS;
 using System;
 using System.Threading.Tasks;
 using Gameplay;
+using Unity.Mathematics;
+using VFX.ECS;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable ConvertToConstant.Global
@@ -342,12 +344,13 @@ namespace Effects
         public Mesh Mesh;
         public Material Material;
         public float Scale = 1;
+        public float TrailScaleFactor = 1;
 
         public bool IsDamageEffect => true;
 
         public void Perform(IAttacker unit)
         {
-            Vector3 targetPosition = unit.AttackPosition;
+            float3 targetPosition = unit.AttackPosition;
             
             float distance = Vector3.Distance(unit.OriginPosition, targetPosition) + Height;
             float lifetime = distance / UnitsPerSecond;
@@ -361,9 +364,8 @@ namespace Effects
                 DeathSystem.DeathCallbacks.Add(DeathSystem.Key++, OnColliderDestroyed);
             }
             
-            Entity CreateEntity(Vector3 pos)
+            Entity CreateEntity(float3 pos) // COULD MAYBE BAKE INTO A PREFAB
             {
-
                 ComponentType[] componentTypes = {
                     typeof(RotateTowardsVelocityComponent),
                     typeof(ArchedMovementComponent),
@@ -373,14 +375,28 @@ namespace Effects
                     typeof(DamageComponent),
                     typeof(SpeedComponent),
                     typeof(LocalTransform),
+                    typeof(InitTrailComponent),
                 };
 
                 Entity spawned = entityManager.CreateEntity(componentTypes);
                 entityManager.SetComponentData(spawned, new SpeedComponent{Speed = 1.0f / lifetime});
                 entityManager.SetComponentData(spawned, new LifetimeComponent{Lifetime = lifetime});
                 entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
-                entityManager.SetComponentData(spawned, new LocalTransform{Position = pos, Scale = Scale});
-                entityManager.SetComponentData(spawned, new ColliderComponent { Radius = Radius, });
+                entityManager.SetComponentData(spawned, new ColliderComponent { Radius = Radius });
+                entityManager.SetComponentData(spawned, new InitTrailComponent { ScaleFactor = TrailScaleFactor });
+
+                float3 direction = math.normalize(targetPosition - pos);
+                entityManager.SetComponentData(spawned, new LocalTransform
+                {
+                    Position = pos,
+                    Rotation = quaternion.LookRotation(direction, Vector3.up),
+                    Scale = Scale
+                });
+                
+                entityManager.SetComponentData(spawned, new RotateTowardsVelocityComponent
+                {
+                    LastPosition = pos - direction,
+                });
                 
                 entityManager.SetComponentData(spawned, new DamageComponent
                 {

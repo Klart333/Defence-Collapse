@@ -5,6 +5,7 @@ using Gameplay;
 
 namespace Effects.ECS
 {
+    [UpdateAfter(typeof(DeathSystem))]
     public partial struct LifetimeSystem : ISystem
     {
         [BurstCompile]

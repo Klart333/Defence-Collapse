@@ -133,6 +133,9 @@ MonoBehaviour:
     - Name: Radius
       Entry: 4
       Data: 0.3
+    - Name: HasLifetime
+      Entry: 5
+      Data: false
     - Name: Lifetime
       Entry: 4
       Data: 0
@@ -179,3 +182,6 @@ MonoBehaviour:
   - 0.01
   UnlockedThreshold: 0
   CreditCost: 1
+  moneyOnDeath: 5
+  explodeOnDeath: 1
+  explosionSize: 0.5
