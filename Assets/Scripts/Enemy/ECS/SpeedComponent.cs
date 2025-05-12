@@ -16,9 +16,6 @@ public struct FlowFieldComponent : IComponentData
     public float3 Forward;
     public float3 Up;
     public float3 TargetUp;    
-    public LayerMask LayerMask;
-
-    public float UpdateTimer;
 }
 
 public struct AttackSpeedComponent : IComponentData

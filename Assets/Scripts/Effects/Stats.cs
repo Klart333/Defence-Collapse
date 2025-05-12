@@ -17,8 +17,9 @@ public class Stats
     public Stat CritMultiplier = new Stat(2);
 
     [Title("Defense")]
-    public Stat Armor = new Stat(0);
     public Stat MaxHealth = new Stat(10);
+    public Stat MaxArmor = new Stat(0);
+    public Stat MaxShield = new Stat(0);
     public Stat Healing = new Stat(0);
 
     public Stats()
@@ -37,7 +38,8 @@ public class Stats
         CritChance = new Stat(copy.CritChance.BaseValue);
         CritMultiplier = new Stat(copy.CritMultiplier.BaseValue);
         
-        Armor = new Stat(copy.Armor.BaseValue);
+        MaxArmor = new Stat(copy.MaxArmor.BaseValue);
+        MaxShield = new Stat(copy.MaxShield.BaseValue);
         MaxHealth = new Stat(copy.MaxHealth.BaseValue);
         Healing = new Stat(copy.Healing.BaseValue);
     }
@@ -52,7 +54,8 @@ public class Stats
             StatType.MovementSpeed => MovementSpeed,
             StatType.CritChance => CritChance,
             StatType.CritMultiplier => CritMultiplier,
-            StatType.Armor => Armor,
+            StatType.MaxArmor => MaxArmor,
+            StatType.MaxShield => MaxShield,
             StatType.MaxHealth => MaxHealth,
             StatType.Healing => Healing,
             _ => null
@@ -96,7 +99,8 @@ public enum StatType
     CritChance,
     CritMultiplier,
     
-    Armor,
+    MaxArmor,
+    MaxShield,
     MaxHealth,
     Healing,
 }

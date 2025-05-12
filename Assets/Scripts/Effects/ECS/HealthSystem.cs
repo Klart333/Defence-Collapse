@@ -1,7 +1,7 @@
+using Health;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using UnityEngine;
 
 namespace Effects.ECS
 {
@@ -42,20 +42,39 @@ namespace Effects.ECS
         public EntityCommandBuffer.ParallelWriter ECB;
         
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent component)
+        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent health)
         {
-            if (component.PendingDamage <= 0)
+            if (health.PendingDamage <= 0) // Probably change to a new pendingdamage component
             {
                 return;
             }
             
-            float damageTaken = component.PendingDamage;
-            component.Health -= damageTaken; // Process resistance
-            component.PendingDamage = 0;
+            float damageTaken = health.PendingDamage;
+            HealthType damageType;
+            if (health.Shield > 0)
+            {
+                damageType = HealthType.Shield;
+                health.Shield -= damageTaken;
+            }
+            else if (health.Armor > 0)
+            {
+                damageType = HealthType.Armor;
+                health.Armor -= damageTaken;
+            }
+            else
+            {
+                damageType = HealthType.Health;
+                health.Health -= damageTaken; // Process resistance
+            }
+            health.PendingDamage = 0;
             
-            ECB.AddComponent(index, entity, new DamageTakenComponent { DamageTaken = damageTaken });
+            ECB.AddComponent(index, entity, new DamageTakenComponent
+            {
+                DamageTaken = damageTaken,
+                DamageTakenType = damageType
+            });
             
-            if (component.Health <= 0)
+            if (health.Health <= 0)
             {
                 ECB.AddComponent(index, entity, new DeathTag());
             }

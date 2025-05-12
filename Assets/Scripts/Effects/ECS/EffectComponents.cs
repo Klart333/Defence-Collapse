@@ -21,6 +21,7 @@ namespace Effects.ECS
 	public struct DamageTakenComponent : IComponentData
 	{
 		public float DamageTaken;
+		public Health.HealthType DamageTakenType;
 	}
 
 	public struct PositionComponent : IComponentData
@@ -45,9 +46,18 @@ namespace Effects.ECS
 	public struct HealthComponent : IComponentData
 	{
 		public float Health;
+		public float Armor;
+		public float Shield;
 		public float PendingDamage;
 	}
 
+	public struct MaxHealthComponent : IComponentData
+	{
+		public float Health;
+		public float Armor;
+		public float Shield;
+	}
+	
 	public struct DeathTag : IComponentData
 	{
 		

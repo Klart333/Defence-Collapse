@@ -9,4 +9,6 @@ namespace InputCamera.ECS
     }    
     
     public struct RotateTowardCameraTag : IComponentData { }
+    
+    public struct RotateTowardCameraLTWTag : IComponentData { }
 }

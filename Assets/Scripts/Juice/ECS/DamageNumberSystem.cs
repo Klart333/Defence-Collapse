@@ -17,7 +17,7 @@ using Juice.Ecs;
 
 namespace TextMeshDOTS.Authoring
 {
-    [BurstCompile, UpdateAfter(typeof(FresnelSystem))]
+    [BurstCompile, UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public partial struct DamageNumberSystem : ISystem
     {
         private BlobAssetReference<FontBlob> singleFontReference;

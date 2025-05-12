@@ -20,6 +20,10 @@ namespace Enemy
         [Title("Authoring", "Movement")]
         [SerializeField]
         private float turnSpeed = 2;
+
+        [Title("Authoring", "Movement")]
+        [SerializeField]
+        private GameObject healthbar;
         
         public EnemyData EnemyData => enemyData;
         
@@ -34,6 +38,7 @@ namespace Enemy
             
                 Stats stats = new Stats(authoring.enemyData.Stats);
                 Entity enemyEntity = GetEntity(TransformUsageFlags.Dynamic);
+                
                 AddComponent(enemyEntity, new SpeedComponent { Speed = stats.MovementSpeed.Value });
                 AddComponent(enemyEntity, new FresnelComponent { Value = 5f});
                 AddComponent(enemyEntity, new AttackSpeedComponent { AttackSpeed = 1.0f / stats.AttackSpeed.Value });
@@ -44,12 +49,21 @@ namespace Enemy
                     TargetUp = new float3(0, 1, 0),
                     Forward = new float3(0, 0, 1),
                     TurnSpeed = authoring.turnSpeed,
-                    LayerMask = authoring.groundMask,
+                    //LayerMask = authoring.groundMask,
                 });
                 
                 AddComponent(enemyEntity, new Effects.ECS.HealthComponent
                 {
                     Health = stats.MaxHealth.Value,
+                    Armor = stats.MaxArmor.Value,
+                    Shield = stats.MaxShield.Value,
+                });
+                
+                AddComponent(enemyEntity, new MaxHealthComponent
+                {
+                    Health = stats.MaxHealth.Value,
+                    Armor = stats.MaxArmor.Value,
+                    Shield = stats.MaxShield.Value,
                 });
                 
                 AddComponent(enemyEntity, new DamageComponent

@@ -16,7 +16,6 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 950717614191496012, guid: b85e15ed555b81648aba7d70d53e4ffa, type: 3}
     - {fileID: -7929139438592967118, guid: b81e4778696bab64387c2007f044d4c1, type: 3}
     - {fileID: 2100000, guid: af2e22e44379fcb4d823d8e8068359c0, type: 2}
     SerializedBytesString: 
@@ -81,27 +80,36 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: Armor
-      Entry: 7
-      Data: 7|Stat, Core
-    - Name: baseValue
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: MaxHealth
       Entry: 7
-      Data: 8|Stat, Core
+      Data: 7|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 10
     - Name: 
       Entry: 8
       Data: 
-    - Name: Healing
+    - Name: MaxArmor
+      Entry: 7
+      Data: 8|Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxShield
       Entry: 7
       Data: 9|Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Healing
+      Entry: 7
+      Data: 10|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -113,16 +121,16 @@ MonoBehaviour:
       Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 10|Attack, Core
+      Data: 11|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 12|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 12|Effects.ArchedDamageColliderEffect, Core
+      Data: 13|Effects.ArchedDamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 10
@@ -146,22 +154,10 @@ MonoBehaviour:
       Data: 10
     - Name: Effects
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 14|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 14|Effects.VisualEffectEffect, Core
-    - Name: ModifierValue
-      Entry: 4
-      Data: 1
-    - Name: AttackEffect
-      Entry: 10
       Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -170,10 +166,10 @@ MonoBehaviour:
       Data: 
     - Name: Mesh
       Entry: 10
-      Data: 1
+      Data: 0
     - Name: Material
       Entry: 10
-      Data: 2
+      Data: 1
     - Name: Scale
       Entry: 4
       Data: 0.5

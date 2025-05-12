@@ -81,7 +81,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: Armor
+    - Name: MaxHealth
       Entry: 7
       Data: 7|Stat, Core
     - Name: baseValue
@@ -90,18 +90,27 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: MaxHealth
+    - Name: MaxArmor
       Entry: 7
       Data: 8|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxShield
+      Entry: 7
+      Data: 9|Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
     - Name: Healing
       Entry: 7
-      Data: 9|Stat, Core
+      Data: 10|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -113,16 +122,16 @@ MonoBehaviour:
       Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 10|Attack, Core
+      Data: 11|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 12|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 12|Effects.ArchedDamageColliderEffect, Core
+      Data: 13|Effects.ArchedDamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 0
@@ -146,13 +155,13 @@ MonoBehaviour:
       Data: 4.5
     - Name: Effects
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 14|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 14|Effects.DamageColliderEffect, Core
+      Data: 15|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 5
@@ -179,7 +188,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 15|Effects.VisualEffectEffect, Core
+      Data: 16|Effects.VisualEffectEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 0.2
@@ -218,7 +227,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0

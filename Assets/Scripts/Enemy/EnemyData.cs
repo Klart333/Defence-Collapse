@@ -45,14 +45,19 @@ public class EnemyData : SerializedScriptableObject
     {
         Stats = new Stats
         {
-            AttackSpeed = new Stat(1),
-            MaxHealth = new Stat(1),
-            DamageMultiplier = new Stat(1),
-            MovementSpeed = new Stat(1),
-            Healing = new Stat(0),
-            Armor = new Stat(0),
-            CritChance = new Stat(0),
-            CritMultiplier = new Stat(0),
+            AttackSpeed = Stats.AttackSpeed != null ? new Stat(Stats.AttackSpeed.Value) : new Stat(1),
+            DamageMultiplier = Stats.DamageMultiplier != null ? new Stat(Stats.DamageMultiplier.Value) : new Stat(1),
+            Range = Stats.Range != null ? new Stat(Stats.Range.Value) : new Stat(1),
+            
+            MovementSpeed = Stats.MovementSpeed != null ? new Stat(Stats.MovementSpeed.Value) : new Stat(1),
+            
+            CritChance = Stats.CritChance != null ? new Stat(Stats.CritChance.Value) : new Stat(1),
+            CritMultiplier = Stats.CritMultiplier != null ? new Stat(Stats.CritMultiplier.Value) : new Stat(1),
+            
+            MaxHealth = Stats.MaxHealth != null ? new Stat(Stats.MaxHealth.Value) : new Stat(1),
+            MaxArmor = Stats.MaxArmor != null ? new Stat(Stats.MaxArmor.Value) : new Stat(1),
+            MaxShield = Stats.MaxShield != null ? new Stat(Stats.MaxShield.Value) : new Stat(1),
+            Healing = Stats.Healing != null ? new Stat(Stats.Healing.Value) : new Stat(1),
         };
     }
 }
