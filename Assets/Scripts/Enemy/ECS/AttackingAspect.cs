@@ -6,7 +6,7 @@ namespace DataStructures.Queue.ECS
     public readonly partial struct AttackingAspect : IAspect
     {
         public readonly RefRW<AttackSpeedComponent> AttackSpeedComponent;
-        public readonly RefRO<DamageComponent> DamageComponent;
+        public readonly RefRO<SimpleDamageComponent> DamageComponent;
         public readonly RefRO<AttackingComponent> AttackingComponent;
 
         public bool CanAttack(float deltaTime)

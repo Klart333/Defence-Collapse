@@ -46,8 +46,11 @@ public class TowerData : SerializedScriptableObject
     {
         Stats = new Stats
         {
+            HealthDamage = Stats.HealthDamage != null ? new Stat(Stats.HealthDamage.Value) : new Stat(1),
+            ArmorDamage = Stats.ArmorDamage != null ? new Stat(Stats.ArmorDamage.Value) : new Stat(1),
+            ShieldDamage = Stats.ShieldDamage != null ? new Stat(Stats.ShieldDamage.Value) : new Stat(1),
+            
             AttackSpeed = Stats.AttackSpeed != null ? new Stat(Stats.AttackSpeed.Value) : new Stat(1),
-            DamageMultiplier = Stats.DamageMultiplier != null ? new Stat(Stats.DamageMultiplier.Value) : new Stat(1),
             Range = Stats.Range != null ? new Stat(Stats.Range.Value) : new Stat(1),
             
             MovementSpeed = Stats.MovementSpeed != null ? new Stat(Stats.MovementSpeed.Value) : new Stat(1),
@@ -59,6 +62,8 @@ public class TowerData : SerializedScriptableObject
             MaxArmor = Stats.MaxArmor != null ? new Stat(Stats.MaxArmor.Value) : new Stat(1),
             MaxShield = Stats.MaxShield != null ? new Stat(Stats.MaxShield.Value) : new Stat(1),
             Healing = Stats.Healing != null ? new Stat(Stats.Healing.Value) : new Stat(1),
+            
+            Productivity = Stats.Productivity != null ? new Stat(Stats.Productivity.Value) : new Stat(1),
         };
     }
 }

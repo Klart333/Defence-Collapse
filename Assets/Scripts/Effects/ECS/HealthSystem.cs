@@ -42,32 +42,30 @@ namespace Effects.ECS
         public EntityCommandBuffer.ParallelWriter ECB;
         
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent health)
+        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent health, in PendingDamageComponent pendingDamage)
         {
-            if (health.PendingDamage <= 0) // Probably change to a new pendingdamage component
-            {
-                return;
-            }
-            
-            float damageTaken = health.PendingDamage;
+            float damageTaken;
             HealthType damageType;
             if (health.Shield > 0)
             {
                 damageType = HealthType.Shield;
+                damageTaken = pendingDamage.ShieldDamage;
                 health.Shield -= damageTaken;
             }
             else if (health.Armor > 0)
             {
                 damageType = HealthType.Armor;
+                damageTaken = pendingDamage.ArmorDamage;
                 health.Armor -= damageTaken;
             }
             else
             {
                 damageType = HealthType.Health;
-                health.Health -= damageTaken; // Process resistance
+                damageTaken = pendingDamage.HealthDamage;
+                health.Health -= pendingDamage.HealthDamage;
             }
-            health.PendingDamage = 0;
             
+            ECB.RemoveComponent<PendingDamageComponent>(index, entity);
             ECB.AddComponent(index, entity, new DamageTakenComponent
             {
                 DamageTaken = damageTaken,

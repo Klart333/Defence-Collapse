@@ -1,3 +1,4 @@
+using System;
 using Random = Unity.Mathematics.Random;
 using DataStructures.Queue.ECS;
 using Unity.Entities.Graphics;
@@ -12,6 +13,7 @@ using InputCamera.ECS;
 using Unity.Entities;
 using UnityEngine;
 using Effects.ECS;
+using Health;
 using Unity.Burst;
 using Juice.Ecs;
 
@@ -65,7 +67,6 @@ namespace TextMeshDOTS.Authoring
         public void OnUpdate(ref SystemState state)
         {
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            textBaseConfiguration.color = Color.red;
 
             state.Dependency = new SpawnNumbersJob
             {
@@ -155,6 +156,14 @@ namespace TextMeshDOTS.Authoring
         [BurstCompile]
         public void Execute([EntityIndexInQuery] int entityIndex, Entity entity, in LocalTransform transform, in DamageTakenComponent damageTaken)
         {
+            TextBaseConfiguration.color = damageTaken.DamageTakenType switch
+            {
+                HealthType.Health => Color.green,
+                HealthType.Armor => Color.yellow,
+                HealthType.Shield => Color.blue,
+                _ => Color.black,
+            };
+
             ECB.RemoveComponent<DamageTakenComponent>(entityIndex, entity);
 
             Entity textEntity = ECB.CreateEntity(entityIndex, TextArchetype);
@@ -162,10 +171,7 @@ namespace TextMeshDOTS.Authoring
             
             DynamicBuffer<CalliByte> calliByteBuffer = ECB.AddBuffer<CalliByte>(entityIndex, textEntity);
             CalliString calliString = new CalliString(calliByteBuffer);
-            if (calliString.Append(math.round(damageTaken.DamageTaken * 100) / 100f) == FormatError.Overflow)
-            {
-                Debug.LogError("Damage overflowed fixedstring capacity");
-            }
+            calliString.Append(math.round(damageTaken.DamageTaken * 100) / 100f);
 
             ECB.SetComponent(entityIndex, textEntity, TextBaseConfiguration);
             ECB.SetComponent(entityIndex, textEntity, new FontBlobReference { value = SingleFontReference });

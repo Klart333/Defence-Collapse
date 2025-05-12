@@ -266,7 +266,10 @@ namespace Effects
             
             DamageComponent dmgComponent = new DamageComponent
             {
-                Damage = ModifierValue * unit.Stats.DamageMultiplier.Value,
+                HealthDamage = ModifierValue * unit.Stats.HealthDamage.Value,
+                ArmorDamage = ModifierValue * unit.Stats.ArmorDamage.Value,
+                ShieldDamage = ModifierValue * unit.Stats.ShieldDamage.Value,
+                
                 Key = unit.Key,
                 TriggerDamageDone = TriggerDamageDone,
                 LimitedHits = Hits,
@@ -400,7 +403,10 @@ namespace Effects
                 
                 entityManager.SetComponentData(spawned, new DamageComponent
                 {
-                    Damage = ModifierValue * unit.Stats.DamageMultiplier.Value,
+                    HealthDamage = ModifierValue * unit.Stats.HealthDamage.Value,
+                    ArmorDamage = ModifierValue * unit.Stats.ArmorDamage.Value,
+                    ShieldDamage = ModifierValue * unit.Stats.ShieldDamage.Value,
+                    
                     Key = unit.Key,
                     TriggerDamageDone = TriggerDamageDone,
                     LimitedHits = Hits,

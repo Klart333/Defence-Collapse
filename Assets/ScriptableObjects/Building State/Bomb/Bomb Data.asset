@@ -27,9 +27,27 @@ MonoBehaviour:
     - Name: Stats
       Entry: 7
       Data: 0|Stats, Core
-    - Name: DamageMultiplier
+    - Name: HealthDamage
       Entry: 7
       Data: 1|Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ArmorDamage
+      Entry: 7
+      Data: 2|Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ShieldDamage
+      Entry: 7
+      Data: 3|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -38,7 +56,7 @@ MonoBehaviour:
       Data: 
     - Name: AttackSpeed
       Entry: 7
-      Data: 2|Stat, Core
+      Data: 4|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0.1
@@ -47,7 +65,7 @@ MonoBehaviour:
       Data: 
     - Name: Range
       Entry: 7
-      Data: 3|Stat, Core
+      Data: 5|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 6
@@ -56,7 +74,7 @@ MonoBehaviour:
       Data: 
     - Name: MovementSpeed
       Entry: 7
-      Data: 4|Stat, Core
+      Data: 6|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -65,7 +83,7 @@ MonoBehaviour:
       Data: 
     - Name: CritChance
       Entry: 7
-      Data: 5|Stat, Core
+      Data: 7|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -74,7 +92,7 @@ MonoBehaviour:
       Data: 
     - Name: CritMultiplier
       Entry: 7
-      Data: 6|Stat, Core
+      Data: 8|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 2
@@ -83,7 +101,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxHealth
       Entry: 7
-      Data: 7|Stat, Core
+      Data: 9|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -92,7 +110,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxArmor
       Entry: 7
-      Data: 8|Stat, Core
+      Data: 10|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -101,7 +119,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxShield
       Entry: 7
-      Data: 9|Stat, Core
+      Data: 11|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -110,10 +128,19 @@ MonoBehaviour:
       Data: 
     - Name: Healing
       Entry: 7
-      Data: 10|Stat, Core
+      Data: 12|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Productivity
+      Entry: 7
+      Data: 13|Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -122,16 +149,16 @@ MonoBehaviour:
       Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 11|Attack, Core
+      Data: 14|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 12|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 13|Effects.ArchedDamageColliderEffect, Core
+      Data: 16|Effects.ArchedDamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 0
@@ -155,16 +182,16 @@ MonoBehaviour:
       Data: 4.5
     - Name: Effects
       Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 15|Effects.DamageColliderEffect, Core
+      Data: 18|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
-      Data: 5
+      Data: 2
     - Name: LimitedHits
       Entry: 5
       Data: false
@@ -188,7 +215,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 16|Effects.VisualEffectEffect, Core
+      Data: 19|Effects.VisualEffectEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 0.2
@@ -227,7 +254,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -251,12 +278,12 @@ MonoBehaviour:
     Cost: 5*'
   districtType: 0
   LevelDatas:
-  - {fileID: 11400000, guid: 1e3da3c7c39d5ff4fa91f50ccf95d1d8, type: 2}
-  - {fileID: 11400000, guid: 172cf1eee2b483f47ae0e99827565b9d, type: 2}
-  - {fileID: 11400000, guid: fd861b7904860d44eaf4dc26d6ee653a, type: 2}
+  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
+  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
+  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
   UpgradeIcons:
-  - {fileID: 21300000, guid: f3d374d9c382df344b627716c212132a, type: 3}
   - {fileID: 21300000, guid: 740f5e97fe6a90547844fb62858ab085, type: 3}
-  - {fileID: 21300000, guid: f80580f52494c0246b8596487f2133fa, type: 3}
+  - {fileID: 21300000, guid: 612aeacb80233d741a233eb3a8940f4d, type: 3}
+  - {fileID: 21300000, guid: 5c91aec45c337e54285b8f9e8434bec1, type: 3}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}

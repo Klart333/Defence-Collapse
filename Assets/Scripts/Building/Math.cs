@@ -17,7 +17,7 @@ public static class Math
 
     public static int GetMultiple(float x, float multiple)
     {
-        return (int)System.Math.Round(x / multiple, MidpointRounding.AwayFromZero);
+        return Mathf.FloorToInt(x / multiple + 0.5f);
     }
     
     public static int GetMultipleFloored(float x, float multiple)

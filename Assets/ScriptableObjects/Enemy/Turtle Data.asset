@@ -25,7 +25,7 @@ MonoBehaviour:
     - Name: Stats
       Entry: 7
       Data: 0|Stats, Core
-    - Name: DamageMultiplier
+    - Name: HealthDamage
       Entry: 7
       Data: 1|Stat, Core
     - Name: baseValue
@@ -34,7 +34,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: AttackSpeed
+    - Name: ArmorDamage
       Entry: 7
       Data: 2|Stat, Core
     - Name: baseValue
@@ -43,25 +43,25 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: Range
+    - Name: ShieldDamage
       Entry: 7
       Data: 3|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
-    - Name: MovementSpeed
+    - Name: AttackSpeed
       Entry: 7
       Data: 4|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0.1
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
-    - Name: CritChance
+    - Name: Range
       Entry: 7
       Data: 5|Stat, Core
     - Name: baseValue
@@ -70,9 +70,27 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: CritMultiplier
+    - Name: MovementSpeed
       Entry: 7
       Data: 6|Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0.1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritChance
+      Entry: 7
+      Data: 7|Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritMultiplier
+      Entry: 7
+      Data: 8|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -81,7 +99,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxHealth
       Entry: 7
-      Data: 7|Stat, Core
+      Data: 9|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 20
@@ -90,7 +108,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxArmor
       Entry: 7
-      Data: 8|Stat, Core
+      Data: 10|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 20
@@ -99,7 +117,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxShield
       Entry: 7
-      Data: 9|Stat, Core
+      Data: 11|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -108,10 +126,19 @@ MonoBehaviour:
       Data: 
     - Name: Healing
       Entry: 7
-      Data: 10|Stat, Core
+      Data: 12|Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Productivity
+      Entry: 7
+      Data: 13|Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -120,16 +147,16 @@ MonoBehaviour:
       Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 11|Attack, Core
+      Data: 14|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 12|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 13|Effects.DamageColliderEffect, Core
+      Data: 16|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 1
@@ -156,7 +183,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 14|Effects.VisualEffectEffect, Core
+      Data: 17|Effects.VisualEffectEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 0.3
@@ -174,7 +201,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -191,7 +218,7 @@ MonoBehaviour:
   - 0.05
   - 0.01
   UnlockedThreshold: 0
-  CreditCost: 1
-  moneyOnDeath: 5
+  CreditCost: 2
+  moneyOnDeath: 8
   explodeOnDeath: 0
   explosionSize: 0.5

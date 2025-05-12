@@ -20,7 +20,7 @@ namespace WaveFunctionCollapse
         private PrototypeInfoCreator[] protoypeInfoCreators;
         #endif
         
-        public Mesh this[int meshRotMeshIndex] => Meshes[meshRotMeshIndex];
+        public Mesh this[int meshIndex] => Meshes[meshIndex];
 
         #if UNITY_EDITOR
         [Button]

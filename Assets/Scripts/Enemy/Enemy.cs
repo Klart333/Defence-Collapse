@@ -20,10 +20,6 @@ namespace Enemy
         [Title("Authoring", "Movement")]
         [SerializeField]
         private float turnSpeed = 2;
-
-        [Title("Authoring", "Movement")]
-        [SerializeField]
-        private GameObject healthbar;
         
         public EnemyData EnemyData => enemyData;
         
@@ -66,13 +62,9 @@ namespace Enemy
                     Shield = stats.MaxShield.Value,
                 });
                 
-                AddComponent(enemyEntity, new DamageComponent
+                AddComponent(enemyEntity, new SimpleDamageComponent
                 {
-                    Damage = stats.DamageMultiplier.Value,
-                    HasLimitedHits = true,
-                    LimitedHits = 5,
-                    Key = -1,
-                    TriggerDamageDone = false,
+                    Damage = stats.HealthDamage.Value,
                 });
 
                 AddComponent(enemyEntity, new MoneyOnDeathComponent { Amount = authoring.enemyData.MoneyOnDeath});

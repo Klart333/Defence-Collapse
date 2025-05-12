@@ -17,6 +17,7 @@ namespace Effects.ECS
             
         private EntityQuery collisionQuery;
         private NativeQueue<Entity> collisionQueue;
+        private ComponentLookup<LocalTransform> transformLookup;
 
         protected override void OnCreate()
         {
@@ -25,7 +26,8 @@ namespace Effects.ECS
             collisionQuery = SystemAPI.QueryBuilder()
                 .WithAspect<ColliderAspect>()
                 .Build();
-            
+
+            transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
             collisionQueue = new NativeQueue<Entity>(Allocator.Persistent);
         }
         
@@ -38,16 +40,16 @@ namespace Effects.ECS
                          
             NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            transformLookup.Update(this);
              
-            new CollisionJob
+            Dependency = new CollisionJob
             {
                 SpatialGrid = spatialGrid.AsReadOnly(),
-                TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
-                HealthLookup = SystemAPI.GetComponentLookup<HealthComponent>(true),
+                TransformLookup = transformLookup,
                 CollisionQueue = collisionQueue.AsParallelWriter(),
                 //CellSize = 1,
                 ECB = ecb.AsParallelWriter(),
-            }.ScheduleParallel();
+            }.ScheduleParallel(Dependency);
                          
             Dependency.Complete(); 
             ecb.Playback(EntityManager);
@@ -79,9 +81,6 @@ namespace Effects.ECS
 
         [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
-
-        [ReadOnly]
-        public ComponentLookup<HealthComponent> HealthLookup;
 
         public EntityCommandBuffer.ParallelWriter ECB;
 
@@ -149,12 +148,15 @@ namespace Effects.ECS
 
                 float distSq = math.distancesq(pos, enemyTransform.Position);
 
-                if (distSq > radiusSq
-                    || !HealthLookup.TryGetComponent(enemy, out HealthComponent health)) continue;
+                if (distSq > radiusSq) continue;
 
                 // COLLIDE
-                health.PendingDamage += colliderAspect.DamageComponent.ValueRO.Damage;
-                ECB.SetComponent(sortKey, enemy, health);
+                ECB.AddComponent(sortKey, enemy, new PendingDamageComponent
+                {
+                    HealthDamage = colliderAspect.DamageComponent.ValueRO.HealthDamage,
+                    ArmorDamage = colliderAspect.DamageComponent.ValueRO.ArmorDamage,
+                    ShieldDamage = colliderAspect.DamageComponent.ValueRO.ShieldDamage,
+                });
                 CollisionQueue.Enqueue(entity);
 
                 if (colliderAspect.DamageComponent.ValueRO.HasLimitedHits)

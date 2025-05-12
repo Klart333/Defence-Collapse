@@ -78,21 +78,21 @@ namespace Buildings.District
         
         private void OnDamageDone(Entity entity)
         {
-            DamageComponent damage = entityManager.GetComponentData<DamageComponent>(entity);
+            DamageComponent damageComp = entityManager.GetComponentData<DamageComponent>(entity);
             PositionComponent transform = entityManager.GetComponentData<PositionComponent>(entity);
+
+            float damage = damageComp.HealthDamage + damageComp.ShieldDamage + damageComp.ShieldDamage;
+            totalDamageDealt += damage;
+            if (!damageComp.TriggerDamageDone) return;
             
-            totalDamageDealt += damage.Damage;
             lastDamageDone = new DamageInstance
             {
-                Damage = damage.Damage,
+                Damage = damage,
                 AttackPosition = transform.Position,
                 Source = this,
             };
-
-            if (damage.TriggerDamageDone)
-            {
-                Attack?.OnDoneDamage(this);
-            }
+            
+            Attack?.OnDoneDamage(this);
         }
 
         public void OnUnitDoneDamage(DamageInstance damageInstance)
@@ -258,22 +258,22 @@ namespace Buildings.District
         private void CreateStats()
         {
             stats = new Stats(archerData.Stats);
-            UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed, archerData.LevelDatas[0],
-                "Attack Speed",
-                new string[] { "Increase Attack Speed by {0}/s", "Current Attack Speed: {0}/s" },
+            UpgradeStat healthDamage = new UpgradeStat(stats.HealthDamage, archerData.LevelDatas[0],
+                "Health Damage",
+                new string[] { "Increase <b>Health Damage Multiplier</b> by {0}", "Current <b>Health Damage Multiplier</b>: <color=green>{0}</color>x" },
                 archerData.UpgradeIcons[0]);
-            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier, archerData.LevelDatas[1],
-                "Damge Multiplier",
-                new string[] { "Increase Damage Multiplier by {0}x", "Current Damage Multiplier: {0}x" },
+            UpgradeStat armorDamage = new UpgradeStat(stats.ArmorDamage, archerData.LevelDatas[1],
+                "Armor Damage",
+                new string[] { "Increase <b>Armor Damage Multiplier</b> by {0}", "Current <b>Armor Damage Multiplier</b>: <color=yellow>{0}</color>x" },
                 archerData.UpgradeIcons[1]);
-            UpgradeStat range = new UpgradeStat(stats.Range, archerData.LevelDatas[2],
-                "Range",
-                new string[] { "Increase Range by {0}", "Current Range: {0}" },
+            UpgradeStat shieldDamage = new UpgradeStat(stats.ShieldDamage, archerData.LevelDatas[2],
+                "Shield Damage",
+                new string[] { "Increase <b>Shield Damage Multiplier</b> by {0}", "Current <b>Shield Damage Multiplier</b>: <color=blue>{0}</color>x" },
                 archerData.UpgradeIcons[2]);
 
-            UpgradeStats.Add(attackSpeed);
-            UpgradeStats.Add(damage);
-            UpgradeStats.Add(range);
+            UpgradeStats.Add(healthDamage);
+            UpgradeStats.Add(armorDamage);
+            UpgradeStats.Add(shieldDamage);
         }
 
         public override void OnSelected(Vector3 pos)
@@ -344,22 +344,22 @@ namespace Buildings.District
         private void CreateStats()
         {
             stats = new Stats(bombData.Stats);
-            UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed, bombData.LevelDatas[0],
-                "Attack Speed",
-                new string[] { "Increase Attack Speed by {0}/s", "Current Attack Speed: {0}/s" },
+            UpgradeStat healthDamage = new UpgradeStat(stats.HealthDamage, bombData.LevelDatas[0],
+                "Health Damage",
+                new string[] { "Increase <b>Health Damage Multiplier</b> by {0}", "Current <b>Health Damage Multiplier</b>: <color=green>{0}</color>x" },
                 bombData.UpgradeIcons[0]);
-            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier, bombData.LevelDatas[1],
-                "Damge Multiplier",
-                new string[] { "Increase Damage Multiplier by {0}x", "Current Damage Multiplier: {0}x" },
+            UpgradeStat armorDamage = new UpgradeStat(stats.ArmorDamage, bombData.LevelDatas[1],
+                "Armor Damage",
+                new string[] { "Increase <b>Armor Damage Multiplier</b> by {0}", "Current <b>Armor Damage Multiplier</b>: <color=yellow>{0}</color>x" },
                 bombData.UpgradeIcons[1]);
-            UpgradeStat range = new UpgradeStat(stats.Range, bombData.LevelDatas[2],
-                "Range",
-                new string[] { "Increase Range by {0}", "Current Range: {0}" },
+            UpgradeStat shieldDamage = new UpgradeStat(stats.ShieldDamage, bombData.LevelDatas[2],
+                "Shield Damage",
+                new string[] { "Increase <b>Shield Damage Multiplier</b> by {0}", "Current <b>Shield Damage Multiplier</b>: <color=blue>{0}</color>x" },
                 bombData.UpgradeIcons[2]);
 
-            UpgradeStats.Add(attackSpeed);
-            UpgradeStats.Add(damage);
-            UpgradeStats.Add(range);
+            UpgradeStats.Add(healthDamage);
+            UpgradeStats.Add(armorDamage);
+            UpgradeStats.Add(shieldDamage);
         }
         
         public override void OnSelected(Vector3 pos)
@@ -576,7 +576,7 @@ namespace Buildings.District
                 "Mine Speed",
                 new string[] { "Increase Mining speed by {0}/s", "Current Mining speed: {0}/s" },
                 mineData.UpgradeIcons[0]);
-            UpgradeStat damage = new UpgradeStat(stats.DamageMultiplier, mineData.LevelDatas[1], 
+            UpgradeStat damage = new UpgradeStat(stats.Productivity, mineData.LevelDatas[1], 
                 "Value Multiplier",
                 new string[] { "Increase Value Multiplier by {0}x", "Current Value Multiplier: {0}x" },
                 mineData.UpgradeIcons[1]);

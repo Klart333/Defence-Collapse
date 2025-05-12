@@ -18,7 +18,7 @@ namespace Effects
         public void Perform(IAttacker unit)
         {
             Vector3 pos = unit.OriginPosition;
-            MoneyManager.Instance.AddMoneyParticles(ModifierValue * unit.Stats.DamageMultiplier.Value, pos);
+            MoneyManager.Instance.AddMoneyParticles(ModifierValue * unit.Stats.Productivity.Value, pos);
         }
 
         public void Revert(IAttacker unit)

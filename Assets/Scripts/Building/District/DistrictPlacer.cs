@@ -4,11 +4,11 @@ using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
+using Sirenix.Utilities;
 using Unity.Mathematics;
 using System.Linq;
 using UnityEngine;
 using System;
-using Sirenix.Utilities;
 
 namespace Buildings.District
 {
@@ -163,42 +163,41 @@ namespace Buildings.District
             builtIndexes.Clear();
             Vector3 mousePos = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
             for (int x = 0; x < districtRadius; x++)
+            for (int z = 0; z < districtRadius; z++)
             {
-                for (int z = 0; z < districtRadius; z++)
+                if (!GetDistrictIndex(x, z, out Vector3 districtPos))
                 {
-                    if (!GetDistrictIndex(x, z, out Vector3 districtPos))
-                    {
-                        return false;
-                    }
-
-                    ChunkIndex? buildIndex = buildingGenerator.GetIndex(districtPos + buildingGenerator.CellSize * 0.5f);
-                    if (!buildIndex.HasValue)
-                    {
-                        if (verbose)
-                        {
-                            Debug.Log("Invalid, Can't find build index");
-                        }
-                        return false;
-                    }
-
-                    buildingIndexes.Add(buildIndex.Value);
-                    Vector3 buildingCellPosition = buildingGenerator.GetPos(buildIndex.Value);
-                    
-                    if (TryGetBuiltIndex(buildingCellPosition, buildIndex.Value, districtPos, out ChunkIndex builtIndex))
-                    {
-                        builtIndexes.Add(builtIndex);
-                        buildingIndexes.AddRange(buildingGenerator.GetCellsSurroundingMarchedIndex(builtIndex));
-                    }
-                    else
-                    {
-                        if (buildingGenerator.ChunkWaveFunction[builtIndex].Buildable)
-                        {
-                            continue;
-                        }
-    
-                        return false;
-                    }
+                    return false;
                 }
+
+                ChunkIndex? buildIndex = buildingGenerator.GetIndex(districtPos + buildingGenerator.CellSize.XyZ(0) / 2.0f);
+                if (!buildIndex.HasValue)
+                {
+                    if (verbose)
+                    {
+                        Debug.Log("Invalid, Can't find build index");
+                    }
+                    return false;
+                }
+
+                buildingIndexes.Add(buildIndex.Value);
+                Vector3 buildingCellPosition = buildingGenerator.GetPos(buildIndex.Value);
+                
+                if (TryGetBuiltIndex(buildingCellPosition, buildIndex.Value, districtPos, out ChunkIndex builtIndex))
+                {
+                    builtIndexes.Add(builtIndex);
+                    buildingIndexes.AddRange(buildingGenerator.GetCellsSurroundingMarchedIndex(builtIndex));
+                }
+                else
+                {
+                    if (buildingGenerator.ChunkWaveFunction[builtIndex].Buildable)
+                    {
+                        continue;
+                    }
+
+                    return false;
+                }
+            
             }
             requireQueryWalls = builtIndexes.Count > 0;
             return true;
@@ -206,15 +205,22 @@ namespace Buildings.District
             bool TryGetBuiltIndex(Vector3 buildingCellPosition, ChunkIndex buildIndex, Vector3 districtPos, out ChunkIndex builtIndex)
             {
                 Vector2 dir = (buildingCellPosition.XZ() - districtPos.XZ()).normalized;
-                builtIndex = (dir.x, dir.y) switch
+                ChunkIndex? builtIndexNullable = (dir.x, dir.y) switch
                 {
                     (x: < 0.1f, y: < 0.1f) => buildIndex,
-                    (x: < 0.1f, y: > 0) => buildingGenerator.GetIndex(buildingCellPosition - Vector3.forward * buildingGenerator.CellSize.z).GetValueOrDefault(),
-                    (x: > 0, y: < 0.1f) => buildingGenerator.GetIndex(buildingCellPosition - Vector3.right * buildingGenerator.CellSize.z).GetValueOrDefault(),
-                    (x: > 0, y: > 0) => buildingGenerator.GetIndex(buildingCellPosition - buildingGenerator.CellSize).GetValueOrDefault(),
+                    (x: < 0.1f, y: > 0) => buildingGenerator.GetIndex(buildingCellPosition - Vector3.forward * buildingGenerator.CellSize.z / 2.0f),
+                    (x: > 0, y: < 0.1f) => buildingGenerator.GetIndex(buildingCellPosition - Vector3.right * buildingGenerator.CellSize.z / 2.0f),
+                    (x: > 0, y: > 0) => buildingGenerator.GetIndex(buildingCellPosition - buildingGenerator.CellSize / 2.0f),
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
+                if (!builtIndexNullable.HasValue)
+                {
+                    builtIndex = default;
+                    return false;
+                }
+                
+                builtIndex = builtIndexNullable.Value;
                 if (!buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].QueryBuiltCells.Contains(builtIndex.CellIndex) 
                     && buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z])
                 {
@@ -227,7 +233,7 @@ namespace Buildings.District
             bool GetDistrictIndex(int x, int z, out Vector3 districtPos)
             {
                 Vector3 pos = mousePos + new Vector3(x * districtGenerator.ChunkScale.x, 0, z * districtGenerator.ChunkScale.z);
-                districtPos = pos + offset;//+ districtGenerator.CellSize.XyZ() * (districtRadius % 2 == 0 ? 0 : -.25f);
+                districtPos = pos + offset - districtGenerator.CellSize.XyZ() * (districtRadius % 2 == 0 ? 0.5f : 0.25f);
                 districtChunkIndexes[x, z] = ChunkWaveUtility.GetDistrictIndex2(districtPos, districtGenerator.ChunkScale);
                 if (districtHandler.IsBuilt(districtChunkIndexes[x, z]))
                 {
@@ -308,7 +314,7 @@ namespace Buildings.District
                             : buildingIndexes.Contains(index)
                                 ? Color.red 
                                 : Color.black;
-                        Gizmos.DrawWireCube(pos + buildingGenerator.CellSize.XyZ() * 0.5f, buildingGenerator.CellSize * 0.95f);
+                        Gizmos.DrawWireCube(pos, buildingGenerator.CellSize * 0.95f);
                     }
                 }
             }

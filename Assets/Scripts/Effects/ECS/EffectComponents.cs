@@ -15,6 +15,14 @@ namespace Effects.ECS
 		public bool IsOneShot;
 		public byte LimitedHits;
 		public int Key;
+		
+		public float HealthDamage;
+		public float ShieldDamage;
+		public float ArmorDamage;
+	}
+	
+	public struct SimpleDamageComponent : IComponentData
+	{
 		public float Damage;
 	}
 	
@@ -48,7 +56,13 @@ namespace Effects.ECS
 		public float Health;
 		public float Armor;
 		public float Shield;
-		public float PendingDamage;
+	}
+
+	public struct PendingDamageComponent : IComponentData
+	{
+		public float HealthDamage;
+		public float ArmorDamage;
+		public float ShieldDamage;
 	}
 
 	public struct MaxHealthComponent : IComponentData

@@ -1,12 +1,10 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using WaveFunctionCollapse;
-using UnityEngine;
-using System.Linq;
-using System.Threading.Tasks;
 using Sirenix.OdinInspector;
+using WaveFunctionCollapse;
 using Unity.Mathematics;
+using System.Linq;
+using UnityEngine;
 
 namespace Chunks
 {
@@ -52,7 +50,8 @@ namespace Chunks
         private void OnCellCollapsed(ChunkIndex chunkIndex)
         {
             Cell cell = groundGenerator.ChunkWaveFunction[chunkIndex];
-            if (!groundTreeMeshSet.Contains(protoypeMeshes[cell.PossiblePrototypes[0].MeshRot.MeshIndex])) return;
+            int meshIndex = cell.PossiblePrototypes[0].MeshRot.MeshIndex;
+            if (meshIndex == -1 || !groundTreeMeshSet.Contains(protoypeMeshes[meshIndex])) return;
             
             TreeGrower spawned = treeGrowerPrefab.GetAtPosAndRot<TreeGrower>(cell.Position, Quaternion.identity);
             spawned.Cell = cell;
