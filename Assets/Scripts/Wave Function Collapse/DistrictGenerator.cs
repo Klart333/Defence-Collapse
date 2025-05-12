@@ -67,6 +67,7 @@ namespace WaveFunctionCollapse
         private Vector3 offset;
 
         private bool isUpdatingChunks;
+        private bool isRemovingChunks;
 
         public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.CellSize.x, chunkSize.y * ChunkWaveFunction.CellSize.y, chunkSize.z * ChunkWaveFunction.CellSize.z);
         public HashSet<QueryChunk> QueriedChunks => queriedChunks;
@@ -75,7 +76,7 @@ namespace WaveFunctionCollapse
         
         public ChunkWaveFunction<QueryChunk> ChunkWaveFunction => waveFunction;
         private bool ShouldAwait => awaitEveryFrame > 0;
-        public bool IsGenerating {get; private set;}
+        public bool IsGenerating { get; private set; }
 
         private void OnEnable()
         {
@@ -124,8 +125,14 @@ namespace WaveFunctionCollapse
 
         private async UniTaskVoid UpdateChunks()
         {
-            await UniTask.Yield();
             isUpdatingChunks = true;
+            
+            await UniTask.Yield();
+            if (IsGenerating || isRemovingChunks)
+            {
+                await UniTask.WaitWhile(() => IsGenerating || isRemovingChunks);
+            }
+            Debug.Log("Updating chunks");
 
             while (buildQueue.TryDequeue(out List<IBuildable> buildables))
             {
@@ -298,7 +305,13 @@ namespace WaveFunctionCollapse
 
         public async UniTaskVoid RemoveChunks(List<ChunkIndex> chunkIndexes)
         {
-            await UniTask.WaitWhile(() => IsGenerating);
+            if (IsGenerating || isUpdatingChunks)
+            {
+                await UniTask.WaitWhile(() => IsGenerating || isUpdatingChunks);
+            }
+
+            isRemovingChunks = true;
+            Debug.Log("Removing Chunks");
 
             HashSet<QueryChunk> neighbours = new HashSet<QueryChunk>();
             HashSet<int3> killIndexes = new HashSet<int3>();
@@ -345,12 +358,15 @@ namespace WaveFunctionCollapse
             await UniTask.Yield();
 
             IterativeFailChecks(neighbours).Forget(Debug.LogError);
+            
+            isRemovingChunks = false;
         }
 
         public async UniTask Run(ICollection<QueryChunk> chunksToCollapse)
         {
             await UniTask.WaitWhile(() => IsGenerating);
-
+            Debug.Log("Running District Generator");
+            
             IsGenerating = true;
             Stopwatch watch = Stopwatch.StartNew();
             int frameCount = 0;
@@ -451,9 +467,6 @@ namespace WaveFunctionCollapse
 
             if (cellsToCollapse.Length <= 0) return QuerySpawnedBuildings;
 
-            // Plan: Add chunks at indicies if not already there
-            // If already there -> Query clear the chunk
-            // Also query clear adjacent chunks, so that they can merge 
             // (optional) Give access to collapse some of the top cells into the shooting ones, could add that info to the district script.  
 
             for (int x = 0; x < cellsToCollapse.GetLength(0); x++)
@@ -505,7 +518,6 @@ namespace WaveFunctionCollapse
 
             return QuerySpawnedBuildings;
         }
-        
         
         private void QueryResetNeighbours(HashSet<QueryChunk> overrideChunks, QueryChunk neighbourChunk, int depth)
         {
@@ -588,11 +600,11 @@ namespace WaveFunctionCollapse
 
             foreach (QueryChunk chunk in waveFunction.Chunks.Values)
             {
-                foreach (Cell cell in chunk.Cells)
+                /*foreach (Cell cell in chunk.Cells)
                 {
                     Gizmos.color = !cell.Collapsed ? Color.red : cell.PossiblePrototypes[0].MeshRot.MeshIndex == -1 ? Color.blue : Color.white;
                     Gizmos.DrawWireCube(cell.Position + CellSize / 2.0f, CellSize * 0.75f);
-                }
+                }*/
                 
                 Vector3 pos = ChunkWaveUtility.GetPosition(chunk.ChunkIndex, ChunkScale);
                 if (queriedChunks.Contains(chunk))
@@ -605,7 +617,6 @@ namespace WaveFunctionCollapse
                 }
 
                 Gizmos.DrawWireCube(pos + ChunkScale / 2.0f, ChunkScale * 0.75f);
-
             }
         }
 #endif
