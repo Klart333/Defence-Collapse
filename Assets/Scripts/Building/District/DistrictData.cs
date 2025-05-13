@@ -11,6 +11,7 @@ using InputCamera;
 using Gameplay;
 using Utility;
 using System;
+using Cysharp.Threading.Tasks;
 using Debug = System.Diagnostics.Debug;
 
 namespace Buildings.District
@@ -132,13 +133,19 @@ namespace Buildings.District
                 OnChunksLost?.Invoke(destroyedIndexes);
                 
                 //State.OnIndexesDestroyed(destroyedIndexes);
-                State.RemoveEntities();
-                State.SpawnEntities();
-                
                 DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
+                
+                DelayedUpdateEntities().Forget();
             }
         }
-        
+
+        private async UniTaskVoid DelayedUpdateEntities()
+        {
+            await UniTask.WaitWhile(() => DistrictGenerator.IsGenerating);
+            State.RemoveEntities();
+            State.SpawnEntities();
+        }
+
         public bool OnDistrictChunkRemoved(IChunk chunk)
         {
             if (!DistrictChunks.ContainsKey(chunk.ChunkIndex))
@@ -147,12 +154,12 @@ namespace Buildings.District
             }
 
             HashSet<int3> destroyedIndexes = new HashSet<int3> { chunk.ChunkIndex };
-            State.RemoveEntities();
-            State.SpawnEntities();
             OnChunksLost?.Invoke(destroyedIndexes);
-
+            
             DistrictChunks.Remove(chunk.ChunkIndex);
             DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
+            
+            DelayedUpdateEntities().Forget();
             return true;
         }
 

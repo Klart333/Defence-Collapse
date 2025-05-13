@@ -125,14 +125,13 @@ namespace WaveFunctionCollapse
 
         private async UniTaskVoid UpdateChunks()
         {
-            isUpdatingChunks = true;
+            await UniTask.DelayFrame(2);
             
-            await UniTask.Yield();
+            isUpdatingChunks = true;
             if (IsGenerating || isRemovingChunks)
             {
                 await UniTask.WaitWhile(() => IsGenerating || isRemovingChunks);
             }
-            Debug.Log("Updating chunks");
 
             while (buildQueue.TryDequeue(out List<IBuildable> buildables))
             {
@@ -147,7 +146,6 @@ namespace WaveFunctionCollapse
                 {
                     if (chunk.IsRemoved)
                     {
-                        Debug.Log("Chunk is removed");
                         continue;
                     }
 
@@ -311,12 +309,12 @@ namespace WaveFunctionCollapse
             }
 
             isRemovingChunks = true;
-            Debug.Log("Removing Chunks");
 
             HashSet<QueryChunk> neighbours = new HashSet<QueryChunk>();
             HashSet<int3> killIndexes = new HashSet<int3>();
             for (int i = 0; i < chunkIndexes.Count; i++)
             {
+
                 if (!ChunkIndexToChunks.TryGetValue(chunkIndexes[i], out List<int3> indexes))
                 {
                     continue;
@@ -329,7 +327,7 @@ namespace WaveFunctionCollapse
                         indexes.RemoveAt(j);
                         continue;
                     }
-                    
+
                     killIndexes.Add(indexes[j]);
                     ResetNeighbours(neighbours, waveFunction.Chunks[indexes[j]], 1);
                 }
@@ -353,7 +351,13 @@ namespace WaveFunctionCollapse
             }
             
             waveFunction.Propagate();
-            
+
+            if (neighbours.Count <= 0)
+            {
+                isRemovingChunks = false;
+                return;
+            }
+
             await Run(neighbours);
             await UniTask.Yield();
 
@@ -365,7 +369,6 @@ namespace WaveFunctionCollapse
         public async UniTask Run(ICollection<QueryChunk> chunksToCollapse)
         {
             await UniTask.WaitWhile(() => IsGenerating);
-            Debug.Log("Running District Generator");
             
             IsGenerating = true;
             Stopwatch watch = Stopwatch.StartNew();
@@ -377,6 +380,7 @@ namespace WaveFunctionCollapse
                 if (!index.HasValue)
                 {
                     Debug.LogError("Could not find lowest entropy index");
+                    IsGenerating = false;
                     return;
                 }
                 PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index.Value]);
@@ -466,9 +470,7 @@ namespace WaveFunctionCollapse
             RevertQuery();
 
             if (cellsToCollapse.Length <= 0) return QuerySpawnedBuildings;
-
-            // (optional) Give access to collapse some of the top cells into the shooting ones, could add that info to the district script.  
-
+            
             for (int x = 0; x < cellsToCollapse.GetLength(0); x++)
             for (int z = 0; z < cellsToCollapse.GetLength(1); z++)
             for (int y = 0; y < height; y++)
@@ -613,7 +615,7 @@ namespace WaveFunctionCollapse
                 }
                 else
                 {
-                    Gizmos.color = chunk.IsChunkQueryAdded ? Color.magenta : Color.white;
+                    Gizmos.color = ChunkIndexToChunks.Values.Any(x => x.Contains(chunk.ChunkIndex)) ? Color.magenta : Color.white;
                 }
 
                 Gizmos.DrawWireCube(pos + ChunkScale / 2.0f, ChunkScale * 0.75f);
@@ -621,5 +623,11 @@ namespace WaveFunctionCollapse
         }
 #endif
         #endregion
+
+        public ChunkIndex? GetBuildingCell(int3 chunkChunkIndex)
+        {
+            Vector3 pos = ChunkWaveUtility.GetPosition(chunkChunkIndex, ChunkScale);
+            return BuildingManager.Instance.GetIndex(pos + BuildingManager.Instance.CellSize.XyZ(0) / 2.0f);
+        }
     }
 }

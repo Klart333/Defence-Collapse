@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
@@ -187,7 +188,12 @@ namespace InputCamera
             panStartScreenPosition = Mouse.current.position.ReadValue();
         }
 
-        private async void EndPan(InputAction.CallbackContext obj)
+        private void EndPan(InputAction.CallbackContext obj)
+        {
+            EndPanAsync().Forget();
+        }
+
+        private async UniTaskVoid EndPanAsync()
         {
             isPressed = false;
             if (!IsDragging)

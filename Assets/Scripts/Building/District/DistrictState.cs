@@ -295,7 +295,7 @@ namespace Buildings.District
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         
         protected override bool UseTargetMeshes => true;
-        protected override float AttackAngle => 60;
+        protected override float AttackAngle => 75;
 
 
         private readonly TowerData archerData;
@@ -429,6 +429,14 @@ namespace Buildings.District
         private GameObject rangeIndicator;
         private bool selected;
         
+        private readonly int2[] corners = // Top left, Top right, bottom left, bottom right 
+        {
+            new int2(-1, 1),
+            new int2(1, 1),
+            new int2(-1, -1),
+            new int2(1, -1),
+        };
+        
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         protected override bool UseTargetMeshes => true;
         protected override float AttackAngle => 360;
@@ -445,19 +453,76 @@ namespace Buildings.District
             stats.Range.OnValueChanged += RangeChanged;
         }
         
+        protected override List<QueryChunk> GetEntityChunks(out List<Vector2> offsets)
+        {
+            List<QueryChunk> chunks = new List<QueryChunk>();
+            HashSet<Tuple<int3, int2>> addedCorners = new HashSet<Tuple<int3, int2>>();
+            offsets = new List<Vector2>();
+
+            foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
+            {
+                for (int corner = 0; corner < 4; corner++)
+                {
+                    int3 chunkIndex = chunk.ChunkIndex;
+                    int2 cornerDir = corners[corner]; 
+                    if (addedCorners.Contains(Tuple.Create(chunkIndex, cornerDir)))
+                    {
+                        continue;
+                    }
+                    
+                    bool isCornerValid = IsCornerValid(chunkIndex, cornerDir);
+
+                    if (!isCornerValid) continue;
+                    
+                    chunks.Add(chunk);
+                    offsets.Add(new Vector2(cornerDir.x, cornerDir.y));
+                    AddCornerToHashSet(cornerDir, chunkIndex);
+                }
+            }
+
+            return chunks;
+            
+            bool IsCornerValid(int3 chunkIndex, int2 cornerDir)
+            {
+                bool isCornerValid = true;
+
+                for (int x = 0; x < 2 && isCornerValid; x++)
+                for (int z = 0; z < 2 && isCornerValid; z++)
+                {
+                    if (x == 0 && z == 0)
+                    {
+                        continue;
+                    }
+                        
+                    int3 index = chunkIndex + new int3(x * cornerDir.x, 0, z * cornerDir.y);
+                    if (!DistrictData.DistrictChunks.ContainsKey(index))
+                    {
+                        isCornerValid = false;
+                    }
+                }
+
+                return isCornerValid;
+            }
+            
+            void AddCornerToHashSet(int2 cornerDir, int3 chunkIndex)
+            {
+                for (int x = 0; x < 2; x++)
+                for (int z = 0; z < 2; z++)
+                {
+                    if (x == 0 && z == 0)
+                    {
+                        continue;
+                    }
+                        
+                    int3 index = chunkIndex + new int3(x * cornerDir.x, 0, z * cornerDir.y);
+                    addedCorners.Add(Tuple.Create(index, -cornerDir));
+                }
+            }
+        }
+        
         protected override DistrictTargetMesh GetTargetMesh(Vector3 position, Vector2 offset)
         {
-            Vector3 dir = (offset.x, offset.y) switch
-            {
-                (x: > 0, y: 0) => Vector3.right,
-                (x: < 0, y: 0) => Vector3.left,
-                (x: 0, y: > 0) => Vector3.forward,
-                (x: 0, y: < 0) => Vector3.back,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-            dir.y -= 0.2f;
-            Quaternion rot = Quaternion.LookRotation(dir.normalized);
-            return bombData.DistrictTargetMesh.GetAtPosAndRot<DistrictTargetMesh>(position, rot);
+            return bombData.DistrictTargetMesh.GetAtPosAndRot<DistrictTargetMesh>(position, Quaternion.identity);
         }
 
         private void RangeChanged()

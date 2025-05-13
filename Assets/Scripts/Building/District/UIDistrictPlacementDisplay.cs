@@ -1,16 +1,15 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine.InputSystem;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
-using System.Linq;
-using DG.Tweening;
-using Gameplay.Money;
 using Sirenix.Utilities;
-using TMPro;
+using Gameplay.Money;
+using DG.Tweening;
+using System.Linq;
 using UnityEngine;
+using TMPro;
 
 namespace Buildings.District
 {
@@ -256,7 +255,7 @@ namespace Buildings.District
             return mat == crystalMaterial ? GroundType.Crystal : GroundType.Grass;
         }
 
-        public void PlacementConfirmed()
+        /*public void PlacementConfirmed()
         {
             Bounds bounds = GetPositionBounds(spawnedPlacers.Where(x => x.Selected));
             
@@ -280,6 +279,7 @@ namespace Buildings.District
             HideAnimated();
             districtHandler.BuildDistrict(chunks, currentType);
         }
+        */
         
         private static Bounds GetBounds(IEnumerable<IChunk> chunks)
         {

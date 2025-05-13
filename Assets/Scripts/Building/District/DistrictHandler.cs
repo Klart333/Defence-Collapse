@@ -113,84 +113,21 @@ namespace Buildings.District
             {
                 GetDistrictData(districtType, chunks);
             }
-            
-            Events.OnDistrictBuilt?.Invoke(districtType);
-        }
 
-        public void BuildDistrict(HashSet<QueryChunk> chunks, DistrictType districtType)
-        {
-            if (!districtInfoData.TryGetValue(districtType, out PrototypeInfoData prototypeInfo))
-            {
-                Debug.LogError("Could not find PrototypeInfoData for DistrictType: " + districtType);
-                return;
-            }
-            
-            HashSet<QueryChunk> neighbours = new HashSet<QueryChunk>();
-            List<QueryChunk> addedChunks = new List<QueryChunk>();
             foreach (QueryChunk chunk in chunks)
             {
-                bool isTop = chunk.IsTop;
-                
-                GetNeighbours(chunks, chunk, neighbours, 1);
-
-                chunk.Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
-                districtGenerator.ChunkWaveFunction.LoadCells(chunk, prototypeInfo);
-
-                if (!isTop) continue;
-
-                int height = districtType switch
+                ChunkIndex? chunkIndex = districtGenerator.GetBuildingCell(chunk.ChunkIndex);
+                Debug.Assert(chunkIndex != null, nameof(chunkIndex) + " != null");
+                if (districtGenerator.ChunkIndexToChunks.TryGetValue(chunkIndex.Value, out List<int3> list))
                 {
-                    DistrictType.TownHall => (townHallDistrict?.State as TownHallState)?.UpgradeStats[0].Level - 1 ?? 0,
-                    DistrictType.Archer => 1,
-                    DistrictType.Bomb => 1,
-                    DistrictType.Mine => 0,
-                    _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
-                };
-
-                ChunkIndex? buildingChunkIndex = BuildingManager.Instance.GetIndex(chunk.Position + BuildingManager.Instance.CellSize / 2.0f);
-                Assert.IsTrue(buildingChunkIndex.HasValue);
-                for (int j = 0; j < height; j++) // Kinda assumes that the chunks are not stacked vertically already
+                    list.Add(chunk.ChunkIndex);
+                }
+                else
                 {
-                    int heightLevel = 1 + j;
-                    Vector3 pos = chunk.Position.XyZ(0) + Vector3.up * districtGenerator.ChunkScale.y * heightLevel;
-                    int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, districtGenerator.ChunkScale);
-                    if (districtGenerator.ChunkWaveFunction.Chunks.TryGetValue(index, out QueryChunk existingChunk))
-                    {
-                        addedChunks.Add(existingChunk);
-                        continue;
-                    }
-
-                    QueryChunk addChunk = districtGenerator.ChunkWaveFunction.LoadChunk(pos, districtGenerator.ChunkSize, prototypeInfo);
-                    addedChunks.Add(addChunk);
-                    
-                    districtGenerator.ChunkIndexToChunks[buildingChunkIndex.Value].Add(addChunk.ChunkIndex);
+                    districtGenerator.ChunkIndexToChunks.Add(chunkIndex.Value, new List<int3> { chunk.ChunkIndex });
                 }
             }
-            chunks.AddRange(addedChunks);
             
-            foreach (QueryChunk chunk in neighbours)
-            {
-                chunk.Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
-                districtGenerator.ClearChunkMeshes(chunk.ChunkIndex);
-                districtGenerator.ChunkWaveFunction.LoadCells(chunk, chunk.PrototypeInfoData);
-            }
-
-            if (districtType == DistrictType.TownHall && CheckMerge(chunks, out DistrictData existingData))
-            {
-                foreach (QueryChunk chunk in chunks)
-                {
-                    districts.TryAdd(chunk.ChunkIndex.xz, existingData);
-                }
-                
-                existingData.ExpandDistrict(chunks);
-            }
-            else
-            {
-                GetDistrictData(districtType, chunks);
-            }
-            
-            districtGenerator.ChunkWaveFunction.Propagate();
-            districtGenerator.Run(neighbours).Forget(Debug.LogError);
             Events.OnDistrictBuilt?.Invoke(districtType);
         }
 
@@ -306,12 +243,6 @@ namespace Buildings.District
         {
             int2 index = chunk.ChunkIndex.xz;
             return districts.TryGetValue(index, out districtData);
-        }
-        
-        public bool IsTownHallBuilt(IChunk chunk)
-        {
-            int2 index = chunk.ChunkIndex.xz;
-            return districts.TryGetValue(index, out DistrictData districtData) && districtData.State is TownHallState;
         }
     }
 }
