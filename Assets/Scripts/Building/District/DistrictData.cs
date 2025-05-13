@@ -11,6 +11,7 @@ using InputCamera;
 using Gameplay;
 using Utility;
 using System;
+using Debug = System.Diagnostics.Debug;
 
 namespace Buildings.District
 {
@@ -33,18 +34,23 @@ namespace Buildings.District
         public DistrictState State { get; }
         public Vector3 Position { get; }
         
-        private IChunkWaveFunction<QueryChunk> waveFunction { get; }
+        public IChunkWaveFunction<QueryChunk> DistrictGenerator { get; }
 
-        public DistrictData(DistrictType districtType, HashSet<QueryChunk> chunks, Vector3 position, IChunkWaveFunction<QueryChunk> chunkWaveFunction, int key)
+        public DistrictData(DistrictType districtType, HashSet<QueryChunk> chunks, Vector3 position, IChunkWaveFunction<QueryChunk> chunkDistrictGenerator, int key)
         {
             DistrictChunks = new Dictionary<int3, QueryChunk>();
             foreach (QueryChunk chunk in chunks)
             {
-                if (chunk.IsTop)
+                if (chunk.IsTop) // Remove if a state uses the below chunks in future
                 {
                     DistrictChunks.Add(chunk.ChunkIndex, chunk);
                 }
             }
+
+            DistrictGenerator = chunkDistrictGenerator;
+            Position = position;
+            DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
+            CreateChunkIndexCache();
             
             State = districtType switch
             {
@@ -56,27 +62,17 @@ namespace Buildings.District
                 _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
             };
 
-            waveFunction = chunkWaveFunction;
-            Position = position;
-            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction.ChunkScale, waveFunction.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
-            CreateChunkIndexCache(chunks);
-
             Events.OnWaveStarted += OnWaveStarted;
             Events.OnWallsDestroyed += OnWallsDestroyed;
         }
 
-        private void CreateChunkIndexCache(HashSet<QueryChunk> chunks)
+        private void CreateChunkIndexCache()
         {
             cachedChunkIndexes.Clear();
-            foreach (QueryChunk chunk in chunks)
+            foreach (QueryChunk chunk in DistrictChunks.Values)
             {
-                if (!chunk.IsTop)
-                {
-                    continue; // Remove if a state uses the below chunks in future
-                }
-                
                 ChunkIndex? index = BuildingManager.Instance.GetIndex(chunk.Position + BuildingManager.Instance.CellSize / 2.0f);
-                Assert.IsTrue(index.HasValue);
+                Debug.Assert(index != null, nameof(index) + " != null");
                 if (!cachedChunkIndexes.TryGetValue(index.Value, out List<int3> chunkIndex))
                 {
                     cachedChunkIndexes.Add(index.Value, new List<int3> { chunk.ChunkIndex });
@@ -98,8 +94,8 @@ namespace Buildings.District
                 }
             }
             
-            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction.ChunkScale, waveFunction.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
-            CreateChunkIndexCache(chunks);
+            DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
+            CreateChunkIndexCache();
 
             State.RemoveEntities();
             State.SpawnEntities();
@@ -134,8 +130,12 @@ namespace Buildings.District
             else if (destroyedIndexes.Count > 0)
             {
                 OnChunksLost?.Invoke(destroyedIndexes);
-                State.OnIndexesDestroyed(destroyedIndexes);
-                DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction.ChunkScale, waveFunction.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
+                
+                //State.OnIndexesDestroyed(destroyedIndexes);
+                State.RemoveEntities();
+                State.SpawnEntities();
+                
+                DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
             }
         }
         
@@ -147,11 +147,12 @@ namespace Buildings.District
             }
 
             HashSet<int3> destroyedIndexes = new HashSet<int3> { chunk.ChunkIndex };
-            State.OnIndexesDestroyed(destroyedIndexes);
+            State.RemoveEntities();
+            State.SpawnEntities();
             OnChunksLost?.Invoke(destroyedIndexes);
 
             DistrictChunks.Remove(chunk.ChunkIndex);
-            DistrictUtility.GenerateCollider(DistrictChunks.Values, waveFunction.ChunkScale, waveFunction.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
+            DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
             return true;
         }
 

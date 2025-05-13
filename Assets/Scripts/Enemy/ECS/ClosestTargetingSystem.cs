@@ -66,42 +66,108 @@ namespace DataStructures.Queue.ECS
             
             float2 towerPosition = enemyTargetAspect.LocalTransform.ValueRO.Position.xz;
             int2 towerCell = HashGridUtility.GetCell(towerPosition, CellSize);
+            float range = enemyTargetAspect.RangeComponent.ValueRO.Range;
+            int radiusCells = Mathf.CeilToInt(range / CellSize);
+            float rangeSq = range * range;
+            float maxCellDist = range + CellSize * 1.414f; // Diagonal of cell
 
-            // Calculate the number of cells to check based on the tower's range
-            int radiusCells = Mathf.CeilToInt(enemyTargetAspect.RangeComponent.ValueRO.Range / CellSize);
+            // Common target finding variables
+            float bestDistSq = rangeSq;
+            float3 bestEnemyPosition = default;
 
-            float bestDistSq = enemyTargetAspect.RangeComponent.ValueRO.Range * enemyTargetAspect.RangeComponent.ValueRO.Range;
-            Entity bestEnemy = Entity.Null;
-
-            // Iterate over nearby cells
-            for (int dx = -radiusCells; dx <= radiusCells; dx++)
-            for (int dy = -radiusCells; dy <= radiusCells; dy++)
+            if (enemyTargetAspect.DirectionComponent.ValueRO.Angle >= 360f)
             {
-                int2 cell = new int2(towerCell.x + dx, towerCell.y + dy);
-
-                // Check if the cell exists in the grid
-                if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) continue;
-                
-                do
+                // Optimized 360-degree path
+                for (int dx = -radiusCells; dx <= radiusCells; dx++)
+                for (int dy = -radiusCells; dy <= radiusCells; dy++)
                 {
-                    RefRO<LocalTransform> enemyTransform = TransformLookup.GetRefRO(enemy);
+                    int2 cell = new int2(towerCell.x + dx, towerCell.y + dy);
                     
-                    float2 enemyPosition = new float2(enemyTransform.ValueRO.Position.x, enemyTransform.ValueRO.Position.z);
-                    float distSq = math.distancesq(towerPosition, enemyPosition);
+                    // Quick distance check at cell level
+                    float2 cellCenter = ((float2)cell + 0.5f) * CellSize;
+                    if (math.lengthsq(cellCenter - towerPosition) > maxCellDist * maxCellDist)
+                        continue;
 
-                    // Check if this enemy is closer
-                    if (distSq < bestDistSq)
+                    if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) 
+                        continue;
+                    
+                    do
                     {
-                        bestDistSq = distSq;
-                        bestEnemy = enemy;
-                    }
-                    // COULD EARLY EXIT IF A "GOOD ENOUGH" TARGET IS FOUND
+                        RefRO<LocalTransform> enemyTransform = TransformLookup.GetRefRO(enemy);
+                        float2 enemyPosition = enemyTransform.ValueRO.Position.xz;
+                        float distSq = math.distancesq(towerPosition, enemyPosition);
 
-                } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
+                        if (distSq < bestDistSq)
+                        {
+                            bestDistSq = distSq;
+                            bestEnemyPosition = enemyTransform.ValueRO.Position;
+                        }
+                    } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
+                }
+            }
+            else
+            {
+                // Directional cone path
+                float2 direction = math.normalize(enemyTargetAspect.DirectionComponent.ValueRO.Direction);
+                float halfAngleRad = math.radians(enemyTargetAspect.DirectionComponent.ValueRO.Angle * 0.5f);
+                float cosHalfAngle = math.cos(halfAngleRad);
+                float2 coneLeft = math.mul(float2x2.Rotate(halfAngleRad), direction);
+                float2 coneRight = math.mul(float2x2.Rotate(-halfAngleRad), direction);
+
+                for (int dx = -radiusCells; dx <= radiusCells; dx++)
+                for (int dy = -radiusCells; dy <= radiusCells; dy++)
+                {
+                    int2 cell = new int2(towerCell.x + dx, towerCell.y + dy);
+                    float2 cellCenter = ((float2)cell + 0.5f) * CellSize;
+                    float2 toCell = cellCenter - towerPosition;
+                    float cellDistSq = math.lengthsq(toCell);
+
+                    // Cell-level culling
+                    if (cellDistSq > maxCellDist * maxCellDist)
+                        continue;
+
+                    if (math.lengthsq(toCell) > 0.001f) // Avoid division by zero
+                    {
+                        float2 normToCell = math.normalize(toCell);
+                        float dotDirection = math.dot(normToCell, direction);
+                        
+                        if (dotDirection < cosHalfAngle - 0.1f) // With safety margin
+                        {
+                            float dotLeft = math.dot(normToCell, coneLeft);
+                            float dotRight = math.dot(normToCell, coneRight);
+                            if (dotLeft < 0 && dotRight < 0)
+                                continue;
+                        }
+                    }
+
+                    if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) 
+                        continue;
+                    
+                    do
+                    {
+                        RefRO<LocalTransform> enemyTransform = TransformLookup.GetRefRO(enemy);
+                        float2 enemyPosition = enemyTransform.ValueRO.Position.xz;
+                        float2 toEnemy = enemyPosition - towerPosition;
+                        float distSq = math.lengthsq(toEnemy);
+
+                        if (distSq < bestDistSq)
+                        {
+                            float2 normToEnemy = math.normalize(toEnemy);
+                            if (math.dot(normToEnemy, direction) >= cosHalfAngle)
+                            {
+                                bestDistSq = distSq;
+                                bestEnemyPosition = enemyTransform.ValueRO.Position;
+                            }
+                        }
+                    } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
+                }
             }
 
-            // Store the closest enemy for this tower
-            enemyTargetAspect.EnemyTargetComponent.ValueRW.Target = bestEnemy;
+            if (!bestEnemyPosition.Equals(default))
+            {
+                enemyTargetAspect.EnemyTargetComponent.ValueRW.TargetPosition = bestEnemyPosition;
+                enemyTargetAspect.EnemyTargetComponent.ValueRW.HasTarget = true;
+            }
         }
     }
     
@@ -109,9 +175,16 @@ namespace DataStructures.Queue.ECS
     {
         public float Range;
     }
+    
+    public struct DirectionRangeComponent : IComponentData
+    {
+        public float2 Direction;
+        public float Angle;
+    }
 
     public struct EnemyTargetComponent : IComponentData
     {
-        public Entity Target;
+        public float3 TargetPosition;
+        public bool HasTarget;
     }
 }

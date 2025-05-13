@@ -38,6 +38,11 @@ namespace Juice
 
         private void OnEnable()
         {
+            Popup();
+        }
+
+        private void Popup()
+        {
             Vector3 endValue = readScale ? transform.localScale : targetScale;
             
             transform.localScale = Vector3.zero;
@@ -45,14 +50,6 @@ namespace Juice
             if (!useGameSpeed)
             {
                 PopupTween.timeScale = 1.0f / gameSpeed.Value;
-            }
-        }
-
-        private void Update()
-        {
-            if (verbose)
-            {
-                Debug.Log(transform.localScale);
             }
         }
 

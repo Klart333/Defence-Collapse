@@ -53,6 +53,11 @@ public static class Extensions
         return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
     }
     
+    public static Vector3 DivideByAxis(this Vector3 a, Vector3 b)
+    {
+        return new Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
+    }
+    
     public static Vector3 MultiplyByAxis(this Vector3 a, int3 b)
     {
         return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);

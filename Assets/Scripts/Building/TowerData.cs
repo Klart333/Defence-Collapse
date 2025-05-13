@@ -2,6 +2,7 @@
 using Sirenix.Serialization;
 using System;
 using Gameplay;
+using Juice;
 using UnityEngine;
 
 [InlineEditor, CreateAssetMenu(fileName = "New Tower Data", menuName = "Building/Tower Data")]
@@ -29,16 +30,20 @@ public class TowerData : SerializedScriptableObject
     
     public Sprite[] UpgradeIcons;
 
-    [Title("Range")]
+    [Title("References")]
     public PooledMonoBehaviour RangeIndicator;
+    
+    [SerializeField]
+    private DistrictTargetMesh districtTargetMesh;
 
     [Title("Attack")]
     [OdinSerialize, NonSerialized]
     public Attack BaseAttack;
     
+    public DistrictTargetMesh DistrictTargetMesh => districtTargetMesh;
     public string DistrictName => districtName;
-    public Sprite Icon => icon;
     public string Description => description;
+    public Sprite Icon => icon;
 
     [TitleGroup("Stats")]
     [Button]
