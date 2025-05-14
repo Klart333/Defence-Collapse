@@ -27,7 +27,7 @@ namespace DataStructures.Queue.ECS
         }
     }
 
-    [InternalBufferCapacity(3)]
+    [InternalBufferCapacity(4)]
     public struct ItemBufferElement: IBufferElementData
     {
         public Entity EnemyEntity;

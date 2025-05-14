@@ -9,16 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e365721dcb580ea40b5bdb0b995bd4ec, type: 3}
-  m_Name: Bomb Data
+  m_Script: {fileID: 11500000, guid: a39d9e0847bee9147a0e20c8ac4e2d3e, type: 3}
+  m_Name: Slime Boss Data
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 8572661992280112000, guid: 22a69d5eac306bf44a5fc4d2fdb22a77, type: 3}
-    - {fileID: -849867405023671905, guid: 9493d9f7340f7b446be9a64bd52f15f6, type: 3}
-    - {fileID: 2100000, guid: e19d812d7f342954b99655172166fd9b, type: 2}
+    - {fileID: 6245472720060021658, guid: c7b1bdefc0a9bdd4db8c00a84c721c62, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -32,7 +30,7 @@ MonoBehaviour:
       Data: 1|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 8
+      Data: 4
     - Name: 
       Entry: 8
       Data: 
@@ -41,7 +39,7 @@ MonoBehaviour:
       Data: 2|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 12
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -50,7 +48,7 @@ MonoBehaviour:
       Data: 3|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 5
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -59,7 +57,7 @@ MonoBehaviour:
       Data: 4|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0.1
+      Data: 0.8
     - Name: 
       Entry: 8
       Data: 
@@ -68,7 +66,7 @@ MonoBehaviour:
       Data: 5|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 10
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -77,7 +75,7 @@ MonoBehaviour:
       Data: 6|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0
+      Data: 0.3
     - Name: 
       Entry: 8
       Data: 
@@ -95,7 +93,7 @@ MonoBehaviour:
       Data: 8|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 2
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -104,7 +102,7 @@ MonoBehaviour:
       Data: 9|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0
+      Data: 1000
     - Name: 
       Entry: 8
       Data: 
@@ -113,7 +111,7 @@ MonoBehaviour:
       Data: 10|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 200
     - Name: 
       Entry: 8
       Data: 
@@ -122,7 +120,7 @@ MonoBehaviour:
       Data: 11|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -155,52 +153,22 @@ MonoBehaviour:
       Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 7
-      Data: 16|Effects.ArchedDamageColliderEffect, Core
+      Data: 16|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: LimitedHits
       Entry: 5
       Data: true
     - Name: Hits
       Entry: 3
       Data: 1
-    - Name: TriggerDamageDone
-      Entry: 5
-      Data: false
     - Name: Radius
       Entry: 4
-      Data: 0.5
-    - Name: Height
-      Entry: 4
-      Data: 5.4
-    - Name: UnitsPerSecond
-      Entry: 4
-      Data: 4.5
-    - Name: Effects
-      Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 18|Effects.DamageColliderEffect, Core
-    - Name: ModifierValue
-      Entry: 4
-      Data: 10
-    - Name: LimitedHits
-      Entry: 5
-      Data: false
-    - Name: Hits
-      Entry: 3
-      Data: 1
-    - Name: Radius
-      Entry: 4
-      Data: 1
+      Data: 0.3
     - Name: HasLifetime
       Entry: 5
       Data: false
@@ -209,16 +177,16 @@ MonoBehaviour:
       Data: 0
     - Name: TriggerDamageDone
       Entry: 5
-      Data: true
+      Data: false
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 19|Effects.VisualEffectEffect, Core
+      Data: 17|Effects.VisualEffectEffect, Core
     - Name: ModifierValue
       Entry: 4
-      Data: 0.2
+      Data: 0.3
     - Name: AttackEffect
       Entry: 10
       Data: 0
@@ -237,30 +205,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: Mesh
-      Entry: 10
-      Data: 1
-    - Name: Material
-      Entry: 10
-      Data: 2
-    - Name: Scale
-      Entry: 4
-      Data: 0.4
-    - Name: TrailScaleFactor
-      Entry: 4
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -273,25 +220,10 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  districtName: Bomb District
-  icon: {fileID: 21300000, guid: a973648b3fa6b4f4b94d515f5893d6bc, type: 3}
-  description: 'Throws bombs at enemies, dealing AoE damage.
-
-
-    Min size: 3 x
-    3
-
-    Cost: 500'
-  districtType: 0
-  LevelDatas:
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  UpgradeIcons:
-  - {fileID: 21300000, guid: 740f5e97fe6a90547844fb62858ab085, type: 3}
-  - {fileID: 21300000, guid: 612aeacb80233d741a233eb3a8940f4d, type: 3}
-  - {fileID: 21300000, guid: 5c91aec45c337e54285b8f9e8434bec1, type: 3}
-  RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
-    type: 3}
-  districtTargetMesh: {fileID: 5266014834842158584, guid: 99d1aab4a605fb045853208c15ac1eb2,
-    type: 3}
+  LootProbability:
+  - 0.01
+  UnlockedThreshold: 50
+  CreditCost: 20
+  moneyOnDeath: 100
+  explodeOnDeath: 0
+  explosionSize: 0.5

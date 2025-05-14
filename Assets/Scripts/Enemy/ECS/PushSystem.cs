@@ -1,3 +1,4 @@
+using Gameplay;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -15,6 +16,7 @@ namespace DataStructures.Queue.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<GameSpeedComponent>();
             transformLookup = state.GetComponentLookup<LocalTransform>(true);
         }
 
@@ -22,11 +24,12 @@ namespace DataStructures.Queue.ECS
         {
             NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             transformLookup.Update(ref state);
+            float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
             
             new PushJob
             {
                 SpatialGrid = spatialGrid.AsReadOnly(),
-                DeltaTime = SystemAPI.Time.DeltaTime,
+                DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
                 TransformLookup = transformLookup,
                 CellSize = 1,
             }.ScheduleParallel();

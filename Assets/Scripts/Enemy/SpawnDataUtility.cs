@@ -24,6 +24,7 @@ namespace Enemy
             float credits = startCredits + Mathf.Pow(combinedWaveLevel, 1.5f) * Random.Range(0.9f, 1.1f);
             List<int> possibleEnemies = new List<int>();
 
+            Debug.Log("Total Credits: " + credits);
             for (int i = 0; i < enemyUtility.Enemies.Count; i++)
             {
                 if (credits > enemyUtility.Enemies[i].EnemyData.UnlockedThreshold)
