@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a39d9e0847bee9147a0e20c8ac4e2d3e, type: 3}
-  m_Name: Slime Data
+  m_Script: {fileID: 11500000, guid: e365721dcb580ea40b5bdb0b995bd4ec, type: 3}
+  m_Name: Flame Data
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 6245472720060021658, guid: c7b1bdefc0a9bdd4db8c00a84c721c62, type: 3}
+    - {fileID: 4101095332268814299, guid: 1b651097b06af7847962bc7dda1d341b, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -30,7 +30,7 @@ MonoBehaviour:
       Data: 1|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -39,7 +39,7 @@ MonoBehaviour:
       Data: 2|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 5
     - Name: 
       Entry: 8
       Data: 
@@ -48,7 +48,7 @@ MonoBehaviour:
       Data: 3|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 5
     - Name: 
       Entry: 8
       Data: 
@@ -57,7 +57,7 @@ MonoBehaviour:
       Data: 4|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 8
       Data: 
@@ -66,7 +66,7 @@ MonoBehaviour:
       Data: 5|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0
+      Data: 1.75
     - Name: 
       Entry: 8
       Data: 
@@ -75,7 +75,7 @@ MonoBehaviour:
       Data: 6|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -93,7 +93,7 @@ MonoBehaviour:
       Data: 8|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0
+      Data: 2
     - Name: 
       Entry: 8
       Data: 
@@ -102,7 +102,7 @@ MonoBehaviour:
       Data: 9|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 100
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -111,7 +111,7 @@ MonoBehaviour:
       Data: 10|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -120,7 +120,7 @@ MonoBehaviour:
       Data: 11|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -159,16 +159,16 @@ MonoBehaviour:
       Data: 16|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
-      Data: 1
+      Data: 2
     - Name: LimitedHits
       Entry: 5
-      Data: true
+      Data: false
     - Name: Hits
       Entry: 3
       Data: 1
     - Name: Radius
       Entry: 4
-      Data: 0.3
+      Data: 1
     - Name: HasLifetime
       Entry: 5
       Data: false
@@ -177,7 +177,7 @@ MonoBehaviour:
       Data: 0
     - Name: TriggerDamageDone
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -186,16 +186,16 @@ MonoBehaviour:
       Data: 17|Effects.VisualEffectEffect, Core
     - Name: ModifierValue
       Entry: 4
-      Data: 0.3
+      Data: 1
     - Name: AttackEffect
       Entry: 10
       Data: 0
     - Name: spawnAtUnitOrigin
       Entry: 5
-      Data: false
+      Data: true
     - Name: orientEffectToAttackPosition
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -220,10 +220,25 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  LootProbability:
-  - 0.01
-  UnlockedThreshold: 0
-  CreditCost: 1
-  moneyOnDeath: 5
-  explodeOnDeath: 1
-  explosionSize: 0.5
+  districtName: Flame District
+  icon: {fileID: 21300000, guid: c4396d10cbb0c2b48abd871ce597c62d, type: 3}
+  description: 'Burns enemies with fire, dealing AoE damage and applies <b>Burn</b>.
+
+
+    Size:
+    3 x 3
+
+    Cost: 500'
+  districtType: 1
+  LevelDatas:
+  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
+  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
+  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
+  UpgradeIcons:
+  - {fileID: 21300000, guid: 740f5e97fe6a90547844fb62858ab085, type: 3}
+  - {fileID: 21300000, guid: 612aeacb80233d741a233eb3a8940f4d, type: 3}
+  - {fileID: 21300000, guid: 5c91aec45c337e54285b8f9e8434bec1, type: 3}
+  RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
+    type: 3}
+  districtTargetMesh: {fileID: 5266014834842158584, guid: 99d1aab4a605fb045853208c15ac1eb2,
+    type: 3}

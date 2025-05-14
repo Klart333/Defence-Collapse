@@ -864,4 +864,140 @@ namespace Buildings.District
 
     #endregion
 
+     #region Flame
+     public class FlameState : DistrictState
+     { 
+         private readonly TowerData flameData;
+
+         private GameObject rangeIndicator;
+         private bool selected;
+         
+         private readonly int2[] corners = // Top left, Top right, bottom left, bottom right 
+         {
+             new int2(-1, 1),
+             new int2(1, 1),
+             new int2(-1, -1),
+             new int2(1, -1),
+         };
+         
+         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
+         protected override bool UseTargetMeshes => true;
+         protected override float AttackAngle => 360;
+         public override Attack Attack { get; }
+         
+         public FlameState(DistrictData districtData, TowerData flameData, Vector3 position, int key) : base(districtData, position, key)
+         {
+             this.flameData = flameData;
+ 
+             CreateStats();
+             SpawnEntities();
+ 
+             Attack = new Attack(flameData.BaseAttack);
+             stats.Range.OnValueChanged += RangeChanged;
+         }
+         
+         protected override List<QueryChunk> GetEntityChunks(out List<Vector2> offsets)
+         {
+             List<QueryChunk> chunks = new List<QueryChunk>();
+             offsets = new List<Vector2>();
+
+             foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
+             {
+                 for (int i = 0; i < chunk.AdjacentChunks.Length; i++)
+                 {
+                     if (i is 2 or 3 || (chunk.AdjacentChunks[i] != null && chunk.AdjacentChunks[i].PrototypeInfoData == chunk.PrototypeInfoData)) continue;
+                    
+                     chunks.Add(chunk);
+                     offsets.Add( i switch
+                     {
+                         0 => new Vector2(0.25f, 0),
+                         1 => new Vector2(-0.25f, 0),
+                         4 => new Vector2(0, 0.25f),
+                         5 => new Vector2(0, -0.25f),
+                         _ => throw new ArgumentOutOfRangeException()
+                     });
+                 }
+             }
+
+             return chunks;
+         }
+        
+         protected override DistrictTargetMesh GetTargetMesh(Vector3 position, Vector2 offset)
+         {
+             Vector3 dir = (offset.x, offset.y) switch
+             {
+                 (x: > 0, y: 0) => Vector3.right,
+                 (x: < 0, y: 0) => Vector3.left,
+                 (x: 0, y: > 0) => Vector3.forward,
+                 (x: 0, y: < 0) => Vector3.back,
+                 _ => throw new ArgumentOutOfRangeException()
+             };
+             dir.y -= 0.2f;
+             Quaternion rot = Quaternion.LookRotation(dir.normalized);
+             return flameData.DistrictTargetMesh.GetAtPosAndRot<DistrictTargetMesh>(position, rot);
+         }
+ 
+         private void RangeChanged()
+         {
+             if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
+             {
+                 rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+             }
+         }
+ 
+         private void CreateStats()
+         {
+             stats = new Stats(flameData.Stats);
+             UpgradeStat healthDamage = new UpgradeStat(stats.HealthDamage, flameData.LevelDatas[0],
+                 "Health Damage",
+                 new string[] { "Increase <b>Health Damage Multiplier</b> by {0}", "Current <b>Health Damage Multiplier</b>: <color=green>{0}</color>x" },
+                 flameData.UpgradeIcons[0]);
+             UpgradeStat armorDamage = new UpgradeStat(stats.ArmorDamage, flameData.LevelDatas[1],
+                 "Armor Damage",
+                 new string[] { "Increase <b>Armor Damage Multiplier</b> by {0}", "Current <b>Armor Damage Multiplier</b>: <color=yellow>{0}</color>x" },
+                 flameData.UpgradeIcons[1]);
+             UpgradeStat shieldDamage = new UpgradeStat(stats.ShieldDamage, flameData.LevelDatas[2],
+                 "Shield Damage",
+                 new string[] { "Increase <b>Shield Damage Multiplier</b> by {0}", "Current <b>Shield Damage Multiplier</b>: <color=blue>{0}</color>x" },
+                 flameData.UpgradeIcons[2]);
+ 
+             UpgradeStats.Add(healthDamage);
+             UpgradeStats.Add(armorDamage);
+             UpgradeStats.Add(shieldDamage);
+         }
+         
+         public override void OnSelected(Vector3 pos)
+         {
+             if (selected) return;
+             
+             selected = true;
+             rangeIndicator = flameData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
+             rangeIndicator.transform.position = pos;
+             rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+             rangeIndicator.gameObject.SetActive(true);
+         }
+ 
+         public override void OnDeselected()
+         {
+             selected = false;
+             
+             if (rangeIndicator != null)
+             {
+                 rangeIndicator.SetActive(false);
+                 rangeIndicator = null;
+             }
+         }
+ 
+         public override void Update()
+         {
+             UpdateEntities();
+         }
+         
+         public override void Die()
+         {
+ 
+         }
+     }
+     
+     #endregion
 }

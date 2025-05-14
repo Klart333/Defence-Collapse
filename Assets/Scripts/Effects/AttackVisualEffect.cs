@@ -1,13 +1,35 @@
+using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
+using UnityEngine.VFX;
 using DG.Tweening;
 using UnityEngine;
+using Gameplay;
 
 public class AttackVisualEffect : PooledMonoBehaviour
 {
+    [Title("Visual Effect")]
+    [SerializeField]
+    private bool hasVisualEffect;
+
+    [SerializeField, ShowIf(nameof(hasVisualEffect))]
+    private VisualEffect visualEffect;
+
+    [SerializeField, ShowIf(nameof(hasVisualEffect))]
+    private bool setVisualEffectToGameSpeed;
+    
+    private IGameSpeed gameSpeed;
+    
     private Vector3 originalScale;
 
     private void Awake()
     {
         originalScale = transform.localScale;
+        GetGameSpeed().Forget();
+    }
+
+    private async UniTaskVoid GetGameSpeed()
+    {
+        gameSpeed = await GameSpeedManager.Get();
     }
 
     protected override void OnDisable()
@@ -28,17 +50,20 @@ public class AttackVisualEffect : PooledMonoBehaviour
         transform.localScale = originalScale;
     }
 
-    public AttackVisualEffect Spawn(Vector3 pos, Quaternion rot, float scale, float lifetime = 1)
+    private void Update()
     {
-        AttackVisualEffect gm = GetAtPosAndRot<AttackVisualEffect>(pos, rot);
-        gm.transform.localScale *= scale;
-        gm.Delay.Lifetime = lifetime;
-
-        return gm;
+        if (setVisualEffectToGameSpeed && !Mathf.Approximately(visualEffect.playRate, gameSpeed.Value))
+        {
+            visualEffect.playRate = gameSpeed.Value;
+        }
     }
 
-    public void OnAttackBreak()
+    public AttackVisualEffect Spawn(Vector3 pos, Quaternion rot, float scale, float lifetime = 1)
     {
-        transform.DOScale(Vector3.zero, 1).SetEase(Ease.InElastic);
+        AttackVisualEffect spawned = GetAtPosAndRot<AttackVisualEffect>(pos, rot);
+        spawned.transform.localScale *= scale;
+        spawned.Delay.Lifetime = lifetime;
+
+        return spawned;
     }
 }

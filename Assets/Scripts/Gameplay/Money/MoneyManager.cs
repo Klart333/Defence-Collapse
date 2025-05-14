@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Unity.Entities;
 using UnityEngine;
 using System;
 using Juice;
-using Unity.Entities;
 
 namespace Gameplay.Money
 {
@@ -92,9 +92,10 @@ namespace Gameplay.Money
         }
 
 
-        public bool CanPurchase(DistrictType districtType, int chunkAmount, out float cost)
+        public bool CanPurchase(DistrictType districtType, int districtAmount, int extraBuildingAmount, out float cost)
         {
-            cost = districtCostUtility.GetCost(districtType, chunkAmount);
+            cost = districtCostUtility.GetCost(districtType, districtAmount);
+            cost += extraBuildingAmount * BuildingCost;
             if (Money >= cost)
             {
                 return true;

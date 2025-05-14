@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using System;
 
 namespace Gameplay
 {
@@ -8,12 +9,19 @@ namespace Gameplay
     public class DistrictCostUtility : SerializedScriptableObject
     {
         [SerializeField]
-        private Dictionary<DistrictType, int> districtPowerBases = new Dictionary<DistrictType, int>();
+        private Dictionary<DistrictType, CostData> districtPowerBases = new Dictionary<DistrictType, CostData>();
         
-        public float GetCost(DistrictType districtType, int chunkAmount)
+        public float GetCost(DistrictType districtType, int districtAmount)
         {
-            int basePower = districtPowerBases[districtType];
-            return 4 * Mathf.Pow(basePower, Mathf.Sqrt(chunkAmount) - 2); // https://www.desmos.com/calculator
+            CostData costData = districtPowerBases[districtType];
+            return costData.Base + costData.Increase * districtAmount;
         }
+
+        [Serializable]
+        private struct CostData
+        {
+            public float Base;
+            public float Increase;
+        } 
     }
 }

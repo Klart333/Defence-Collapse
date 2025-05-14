@@ -12,7 +12,7 @@ using UnityEngine;
 using TMPro;
 
 namespace Buildings.District
-{
+{/*
     public class UIDistrictPlacementDisplay : SerializedMonoBehaviour
     {
         public static bool Displaying = false; 
@@ -255,7 +255,7 @@ namespace Buildings.District
             return mat == crystalMaterial ? GroundType.Crystal : GroundType.Grass;
         }
 
-        /*public void PlacementConfirmed()
+        public void PlacementConfirmed()
         {
             Bounds bounds = GetPositionBounds(spawnedPlacers.Where(x => x.Selected));
             
@@ -279,7 +279,7 @@ namespace Buildings.District
             HideAnimated();
             districtHandler.BuildDistrict(chunks, currentType);
         }
-        */
+        
         
         private static Bounds GetBounds(IEnumerable<IChunk> chunks)
         {
@@ -396,5 +396,5 @@ namespace Buildings.District
                    vec.x >= Min.x && vec.x <= Max.x 
                 && vec.y >= Min.y && vec.y <= Max.y;
         }
-    }
+    }*/
 }

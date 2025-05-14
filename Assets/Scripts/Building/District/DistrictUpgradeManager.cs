@@ -17,6 +17,9 @@ namespace Buildings.District
         private TowerData bombData;
 
         [SerializeField]
+        private TowerData flameData;
+
+        [SerializeField]
         private TowerData mineData;
 
         [SerializeField]
@@ -41,6 +44,7 @@ namespace Buildings.District
         public List<EffectModifier> ModifierEffects => modifierEffectsToSpawn;
         public TowerData ArcherData => archerData;
         public TowerData BombData => bombData;
+        public TowerData FlameData => flameData;
         public TowerData MineData => mineData;
         public TowerData TownHallData => townHallData;
 

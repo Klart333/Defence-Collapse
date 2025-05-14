@@ -118,6 +118,7 @@ public class UIDistrictUpgrade : MonoBehaviour
             MineState => "Mine District",
             BombState => "Bomb District",
             ArcherState => "Archer District",
+            FlameState => "Flame District",
 
             _ => throw new ArgumentOutOfRangeException()
         };

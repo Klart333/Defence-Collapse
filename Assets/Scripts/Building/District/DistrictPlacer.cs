@@ -9,6 +9,9 @@ using Unity.Mathematics;
 using System.Linq;
 using UnityEngine;
 using System;
+using Gameplay;
+using Gameplay.Money;
+using TMPro;
 
 namespace Buildings.District
 {
@@ -16,6 +19,7 @@ namespace Buildings.District
     {
         public static bool Placing;
         
+        [Title("District")]
         [SerializeField]
         private DistrictGenerator districtGenerator;
         
@@ -28,6 +32,19 @@ namespace Buildings.District
         [SerializeField]
         private Dictionary<DistrictType, PrototypeInfoData> districtInfoData = new Dictionary<DistrictType, PrototypeInfoData>();
 
+        [Title("Cost")]
+        [SerializeField]
+        private TextMeshProUGUI costText;
+        
+        [SerializeField]
+        private DistrictCostUtility districtCostData;
+
+        [SerializeField]
+        private Color affordableColor;
+        
+        [SerializeField]
+        private Color notAffordableColor;
+        
         [Title("Debug")]
         [SerializeField]
         private bool verbose = true;
@@ -39,9 +56,11 @@ namespace Buildings.District
         
         private DistrictType districtType;
         private InputManager inputManager;
+        private MoneyManager moneyManager;
         private Vector3 offset;
         private Camera cam;
 
+        private int additionalBuildingAmount = 0;
         private bool isPlacementValid;
         private int districtRadius;
 
@@ -53,8 +72,14 @@ namespace Buildings.District
             Events.OnDistrictClicked += DistrictClicked;
 
             GetInput().Forget();
+            GetMoney().Forget();
         }
 
+        private async UniTaskVoid GetMoney()
+        {
+            moneyManager = await MoneyManager.Get();
+        }
+        
         private async UniTaskVoid GetInput()
         {
             inputManager = await InputManager.Get();
@@ -94,22 +119,12 @@ namespace Buildings.District
 
             if (requireQueryWalls)
             {
-                Dictionary<ChunkIndex, IBuildable> buildings = buildingGenerator.Query(buildingIndexes.ToList(), builtIndexes);
-                bool isValid = false;
-                foreach (IBuildable buildable in buildings.Values)
-                {
-                    buildable.ToggleIsBuildableVisual(true, false);
-                    if (buildable.MeshRot.MeshIndex != -1)
-                    {
-                        isValid = true;
-                    }
-                }
-
-                if (!isValid)
-                {
-                    SetInvalid();
-                    return;
-                }
+                if (!QueryWalls()) return;
+            }
+            else
+            {
+                additionalBuildingAmount = 0;
+                buildingGenerator.RevertQuery();
             }
             
             Dictionary<ChunkIndex, IBuildable> districts = districtGenerator.Query(districtChunkIndexes, 2, districtInfoData[districtType]);
@@ -133,13 +148,48 @@ namespace Buildings.District
             }
 
             isPlacementValid = true;
+            UpdateCost();
+        }
 
-            void SetInvalid()
+        private bool QueryWalls()
+        {
+            Dictionary<ChunkIndex, IBuildable> buildings = buildingGenerator.Query(buildingIndexes.ToList(), builtIndexes);
+            additionalBuildingAmount = builtIndexes.Count;
+            bool isValid = false;
+            foreach (IBuildable buildable in buildings.Values)
             {
-                isPlacementValid = false;
-                buildingGenerator.RevertQuery();
-                districtGenerator.RevertQuery();
+                buildable.ToggleIsBuildableVisual(true, false);
+                if (buildable.MeshRot.MeshIndex != -1)
+                {
+                    isValid = true;
+                }
             }
+
+            if (isValid) return true;
+            
+            SetInvalid();
+            return false;
+
+        }
+        
+        private void SetInvalid()
+        {
+            isPlacementValid = false;
+            buildingGenerator.RevertQuery();
+            districtGenerator.RevertQuery();
+        }
+        
+        private void UpdateCost()
+        {
+            int amount = districtHandler.GetDistrictAmount(districtType);
+            float cost = districtCostData.GetCost(districtType, amount);
+            cost += additionalBuildingAmount * moneyManager.BuildingCost;
+            if (cost <= 0) return;
+
+            costText.text = $"{cost:N0}g";
+
+            costText.color = moneyManager.Money >= cost ? affordableColor : notAffordableColor;
+            costText.gameObject.SetActive(true);
         }
 
         private bool ChunkIndexesAreIdentical(int2[,] lastDistrictChunkIndexes, int2[,] districtChunkIndexes)
@@ -268,6 +318,8 @@ namespace Buildings.District
         {
             buildingGenerator.RevertQuery();
             districtGenerator.RevertQuery();
+            costText.gameObject.SetActive(false);
+
             Placing = false;
         }
 
@@ -278,11 +330,21 @@ namespace Buildings.District
                 return;
             }
 
+            int amount = districtHandler.GetDistrictAmount(districtType);
+            if (!moneyManager.CanPurchase(districtType, amount, additionalBuildingAmount, out float cost))
+            {
+                return;
+            }
+
+            moneyManager.RemoveMoney(cost);
+            
             PrototypeInfoData protInfo = districtInfoData[districtType];
             HashSet<QueryChunk> chunks = districtGenerator.QueriedChunks.Where(x => x.PrototypeInfoData == protInfo).ToHashSet();
             districtHandler.AddBuiltDistrict(chunks, districtType);
             districtGenerator.Place();
             buildingGenerator.Place();
+            costText.gameObject.SetActive(false);
+
             Placing = false;
         }
         

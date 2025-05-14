@@ -1,9 +1,9 @@
 ﻿using Sirenix.OdinInspector;
 using Sirenix.Serialization;
-using System;
-using Gameplay;
-using Juice;
 using UnityEngine;
+using Gameplay;
+using System;
+using Juice;
 
 [InlineEditor, CreateAssetMenu(fileName = "New Tower Data", menuName = "Building/Tower Data")]
 public class TowerData : SerializedScriptableObject

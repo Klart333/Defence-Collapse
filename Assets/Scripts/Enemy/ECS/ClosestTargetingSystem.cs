@@ -70,6 +70,7 @@ namespace DataStructures.Queue.ECS
             int radiusCells = Mathf.CeilToInt(range / CellSize);
             float rangeSq = range * range;
             float maxCellDist = range + CellSize * 1.414f; // Diagonal of cell
+            float maxCellDistSq = maxCellDist * maxCellDist;
 
             // Common target finding variables
             float bestDistSq = rangeSq;
@@ -85,7 +86,10 @@ namespace DataStructures.Queue.ECS
                     
                     // Quick distance check at cell level
                     float2 cellCenter = ((float2)cell + 0.5f) * CellSize;
-                    if (math.lengthsq(cellCenter - towerPosition) > maxCellDist * maxCellDist)
+                    float2 toCell = cellCenter - towerPosition;
+                    float cellDistSq = math.lengthsq(toCell);
+                    if (cellDistSq > maxCellDistSq
+                        || cellDistSq > bestDistSq)
                         continue;
 
                     if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) 
@@ -108,7 +112,7 @@ namespace DataStructures.Queue.ECS
             else
             {
                 // Directional cone path
-                float2 direction = math.normalize(enemyTargetAspect.DirectionComponent.ValueRO.Direction);
+                float2 direction = enemyTargetAspect.DirectionComponent.ValueRO.Direction;
                 float halfAngleRad = math.radians(enemyTargetAspect.DirectionComponent.ValueRO.Angle * 0.5f);
                 float cosHalfAngle = math.cos(halfAngleRad);
                 float2 coneLeft = math.mul(float2x2.Rotate(halfAngleRad), direction);
@@ -123,7 +127,8 @@ namespace DataStructures.Queue.ECS
                     float cellDistSq = math.lengthsq(toCell);
 
                     // Cell-level culling
-                    if (cellDistSq > maxCellDist * maxCellDist)
+                    if (cellDistSq > maxCellDistSq
+                        || cellDistSq > bestDistSq)
                         continue;
 
                     if (math.lengthsq(toCell) > 0.001f) // Avoid division by zero
@@ -146,7 +151,7 @@ namespace DataStructures.Queue.ECS
                     do
                     {
                         RefRO<LocalTransform> enemyTransform = TransformLookup.GetRefRO(enemy);
-                        float2 enemyPosition = enemyTransform.ValueRO.Position.xz;
+                        float2 enemyPosition = enemyTransform.ValueRO.Position.xz + direction;
                         float2 toEnemy = enemyPosition - towerPosition;
                         float distSq = math.lengthsq(toEnemy);
 

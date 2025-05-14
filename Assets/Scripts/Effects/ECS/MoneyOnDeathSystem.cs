@@ -31,22 +31,22 @@ namespace Effects.ECS
             Entity moneyPrefab = SystemAPI.GetSingleton<MoneyPrefabComponent>().MoneyPrefab;
             float scale = state.EntityManager.GetComponentData<LocalTransform>(moneyPrefab).Scale; 
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            NativeArray<float> moneyArray = new NativeArray<float>(1, Allocator.TempJob);
+            NativeReference<float> moneyArray = new NativeReference<float>(0, Allocator.TempJob);
 
-            new MoneyOnDeathJob
+            state.Dependency = new MoneyOnDeathJob
             {
                 MoneyPrefab = moneyPrefab,
-                ECB = ecb.AsParallelWriter(),
+                ECB = ecb,
                 Scale = scale,
                 BaseSeed = UnityEngine.Random.Range(0, 100000),
                 TotalMoney = moneyArray,
-            }.ScheduleParallel();
+            }.Schedule(state.Dependency);
             
             state.Dependency.Complete();
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
 
-            SystemAPI.SetSingleton(new MoneyToAddComponent { Money = moneyArray[0] });
+            SystemAPI.SetSingleton(new MoneyToAddComponent { Money = moneyArray.Value });
             moneyArray.Dispose();
         }
 
@@ -60,29 +60,29 @@ namespace Effects.ECS
     [BurstCompile, WithAll(typeof(DeathTag))]
     public partial struct MoneyOnDeathJob : IJobEntity
     {
-        public NativeArray<float> TotalMoney;
+        public NativeReference<float> TotalMoney;
         public Entity MoneyPrefab;
         public float Scale;
         public int BaseSeed;
         
-        public EntityCommandBuffer.ParallelWriter ECB;
+        public EntityCommandBuffer ECB;
         
         public void Execute([EntityIndexInChunk] int sortKey, in LocalTransform localTransform, in MoneyOnDeathComponent money)
         {
-            TotalMoney[0] += money.Amount;
+            TotalMoney.Value += money.Amount;
 
             for (int i = 0; i < money.Amount; i++)
             {
-                Entity spawnedMoney = ECB.Instantiate(sortKey, MoneyPrefab);
+                Entity spawnedMoney = ECB.Instantiate(MoneyPrefab);
                 Random random = Random.CreateFromIndex((uint)(BaseSeed + sortKey + i));
-                ECB.SetComponent(sortKey, spawnedMoney, new RandomComponent { Random = random});
-                ECB.SetComponent(sortKey, spawnedMoney, new LocalTransform
+                ECB.SetComponent(spawnedMoney, new RandomComponent { Random = random});
+                ECB.SetComponent(spawnedMoney, new MovementDirectionComponent { Direction = random.NextFloat3Direction() });
+                ECB.SetComponent(spawnedMoney, new LocalTransform
                 {
                     Position = localTransform.Position + random.NextFloat3(new float3(-1, 1f, -1), new float3(1, 2f, 1)) * Scale * 5,
                     Rotation = random.NextQuaternionRotation(),
                     Scale = Scale
                 });
-                ECB.SetComponent(sortKey, spawnedMoney, new MovementDirectionComponent { Direction = random.NextFloat3Direction() });
             }
         }
     }

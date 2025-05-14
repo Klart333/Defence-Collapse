@@ -32,7 +32,7 @@ MonoBehaviour:
       Data: 1|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 3
+      Data: 8
     - Name: 
       Entry: 8
       Data: 
@@ -41,7 +41,7 @@ MonoBehaviour:
       Data: 2|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 6
+      Data: 12
     - Name: 
       Entry: 8
       Data: 
@@ -50,7 +50,7 @@ MonoBehaviour:
       Data: 3|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 5
     - Name: 
       Entry: 8
       Data: 
@@ -191,7 +191,7 @@ MonoBehaviour:
       Data: 18|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
-      Data: 2
+      Data: 10
     - Name: LimitedHits
       Entry: 5
       Data: false
@@ -222,6 +222,12 @@ MonoBehaviour:
     - Name: AttackEffect
       Entry: 10
       Data: 0
+    - Name: spawnAtUnitOrigin
+      Entry: 5
+      Data: false
+    - Name: orientEffectToAttackPosition
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -269,13 +275,13 @@ MonoBehaviour:
       Data: 
   districtName: Bomb District
   icon: {fileID: 21300000, guid: a973648b3fa6b4f4b94d515f5893d6bc, type: 3}
-  description: 'Throws bombs at enemies, dealing AoE damage. Great for clustered,
-    slow, or weak enemies.
+  description: 'Throws bombs at enemies, dealing AoE damage.
 
 
-    Min size: 3 x 3
+    Min size: 3 x
+    3
 
-    Cost: 5*'
+    Cost: 500'
   districtType: 0
   LevelDatas:
   - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}

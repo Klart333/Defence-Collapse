@@ -59,7 +59,7 @@ MonoBehaviour:
       Data: 4|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 0.8
     - Name: 
       Entry: 8
       Data: 
@@ -68,7 +68,7 @@ MonoBehaviour:
       Data: 5|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 10
+      Data: 8
     - Name: 
       Entry: 8
       Data: 
@@ -161,7 +161,7 @@ MonoBehaviour:
       Data: 16|Effects.ArchedDamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
-      Data: 1
+      Data: 5
     - Name: LimitedHits
       Entry: 5
       Data: true
@@ -195,6 +195,12 @@ MonoBehaviour:
     - Name: AttackEffect
       Entry: 10
       Data: 0
+    - Name: spawnAtUnitOrigin
+      Entry: 5
+      Data: false
+    - Name: orientEffectToAttackPosition
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -250,3 +256,4 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b5bf9ae6f97b5e548abe324f059a1523, type: 3}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
+  districtTargetMesh: {fileID: 0}

@@ -59,7 +59,7 @@ namespace Buildings.District
                 DistrictType.Archer => new ArcherState(this, DistrictUpgradeManager.Instance.ArcherData, position, key),
                 DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, position, key),
                 DistrictType.Mine => new MineState(this, DistrictUpgradeManager.Instance.MineData, position, key),
-                //DistrictType.Church => expr,
+                DistrictType.Flame => new FlameState(this, DistrictUpgradeManager.Instance.FlameData, position, key),
                 _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
             };
 

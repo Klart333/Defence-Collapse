@@ -976,14 +976,27 @@ namespace Effects
         [Title("VFX")]
         [AssetSelector]
         public AttackVisualEffect AttackEffect;
+
+        [Title("Position")]
+        [SerializeField]
+        private bool spawnAtUnitOrigin;
+        
+        [SerializeField, ShowIf(nameof(spawnAtUnitOrigin))]
+        private bool orientEffectToAttackPosition;
         
         public bool IsDamageEffect => false;
 
         public void Perform(IAttacker unit)
         {
-            Vector3 pos = unit.AttackPosition;
+            Vector3 pos = spawnAtUnitOrigin 
+                    ? unit.OriginPosition
+                    : unit.AttackPosition;
+            
+            Quaternion rot = orientEffectToAttackPosition 
+                ? Quaternion.LookRotation((unit.AttackPosition - unit.OriginPosition).normalized) 
+                : Quaternion.identity;
 
-            AttackEffect.Spawn(pos, Quaternion.identity, ModifierValue);
+            AttackEffect.Spawn(pos, rot, ModifierValue);
         }
 
         public void Revert(IAttacker unit)

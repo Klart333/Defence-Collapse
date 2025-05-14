@@ -31,6 +31,8 @@ namespace Buildings.District
         [OdinSerialize, ReadOnly]
         private readonly List<DistrictData> uniqueDistricts = new List<DistrictData>();
 
+        private readonly Dictionary<DistrictType, int> districtAmounts = new Dictionary<DistrictType, int>();
+        
         private DistrictData townHallDistrict;
 
         private int districtKey;
@@ -41,6 +43,7 @@ namespace Buildings.District
         private void OnEnable()
         {
             Events.OnWallsDestroyed += OnWallsDestroyed;
+            Events.OnDistrictBuilt += OnDistrictBuilt;
             Events.OnWaveStarted += OnWaveStarted;
             Events.OnWaveEnded += OnWaveEnded;
             
@@ -50,6 +53,7 @@ namespace Buildings.District
         private void OnDisable()
         {
             Events.OnWallsDestroyed -= OnWallsDestroyed;
+            Events.OnDistrictBuilt -= OnDistrictBuilt;
             Events.OnWaveStarted -= OnWaveStarted;
             Events.OnWaveEnded -= OnWaveEnded;
             
@@ -243,6 +247,19 @@ namespace Buildings.District
         {
             int2 index = chunk.ChunkIndex.xz;
             return districts.TryGetValue(index, out districtData);
+        }
+        
+        private void OnDistrictBuilt(DistrictType districtType)
+        {
+            if (!districtAmounts.TryAdd(districtType, 1))
+            {
+                districtAmounts[districtType]++;
+            }
+        }
+        
+        public int GetDistrictAmount(DistrictType districtType)
+        {
+            return districtAmounts.GetValueOrDefault(districtType, 0);
         }
     }
 }
