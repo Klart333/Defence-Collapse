@@ -151,12 +151,7 @@ namespace Effects.ECS
                 if (distSq > radiusSq) continue;
 
                 // COLLIDE
-                ECB.AddComponent(sortKey, enemy, new PendingDamageComponent
-                {
-                    HealthDamage = colliderAspect.DamageComponent.ValueRO.HealthDamage,
-                    ArmorDamage = colliderAspect.DamageComponent.ValueRO.ArmorDamage,
-                    ShieldDamage = colliderAspect.DamageComponent.ValueRO.ShieldDamage,
-                });
+                ECB.AddComponent(sortKey, enemy, GetDamage(colliderAspect));
                 CollisionQueue.Enqueue(entity);
 
                 if (colliderAspect.DamageComponent.ValueRO.HasLimitedHits)
@@ -171,6 +166,19 @@ namespace Effects.ECS
             } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
 
             return false;
+        }
+
+        private static PendingDamageComponent GetDamage(ColliderAspect colliderAspect)
+        {
+            bool isCrit = colliderAspect.RandomComponent.ValueRW.Random.NextFloat() < colliderAspect.CritComponent.ValueRO.CritChance;
+            float critMultiplier = isCrit ? colliderAspect.CritComponent.ValueRO.CritDamage : 1;
+            return new PendingDamageComponent
+            {
+                HealthDamage = colliderAspect.DamageComponent.ValueRO.HealthDamage * critMultiplier,
+                ArmorDamage = colliderAspect.DamageComponent.ValueRO.ArmorDamage * critMultiplier,
+                ShieldDamage = colliderAspect.DamageComponent.ValueRO.ShieldDamage * critMultiplier,
+                IsCrit = isCrit,
+            };
         }
     }
 }

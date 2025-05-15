@@ -15,18 +15,16 @@ public class EnemyData : SerializedScriptableObject
     [OdinSerialize, NonSerialized]
     public Attack BaseAttack;
 
-    [Title("Loot")]
-    public List<float> LootProbability;
-
     [Title("Spawning")]
     public int UnlockedThreshold = 0;
     
     public int CreditCost = 1;
 
-    [Title("OnDeath")]
+    [Title("OnDeath", "Money")]
     [SerializeField]
     private float moneyOnDeath = 5;
     
+    [Title("OnDeath", "Explosion")]
     [SerializeField]
     private bool explodeOnDeath = false;
 
@@ -34,10 +32,19 @@ public class EnemyData : SerializedScriptableObject
     [SerializeField]
     private float explosionSize = 0.5f;
     
+    [Title("OnDeath", "Loot")]
+    [SerializeField]
+    private bool canDropLoot;
     
+    [ShowIf(nameof(canDropLoot))]
+    [SerializeField]
+    private float dropLootChance = 0.5f;
+    
+    public float DropLootChance => dropLootChance;
     public bool ExplodeOnDeath => explodeOnDeath;
     public float ExplosionSize => explosionSize;
     public float MoneyOnDeath => moneyOnDeath;
+    public bool CanDropLoot => canDropLoot;
 
     [TitleGroup("Stats")]
     [Button]
@@ -54,8 +61,8 @@ public class EnemyData : SerializedScriptableObject
             
             MovementSpeed = Stats.MovementSpeed != null ? new Stat(Stats.MovementSpeed.Value) : new Stat(1),
             
-            CritChance = Stats.CritChance != null ? new Stat(Stats.CritChance.Value) : new Stat(1),
-            CritMultiplier = Stats.CritMultiplier != null ? new Stat(Stats.CritMultiplier.Value) : new Stat(1),
+            CritChance = Stats.CritChance != null ? new Stat(Stats.CritChance.Value) : new Stat(0.01f),
+            CritMultiplier = Stats.CritMultiplier != null ? new Stat(Stats.CritMultiplier.Value) : new Stat(2),
             
             MaxHealth = Stats.MaxHealth != null ? new Stat(Stats.MaxHealth.Value) : new Stat(1),
             MaxArmor = Stats.MaxArmor != null ? new Stat(Stats.MaxArmor.Value) : new Stat(1),

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Loot
 {
-    [InlineEditor, CreateAssetMenu(fileName = "New Loot", menuName = "Loot")]
+    [InlineEditor, CreateAssetMenu(fileName = "New Loot", menuName = "Loot/Loot Data")]
     public class LootData : SerializedScriptableObject
     {
         [Title("Rarity")]

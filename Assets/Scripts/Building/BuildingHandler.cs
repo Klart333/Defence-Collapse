@@ -254,7 +254,6 @@ public class BuildingHandler : SerializedMonoBehaviour
         
         if (destroyedIndexes.Count > 0)
         {
-            Debug.Log("On Walls Destroyed");
             Events.OnWallsDestroyed?.Invoke(destroyedIndexes);
         }
     }

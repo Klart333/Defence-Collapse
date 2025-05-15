@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using WaveFunctionCollapse;
 using Buildings.District;
+using Unity.Mathematics;
 using UnityEngine.Events;
 
 public static class Events
@@ -22,6 +23,11 @@ public static class Events
     public static UnityAction<TowerData> OnDistrictUnlocked;
     
     public static UnityAction OnGameReset;
+}
+
+public static class ECSEvents
+{
+    public static UnityAction<float3> OnLootSpawn;
 }
 
 public static class UIEvents

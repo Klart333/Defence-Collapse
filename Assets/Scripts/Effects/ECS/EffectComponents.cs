@@ -20,6 +20,12 @@ namespace Effects.ECS
 		public float ShieldDamage;
 		public float ArmorDamage;
 	}
+
+	public struct CritComponent : IComponentData
+	{
+		public float CritChance;
+		public float CritDamage;
+	}
 	
 	public struct SimpleDamageComponent : IComponentData
 	{
@@ -30,6 +36,7 @@ namespace Effects.ECS
 	{
 		public float DamageTaken;
 		public Health.HealthType DamageTakenType;
+		public bool IsCrit;
 	}
 
 	public struct PositionComponent : IComponentData
@@ -63,6 +70,7 @@ namespace Effects.ECS
 		public float HealthDamage;
 		public float ArmorDamage;
 		public float ShieldDamage;
+		public bool IsCrit; // Can make into flag for different effects
 	}
 
 	public struct MaxHealthComponent : IComponentData

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: beb9e761c9c7d41449d8780edcd6a54c, type: 3}
-  m_Name: Big Gold Loot
+  m_Name: Gold Loot
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -23,20 +23,19 @@ MonoBehaviour:
     SerializationNodes:
     - Name: LootEffects
       Entry: 7
-      Data: 0|System.Collections.Generic.List`1[[ILootEffect, Assembly-CSharp]],
-        mscorlib
+      Data: 0|System.Collections.Generic.List`1[[Loot.ILootEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1|GoldLoot, Assembly-CSharp
+      Data: 1|Loot.GoldLoot, Core
     - Name: Gold
       Entry: 3
-      Data: 30
+      Data: 250
     - Name: GradeMultiplier
       Entry: 4
-      Data: 2
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -46,4 +45,4 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  Grade: 2
+  Grade: 1

@@ -69,7 +69,8 @@ namespace Effects.ECS
             ECB.AddComponent(index, entity, new DamageTakenComponent
             {
                 DamageTaken = damageTaken,
-                DamageTakenType = damageType
+                DamageTakenType = damageType,
+                IsCrit = pendingDamage.IsCrit,
             });
             
             if (health.Health <= 0)

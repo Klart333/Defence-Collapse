@@ -22,7 +22,8 @@ namespace TextMeshDOTS.Authoring
     [BurstCompile, UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public partial struct DamageNumberSystem : ISystem
     {
-        private BlobAssetReference<FontBlob> singleFontReference;
+        private BlobAssetReference<FontBlob> normalFontReference;
+        private BlobAssetReference<FontBlob> boldFontReference;
         private EntityArchetype textRenderArchetype;
         private TextBaseConfiguration textBaseConfiguration;
         private RenderFilterSettings renderFilterSettings;
@@ -32,8 +33,11 @@ namespace TextMeshDOTS.Authoring
         {
             textRenderArchetype = GetSingleFontTextArchetype(ref state);
 
-            FontRequest fontRequest = GetFontRequest();
-            singleFontReference = FontBlobber.GetRuntimeFontBlob(fontRequest);
+            FontRequest fontRequest = GetFontRequest(FontWeight.Normal);
+            FontRequest fontRequestBold = GetFontRequest(FontWeight.Bold);
+            normalFontReference = FontBlobber.GetRuntimeFontBlob(fontRequest);
+            boldFontReference = FontBlobber.GetRuntimeFontBlob(fontRequestBold);
+            
             textBaseConfiguration = new TextBaseConfiguration
             {
                 fontSize = 1.6f,
@@ -46,16 +50,13 @@ namespace TextMeshDOTS.Authoring
                 lineJustification = HorizontalAlignmentOptions.Left,
                 verticalAlignment = VerticalAlignmentOptions.TopBase,
                 isOrthographic = false,
-                
-                fontWidth = fontRequest.fontWidth,
-                fontWeight = fontRequest.fontWeight,
             };
             
-            var layer = 1;
+            const int layer = 1;
             renderFilterSettings = new RenderFilterSettings
             {
                 Layer = layer,
-                RenderingLayerMask = (uint)(1 << layer),
+                RenderingLayerMask = 1 << layer,
                 ShadowCastingMode = ShadowCastingMode.Off,
                 ReceiveShadows = false,
                 MotionMode = MotionVectorGenerationMode.ForceNoMotion,
@@ -71,7 +72,8 @@ namespace TextMeshDOTS.Authoring
             state.Dependency = new SpawnNumbersJob
             {
                 ECB = ecb.AsParallelWriter(),
-                SingleFontReference = singleFontReference, 
+                NormalFontReference = normalFontReference, 
+                BoldFontReference = boldFontReference,
                 TextBaseConfiguration = textBaseConfiguration,
                 RenderFilterSettings = renderFilterSettings,
                 TextRenderControl = textRenderControl,
@@ -87,10 +89,10 @@ namespace TextMeshDOTS.Authoring
 
         public void OnDestroy(ref SystemState state)
         {
-            if (singleFontReference.IsCreated) singleFontReference.Dispose();
+            if (normalFontReference.IsCreated) normalFontReference.Dispose();
         }
         
-        private FontRequest GetFontRequest()
+        private FontRequest GetFontRequest(FontWeight fontWeight)
         {
             //use FontUtility Scriptable Object to extract the following needed information
             //see ReadMe for more details how
@@ -101,7 +103,7 @@ namespace TextMeshDOTS.Authoring
                 fontSubFamily = "Regular",
                 typographicFamily = "",
                 typographicSubfamily = "",
-                fontWeight = FontWeight.Normal,
+                fontWeight = fontWeight,
                 fontWidth = 100,
                 isItalic = false,
                 slant = 0,
@@ -149,7 +151,8 @@ namespace TextMeshDOTS.Authoring
         public TextBaseConfiguration TextBaseConfiguration;
         public TextRenderControl TextRenderControl;
         
-        public BlobAssetReference<FontBlob> SingleFontReference;
+        public BlobAssetReference<FontBlob> NormalFontReference;
+        public BlobAssetReference<FontBlob> BoldFontReference;
         public float3 SpawnOffset;
         public int BaseSeed;
 
@@ -172,9 +175,13 @@ namespace TextMeshDOTS.Authoring
             DynamicBuffer<CalliByte> calliByteBuffer = ECB.AddBuffer<CalliByte>(entityIndex, textEntity);
             CalliString calliString = new CalliString(calliByteBuffer);
             calliString.Append(math.round(damageTaken.DamageTaken * 100) / 100f);
+            if (damageTaken.IsCrit)
+            {
+                calliString.Append('!');
+            }
 
             ECB.SetComponent(entityIndex, textEntity, TextBaseConfiguration);
-            ECB.SetComponent(entityIndex, textEntity, new FontBlobReference { value = SingleFontReference });
+            ECB.SetComponent(entityIndex, textEntity, new FontBlobReference { value = damageTaken.IsCrit ? BoldFontReference : NormalFontReference });
             ECB.SetComponent(entityIndex, textEntity, LocalTransform.FromPosition(transform.Position + SpawnOffset));
             ECB.SetComponent(entityIndex, textEntity, TextRenderControl);
             

@@ -12,7 +12,6 @@ namespace Effects.ECS
     [UpdateAfter(typeof(HealthSystem))]
     public partial struct MoneyOnDeathSystem : ISystem
     {
-        private EntityQuery moneyOnDeathQuery;
         
         [BurstCompile]
         public void OnCreate(ref SystemState state)
@@ -21,8 +20,7 @@ namespace Effects.ECS
             state.RequireForUpdate<MoneyPrefabComponent>();
             
             EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<DeathTag, MoneyOnDeathComponent>();
-            moneyOnDeathQuery = state.GetEntityQuery(builder);
-            state.RequireForUpdate(moneyOnDeathQuery);
+            state.RequireForUpdate(state.GetEntityQuery(builder));
         }
 
         [BurstCompile]

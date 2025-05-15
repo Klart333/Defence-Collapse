@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Gameplay;
 using Unity.Mathematics;
 using VFX.ECS;
+using Random = Unity.Mathematics.Random;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable ConvertToConstant.Global
@@ -282,10 +283,16 @@ namespace Effects
                 Radius = Radius,
             };
             
-            Entity colliderEntity = CreateEntity(pos, colliderComponent, dmgComponent);
+            CritComponent critComponent = new CritComponent
+            {
+                CritChance = unit.Stats.CritChance.Value,
+                CritDamage = unit.Stats.CritMultiplier.Value,
+            };
+            
+            Entity colliderEntity = CreateEntity(pos, colliderComponent, dmgComponent, critComponent);
         }
 
-        private Entity CreateEntity(Vector3 pos, ColliderComponent colliderComponent, DamageComponent dmgComponent)
+        private Entity CreateEntity(Vector3 pos, ColliderComponent colliderComponent, DamageComponent dmgComponent, CritComponent critComponent)
         {
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
@@ -293,10 +300,14 @@ namespace Effects
                 typeof(DamageComponent),
                 typeof(ColliderComponent),
                 typeof(PositionComponent),
+                typeof(RandomComponent),
+                typeof(CritComponent),
             };
 
             Entity spawned = entityManager.CreateEntity(componentTypes);
             entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
+            entityManager.SetComponentData(spawned, new RandomComponent { Random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 100000)) });
+            entityManager.SetComponentData(spawned, critComponent);
             entityManager.SetComponentData(spawned, colliderComponent);
             entityManager.SetComponentData(spawned, dmgComponent);
 
@@ -372,13 +383,15 @@ namespace Effects
                 ComponentType[] componentTypes = {
                     typeof(RotateTowardsVelocityComponent),
                     typeof(ArchedMovementComponent),
+                    typeof(InitTrailComponent),
                     typeof(ColliderComponent),
                     typeof(PositionComponent),
                     typeof(LifetimeComponent),
                     typeof(DamageComponent),
+                    typeof(RandomComponent),
                     typeof(SpeedComponent),
                     typeof(LocalTransform),
-                    typeof(InitTrailComponent),
+                    typeof(CritComponent),
                 };
 
                 Entity spawned = entityManager.CreateEntity(componentTypes);
@@ -388,6 +401,13 @@ namespace Effects
                 entityManager.SetComponentData(spawned, new ColliderComponent { Radius = Radius });
                 entityManager.SetComponentData(spawned, new InitTrailComponent { ScaleFactor = TrailScaleFactor });
 
+                entityManager.SetComponentData(spawned, new RandomComponent { Random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 100000)) });
+                entityManager.SetComponentData(spawned, new CritComponent
+                {
+                    CritChance = unit.Stats.CritChance.Value,
+                    CritDamage = unit.Stats.CritMultiplier.Value,
+                });
+                
                 float3 direction = math.normalize(targetPosition - pos);
                 entityManager.SetComponentData(spawned, new LocalTransform
                 {

@@ -23,17 +23,16 @@ MonoBehaviour:
     SerializationNodes:
     - Name: LootEffects
       Entry: 7
-      Data: 0|System.Collections.Generic.List`1[[ILootEffect, Assembly-CSharp]],
-        mscorlib
+      Data: 0|System.Collections.Generic.List`1[[Loot.ILootEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1|GoldLoot, Assembly-CSharp
+      Data: 1|Loot.GoldLoot, Core
     - Name: Gold
       Entry: 3
-      Data: 3
+      Data: 50
     - Name: GradeMultiplier
       Entry: 4
       Data: 1

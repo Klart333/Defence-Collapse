@@ -1,7 +1,9 @@
-﻿using Sirenix.OdinInspector;
+﻿using System;
 using System.Collections.Generic;
-using Buildings.District;
+using Sirenix.OdinInspector;
+using Unity.Mathematics;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Loot
 {
@@ -9,7 +11,7 @@ namespace Loot
     {
         [Title("Loot Data")]
         [SerializeField]
-        private List<LootData> lootDatas = new List<LootData>();
+        private LootDataUtility lootDataUtility;
 
         [Title("Prefabs")]
         [SerializeField]
@@ -25,17 +27,38 @@ namespace Loot
         {
             base.Awake();
 
-            for (int i = 0; i < lootDatas.Count; i++)
+            SortLootData();
+        }
+
+        private void OnEnable()
+        {
+            ECSEvents.OnLootSpawn += OnLootSpawn;
+        }
+
+        private void OnDisable()
+        {
+            ECSEvents.OnLootSpawn -= OnLootSpawn;
+        }
+        
+        private void SortLootData()
+        {
+            for (int i = 0; i < lootDataUtility.LootDatas.Length; i++)
             {
-                if (GradedLootData.TryGetValue(lootDatas[i].Grade, out List<LootData> value))
+                LootData lootData = lootDataUtility.LootDatas[i];
+                if (GradedLootData.TryGetValue(lootData.Grade, out List<LootData> value))
                 {
-                    value.Add(lootDatas[i]);
+                    value.Add(lootData);
                 }
                 else
                 {
-                    GradedLootData.Add(lootDatas[i].Grade, new List<LootData> { lootDatas[i] });
+                    GradedLootData.Add(lootData.Grade, new List<LootData> { lootData });
                 }
             }
+        }
+
+        private void OnLootSpawn(float3 position)
+        {
+            SpawnLoot(position, 1, 1);
         }
 
         public LootOrb SpawnLoot(Vector3 pos, float scale, int grade)
