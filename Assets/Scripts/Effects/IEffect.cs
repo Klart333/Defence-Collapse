@@ -774,10 +774,10 @@ namespace Effects
 
         public void Perform(IAttacker unit)
         {
-            PerformAsync(unit).Forget();
+            PerformAsync(unit, unit.AttackPosition, unit.OriginPosition).Forget();
         }
 
-        private async UniTaskVoid PerformAsync(IAttacker unit)
+        private async UniTaskVoid PerformAsync(IAttacker unit, Vector3 targetPosition, Vector3 originPosition)
         {
             float timer = repeatFrequency - initialDelay;
             float totalTimer = 0;
@@ -790,13 +790,14 @@ namespace Effects
                 totalTimer += delta;
                 timer += delta;
 
-                if (timer >= repeatFrequency)
+                if (!(timer >= repeatFrequency)) continue;
+                timer = 0;
+                
+                for (int i = 0; i < Effects.Count; i++)
                 {
-                    timer = 0;
-                    for (int i = 0; i < Effects.Count; i++)
-                    {
-                        Effects[i].Perform(unit);
-                    }
+                    unit.OriginPosition = originPosition;                    
+                    unit.AttackPosition = targetPosition;
+                    Effects[i].Perform(unit);
                 }
             }
         }

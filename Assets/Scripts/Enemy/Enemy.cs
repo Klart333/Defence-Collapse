@@ -32,7 +32,7 @@ namespace Enemy
                 {
                     return;
                 }
-            
+                
                 Stats stats = new Stats(authoring.enemyData.Stats);
                 Entity enemyEntity = GetEntity(TransformUsageFlags.Dynamic);
                 
@@ -62,6 +62,11 @@ namespace Enemy
                     Health = stats.MaxHealth.Value,
                     Armor = stats.MaxArmor.Value,
                     Shield = stats.MaxShield.Value,
+                });
+                
+                AddComponent(enemyEntity, new HealthScalingComponent
+                {
+                    Multiplier = authoring.EnemyData.HealthScalingMultiplier
                 });
                 
                 AddComponent(enemyEntity, new SimpleDamageComponent

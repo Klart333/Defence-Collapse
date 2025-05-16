@@ -24,6 +24,7 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private TextMeshProUGUI emptyText;
 
     private readonly List<UIEffectDisplay> spawnedDisplays = new List<UIEffectDisplay>();
+    private UIFlexibleLayoutGroup flexGroup;
 
     private bool hovered = false;
 
@@ -31,6 +32,8 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     private void OnEnable()
     {
+        flexGroup = GetComponentInChildren<UIFlexibleLayoutGroup>();
+
         UIEvents.OnEndDrag += OnEndDrag;
         UIEvents.OnBeginDrag += OnBeginDrag;
     }
@@ -50,6 +53,8 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
             SpawnEffect(effects[i]);
             effects.RemoveAt(i);
         }
+        
+        flexGroup?.CalculateNewBounds();
     }
 
     private void SpawnEffect(EffectModifier effectModifier)
@@ -67,6 +72,8 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
         spawnedDisplays.Remove(effectDisplay);
 
         OnEffectRemoved?.Invoke(effectDisplay.EffectModifier);
+        
+        flexGroup?.CalculateNewBounds();
     }
 
     public void AddEffectDisplay(UIEffectDisplay effectDisplay)
@@ -79,6 +86,8 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
         spawnedDisplays.Add(effectDisplay);
 
         OnEffectAdded?.Invoke(effectDisplay.EffectModifier);
+
+        flexGroup?.CalculateNewBounds();
     }
 
     private void OnBeginDrag(UIEffectDisplay display)

@@ -307,6 +307,7 @@ namespace Buildings.District
             districtChunkIndexes = new int2[radius, radius];
             districtRadius = radius;
             Placing = true;
+            isPlacementValid = false;
         }
 
         private void CancelPerformed(InputAction.CallbackContext obj)
@@ -321,6 +322,7 @@ namespace Buildings.District
             costText.gameObject.SetActive(false);
 
             Placing = false;
+            isPlacementValid = false;
         }
 
         private void FirePerformed(InputAction.CallbackContext obj)
@@ -346,6 +348,7 @@ namespace Buildings.District
             costText.gameObject.SetActive(false);
 
             Placing = false;
+            isPlacementValid = false;
         }
         
         #region Debug

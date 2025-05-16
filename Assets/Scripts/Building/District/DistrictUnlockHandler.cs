@@ -34,6 +34,8 @@ namespace Buildings.District
         
         [SerializeField]
         private Ease fadeOutEase = Ease.Linear;
+
+        private bool ignoreFirst = true;
         
         private readonly List<TowerData> unlockedTowers = new List<TowerData>();
         
@@ -50,6 +52,11 @@ namespace Buildings.District
         private void OnDistrictBuilt(DistrictType districtType)
         {
             if (districtType != DistrictType.TownHall) return;
+            if (ignoreFirst)
+            {
+                ignoreFirst = false;
+                return;
+            }
 
             List<TowerData> towers = new List<TowerData>(unlockableTowers);
             for (int i = 0; i < unlockedTowers.Count; i++)

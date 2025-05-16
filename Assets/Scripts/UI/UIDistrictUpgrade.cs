@@ -62,6 +62,8 @@ public class UIDistrictUpgrade : MonoBehaviour
     [SerializeField]
     private UIEffectsHandler towerEffectsPanel;
     
+    
+    
     private readonly List<UIUpgradeDisplay> spawnedDisplays = new List<UIUpgradeDisplay>();
 
     private DistrictData districtData;

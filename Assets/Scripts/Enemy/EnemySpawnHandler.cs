@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Effects.ECS;
 using Gameplay;
 using Sirenix.OdinInspector;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using WaveFunctionCollapse;
@@ -31,6 +33,9 @@ namespace Enemy
         private readonly Dictionary<int3, List<EnemySpawnPoint>>  spawnPoints = new Dictionary<int3, List<EnemySpawnPoint>>();
         private Random random;
         
+        private EntityManager entityManager;
+        private Entity waveCountEntity;
+        
         public int WaveCount { get; private set; }
 
         private void OnEnable()
@@ -39,6 +44,10 @@ namespace Enemy
             Events.OnWaveStarted += OnWaveStarted;
             
             random = new Random(GameManager.Instance?.Seed ?? -1);
+            
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            waveCountEntity = entityManager.CreateEntity();
+            entityManager.AddComponent<WaveCountComponent>(waveCountEntity);
         }
 
         private void OnDisable()
@@ -50,6 +59,7 @@ namespace Enemy
         private void OnWaveStarted()
         {
             WaveCount++;
+            entityManager.SetComponentData(waveCountEntity, new WaveCountComponent { Value = WaveCount });
         }
 
         private void OnChunkUnlocked(Chunk chunk)

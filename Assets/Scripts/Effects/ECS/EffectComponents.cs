@@ -58,7 +58,7 @@ namespace Effects.ECS
 		public float Value;
 	}
 
-	public struct HealthComponent : IComponentData
+	public struct HealthComponent : IComponentData 
 	{
 		public float Health;
 		public float Armor;
@@ -78,6 +78,11 @@ namespace Effects.ECS
 		public float Health;
 		public float Armor;
 		public float Shield;
+	}
+
+	public struct HealthScalingComponent : IComponentData
+	{
+		public float Multiplier;
 	}
 	
 	public struct DeathTag : IComponentData

@@ -38,12 +38,12 @@ public class UIFlexibleLayoutGroup : MonoBehaviour
     [Button]
     public void CalculateNewBounds()
     {
-        float width = gameObject.GetComponent<RectTransform>().rect.width;
-        float height = gameObject.GetComponent<RectTransform>().rect.height;
+        float width = (transform as RectTransform).rect.width;
+        float height = (transform as RectTransform).rect.height;
         if (useParentRect)
         {
-            width = transform.parent.GetComponent<RectTransform>().rect.width;
-            height = transform.parent.GetComponent<RectTransform>().rect.height;
+            width = (transform.parent as RectTransform).rect.width;
+            height = (transform.parent as RectTransform).rect.height;
         }
 
         GridLayoutGroup layoutGroup = GetComponent<GridLayoutGroup>();
@@ -64,20 +64,11 @@ public class UIFlexibleLayoutGroup : MonoBehaviour
 
             if (!clampingX)
             {
-                rect.offsetMin = new Vector2(rect.offsetMin.x, (transform.childCount * -(layoutGroup.cellSize.y + layoutGroup.spacing.y)) + rect.rect.height);
+                rect.offsetMin = new Vector2(rect.offsetMin.x, Mathf.Min(0, transform.childCount * -(layoutGroup.cellSize.y + layoutGroup.spacing.y) - layoutGroup.padding.bottom + height));
             }
             else
             {
-                int children = 0;
-                for (int i = 0; i < transform.childCount; i++)
-                {
-                    if (transform.GetChild(i).gameObject.activeSelf)
-                    {
-                        children += 1;
-                    }
-                }
-
-                rect.offsetMax = new Vector2((children * (layoutGroup.cellSize.x + layoutGroup.spacing.x)) - rect.rect.width + layoutGroup.padding.right, rect.offsetMin.y);
+                rect.offsetMax = new Vector2(transform.childCount * (layoutGroup.cellSize.x + layoutGroup.spacing.x) - width + layoutGroup.padding.right, rect.offsetMin.y);
             }
         }
 

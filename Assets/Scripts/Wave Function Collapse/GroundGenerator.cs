@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
+using UnityEngine.Assertions;
 using Sirenix.OdinInspector;
-using Unity.Mathematics;
 using System.Diagnostics;
+using Unity.Mathematics;
+using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Physics;
@@ -15,8 +17,6 @@ using UnityEngine;
 using System;
 using Chunks;
 using Enemy;
-using Unity.Collections;
-using UnityEngine.Assertions;
 
 namespace WaveFunctionCollapse
 {
@@ -86,13 +86,7 @@ namespace WaveFunctionCollapse
         
 #if UNITY_EDITOR
         private async UniTaskVoid Start()
-#else
-        private void Start()
-#endif
         {
-            spawnedColliders = new NativeList<BlobAssetReference<Collider>>(Allocator.Persistent);
-
-#if UNITY_EDITOR
             if (compilePrototypeMeshes)
             {
                 //waveFunction.ProtoypeMeshes.CompilePrototypes();
@@ -100,8 +94,11 @@ namespace WaveFunctionCollapse
 
                 await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
             }
+#else
+        private void Start()
+        {
 #endif
-            
+            spawnedColliders = new NativeList<BlobAssetReference<Collider>>(Allocator.Persistent);
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             if (!waveFunction.Load(this))
@@ -111,7 +108,7 @@ namespace WaveFunctionCollapse
             waveFunction.ParentTransform = transform;
             
             Chunk chunk = waveFunction.LoadChunk(transform.position, chunkSize, defaultPrototypeInfoData, false);
-            SetCrystalInCenter(chunk);
+            //SetCrystalInCenter(chunk);
             
             if (shouldRun)
                 LoadChunk(chunk).Forget();

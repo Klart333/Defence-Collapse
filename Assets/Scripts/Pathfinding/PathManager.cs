@@ -50,9 +50,12 @@ namespace Pathfinding
         private int chunkAmount;
         private int jobStartIndex;
 
+        public BlobAssetReference<PathChunkArray> PathChunks => pathChunks;
         public float GridWorldHeight => gridSize.y * CellScale;
         public float GridWorldWidth => gridSize.x * CellScale;
+        public int ArrayLength => arrayLength;
         public float CellScale => cellScale;
+        public Vector2Int GridSize => gridSize;
 
         public BoolPathSet BlockerPathSet { get; private set; }
         public BytePathSet TargetPathSet { get; private set; }

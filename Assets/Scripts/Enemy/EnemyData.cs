@@ -11,6 +11,10 @@ public class EnemyData : SerializedScriptableObject
     [OdinSerialize, NonSerialized]
     public Stats Stats;
 
+    [Title("Scaling")]
+    [SerializeField]
+    private float healthScalingMultiplier = 1;
+    
     [Title("Attack")]
     [OdinSerialize, NonSerialized]
     public Attack BaseAttack;
@@ -40,6 +44,7 @@ public class EnemyData : SerializedScriptableObject
     [SerializeField]
     private float dropLootChance = 0.5f;
     
+    public float HealthScalingMultiplier => healthScalingMultiplier;
     public float DropLootChance => dropLootChance;
     public bool ExplodeOnDeath => explodeOnDeath;
     public float ExplosionSize => explosionSize;

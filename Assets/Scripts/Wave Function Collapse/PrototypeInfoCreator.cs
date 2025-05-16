@@ -4,6 +4,8 @@ using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
+using Sirenix.Utilities;
+
 namespace WaveFunctionCollapse
 {
 #if UNITY_EDITOR
@@ -59,7 +61,7 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private MaterialData materialData;
 
-        [Title("Weight")]
+        [TitleGroup("Weight")]
         [SerializeField]
         private List<StupidWeightThing> pieceWeights;
 
@@ -493,7 +495,7 @@ namespace WaveFunctionCollapse
             Reset();
         }
 
-        [TitleGroup("Util", Order = -45)]
+        [TitleGroup("Weight")]
         [Button]
         public void CreateWeights(bool resetValues = false)
         {
@@ -521,6 +523,20 @@ namespace WaveFunctionCollapse
             }
         }
 
+        [TitleGroup("Weight")]
+        [Button]
+        public void ModifyWeights(string withAll, float multiplier = 2)
+        {
+            for (int i = 0; i < pieceWeights.Count; i++)
+            {
+                if (!pieceWeights[i].Name.Contains(withAll)) continue;
+                
+                var weight = pieceWeights[i];
+                weight.Weight *= multiplier;
+                pieceWeights[i] = weight;
+            }
+        }
+        
         private void Reset()
         {
             currentSideIndex = 0;
