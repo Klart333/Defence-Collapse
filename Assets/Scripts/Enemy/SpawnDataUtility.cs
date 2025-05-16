@@ -17,14 +17,20 @@ namespace Enemy
 
         [SerializeField]
         private float startCredits = 5;
+
+        [SerializeField]
+        private float creditBaseMultiplier = 0.5f;
+        
+        [SerializeField]
+        private float creditExponent = 1.5f;
         
         public SpawnPointComponent GetSpawnPointData(int spawnPointLevel, int waveLevel)
         {
-            float combinedWaveLevel = (spawnPointLevel + waveLevel) / 2.0f;
-            float credits = startCredits + Mathf.Pow(combinedWaveLevel, 1.5f) * Random.Range(0.9f, 1.1f);
+            float combinedWaveLevel = (spawnPointLevel + waveLevel) * creditBaseMultiplier;
+            float credits = startCredits + Mathf.Pow(combinedWaveLevel, creditExponent) * Random.Range(0.9f, 1.1f);
             List<int> possibleEnemies = new List<int>();
 
-            Debug.Log("Total Credits: " + credits);
+            //Debug.Log("Total Credits: " + credits);
             for (int i = 0; i < enemyUtility.Enemies.Count; i++)
             {
                 if (credits > enemyUtility.Enemies[i].EnemyData.UnlockedThreshold)

@@ -11,6 +11,7 @@ using UnityEngine;
 using System;
 using Gameplay;
 using Gameplay.Money;
+using InputCamera;
 using TMPro;
 
 namespace Buildings.District
@@ -18,6 +19,8 @@ namespace Buildings.District
     public class DistrictPlacer : SerializedMonoBehaviour
     {
         public static bool Placing;
+
+        public event Action OnPlacingCanceled; // Does not mean it failed
         
         [Title("District")]
         [SerializeField]
@@ -32,6 +35,9 @@ namespace Buildings.District
         [SerializeField]
         private Dictionary<DistrictType, PrototypeInfoData> districtInfoData = new Dictionary<DistrictType, PrototypeInfoData>();
 
+        [SerializeField]
+        private PooledMonoBehaviour unableToPlacePrefab;
+        
         [Title("Cost")]
         [SerializeField]
         private TextMeshProUGUI costText;
@@ -54,6 +60,7 @@ namespace Buildings.District
         
         private int2[,] districtChunkIndexes;
         
+        private PooledMonoBehaviour spawnedUnableToPlace;
         private DistrictType districtType;
         private InputManager inputManager;
         private MoneyManager moneyManager;
@@ -143,11 +150,16 @@ namespace Buildings.District
 
             if (!isDistrictValid)
             {
+                Vector3 mousePos = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
+                spawnedUnableToPlace?.gameObject.SetActive(false);
+                spawnedUnableToPlace = unableToPlacePrefab.GetAtPosAndRot<PooledMonoBehaviour>(mousePos, Quaternion.identity);
+                
                 isPlacementValid = false;
                 return;
             }
 
             isPlacementValid = true;
+            spawnedUnableToPlace?.gameObject.SetActive(false);
             UpdateCost();
         }
 
@@ -174,6 +186,11 @@ namespace Buildings.District
         
         private void SetInvalid()
         {
+            spawnedUnableToPlace?.gameObject.SetActive(false);
+
+            Vector3 mousePos = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
+            spawnedUnableToPlace = unableToPlacePrefab.GetAtPosAndRot<PooledMonoBehaviour>(mousePos, Quaternion.identity);
+
             isPlacementValid = false;
             buildingGenerator.RevertQuery();
             districtGenerator.RevertQuery();
@@ -323,11 +340,13 @@ namespace Buildings.District
 
             Placing = false;
             isPlacementValid = false;
+            spawnedUnableToPlace?.gameObject.SetActive(false);
+            OnPlacingCanceled?.Invoke();
         }
 
         private void FirePerformed(InputAction.CallbackContext obj)
         {
-            if (!Placing || !isPlacementValid)
+            if (!Placing || CameraController.IsDragging || !isPlacementValid)
             {
                 return;
             }
@@ -349,6 +368,8 @@ namespace Buildings.District
 
             Placing = false;
             isPlacementValid = false;
+            spawnedUnableToPlace?.gameObject.SetActive(false);
+            OnPlacingCanceled?.Invoke();
         }
         
         #region Debug

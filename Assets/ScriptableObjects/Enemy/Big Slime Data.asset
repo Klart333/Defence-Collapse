@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a39d9e0847bee9147a0e20c8ac4e2d3e, type: 3}
-  m_Name: Slime Boss Data
+  m_Name: Big Slime Data
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -75,7 +75,7 @@ MonoBehaviour:
       Data: 6|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0.3
+      Data: 0.2
     - Name: 
       Entry: 8
       Data: 
@@ -220,10 +220,11 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+  healthScalingMultiplier: 1
   UnlockedThreshold: 50
   CreditCost: 20
   moneyOnDeath: 100
   explodeOnDeath: 0
   explosionSize: 0.5
   canDropLoot: 1
-  dropLootChance: 0.76
+  dropLootChance: 0.2

@@ -37,6 +37,9 @@ namespace Buildings.District
         [Title("Debug")]
         [SerializeField]
         private List<LootData> debugStartingLootDatas;
+
+        [SerializeField]
+        private bool giveStartingLootData;
 #endif
 
         private readonly List<EffectModifier> modifierEffectsToSpawn = new List<EffectModifier>();
@@ -53,9 +56,12 @@ namespace Buildings.District
             UIEvents.OnFocusChanged += Close;
 
 #if UNITY_EDITOR
-            foreach (LootData lot in debugStartingLootDatas)
+            if (giveStartingLootData)
             {
-                lot.AddModifierEditorOnly();
+                foreach (LootData lot in debugStartingLootDatas)
+                {
+                    lot.AddModifierEditorOnly();
+                }   
             }
 #endif
 
