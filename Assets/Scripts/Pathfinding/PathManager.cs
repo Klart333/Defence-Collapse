@@ -50,6 +50,7 @@ namespace Pathfinding
         private int chunkAmount;
         private int jobStartIndex;
 
+        public NativeHashMap<int2, int> ChunkIndexToListIndex => chunkIndexToListIndex;
         public BlobAssetReference<PathChunkArray> PathChunks => pathChunks;
         public float GridWorldHeight => gridSize.y * CellScale;
         public float GridWorldWidth => gridSize.x * CellScale;
@@ -268,11 +269,11 @@ namespace Pathfinding
         
         #region Static
         
-        private const float HALF_BUILDING_CELL = 0.25f;
-        private const float FULL_BUILDING_CELL = 0.5f;
-        private const float CELL_SCALE = 0.5f;
-        private const float CHUNK_SIZE = 12;
-        private const int GRID_WIDTH = 24; // Also change GetNeighbours inside PathJob
+        public const float HALF_BUILDING_CELL = 0.25f;
+        public const float FULL_BUILDING_CELL = 0.5f;
+        public const float CELL_SCALE = 0.5f;
+        public const float CHUNK_SIZE = 12;
+        public const int GRID_WIDTH = 24; // Also change GetNeighbours inside PathJob
         public static float2 ByteToDirection(byte directionByte)
         {
             float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees
@@ -297,6 +298,8 @@ namespace Pathfinding
             
             return chunkPos + gridPos;
         }
+        
+        public static PathIndex GetIndex(float2 pos) => GetIndex(pos.x, pos.y);
         
         public static PathIndex GetIndex(float xPos, float zPos)
         {

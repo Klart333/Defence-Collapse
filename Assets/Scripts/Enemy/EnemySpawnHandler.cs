@@ -36,6 +36,8 @@ namespace Enemy
         private EntityManager entityManager;
         private Entity waveCountEntity;
         
+        public Dictionary<int3, List<EnemySpawnPoint>> SpawnPoints => spawnPoints;
+        
         public int WaveCount { get; private set; }
 
         private void OnEnable()
