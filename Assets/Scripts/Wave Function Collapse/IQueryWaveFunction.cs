@@ -19,7 +19,7 @@ namespace WaveFunctionCollapse
             
             if (query)
             {
-                QuerySpawnedBuildings.Add(index, spawned);
+                QuerySpawnedBuildings.TryAdd(index, spawned);
                 return;
             }
 
@@ -130,16 +130,14 @@ namespace WaveFunctionCollapse
         private List<ChunkIndex> GetSurroundingCells(Vector3 queryPosition)
         {
             List<ChunkIndex> surrounding = new List<ChunkIndex>();
-            for (int x = -1; x <= 1; x += 2)
+            for (int x = -1; x <= 1; x+=2)
+            for (int z = -1; z <= 1; z+=2)
             {
-                for (int z = -1; z <= 1; z += 2)
+                Vector3 pos = queryPosition + new Vector3(x, 0, z).MultiplyByAxis(ChunkWaveFunction.CellSize);
+                ChunkIndex? index = GetIndex(pos);
+                if (index.HasValue) 
                 {
-                    Vector3 pos = queryPosition + new Vector3(x, 0, z).MultiplyByAxis(ChunkWaveFunction.CellSize);
-                    ChunkIndex? index = GetIndex(pos);
-                    if (index.HasValue) 
-                    {
-                        surrounding.Add(index.Value);
-                    }
+                    surrounding.Add(index.Value);
                 }
             }
 
@@ -148,17 +146,27 @@ namespace WaveFunctionCollapse
         
         public List<ChunkIndex> GetSurroundingMarchedIndexes(ChunkIndex queryIndex)
         {
-            List<ChunkIndex> surroundingCells = GetSurroundingCells(GetPos(queryIndex));
-            for (int i = surroundingCells.Count - 1; i >= 0; i--)
+            List<ChunkIndex> builtIndexes = new List<ChunkIndex>(4) { queryIndex };
+            Vector3 queryPos = ChunkWaveFunction[queryIndex].Position;
+            ChunkIndex? westCell = GetIndex(queryPos + new Vector3(-1, 0, 0).MultiplyByAxis(ChunkWaveFunction.CellSize));
+            if (westCell.HasValue) builtIndexes.Add(westCell.Value);
+            
+            ChunkIndex? southCell = GetIndex(queryPos + new Vector3(0, 0, -1).MultiplyByAxis(ChunkWaveFunction.CellSize));
+            if (southCell.HasValue) builtIndexes.Add(southCell.Value);
+
+            ChunkIndex? southWestCell = GetIndex(queryPos + new Vector3(-1, 0, -1).MultiplyByAxis(ChunkWaveFunction.CellSize));
+            if (southWestCell.HasValue) builtIndexes.Add(southWestCell.Value);
+            
+            for (int i = builtIndexes.Count - 1; i >= 0; i--)
             {
-                QueryMarchedChunk chunk = ChunkWaveFunction.Chunks[surroundingCells[i].Index];
-                if (!chunk.BuiltCells[surroundingCells[i].CellIndex.x, surroundingCells[i].CellIndex.y, surroundingCells[i].CellIndex.z])
+                QueryMarchedChunk chunk = ChunkWaveFunction.Chunks[builtIndexes[i].Index];
+                if (!chunk.BuiltCells[builtIndexes[i].CellIndex.x, builtIndexes[i].CellIndex.y, builtIndexes[i].CellIndex.z])
                 {
-                    surroundingCells.RemoveAt(i);
+                    builtIndexes.RemoveAt(i);
                 }
             }
             
-            return surroundingCells;
+            return builtIndexes;
         }
 
         public List<ChunkIndex> GetCellsSurroundingMarchedIndex(ChunkIndex builtIndex)

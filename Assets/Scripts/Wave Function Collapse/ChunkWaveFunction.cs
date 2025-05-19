@@ -41,7 +41,16 @@ namespace WaveFunctionCollapse
 
         public Cell this[ChunkIndex index]
         {
-            get => Chunks[index.Index][index.CellIndex];
+            get 
+            {
+                if (!Chunks.TryGetValue(index.Index, out _))
+                {
+                    Debug.LogError("PROBLEM!");
+                    return default;
+                }
+
+                return Chunks[index.Index][index.CellIndex]; 
+            }
             set
             {
                 if (Chunks.TryGetValue(index.Index, out TChunk chunk))

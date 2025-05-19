@@ -137,7 +137,7 @@ namespace Buildings.District
             Dictionary<ChunkIndex, IBuildable> districts = districtGenerator.Query(districtChunkIndexes, 2, districtInfoData[districtType]);
             if (districts == null)
             {
-                CancelPlacement();
+                SetInvalid();
                 return;
             }
             
@@ -365,11 +365,18 @@ namespace Buildings.District
             districtGenerator.Place();
             buildingGenerator.Place();
             costText.gameObject.SetActive(false);
-
-            Placing = false;
-            isPlacementValid = false;
-            spawnedUnableToPlace?.gameObject.SetActive(false);
-            OnPlacingCanceled?.Invoke();
+            
+            if (districtType == DistrictType.TownHall)
+            {
+                spawnedUnableToPlace?.gameObject.SetActive(false);
+                isPlacementValid = false;
+                Placing = false;
+                OnPlacingCanceled?.Invoke();
+            }
+            else
+            {
+                SetInvalid();
+            }
         }
         
         #region Debug

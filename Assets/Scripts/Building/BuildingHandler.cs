@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using DataStructures.Queue.ECS;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
@@ -7,6 +9,7 @@ using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using Pathfinding;
+using Sirenix.Utilities;
 using UI;
 
 public class BuildingHandler : SerializedMonoBehaviour 
@@ -29,6 +32,10 @@ public class BuildingHandler : SerializedMonoBehaviour
     [SerializeField]
     private Canvas canvasParent;
 
+    [Title("References")]
+    [SerializeField]
+    private DistrictGenerator districtGenerator;
+    
     [Title("Debug")]
     [SerializeField]
     private bool verbose = true;
@@ -40,21 +47,21 @@ public class BuildingHandler : SerializedMonoBehaviour
     private HashSet<ChunkIndex> wallStatesWithHealth = new HashSet<ChunkIndex>();
     private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
     private List<Building> buildingQueue = new List<Building>();
-
+    
     private int selectedGroupIndex = -1;
     private int groupIndexCounter;
-    private bool chilling;
+    private bool isAddingBuildings;
     
     #region Handling Groups
 
     public async UniTaskVoid AddBuilding(Building building)
     {
         buildingQueue.Add(building);
-        if (chilling) return;
+        if (isAddingBuildings) return;
 
-        chilling = true;
+        isAddingBuildings = true;
         await UniTask.Yield();
-
+        
         for (int i = 0; i < buildingQueue.Count; i++)
         {
             List<ChunkIndex> damageIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(buildingQueue[i].ChunkIndex);
@@ -88,7 +95,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         buildingQueue.Clear();
 
         CheckMerge(groupIndexCounter);
-        chilling = false;
+        isAddingBuildings = false;
     }
 
     private WallState CreateData(ChunkIndex chunkIndex)
@@ -158,6 +165,8 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     public void RemoveBuilding(Building building)
     {
+        if (!BuildingGroups.TryGetValue(building.BuildingGroupIndex, out List<Building> builds)) return;
+
         List<ChunkIndex> builtIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(building.ChunkIndex);
         foreach (ChunkIndex chunkIndex in builtIndexes)
         {
@@ -166,8 +175,6 @@ public class BuildingHandler : SerializedMonoBehaviour
                 buildings.Remove(building);
             }    
         }
-        
-        if (!BuildingGroups.TryGetValue(building.BuildingGroupIndex, out List<Building> builds)) return;
         
         builds.RemoveSwapBack(building);
         if (builds.Count == 0)
@@ -233,22 +240,29 @@ public class BuildingHandler : SerializedMonoBehaviour
     public async UniTaskVoid BuildingDestroyed(ChunkIndex chunkIndex)
     {
         BuildingManager.Instance.RevertQuery();
-        if (chilling)
+        districtGenerator.RevertQuery();
+        if (isAddingBuildings)
         {
-            await UniTask.WaitWhile(() => chilling);
+            await UniTask.WaitWhile(() => isAddingBuildings);
+        }
+
+        
+        if (!Buildings.Remove(chunkIndex, out HashSet<Building> buildings))
+        {
+            WallStates.Remove(chunkIndex);
+            Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
+            return;
         }
         
-        WallStates.Remove(chunkIndex);
-        Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
-        
-        if (!Buildings.Remove(chunkIndex, out HashSet<Building> buildings)) return;
-
         List<ChunkIndex> destroyedIndexes = new List<ChunkIndex>();
         foreach (Building building in buildings)
         {
-            if (BuildingManager.Instance.GetSurroundingMarchedIndexes(building.ChunkIndex).Count > 0) continue;
+            if (BuildingManager.Instance.GetSurroundingMarchedIndexes(building.ChunkIndex).Any(x => !x.Equals(chunkIndex)))
+            {
+                continue;
+            }
             
-            building.OnDestroyed();
+            //building.OnDestroyed();
             destroyedIndexes.Add(building.ChunkIndex);
         }
         
@@ -256,6 +270,10 @@ public class BuildingHandler : SerializedMonoBehaviour
         {
             Events.OnWallsDestroyed?.Invoke(destroyedIndexes);
         }
+        
+        
+        WallStates.Remove(chunkIndex);
+        Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
     }
 
     #endregion

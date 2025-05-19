@@ -90,6 +90,7 @@ namespace TextMeshDOTS.Authoring
         public void OnDestroy(ref SystemState state)
         {
             if (normalFontReference.IsCreated) normalFontReference.Dispose();
+            if (boldFontReference.IsCreated) boldFontReference.Dispose();
         }
         
         private FontRequest GetFontRequest(FontWeight fontWeight)

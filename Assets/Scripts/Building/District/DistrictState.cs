@@ -87,7 +87,17 @@ namespace Buildings.District
             
             entitiesToDestroy.Dispose();
         }
-        public abstract void Die();
+
+        public virtual void Die()
+        {
+            foreach (List<DistrictTargetMesh> meshes in targetMeshes.Values)
+            {
+                foreach (DistrictTargetMesh targetMesh in meshes) 
+                    targetMesh.gameObject.SetActive(false);
+            }
+            
+            targetMeshes.Clear();
+        }
 
         public virtual void OnWaveStart()
         {
@@ -407,11 +417,6 @@ namespace Buildings.District
         {
             UpdateEntities();
         }
-
-        public override void Die()
-        {
-
-        }
     }
 
     #endregion
@@ -578,11 +583,6 @@ namespace Buildings.District
         public override void Update()
         {
             UpdateEntities();
-        }
-        
-        public override void Die()
-        {
-
         }
     }
     
@@ -854,11 +854,6 @@ namespace Buildings.District
             }
         }
 
-        public override void Die()
-        {
-            
-        }
-
         protected override DistrictTargetMesh GetTargetMesh(Vector3 position, Vector2 offset) => throw new NotImplementedException();
     }
 
@@ -1035,11 +1030,6 @@ namespace Buildings.District
         public override void Update()
         {
             UpdateEntities();
-        }
-        
-        public override void Die()
-        {
- 
         }
     }
      

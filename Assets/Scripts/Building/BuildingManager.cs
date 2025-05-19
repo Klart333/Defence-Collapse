@@ -217,6 +217,11 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     
     public Dictionary<ChunkIndex, IBuildable> Query(List<ChunkIndex> cellsToCollapse, IEnumerable<ChunkIndex> builtIndexes)
     {
+        if (IsGenerating)
+        {
+            return new Dictionary<ChunkIndex, IBuildable>();
+        }
+        
         RevertQuery();
 
         if (cellsToCollapse.Count <= 0) return QuerySpawnedBuildings;

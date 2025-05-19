@@ -100,13 +100,13 @@ public class Building : PooledMonoBehaviour, IBuildable
     {
         base.OnDisable();
         
-        Reset();
+        ResetState();
 
         Events.OnBuildingClicked -= OnBuildingClicked;
         Events.OnBuildingCanceled -= () => purchasing = false;
     }
 
-    private void Reset()
+    private void ResetState()
     {
         transform.localScale = Vector3.one;
         MeshRenderer.transform.localScale = Vector3.one;

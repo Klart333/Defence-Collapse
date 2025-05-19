@@ -275,7 +275,7 @@ namespace VFX
 #else
         public const int HitSparksCapacity = 1000;
         public const int ExplosionsCapacity = 1000;
-        public const int TrailCapacity = 100000;
+        public const int TrailCapacity = 1000;
 #endif
 
         public void OnCreate(ref SystemState state)

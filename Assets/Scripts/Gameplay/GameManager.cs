@@ -24,6 +24,7 @@ namespace Gameplay
         private void OnDisable()
         {
             Events.OnCapitolDestroyed -= OnCapitolDestroyed;
+            Pool.Clear();
         }
 
         private void OnCapitolDestroyed(DistrictData destroyedDistrict)

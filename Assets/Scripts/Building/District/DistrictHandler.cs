@@ -73,7 +73,7 @@ namespace Buildings.District
 
         private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
         {
-            districtGenerator.RemoveChunks(chunkIndexes).Forget();
+            districtGenerator.AddAction(async () => await districtGenerator.RemoveChunks(chunkIndexes));
         }
 
         private void OnWaveEnded()

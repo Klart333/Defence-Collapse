@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Chunks
 {
-    public class ChunkMask : PooledMonoBehaviour
+    public class     ChunkMask : PooledMonoBehaviour
     {
         private static readonly int Color = Shader.PropertyToID("_Color");
         private static readonly int North = Shader.PropertyToID("_North");

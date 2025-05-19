@@ -22,6 +22,10 @@ public class BuildingPlacer : MonoBehaviour
     [SerializeField]
     private PlaceSquare placeSquarePrefab;
 
+    [Title("References")]
+    [SerializeField]
+    private DistrictGenerator districtGenerator;
+
     private readonly Dictionary<ChunkIndex, PlaceSquare> spawnedSpawnPlaces = new Dictionary<ChunkIndex, PlaceSquare>();
     private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
 
@@ -249,7 +253,7 @@ public class BuildingPlacer : MonoBehaviour
 
             if (queryIndex.Equals(SquareIndex.Value))
             {
-                if (buildables.Count > 0 && SquareWasPressed)
+                if (buildables.Count > 0 && SquareWasPressed && !districtGenerator.IsGenerating)
                 {
                     if (pressedSquare.Placed)
                     {
@@ -263,7 +267,6 @@ public class BuildingPlacer : MonoBehaviour
                 continue;
             }
             
-            DisablePlaces();
             BuildingManager.Instance.RevertQuery();
             await UniTask.NextFrame();
             if (!SquareIndex.HasValue) continue;
@@ -282,7 +285,7 @@ public class BuildingPlacer : MonoBehaviour
                 continue;
             }
 
-            if (!SquareWasPressed) continue;
+            if (!SquareWasPressed ||  districtGenerator.IsGenerating) continue;
             
             if (pressedSquare.Placed)
             {
