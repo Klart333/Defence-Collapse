@@ -134,7 +134,8 @@ namespace Buildings.District
                 buildingGenerator.RevertQuery();
             }
             
-            Dictionary<ChunkIndex, IBuildable> districts = districtGenerator.Query(districtChunkIndexes, 2, districtInfoData[districtType]);
+            int height = districtType == DistrictType.TownHall ? 1 : 2;
+            Dictionary<ChunkIndex, IBuildable> districts = districtGenerator.Query(districtChunkIndexes, height, districtInfoData[districtType]);
             if (districts == null)
             {
                 SetInvalid();

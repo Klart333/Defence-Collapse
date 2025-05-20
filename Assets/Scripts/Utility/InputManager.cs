@@ -12,7 +12,6 @@ public class InputManager : Singleton<InputManager>
     public InputAction Cancel {  get; private set; }
     public InputAction Space {  get; private set; }
 
-    public bool GetFire => Fire.IsPressed();
     public bool GetShift => Shift.IsPressed();
 
     private void OnEnable()

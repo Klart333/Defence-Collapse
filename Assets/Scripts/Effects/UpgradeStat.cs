@@ -4,7 +4,10 @@ using UnityEngine;
 using Gameplay;
 using System;
 using System.Threading.Tasks;
+using Buildings.District;
 using UnityEngine.InputSystem;
+using WaveFunctionCollapse;
+using Object = UnityEngine.Object;
 
 public interface IUpgradeStat : IStat
 {
@@ -15,7 +18,7 @@ public interface IUpgradeStat : IStat
 
     public float GetCost();
     public float GetIncrease();
-    public UniTask<bool> IncreaseLevel();
+    public void IncreaseLevel();
 }
 
 [Serializable, InlineProperty]
@@ -69,7 +72,7 @@ public class UpgradeStat : IUpgradeStat
         Stat.RemoveAllModifiers();
     }
 
-    public UniTask<bool> IncreaseLevel()
+    public void IncreaseLevel()
     {
         if (increaseModifier == null)
         {
@@ -84,8 +87,6 @@ public class UpgradeStat : IUpgradeStat
         increaseModifier.Value += GetIncrease();
         Stat.SetDirty(false);
         Level++;
-
-        return new UniTask<bool>(true);
     }
 
     public float GetCost()
@@ -118,11 +119,6 @@ public class TownHallUpgradeStat : IUpgradeStat
     public float Value => Stat.Value;
     public float BaseValue => Stat.BaseValue;
 
-    public TownHallUpgradeStat()
-    {
-        Stat.OnValueChanged += () => OnValueChanged?.Invoke();
-    }
-
     public TownHallUpgradeStat(Stat stat, LevelData levelData, string name, string[] descriptions, Sprite icon)
     {
         Stat = stat;
@@ -149,13 +145,9 @@ public class TownHallUpgradeStat : IUpgradeStat
         Stat.RemoveAllModifiers();
     }
 
-    public async UniTask<bool> IncreaseLevel()
+    public void IncreaseLevel()
     {
-        bool suceeded = await IncreaseLevelAsync();
-        if (!suceeded)
-        {
-            return false;
-        }
+        IncreaseDistrictHeight();
 
         if (increaseModifier == null)
         {
@@ -170,33 +162,14 @@ public class TownHallUpgradeStat : IUpgradeStat
         increaseModifier.Value += GetIncrease();
         Stat.SetDirty(false);
         Level++;
-        return true;
+        
+        UIEvents.OnFocusChanged?.Invoke();
+        Object.FindFirstObjectByType<DistrictUnlockHandler>().DisplayUnlockableDistricts();
     }
 
-    private async Task<bool> IncreaseLevelAsync()
+    private void IncreaseDistrictHeight()
     {
-        bool placed = false;
-        bool canceled = false;
-        Events.OnDistrictClicked?.Invoke(DistrictType.TownHall, 1 + Level);
-        Events.OnDistrictBuilt += OnCapitolUpgradePlaced;
-
-        UIEvents.OnFocusChanged += OnFocusChanged;
-        InputManager.Instance.Cancel.performed += CancelOnperformed;
-
-        while (!canceled && !placed)
-        {
-            await UniTask.Yield();
-        }
-        
-        UIEvents.OnFocusChanged -= OnFocusChanged;
-        Events.OnDistrictBuilt -= OnCapitolUpgradePlaced;
-        InputManager.Instance.Cancel.performed -= CancelOnperformed;
-        return !canceled;
-
-        void OnCapitolUpgradePlaced(DistrictType type) => placed = true;
-
-        void CancelOnperformed(InputAction.CallbackContext obj) => canceled = true;
-        void OnFocusChanged() => placed = true;
+        Object.FindFirstObjectByType<DistrictGenerator>().AddAction(Object.FindFirstObjectByType<DistrictHandler>().IncreaseTownHallHeight);
     }
 
     public float GetCost()

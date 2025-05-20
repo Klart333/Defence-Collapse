@@ -10,6 +10,7 @@ using UnityEngine;
 using System.Linq;
 using Gameplay;
 using System;
+using Gameplay.Upgrades;
 
 namespace Buildings.District
 {
@@ -149,23 +150,6 @@ namespace Buildings.District
             return false;
         }
 
-        private static void GetNeighbours(HashSet<QueryChunk> chunks, IChunk chunk, HashSet<QueryChunk> neighbours, int depth)
-        {
-            foreach (IChunk adjacentChunk in chunk.AdjacentChunks)
-            {
-                if (adjacentChunk == null || chunks.Contains(adjacentChunk))
-                {
-                    continue;
-                }
-                    
-                neighbours.Add(adjacentChunk as QueryChunk);
-                if (depth > 0)
-                {
-                    GetNeighbours(chunks, adjacentChunk, neighbours, depth - 1);
-                }
-            }
-        }
-
         private DistrictData GetDistrictData(DistrictType districtType, HashSet<QueryChunk> chunks)
         {
             Vector3 position = GetAveragePosition(chunks);
@@ -260,6 +244,52 @@ namespace Buildings.District
         public int GetDistrictAmount(DistrictType districtType)
         {
             return districtAmounts.GetValueOrDefault(districtType, 0);
+        }
+        
+        public async UniTask IncreaseTownHallHeight()
+        {
+            HashSet<QueryChunk> addedChunks = new HashSet<QueryChunk>();
+
+            foreach (DistrictData districtData in uniqueDistricts)
+            {
+                if ((districtData.State.CategoryType & CategoryType.TownHall) == 0) continue;
+                
+                foreach (QueryChunk queryChunk in districtData.DistrictChunks.Values)
+                {
+                    queryChunk.Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
+                    districtGenerator.ClearChunkMeshes(queryChunk.ChunkIndex);
+                    districtGenerator.ChunkWaveFunction.LoadCells(queryChunk, queryChunk.PrototypeInfoData);
+                    addedChunks.Add(queryChunk);
+
+                    if (!queryChunk.IsTop)
+                    {
+                        continue;
+                    }
+
+                    ChunkIndex? buildingChunkIndex = BuildingManager.Instance.GetIndex(queryChunk.Position);
+                    Assert.IsTrue(buildingChunkIndex.HasValue);
+                    
+                    int heightLevel = queryChunk.ChunkIndex.y + 1;
+                    Vector3 pos = queryChunk.Position.XyZ(0) + Vector3.up * (districtGenerator.ChunkScale.y * heightLevel);
+                    int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, districtGenerator.ChunkScale);
+                    if (districtGenerator.ChunkWaveFunction.Chunks.TryGetValue(index, out QueryChunk existingChunk))
+                    {
+                        addedChunks.Add(existingChunk);
+                        continue;
+                    }
+                    
+                    QueryChunk addChunk = districtGenerator.ChunkWaveFunction.LoadChunk(pos, districtGenerator.ChunkSize, queryChunk.PrototypeInfoData);
+                    addedChunks.Add(addChunk);
+
+                    districtGenerator.ChunkIndexToChunks[buildingChunkIndex.Value].Add(addChunk.ChunkIndex);
+                }
+                    
+                districtData.ExpandDistrict(addedChunks);
+                break;
+            }
+            
+            districtGenerator.ChunkWaveFunction.Propagate();
+            await districtGenerator.Run(addedChunks);
         }
     }
 }

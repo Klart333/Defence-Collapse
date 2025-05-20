@@ -1,11 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Audio;
+using Random = UnityEngine.Random;
 
 [CreateAssetMenu(menuName = "Audio Events/Simple")]
 public class SimpleAudioEvent : ScriptableObject
 {
     [SerializeField]
-    public AudioClip[] Clips = new AudioClip[0];
+    private AudioClip[] clips = Array.Empty<AudioClip>();
 
     [SerializeField]
     private RangedFloat volume = new RangedFloat(1, 1);
@@ -17,18 +19,17 @@ public class SimpleAudioEvent : ScriptableObject
     [SerializeField]
     private AudioMixerGroup mixer;
 
-    public int Play(AudioSource source)
+    public AudioClip Play(AudioSource source)
     {
         source.outputAudioMixerGroup = mixer; // Can be null
 
-        int clipIndex = UnityEngine.Random.Range(0, Clips.Length);
-        source.clip = Clips[clipIndex];
+        int clipIndex = Random.Range(0, clips.Length);
+        source.clip = clips[clipIndex];
 
-        source.pitch = UnityEngine.Random.Range(pitch.minValue, pitch.maxValue);
-        source.volume = UnityEngine.Random.Range(volume.minValue, volume.maxValue);
+        source.pitch = Random.Range(pitch.minValue, pitch.maxValue);
+        source.volume = Random.Range(volume.minValue, volume.maxValue);
 
         source.Play();
-
-        return clipIndex;
+        return clips[clipIndex];
     }
 }

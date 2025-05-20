@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: 598327024341094733, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
       propertyPath: m_Name
-      value: FlipButton Variant
+      value: DistrictFlipButton
       objectReference: {fileID: 0}
     - target: {fileID: 4880935768058073186, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
@@ -116,11 +116,16 @@ PrefabInstance:
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
@@ -130,7 +135,17 @@ PrefabInstance:
       objectReference: {fileID: 365231240779658466}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 6372887756014903830}
+    - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
+        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
@@ -145,6 +160,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: Play
+      objectReference: {fileID: 0}
+    - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
+        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: UI.UITownHallButton, Core
       objectReference: {fileID: 0}
@@ -155,7 +175,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: Audio.PlayAudio, Core
+      objectReference: {fileID: 0}
+    - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
+        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 8998491561055900711, guid: ec4731a09368da74080b0ab071ae4c64,
@@ -172,6 +202,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 365231240779658466}
+    - targetCorrespondingSourceObject: {fileID: 598327024341094733, guid: ec4731a09368da74080b0ab071ae4c64,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6372887756014903830}
   m_SourcePrefab: {fileID: 100100000, guid: ec4731a09368da74080b0ab071ae4c64, type: 3}
 --- !u!114 &237831704842649072 stripped
 MonoBehaviour:
@@ -212,3 +246,16 @@ MonoBehaviour:
   districtButton: {fileID: 237831704842649072}
   animator: {fileID: 7334995807294085001}
   unFlipAnimation: {fileID: 7400000, guid: ea36bebefa8aa2845ad5be004acc47cf, type: 2}
+--- !u!114 &6372887756014903830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7803142910978295212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f6dd00943a748a2be89520dda6e0e17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioEvent: {fileID: 11400000, guid: e3c7675049d1fdd409ce3e1571dffe9c, type: 2}

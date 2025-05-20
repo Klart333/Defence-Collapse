@@ -7,8 +7,11 @@ using Gameplay.Money;
 using UnityEngine;
 using DG.Tweening;
 using System;
+using InputCamera;
 using Loot;
 using TMPro;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 public class UIDistrictUpgrade : MonoBehaviour
 {
@@ -68,19 +71,21 @@ public class UIDistrictUpgrade : MonoBehaviour
     private readonly List<UIUpgradeDisplay> spawnedDisplays = new List<UIUpgradeDisplay>();
 
     private DistrictUpgradeManager upgradeManager;
+    private InputManager inputManager;
     private DistrictData districtData;
     private Canvas canvas;
     private Camera cam;
-
+    
     private void OnEnable()
     {
         canvas = GetComponentInParent<Canvas>();
         cam = Camera.main;
 
-        towerEffectsPanel.OnEffectAdded += AddEffectToTower;
         towerEffectsPanel.OnEffectRemoved += RemoveEffectFromTower;
+        towerEffectsPanel.OnEffectAdded += AddEffectToTower;
         
         GetUpgradeManager().Forget();
+        GetInput().Forget();
     }
 
     private async UniTaskVoid GetUpgradeManager()
@@ -88,12 +93,19 @@ public class UIDistrictUpgrade : MonoBehaviour
         upgradeManager = await DistrictUpgradeManager.Get();
         upgradeManager.OnEffectGained += OnEffectGained;
     }
+    
+    private async UniTaskVoid GetInput()
+    {
+        inputManager = await InputManager.Get();
+        inputManager.Fire.canceled += ClickReleased;
+    }
 
     private void OnDisable()
     {
-        towerEffectsPanel.OnEffectAdded -= AddEffectToTower;
         towerEffectsPanel.OnEffectRemoved -= RemoveEffectFromTower;
+        towerEffectsPanel.OnEffectAdded -= AddEffectToTower;
         upgradeManager.OnEffectGained -= OnEffectGained;
+        inputManager.Fire.canceled -= ClickReleased;
     }
     
     private void Update()
@@ -101,6 +113,19 @@ public class UIDistrictUpgrade : MonoBehaviour
         if (parentPanel.activeSelf)
         {
             PositionRectTransform.PositionOnOverlayCanvas(canvas, cam, parentPanel.transform as RectTransform, districtData.Position, pivot);
+        }
+    }
+    
+    private void ClickReleased(InputAction.CallbackContext obj)
+    {
+        CheckCancel();
+    }
+
+    private void CheckCancel()
+    {
+        if (InputManager.Instance.Fire.WasReleasedThisFrame() && !CameraController.IsDragging && !EventSystem.current.IsPointerOverGameObject())
+        {
+            UIEvents.OnFocusChanged?.Invoke();
         }
     }
 
@@ -217,14 +242,10 @@ public class UIDistrictUpgrade : MonoBehaviour
 
     #region Upgrades
 
-    public async UniTaskVoid UpgradeStat(IUpgradeStat stat)
+    public void UpgradeStat(IUpgradeStat stat)
     {
         float cost = stat.GetCost();
-        bool succeded = await stat.IncreaseLevel();
-        if (!succeded)
-        {
-            return;
-        }
+        stat.IncreaseLevel();
 
         MoneyManager.Instance.RemoveMoney(cost);
 

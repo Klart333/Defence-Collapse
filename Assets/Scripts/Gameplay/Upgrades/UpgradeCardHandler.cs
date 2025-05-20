@@ -57,6 +57,8 @@ namespace Gameplay.Upgrades
 
         private void OnWaveEnded()
         {
+            UIEvents.OnFocusChanged?.Invoke();
+
             waveCount++;
             DisplayUpgradeCards();
         }

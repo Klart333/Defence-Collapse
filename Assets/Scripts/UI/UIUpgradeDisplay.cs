@@ -59,7 +59,7 @@ public class UIUpgradeDisplay : PooledMonoBehaviour
     {
         if (DistrictUpgrade.CanPurchase(upgradeStat))
         {
-            DistrictUpgrade.UpgradeStat(upgradeStat).Forget();
+            DistrictUpgrade.UpgradeStat(upgradeStat);
         }
     }
 }

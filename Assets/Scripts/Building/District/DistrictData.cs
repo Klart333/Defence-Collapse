@@ -72,7 +72,7 @@ namespace Buildings.District
             cachedChunkIndexes.Clear();
             foreach (QueryChunk chunk in DistrictChunks.Values)
             {
-                ChunkIndex? index = BuildingManager.Instance.GetIndex(chunk.Position + BuildingManager.Instance.CellSize / 2.0f);
+                ChunkIndex? index = BuildingManager.Instance.GetIndex(chunk.Position);
                 Debug.Assert(index != null, nameof(index) + " != null");
                 if (!cachedChunkIndexes.TryGetValue(index.Value, out List<int3> chunkIndex))
                 {

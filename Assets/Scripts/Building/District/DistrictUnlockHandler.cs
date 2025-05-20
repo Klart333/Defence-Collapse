@@ -39,25 +39,8 @@ namespace Buildings.District
         
         private readonly List<TowerData> unlockedTowers = new List<TowerData>();
         
-        private void OnEnable()
+        public void DisplayUnlockableDistricts()
         {
-            Events.OnDistrictBuilt += OnDistrictBuilt;
-        }
-
-        private void OnDisable()
-        {
-            Events.OnDistrictBuilt -= OnDistrictBuilt;
-        }
-
-        private void OnDistrictBuilt(DistrictType districtType)
-        {
-            if (districtType != DistrictType.TownHall) return;
-            if (ignoreFirst)
-            {
-                ignoreFirst = false;
-                return;
-            }
-
             List<TowerData> towers = new List<TowerData>(unlockableTowers);
             for (int i = 0; i < unlockedTowers.Count; i++)
             {

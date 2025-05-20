@@ -12,6 +12,7 @@ using UnityEngine;
 using System.Linq;
 using System;
 using Gameplay;
+using Gameplay.Upgrades;
 using Unity.Assertions;
 
 namespace WaveFunctionCollapse
@@ -259,7 +260,7 @@ namespace WaveFunctionCollapse
             }
         }
 
-        private void ResetNeighbours(HashSet<QueryChunk> overrideChunks, QueryChunk neighbourChunk, int depth)
+        public void ResetNeighbours(HashSet<QueryChunk> overrideChunks, QueryChunk neighbourChunk, int depth)
         {
             for (int i = 0; i < neighbourChunk.AdjacentChunks.Length; i++)
             {
@@ -299,6 +300,7 @@ namespace WaveFunctionCollapse
                         continue;
                     }
 
+                    Debug.Log("Killing Index: " + indexes[j]);
                     killIndexes.Add(indexes[j]);
                     ResetNeighbours(neighbours, waveFunction.Chunks[indexes[j]], 1);
                 }
