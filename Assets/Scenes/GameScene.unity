@@ -1645,7 +1645,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 226841346}
-  - component: {fileID: 226841347}
   - component: {fileID: 226841348}
   m_Layer: 0
   m_Name: UpgradePanel
@@ -1676,38 +1675,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &226841347
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 226841345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f827d78648883c48b631e240b11e4a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parentPanel: {fileID: 226841345}
-  pivot: {x: 0.5, y: 0.5}
-  upgradeTitleText: {fileID: 56450429}
-  costText: {fileID: 1069300710}
-  descriptions:
-  - {fileID: 782896554}
-  - {fileID: 326702142}
-  points:
-  - {fileID: 1880582999}
-  - {fileID: 468109195}
-  panelTitleText: {fileID: 659586654}
-  upgradeDisplayPrefab: {fileID: 8273016972511256441, guid: 17f80363816532d44aac07d22bcb1b0e,
-    type: 3}
-  upgradeDisplayParent: {fileID: 1214388850}
-  flexibleLayoutGroup: {fileID: 1214388851}
-  upgradeSection: {fileID: 1355064956}
-  modifySection: {fileID: 639690080}
-  line: {fileID: 332985430}
-  ownedEffectsPanel: {fileID: 974671706}
-  towerEffectsPanel: {fileID: 696877375}
 --- !u!114 &226841348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5916,6 +5883,8 @@ MonoBehaviour:
     type: 3}
   displayParent: {fileID: 1466340311}
   emptyText: {fileID: 513559011}
+  restrictedAmount: 1
+  maxAmount: 3
 --- !u!1001 &713785030
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7110,8 +7079,8 @@ Transform:
   - {fileID: 1001645614}
   - {fileID: 448074542}
   - {fileID: 406381898}
-  - {fileID: 1289934842}
   - {fileID: 1224394948}
+  - {fileID: 1289934842}
   - {fileID: 1568006376}
   - {fileID: 1816681070}
   m_Father: {fileID: 920425043}
@@ -7199,7 +7168,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 226841347}
+      - m_Target: {fileID: 1224394952}
         m_TargetAssemblyTypeName: UIDistrictUpgrade, Core
         m_MethodName: ShowSection
         m_Mode: 6
@@ -7847,6 +7816,8 @@ MonoBehaviour:
     type: 3}
   displayParent: {fileID: 558038931}
   emptyText: {fileID: 1242740538}
+  restrictedAmount: 0
+  maxAmount: 3
 --- !u!1 &976046199
 GameObject:
   m_ObjectHideFlags: 0
@@ -9420,13 +9391,14 @@ GameObject:
   - component: {fileID: 1224394951}
   - component: {fileID: 1224394950}
   - component: {fileID: 1224394949}
+  - component: {fileID: 1224394952}
   m_Layer: 0
   m_Name: UpgradeCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1224394948
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9434,7 +9406,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1224394947}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
@@ -9510,6 +9482,38 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 5
   m_TargetDisplay: 0
+--- !u!114 &1224394952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1224394947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f827d78648883c48b631e240b11e4a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentPanel: {fileID: 226841345}
+  pivot: {x: 0.5, y: 0.5}
+  upgradeTitleText: {fileID: 56450429}
+  costText: {fileID: 1069300710}
+  descriptions:
+  - {fileID: 782896554}
+  - {fileID: 326702142}
+  points:
+  - {fileID: 1880582999}
+  - {fileID: 468109195}
+  panelTitleText: {fileID: 659586654}
+  upgradeDisplayPrefab: {fileID: 8273016972511256441, guid: 17f80363816532d44aac07d22bcb1b0e,
+    type: 3}
+  upgradeDisplayParent: {fileID: 1214388850}
+  flexibleLayoutGroup: {fileID: 1214388851}
+  upgradeSection: {fileID: 1355064956}
+  modifySection: {fileID: 639690080}
+  line: {fileID: 332985430}
+  ownedEffectsPanel: {fileID: 974671706}
+  towerEffectsPanel: {fileID: 696877375}
 --- !u!1 &1231423573
 GameObject:
   m_ObjectHideFlags: 0
@@ -11010,7 +11014,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 226841347}
+      - m_Target: {fileID: 1224394952}
         m_TargetAssemblyTypeName: UIDistrictUpgrade, Core
         m_MethodName: ShowSection
         m_Mode: 6
@@ -13601,13 +13605,12 @@ MonoBehaviour:
   flameData: {fileID: 11400000, guid: 1dd3ffd0f7a088a459f69a209761a225, type: 2}
   mineData: {fileID: 11400000, guid: 61ff2f7cc3424844d9561d4d0f7828a4, type: 2}
   townHallData: {fileID: 11400000, guid: 09563fb9467471c4c992f25bf62e716d, type: 2}
-  canvas: {fileID: 1224394947}
-  districtUpgrade: {fileID: 226841347}
+  districtUpgrade: {fileID: 1224394952}
   debugStartingLootDatas:
   - {fileID: 11400000, guid: 655a07dadef02e24c8bf1ce537df38a5, type: 2}
   - {fileID: 11400000, guid: 42eb147ba1b06a04c92f1b3e953f27c4, type: 2}
   - {fileID: 11400000, guid: fe23badb5416a0047a9fff8d174e06cd, type: 2}
-  giveStartingLootData: 0
+  giveStartingLootData: 1
 --- !u!1 &2108250015
 GameObject:
   m_ObjectHideFlags: 0

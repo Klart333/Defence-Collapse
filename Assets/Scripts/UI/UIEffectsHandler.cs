@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using Sirenix.OdinInspector;
-using Buildings.District;
 using UnityEngine;
 using System;
 using TMPro;
@@ -23,7 +22,15 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
     [SerializeField]
     private TextMeshProUGUI emptyText;
 
+    [Title("Settings")]
+    [SerializeField]
+    private bool restrictedAmount;
+
+    [SerializeField, ShowIf(nameof(restrictedAmount))]
+    private int maxAmount = 3;
+
     private readonly List<UIEffectDisplay> spawnedDisplays = new List<UIEffectDisplay>();
+    
     private UIFlexibleLayoutGroup flexGroup;
 
     private bool hovered = false;
@@ -42,16 +49,19 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         UIEvents.OnEndDrag -= OnEndDrag;
         UIEvents.OnBeginDrag -= OnBeginDrag;
+
+        for (int i = 0; i < spawnedDisplays.Count; i++)
+        {
+            spawnedDisplays[i].gameObject.SetActive(false);
+        }
+        spawnedDisplays.Clear();
     }
 
-    public void SpawnEffects()
+    public void SpawnEffects(List<EffectModifier> effects)
     {
-        List<EffectModifier> effects = DistrictUpgradeManager.Instance.ModifierEffects;
-
         for (int i = effects.Count - 1; i >= 0; i--)
         {
             SpawnEffect(effects[i]);
-            effects.RemoveAt(i);
         }
         
         flexGroup?.CalculateNewBounds();
@@ -61,7 +71,9 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         emptyText.gameObject.SetActive(false);
 
-        UIEffectDisplay effect = Instantiate(effectDisplayPrefab, displayParent);
+        UIEffectDisplay effect = effectDisplayPrefab.Get<UIEffectDisplay>();
+        effect.transform.SetParent(displayParent, false);
+        effect.Handler = this;
         effect.Display(effectModifier);
 
         spawnedDisplays.Add(effect);
@@ -70,7 +82,7 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private void RemoveEffect(UIEffectDisplay effectDisplay)
     {
         spawnedDisplays.Remove(effectDisplay);
-
+        
         OnEffectRemoved?.Invoke(effectDisplay.EffectModifier);
         
         flexGroup?.CalculateNewBounds();
@@ -100,7 +112,7 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void OnEndDrag(UIEffectDisplay display)
     {
-        if (hovered)
+        if (hovered && (!restrictedAmount || spawnedDisplays.Count < maxAmount))
         {
             display.Handler = this;
         }

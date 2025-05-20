@@ -1,14 +1,12 @@
+using UnityEngine.EventSystems;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
-using System;
-using Buildings.District;
-using Loot;
-using TMPro;
-using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine;
+using TMPro;
+using Loot;
 
-public class UIEffectDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class UIEffectDisplay : PooledMonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Title("References")]
     [SerializeField]
@@ -26,13 +24,11 @@ public class UIEffectDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public UIEffectsHandler Handler { get; set; }
     public EffectModifier EffectModifier {  get; private set; }
-    public bool Locked { get; set; }
 
     private void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
         rectTransform = GetComponent<RectTransform>();
-        canvas = GetComponentInParent<Canvas>(); // Ensure there is a Canvas in the parent hierarchy.
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -63,6 +59,8 @@ public class UIEffectDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void Display(EffectModifier effectModifier)
     {
+        canvas ??= GetComponentInParent<Canvas>();
+
         EffectModifier = effectModifier;
 
         description.text = effectModifier.Description;

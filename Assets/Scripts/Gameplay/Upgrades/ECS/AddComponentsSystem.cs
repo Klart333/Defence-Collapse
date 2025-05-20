@@ -2,13 +2,12 @@ using Unity.Collections;
 using Unity.Entities;
 using Effects.ECS;
 using Unity.Burst;
-using System;
 
 namespace Gameplay.Upgrades.ECS
 {
-    public partial struct AddComponentsSystem : ISystem
+    public partial struct AddComponentsSystem : ISystem 
     {
-        private EntityQuery componentQuery; 
+        private EntityQuery componentQuery;  
             
         [BurstCompile]
         public void OnCreate(ref SystemState state)

@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Effects;
 using UnityEngine.InputSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -10,6 +10,8 @@ namespace Buildings.District
 {
     public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
     {
+        public event Action<EffectModifier> OnEffectGained;
+        
         [Title("State Data")]
         [SerializeField]
         private TowerData archerData;
@@ -26,10 +28,6 @@ namespace Buildings.District
         [SerializeField]
         private TowerData townHallData;
 
-        [Title("UI")]
-        [SerializeField]
-        private GameObject canvas;
-
         [Title("UI", "Upgrade")]
         [SerializeField]
         private UIDistrictUpgrade districtUpgrade;
@@ -42,10 +40,7 @@ namespace Buildings.District
         [SerializeField]
         private bool giveStartingLootData;
 #endif
-
-        private readonly List<EffectModifier> modifierEffectsToSpawn = new List<EffectModifier>();
-
-        public List<EffectModifier> ModifierEffects => modifierEffectsToSpawn;
+        
         public TowerData ArcherData => archerData;
         public TowerData BombData => bombData;
         public TowerData FlameData => flameData;
@@ -58,15 +53,21 @@ namespace Buildings.District
 
 #if UNITY_EDITOR
             if (giveStartingLootData)
-            {
-                foreach (LootData lot in debugStartingLootDatas)
-                {
-                    lot.AddModifierEditorOnly();
-                }   
+            { 
+                AddStartingLoot().Forget();
             }
 #endif
 
             GetInput().Forget();
+        }
+
+        private async UniTaskVoid AddStartingLoot()
+        {
+            await UniTask.Delay(500);
+            foreach (LootData lot in debugStartingLootDatas)
+            {
+                lot.AddModifierEditorOnly();
+            }
         }
 
         private async UniTaskVoid GetInput()
@@ -91,15 +92,11 @@ namespace Buildings.District
             UIEvents.OnFocusChanged?.Invoke();
             await UniTask.Yield();
 
-            canvas.SetActive(true);
             districtUpgrade.ShowUpgrades(district);
         }
 
         public void Close()
         {
-            if (!canvas.activeSelf) return;
-
-            canvas.SetActive(false);
             districtUpgrade.Close();
         }
 
@@ -107,7 +104,7 @@ namespace Buildings.District
 
         public void AddModifierEffect(EffectModifier effect)
         {
-            modifierEffectsToSpawn.Add(effect);
+            OnEffectGained?.Invoke(effect);
         }
 
         #endregion

@@ -62,10 +62,12 @@ public class UIDistrictUpgrade : MonoBehaviour
     [SerializeField]
     private UIEffectsHandler towerEffectsPanel;
     
+    private readonly Dictionary<DistrictData, List<EffectModifier>> effectModifiers = new Dictionary<DistrictData, List<EffectModifier>>();
     
-    
+    private readonly List<EffectModifier> availableEffectModifiers = new List<EffectModifier>();
     private readonly List<UIUpgradeDisplay> spawnedDisplays = new List<UIUpgradeDisplay>();
 
+    private DistrictUpgradeManager upgradeManager;
     private DistrictData districtData;
     private Canvas canvas;
     private Camera cam;
@@ -77,17 +79,29 @@ public class UIDistrictUpgrade : MonoBehaviour
 
         towerEffectsPanel.OnEffectAdded += AddEffectToTower;
         towerEffectsPanel.OnEffectRemoved += RemoveEffectFromTower;
+        
+        GetUpgradeManager().Forget();
+    }
+
+    private async UniTaskVoid GetUpgradeManager()
+    {
+        upgradeManager = await DistrictUpgradeManager.Get();
+        upgradeManager.OnEffectGained += OnEffectGained;
     }
 
     private void OnDisable()
     {
         towerEffectsPanel.OnEffectAdded -= AddEffectToTower;
         towerEffectsPanel.OnEffectRemoved -= RemoveEffectFromTower;
+        upgradeManager.OnEffectGained -= OnEffectGained;
     }
-
+    
     private void Update()
     {
-        PositionRectTransform.PositionOnOverlayCanvas(canvas, cam, transform as RectTransform, districtData.Position, pivot);
+        if (parentPanel.activeSelf)
+        {
+            PositionRectTransform.PositionOnOverlayCanvas(canvas, cam, parentPanel.transform as RectTransform, districtData.Position, pivot);
+        }
     }
 
     #region UI
@@ -97,10 +111,15 @@ public class UIDistrictUpgrade : MonoBehaviour
         upgradeSection.SetActive(isUpgrade);
         modifySection.SetActive(!isUpgrade);
 
-        //line.DORewind();
+        line.DOKill();
         line.DOAnchorPosX(isUpgrade ? -100 : 100, 0.2f).SetEase(Ease.OutCirc);
 
         (ownedEffectsPanel.transform.parent as RectTransform).DOAnchorPosX(isUpgrade ? -0 : -420, 0.5f).SetEase(Ease.OutCirc);
+        
+        if (!isUpgrade && effectModifiers.TryGetValue(districtData, out List<EffectModifier> effects))
+        {
+            towerEffectsPanel.SpawnEffects(effects);
+        }
     }
 
     public void ShowUpgrades(DistrictData districtData)
@@ -108,7 +127,8 @@ public class UIDistrictUpgrade : MonoBehaviour
         this.districtData = districtData;
 
         parentPanel.SetActive(true);
-        ownedEffectsPanel.SpawnEffects();
+        ownedEffectsPanel.SpawnEffects(availableEffectModifiers);
+        
         (ownedEffectsPanel.transform.parent as RectTransform).anchoredPosition = Vector2.zero;
 
         ShowSection(true);
@@ -124,6 +144,20 @@ public class UIDistrictUpgrade : MonoBehaviour
 
             _ => throw new ArgumentOutOfRangeException()
         };
+        
+        districtData.OnDisposed += DistrictDataOnOnDisposed;
+
+        void DistrictDataOnOnDisposed()
+        {
+            districtData.OnDisposed -= DistrictDataOnOnDisposed;
+
+            if (effectModifiers.TryGetValue(districtData, out List<EffectModifier> districtEffects))
+            {
+                availableEffectModifiers.AddRange(districtEffects);     
+            }
+            
+            parentPanel.SetActive(false);
+        }
     }
 
     private void SpawnUpgradeDisplays(DistrictData districtData)
@@ -167,6 +201,11 @@ public class UIDistrictUpgrade : MonoBehaviour
 
     public void Close()
     {
+        if (!parentPanel.activeSelf)
+        {
+            return;
+        }
+        
         for (int i = 0; i < spawnedDisplays.Count; i++)
         {
             spawnedDisplays[i].gameObject.SetActive(false);
@@ -176,7 +215,7 @@ public class UIDistrictUpgrade : MonoBehaviour
     }
     #endregion
 
-    #region Functionality
+    #region Upgrades
 
     public async UniTaskVoid UpgradeStat(IUpgradeStat stat)
     {
@@ -199,14 +238,48 @@ public class UIDistrictUpgrade : MonoBehaviour
         return MoneyManager.Instance.Money >= upgradeStat.GetCost();
     }
 
+    #endregion
+    
+    #region Effects
+    
+    private void OnEffectGained(EffectModifier effectModifier)
+    {
+        availableEffectModifiers.Add(effectModifier);
+        if (gameObject.activeInHierarchy)
+        {
+            Close();
+        }
+    }
+    
     private void AddEffectToTower(EffectModifier effectModifier)
     {
         districtData.State.Attack.AddEffect(effectModifier.Effects, effectModifier.EffectType);
+
+        availableEffectModifiers.Remove(effectModifier);
+
+        if (effectModifiers.TryGetValue(districtData, out List<EffectModifier> list))
+        {
+            list.Add(effectModifier);
+        }
+        else
+        {
+            effectModifiers.Add(districtData, new List<EffectModifier> { effectModifier });
+        }
+
     }
 
-    private void RemoveEffectFromTower(EffectModifier modifier)
+    private void RemoveEffectFromTower(EffectModifier effectModifier)
     {
-        districtData.State.Attack.RemoveEffect(modifier.Effects, modifier.EffectType);
+        districtData.State.Attack.RemoveEffect(effectModifier.Effects, effectModifier.EffectType);
+        
+        availableEffectModifiers.Add(effectModifier);
+        
+        if (!effectModifiers.TryGetValue(districtData, out List<EffectModifier> list)) return;
+        list.Remove(effectModifier);
+        if (list.Count == 0)
+        {
+            effectModifiers.Remove(districtData);
+        }
     }
 
     #endregion

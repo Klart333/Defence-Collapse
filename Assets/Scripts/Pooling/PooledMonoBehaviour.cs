@@ -10,7 +10,7 @@ public class PooledMonoBehaviour : MonoBehaviour
     [Title("Pool")]
     [SerializeField]
     private int initialPoolSize = 10;
-
+    
     public event Action<PooledMonoBehaviour> OnReturnToPool; // Takes a PooledMonoBehaviour as an argument so that we know what object to return
 
     public int InitialPoolSize => initialPoolSize;

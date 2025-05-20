@@ -433,7 +433,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8252277805250641144}
-  - component: {fileID: 254853098655778466}
   - component: {fileID: 2469724980238236484}
   - component: {fileID: 6256566722320315504}
   m_Layer: 0
@@ -466,14 +465,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 980, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &254853098655778466
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8560921894586417560}
-  m_CullTransparentMesh: 1
 --- !u!114 &2469724980238236484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -486,6 +477,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5811fc98c8c4df14d9e994309472fdd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  initialPoolSize: 10
+  shouldReturnIfActive: 0
   description: {fileID: 3239325283726968515}
   title: {fileID: 8531164603817422229}
   iconImage: {fileID: 5692787310216145197}
