@@ -45,7 +45,7 @@ namespace Chunks
                 return;
             }
             
-            Vector3 point = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
+            Vector3 point = Utility.Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
             foreach (KeyValuePair<Chunk, ChunkUnlocker> kvp in unlockers)
             {
                 kvp.Value.SetShowing(kvp.Key.ContainsPoint(point, Vector3.one * 2));

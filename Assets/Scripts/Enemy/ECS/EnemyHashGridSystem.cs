@@ -23,7 +23,7 @@ namespace DataStructures.Queue.ECS
         {
             int enemyCount = SystemAPI.GetSingletonRW<WaveStateComponent>().ValueRO.EnemyCount;
             RefRW<SpatialHashMapSingleton> mapSingleton = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>();
-            mapSingleton.ValueRW.Value = new NativeParallelMultiHashMap<int2, Entity>(enemyCount * 2, state.WorldUpdateAllocator); // Double for loadfactor stuff
+            mapSingleton.ValueRW.Value = new NativeParallelMultiHashMap<int2, Entity>((int)(enemyCount * 2.5f), state.WorldUpdateAllocator); // Double for loadfactor stuff
             if (enemyCount == 0)
             {
                 return;

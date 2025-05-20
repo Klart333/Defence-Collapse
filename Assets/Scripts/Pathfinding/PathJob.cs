@@ -15,8 +15,6 @@ public struct PathJob : IJob
     public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
 
     public int Start;
-    public int GridWidth;
-    public int GridHeight;
     public int ArrayLength;
     public int ChunkAmount;
     
@@ -80,29 +78,29 @@ public struct PathJob : IJob
 
     private void GetNeighbours(int2 chunkIndex, int gridIndex, NativeArray<PathIndex> array)
     {
-        int x = gridIndex % GridWidth;
-        int y = gridIndex / GridWidth;
+        int x = gridIndex % PathManager.GRID_WIDTH;
+        int y = gridIndex /  PathManager.GRID_WIDTH;
 
         for (int i = 0; i < 8; i++)
         {
             int2 dir = PathManager.NeighbourDirections[i];
             int2 neighbour = new int2(x + dir.x, y + dir.y);
 
-            array[i] = neighbour switch // Grid width / height = 24, // NO DIAGONALS BUT IT'S FINE
+            array[i] = neighbour switch // Grid width / height = 16, // NO DIAGONALS BUT IT'S FINE
             {
                 {x: < 0} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x - 1, chunkIndex.y)) 
-                    ? new PathIndex(new int2(chunkIndex.x - 1, chunkIndex.y), 23 + y * GridWidth )
+                    ? new PathIndex(new int2(chunkIndex.x - 1, chunkIndex.y), 15 + y * PathManager.GRID_WIDTH )
                     : new PathIndex(default, -1),
-                {x: > 23} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x + 1, chunkIndex.y)) 
-                    ? new PathIndex(new int2(chunkIndex.x + 1, chunkIndex.y), 0 + y * GridWidth )
+                {x: > 15} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x + 1, chunkIndex.y)) 
+                    ? new PathIndex(new int2(chunkIndex.x + 1, chunkIndex.y), 0 + y * PathManager.GRID_WIDTH )
                     : new PathIndex(default, -1),
                 {y: < 0} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y - 1)) 
-                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y - 1), x + 23 * GridWidth  ) 
+                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y - 1), x + 15 * PathManager.GRID_WIDTH  ) 
                     : new PathIndex(default, -1),
-                {y: > 23} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y + 1)) 
-                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y + 1), x + 0 * GridWidth ) 
+                {y: > 15} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y + 1)) 
+                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y + 1), x + 0 * PathManager.GRID_WIDTH ) 
                     : new PathIndex(default, -1),
-                _ => new PathIndex(chunkIndex, neighbour.x + neighbour.y * GridWidth),
+                _ => new PathIndex(chunkIndex, neighbour.x + neighbour.y * PathManager.GRID_WIDTH),
             };
         }
     }

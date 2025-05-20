@@ -150,7 +150,7 @@ namespace Buildings.District
 
             if (!isDistrictValid)
             {
-                Vector3 mousePos = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
+                Vector3 mousePos = Utility.Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
                 spawnedUnableToPlace?.gameObject.SetActive(false);
                 spawnedUnableToPlace = unableToPlacePrefab.GetAtPosAndRot<PooledMonoBehaviour>(mousePos, Quaternion.identity);
                 
@@ -188,7 +188,7 @@ namespace Buildings.District
         {
             spawnedUnableToPlace?.gameObject.SetActive(false);
 
-            Vector3 mousePos = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
+            Vector3 mousePos = Utility.Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
             spawnedUnableToPlace = unableToPlacePrefab.GetAtPosAndRot<PooledMonoBehaviour>(mousePos, Quaternion.identity);
 
             isPlacementValid = false;
@@ -228,7 +228,7 @@ namespace Buildings.District
             requireQueryWalls = true;
             buildingIndexes.Clear();
             builtIndexes.Clear();
-            Vector3 mousePos = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
+            Vector3 mousePos = Utility.Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
             for (int x = 0; x < districtRadius; x++)
             for (int z = 0; z < districtRadius; z++)
             {

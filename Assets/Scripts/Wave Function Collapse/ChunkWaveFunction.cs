@@ -824,16 +824,16 @@ namespace WaveFunctionCollapse
 
         public static int2 GetDistrictIndex2(Vector3 position, Vector3 chunkScale)
         {
-            int x = Math.GetMultipleFloored(position.x, chunkScale.x);
-            int y = Math.GetMultipleFloored(position.z, chunkScale.z);
+            int x = Utility.Math.GetMultipleFloored(position.x, chunkScale.x);
+            int y = Utility.Math.GetMultipleFloored(position.z, chunkScale.z);
             return new int2(x, y);
         }
 
         public static int3 GetDistrictIndex3(Vector3 position, Vector3 chunkScale)
         {
-            int x = Math.GetMultipleFloored(position.x, chunkScale.x);
-            int y = Math.GetMultipleFloored(position.y, chunkScale.y);
-            int z = Math.GetMultipleFloored(position.z, chunkScale.z);
+            int x = Utility.Math.GetMultipleFloored(position.x, chunkScale.x);
+            int y = Utility.Math.GetMultipleFloored(position.y, chunkScale.y);
+            int z = Utility.Math.GetMultipleFloored(position.z, chunkScale.z);
             return new int3(x, y, z);
         }
 

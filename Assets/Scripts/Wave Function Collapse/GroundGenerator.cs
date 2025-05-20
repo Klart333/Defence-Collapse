@@ -242,7 +242,7 @@ namespace WaveFunctionCollapse
                 }
                 
                 Chunk adjacent = waveFunction.LoadChunk(chunkIndex, chunkSize, defaultPrototypeInfoData, false);
-                chunkMaskHandler.CreateMask(adjacent, Math.IntToAdjacency(new int2(-x, -z)));
+                chunkMaskHandler.CreateMask(adjacent, Utility.Math.IntToAdjacency(new int2(-x, -z)));
                 adjacentChunks.Add(adjacent);
                 directions.Add(DirectionUtility.Int2ToDirection(new int2(-x, -z)));
             }
@@ -292,10 +292,14 @@ namespace WaveFunctionCollapse
             {
                 int x = isHorizontal ? edge : i;
                 int z = isHorizontal ? i : edge;
-            
-                List<PrototypeData> prots = Mathf.Abs(middle - (isHorizontal ? z : x)) <= 1
-                    ? new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[enemyGateIndex], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 1], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 2], defaultPrototypeInfoData.Prototypes[enemyGateIndex + 3] }
-                    : new List<PrototypeData> { defaultPrototypeInfoData.Prototypes[fullTreeIndex] };
+
+                List<PrototypeData> prots = new List<PrototypeData>
+                {
+                    defaultPrototypeInfoData.Prototypes[isHorizontal 
+                        ? enemyGateIndex + 1 + (i - 1) * 2
+                        : enemyGateIndex + 2 - (i - 1) * 2
+                    ]
+                };
 
                 chunk.Cells[x, 0, z] = new Cell(false, chunk.Cells[x, 0, z].Position, prots);
                 ChunkIndex index = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));

@@ -115,6 +115,8 @@ namespace Pathfinding
                 for (int i = 0; i < target.TargetIndexes.Count; i++)
                 {
                     PathIndex index = target.TargetIndexes[i];
+                    Debug.Log("PathIndex" + index);
+
                     if (index.GridIndex < 0 || !TargetIndexes.Add(index)) continue;
 
                     ref BlobArray<int> blobArray = ref targetArray.Invoke(index.ChunkIndex);

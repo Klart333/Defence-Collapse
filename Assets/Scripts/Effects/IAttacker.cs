@@ -1,10 +1,12 @@
 using System;
+using Gameplay.Upgrades;
 using UnityEngine;
 
 public interface IAttacker
 {
-    // References
+    // Info
     public Stats Stats { get; }
+    public CategoryType CategoryType { get; }
 
     // Position
     public Vector3 AttackPosition { get; set; }

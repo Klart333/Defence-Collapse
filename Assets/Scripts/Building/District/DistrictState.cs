@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Vector2 = UnityEngine.Vector2;
+using System.Collections.Generic;
 using DataStructures.Queue.ECS;
 using WaveFunctionCollapse;
 using Gameplay.Research;
 using Unity.Collections;
 using Unity.Mathematics;
+using Gameplay.Upgrades;
 using Unity.Transforms;
 using Unity.Entities;
 using System.Linq;
@@ -12,7 +14,6 @@ using UnityEngine;
 using Effects;
 using System;
 using Juice;
-using Vector2 = UnityEngine.Vector2;
 
 namespace Buildings.District
 {
@@ -35,6 +36,7 @@ namespace Buildings.District
         public Stats Stats => stats;
 
         public abstract List<IUpgradeStat> UpgradeStats { get; }
+        public abstract CategoryType CategoryType { get; }
         protected abstract bool UseTargetMeshes { get; }
         protected abstract float AttackAngle { get; }
         public Vector3 OriginPosition { get; set; }
@@ -304,18 +306,18 @@ namespace Buildings.District
 
     public class ArcherState : DistrictState
     {
-        public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
-        
-        protected override bool UseTargetMeshes => true;
-        protected override float AttackAngle => 75;
-
-
         private readonly TowerData archerData;
-
+        
         private GameObject rangeIndicator;
+        
         private bool selected;
         
+        public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
+        
+        public override CategoryType CategoryType => CategoryType.Archer;
+        protected override bool UseTargetMeshes => true;
+        protected override float AttackAngle => 75;
 
         public ArcherState(DistrictData districtData, TowerData archerData, Vector3 position, int key) : base(districtData, position, key)
         {
@@ -439,6 +441,7 @@ namespace Buildings.District
         };
         
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
+        public override CategoryType CategoryType => CategoryType.Bomb;
         protected override bool UseTargetMeshes => true;
         protected override float AttackAngle => 360;
         public override Attack Attack { get; }
@@ -597,6 +600,7 @@ namespace Buildings.District
         private bool selected;
 
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
+        public override CategoryType CategoryType => CategoryType.TownHall;
         protected override bool UseTargetMeshes => false;
         protected override float AttackAngle => 360;
         public override Attack Attack { get; }
@@ -707,6 +711,7 @@ namespace Buildings.District
         private bool selected;
         
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
+        public override CategoryType CategoryType => CategoryType.Mine;
         protected override bool UseTargetMeshes => false;
         protected override float AttackAngle => 360;
         public override Attack Attack { get; }
@@ -876,6 +881,7 @@ namespace Buildings.District
         };
         
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
+        public override CategoryType CategoryType => CategoryType.Flame;
         protected override bool UseTargetMeshes => true;
         protected override float AttackAngle => 90;
         public override Attack Attack { get; }

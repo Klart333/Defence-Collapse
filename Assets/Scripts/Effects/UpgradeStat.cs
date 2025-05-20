@@ -82,8 +82,7 @@ public class UpgradeStat : IUpgradeStat
         }
         
         increaseModifier.Value += GetIncrease();
-        Stat.SetDirty();
-        Stat.InvokeValueChanged();
+        Stat.SetDirty(false);
         Level++;
 
         return new UniTask<bool>(true);
@@ -169,8 +168,7 @@ public class TownHallUpgradeStat : IUpgradeStat
         }
         
         increaseModifier.Value += GetIncrease();
-        Stat.SetDirty();
-        Stat.InvokeValueChanged();
+        Stat.SetDirty(false);
         Level++;
         return true;
     }

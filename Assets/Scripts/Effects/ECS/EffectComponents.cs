@@ -1,5 +1,7 @@
-using Unity.Entities;
+using Random = Unity.Mathematics.Random;
+using Gameplay.Upgrades;
 using Unity.Mathematics;
+using Unity.Entities;
 
 namespace Effects.ECS
 {
@@ -109,4 +111,31 @@ namespace Effects.ECS
 	{
 		public Random Random;
 	}
+
+	public struct AddComponentComponent : IComponentData
+	{
+		public CategoryType AppliedCategory;
+		public UpgradeComponentType ComponentType;
+
+		public float Strength;
+	}
+	
+	#region Effect Components
+	
+	public struct LightningComponent : IComponentData
+	{
+		public int Bounces;
+	}
+
+	public struct ExplosionComponent : IComponentData
+	{
+		
+	}
+
+	public struct FireComponent : IComponentData
+	{
+		
+	}
+	
+	#endregion
 }

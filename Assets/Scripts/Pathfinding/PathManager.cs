@@ -215,8 +215,6 @@ namespace Pathfinding
                 ChunkIndexToListIndex = chunkIndexToListIndex.AsReadOnly(),
                 Start = jobStartIndex,
                 ArrayLength = arrayLength,
-                GridWidth = gridSize.x,
-                GridHeight = gridSize.y,
                 ChunkAmount = chunkAmount,
             }.Schedule().Complete();
 
@@ -256,24 +254,13 @@ namespace Pathfinding
         #endregion
 
         #region Utility
-
-        public bool CheckIfValid(float xPos, float zPos)
-        {
-            return xPos > 0 && zPos > 0 && xPos < GridWorldWidth && zPos < GridWorldHeight;
-        }
-
-        public bool CheckIfValid(Vector2 pos)
-        {
-            return pos is { x: > 0, y: > 0 } && pos.x < GridWorldWidth && pos.y < GridWorldHeight;
-        }
-        
-        #region Static
         
         public const float HALF_BUILDING_CELL = 0.25f;
         public const float FULL_BUILDING_CELL = 0.5f;
         public const float CELL_SCALE = 0.5f;
-        public const float CHUNK_SIZE = 12;
-        public const int GRID_WIDTH = 24; // Also change GetNeighbours inside PathJob
+        public const float CHUNK_SIZE = 8;
+        public const int GRID_WIDTH = 16; // Also change GetNeighbours inside PathJob
+        public const int GRID_Length = 256; // Width * Width
         public static float2 ByteToDirection(byte directionByte)
         {
             float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees
@@ -304,8 +291,8 @@ namespace Pathfinding
         public static PathIndex GetIndex(float xPos, float zPos)
         {
             // Find which chunk the position is in
-            int chunkX = Math.GetMultipleFloored(xPos + FULL_BUILDING_CELL, CHUNK_SIZE);
-            int chunkZ = Math.GetMultipleFloored(zPos + FULL_BUILDING_CELL, CHUNK_SIZE);
+            int chunkZ = Utility.Math.GetMultipleFloored(zPos + FULL_BUILDING_CELL, CHUNK_SIZE);
+            int chunkX = Utility.Math.GetMultipleFloored(xPos + FULL_BUILDING_CELL, CHUNK_SIZE);
             int2 chunkIndex = new int2(chunkX, chunkZ);
         
             // Calculate position relative to the chunk's origin
@@ -313,16 +300,14 @@ namespace Pathfinding
             float localZ = zPos - chunkZ * CHUNK_SIZE;
         
             // Find grid indices within the chunk
-            int gridX = Math.GetMultiple(localX + HALF_BUILDING_CELL, CELL_SCALE);
-            int gridZ = Math.GetMultiple(localZ + HALF_BUILDING_CELL, CELL_SCALE);
+            int gridX = Utility.Math.GetMultiple(localX + HALF_BUILDING_CELL, CELL_SCALE);
+            int gridZ = Utility.Math.GetMultiple(localZ + HALF_BUILDING_CELL, CELL_SCALE);
         
             // Convert 2D grid index to 1D
             int targetIndex = gridZ * GRID_WIDTH + gridX;
         
             return new PathIndex(chunkIndex, targetIndex);
         }
-
-        #endregion
 
         #endregion
     }

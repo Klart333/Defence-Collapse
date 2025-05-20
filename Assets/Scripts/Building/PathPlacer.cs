@@ -71,7 +71,7 @@ namespace Buildings
                 return;
             }
             
-            Vector3 mousePoint = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
+            Vector3 mousePoint = Utility.Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
             ChunkIndex? chunkIndex = pathGenerator.GetIndex(mousePoint);
             if (!chunkIndex.HasValue)
             {

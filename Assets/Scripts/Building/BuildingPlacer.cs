@@ -82,7 +82,7 @@ public class BuildingPlacer : MonoBehaviour
             SquareIndex = null;
             return;
         }
-        Vector3 mousePoint = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
+        Vector3 mousePoint = Utility.Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
         ChunkIndex? chunkIndex = BuildingManager.Instance.GetIndex(mousePoint);
         if (!chunkIndex.HasValue)
         {

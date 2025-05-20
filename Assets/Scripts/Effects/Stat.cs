@@ -134,16 +134,16 @@ public class Stat : IStat
         OnValueChanged?.Invoke();
     }
 
-    public void SetDirty()
+    public void SetDirty(bool silent = true)
     {
         isDirty = true;
+        
+        if (!silent)
+        {
+            OnValueChanged?.Invoke();
+        }
     }
 
-    public void InvokeValueChanged()
-    {
-        OnValueChanged?.Invoke();
-    }
-    
     public static implicit operator float(Stat stat) => stat.Value;
 }
 

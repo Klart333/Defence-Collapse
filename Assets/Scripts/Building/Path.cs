@@ -31,8 +31,8 @@ namespace Buildings
         [SerializeField]
         private UnityEvent OnResetEvent;
 
-        private List<Material> transparentMaterials = new List<Material>();
-        private List<Material> transparentRemoveMaterials = new List<Material>();
+        private readonly List<Material> transparentMaterials = new List<Material>();
+        private readonly List<Material> transparentRemoveMaterials = new List<Material>();
 
         private MeshCollider meshCollider;
         private MeshRenderer meshRenderer;

@@ -45,7 +45,7 @@ namespace WaveFunctionCollapse
         {
             return key switch
             {
-                >= 5000 => $"v{key % 100}_{Math.GetSecondSocketValue(key)}",
+                >= 5000 => $"v{key % 100}_{Utility.Math.GetSecondSocketValue(key)}",
                 >= 2000 => $"{key - 2000}s",
                 >= 1000 => $"{key - 1000}f", 
                 _ => key.ToString()

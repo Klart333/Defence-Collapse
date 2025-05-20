@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using Gameplay.Money;
+using Gameplay.Upgrades;
 using UnityEngine;
 
 namespace Effects

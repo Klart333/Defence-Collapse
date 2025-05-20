@@ -23,7 +23,6 @@ namespace TextMeshDOTS.Authoring
     public partial struct DamageNumberSystem : ISystem
     {
         private BlobAssetReference<FontBlob> normalFontReference;
-        private BlobAssetReference<FontBlob> boldFontReference;
         private EntityArchetype textRenderArchetype;
         private TextBaseConfiguration textBaseConfiguration;
         private RenderFilterSettings renderFilterSettings;
@@ -33,10 +32,8 @@ namespace TextMeshDOTS.Authoring
         {
             textRenderArchetype = GetSingleFontTextArchetype(ref state);
 
-            FontRequest fontRequest = GetFontRequest(FontWeight.Normal);
-            FontRequest fontRequestBold = GetFontRequest(FontWeight.Bold);
+            FontRequest fontRequest = GetFontRequest();
             normalFontReference = FontBlobber.GetRuntimeFontBlob(fontRequest);
-            boldFontReference = FontBlobber.GetRuntimeFontBlob(fontRequestBold);
             
             textBaseConfiguration = new TextBaseConfiguration
             {
@@ -73,7 +70,6 @@ namespace TextMeshDOTS.Authoring
             {
                 ECB = ecb.AsParallelWriter(),
                 NormalFontReference = normalFontReference, 
-                BoldFontReference = boldFontReference,
                 TextBaseConfiguration = textBaseConfiguration,
                 RenderFilterSettings = renderFilterSettings,
                 TextRenderControl = textRenderControl,
@@ -90,10 +86,9 @@ namespace TextMeshDOTS.Authoring
         public void OnDestroy(ref SystemState state)
         {
             if (normalFontReference.IsCreated) normalFontReference.Dispose();
-            if (boldFontReference.IsCreated) boldFontReference.Dispose();
         }
         
-        private FontRequest GetFontRequest(FontWeight fontWeight)
+        private FontRequest GetFontRequest()
         {
             //use FontUtility Scriptable Object to extract the following needed information
             //see ReadMe for more details how
@@ -104,7 +99,7 @@ namespace TextMeshDOTS.Authoring
                 fontSubFamily = "Regular",
                 typographicFamily = "",
                 typographicSubfamily = "",
-                fontWeight = fontWeight,
+                fontWeight = FontWeight.Normal,
                 fontWidth = 100,
                 isItalic = false,
                 slant = 0,
@@ -153,7 +148,6 @@ namespace TextMeshDOTS.Authoring
         public TextRenderControl TextRenderControl;
         
         public BlobAssetReference<FontBlob> NormalFontReference;
-        public BlobAssetReference<FontBlob> BoldFontReference;
         public float3 SpawnOffset;
         public int BaseSeed;
 
@@ -182,7 +176,7 @@ namespace TextMeshDOTS.Authoring
             }
 
             ECB.SetComponent(entityIndex, textEntity, TextBaseConfiguration);
-            ECB.SetComponent(entityIndex, textEntity, new FontBlobReference { value = damageTaken.IsCrit ? BoldFontReference : NormalFontReference });
+            ECB.SetComponent(entityIndex, textEntity, new FontBlobReference { value = NormalFontReference });
             ECB.SetComponent(entityIndex, textEntity, LocalTransform.FromPosition(transform.Position + SpawnOffset));
             ECB.SetComponent(entityIndex, textEntity, TextRenderControl);
             

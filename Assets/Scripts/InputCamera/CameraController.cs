@@ -153,7 +153,7 @@ namespace InputCamera
             float zoomAmount = zoomSensitivity * zoomDirection * Time.deltaTime;
 
             // Raycast-based zoom (towards what the camera is pointing at)
-            Vector3 groundPos = Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
+            Vector3 groundPos = Utility.Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
             Vector3 directionToTarget = (transform.position - groundPos).normalized;
             float currentDistance = Vector3.Distance(transform.position, groundPos);
             float newDistance = Mathf.Clamp(currentDistance - zoomAmount, minZoomDistance, maxZoomDistance);
@@ -166,7 +166,7 @@ namespace InputCamera
             float rotateInput = rotateAction.ReadValue<float>();
             if (rotateInput == 0) return;
 
-            Vector3 currentMousePoint = Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
+            Vector3 currentMousePoint = Utility.Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
             if (currentMousePoint == Vector3.zero) return;
 
             float rotationAmount = rotationSpeed * Time.deltaTime * (fastMoveAction.IsPressed() ? fastMoveMultiplier : 1f);
@@ -184,7 +184,7 @@ namespace InputCamera
             }
 
             isPressed = true;
-            panStartPosition = Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
+            panStartPosition = Utility.Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
             panStartScreenPosition = Mouse.current.position.ReadValue();
         }
 
@@ -215,7 +215,7 @@ namespace InputCamera
                 return;
             }
 
-            Vector3 currentMousePoint = Math.GetGroundIntersectionPoint(controlledCamera, mousePosition);
+            Vector3 currentMousePoint = Utility.Math.GetGroundIntersectionPoint(controlledCamera, mousePosition);
             if (currentMousePoint == Vector3.zero) return;
 
             Vector3 delta = panStartPosition - currentMousePoint;

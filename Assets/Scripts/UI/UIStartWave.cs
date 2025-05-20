@@ -28,6 +28,14 @@ public class UIStartWave : MonoBehaviour
         Events.OnWaveEnded -= OnWaveEnded;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            Events.OnWaveEnded?.Invoke();
+        }
+    }
+
     private void OnWaveEnded()
     {
         animator.SetBool(Interactable, true);

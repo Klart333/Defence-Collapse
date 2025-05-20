@@ -114,19 +114,27 @@ namespace Pathfinding
 
         private List<Vector3> GetLine(PathIndex startIndex)
         {
-            HashSet<Vector3> path = new HashSet<Vector3>();
+            HashSet<Vector3> path = new HashSet<Vector3> {PathManager.GetPos(startIndex)};
             PathIndex index = startIndex;
             int chunkIndex = pathManager.ChunkIndexToListIndex[index.ChunkIndex];
             byte direction = pathManager.PathChunks.Value.PathChunks[chunkIndex].Directions[index.GridIndex];
-
+            bool pointsAreUnique = true;
             int i = 100;
-            while (direction != byte.MaxValue && i-- > 0 && path.Add(PathManager.GetPos(index).xzy))
+            while (direction != byte.MaxValue && i-- > 0 && pointsAreUnique)
             {
-                chunkIndex = pathManager.ChunkIndexToListIndex[index.ChunkIndex];
-                direction = pathManager.PathChunks.Value.PathChunks[chunkIndex].Directions[index.GridIndex];
-                
                 float2 dir = PathManager.ByteToDirection(direction);
                 index = PathManager.GetIndex(PathManager.GetPos(index).xz + dir);
+                
+                byte lastDirection = direction;
+                if (!pathManager.ChunkIndexToListIndex.TryGetValue(index.ChunkIndex, out chunkIndex) 
+                    || index.GridIndex < 0 || index.GridIndex >= PathManager.GRID_Length) return path.ToList();
+                
+                direction = pathManager.PathChunks.Value.PathChunks[chunkIndex].Directions[index.GridIndex];
+
+                if (direction != lastDirection)
+                {
+                    pointsAreUnique = path.Add(PathManager.GetPos(index));
+                }
             }
 
             return path.ToList();

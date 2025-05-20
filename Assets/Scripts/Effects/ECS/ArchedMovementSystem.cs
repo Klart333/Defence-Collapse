@@ -39,7 +39,7 @@ namespace Effects.ECS
         {
             arch.Value += speed.Speed * DeltaTime;
             
-            position.Position = Math.CubicLerp(arch.StartPosition, arch.EndPosition, arch.Pivot, arch.Value);
+            position.Position = Utility.Math.CubicLerp(arch.StartPosition, arch.EndPosition, arch.Pivot, arch.Value);
         }
     }
 }

@@ -386,7 +386,7 @@ namespace WaveFunctionCollapse
                 
                 short[] existingKeys = new short[4];
                 existingKeys[0] = prototypeData.VerticalSocketList[g].socketname;
-                short index = Math.GetSecondSocketValue(existingKeys[0]);
+                short index = Utility.Math.GetSecondSocketValue(existingKeys[0]);
                 short keyValue = (short)(existingKeys[0] % 100);
                 
                 for (int i = 1; i < 4; i++)

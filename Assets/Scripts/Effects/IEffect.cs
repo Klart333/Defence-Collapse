@@ -1,19 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using Random = Unity.Mathematics.Random;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine.Rendering;
+using Gameplay.Upgrades.ECS;
+using Gameplay.Upgrades;
+using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Rendering;
 using Unity.Entities;
-using UnityEngine;
 using Effects.ECS;
-using System;
-using System.Threading.Tasks;
+using UnityEngine;
 using Gameplay;
-using Unity.Mathematics;
 using VFX.ECS;
-using Random = Unity.Mathematics.Random;
+using System;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable ConvertToConstant.Global
@@ -37,6 +38,11 @@ namespace Effects
         public List<IEffect> Effects { get; set; }
 
         public IEffectHolder Clone();
+    }
+
+    public interface IEntityEffect : IEffect
+    {
+        public void Perform(IAttacker attacker, CategoryType extraCategory);
     }
 
     #region Increase Stat
@@ -67,17 +73,19 @@ namespace Effects
 
             if (!ModifierDictionary.TryGetValue(unit, out Modifier value))
             {
-                ModifierDictionary.Add(unit, new Modifier
+                Modifier modifier = new Modifier
                 {
                     Type = ModifierType,
                     Value = ModifierValue
-                });
-
-                unit.Stats.ModifyStat(StatType, ModifierDictionary[unit]);
+                };
+                
+                ModifierDictionary.Add(unit, modifier);
+                unit.Stats.ModifyStat(StatType, modifier);
             }
             else if (CanIncrease)
             {
                 value.Value += ModifierValue;
+                unit.Stats.Get(StatType).SetDirty(false);
             }
         }
 
@@ -237,7 +245,7 @@ namespace Effects
     #region Damage Collider
 
     [Serializable]
-    public class DamageColliderEffect : IEffect
+    public class DamageColliderEffect : IEntityEffect
     {
         [Title("Attack Damage")]
         [OdinSerialize]
@@ -261,7 +269,9 @@ namespace Effects
 
         public bool IsDamageEffect => true;
 
-        public void Perform(IAttacker unit)
+        public void Perform(IAttacker unit) => Perform(unit, 0);
+        
+        public void Perform(IAttacker unit, CategoryType extraCategory)
         {
             Vector3 pos = unit.AttackPosition;
             
@@ -289,36 +299,42 @@ namespace Effects
                 CritDamage = unit.Stats.CritMultiplier.Value,
             };
             
-            Entity colliderEntity = CreateEntity(pos, colliderComponent, dmgComponent, critComponent);
-        }
-
-        private Entity CreateEntity(Vector3 pos, ColliderComponent colliderComponent, DamageComponent dmgComponent, CritComponent critComponent)
-        {
-            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-            ComponentType[] componentTypes = {
-                typeof(DamageComponent),
-                typeof(ColliderComponent),
-                typeof(PositionComponent),
-                typeof(RandomComponent),
-                typeof(CritComponent),
-            };
-
-            Entity spawned = entityManager.CreateEntity(componentTypes);
-            entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
-            entityManager.SetComponentData(spawned, new RandomComponent { Random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 100000)) });
-            entityManager.SetComponentData(spawned, critComponent);
-            entityManager.SetComponentData(spawned, colliderComponent);
-            entityManager.SetComponentData(spawned, dmgComponent);
-
-            if (HasLifetime)
-            {
-                entityManager.AddComponentData(spawned, new LifetimeComponent { Lifetime = Lifetime });
-            }
+            Entity colliderEntity = CreateEntity();
             
-            return spawned;
-        }
+            Entity CreateEntity()
+            {
+                EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
+                ComponentType[] componentTypes = {
+                    typeof(AddComponentInitComponent),
+                    typeof(ColliderComponent),
+                    typeof(PositionComponent),
+                    typeof(RandomComponent),
+                    typeof(DamageComponent),
+                    typeof(CritComponent),
+                };
+
+                Entity spawned = entityManager.CreateEntity(componentTypes);
+                entityManager.SetComponentData(spawned, new PositionComponent { Position = pos });
+                entityManager.SetComponentData(spawned, new RandomComponent { Random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 100000)) });
+                entityManager.SetComponentData(spawned, critComponent);
+                entityManager.SetComponentData(spawned, colliderComponent);
+                entityManager.SetComponentData(spawned, dmgComponent);
+
+                entityManager.SetComponentData(spawned, new AddComponentInitComponent
+                {
+                    CategoryType = unit.CategoryType | extraCategory | (LimitedHits ? 0 : CategoryType.AoE),
+                });
+                
+                if (HasLifetime)
+                {
+                    entityManager.AddComponentData(spawned, new LifetimeComponent { Lifetime = Lifetime });
+                }
+            
+                return spawned;
+            }
+        }
+        
         public void Revert(IAttacker unit)
         {
             // Cant revert
@@ -330,39 +346,47 @@ namespace Effects
     #region Arched Damage Collider
 
     [Serializable]
-    public class ArchedDamageColliderEffect : IEffect
+    public class ArchedDamageColliderEffect : IEntityEffect
     {
-        [Title("Attack Damage")]
+        [FoldoutGroup("Attack Damage", order: 1)]
         [OdinSerialize]
         public float ModifierValue { get; set; } = 20f;
 
-        [Title("Hits")]
-        public bool LimitedHits = false;
+        [FoldoutGroup("Hits")]
+        public bool LimitedHits;
         
+        [FoldoutGroup("Hits")]
         [ShowIf(nameof(LimitedHits))]
         public byte Hits = 1;
         
+        [FoldoutGroup("Hits")]
         public bool TriggerDamageDone = true;
 
-        [Title("Collider")]
+        [FoldoutGroup("Collider")]
         public float Radius = 1;
 
-        [Title("Movement")]
+        [FoldoutGroup("Movement")]
         public float Height = 5;
+        [FoldoutGroup("Movement")]
         public float UnitsPerSecond = 8;
 
-        [Title("OnComplete Effects")]
+        [FoldoutGroup("OnComplete Effects")]
         public List<IEffect> Effects;
-
-        [Title("Visual")]
+        
+        [FoldoutGroup("Visual")]
         public Mesh Mesh;
+        [FoldoutGroup("Visual")]
         public Material Material;
+        [FoldoutGroup("Visual")]
         public float Scale = 1;
+        [FoldoutGroup("Visual")]
         public float TrailScaleFactor = 1;
 
         public bool IsDamageEffect => true;
 
-        public void Perform(IAttacker unit)
+        public void Perform(IAttacker unit) => Perform(unit, 0);
+        
+        public void Perform(IAttacker unit, CategoryType extraCategory)
         {
             float3 targetPosition = unit.AttackPosition;
             
@@ -382,6 +406,7 @@ namespace Effects
             {
                 ComponentType[] componentTypes = {
                     typeof(RotateTowardsVelocityComponent),
+                    typeof(AddComponentInitComponent),
                     typeof(ArchedMovementComponent),
                     typeof(InitTrailComponent),
                     typeof(ColliderComponent),
@@ -395,13 +420,20 @@ namespace Effects
                 };
 
                 Entity spawned = entityManager.CreateEntity(componentTypes);
-                entityManager.SetComponentData(spawned, new SpeedComponent{Speed = 1.0f / lifetime});
-                entityManager.SetComponentData(spawned, new LifetimeComponent{Lifetime = lifetime});
-                entityManager.SetComponentData(spawned, new PositionComponent{Position = pos});
+                entityManager.SetComponentData(spawned, new SpeedComponent { Speed = 1.0f / lifetime });
+                entityManager.SetComponentData(spawned, new LifetimeComponent { Lifetime = lifetime });
+                entityManager.SetComponentData(spawned, new PositionComponent { Position = pos });
                 entityManager.SetComponentData(spawned, new ColliderComponent { Radius = Radius });
                 entityManager.SetComponentData(spawned, new InitTrailComponent { ScaleFactor = TrailScaleFactor });
+                entityManager.SetComponentData(spawned, new AddComponentInitComponent
+                {
+                    CategoryType = unit.CategoryType | CategoryType.Projectile | extraCategory,
+                });
 
-                entityManager.SetComponentData(spawned, new RandomComponent { Random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 100000)) });
+                entityManager.SetComponentData(spawned, new RandomComponent
+                {
+                    Random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 100000))
+                });
                 entityManager.SetComponentData(spawned, new CritComponent
                 {
                     CritChance = unit.Stats.CritChance.Value,
@@ -461,8 +493,14 @@ namespace Effects
 
                 for (int i = 0; i < Effects.Count; i++)
                 {
-                    Effects[i].Perform(unit);
-                    //Debug.Log("Performing effect: " + Effects[i]);
+                    if (Effects[i] is IEntityEffect entityEffect)
+                    {
+                        entityEffect.Perform(unit, CategoryType.Projectile | extraCategory);
+                    }
+                    else
+                    {
+                        Effects[i].Perform(unit);
+                    }
                 }
             }
         }

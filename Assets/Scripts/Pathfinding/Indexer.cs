@@ -91,15 +91,13 @@ namespace Pathfinding
 
             if (Indexes.Count == 0)
             {
-                Vector2 pos = transform.position.XZ();
+                Debug.LogWarning($"Indexer {this} failed to build valid indexes", this);
+
+                /*Vector2 pos = transform.position.XZ();
                 if (PathManager.Instance.CheckIfValid(pos))
                 {
-                    //Indexes.Add(PathManager.Instance.GetIndex(pos));
-                }
-                else
-                {
-                    Debug.LogWarning($"Indexer {this} failed to build valid indexes", this);
-                }
+                    Indexes.Add(PathManager.Instance.GetIndex(pos));
+                }*/
             }
             
             OnRebuilt?.Invoke();
@@ -132,10 +130,10 @@ namespace Pathfinding
     {
         public static void BuildColliderIndexes(Collider collider, List<PathIndex> indexes)
         {
-            float xMin = Mathf.Max(0, collider.bounds.min.x);
-            float xMax = Mathf.Min(PathManager.Instance.GridWorldWidth, collider.bounds.max.x);
-            float zMin = Mathf.Max(0, collider.bounds.min.z);
-            float zMax = Mathf.Min(PathManager.Instance.GridWorldHeight, collider.bounds.max.z);
+            float xMin = collider.bounds.min.x;
+            float xMax = collider.bounds.max.x;
+            float zMin = collider.bounds.min.z;
+            float zMax = collider.bounds.max.z;
 
             ColliderType colliderType = collider switch
             {
@@ -162,9 +160,6 @@ namespace Pathfinding
             {
                 for (float zPos = zMin; zPos <= zMax; zPos += increment)
                 {
-                    if (!PathManager.Instance.CheckIfValid(xPos, zPos))
-                        continue;
-
                     switch (colliderType)
                     {
                         case ColliderType.Circle:

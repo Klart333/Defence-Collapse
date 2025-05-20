@@ -103,7 +103,7 @@ namespace WaveFunctionCollapse
         public int3? GetIndex(Vector3 pos, IChunk chunk)
         {
             pos -= chunk.Position;
-            int3 index = new int3(Math.GetMultiple(pos.x, CellSize.x), 0, Math.GetMultiple(pos.z, CellSize.z));
+            int3 index = new int3(Utility.Math.GetMultiple(pos.x, CellSize.x), 0, Utility.Math.GetMultiple(pos.z, CellSize.z));
             if (chunk.Cells.IsInBounds(index))
             {
                 return index;

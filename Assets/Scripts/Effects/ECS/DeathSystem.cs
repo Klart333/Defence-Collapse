@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Entities;
 using System;
+using UnityEngine;
 
 namespace Effects.ECS
 {
