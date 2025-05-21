@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
-using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using UnityEngine;
 
@@ -17,15 +17,25 @@ namespace Chunks
         [SerializeField]
         private Canvas canvas;
 
+        [Title("Cost")]
+        [SerializeField]
+        private float startingChunkCost = 200;
+
+        [SerializeField]
+        private float chunkCostIncrease = 3;
+
         private Camera cam;
         
         private readonly Dictionary<Chunk, ChunkUnlocker> unlockers = new Dictionary<Chunk, ChunkUnlocker>();
+        
+        private float Cost { get; set; }
         
         private void OnEnable()
         {
             groundGenerator.OnLockedChunkGenerated += SetupLockedChunk; 
             
             cam = Camera.main;
+            Cost = startingChunkCost;
         }
 
         private void OnDisable()
@@ -57,7 +67,7 @@ namespace Chunks
             Vector3 pos = chunk.Position + chunk.ChunkSize + Vector3.up * 3f;
             ChunkUnlocker unlocker = unlockPrefab.Get<ChunkUnlocker>();
             unlocker.transform.SetParent(canvas.transform, false);
-            unlocker.Cost = 50;
+            unlocker.Cost = Cost;
             unlocker.Canvas = canvas;
             unlocker.TargetPosition = pos;
             unlocker.DisplayCost();
@@ -80,8 +90,14 @@ namespace Chunks
         {
             groundGenerator.ChunkWaveFunction.RemoveChunk(chunk.ChunkIndex, out _);
             Chunk newChunk = groundGenerator.ChunkWaveFunction.LoadChunk(chunk.ChunkIndex, chunk.ChunkSize, groundGenerator.DefaultPrototypeInfoData, false);
-            
             groundGenerator.LoadChunk(newChunk).Forget();
+            Cost *= chunkCostIncrease;
+
+            foreach (ChunkUnlocker unlocker in unlockers.Values)
+            {
+                unlocker.Cost = Cost;
+                unlocker.DisplayCost();
+            }
         }
     }
 }

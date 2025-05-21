@@ -300,7 +300,6 @@ namespace WaveFunctionCollapse
                         continue;
                     }
 
-                    Debug.Log("Killing Index: " + indexes[j]);
                     killIndexes.Add(indexes[j]);
                     ResetNeighbours(neighbours, waveFunction.Chunks[indexes[j]], 1);
                 }

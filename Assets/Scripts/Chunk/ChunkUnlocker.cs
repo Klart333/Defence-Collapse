@@ -21,7 +21,7 @@ namespace Chunks
 
         private Camera cam;
         
-        public int Cost { get; set; }
+        public float Cost { get; set; }
         public Canvas Canvas { get; set; }
         public Vector3 TargetPosition { get; set; }
 
@@ -54,7 +54,7 @@ namespace Chunks
 
         public void DisplayCost()
         {
-            costText.text = $"Unlock Cost: {Cost}";
+            costText.text = $"Unlock Cost: {Cost:N0}";
         }
 
         public void SetShowing(bool value)

@@ -43,11 +43,13 @@ namespace WaveFunctionCollapse
         {
             get 
             {
+#if UNITY_EDITOR
                 if (!Chunks.TryGetValue(index.Index, out _))
                 {
                     Debug.LogError("PROBLEM!");
                     return default;
                 }
+#endif
 
                 return Chunks[index.Index][index.CellIndex]; 
             }
