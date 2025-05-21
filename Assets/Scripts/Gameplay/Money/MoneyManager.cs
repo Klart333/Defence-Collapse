@@ -34,8 +34,6 @@ namespace Gameplay.Money
         [SerializeField]
         private bool verbose = true;
         
-        private Dictionary<BuildingType, int> AvailableBuildables = new Dictionary<BuildingType, int>();
-        
         private EntityManager entityManager;
         private Entity moneyEntity;
 
@@ -50,11 +48,6 @@ namespace Gameplay.Money
             moneyEntity = entityManager.CreateEntity(); 
             entityManager.AddComponent<MoneyToAddComponent>(moneyEntity);
             
-            AvailableBuildables = new Dictionary<BuildingType, int>
-            {
-                { BuildingType.Building, 0 },
-                { BuildingType.Path, 0 },
-            };
             money = startingMoney;
         }
         
@@ -77,11 +70,6 @@ namespace Gameplay.Money
 
         public bool CanPurchase(BuildingType buildingType)
         {
-            if (AvailableBuildables[buildingType] > 0)
-            {
-                return true;
-            }
-
             if (Money >= costData.GetCost(buildingType))
             {
                 return true;
@@ -107,28 +95,9 @@ namespace Gameplay.Money
 
         public void Purchase(BuildingType buildingType)
         {
-            if (AvailableBuildables[buildingType] > 0)
-            {
-                AvailableBuildables[buildingType] -= 1;
-            }
-            else
-            {
-                RemoveMoney(costData.GetCost(buildingType));
-            }
+            RemoveMoney(costData.GetCost(buildingType));
         }
-
-        public void Purchase(DistrictType districtType, int chunkAmount)
-        {
-            float cost = districtCostUtility.GetCost(districtType, chunkAmount);
-
-            RemoveMoney(cost);
-        }
-
-        public void AddBuildable(BuildingType buildingType, int amount)
-        {
-            AvailableBuildables[buildingType] += amount;
-        }
-
+        
         public void AddMoney(float amount)
         {
             money += amount;
