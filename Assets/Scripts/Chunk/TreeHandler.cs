@@ -17,24 +17,15 @@ namespace Chunks
         [SerializeField]
         private GroundGenerator groundGenerator;
         
-        [SerializeField]
-        private ProtoypeMeshes protoypeMeshes;
-        
         [Title("Tree")]
         [SerializeField]
         private TreeGrower treeGrowerPrefab;
         
         [SerializeField]
-        private Mesh[] groundTreeMeshes;
+        private int treeMaterialIndex = 1;
         
         private readonly Dictionary<int3, List<TreeGrower>> treeGrowersByChunk = new Dictionary<int3, List<TreeGrower>>();
-        private HashSet<Mesh> groundTreeMeshSet = new HashSet<Mesh>();
-
-        private void Awake()
-        {
-            groundTreeMeshSet = groundTreeMeshes.ToHashSet();
-        }
-
+        
         private void OnEnable()
         {
             groundGenerator.OnChunkGenerated += OnChunkGenerated;
@@ -50,8 +41,7 @@ namespace Chunks
         private void OnCellCollapsed(ChunkIndex chunkIndex)
         {
             Cell cell = groundGenerator.ChunkWaveFunction[chunkIndex];
-            int meshIndex = cell.PossiblePrototypes[0].MeshRot.MeshIndex;
-            if (meshIndex == -1 || !groundTreeMeshSet.Contains(protoypeMeshes[meshIndex])) return;
+            if (!cell.PossiblePrototypes[0].MaterialIndexes.Contains(treeMaterialIndex)) return;
             
             TreeGrower spawned = treeGrowerPrefab.GetAtPosAndRot<TreeGrower>(cell.Position, Quaternion.identity);
             spawned.Cell = cell;
@@ -67,7 +57,6 @@ namespace Chunks
                 treeGrowersByChunk.Add(chunk.ChunkIndex, new List<TreeGrower> { spawned });
                 chunk.OnCleared += ChunkCleared;
             }
-            return;
 
             void ChunkCleared()
             {

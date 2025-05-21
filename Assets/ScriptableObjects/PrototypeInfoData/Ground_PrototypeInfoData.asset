@@ -27,11 +27,15 @@ MonoBehaviour:
     - {fileID: 5231140961976342539, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: -4490079205434473833, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: -6543175010577019574, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: 8303154009079995146, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: -5146451520101148786, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 2102217836243392270, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 6806256637640101065, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: -2996537341903863319, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: -4595724679988189385, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: -4388209068900857936, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: -6309255644155813313, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: -5460074429013819849, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 8254687373856176130, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 6015863633982791618, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 3953289173884318016, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
@@ -48,7 +52,7 @@ MonoBehaviour:
         Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 68
+      Data: 84
     - Name: 
       Entry: 7
       Data: WaveFunctionCollapse.PrototypeData, Core
@@ -1743,7 +1747,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_OnPass_TreeGrass
+      Data: Crystal_Side_GrassTree
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -1758,16 +1762,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 1004
+      Data: 3
     - Name: NegX
       Entry: 3
-      Data: 1003
+      Data: 1004
     - Name: PosZ
       Entry: 3
-      Data: 4
+      Data: 2005
     - Name: NegZ
       Entry: 3
-      Data: 3
+      Data: 2
     - Name: PosY
       Entry: 3
       Data: -1
@@ -1776,7 +1780,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.375
+      Data: 0.5
     - Name: MaterialIndexes
       Entry: 7
       Data: 12|System.Int32[], mscorlib
@@ -1785,13 +1789,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 3
-      Data: 2
+      Data: 1
     - Name: 
       Entry: 3
       Data: 0
     - Name: 
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 13
       Data: 
@@ -1806,7 +1810,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_OnPass_TreeGrass
+      Data: Crystal_Side_GrassTree
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -1821,16 +1825,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 4
+      Data: 2005
     - Name: NegX
       Entry: 3
-      Data: 3
+      Data: 2
     - Name: PosZ
       Entry: 3
-      Data: 1003
+      Data: 1004
     - Name: NegZ
       Entry: 3
-      Data: 1004
+      Data: 3
     - Name: PosY
       Entry: 3
       Data: -1
@@ -1839,7 +1843,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.375
+      Data: 0.5
     - Name: MaterialIndexes
       Entry: 9
       Data: 12
@@ -1851,7 +1855,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_OnPass_TreeGrass
+      Data: Crystal_Side_GrassTree
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -1866,16 +1870,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 1003
+      Data: 1004
     - Name: NegX
       Entry: 3
-      Data: 1004
+      Data: 3
     - Name: PosZ
       Entry: 3
-      Data: 3
+      Data: 2
     - Name: NegZ
       Entry: 3
-      Data: 4
+      Data: 2005
     - Name: PosY
       Entry: 3
       Data: -1
@@ -1884,7 +1888,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.375
+      Data: 0.5
     - Name: MaterialIndexes
       Entry: 9
       Data: 12
@@ -1896,7 +1900,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_OnPass_TreeGrass
+      Data: Crystal_Side_GrassTree
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -1911,16 +1915,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 3
+      Data: 2
     - Name: NegX
       Entry: 3
-      Data: 4
+      Data: 2005
     - Name: PosZ
       Entry: 3
-      Data: 1004
+      Data: 3
     - Name: NegZ
       Entry: 3
-      Data: 1003
+      Data: 1004
     - Name: PosY
       Entry: 3
       Data: -1
@@ -1929,7 +1933,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.375
+      Data: 0.5
     - Name: MaterialIndexes
       Entry: 9
       Data: 12
@@ -1941,7 +1945,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_Corner_GrassTree
+      Data: Crystal_Side_GrassTree_Mirrored
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -1956,16 +1960,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 1003
+      Data: 4
     - Name: NegX
       Entry: 3
-      Data: 1002
+      Data: 1003
     - Name: PosZ
       Entry: 3
-      Data: 2001
+      Data: 2005
     - Name: NegZ
       Entry: 3
-      Data: 4
+      Data: 1002
     - Name: PosY
       Entry: 3
       Data: -1
@@ -1974,7 +1978,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.75
+      Data: 0.5
     - Name: MaterialIndexes
       Entry: 7
       Data: 13|System.Int32[], mscorlib
@@ -2004,7 +2008,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_Corner_GrassTree
+      Data: Crystal_Side_GrassTree_Mirrored
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -2019,16 +2023,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 2001
+      Data: 2005
     - Name: NegX
       Entry: 3
-      Data: 4
+      Data: 1002
     - Name: PosZ
       Entry: 3
-      Data: 1002
+      Data: 1003
     - Name: NegZ
       Entry: 3
-      Data: 1003
+      Data: 4
     - Name: PosY
       Entry: 3
       Data: -1
@@ -2037,7 +2041,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.75
+      Data: 0.5
     - Name: MaterialIndexes
       Entry: 9
       Data: 13
@@ -2049,7 +2053,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_Corner_GrassTree
+      Data: Crystal_Side_GrassTree_Mirrored
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -2064,16 +2068,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 1002
+      Data: 1003
     - Name: NegX
       Entry: 3
-      Data: 1003
+      Data: 4
     - Name: PosZ
       Entry: 3
-      Data: 4
+      Data: 1002
     - Name: NegZ
       Entry: 3
-      Data: 2001
+      Data: 2005
     - Name: PosY
       Entry: 3
       Data: -1
@@ -2082,7 +2086,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.75
+      Data: 0.5
     - Name: MaterialIndexes
       Entry: 9
       Data: 13
@@ -2094,7 +2098,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_Corner_GrassTree
+      Data: Crystal_Side_GrassTree_Mirrored
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -2109,16 +2113,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 4
+      Data: 1002
     - Name: NegX
       Entry: 3
-      Data: 2001
+      Data: 2005
     - Name: PosZ
       Entry: 3
-      Data: 1003
+      Data: 4
     - Name: NegZ
       Entry: 3
-      Data: 1002
+      Data: 1003
     - Name: PosY
       Entry: 3
       Data: -1
@@ -2127,7 +2131,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.75
+      Data: 0.5
     - Name: MaterialIndexes
       Entry: 9
       Data: 13
@@ -2139,7 +2143,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_Corner_GrassTree_Mirrored
+      Data: Crystal_OnPass_TreeGrass
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -2154,16 +2158,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 3
+      Data: 1004
     - Name: NegX
       Entry: 3
-      Data: 2
+      Data: 1003
     - Name: PosZ
       Entry: 3
-      Data: 1004
+      Data: 4
     - Name: NegZ
       Entry: 3
-      Data: 2001
+      Data: 3
     - Name: PosY
       Entry: 3
       Data: -1
@@ -2172,7 +2176,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.75
+      Data: 0.375
     - Name: MaterialIndexes
       Entry: 7
       Data: 14|System.Int32[], mscorlib
@@ -2181,13 +2185,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 3
       Data: 0
     - Name: 
       Entry: 3
-      Data: 2
+      Data: 1
     - Name: 
       Entry: 13
       Data: 
@@ -2202,7 +2206,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_Corner_GrassTree_Mirrored
+      Data: Crystal_OnPass_TreeGrass
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -2217,16 +2221,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 1004
+      Data: 4
     - Name: NegX
       Entry: 3
-      Data: 2001
+      Data: 3
     - Name: PosZ
       Entry: 3
-      Data: 2
+      Data: 1003
     - Name: NegZ
       Entry: 3
-      Data: 3
+      Data: 1004
     - Name: PosY
       Entry: 3
       Data: -1
@@ -2235,7 +2239,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.75
+      Data: 0.375
     - Name: MaterialIndexes
       Entry: 9
       Data: 14
@@ -2247,7 +2251,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_Corner_GrassTree_Mirrored
+      Data: Crystal_OnPass_TreeGrass
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -2262,16 +2266,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 2
+      Data: 1003
     - Name: NegX
       Entry: 3
-      Data: 3
+      Data: 1004
     - Name: PosZ
       Entry: 3
-      Data: 2001
+      Data: 3
     - Name: NegZ
       Entry: 3
-      Data: 1004
+      Data: 4
     - Name: PosY
       Entry: 3
       Data: -1
@@ -2280,7 +2284,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.75
+      Data: 0.375
     - Name: MaterialIndexes
       Entry: 9
       Data: 14
@@ -2292,7 +2296,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_Corner_GrassTree_Mirrored
+      Data: Crystal_OnPass_TreeGrass
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -2307,16 +2311,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 2001
+      Data: 3
     - Name: NegX
       Entry: 3
-      Data: 1004
+      Data: 4
     - Name: PosZ
       Entry: 3
-      Data: 3
+      Data: 1004
     - Name: NegZ
       Entry: 3
-      Data: 2
+      Data: 1003
     - Name: PosY
       Entry: 3
       Data: -1
@@ -2325,7 +2329,7 @@ MonoBehaviour:
       Data: -1
     - Name: Weight
       Entry: 4
-      Data: 0.75
+      Data: 0.375
     - Name: MaterialIndexes
       Entry: 9
       Data: 14
@@ -2337,7 +2341,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_Corner_TreeGrass
+      Data: Crystal_Corner_GrassTree
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
@@ -2355,13 +2359,13 @@ MonoBehaviour:
       Data: 4
     - Name: NegX
       Entry: 3
-      Data: 1002
+      Data: 2001
     - Name: PosZ
       Entry: 3
       Data: 1003
     - Name: NegZ
       Entry: 3
-      Data: 2000
+      Data: 1002
     - Name: PosY
       Entry: 3
       Data: -1
@@ -2382,6 +2386,402 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_GrassTree
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 45
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 1003
+    - Name: NegX
+      Entry: 3
+      Data: 1002
+    - Name: PosZ
+      Entry: 3
+      Data: 2001
+    - Name: NegZ
+      Entry: 3
+      Data: 4
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_GrassTree
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 45
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2001
+    - Name: NegX
+      Entry: 3
+      Data: 4
+    - Name: PosZ
+      Entry: 3
+      Data: 1002
+    - Name: NegZ
+      Entry: 3
+      Data: 1003
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_GrassTree
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 45
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 1002
+    - Name: NegX
+      Entry: 3
+      Data: 1003
+    - Name: PosZ
+      Entry: 3
+      Data: 4
+    - Name: NegZ
+      Entry: 3
+      Data: 2001
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_GrassTree_Mirrored
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 46
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 3
+    - Name: NegX
+      Entry: 3
+      Data: 2
+    - Name: PosZ
+      Entry: 3
+      Data: 1004
+    - Name: NegZ
+      Entry: 3
+      Data: 2001
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 16|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 3
+    - Name: 
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_GrassTree_Mirrored
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 46
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 1004
+    - Name: NegX
+      Entry: 3
+      Data: 2001
+    - Name: PosZ
+      Entry: 3
+      Data: 2
+    - Name: NegZ
+      Entry: 3
+      Data: 3
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 16
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_GrassTree_Mirrored
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 46
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2
+    - Name: NegX
+      Entry: 3
+      Data: 3
+    - Name: PosZ
+      Entry: 3
+      Data: 2001
+    - Name: NegZ
+      Entry: 3
+      Data: 1004
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 16
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_GrassTree_Mirrored
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 46
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2001
+    - Name: NegX
+      Entry: 3
+      Data: 1004
+    - Name: PosZ
+      Entry: 3
+      Data: 3
+    - Name: NegZ
+      Entry: 3
+      Data: 2
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 16
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_TreeGrass
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 47
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 4
+    - Name: NegX
+      Entry: 3
+      Data: 1002
+    - Name: PosZ
+      Entry: 3
+      Data: 1003
+    - Name: NegZ
+      Entry: 3
+      Data: 2000
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 17|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 3
+    - Name: 
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 3
       Data: 2
     - Name: 
       Entry: 3
@@ -2406,7 +2806,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 45
+      Data: 47
     - Name: Rot
       Entry: 3
       Data: 1
@@ -2436,7 +2836,7 @@ MonoBehaviour:
       Data: 0.75
     - Name: MaterialIndexes
       Entry: 9
-      Data: 15
+      Data: 17
     - Name: 
       Entry: 8
       Data: 
@@ -2451,7 +2851,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 45
+      Data: 47
     - Name: Rot
       Entry: 3
       Data: 2
@@ -2481,7 +2881,7 @@ MonoBehaviour:
       Data: 0.75
     - Name: MaterialIndexes
       Entry: 9
-      Data: 15
+      Data: 17
     - Name: 
       Entry: 8
       Data: 
@@ -2496,7 +2896,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 45
+      Data: 47
     - Name: Rot
       Entry: 3
       Data: 3
@@ -2526,7 +2926,7 @@ MonoBehaviour:
       Data: 0.75
     - Name: MaterialIndexes
       Entry: 9
-      Data: 15
+      Data: 17
     - Name: 
       Entry: 8
       Data: 
@@ -2541,7 +2941,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 46
+      Data: 48
     - Name: Rot
       Entry: 3
       Data: 0
@@ -2550,16 +2950,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 1004
+      Data: 3
     - Name: NegX
       Entry: 3
-      Data: 2
+      Data: 2000
     - Name: PosZ
       Entry: 3
-      Data: 2000
+      Data: 1004
     - Name: NegZ
       Entry: 3
-      Data: 3
+      Data: 2
     - Name: PosY
       Entry: 3
       Data: -1
@@ -2571,7 +2971,7 @@ MonoBehaviour:
       Data: 0.75
     - Name: MaterialIndexes
       Entry: 7
-      Data: 16|System.Int32[], mscorlib
+      Data: 18|System.Int32[], mscorlib
     - Name: 
       Entry: 14
       Data: 3
@@ -2604,7 +3004,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 46
+      Data: 48
     - Name: Rot
       Entry: 3
       Data: 1
@@ -2613,6 +3013,51 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
+      Data: 1004
+    - Name: NegX
+      Entry: 3
+      Data: 2
+    - Name: PosZ
+      Entry: 3
+      Data: 2000
+    - Name: NegZ
+      Entry: 3
+      Data: 3
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_TreeGrass_Mirrored
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 48
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
       Data: 2000
     - Name: NegX
       Entry: 3
@@ -2634,7 +3079,7 @@ MonoBehaviour:
       Data: 0.75
     - Name: MaterialIndexes
       Entry: 9
-      Data: 16
+      Data: 18
     - Name: 
       Entry: 8
       Data: 
@@ -2649,10 +3094,10 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 46
+      Data: 48
     - Name: Rot
       Entry: 3
-      Data: 2
+      Data: 3
     - Name: 
       Entry: 8
       Data: 
@@ -2679,7 +3124,7 @@ MonoBehaviour:
       Data: 0.75
     - Name: MaterialIndexes
       Entry: 9
-      Data: 16
+      Data: 18
     - Name: 
       Entry: 8
       Data: 
@@ -2688,13 +3133,166 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Crystal_Corner_TreeGrass_Mirrored
+      Data: Crystal_Corner_TreeGrassTree
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 46
+      Data: 49
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 4
+    - Name: NegX
+      Entry: 3
+      Data: 2
+    - Name: PosZ
+      Entry: 3
+      Data: 1004
+    - Name: NegZ
+      Entry: 3
+      Data: 1002
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 19|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 3
+    - Name: 
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_TreeGrassTree
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 49
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 1004
+    - Name: NegX
+      Entry: 3
+      Data: 1002
+    - Name: PosZ
+      Entry: 3
+      Data: 2
+    - Name: NegZ
+      Entry: 3
+      Data: 4
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 19
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_TreeGrassTree
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 49
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2
+    - Name: NegX
+      Entry: 3
+      Data: 4
+    - Name: PosZ
+      Entry: 3
+      Data: 1002
+    - Name: NegZ
+      Entry: 3
+      Data: 1004
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 19
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_TreeGrassTree
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 49
     - Name: Rot
       Entry: 3
       Data: 3
@@ -2703,13 +3301,13 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: 3
+      Data: 1002
     - Name: NegX
       Entry: 3
-      Data: 2000
+      Data: 1004
     - Name: PosZ
       Entry: 3
-      Data: 1004
+      Data: 4
     - Name: NegZ
       Entry: 3
       Data: 2
@@ -2724,7 +3322,205 @@ MonoBehaviour:
       Data: 0.75
     - Name: MaterialIndexes
       Entry: 9
-      Data: 16
+      Data: 19
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_GrassTreeGrass
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 50
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 3
+    - Name: NegX
+      Entry: 3
+      Data: 1002
+    - Name: PosZ
+      Entry: 3
+      Data: 1003
+    - Name: NegZ
+      Entry: 3
+      Data: 2
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 20|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 3
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_GrassTreeGrass
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 50
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 1003
+    - Name: NegX
+      Entry: 3
+      Data: 2
+    - Name: PosZ
+      Entry: 3
+      Data: 1002
+    - Name: NegZ
+      Entry: 3
+      Data: 3
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 20
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_GrassTreeGrass
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 50
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 1002
+    - Name: NegX
+      Entry: 3
+      Data: 3
+    - Name: PosZ
+      Entry: 3
+      Data: 2
+    - Name: NegZ
+      Entry: 3
+      Data: 1003
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 20
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Crystal_Corner_GrassTreeGrass
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 50
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2
+    - Name: NegX
+      Entry: 3
+      Data: 1003
+    - Name: PosZ
+      Entry: 3
+      Data: 3
+    - Name: NegZ
+      Entry: 3
+      Data: 1002
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 0.75
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 20
     - Name: 
       Entry: 8
       Data: 
@@ -2739,7 +3535,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 47
+      Data: 51
     - Name: Rot
       Entry: 3
       Data: 0
@@ -2769,564 +3565,9 @@ MonoBehaviour:
       Data: 120
     - Name: MaterialIndexes
       Entry: 7
-      Data: 17|System.Int32[], mscorlib
-    - Name: 
-      Entry: 14
-      Data: 1
-    - Name: 
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: Trees_Corner
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: 48
-    - Name: Rot
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 1002
-    - Name: NegX
-      Entry: 3
-      Data: 2000
-    - Name: PosZ
-      Entry: 3
-      Data: 2000
-    - Name: NegZ
-      Entry: 3
-      Data: 2
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 7
-      Data: 18|System.Int32[], mscorlib
-    - Name: 
-      Entry: 14
-      Data: 2
-    - Name: 
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: Trees_Corner
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: 48
-    - Name: Rot
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2000
-    - Name: NegX
-      Entry: 3
-      Data: 2
-    - Name: PosZ
-      Entry: 3
-      Data: 2000
-    - Name: NegZ
-      Entry: 3
-      Data: 1002
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 18
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: Trees_Corner
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: 48
-    - Name: Rot
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2000
-    - Name: NegX
-      Entry: 3
-      Data: 1002
-    - Name: PosZ
-      Entry: 3
-      Data: 2
-    - Name: NegZ
-      Entry: 3
-      Data: 2000
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 18
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: Trees_Corner
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: 48
-    - Name: Rot
-      Entry: 3
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2
-    - Name: NegX
-      Entry: 3
-      Data: 2000
-    - Name: PosZ
-      Entry: 3
-      Data: 1002
-    - Name: NegZ
-      Entry: 3
-      Data: 2000
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 18
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: Trees_GrassPass
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: 49
-    - Name: Rot
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2
-    - Name: NegX
-      Entry: 3
-      Data: 2
-    - Name: PosZ
-      Entry: 3
-      Data: 1002
-    - Name: NegZ
-      Entry: 3
-      Data: 1002
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 2
-    - Name: MaterialIndexes
-      Entry: 7
-      Data: 19|System.Int32[], mscorlib
-    - Name: 
-      Entry: 14
-      Data: 2
-    - Name: 
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: Trees_GrassPass
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: 49
-    - Name: Rot
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 1002
-    - Name: NegX
-      Entry: 3
-      Data: 1002
-    - Name: PosZ
-      Entry: 3
-      Data: 2
-    - Name: NegZ
-      Entry: 3
-      Data: 2
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 2
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 19
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: Trees_InCorner
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: 50
-    - Name: Rot
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2
-    - Name: NegX
-      Entry: 3
-      Data: 2001
-    - Name: PosZ
-      Entry: 3
-      Data: 2001
-    - Name: NegZ
-      Entry: 3
-      Data: 1002
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 7
-      Data: 20|System.Int32[], mscorlib
-    - Name: 
-      Entry: 14
-      Data: 2
-    - Name: 
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: Trees_InCorner
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: 50
-    - Name: Rot
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2001
-    - Name: NegX
-      Entry: 3
-      Data: 1002
-    - Name: PosZ
-      Entry: 3
-      Data: 2001
-    - Name: NegZ
-      Entry: 3
-      Data: 2
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 20
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: Trees_InCorner
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: 50
-    - Name: Rot
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2001
-    - Name: NegX
-      Entry: 3
-      Data: 2
-    - Name: PosZ
-      Entry: 3
-      Data: 1002
-    - Name: NegZ
-      Entry: 3
-      Data: 2001
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 20
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: Trees_InCorner
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: 50
-    - Name: Rot
-      Entry: 3
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 1002
-    - Name: NegX
-      Entry: 3
-      Data: 2001
-    - Name: PosZ
-      Entry: 3
-      Data: 2
-    - Name: NegZ
-      Entry: 3
-      Data: 2001
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 1
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 20
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: Trees_TreePass
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: 51
-    - Name: Rot
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 1002
-    - Name: NegX
-      Entry: 3
-      Data: 1002
-    - Name: PosZ
-      Entry: 3
-      Data: 2
-    - Name: NegZ
-      Entry: 3
-      Data: 2
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 2
-    - Name: MaterialIndexes
-      Entry: 7
       Data: 21|System.Int32[], mscorlib
     - Name: 
       Entry: 14
-      Data: 2
-    - Name: 
-      Entry: 3
       Data: 1
     - Name: 
       Entry: 3
@@ -3345,58 +3586,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: Trees_TreePass
+      Data: Trees_Corner
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 51
-    - Name: Rot
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: PosX
-      Entry: 3
-      Data: 2
-    - Name: NegX
-      Entry: 3
-      Data: 2
-    - Name: PosZ
-      Entry: 3
-      Data: 1002
-    - Name: NegZ
-      Entry: 3
-      Data: 1002
-    - Name: PosY
-      Entry: 3
-      Data: -1
-    - Name: NegY
-      Entry: 3
-      Data: -1
-    - Name: Weight
-      Entry: 4
-      Data: 2
-    - Name: MaterialIndexes
-      Entry: 9
-      Data: 21
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: WaveFunctionCollapse.PrototypeData, Core
-    - Name: Name_EditorOnly
-      Entry: 1
-      Data: 
-    - Name: MeshRot
-      Entry: 7
-      Data: WaveFunctionCollapse.MeshWithRotation, Core
-    - Name: MeshIndex
-      Entry: 3
-      Data: -1
+      Data: 52
     - Name: Rot
       Entry: 3
       Data: 0
@@ -3405,16 +3601,16 @@ MonoBehaviour:
       Data: 
     - Name: PosX
       Entry: 3
-      Data: -1
+      Data: 2
     - Name: NegX
       Entry: 3
-      Data: -1
+      Data: 2000
     - Name: PosZ
       Entry: 3
-      Data: -1
+      Data: 1002
     - Name: NegZ
       Entry: 3
-      Data: -1
+      Data: 2000
     - Name: PosY
       Entry: 3
       Data: -1
@@ -3427,6 +3623,606 @@ MonoBehaviour:
     - Name: MaterialIndexes
       Entry: 7
       Data: 22|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Trees_Corner
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 52
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 1002
+    - Name: NegX
+      Entry: 3
+      Data: 2000
+    - Name: PosZ
+      Entry: 3
+      Data: 2000
+    - Name: NegZ
+      Entry: 3
+      Data: 2
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 22
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Trees_Corner
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 52
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2000
+    - Name: NegX
+      Entry: 3
+      Data: 2
+    - Name: PosZ
+      Entry: 3
+      Data: 2000
+    - Name: NegZ
+      Entry: 3
+      Data: 1002
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 22
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Trees_Corner
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 52
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2000
+    - Name: NegX
+      Entry: 3
+      Data: 1002
+    - Name: PosZ
+      Entry: 3
+      Data: 2
+    - Name: NegZ
+      Entry: 3
+      Data: 2000
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 22
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Trees_GrassPass
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 53
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2
+    - Name: NegX
+      Entry: 3
+      Data: 2
+    - Name: PosZ
+      Entry: 3
+      Data: 1002
+    - Name: NegZ
+      Entry: 3
+      Data: 1002
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 2
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 23|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Trees_GrassPass
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 53
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 1002
+    - Name: NegX
+      Entry: 3
+      Data: 1002
+    - Name: PosZ
+      Entry: 3
+      Data: 2
+    - Name: NegZ
+      Entry: 3
+      Data: 2
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 2
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 23
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Trees_InCorner
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 54
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 1002
+    - Name: NegX
+      Entry: 3
+      Data: 2001
+    - Name: PosZ
+      Entry: 3
+      Data: 2
+    - Name: NegZ
+      Entry: 3
+      Data: 2001
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 24|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Trees_InCorner
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 54
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2
+    - Name: NegX
+      Entry: 3
+      Data: 2001
+    - Name: PosZ
+      Entry: 3
+      Data: 2001
+    - Name: NegZ
+      Entry: 3
+      Data: 1002
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Trees_InCorner
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 54
+    - Name: Rot
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2001
+    - Name: NegX
+      Entry: 3
+      Data: 1002
+    - Name: PosZ
+      Entry: 3
+      Data: 2001
+    - Name: NegZ
+      Entry: 3
+      Data: 2
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Trees_InCorner
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 54
+    - Name: Rot
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2001
+    - Name: NegX
+      Entry: 3
+      Data: 2
+    - Name: PosZ
+      Entry: 3
+      Data: 1002
+    - Name: NegZ
+      Entry: 3
+      Data: 2001
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Trees_TreePass
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 55
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 1002
+    - Name: NegX
+      Entry: 3
+      Data: 1002
+    - Name: PosZ
+      Entry: 3
+      Data: 2
+    - Name: NegZ
+      Entry: 3
+      Data: 2
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 2
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 25|System.Int32[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 2
+    - Name: 
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: Trees_TreePass
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: 55
+    - Name: Rot
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: 2
+    - Name: NegX
+      Entry: 3
+      Data: 2
+    - Name: PosZ
+      Entry: 3
+      Data: 1002
+    - Name: NegZ
+      Entry: 3
+      Data: 1002
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 2
+    - Name: MaterialIndexes
+      Entry: 9
+      Data: 25
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: WaveFunctionCollapse.PrototypeData, Core
+    - Name: Name_EditorOnly
+      Entry: 1
+      Data: 
+    - Name: MeshRot
+      Entry: 7
+      Data: WaveFunctionCollapse.MeshWithRotation, Core
+    - Name: MeshIndex
+      Entry: 3
+      Data: -1
+    - Name: Rot
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PosX
+      Entry: 3
+      Data: -1
+    - Name: NegX
+      Entry: 3
+      Data: -1
+    - Name: PosZ
+      Entry: 3
+      Data: -1
+    - Name: NegZ
+      Entry: 3
+      Data: -1
+    - Name: PosY
+      Entry: 3
+      Data: -1
+    - Name: NegY
+      Entry: 3
+      Data: -1
+    - Name: Weight
+      Entry: 4
+      Data: 1
+    - Name: MaterialIndexes
+      Entry: 7
+      Data: 26|System.Int32[], mscorlib
     - Name: 
       Entry: 14
       Data: 0
@@ -3447,7 +4243,7 @@ MonoBehaviour:
       Data: 
     - Name: SocketList
       Entry: 7
-      Data: 23|System.Collections.Generic.List`1[[WaveFunctionCollapse.DicData, Core]],
+      Data: 27|System.Collections.Generic.List`1[[WaveFunctionCollapse.DicData, Core]],
         mscorlib
     - Name: 
       Entry: 12
@@ -3457,7 +4253,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.DicData, Core
     - Name: positions
       Entry: 7
-      Data: 24|UnityEngine.Vector2[], UnityEngine.CoreModule
+      Data: 28|UnityEngine.Vector2[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 2
@@ -3502,7 +4298,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.DicData, Core
     - Name: positions
       Entry: 7
-      Data: 25|UnityEngine.Vector2[], UnityEngine.CoreModule
+      Data: 29|UnityEngine.Vector2[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 2
@@ -3547,7 +4343,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.DicData, Core
     - Name: positions
       Entry: 7
-      Data: 26|UnityEngine.Vector2[], UnityEngine.CoreModule
+      Data: 30|UnityEngine.Vector2[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 3
@@ -3604,7 +4400,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.DicData, Core
     - Name: positions
       Entry: 7
-      Data: 27|UnityEngine.Vector2[], UnityEngine.CoreModule
+      Data: 31|UnityEngine.Vector2[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 3
@@ -3661,7 +4457,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.DicData, Core
     - Name: positions
       Entry: 7
-      Data: 28|UnityEngine.Vector2[], UnityEngine.CoreModule
+      Data: 32|UnityEngine.Vector2[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 5
@@ -3742,7 +4538,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.DicData, Core
     - Name: positions
       Entry: 7
-      Data: 29|UnityEngine.Vector2[], UnityEngine.CoreModule
+      Data: 33|UnityEngine.Vector2[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 5
@@ -3823,7 +4619,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.DicData, Core
     - Name: positions
       Entry: 7
-      Data: 30|UnityEngine.Vector2[], UnityEngine.CoreModule
+      Data: 34|UnityEngine.Vector2[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 5
@@ -3904,7 +4700,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.DicData, Core
     - Name: positions
       Entry: 7
-      Data: 31|UnityEngine.Vector2[], UnityEngine.CoreModule
+      Data: 35|UnityEngine.Vector2[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 5
@@ -3985,7 +4781,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.DicData, Core
     - Name: positions
       Entry: 7
-      Data: 32|UnityEngine.Vector2[], UnityEngine.CoreModule
+      Data: 36|UnityEngine.Vector2[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 3
@@ -4045,7 +4841,7 @@ MonoBehaviour:
       Data: 
     - Name: VerticalSocketList
       Entry: 7
-      Data: 33|System.Collections.Generic.List`1[[WaveFunctionCollapse.DicData, Core]],
+      Data: 37|System.Collections.Generic.List`1[[WaveFunctionCollapse.DicData, Core]],
         mscorlib
     - Name: 
       Entry: 12
@@ -4058,7 +4854,7 @@ MonoBehaviour:
       Data: 
     - Name: NotAllowedForBottom
       Entry: 7
-      Data: 34|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
+      Data: 38|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -4070,7 +4866,7 @@ MonoBehaviour:
       Data: 
     - Name: OnlyAllowedForBottom
       Entry: 7
-      Data: 35|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
+      Data: 39|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -4082,7 +4878,7 @@ MonoBehaviour:
       Data: 
     - Name: NotAllowedForSides
       Entry: 7
-      Data: 36|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
+      Data: 40|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -4094,7 +4890,7 @@ MonoBehaviour:
       Data: 
     - Name: MarchingTable
       Entry: 7
-      Data: 37|System.Collections.Generic.List`1[[WaveFunctionCollapse.PrototypeData,
+      Data: 41|System.Collections.Generic.List`1[[WaveFunctionCollapse.PrototypeData,
         Core, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]][], mscorlib
     - Name: 
       Entry: 12
@@ -4107,11 +4903,11 @@ MonoBehaviour:
       Data: 
     - Name: PrototypeMeshes
       Entry: 7
-      Data: 38|System.Collections.Generic.List`1[[UnityEngine.Mesh, UnityEngine.CoreModule]],
+      Data: 42|System.Collections.Generic.List`1[[UnityEngine.Mesh, UnityEngine.CoreModule]],
         mscorlib
     - Name: 
       Entry: 12
-      Data: 21
+      Data: 25
     - Name: 
       Entry: 10
       Data: 0
@@ -4175,6 +4971,18 @@ MonoBehaviour:
     - Name: 
       Entry: 10
       Data: 20
+    - Name: 
+      Entry: 10
+      Data: 21
+    - Name: 
+      Entry: 10
+      Data: 22
+    - Name: 
+      Entry: 10
+      Data: 23
+    - Name: 
+      Entry: 10
+      Data: 24
     - Name: 
       Entry: 13
       Data: 

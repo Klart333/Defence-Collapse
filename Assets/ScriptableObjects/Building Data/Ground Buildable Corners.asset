@@ -18,22 +18,28 @@ MonoBehaviour:
     ReferencedUnityObjects:
     - {fileID: 5332504404861797108, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 8176261884379238797, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: 4510174008391847051, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: 1982539670953448499, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: -6896801049345947227, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: 5792170228495372621, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: -2739907200932889757, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: 5231140961976342539, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: -4490079205434473833, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: -6543175010577019574, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: 8303154009079995146, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: -5146451520101148786, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 2102217836243392270, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 6806256637640101065, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: -2996537341903863319, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: -4595724679988189385, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: -4388209068900857936, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: -6309255644155813313, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
+    - {fileID: -5460074429013819849, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 8254687373856176130, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 6015863633982791618, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 3953289173884318016, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: 584684585022501903, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     - {fileID: -3676194533806895147, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
-    - {fileID: 4510174008391847051, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
-    - {fileID: 1982539670953448499, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
-    - {fileID: 5792170228495372621, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
-    - {fileID: 5231140961976342539, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
-    - {fileID: -6543175010577019574, guid: 8ff65613c5611e945b081cf42e3dc444, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -52,7 +58,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 18
+      Data: 24
     - Name: 
       Entry: 7
       Data: 
@@ -192,18 +198,8 @@ MonoBehaviour:
       Data: 6|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 7|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -311,24 +307,129 @@ MonoBehaviour:
       Data: 2
     - Name: $v
       Entry: 7
-      Data: 8|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 7|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 8|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 10|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
       Data: 0
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 10
+      Data: 3
+    - Name: $v
+      Entry: 7
+      Data: 9|WaveFunctionCollapse.BuildableCorners, Core
+    - Name: CornerDictionary
+      Entry: 7
+      Data: 10|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+        Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -388,7 +489,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -433,7 +534,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 10
-      Data: 3
+      Data: 4
     - Name: $v
       Entry: 7
       Data: 11|WaveFunctionCollapse.BuildableCorners, Core
@@ -442,143 +543,8 @@ MonoBehaviour:
       Data: 12|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 13|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
+      Entry: 9
       Data: 4
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 7
-      Data: WaveFunctionCollapse.CornerData, Core
-    - Name: Buildable
-      Entry: 5
-      Data: true
-    - Name: GroundType
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 7
-      Data: WaveFunctionCollapse.CornerData, Core
-    - Name: Buildable
-      Entry: 5
-      Data: true
-    - Name: GroundType
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 7
-      Data: WaveFunctionCollapse.CornerData, Core
-    - Name: Buildable
-      Entry: 5
-      Data: true
-    - Name: GroundType
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 7
-      Data: WaveFunctionCollapse.CornerData, Core
-    - Name: Buildable
-      Entry: 5
-      Data: true
-    - Name: GroundType
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 10
-      Data: 4
-    - Name: $v
-      Entry: 7
-      Data: 14|WaveFunctionCollapse.BuildableCorners, Core
-    - Name: CornerDictionary
-      Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
-        Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 16|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 12
       Data: 4
@@ -659,7 +625,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -686,24 +652,14 @@ MonoBehaviour:
       Data: 5
     - Name: $v
       Entry: 7
-      Data: 17|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 13|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 18|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 14|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 19|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -739,10 +695,10 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: false
+      Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -760,7 +716,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: true
+      Data: false
     - Name: GroundType
       Entry: 3
       Data: 0
@@ -811,24 +767,14 @@ MonoBehaviour:
       Data: 6
     - Name: $v
       Entry: 7
-      Data: 20|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 15|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 21|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 16|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 22|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -843,7 +789,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: false
+      Data: true
     - Name: GroundType
       Entry: 3
       Data: 1
@@ -867,7 +813,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -909,7 +855,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -936,24 +882,14 @@ MonoBehaviour:
       Data: 7
     - Name: $v
       Entry: 7
-      Data: 23|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 17|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 24|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 18|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 25|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -971,7 +907,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -989,7 +925,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: true
+      Data: false
     - Name: GroundType
       Entry: 3
       Data: 0
@@ -1061,24 +997,14 @@ MonoBehaviour:
       Data: 8
     - Name: $v
       Entry: 7
-      Data: 26|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 19|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 27|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 20|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 28|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -1096,7 +1022,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -1117,7 +1043,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -1186,24 +1112,14 @@ MonoBehaviour:
       Data: 9
     - Name: $v
       Entry: 7
-      Data: 29|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 21|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 30|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 22|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 31|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -1218,10 +1134,10 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: false
+      Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -1239,10 +1155,10 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: false
+      Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -1281,7 +1197,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: true
+      Data: false
     - Name: GroundType
       Entry: 3
       Data: 0
@@ -1311,24 +1227,14 @@ MonoBehaviour:
       Data: 10
     - Name: $v
       Entry: 7
-      Data: 32|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 23|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 33|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 24|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 34|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -1343,10 +1249,10 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: false
+      Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -1367,7 +1273,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -1385,7 +1291,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: true
+      Data: false
     - Name: GroundType
       Entry: 3
       Data: 0
@@ -1406,7 +1312,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: false
+      Data: true
     - Name: GroundType
       Entry: 3
       Data: 0
@@ -1436,24 +1342,14 @@ MonoBehaviour:
       Data: 11
     - Name: $v
       Entry: 7
-      Data: 35|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 25|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 36|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 26|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 37|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -1471,7 +1367,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -1492,7 +1388,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -1561,24 +1457,14 @@ MonoBehaviour:
       Data: 12
     - Name: $v
       Entry: 7
-      Data: 38|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 27|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 39|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 28|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 40|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -1596,7 +1482,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -1635,7 +1521,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: false
+      Data: true
     - Name: GroundType
       Entry: 3
       Data: 0
@@ -1659,7 +1545,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -1686,24 +1572,14 @@ MonoBehaviour:
       Data: 13
     - Name: $v
       Entry: 7
-      Data: 41|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 29|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 42|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 30|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 43|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -1718,7 +1594,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: false
+      Data: true
     - Name: GroundType
       Entry: 3
       Data: 0
@@ -1760,7 +1636,7 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: false
+      Data: true
     - Name: GroundType
       Entry: 3
       Data: 0
@@ -1811,24 +1687,14 @@ MonoBehaviour:
       Data: 14
     - Name: $v
       Entry: 7
-      Data: 44|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 31|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 45|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 32|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 46|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -1843,10 +1709,10 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: true
+      Data: false
     - Name: GroundType
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -1888,7 +1754,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -1909,7 +1775,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -1936,24 +1802,14 @@ MonoBehaviour:
       Data: 15
     - Name: $v
       Entry: 7
-      Data: 47|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 33|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 48|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 34|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 49|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -1971,7 +1827,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -2031,10 +1887,10 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: true
+      Data: false
     - Name: GroundType
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -2061,24 +1917,14 @@ MonoBehaviour:
       Data: 16
     - Name: $v
       Entry: 7
-      Data: 50|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 35|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 51|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 36|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 52|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -2093,10 +1939,10 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: true
+      Data: false
     - Name: GroundType
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -2114,10 +1960,10 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
-      Data: false
+      Data: true
     - Name: GroundType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -2159,7 +2005,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -2186,24 +2032,129 @@ MonoBehaviour:
       Data: 17
     - Name: $v
       Entry: 7
-      Data: 53|WaveFunctionCollapse.BuildableCorners, Core
+      Data: 37|WaveFunctionCollapse.BuildableCorners, Core
     - Name: CornerDictionary
       Entry: 7
-      Data: 54|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+      Data: 38|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
         Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 55|System.Collections.Generic.EnumEqualityComparer`1[[WaveFunctionCollapse.Corner,
-        Core]], mscorlib
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
       Data: 0
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 10
+      Data: 18
+    - Name: $v
+      Entry: 7
+      Data: 39|WaveFunctionCollapse.BuildableCorners, Core
+    - Name: CornerDictionary
+      Entry: 7
+      Data: 40|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+        Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 4
     - Name: 
       Entry: 12
       Data: 4
@@ -2221,7 +2172,7 @@ MonoBehaviour:
       Data: true
     - Name: GroundType
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -2281,7 +2232,582 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.CornerData, Core
     - Name: Buildable
       Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 10
+      Data: 19
+    - Name: $v
+      Entry: 7
+      Data: 41|WaveFunctionCollapse.BuildableCorners, Core
+    - Name: CornerDictionary
+      Entry: 7
+      Data: 42|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+        Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 10
+      Data: 20
+    - Name: $v
+      Entry: 7
+      Data: 43|WaveFunctionCollapse.BuildableCorners, Core
+    - Name: CornerDictionary
+      Entry: 7
+      Data: 44|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+        Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
       Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 10
+      Data: 21
+    - Name: $v
+      Entry: 7
+      Data: 45|WaveFunctionCollapse.BuildableCorners, Core
+    - Name: CornerDictionary
+      Entry: 7
+      Data: 46|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+        Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 10
+      Data: 22
+    - Name: $v
+      Entry: 7
+      Data: 47|WaveFunctionCollapse.BuildableCorners, Core
+    - Name: CornerDictionary
+      Entry: 7
+      Data: 48|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+        Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 10
+      Data: 23
+    - Name: $v
+      Entry: 7
+      Data: 49|WaveFunctionCollapse.BuildableCorners, Core
+    - Name: CornerDictionary
+      Entry: 7
+      Data: 50|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.Corner,
+        Core],[WaveFunctionCollapse.CornerData, Core]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: false
+    - Name: GroundType
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 7
+      Data: WaveFunctionCollapse.CornerData, Core
+    - Name: Buildable
+      Entry: 5
+      Data: true
     - Name: GroundType
       Entry: 3
       Data: 0
