@@ -311,8 +311,14 @@ public class UIDistrictUpgrade : MonoBehaviour
 
 public static class PositionRectTransform // Chat gippity
 {
-    // Function to position RectTransform on Overlay Canvas to align with world position
     public static void PositionOnOverlayCanvas(Canvas canvas, Camera cam, RectTransform rectTransform, Vector3 worldPosition, Vector2 pivot)
+    {
+        // Set anchored position
+        rectTransform.anchoredPosition = GetPositionOnOverlayCanvas(canvas, cam, rectTransform, worldPosition, pivot);
+    }
+    
+    // Function to position RectTransform on Overlay Canvas to align with world position
+    public static Vector2 GetPositionOnOverlayCanvas(Canvas canvas, Camera cam, RectTransform rectTransform, Vector3 worldPosition, Vector2 pivot)
     {
         // Convert world position to screen space
         Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(cam, worldPosition);
@@ -326,7 +332,7 @@ public static class PositionRectTransform // Chat gippity
             rectTransform.rect.height * (pivot.y - 0.5f)
         );
 
-        // Set anchored position
-        rectTransform.anchoredPosition = canvasPos + pivotOffset;
+        // Return anchored position
+        return canvasPos + pivotOffset;
     }
 }

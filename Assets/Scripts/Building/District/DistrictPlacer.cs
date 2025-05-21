@@ -31,7 +31,10 @@ namespace Buildings.District
         
         [SerializeField]
         private DistrictHandler districtHandler;
-
+        
+        [SerializeField]
+        private BuildingPlacer buildingPlacer;
+        
         [SerializeField]
         private Dictionary<DistrictType, PrototypeInfoData> districtInfoData = new Dictionary<DistrictType, PrototypeInfoData>();
 
@@ -60,6 +63,7 @@ namespace Buildings.District
         
         private int2[,] districtChunkIndexes;
         
+        private List<PlaceSquare> hoveredSquares = new List<PlaceSquare>();
         private PooledMonoBehaviour spawnedUnableToPlace;
         private DistrictType districtType;
         private InputManager inputManager;
@@ -77,6 +81,7 @@ namespace Buildings.District
             offset = new Vector3(districtGenerator.CellSize.x, 0, districtGenerator.CellSize.z) / -2.0f;
 
             Events.OnDistrictClicked += DistrictClicked;
+            UIEvents.OnFocusChanged += CancelPlacement;
 
             GetInput().Forget();
             GetMoney().Forget();
@@ -96,6 +101,7 @@ namespace Buildings.District
 
         private void OnDisable()
         {
+            UIEvents.OnFocusChanged -= CancelPlacement;
             Events.OnDistrictClicked -= DistrictClicked;
             inputManager.Fire.performed -= FirePerformed;
             inputManager.Cancel.performed -= CancelPerformed;
@@ -111,6 +117,12 @@ namespace Buildings.District
             {
                 lastDistrictChunkIndexes[x, y] = districtChunkIndexes[x, y];
             }
+
+            for (int i = 0; i < hoveredSquares.Count; i++)
+            {
+                hoveredSquares[i].OnHoverExit();
+            }
+            hoveredSquares.Clear();
 
             if (!GetChunkIndexes(out bool requireQueryWalls))
             {
@@ -238,7 +250,7 @@ namespace Buildings.District
                     return false;
                 }
 
-                ChunkIndex? buildIndex = buildingGenerator.GetIndex(districtPos + buildingGenerator.CellSize.XyZ(0) / 2.0f);
+                ChunkIndex? buildIndex = buildingGenerator.GetIndex(districtPos);// + buildingGenerator.CellSize.XyZ(0) / 2.0f);
                 if (!buildIndex.HasValue)
                 {
                     if (verbose)
@@ -253,6 +265,13 @@ namespace Buildings.District
                 
                 if (TryGetBuiltIndex(buildingCellPosition, buildIndex.Value, districtPos, out ChunkIndex builtIndex))
                 {
+                    if (!buildingPlacer.SpawnedSpawnPlaces.TryGetValue(builtIndex, out var spawnPlace))
+                    {
+                        return false;
+                    }
+                    
+                    spawnPlace.OnHover();
+                    hoveredSquares.Add(spawnPlace);
                     builtIndexes.Add(builtIndex);
                     buildingIndexes.AddRange(buildingGenerator.GetCellsSurroundingMarchedIndex(builtIndex));
                 }
@@ -319,12 +338,9 @@ namespace Buildings.District
 
         private void DistrictClicked(DistrictType districtType, int radius)
         {
-            if (Placing)
-            {
-                CancelPlacement();
-            }
             UIEvents.OnFocusChanged?.Invoke();
             
+            buildingPlacer.ToggleSpawnPlaces(true);
             this.districtType = districtType;
             districtChunkIndexes = new int2[radius, radius];
             districtRadius = radius;
@@ -346,6 +362,8 @@ namespace Buildings.District
             Placing = false;
             isPlacementValid = false;
             spawnedUnableToPlace?.gameObject.SetActive(false);
+            buildingPlacer.ToggleSpawnPlaces(false);
+
             OnPlacingCanceled?.Invoke();
         }
 

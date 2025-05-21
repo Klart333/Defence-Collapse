@@ -1629,6 +1629,7 @@ MonoBehaviour:
   districtGenerator: {fileID: 1551488502}
   buildingGenerator: {fileID: 771210304}
   districtHandler: {fileID: 491554922}
+  buildingPlacer: {fileID: 604477866}
   unableToPlacePrefab: {fileID: -7155613184035295475, guid: 37457fca56525af4bab8884b7e239b05,
     type: 3}
   costText: {fileID: 104919694}
@@ -2641,6 +2642,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  displayPrefab: {fileID: 4713737178620374483, guid: 417e811b0c4e9ee4b8299fbb35e0048d,
+    type: 3}
 --- !u!1 &347176550
 GameObject:
   m_ObjectHideFlags: 0
@@ -2830,7 +2833,7 @@ GameObject:
   - component: {fileID: 406381900}
   - component: {fileID: 406381899}
   m_Layer: 5
-  m_Name: Chunk_Canvas
+  m_Name: ChunkLock_Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

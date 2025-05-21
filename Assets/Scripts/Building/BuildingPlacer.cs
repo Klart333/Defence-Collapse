@@ -38,6 +38,7 @@ public class BuildingPlacer : MonoBehaviour
 
     private bool manualCancel;
     
+    public Dictionary<ChunkIndex, PlaceSquare> SpawnedSpawnPlaces => spawnedSpawnPlaces;
     private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
     public bool SquareWasPressed { get; set; }
     public ChunkIndex? SquareIndex { get; set; }
@@ -312,7 +313,7 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
-    private void ToggleSpawnPlaces(bool enabled)
+    public void ToggleSpawnPlaces(bool enabled)
     {
         foreach (PlaceSquare placeSquare in spawnedSpawnPlaces.Values)
         {

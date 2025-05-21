@@ -24,6 +24,8 @@ namespace Enemy
 
         private int spawnLevel;
         
+        public int SpawnLevel => spawnLevel;
+        public int LevelFrequency => spawnerFrequency;
         public int BaseDifficulty { get; set; }
         public EnemySpawnHandler EnemySpawnHandler { get; set; }
 

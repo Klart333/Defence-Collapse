@@ -64,7 +64,7 @@ namespace Chunks
 
         private void SetupLockedChunk(Chunk chunk)
         {
-            Vector3 pos = chunk.Position + chunk.ChunkSize + Vector3.up * 3f;
+            Vector3 pos = chunk.Position + ((Vector3)chunk.ChunkSize).XyZ(0) / 2f + groundGenerator.ChunkWaveFunction.CellSize.XyZ(0) / 2.0f + Vector3.up * 2f;
             ChunkUnlocker unlocker = unlockPrefab.Get<ChunkUnlocker>();
             unlocker.transform.SetParent(canvas.transform, false);
             unlocker.Cost = Cost;

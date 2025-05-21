@@ -1,14 +1,21 @@
+using UnityEngine.EventSystems;
+using Sirenix.OdinInspector;
+using UnityEngine.Events;
+using UnityEngine.UI;
+using Gameplay.Money;
 using UnityEngine;
 using System;
-using Gameplay.Money;
 using TMPro;
-using WaveFunctionCollapse;
 
 namespace Chunks
 {
-    public class ChunkUnlocker : PooledMonoBehaviour
+    public class ChunkUnlocker : PooledMonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
     {
         public event Action OnChunkUnlocked;
+
+        [Title("References")]
+        [SerializeField]
+        private Image selectedImage;
 
         [SerializeField]
         private TextMeshProUGUI costText;
@@ -18,12 +25,16 @@ namespace Chunks
 
         [SerializeField]
         private Vector2 pivot;
-
+        
+        [Title("Events")]
+        [SerializeField]
+        private UnityEvent onUnlocked;
+        
         private Camera cam;
         
-        public float Cost { get; set; }
-        public Canvas Canvas { get; set; }
         public Vector3 TargetPosition { get; set; }
+        public Canvas Canvas { get; set; }
+        public float Cost { get; set; }
 
         private void Awake()
         {
@@ -40,12 +51,6 @@ namespace Chunks
 
         public void Unlock()
         {
-            if (MoneyManager.Instance.Money < Cost)
-            {
-                MoneyManager.Instance.InsufficientFunds(Cost);
-                return;
-            }
-            
             MoneyManager.Instance.RemoveMoney(Cost);
             OnChunkUnlocked?.Invoke();
             
@@ -60,6 +65,28 @@ namespace Chunks
         public void SetShowing(bool value)
         {
             graphicParent.gameObject.SetActive(value);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            selectedImage.gameObject.SetActive(true);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            selectedImage.gameObject.SetActive(false);
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (MoneyManager.Instance.Money < Cost)
+            {
+                MoneyManager.Instance.InsufficientFunds(Cost);
+                return;
+            }
+            
+            Unlock();
+            onUnlocked?.Invoke();
         }
     }
 }
