@@ -27,7 +27,7 @@ namespace UI
             districtPlacer = FindFirstObjectByType<DistrictPlacer>();
             districtPlacer.OnPlacingCanceled += OnPlacingCanceled;
         }
-
+        
         private void OnDisable()
         {
             districtPlacer.OnPlacingCanceled -= OnPlacingCanceled;
@@ -42,6 +42,11 @@ namespace UI
 
         private void OnPlacingCanceled()
         {
+            if (districtButton.interactable)
+            {
+                return;
+            }
+            
             animator.SetBool(Interactable, true);
 
             SetInteractableAfterDelay().Forget();

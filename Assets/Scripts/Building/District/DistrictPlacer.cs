@@ -319,6 +319,10 @@ namespace Buildings.District
 
         private void DistrictClicked(DistrictType districtType, int radius)
         {
+            if (Placing)
+            {
+                CancelPlacement();
+            }
             UIEvents.OnFocusChanged?.Invoke();
             
             this.districtType = districtType;

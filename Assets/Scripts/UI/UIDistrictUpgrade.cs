@@ -118,7 +118,10 @@ public class UIDistrictUpgrade : MonoBehaviour
     
     private void ClickReleased(InputAction.CallbackContext obj)
     {
-        CheckCancel();
+        if (parentPanel.activeSelf)
+        {
+            CheckCancel();
+        }
     }
 
     private void CheckCancel()
