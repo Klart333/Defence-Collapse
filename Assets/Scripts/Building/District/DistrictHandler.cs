@@ -123,13 +123,13 @@ namespace Buildings.District
             {
                 ChunkIndex? chunkIndex = districtGenerator.GetBuildingCell(chunk.ChunkIndex);
                 Debug.Assert(chunkIndex != null, nameof(chunkIndex) + " != null");
-                if (districtGenerator.ChunkIndexToChunks.TryGetValue(chunkIndex.Value, out List<int3> list))
+                if (districtGenerator.ChunkIndexToChunks.TryGetValue(chunkIndex.Value, out HashSet<int3> list))
                 {
                     list.Add(chunk.ChunkIndex);
                 }
                 else
                 {
-                    districtGenerator.ChunkIndexToChunks.Add(chunkIndex.Value, new List<int3> { chunk.ChunkIndex });
+                    districtGenerator.ChunkIndexToChunks.Add(chunkIndex.Value, new HashSet<int3> { chunk.ChunkIndex });
                 }
             }
             
@@ -224,7 +224,7 @@ namespace Buildings.District
 
         public bool IsBuilt(int2 chunkIndex2)
         {
-            return districts.TryGetValue(chunkIndex2, out _);
+            return districts.ContainsKey(chunkIndex2);
         }
         
         public bool IsBuilt(IChunk chunk, out DistrictData districtData)

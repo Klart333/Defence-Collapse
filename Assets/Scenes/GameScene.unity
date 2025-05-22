@@ -10907,8 +10907,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 038a77d210b84ffc925e634601fd3007, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shouldDestroyOnLoad: 1
-  <ResearchCurrency>k__BackingField: 0
 --- !u!1 &1466340310
 GameObject:
   m_ObjectHideFlags: 0
@@ -11527,8 +11525,8 @@ MonoBehaviour:
     - Name: ChunkIndexToChunks
       Entry: 7
       Data: 0|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.ChunkIndex,
-        Core],[System.Collections.Generic.List`1[[Unity.Mathematics.int3, Unity.Mathematics]],
-        mscorlib]], mscorlib
+        Core],[System.Collections.Generic.HashSet`1[[Unity.Mathematics.int3, Unity.Mathematics]],
+        System.Core]], mscorlib
     - Name: comparer
       Entry: 7
       Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[WaveFunctionCollapse.ChunkIndex,
@@ -11560,7 +11558,7 @@ MonoBehaviour:
   awaitEveryFrame: 100
   awaitTimeMs: 1
   maxMillisecondsPerFrame: 2
-  debug: 1
+  verbose: 0
 --- !u!1 &1568006375
 GameObject:
   m_ObjectHideFlags: 0

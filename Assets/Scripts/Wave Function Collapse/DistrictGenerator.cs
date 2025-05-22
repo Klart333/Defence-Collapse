@@ -14,6 +14,7 @@ using System;
 using Gameplay;
 using Gameplay.Upgrades;
 using Unity.Assertions;
+using UnityEngine.Serialization;
 
 namespace WaveFunctionCollapse
 {
@@ -53,10 +54,10 @@ namespace WaveFunctionCollapse
 
         [Title("Debug")]
         [SerializeField]
-        private bool debug;
+        private bool verbose;
 
-        [OdinSerialize, ReadOnly]
-        public readonly Dictionary<ChunkIndex, List<int3>> ChunkIndexToChunks = new Dictionary<ChunkIndex, List<int3>>();
+        [OdinSerialize]
+        public readonly Dictionary<ChunkIndex, HashSet<int3>> ChunkIndexToChunks = new Dictionary<ChunkIndex, HashSet<int3>>();
 
         public Dictionary<int3, PrototypeInfoData> QueryChangedData { get; } = new Dictionary<int3, PrototypeInfoData>();
         public Dictionary<ChunkIndex, IBuildable> QuerySpawnedBuildings { get; } = new Dictionary<ChunkIndex, IBuildable>();
@@ -203,59 +204,73 @@ namespace WaveFunctionCollapse
                     int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, ChunkScale);
                     if (waveFunction.Chunks.TryGetValue(index, out QueryChunk chunk))
                     {
-                        Queue<QueryChunk> chunkQueue = new Queue<QueryChunk>();
-                        chunkQueue.Enqueue(chunk);
-
-                        while (chunkQueue.TryDequeue(out chunk))
-                        {
-                            bool isDistrict = districtHandler.IsBuilt(chunk.ChunkIndex.xz);
-                            if (isDistrict)
-                            {
-                                int3 aboveIndex = chunk.ChunkIndex + new int3(0, 1, 0);
-                                if (waveFunction.Chunks.TryGetValue(aboveIndex, out QueryChunk aboveChunk))
-                                {
-                                    chunkQueue.Enqueue(aboveChunk);
-                                }
-                            }
-                            
-                            if (isBuildable)
-                            {
-                                chunk.Clear(waveFunction.GameObjectPool);
-                                ClearChunkMeshes(chunk.ChunkIndex);
-                                overrideChunks.Add(chunk);
-                            }
-                            else
-                            {
-                                OnDistrictChunkRemoved?.Invoke(chunk);
-                                waveFunction.RemoveChunk(chunk.ChunkIndex, out List<QueryChunk> neighbourChunks);
-                                ClearChunkMeshes(chunk.ChunkIndex);
-                                for (int j = 0; j < neighbourChunks.Count; j++)
-                                {
-                                    ResetNeighbours(overrideChunks, neighbourChunks[j], 1);
-                                }
-
-                                if (!ChunkIndexToChunks.TryGetValue(buildable.ChunkIndex, out var list)) continue;
-                                list.Remove(chunk.ChunkIndex);
-                                if (list.Count == 0)
-                                {
-                                    ChunkIndexToChunks.Remove(buildable.ChunkIndex);
-                                }
-                            }   
-                        }
+                        HandleBuiltChunk(chunk, isBuildable, overrideChunks, buildable.ChunkIndex);
                     }
                     else if (isBuildable)
                     {
                         positions.Add(pos);
-                        if (ChunkIndexToChunks.TryGetValue(buildable.ChunkIndex, out List<int3> list))
+                        if (ChunkIndexToChunks.TryGetValue(buildable.ChunkIndex, out HashSet<int3> list))
                         {
                             list.Add(index);
                         }
                         else
                         {
-                            ChunkIndexToChunks.Add(buildable.ChunkIndex, new List<int3> { index });
+                            ChunkIndexToChunks.Add(buildable.ChunkIndex, new HashSet<int3> { index });
                         }
                     }
                 }
+            }
+
+            void HandleBuiltChunk(QueryChunk chunk, bool isBuildable, HashSet<QueryChunk> overrideChunks, ChunkIndex buildIndex)
+            {
+                Queue<QueryChunk> chunkQueue = new Queue<QueryChunk>();
+                chunkQueue.Enqueue(chunk);
+
+                int removed = 0;
+                while (chunkQueue.TryDequeue(out chunk))
+                {
+                    bool isDistrict = chunk.PrototypeInfoData != defaultPrototypeInfoData;
+                    
+                    if (isDistrict)
+                    {
+                        int3 aboveIndex = chunk.ChunkIndex + new int3(0, 1, 0);
+                        if (waveFunction.Chunks.TryGetValue(aboveIndex, out QueryChunk aboveChunk))
+                        {
+                            chunkQueue.Enqueue(aboveChunk);
+                        }
+                    }
+                            
+                    if (isBuildable)
+                    {
+                        chunk.Clear(waveFunction.GameObjectPool);
+                        ClearChunkMeshes(chunk.ChunkIndex);
+                        overrideChunks.Add(chunk);
+                    }
+                    else
+                    {
+                        removed++;
+                        OnDistrictChunkRemoved?.Invoke(chunk);
+                        waveFunction.RemoveChunk(chunk.ChunkIndex, out List<QueryChunk> neighbourChunks);
+                        ClearChunkMeshes(chunk.ChunkIndex);
+                        for (int i = 0; i < neighbourChunks.Count; i++)
+                        {
+                            ResetNeighbours(overrideChunks, neighbourChunks[i], 1);
+                        }
+
+                        if (!ChunkIndexToChunks.TryGetValue(buildIndex, out var list))
+                        {
+                            Debug.LogError("Could not find DistrictChunk at buildIndex: " + buildIndex);
+                            continue;
+                        }
+                        list.Remove(chunk.ChunkIndex);
+                        if (list.Count == 0)
+                        {
+                            ChunkIndexToChunks.Remove(buildIndex);
+                        }
+                    } 
+                }
+
+                Debug.Log("Removed " + removed + " chunks");
             }
         }
 
@@ -286,21 +301,20 @@ namespace WaveFunctionCollapse
             HashSet<int3> killIndexes = new HashSet<int3>();
             for (int i = 0; i < chunkIndexes.Count; i++)
             {
-                if (!ChunkIndexToChunks.TryGetValue(chunkIndexes[i], out List<int3> indexes))
+                if (!ChunkIndexToChunks.TryGetValue(chunkIndexes[i], out HashSet<int3> indexes))
                 {
                     continue;
                 }
-                
-                for (int j = indexes.Count - 1; j >= 0; j--)
+
+                foreach (int3 index in indexes)
                 {
-                    if (!waveFunction.Chunks.ContainsKey(indexes[j]))
+                    if (!waveFunction.Chunks.ContainsKey(index))
                     {
-                        indexes.RemoveAt(j);
                         continue;
                     }
-
-                    killIndexes.Add(indexes[j]);
-                    ResetNeighbours(neighbours, waveFunction.Chunks[indexes[j]], 1);
+                    
+                    killIndexes.Add(index);
+                    ResetNeighbours(neighbours, waveFunction.Chunks[index], 1);
                 }
                 
                 ChunkIndexToChunks.Remove(chunkIndexes[i]);
@@ -570,12 +584,12 @@ namespace WaveFunctionCollapse
 #if UNITY_EDITOR
         public void OnDrawGizmosSelected()
         {
-            if (!EditorApplication.isPlaying || !debug)
+            if (!EditorApplication.isPlaying || !verbose)
             {
                 return;
             }
 
-            foreach (KeyValuePair<ChunkIndex,List<int3>> chunkIndexToChunk in ChunkIndexToChunks)
+            foreach (KeyValuePair<ChunkIndex, HashSet<int3>> chunkIndexToChunk in ChunkIndexToChunks)
             {
                 Gizmos.color = Color.blue;
                 Vector3 buildingIndex = BuildingManager.Instance.ChunkWaveFunction[chunkIndexToChunk.Key].Position + Vector3.up;
@@ -584,6 +598,11 @@ namespace WaveFunctionCollapse
                 foreach (int3 int3 in chunkIndexToChunk.Value)
                 {
                     Gizmos.color = Color.magenta;
+                    if (!ChunkWaveFunction.Chunks.ContainsKey(int3))
+                    {
+                        Debug.LogError("Index: " + int3 + " not in Chunk List");
+                        continue;
+                    }
                     Vector3 districtpos = ChunkWaveFunction.Chunks[int3].Position + ChunkScale.XyZ(0) / 2.0f + Vector3.up;
                     Gizmos.DrawWireCube(districtpos, ChunkScale * 0.75f);
                     Gizmos.DrawLine(Vector3.Lerp(buildingIndex, districtpos, 0.1f), districtpos);

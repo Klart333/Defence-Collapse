@@ -267,6 +267,13 @@ namespace Effects
         [Title("Callbacks")]
         public bool TriggerDamageDone = true;
 
+        [Title("Fire")]
+        [SerializeField]
+        private bool hasFireComponent;
+
+        [SerializeField, ShowIf(nameof(hasFireComponent))]
+        private float fireTotalDamage = 50;
+        
         public bool IsDamageEffect => true;
 
         public void Perform(IAttacker unit) => Perform(unit, 0);
@@ -329,6 +336,11 @@ namespace Effects
                 if (HasLifetime)
                 {
                     entityManager.AddComponentData(spawned, new LifetimeComponent { Lifetime = Lifetime });
+                }
+
+                if (hasFireComponent)
+                {
+                    entityManager.AddComponentData(spawned, new FireComponent { TotalDamage = fireTotalDamage });
                 }
             
                 return spawned;
