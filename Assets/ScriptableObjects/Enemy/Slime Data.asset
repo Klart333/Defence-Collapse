@@ -220,10 +220,11 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  LootProbability:
-  - 0.01
+  healthScalingMultiplier: 1
   UnlockedThreshold: 0
   CreditCost: 1
   moneyOnDeath: 5
   explodeOnDeath: 1
   explosionSize: 0.5
+  canDropLoot: 0
+  dropLootChance: 0.5

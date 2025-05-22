@@ -209,7 +209,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
         transparentMaterials.Clear();
         transparentRemoveMaterials.Clear();
-        for (int i = 0; i < Prototype.MaterialIndexes.Length; i++)
+        for (int i = 0; i < Prototype.MaterialIndexes.Length - 1; i++)
         {
             transparentMaterials.Add(transparentGreen);
             transparentRemoveMaterials.Add(transparentRed);

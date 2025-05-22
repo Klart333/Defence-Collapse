@@ -1,14 +1,14 @@
-using Effects.ECS;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
-using UnityEngine;
+using Effects.ECS;
 
 namespace VFX.ECS
 {
+    [BurstCompile]
     public partial struct TrailSystem : ISystem
     {
         private EntityQuery initTrailQuery;
@@ -27,20 +27,20 @@ namespace VFX.ECS
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            VFXTrailSingleton vfxThrustersSingleton = SystemAPI.GetSingletonRW<VFXTrailSingleton>().ValueRW;
+            VFXTrailSingleton vfxTrailSingleton = SystemAPI.GetSingletonRW<VFXTrailSingleton>().ValueRW;
             if (!initTrailQuery.IsEmpty)
             {
-                InitializeTrails(ref state, vfxThrustersSingleton);
+                InitializeTrails(ref state, vfxTrailSingleton);
             }
 
             state.Dependency = new SetTrailVFXDataJob()
             {
-                TrailsData = vfxThrustersSingleton.Manager.Datas,
+                TrailsData = vfxTrailSingleton.Manager.Datas,
             }.ScheduleParallel(state.Dependency);
             
             if (!deathTrailQuery.IsEmpty)
             {
-                KillTrails(ref state, vfxThrustersSingleton);
+                KillTrails(ref state, vfxTrailSingleton);
             }
         }
 
@@ -111,7 +111,7 @@ namespace VFX.ECS
             if (trail.TrailVFXIndex < 0) return;
             
             VFXTrailData trailData = TrailsData[trail.TrailVFXIndex];
-            trailData.Position = transform.Position + math.mul(transform.Rotation, trail.TrailLocalPosition);
+            trailData.Position = transform.Position;
             trailData.Direction = math.mul(transform.Rotation, -math.forward());
             TrailsData[trail.TrailVFXIndex] = trailData;
         }
@@ -131,7 +131,6 @@ namespace VFX.ECS
     public struct TrailComponent : IComponentData
     {
         public int TrailVFXIndex;
-        public float3 TrailLocalPosition;
     }
     
     public struct InitTrailComponent : IComponentData

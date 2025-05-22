@@ -15,11 +15,11 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var ecb = new EntityCommandBuffer(Allocator.TempJob);
-            new LimitedHitsJob
+            var ecb = new EntityCommandBuffer(Allocator.TempJob); 
+            state.Dependency = new LimitedHitsJob
             {
                 ECB = ecb.AsParallelWriter()
-            }.ScheduleParallel();
+            }.ScheduleParallel(state.Dependency);
             
             state.Dependency.Complete(); 
             ecb.Playback(state.EntityManager);

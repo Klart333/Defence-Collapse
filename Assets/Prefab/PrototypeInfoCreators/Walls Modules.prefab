@@ -65,7 +65,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
-  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: 2bf3403a5bd33744cb31b3550f12fb49, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -152,7 +152,93 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
-  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: 2bf3403a5bd33744cb31b3550f12fb49, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &3107672834830870004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6811301281493594364}
+  - component: {fileID: 6037000327414850118}
+  - component: {fileID: 1316487974021253426}
+  m_Layer: 0
+  m_Name: Full
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6811301281493594364
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3107672834830870004}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 8, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4686075068635936782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &6037000327414850118
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3107672834830870004}
+  m_Mesh: {fileID: -7394423560028368666, guid: fcc547fb15d1db845858c2be4a58b67a, type: 3}
+--- !u!23 &1316487974021253426
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3107672834830870004}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 2bf3403a5bd33744cb31b3550f12fb49, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -239,7 +325,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
-  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: 2bf3403a5bd33744cb31b3550f12fb49, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -326,7 +412,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
-  - {fileID: 2100000, guid: 2df2347453028ce4382427270a8f9f6d, type: 2}
+  - {fileID: 2100000, guid: 2bf3403a5bd33744cb31b3550f12fb49, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -359,7 +445,7 @@ GameObject:
   - component: {fileID: 4686075068635936782}
   - component: {fileID: 2511382896000271184}
   m_Layer: 0
-  m_Name: Town Modules
+  m_Name: Walls Modules
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -382,6 +468,7 @@ Transform:
   - {fileID: 5044296607891217854}
   - {fileID: 2372009415461817715}
   - {fileID: 6627271170812180962}
+  - {fileID: 6811301281493594364}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2511382896000271184
@@ -416,33 +503,21 @@ MonoBehaviour:
   useMCode: 1
   useMCodeHeight: 0
   useBuildableCorners: 1
-  rightBuildableCode: 0
+  rightBuildableCodes: 0000d107
   buildableCornerData: {fileID: 11400000, guid: 21c6865fe1599b64699908607cd7f257,
     type: 2}
   prototypeData: {fileID: 11400000, guid: 02f9ef3e110b83748bc36550093a3e44, type: 2}
   materialData: {fileID: 11400000, guid: 64f0dca35d7079143abbf4da786afcf2, type: 2}
   pieceWeights:
-  - Name: Corner2
+  - Name: Corner
     Weight: 1
-  - Name: Incorner
+  - Name: InCorner
     Weight: 1
-  - Name: OnPass2
+  - Name: OnPass
     Weight: 1
   - Name: Side
     Weight: 1
-  - Name: "SideV\xE4g"
-    Weight: 1
-  - Name: "SideV\xE4gTv\xE5"
-    Weight: 1
-  - Name: Path_Corner
-    Weight: 1
-  - Name: Path_DoubleCorner
-    Weight: 1
-  - Name: Path_Full
-    Weight: 1
-  - Name: Path_InCorner
-    Weight: 1
-  - Name: Path_Straight
+  - Name: Full
     Weight: 1
   - Name: Air
     Weight: 0.01

@@ -34,6 +34,19 @@ namespace VFX
             Size = -1f;
         }
     }
+    
+    [VFXType(VFXTypeAttribute.Usage.GraphicsBuffer)]
+    public struct VFXFireData : IKillableVFX
+    {
+        public Vector3 Position;
+        public Vector3 Velocity;
+        public float Size;
+
+        public void Kill()
+        {
+            Size = -1f;
+        }
+    }
 
     public static class VFXReferences
     {
@@ -46,6 +59,10 @@ namespace VFX
         public static VisualEffect TrailGraph;
         public static GraphicsBuffer TrailRequestsBuffer;
         public static GraphicsBuffer TrailDatasBuffer;
+        
+        public static VisualEffect FireParticleGraph;
+        public static GraphicsBuffer FireParticleRequestsBuffer;
+        public static GraphicsBuffer FireParticlesDatasBuffer;
     }
 
     public interface IKillableVFX
@@ -93,23 +110,22 @@ namespace VFX
             int requestsCountId,
             int requestsBufferId)
         {
-            if (vfxGraph != null && graphicsBuffer != null)
+            if (vfxGraph == null || graphicsBuffer == null) return;
+            
+            vfxGraph.playRate = deltaTimeMultiplier;
+
+            if (!GraphIsInitialized)
             {
-                vfxGraph.playRate = deltaTimeMultiplier;
+                vfxGraph.SetGraphicsBuffer(requestsBufferId, graphicsBuffer);
+                GraphIsInitialized = true;
+            }
 
-                if (!GraphIsInitialized)
-                {
-                    vfxGraph.SetGraphicsBuffer(requestsBufferId, graphicsBuffer);
-                    GraphIsInitialized = true;
-                }
-
-                if (graphicsBuffer.IsValid())
-                {
-                    graphicsBuffer.SetData(Requests, 0, 0, RequestsCount.Value);
-                    vfxGraph.SetInt(requestsCountId, math.min(RequestsCount.Value, Requests.Length));
-                    vfxGraph.SendEvent(spawnBatchId);
-                    RequestsCount.Value = 0;
-                }
+            if (graphicsBuffer.IsValid())
+            {
+                graphicsBuffer.SetData(Requests, 0, 0, RequestsCount.Value);
+                vfxGraph.SetInt(requestsCountId, math.min(RequestsCount.Value, Requests.Length));
+                vfxGraph.SendEvent(spawnBatchId);
+                RequestsCount.Value = 0;
             }
         }
 
@@ -210,34 +226,30 @@ namespace VFX
 
         public int Create()
         {
-            if (FreeIndexes.TryDequeue(out int index))
+            if (!FreeIndexes.TryDequeue(out int index)) return -1;
+            
+            // Request to spawn
+            if (RequestsCount.Value >= Requests.Length) return index;
+            
+            Requests[RequestsCount.Value] = new VFXSpawnToDataRequest
             {
-                // Request to spawn
-                if (RequestsCount.Value < Requests.Length)
-                {
-                    Requests[RequestsCount.Value] = new VFXSpawnToDataRequest
-                    {
-                        IndexInData = index,
-                    };
-                    RequestsCount.Value++;
-                }
+                IndexInData = index,
+            };
+            RequestsCount.Value++;
 
-                return index;
-            }
+            return index;
 
-            return -1;
         }
 
         public void Kill(int index)
         {
-            if (index >= 0 && index < Datas.Length)
-            {
-                T killdata = default;
-                killdata.Kill();
-                Datas[index] = killdata;
+            if (index < 0 || index >= Datas.Length) return;
+            
+            T killdata = default;
+            killdata.Kill();
+            Datas[index] = killdata;
 
-                FreeIndexes.Enqueue(index);
-            }
+            FreeIndexes.Enqueue(index);
         }
     }
 
@@ -255,6 +267,11 @@ namespace VFX
     {
         public VFXManagerParented<VFXTrailData> Manager;
     }
+    
+    public struct VFXFireParticlesSingleton : IComponentData
+    {
+        public VFXManagerParented<VFXFireData> Manager;
+    }
 
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public partial struct VFXSystem : ISystem
@@ -264,19 +281,16 @@ namespace VFX
         private int _requestsBufferId;
         private int _datasBufferId;
 
-        private VFXManager<VFXHitSparksRequest> hitSparksManager;
         private VFXManager<VFXExplosionRequest> explosionsManager;
+        private VFXManager<VFXHitSparksRequest> hitSparksManager;
+        
+        private VFXManagerParented<VFXFireData> fireParticleManager;
         private VFXManagerParented<VFXTrailData> trailManager;
 
-#if UNITY_ANDROID || UNITY_IOS
-    public const int HitSparksCapacity = 700;
-    public const int ExplosionsCapacity = 700;
-    public const int ThrustersCapacity = 50000;
-#else
-        public const int HitSparksCapacity = 1000;
-        public const int ExplosionsCapacity = 1000;
-        public const int TrailCapacity = 1000;
-#endif
+        private const int FireParticleCapacity = 1000;
+        private const int ExplosionsCapacity = 1000;
+        private const int HitSparksCapacity = 1000;
+        private const int TrailCapacity = 1000;
 
         public void OnCreate(ref SystemState state)
         {
@@ -287,9 +301,11 @@ namespace VFX
             _datasBufferId = Shader.PropertyToID("DatasBuffer");
 
             // VFX managers
-            hitSparksManager = new VFXManager<VFXHitSparksRequest>(HitSparksCapacity, ref VFXReferences.HitSparksRequestsBuffer);
+            hitSparksManager  = new VFXManager<VFXHitSparksRequest>(HitSparksCapacity , ref VFXReferences.HitSparksRequestsBuffer );
             explosionsManager = new VFXManager<VFXExplosionRequest>(ExplosionsCapacity, ref VFXReferences.ExplosionsRequestsBuffer);
-            trailManager = new VFXManagerParented<VFXTrailData>(TrailCapacity, ref VFXReferences.TrailRequestsBuffer, ref VFXReferences.TrailDatasBuffer);
+            
+            trailManager        = new VFXManagerParented<VFXTrailData>(TrailCapacity       , ref VFXReferences.TrailRequestsBuffer       , ref VFXReferences.TrailDatasBuffer        );
+            fireParticleManager = new VFXManagerParented<VFXFireData >(FireParticleCapacity, ref VFXReferences.FireParticleRequestsBuffer, ref VFXReferences.FireParticlesDatasBuffer);
 
             // Singletons
             state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new VFXHitSparksSingleton
@@ -304,6 +320,10 @@ namespace VFX
             {
                 Manager = trailManager,
             });
+            state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new VFXFireParticlesSingleton
+            {
+                Manager = fireParticleManager,
+            });
         }
 
         public void OnDestroy(ref SystemState state)
@@ -311,6 +331,7 @@ namespace VFX
             hitSparksManager.Dispose(ref VFXReferences.HitSparksRequestsBuffer);
             explosionsManager.Dispose(ref VFXReferences.ExplosionsRequestsBuffer);
             trailManager.Dispose(ref VFXReferences.TrailRequestsBuffer, ref VFXReferences.TrailDatasBuffer);
+            fireParticleManager.Dispose(ref VFXReferences.FireParticleRequestsBuffer, ref VFXReferences.FireParticlesDatasBuffer);
         }
 
         public void OnUpdate(ref SystemState state)
@@ -319,6 +340,7 @@ namespace VFX
             SystemAPI.QueryBuilder().WithAll<VFXHitSparksSingleton>().Build().CompleteDependency();
             SystemAPI.QueryBuilder().WithAll<VFXExplosionsSingleton>().Build().CompleteDependency();
             SystemAPI.QueryBuilder().WithAll<VFXTrailSingleton>().Build().CompleteDependency();
+            SystemAPI.QueryBuilder().WithAll<VFXFireParticlesSingleton>().Build().CompleteDependency();
 
             // Update managers
             float rateRatio = SystemAPI.Time.DeltaTime / Time.deltaTime;
@@ -343,6 +365,16 @@ namespace VFX
                 VFXReferences.TrailGraph,
                 ref VFXReferences.TrailRequestsBuffer,
                 ref VFXReferences.TrailDatasBuffer,
+                rateRatio,
+                _spawnBatchId,
+                _requestsCountId,
+                _requestsBufferId,
+                _datasBufferId);
+            
+            fireParticleManager.Update(
+                VFXReferences.FireParticleGraph,
+                ref VFXReferences.FireParticleRequestsBuffer,
+                ref VFXReferences.FireParticlesDatasBuffer,
                 rateRatio,
                 _spawnBatchId,
                 _requestsCountId,

@@ -1,10 +1,9 @@
-using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
-using Sirenix.Utilities;
+using System;
 
 namespace WaveFunctionCollapse
 {
@@ -48,7 +47,7 @@ namespace WaveFunctionCollapse
         private bool useBuildableCorners = false;
 
         [SerializeField, ShowIf(nameof(useBuildableCorners))]
-        private short rightBuildableCode = 0;
+        private List<short> rightBuildableCodes;
         
         [SerializeField, ShowIf(nameof(useBuildableCorners))]
         private BuildableCornerData buildableCornerData;
@@ -180,7 +179,7 @@ namespace WaveFunctionCollapse
                     SetMarchingTable2D(prots);
                 }
 
-                if (useBuildableCorners && prots[0].Keys.Any(x => x % 1000 == rightBuildableCode))
+                if (useBuildableCorners && prots[0].Keys.Any(x => rightBuildableCodes.Contains(x)))
                 {
                     buildableCornerData.BuildableDictionary.Add(mesh, GetBuildableCorners(prots[0]));
                 }
@@ -280,12 +279,13 @@ namespace WaveFunctionCollapse
             }
         }
 
-        private BuildableCorners GetBuildableCorners(PrototypeData prot) // DOES NOT WORK FOR ALL ROTATIONS!! AAAAHH!
+        private BuildableCorners GetBuildableCorners(PrototypeData prot)
         {
-            bool topLeft = prot.PosZ == rightBuildableCode + 1000;
-            bool topRight = prot.PosZ == rightBuildableCode;
-            bool botLeft = (prot.NegZ == -1 && prot.NegX == rightBuildableCode + 1000) || prot.NegZ == rightBuildableCode;
-            bool botRight = (topRight && botLeft && prot.NegZ == -1) || prot.NegZ == rightBuildableCode + 1000;
+            bool topLeft = rightBuildableCodes.Contains(prot.NegX);
+            bool topRight = rightBuildableCodes.Contains(prot.PosZ);
+            bool botLeft = rightBuildableCodes.Contains(prot.NegZ);
+            bool botRight = rightBuildableCodes.Contains(prot.PosX);
+            
             BuildableCorners corner = new BuildableCorners()
             {
                 CornerDictionary = new Dictionary<Corner, CornerData>()
@@ -296,7 +296,6 @@ namespace WaveFunctionCollapse
                     {Corner.BottomRight, botRight}, 
                 }
             };
-            
             return corner;
         }
 

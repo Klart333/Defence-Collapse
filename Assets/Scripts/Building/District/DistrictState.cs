@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using DataStructures.Queue.ECS;
 using WaveFunctionCollapse;
-using Gameplay.Research;
 using Unity.Collections;
 using Unity.Mathematics;
 using Gameplay.Upgrades;
@@ -638,7 +637,7 @@ namespace Buildings.District
         
         private void OnWaveEnded()
         {
-            ResearchManager.Instance.AddResearchPoints(10 * UpgradeStats[0].Level);
+            
         }
 
         protected override List<QueryChunk> GetEntityChunks(out List<Vector2> offsets, out List<Vector2> directions)

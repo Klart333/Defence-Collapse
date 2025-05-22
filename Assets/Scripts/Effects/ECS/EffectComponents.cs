@@ -73,6 +73,8 @@ namespace Effects.ECS
 		public float ArmorDamage;
 		public float ShieldDamage;
 		public bool IsCrit; // Can make into flag for different effects
+
+		public Entity SourceEntity;
 	}
 
 	public struct MaxHealthComponent : IComponentData
@@ -134,7 +136,8 @@ namespace Effects.ECS
 
 	public struct FireComponent : IComponentData
 	{
-		
+		public float TotalDamage;
+		public float Timer;
 	}
 	
 	#endregion

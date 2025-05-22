@@ -4,6 +4,7 @@ using DataStructures.Queue.ECS;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
@@ -15,20 +16,21 @@ namespace Effects.ECS
     {
         public static readonly Dictionary<int, Action<Entity>> DamageDoneEvent = new Dictionary<int, Action<Entity>>();
             
-        private EntityQuery collisionQuery;
-        private NativeQueue<Entity> collisionQueue;
         private ComponentLookup<LocalTransform> transformLookup;
+        private NativeQueue<Entity> collisionQueue;
+        private EntityQuery collisionQuery;
 
         protected override void OnCreate()
         {
             base.OnCreate();
             
-            collisionQuery = SystemAPI.QueryBuilder()
-                .WithAspect<ColliderAspect>()
-                .Build();
+            collisionQuery = SystemAPI.QueryBuilder().WithAspect<ColliderAspect>().Build();
 
             transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
             collisionQueue = new NativeQueue<Entity>(Allocator.Persistent);
+            
+            RequireForUpdate<WaveStateComponent>();
+            RequireForUpdate<SpatialHashMapSingleton>();
         }
         
         protected override void OnUpdate()
@@ -37,24 +39,36 @@ namespace Effects.ECS
             {
                 return;
             }
-                         
+
+            int enemyCount = SystemAPI.GetSingleton<WaveStateComponent>().EnemyCount;
+            NativeParallelMultiHashMap<Entity, PendingDamageComponent> pendingDamageMap = new NativeParallelMultiHashMap<Entity, PendingDamageComponent>((int)(enemyCount * 2.5f), WorldUpdateAllocator);
+
             NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
             transformLookup.Update(this);
              
             Dependency = new CollisionJob
             {
+                PendingDamageMap = pendingDamageMap.AsParallelWriter(),
+                CollisionQueue = collisionQueue.AsParallelWriter(),
                 SpatialGrid = spatialGrid.AsReadOnly(),
                 TransformLookup = transformLookup,
-                CollisionQueue = collisionQueue.AsParallelWriter(),
-                //CellSize = 1,
                 ECB = ecb.AsParallelWriter(),
             }.ScheduleParallel(Dependency);
-                         
+            Dependency.Complete(); 
+
+            Dependency = new SumCollisionJob
+            {
+                ECB = ecb,
+                PendingDamageMap = pendingDamageMap.AsReadOnly(),
+            }.Schedule(Dependency);
+            
             Dependency.Complete(); 
             ecb.Playback(EntityManager);
             ecb.Dispose();
-             
+
+            pendingDamageMap.Dispose();
+            
             while (collisionQueue.TryDequeue(out Entity entity))
             {
                 if (DamageDoneEvent.TryGetValue(EntityManager.GetComponentData<DamageComponent>(entity).Key, out var action))
@@ -81,6 +95,8 @@ namespace Effects.ECS
 
         [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
+        
+        public NativeParallelMultiHashMap<Entity, PendingDamageComponent>.ParallelWriter PendingDamageMap;
 
         public EntityCommandBuffer.ParallelWriter ECB;
 
@@ -99,7 +115,7 @@ namespace Effects.ECS
             float radiusSq = radius * radius;
 
             int2 centerCell = new int2((int)pos.x, (int)pos.z);
-            if (CollideWithinCell(sortKey, entity, colliderAspect, centerCell, pos, radiusSq))
+            if (CollideWithinCell(entity, colliderAspect, centerCell, pos, radiusSq))
             {
                 if (colliderAspect.DamageComponent.ValueRO.IsOneShot)
                 {
@@ -128,7 +144,7 @@ namespace Effects.ECS
                     
                     if (cellDistX * cellDistX + cellDistZ * cellDistZ > radiusSq) continue;
                     
-                    if (CollideWithinCell(sortKey, entity, colliderAspect, cell, pos, radiusSq)) return;
+                    if (CollideWithinCell(entity, colliderAspect, cell, pos, radiusSq)) return;
                 }
             }
 
@@ -138,7 +154,7 @@ namespace Effects.ECS
             }
         }
 
-        private bool CollideWithinCell(int sortKey, Entity entity, ColliderAspect colliderAspect, int2 cell, float3 pos, float radiusSq)
+        private bool CollideWithinCell(Entity entity, ColliderAspect colliderAspect, int2 cell, float3 pos, float radiusSq)
         {
             if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) return false;
 
@@ -151,7 +167,9 @@ namespace Effects.ECS
                 if (distSq > radiusSq) continue;
 
                 // COLLIDE
-                ECB.AddComponent(sortKey, enemy, GetDamage(colliderAspect));
+                PendingDamageComponent pendingDamage = GetDamage(colliderAspect, entity);
+                PendingDamageMap.Add(enemy, pendingDamage);
+
                 CollisionQueue.Enqueue(entity);
 
                 if (colliderAspect.DamageComponent.ValueRO.HasLimitedHits)
@@ -168,7 +186,7 @@ namespace Effects.ECS
             return false;
         }
 
-        private static PendingDamageComponent GetDamage(ColliderAspect colliderAspect)
+        private PendingDamageComponent GetDamage(ColliderAspect colliderAspect, Entity sourceEntity)
         {
             bool isCrit = colliderAspect.RandomComponent.ValueRW.Random.NextFloat() < colliderAspect.CritComponent.ValueRO.CritChance;
             float critMultiplier = isCrit ? colliderAspect.CritComponent.ValueRO.CritDamage : 1;
@@ -178,7 +196,48 @@ namespace Effects.ECS
                 ArmorDamage = colliderAspect.DamageComponent.ValueRO.ArmorDamage * critMultiplier,
                 ShieldDamage = colliderAspect.DamageComponent.ValueRO.ShieldDamage * critMultiplier,
                 IsCrit = isCrit,
+                
+                SourceEntity = sourceEntity,
             };
+        }
+    }
+
+    [BurstCompile]
+    public struct SumCollisionJob : IJob
+    {
+        [ReadOnly]
+        public NativeParallelMultiHashMap<Entity, PendingDamageComponent>.ReadOnly PendingDamageMap;
+        
+        public EntityCommandBuffer ECB;
+        
+        public void Execute()
+        {
+            // Get all unique keys (entities that were hit)
+            NativeArray<Entity> keys = PendingDamageMap.GetKeyArray(Allocator.Temp);
+            
+            // Proper iteration pattern for NativeMultiHashMap
+            foreach (Entity entity in keys)
+            {
+                if (!PendingDamageMap.TryGetFirstValue(entity, out PendingDamageComponent damage, out var iterator)) continue;
+
+                PendingDamageComponent pendingDamage = new PendingDamageComponent
+                {
+                    SourceEntity = damage.SourceEntity
+                };
+                
+                do 
+                {
+                    pendingDamage.HealthDamage += damage.HealthDamage;
+                    pendingDamage.ArmorDamage += damage.ArmorDamage;
+                    pendingDamage.ShieldDamage += damage.ShieldDamage;
+                    pendingDamage.IsCrit |= damage.IsCrit;
+                } 
+                while (PendingDamageMap.TryGetNextValue(out damage, ref iterator));
+                    
+                ECB.AddComponent(entity, pendingDamage);
+            }
+            
+            keys.Dispose();
         }
     }
 }

@@ -5,7 +5,6 @@ using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
-using UnityEngine;
 
 namespace Effects.ECS
 {
