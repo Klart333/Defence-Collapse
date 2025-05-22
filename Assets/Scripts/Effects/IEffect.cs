@@ -84,7 +84,10 @@ namespace Effects
             }
             else if (CanIncrease)
             {
-                value.Value += ModifierValue;
+                value.Value += ModifierType == Modifier.ModifierType.Multiplicative 
+                    ? Mathf.Max(ModifierValue - 1.0f, 0) 
+                    : ModifierValue;
+                
                 unit.Stats.Get(StatType).SetDirty(false);
             }
         }

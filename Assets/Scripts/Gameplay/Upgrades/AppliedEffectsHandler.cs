@@ -19,7 +19,7 @@ namespace Gameplay.Upgrades
         [SerializeField]
         private UpgradeCardDataUtility upgradeUtility;
         
-        public Dictionary<UpgradeComponentType, List<CategoryType>> spawnedEffects = new Dictionary<UpgradeComponentType, List<CategoryType>>();
+        public readonly Dictionary<UpgradeComponentType, List<CategoryType>> spawnedEffects = new Dictionary<UpgradeComponentType, List<CategoryType>>();
         
         private EntityManager entityManager;
         private EntityQuery upgradeComponentQuery;
@@ -55,7 +55,10 @@ namespace Gameplay.Upgrades
         {
             if (upgradeData.UpgradeType == UpgradeType.Effect)
             {
-                AddUpgradeEffect(upgradeData.AppliedCategories, upgradeData.Effect);
+                foreach (IEffect effect in upgradeData.Effects)
+                {
+                    AddUpgradeEffect(upgradeData.AppliedCategories, effect);
+                }
             }
             else if (upgradeData.UpgradeType == UpgradeType.Component)
             {

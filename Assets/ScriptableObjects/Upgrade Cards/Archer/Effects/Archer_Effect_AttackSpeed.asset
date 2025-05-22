@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3d805e3b3ab4891bec7b5cebf945158, type: 3}
-  m_Name: Archer_Component_MoneyOnDeath
+  m_Name: Archer_Effect_AttackSpeed
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -21,12 +21,39 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: effect
-      Entry: 6
+    - Name: effects
+      Entry: 7
+      Data: 0|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 1|Effects.IncreaseStatEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 1.2
+    - Name: ModifierType
+      Entry: 3
+      Data: 1
+    - Name: StatType
+      Entry: 3
+      Data: 3
+    - Name: CanIncrease
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
   icon: {fileID: 21300000, guid: 589db224aea12884880200807e357d93, type: 3}
-  description: 'Archer Districts'' attacks grant 2 gold. '
+  description: +20% AttackSpeed on Archer Districts.
   appliedCategories: 1
-  upgradeType: 1
-  componentType: 3
-  componentStrength: 2
+  upgradeType: 0
+  componentType: 0
+  componentStrength: 1

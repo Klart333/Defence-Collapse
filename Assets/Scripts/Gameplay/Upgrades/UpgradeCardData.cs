@@ -2,6 +2,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using Effects;
 using System;
+using System.Collections.Generic;
 
 namespace Gameplay.Upgrades
 {
@@ -25,7 +26,7 @@ namespace Gameplay.Upgrades
         private UpgradeType upgradeType;
         
         [SerializeField, ShowIf(nameof(isEffectType))]
-        private IEffect effect;
+        private List<IEffect> effects = new List<IEffect>();
         
         [SerializeField, ShowIf(nameof(isComponent))]
         private UpgradeComponentType componentType;
@@ -43,7 +44,7 @@ namespace Gameplay.Upgrades
         public UpgradeComponentType ComponentType => componentType;
         public float ComponentStrength => componentStrength;
         public UpgradeType UpgradeType => upgradeType;
-        public IEffect Effect => effect;
+        public List<IEffect> Effects => effects;
         
         public void Perform()
         {

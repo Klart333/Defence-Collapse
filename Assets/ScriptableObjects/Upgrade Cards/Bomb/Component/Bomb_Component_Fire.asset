@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3d805e3b3ab4891bec7b5cebf945158, type: 3}
-  m_Name: TownHall_AttackSpeed
+  m_Name: Bomb_Component_Fire
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -21,27 +21,21 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: effect
+    - Name: effects
       Entry: 7
-      Data: 0|Effects.IncreaseStatEffect, Core
-    - Name: ModifierValue
-      Entry: 4
-      Data: 2
-    - Name: ModifierType
-      Entry: 3
-      Data: 1
-    - Name: StatType
-      Entry: 3
-      Data: 3
-    - Name: CanIncrease
-      Entry: 5
-      Data: true
+      Data: 0|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
     - Name: 
       Entry: 8
       Data: 
-  icon: {fileID: 21300000, guid: a1823540bcd4eb948913aeb160d7d269, type: 3}
-  description: Double the Attack Speed of the Town Hall.
-  appliedCategories: 8
-  upgradeType: 0
+  icon: {fileID: 21300000, guid: a973648b3fa6b4f4b94d515f5893d6bc, type: 3}
+  description: Bomb Districts fire <color=red>Incendiary Bombs</color>
+  appliedCategories: 2
+  upgradeType: 1
   componentType: 0
-  componentStrength: 1
+  componentStrength: 50

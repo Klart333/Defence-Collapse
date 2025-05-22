@@ -1,5 +1,12 @@
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using System.IO;
+using System.Linq;
+#endif
 
 namespace Gameplay.Upgrades
 {
@@ -24,5 +31,41 @@ namespace Gameplay.Upgrades
             }
             return result;
         }
+        
+        #if UNITY_EDITOR
+        [Button]
+        public void FindAllUpgradeCardDatasInFolder()
+        {
+            // Get the path of the current scriptable object
+            string currentPath = AssetDatabase.GetAssetPath(this);
+            string directoryPath = Path.GetDirectoryName(currentPath);
+    
+            if (string.IsNullOrEmpty(directoryPath))
+            {
+                Debug.LogError("Could not determine the folder path of this utility object.");
+                return;
+            }
+    
+            // Find all UpgradeCardData assets in this folder and subfolders
+            string[] guids = AssetDatabase.FindAssets("t:UpgradeCardData", new[] { directoryPath });
+    
+            List<UpgradeCardData> upgradeCardDatas = new List<UpgradeCardData>();
+    
+            foreach (string guid in guids)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                UpgradeCardData cardData = AssetDatabase.LoadAssetAtPath<UpgradeCardData>(assetPath);
+                if (cardData != null)
+                {
+                    upgradeCardDatas.Add(cardData);
+                }
+            }
+    
+            upgradeCards = upgradeCardDatas.ToArray();
+            // Mark the object as dirty so changes will be saved
+            EditorUtility.SetDirty(this);
+            Debug.Log($"Found {upgradeCardDatas.Count} UpgradeCardData assets in {directoryPath} and its subfolders.");
+        }
+#endif
     }
 }
