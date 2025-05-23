@@ -41,7 +41,7 @@ namespace Effects.ECS
             }
 
             int enemyCount = SystemAPI.GetSingleton<WaveStateComponent>().EnemyCount;
-            NativeParallelMultiHashMap<Entity, PendingDamageComponent> pendingDamageMap = new NativeParallelMultiHashMap<Entity, PendingDamageComponent>(enemyCount * 2, WorldUpdateAllocator);
+            NativeParallelMultiHashMap<Entity, PendingDamageComponent> pendingDamageMap = new NativeParallelMultiHashMap<Entity, PendingDamageComponent>(enemyCount * 2 + 10, WorldUpdateAllocator);
 
             NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);

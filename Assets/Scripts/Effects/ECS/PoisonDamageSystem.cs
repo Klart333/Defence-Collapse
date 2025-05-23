@@ -7,8 +7,8 @@ using System;
 
 namespace Effects.ECS
 {
-    [UpdateAfter(typeof(FireCollisionSystem)), UpdateBefore(typeof(HealthSystem))]
-    public partial struct FireDamageSystem : ISystem
+    [UpdateAfter(typeof(PoisonCollisionSystem)), UpdateBefore(typeof(HealthSystem))]
+    public partial struct PoisonDamageSystem : ISystem
     {
         private ComponentLookup<PendingDamageComponent> pendingDamageLookup;
         
@@ -16,18 +16,18 @@ namespace Effects.ECS
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<GameSpeedComponent>();
-            state.RequireForUpdate<FireTickDataComponent>();
+            state.RequireForUpdate<PoisonTickDataComponent>();
             state.RequireForUpdate<PendingDamageECBSystem.Singleton>();
             pendingDamageLookup = state.GetComponentLookup<PendingDamageComponent>(true);
             
-            EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<FireComponent, HealthComponent>();
+            EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<PoisonComponent, HealthComponent>();
             state.RequireForUpdate(state.GetEntityQuery(builder));
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            FireTickDataComponent fireTickData = SystemAPI.GetSingleton<FireTickDataComponent>();
+            PoisonTickDataComponent poisonTickData = SystemAPI.GetSingleton<PoisonTickDataComponent>();
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
             
             PendingDamageECBSystem.Singleton singleton = SystemAPI.GetSingleton<PendingDamageECBSystem.Singleton>();
@@ -35,12 +35,12 @@ namespace Effects.ECS
             
             pendingDamageLookup.Update(ref state);
             
-            state.Dependency = new FireDamageJob
+            state.Dependency = new PoisonDamageJob
             {
                 PendingDamageLookup = pendingDamageLookup,
                 ECB = ecb.AsParallelWriter(), 
-                TickDamage = fireTickData.TickDamage,
-                TickRate = fireTickData.TickRate,
+                TickDamage = poisonTickData.TickDamage,
+                TickRate = poisonTickData.TickRate,
                 DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
             }.ScheduleParallel(state.Dependency);
             
@@ -55,7 +55,7 @@ namespace Effects.ECS
     }
     
     [BurstCompile, WithAll(typeof(HealthComponent))]
-    public partial struct FireDamageJob : IJobEntity
+    public partial struct PoisonDamageJob : IJobEntity
     {
         [ReadOnly]
         public ComponentLookup<PendingDamageComponent> PendingDamageLookup;
@@ -66,14 +66,14 @@ namespace Effects.ECS
         public float TickRate;
         public float DeltaTime;
         
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ref FireComponent fireComponent)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ref PoisonComponent poisonComponent)
         {
-            fireComponent.Timer += DeltaTime;
-            if (fireComponent.Timer < TickRate) return;
-            fireComponent.Timer = 0;
+            poisonComponent.Timer += DeltaTime;
+            if (poisonComponent.Timer < TickRate) return;
+            poisonComponent.Timer = 0;
             
-            float damage = math.min(fireComponent.TotalDamage, TickDamage);
-            fireComponent.TotalDamage -= damage;
+            float damage = math.min(poisonComponent.TotalDamage, TickDamage);
+            poisonComponent.TotalDamage -= damage;
 
             if (!PendingDamageLookup.TryGetComponent(entity, out PendingDamageComponent pendingDamage))
             {
@@ -86,15 +86,15 @@ namespace Effects.ECS
             }
             ECB.AddComponent(sortKey, entity, pendingDamage);
 
-            if (fireComponent.TotalDamage <= 0)
+            if (poisonComponent.TotalDamage <= 0)
             {
-                ECB.RemoveComponent<FireComponent>(sortKey, entity);
+                ECB.RemoveComponent<PoisonComponent>(sortKey, entity);
             }
         }
     }
 
     [Serializable]
-    public struct FireTickDataComponent : IComponentData
+    public struct PoisonTickDataComponent : IComponentData
     {
         public float TickRate;
         public float TickDamage;

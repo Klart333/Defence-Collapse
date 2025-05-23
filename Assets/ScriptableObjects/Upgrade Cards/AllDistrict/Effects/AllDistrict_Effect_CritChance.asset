@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3d805e3b3ab4891bec7b5cebf945158, type: 3}
-  m_Name: Bomb_Component_Fire
+  m_Name: AllDistrict_Effect_CritChance
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -26,17 +26,34 @@ MonoBehaviour:
       Data: 0|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 1|Effects.IncreaseStatEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 1.05
+    - Name: ModifierType
+      Entry: 3
+      Data: 1
+    - Name: StatType
+      Entry: 3
+      Data: 6
+    - Name: CanIncrease
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
-  icon: {fileID: 21300000, guid: a973648b3fa6b4f4b94d515f5893d6bc, type: 3}
-  description: Bomb Districts fire <color=red>Incendiary Bombs</color> (+20 Fire
-    Damage)
-  appliedCategories: 2
-  upgradeType: 1
+  icon: {fileID: 21300000, guid: 740f5e97fe6a90547844fb62858ab085, type: 3}
+  description: +5% Criti Chance on All Districts.
+  appliedCategories: 64
+  upgradeType: 0
   componentType: 0
-  componentStrength: 20
+  componentStrength: 1

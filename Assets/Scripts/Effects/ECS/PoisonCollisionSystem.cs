@@ -5,17 +5,17 @@ using Unity.Entities;
 namespace Effects.ECS
 {
     [UpdateAfter(typeof(CollisionSystem)), UpdateBefore(typeof(HealthSystem))]
-    public partial struct FireCollisionSystem : ISystem
+    public partial struct PoisonCollisionSystem : ISystem
     {
-        private ComponentLookup<FireComponent> fireComponentLookup;
+        private ComponentLookup<PoisonComponent> poisonComponentLookup;
         
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<PendingDamageECBSystem.Singleton>();
-            fireComponentLookup = SystemAPI.GetComponentLookup<FireComponent>(true);
+            poisonComponentLookup = SystemAPI.GetComponentLookup<PoisonComponent>(true);
             
-            EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<FireComponent>();
+            EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<PoisonComponent>();
             state.RequireForUpdate(state.GetEntityQuery(builder));
             
             EntityQueryBuilder builder2 = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<PendingDamageComponent>();
@@ -25,14 +25,14 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            fireComponentLookup.Update(ref state);
+            poisonComponentLookup.Update(ref state);
             var singleton = SystemAPI.GetSingleton<PendingDamageECBSystem.Singleton>();
             EntityCommandBuffer ecb = singleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            state.Dependency = new FireCollisionJob
+            state.Dependency = new PoisonCollisionJob
             {
                 ECB = ecb.AsParallelWriter(),
-                FireLookup = fireComponentLookup,
+                PoisonLookup = poisonComponentLookup,
             }.ScheduleParallel(state.Dependency);
             state.Dependency.Complete();
         }
@@ -43,31 +43,26 @@ namespace Effects.ECS
 
         }
     }
-
+    
     [BurstCompile]
-    public partial struct FireCollisionJob : IJobEntity
+    public partial struct PoisonCollisionJob : IJobEntity
     {
         [ReadOnly]
-        public ComponentLookup<FireComponent> FireLookup;
+        public ComponentLookup<PoisonComponent> PoisonLookup;
 
         public EntityCommandBuffer.ParallelWriter ECB;
         
         public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in PendingDamageComponent pendingDamage)
         {
-            if (!FireLookup.TryGetComponent(pendingDamage.SourceEntity, out FireComponent sourceFire)) return;
+            if (!PoisonLookup.TryGetComponent(pendingDamage.SourceEntity, out PoisonComponent sourcePoison)) return;
             
-            if (FireLookup.TryGetComponent(entity, out FireComponent fire))
+            if (!PoisonLookup.TryGetComponent(entity, out PoisonComponent fire))
             {
-                fire.TotalDamage += sourceFire.TotalDamage;
-                ECB.SetComponent(sortKey, entity, fire);
+                fire = new PoisonComponent();                
             }
-            else
-            {
-                ECB.AddComponent(sortKey, entity, new FireComponent
-                {
-                    TotalDamage = sourceFire.TotalDamage,
-                });
-            }
+            
+            fire.TotalDamage += sourcePoison.TotalDamage;
+            ECB.AddComponent(sortKey, entity, sourcePoison);
         }
     }
 }

@@ -53,16 +53,26 @@ namespace Gameplay.Upgrades
 
         private void PerformUpgrade(UpgradeCardData upgradeData)
         {
-            if (upgradeData.UpgradeType == UpgradeType.Effect)
+            switch (upgradeData.UpgradeType)
             {
-                foreach (IEffect effect in upgradeData.Effects)
+                case UpgradeType.Effect:
                 {
-                    AddUpgradeEffect(upgradeData.AppliedCategories, effect);
+                    foreach (IEffect effect in upgradeData.Effects)
+                    {
+                        AddUpgradeEffect(upgradeData.AppliedCategories, effect);
+                    }
+
+                    break;
                 }
-            }
-            else if (upgradeData.UpgradeType == UpgradeType.Component)
-            {
-                AddComponentEffect(upgradeData.AppliedCategories, upgradeData.ComponentType, upgradeData.ComponentStrength);
+                case UpgradeType.Component:
+                    AddComponentEffect(upgradeData.AppliedCategories, upgradeData.ComponentType, upgradeData.ComponentStrength);
+                    break;
+                case UpgradeType.StandAloneEffect:
+                    foreach (IEffect effect in upgradeData.Effects)
+                    {
+                        effect.Perform(null);
+                    }
+                    break;
             }
         }
         

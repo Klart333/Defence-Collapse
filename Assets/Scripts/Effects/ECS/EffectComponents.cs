@@ -140,5 +140,12 @@ namespace Effects.ECS
 		public float Timer;
 	}
 	
+	public struct PoisonComponent : IComponentData
+	{
+		public float TotalDamage;
+		public float Timer;
+	}
+
+	
 	#endregion
 }

@@ -1,8 +1,8 @@
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Effects;
 using System;
-using System.Collections.Generic;
 
 namespace Gameplay.Upgrades
 {
@@ -34,7 +34,7 @@ namespace Gameplay.Upgrades
         [SerializeField, ShowIf(nameof(isComponent))]
         private float componentStrength = 1;
 
-        private bool isEffectType => upgradeType == UpgradeType.Effect;
+        private bool isEffectType => upgradeType is UpgradeType.Effect or UpgradeType.StandAloneEffect;
         private bool isComponent => upgradeType == UpgradeType.Component;
         
         public string Description => description;
@@ -46,6 +46,7 @@ namespace Gameplay.Upgrades
         public UpgradeType UpgradeType => upgradeType;
         public List<IEffect> Effects => effects;
         
+        [Button, TitleGroup("Debug")]
         public void Perform()
         {
             OnUpgradePerformed?.Invoke(this);
@@ -74,6 +75,8 @@ namespace Gameplay.Upgrades
     {
         Effect,
         Component,
+        
+        StandAloneEffect,
     }
 
     public enum UpgradeComponentType
@@ -82,5 +85,6 @@ namespace Gameplay.Upgrades
         Lightning,
         Explosion,
         MoneyOnDeath,
+        Poison,
     }
 }

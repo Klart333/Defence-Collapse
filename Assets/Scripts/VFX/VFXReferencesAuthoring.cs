@@ -14,8 +14,12 @@ namespace VFX
         [SerializeField]
         private VisualEffect fireParticleEffect;
         
+        [SerializeField]
+        private VisualEffect poisonParticlesEffect;
+        
         private void Awake()
         {
+            VFXReferences.PoisonParticleGraph = poisonParticlesEffect;
             VFXReferences.FireParticleGraph = fireParticleEffect;
             VFXReferences.ExplosionsGraph = explosionEffect;
             VFXReferences.TrailGraph = trailEffect;

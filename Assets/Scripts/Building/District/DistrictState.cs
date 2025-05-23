@@ -42,7 +42,7 @@ namespace Buildings.District
         public Vector3 AttackPosition { get; set; }
         public DistrictData DistrictData { get; }
         public abstract Attack Attack { get; }
-        public int Level { get; set; }
+        public int Level { get; set; } = 1;
         public int Key { get; set; }
 
         protected DistrictState(DistrictData districtData, Vector3 position, int key)

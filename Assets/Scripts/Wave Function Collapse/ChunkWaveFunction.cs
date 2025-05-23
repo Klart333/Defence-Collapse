@@ -366,8 +366,10 @@ namespace WaveFunctionCollapse
         {
             while (CellStack.TryPop(out ChunkIndex chunkIndex))
             {
+                if (!Chunks.TryGetValue(chunkIndex.Index, out TChunk chunk)) continue;
+                
+                List<ChunkIndex> neighbours = chunk.GetAdjacentCells(chunkIndex.CellIndex, out List<Direction> directions);
                 Cell changedCell = this[chunkIndex];
-                List<ChunkIndex> neighbours = Chunks[chunkIndex.Index].GetAdjacentCells(chunkIndex.CellIndex, out List<Direction> directions);
 
                 for (int i = 0; i < neighbours.Count; i++)
                 {

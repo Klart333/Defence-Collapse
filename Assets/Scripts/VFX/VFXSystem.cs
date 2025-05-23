@@ -47,22 +47,39 @@ namespace VFX
             Size = -1f;
         }
     }
+    
+    [VFXType(VFXTypeAttribute.Usage.GraphicsBuffer)]
+    public struct VFXPoisonParticleData : IKillableVFX
+    {
+        public Vector3 Position;
+        public Vector3 Velocity;
+        public float Size;
+
+        public void Kill()
+        {
+            Size = -1f;
+        }
+    }
 
     public static class VFXReferences
     {
-        public static VisualEffect HitSparksGraph;
+        public static VisualEffect   HitSparksGraph;
         public static GraphicsBuffer HitSparksRequestsBuffer;
 
-        public static VisualEffect ExplosionsGraph;
+        public static VisualEffect   ExplosionsGraph;
         public static GraphicsBuffer ExplosionsRequestsBuffer;
 
-        public static VisualEffect TrailGraph;
+        public static VisualEffect   TrailGraph;
         public static GraphicsBuffer TrailRequestsBuffer;
         public static GraphicsBuffer TrailDatasBuffer;
         
-        public static VisualEffect FireParticleGraph;
+        public static VisualEffect   FireParticleGraph;
         public static GraphicsBuffer FireParticleRequestsBuffer;
         public static GraphicsBuffer FireParticlesDatasBuffer;
+        
+        public static VisualEffect   PoisonParticleGraph;
+        public static GraphicsBuffer PoisonParticleRequestsBuffer;
+        public static GraphicsBuffer PoisonParticlesDatasBuffer;
     }
 
     public interface IKillableVFX
@@ -272,6 +289,11 @@ namespace VFX
     {
         public VFXManagerParented<VFXFireData> Manager;
     }
+    
+    public struct VFXPoisonParticlesSingleton : IComponentData
+    {
+        public VFXManagerParented<VFXPoisonParticleData> Manager;
+    }
 
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public partial struct VFXSystem : ISystem
@@ -284,9 +306,11 @@ namespace VFX
         private VFXManager<VFXExplosionRequest> explosionsManager;
         private VFXManager<VFXHitSparksRequest> hitSparksManager;
         
+        private VFXManagerParented<VFXPoisonParticleData> poisonParticleManager;
         private VFXManagerParented<VFXFireData> fireParticleManager;
         private VFXManagerParented<VFXTrailData> trailManager;
 
+        private const int PoisonParticleCapacity = 1000;
         private const int FireParticleCapacity = 1000;
         private const int ExplosionsCapacity = 1000;
         private const int HitSparksCapacity = 1000;
@@ -303,9 +327,10 @@ namespace VFX
             // VFX managers
             hitSparksManager  = new VFXManager<VFXHitSparksRequest>(HitSparksCapacity , ref VFXReferences.HitSparksRequestsBuffer );
             explosionsManager = new VFXManager<VFXExplosionRequest>(ExplosionsCapacity, ref VFXReferences.ExplosionsRequestsBuffer);
-            
-            trailManager        = new VFXManagerParented<VFXTrailData>(TrailCapacity       , ref VFXReferences.TrailRequestsBuffer       , ref VFXReferences.TrailDatasBuffer        );
-            fireParticleManager = new VFXManagerParented<VFXFireData >(FireParticleCapacity, ref VFXReferences.FireParticleRequestsBuffer, ref VFXReferences.FireParticlesDatasBuffer);
+
+            poisonParticleManager = new VFXManagerParented<VFXPoisonParticleData>(PoisonParticleCapacity, ref VFXReferences.PoisonParticleRequestsBuffer, ref VFXReferences.PoisonParticlesDatasBuffer);
+            fireParticleManager = new VFXManagerParented<VFXFireData>(FireParticleCapacity, ref VFXReferences.FireParticleRequestsBuffer, ref VFXReferences.FireParticlesDatasBuffer);
+            trailManager = new VFXManagerParented<VFXTrailData>(TrailCapacity, ref VFXReferences.TrailRequestsBuffer, ref VFXReferences.TrailDatasBuffer);
 
             // Singletons
             state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new VFXHitSparksSingleton
@@ -324,6 +349,10 @@ namespace VFX
             {
                 Manager = fireParticleManager,
             });
+            state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new VFXPoisonParticlesSingleton()
+            {
+                Manager = poisonParticleManager,
+            });
         }
 
         public void OnDestroy(ref SystemState state)
@@ -332,15 +361,17 @@ namespace VFX
             explosionsManager.Dispose(ref VFXReferences.ExplosionsRequestsBuffer);
             trailManager.Dispose(ref VFXReferences.TrailRequestsBuffer, ref VFXReferences.TrailDatasBuffer);
             fireParticleManager.Dispose(ref VFXReferences.FireParticleRequestsBuffer, ref VFXReferences.FireParticlesDatasBuffer);
+            poisonParticleManager.Dispose(ref VFXReferences.PoisonParticleRequestsBuffer, ref VFXReferences.PoisonParticlesDatasBuffer);
         }
 
         public void OnUpdate(ref SystemState state)
         {
             // This is required because we must use data in native collections on the main thread, to send it to VFXGraphs
-            SystemAPI.QueryBuilder().WithAll<VFXHitSparksSingleton>().Build().CompleteDependency();
-            SystemAPI.QueryBuilder().WithAll<VFXExplosionsSingleton>().Build().CompleteDependency();
-            SystemAPI.QueryBuilder().WithAll<VFXTrailSingleton>().Build().CompleteDependency();
+            SystemAPI.QueryBuilder().WithAll<VFXPoisonParticlesSingleton>().Build().CompleteDependency();
             SystemAPI.QueryBuilder().WithAll<VFXFireParticlesSingleton>().Build().CompleteDependency();
+            SystemAPI.QueryBuilder().WithAll<VFXExplosionsSingleton>().Build().CompleteDependency();
+            SystemAPI.QueryBuilder().WithAll<VFXHitSparksSingleton>().Build().CompleteDependency();
+            SystemAPI.QueryBuilder().WithAll<VFXTrailSingleton>().Build().CompleteDependency();
 
             // Update managers
             float rateRatio = SystemAPI.Time.DeltaTime / Time.deltaTime;
@@ -375,6 +406,16 @@ namespace VFX
                 VFXReferences.FireParticleGraph,
                 ref VFXReferences.FireParticleRequestsBuffer,
                 ref VFXReferences.FireParticlesDatasBuffer,
+                rateRatio,
+                _spawnBatchId,
+                _requestsCountId,
+                _requestsBufferId,
+                _datasBufferId);
+            
+            poisonParticleManager.Update(
+                VFXReferences.PoisonParticleGraph,
+                ref VFXReferences.PoisonParticleRequestsBuffer,
+                ref VFXReferences.PoisonParticlesDatasBuffer,
                 rateRatio,
                 _spawnBatchId,
                 _requestsCountId,

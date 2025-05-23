@@ -36,9 +36,12 @@ public class UpgradeStat : IUpgradeStat
     private Modifier increaseModifier;
 
     public event Action OnValueChanged;
-    public float Value => Stat.Value;
+    
     public float BaseValue => Stat.BaseValue;
+    public float Value => Stat.Value;
+
     public DistrictState DistrictState { get; set; }
+    private int Level { get; set; } = 1;
 
     public UpgradeStat()
     {
@@ -86,6 +89,7 @@ public class UpgradeStat : IUpgradeStat
         increaseModifier.Value += GetIncrease();
         Stat.SetDirty(false);
         DistrictState.Level++;
+        Level++;
     }
 
     public float GetCost()
@@ -95,17 +99,18 @@ public class UpgradeStat : IUpgradeStat
     
     public float GetIncrease()
     {
-        return LevelData.GetIncrease(DistrictState.Level);
+        return LevelData.GetIncrease(Level);
     }
 }
 
+[Serializable, InlineProperty]
 public class TownHallUpgradeStat : IUpgradeStat
 {
     [Title("Stat")]
-    public Stat Stat = new Stat(1);
+    public Stat Stat;
     
     [Title("Upgrade Settings")]
-    public string Name { get; } = "Stat Name";
+    public string Name { get; }
     public string[] Descriptions { get; }
     public Sprite Icon { get; }
     
@@ -113,6 +118,7 @@ public class TownHallUpgradeStat : IUpgradeStat
 
     private Modifier increaseModifier;
 
+    private int Level { get; set; } = 1;
     public float BaseValue => Stat.BaseValue;
     public event Action OnValueChanged;
     public float Value => Stat.Value;
@@ -162,6 +168,7 @@ public class TownHallUpgradeStat : IUpgradeStat
         increaseModifier.Value += GetIncrease();
         Stat.SetDirty(false);
         DistrictState.Level++;
+        Level++;
         
         UIEvents.OnFocusChanged?.Invoke();
         Object.FindFirstObjectByType<DistrictUnlockHandler>().DisplayUnlockableDistricts();
@@ -179,6 +186,6 @@ public class TownHallUpgradeStat : IUpgradeStat
     
     public float GetIncrease()
     {
-        return LevelData.GetIncrease(DistrictState.Level);
+        return LevelData.GetIncrease(Level);
     }
 }
