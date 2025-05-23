@@ -32,7 +32,7 @@ namespace Effects.ECS
         [BurstCompile]
         public void Execute(ref RotateTowardsVelocityComponent rot, ref LocalTransform transform)
         {
-            float3 direction = math.normalize(rot.LastPosition - transform.Position);
+            float3 direction = math.normalize(transform.Position - rot.LastPosition);
             rot.LastPosition = transform.Position;
 
             transform.Rotation = quaternion.LookRotation(direction, new float3(0, 1, 0));

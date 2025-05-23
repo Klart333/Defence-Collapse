@@ -5,6 +5,7 @@ using Unity.Burst;
 
 namespace Gameplay.Upgrades.ECS
 {
+    [UpdateBefore(typeof(CollisionSystem))]
     public partial struct AddComponentsSystem : ISystem 
     {
         private EntityQuery componentQuery;  
@@ -14,7 +15,7 @@ namespace Gameplay.Upgrades.ECS
         {
             EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<AddComponentInitComponent>();
             state.RequireForUpdate(state.GetEntityQuery(builder));
-            
+
             EntityQueryBuilder builder2 = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<AddComponentComponent>();
             componentQuery = state.GetEntityQuery(builder2);
             state.RequireForUpdate(componentQuery);

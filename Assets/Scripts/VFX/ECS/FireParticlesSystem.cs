@@ -134,7 +134,7 @@ namespace VFX.ECS
             
             VFXFireData fireData = FireData[fire.FireParticleVFXIndex];
             fireData.Position = transform.Position;
-            fireData.Velocity = math.mul(transform.Rotation, -math.forward()) * speed.Speed;
+            fireData.Velocity = math.mul(transform.Rotation, math.forward()) * speed.Speed;
             FireData[fire.FireParticleVFXIndex] = fireData;
         }
     }
