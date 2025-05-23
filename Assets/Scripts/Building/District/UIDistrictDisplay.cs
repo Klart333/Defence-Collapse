@@ -15,6 +15,13 @@ namespace Buildings.District
         private void OnDistrictCreated(DistrictData data)
         {
             data.OnClicked += OnDistrictClicked;
+            data.OnDisposed += DataOnOnDisposed;
+
+            void DataOnOnDisposed()
+            {
+                data.OnDisposed -= DataOnOnDisposed;
+                data.OnClicked -= OnDistrictClicked;
+            }
         }
 
         private void OnDistrictClicked(DistrictData data)

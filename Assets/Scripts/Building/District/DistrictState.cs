@@ -42,6 +42,7 @@ namespace Buildings.District
         public Vector3 AttackPosition { get; set; }
         public DistrictData DistrictData { get; }
         public abstract Attack Attack { get; }
+        public int Level { get; set; }
         public int Key { get; set; }
 
         protected DistrictState(DistrictData districtData, Vector3 position, int key)
@@ -343,15 +344,21 @@ namespace Buildings.District
             UpgradeStat healthDamage = new UpgradeStat(stats.HealthDamage, archerData.LevelDatas[0],
                 "Health Damage",
                 new string[] { "Increase <b>Health Damage Multiplier</b> by {0}", "Current <b>Health Damage Multiplier</b>: <color=green>{0}</color>x" },
-                archerData.UpgradeIcons[0]);
+                archerData.UpgradeIcons[0]){
+                DistrictState = this
+            };
             UpgradeStat armorDamage = new UpgradeStat(stats.ArmorDamage, archerData.LevelDatas[1],
                 "Armor Damage",
                 new string[] { "Increase <b>Armor Damage Multiplier</b> by {0}", "Current <b>Armor Damage Multiplier</b>: <color=yellow>{0}</color>x" },
-                archerData.UpgradeIcons[1]);
+                archerData.UpgradeIcons[1]){
+                DistrictState = this
+            };
             UpgradeStat shieldDamage = new UpgradeStat(stats.ShieldDamage, archerData.LevelDatas[2],
                 "Shield Damage",
                 new string[] { "Increase <b>Shield Damage Multiplier</b> by {0}", "Current <b>Shield Damage Multiplier</b>: <color=blue>{0}</color>x" },
-                archerData.UpgradeIcons[2]);
+                archerData.UpgradeIcons[2]) {
+                DistrictState = this
+            };
 
             UpgradeStats.Add(healthDamage);
             UpgradeStats.Add(armorDamage);
@@ -545,15 +552,21 @@ namespace Buildings.District
             UpgradeStat healthDamage = new UpgradeStat(stats.HealthDamage, bombData.LevelDatas[0],
                 "Health Damage",
                 new string[] { "Increase <b>Health Damage Multiplier</b> by {0}", "Current <b>Health Damage Multiplier</b>: <color=green>{0}</color>x" },
-                bombData.UpgradeIcons[0]);
+                bombData.UpgradeIcons[0]){
+                DistrictState = this
+            };
             UpgradeStat armorDamage = new UpgradeStat(stats.ArmorDamage, bombData.LevelDatas[1],
                 "Armor Damage",
                 new string[] { "Increase <b>Armor Damage Multiplier</b> by {0}", "Current <b>Armor Damage Multiplier</b>: <color=yellow>{0}</color>x" },
-                bombData.UpgradeIcons[1]);
+                bombData.UpgradeIcons[1]){
+                DistrictState = this
+            };
             UpgradeStat shieldDamage = new UpgradeStat(stats.ShieldDamage, bombData.LevelDatas[2],
                 "Shield Damage",
                 new string[] { "Increase <b>Shield Damage Multiplier</b> by {0}", "Current <b>Shield Damage Multiplier</b>: <color=blue>{0}</color>x" },
-                bombData.UpgradeIcons[2]);
+                bombData.UpgradeIcons[2]){
+                DistrictState = this
+            };
 
             UpgradeStats.Add(healthDamage);
             UpgradeStats.Add(armorDamage);
@@ -630,7 +643,9 @@ namespace Buildings.District
             TownHallUpgradeStat townHall = new TownHallUpgradeStat(new Stat(1), townHallData.LevelDatas[0],
                 "Level",
                 new string[] { "Increase Level by {0}", "Current Level: {0}" },
-                townHallData.UpgradeIcons[0]);
+                townHallData.UpgradeIcons[0]){
+                DistrictState = this
+            };
 
             UpgradeStats.Add(townHall);
         }
@@ -778,11 +793,15 @@ namespace Buildings.District
             UpgradeStat attackSpeed = new UpgradeStat(stats.AttackSpeed, mineData.LevelDatas[0], 
                 "Mine Speed",
                 new string[] { "Increase Mining speed by {0}/s", "Current Mining speed: {0}/s" },
-                mineData.UpgradeIcons[0]);
+                mineData.UpgradeIcons[0]){
+                DistrictState = this
+            };
             UpgradeStat damage = new UpgradeStat(stats.Productivity, mineData.LevelDatas[1], 
                 "Value Multiplier",
                 new string[] { "Increase Value Multiplier by {0}x", "Current Value Multiplier: {0}x" },
-                mineData.UpgradeIcons[1]);
+                mineData.UpgradeIcons[1]){
+                DistrictState = this
+            };
 
             UpgradeStats.Add(attackSpeed);
             UpgradeStats.Add(damage);
@@ -995,15 +1014,21 @@ namespace Buildings.District
             UpgradeStat healthDamage = new UpgradeStat(stats.HealthDamage, flameData.LevelDatas[0],
                 "Health Damage",
                 new string[] { "Increase <b>Health Damage Multiplier</b> by {0}", "Current <b>Health Damage Multiplier</b>: <color=green>{0}</color>x" },
-                flameData.UpgradeIcons[0]);
+                flameData.UpgradeIcons[0]){
+                DistrictState = this
+            };
             UpgradeStat armorDamage = new UpgradeStat(stats.ArmorDamage, flameData.LevelDatas[1],
                 "Armor Damage",
                 new string[] { "Increase <b>Armor Damage Multiplier</b> by {0}", "Current <b>Armor Damage Multiplier</b>: <color=yellow>{0}</color>x" },
-                flameData.UpgradeIcons[1]);
+                flameData.UpgradeIcons[1]){
+                DistrictState = this
+            };
             UpgradeStat shieldDamage = new UpgradeStat(stats.ShieldDamage, flameData.LevelDatas[2],
                 "Shield Damage",
                 new string[] { "Increase <b>Shield Damage Multiplier</b> by {0}", "Current <b>Shield Damage Multiplier</b>: <color=blue>{0}</color>x" },
-                flameData.UpgradeIcons[2]);
+                flameData.UpgradeIcons[2]){
+                DistrictState = this
+            };
  
             UpgradeStats.Add(healthDamage);
             UpgradeStats.Add(armorDamage);

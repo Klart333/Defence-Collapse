@@ -680,7 +680,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1700,8 +1700,8 @@ MonoBehaviour:
     SerializedBytes: 
     ReferencedUnityObjects:
     - {fileID: 11400000, guid: 245db626b31676a4183321c87b450a27, type: 2}
-    - {fileID: 11400000, guid: ab0696a35eef117499e0fdc29a15b776, type: 2}
     - {fileID: 11400000, guid: 20071b5325a2e33418874ae5d70b303e, type: 2}
+    - {fileID: 11400000, guid: ab0696a35eef117499e0fdc29a15b776, type: 2}
     - {fileID: 11400000, guid: d94a6d5c1a8128544a4b6388e09ea944, type: 2}
     - {fileID: 11400000, guid: 78c9d3f9d472dc64296ab95b899cfe91, type: 2}
     SerializedBytesString: 
@@ -1746,7 +1746,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 3
+      Data: 1
     - Name: $v
       Entry: 10
       Data: 1
@@ -1758,7 +1758,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 1
+      Data: 3
     - Name: $v
       Entry: 10
       Data: 2
@@ -1805,7 +1805,7 @@ MonoBehaviour:
   districtCostData: {fileID: 11400000, guid: a6d3084868d171045b5e0972b383d96e, type: 2}
   affordableColor: {r: 0.40156865, g: 1, b: 0.2999999, a: 1}
   notAffordableColor: {r: 1, g: 0.28490567, b: 0.28490567, a: 1}
-  verbose: 0
+  verbose: 1
 --- !u!1 &226841345
 GameObject:
   m_ObjectHideFlags: 0
@@ -4016,110 +4016,19 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects:
-    - {fileID: 11400000, guid: d94a6d5c1a8128544a4b6388e09ea944, type: 2}
-    - {fileID: 11400000, guid: 20071b5325a2e33418874ae5d70b303e, type: 2}
-    - {fileID: 11400000, guid: ab0696a35eef117499e0fdc29a15b776, type: 2}
-    - {fileID: 11400000, guid: 78c9d3f9d472dc64296ab95b899cfe91, type: 2}
-    - {fileID: 11400000, guid: 245db626b31676a4183321c87b450a27, type: 2}
+    ReferencedUnityObjects: []
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: districtInfoData
-      Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[DistrictType, Core],[WaveFunctionCollapse.PrototypeInfoData,
-        Core]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[DistrictType, Core]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 5
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
-      Entry: 10
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 10
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 10
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 5
-    - Name: $v
-      Entry: 10
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 10
-      Data: 4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: districts
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[Unity.Mathematics.int2, Unity.Mathematics],[Buildings.District.DistrictData,
+      Data: 0|System.Collections.Generic.Dictionary`2[[Unity.Mathematics.int2, Unity.Mathematics],[Buildings.District.DistrictData,
         Core]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[Unity.Mathematics.int2,
+      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[Unity.Mathematics.int2,
         Unity.Mathematics]], mscorlib
     - Name: 
       Entry: 8
@@ -4135,7 +4044,7 @@ MonoBehaviour:
       Data: 
     - Name: uniqueDistricts
       Entry: 7
-      Data: 4|System.Collections.Generic.List`1[[Buildings.District.DistrictData,
+      Data: 2|System.Collections.Generic.List`1[[Buildings.District.DistrictData,
         Core]], mscorlib
     - Name: 
       Entry: 12
@@ -4793,11 +4702,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 418315291951384129, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 418315291951384129, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -4866,32 +4770,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 527352178}
-    - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 878972491703753982, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_Type
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 878972491703753982, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: a973648b3fa6b4f4b94d515f5893d6bc,
-        type: 3}
     - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
@@ -4936,27 +4814,6 @@ PrefabInstance:
     - target: {fileID: 4396926357991724226, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
       propertyPath: districtType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7164628421216684485, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: a973648b3fa6b4f4b94d515f5893d6bc,
-        type: 3}
-    - target: {fileID: 7164628421216684485, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_Color.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7164628421216684485, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7164628421216684485, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -11558,7 +11415,7 @@ MonoBehaviour:
   awaitEveryFrame: 100
   awaitTimeMs: 1
   maxMillisecondsPerFrame: 2
-  verbose: 0
+  verbose: 1
 --- !u!1 &1568006375
 GameObject:
   m_ObjectHideFlags: 0
@@ -12575,7 +12432,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1663617817}
   - component: {fileID: 1663617819}
-  - component: {fileID: 1663617818}
   - component: {fileID: 1663617821}
   - component: {fileID: 1663617820}
   - component: {fileID: 1663617822}
@@ -12606,36 +12462,6 @@ RectTransform:
   m_AnchoredPosition: {x: -0.000030517578, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1663617818
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1663617816}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Content: {fileID: 1978976919}
-  m_Horizontal: 1
-  m_Vertical: 0
-  m_MovementType: 0
-  m_Elasticity: 0.1
-  m_Inertia: 0
-  m_DecelerationRate: 1
-  m_ScrollSensitivity: 0
-  m_Viewport: {fileID: 0}
-  m_HorizontalScrollbar: {fileID: 0}
-  m_VerticalScrollbar: {fileID: 0}
-  m_HorizontalScrollbarVisibility: 0
-  m_VerticalScrollbarVisibility: 0
-  m_HorizontalScrollbarSpacing: 0
-  m_VerticalScrollbarSpacing: 0
-  m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &1663617819
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
@@ -22,20 +23,40 @@ namespace Buildings.District
 
         [SerializeField]
         private Transform meshTransform;
+        
+        [SerializeField]
+        private LayerMask highlightedLayer;
 
+        [SerializeField]
+        private LayerMask defaultLayer;
+        
         private readonly List<Material> transparentMaterials = new List<Material>();
         private readonly List<Material> transparentRemoveMaterials = new List<Material>();
         
         private MeshRenderer meshRenderer;
         private MeshFilter meshFilter;
-
+        private DistrictHandler districtHandler;
+        
         public PrototypeData Prototype { get; private set; }
         public MeshWithRotation MeshRot { get; private set; }
         public Transform MeshTransform => meshTransform;
         public ChunkIndex ChunkIndex { get; private set; }
         public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
         public MeshFilter MeshFilter => meshFilter ??= GetComponentInChildren<MeshFilter>();
-        
+
+        private void Awake()
+        {
+            districtHandler = FindFirstObjectByType<DistrictHandler>();
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            
+            districtHandler?.RemoveDistrictObject(this);
+            MeshRenderer.gameObject.layer = (int)Mathf.Log(defaultLayer.value, 2);
+        }
+
         public void Setup(PrototypeData prototypeData, ChunkIndex chunkIndex, Vector3 scale)
         {
             ChunkIndex = chunkIndex;
@@ -78,6 +99,25 @@ namespace Buildings.District
                 {
                     MeshRenderer.SetMaterials(materialData.GetMaterials(Prototype.MaterialIndexes));
                 }
+
+                Place();
+            }
+        }
+
+        private void Place()
+        {
+            districtHandler.AddDistrictObject(this);
+        }
+
+        public void Highlight(bool isHover)
+        {
+            if (isHover)
+            {
+                MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2);
+            }
+            else
+            {
+                MeshRenderer.gameObject.layer = (int)Mathf.Log(defaultLayer.value, 2);
             }
         }
     }

@@ -46,7 +46,7 @@ namespace WaveFunctionCollapse
 #if UNITY_EDITOR
                 if (!Chunks.TryGetValue(index.Index, out _))
                 {
-                    Debug.LogError("PROBLEM!");
+                    Debug.LogError("PROBLEM! - " + index.Index);
                     return default;
                 }
 #endif

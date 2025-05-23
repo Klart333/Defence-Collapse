@@ -1,3 +1,4 @@
+using Effects.ECS;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -8,6 +9,7 @@ using Enemy;
 
 namespace DataStructures.Queue.ECS
 {
+    [UpdateAfter(typeof(DeathSystem))]
     public partial struct SpawnerSystem : ISystem
     {
         private EntityQuery spawnerQuery;

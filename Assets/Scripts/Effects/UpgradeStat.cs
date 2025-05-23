@@ -14,7 +14,6 @@ public interface IUpgradeStat : IStat
     public string Name { get; }
     public string[] Descriptions { get; }
     public Sprite Icon { get; }
-    public int Level { get; }
 
     public float GetCost();
     public float GetIncrease();
@@ -36,10 +35,10 @@ public class UpgradeStat : IUpgradeStat
 
     private Modifier increaseModifier;
 
-    public int Level { get; private set; } = 1;
     public event Action OnValueChanged;
     public float Value => Stat.Value;
     public float BaseValue => Stat.BaseValue;
+    public DistrictState DistrictState { get; set; }
 
     public UpgradeStat()
     {
@@ -86,17 +85,17 @@ public class UpgradeStat : IUpgradeStat
         
         increaseModifier.Value += GetIncrease();
         Stat.SetDirty(false);
-        Level++;
+        DistrictState.Level++;
     }
 
     public float GetCost()
     {
-        return LevelData.GetCost(Level);
+        return LevelData.GetCost(DistrictState.Level);
     }
     
     public float GetIncrease()
     {
-        return LevelData.GetIncrease(Level);
+        return LevelData.GetIncrease(DistrictState.Level);
     }
 }
 
@@ -114,10 +113,11 @@ public class TownHallUpgradeStat : IUpgradeStat
 
     private Modifier increaseModifier;
 
-    public int Level { get; private set; } = 1;
+    public float BaseValue => Stat.BaseValue;
     public event Action OnValueChanged;
     public float Value => Stat.Value;
-    public float BaseValue => Stat.BaseValue;
+    
+    public DistrictState DistrictState { get; set; }
 
     public TownHallUpgradeStat(Stat stat, LevelData levelData, string name, string[] descriptions, Sprite icon)
     {
@@ -161,7 +161,7 @@ public class TownHallUpgradeStat : IUpgradeStat
         
         increaseModifier.Value += GetIncrease();
         Stat.SetDirty(false);
-        Level++;
+        DistrictState.Level++;
         
         UIEvents.OnFocusChanged?.Invoke();
         Object.FindFirstObjectByType<DistrictUnlockHandler>().DisplayUnlockableDistricts();
@@ -174,11 +174,11 @@ public class TownHallUpgradeStat : IUpgradeStat
 
     public float GetCost()
     {
-        return LevelData.GetCost(Level);
+        return LevelData.GetCost(DistrictState.Level);
     }
     
     public float GetIncrease()
     {
-        return LevelData.GetIncrease(Level);
+        return LevelData.GetIncrease(DistrictState.Level);
     }
 }

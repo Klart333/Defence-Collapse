@@ -5,16 +5,12 @@ using Sirenix.Serialization;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
 using Buildings.District;
-using Sirenix.Utilities;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
 using System.Linq;
-using System;
 using Gameplay;
-using Gameplay.Upgrades;
-using Unity.Assertions;
-using UnityEngine.Serialization;
+using System;
 
 namespace WaveFunctionCollapse
 {
@@ -226,7 +222,6 @@ namespace WaveFunctionCollapse
                 Queue<QueryChunk> chunkQueue = new Queue<QueryChunk>();
                 chunkQueue.Enqueue(chunk);
 
-                int removed = 0;
                 while (chunkQueue.TryDequeue(out chunk))
                 {
                     bool isDistrict = chunk.PrototypeInfoData != defaultPrototypeInfoData;
@@ -248,7 +243,6 @@ namespace WaveFunctionCollapse
                     }
                     else
                     {
-                        removed++;
                         OnDistrictChunkRemoved?.Invoke(chunk);
                         waveFunction.RemoveChunk(chunk.ChunkIndex, out List<QueryChunk> neighbourChunks);
                         ClearChunkMeshes(chunk.ChunkIndex);
@@ -269,8 +263,6 @@ namespace WaveFunctionCollapse
                         }
                     } 
                 }
-
-                Debug.Log("Removed " + removed + " chunks");
             }
         }
 

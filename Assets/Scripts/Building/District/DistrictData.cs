@@ -30,8 +30,8 @@ namespace Buildings.District
 
         public List<IUpgradeStat> UpgradeStats => State.UpgradeStats;
         public Dictionary<int3, QueryChunk> DistrictChunks { get; } 
+        public DistrictHandler DistrictHandler { get; set; }
         public IGameSpeed GameSpeed { get; set; }
-        public ChunkIndex Index { get; set; }
         public DistrictState State { get; }
         public Vector3 Position { get; }
         
@@ -50,7 +50,7 @@ namespace Buildings.District
 
             DistrictGenerator = chunkDistrictGenerator;
             Position = position;
-            DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
+            GenerateCollider();
             CreateChunkIndexCache();
             
             State = districtType switch
@@ -65,6 +65,16 @@ namespace Buildings.District
 
             Events.OnWaveStarted += OnWaveStarted;
             Events.OnWallsDestroyed += OnWallsDestroyed;
+        }
+
+        private void GenerateCollider()
+        {
+            ClickCallbackComponent clickCallback = DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, ref meshCollider);
+            if (!clickCallback) return;
+            
+            clickCallback.OnClick += InvokeOnClicked;
+            clickCallback.OnHoverEnter += OnHoverEnter;
+            clickCallback.OnHoverExit += OnHoverExit;
         }
 
         private void CreateChunkIndexCache()
@@ -95,7 +105,7 @@ namespace Buildings.District
                 }
             }
             
-            DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
+            GenerateCollider();
             CreateChunkIndexCache();
 
             State.RemoveEntities();
@@ -124,18 +134,22 @@ namespace Buildings.District
                 }
             }
 
-            if (DistrictChunks.Count <= 0)
-            {
-                Dispose();
-            }
-            else if (destroyedIndexes.Count > 0)
+            bool isDead = DistrictChunks.Count <= 0;
+            if (destroyedIndexes.Count > 0)
             {
                 OnChunksLost?.Invoke(destroyedIndexes);
                 
                 //State.OnIndexesDestroyed(destroyedIndexes);
-                DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
-                
-                DelayedUpdateEntities().Forget();
+                if (!isDead)
+                {
+                    GenerateCollider();
+                    DelayedUpdateEntities().Forget();
+                }
+            }
+
+            if (isDead)
+            {
+                Dispose();
             }
         }
 
@@ -157,10 +171,25 @@ namespace Buildings.District
             OnChunksLost?.Invoke(destroyedIndexes);
             
             DistrictChunks.Remove(chunk.ChunkIndex);
-            DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, InvokeOnClicked, ref meshCollider);
+            GenerateCollider();
             
             DelayedUpdateEntities().Forget();
             return true;
+        }
+
+        private void OnHoverEnter()
+        {
+            if (DistrictPlacer.Placing || BuildingPlacer.Displaying || PathPlacer.Displaying)
+            {
+                return;
+            }
+            
+            DistrictHandler.SetHoverOnObjects(DistrictChunks.Values, true);
+        }
+
+        private void OnHoverExit()
+        {
+            DistrictHandler.SetHoverOnObjects(DistrictChunks.Values, false);
         }
 
         private void InvokeOnClicked()
@@ -210,6 +239,9 @@ namespace Buildings.District
         {
             State.Die();
             
+            Events.OnWallsDestroyed -= OnWallsDestroyed;
+            InputManager.Instance.Cancel.performed -= OnDeselected;
+            UIEvents.OnFocusChanged -= Deselect;
             Events.OnWaveStarted -= OnWaveStarted;
             if (meshCollider)
             {
@@ -222,7 +254,7 @@ namespace Buildings.District
 
     public static class DistrictUtility
     {
-        public static void GenerateCollider(IEnumerable<IChunk> chunks, Vector3 ChunkScale, Vector3 CellSize, Vector3 pos, Action action, ref MeshCollider meshCollider)
+        public static ClickCallbackComponent GenerateCollider(IEnumerable<IChunk> chunks, Vector3 ChunkScale, Vector3 CellSize, Vector3 pos, ref MeshCollider meshCollider)
         {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
@@ -285,10 +317,11 @@ namespace Buildings.District
             mesh.RecalculateNormals(); // Make sure to recalculate normals
             mesh.RecalculateBounds();
 
+            ClickCallbackComponent clickCallbackComponent = null;
             if (!meshCollider)
             {
                 meshCollider = new GameObject("District Collider").AddComponent<MeshCollider>();
-                meshCollider.gameObject.AddComponent<ClickCallbackComponent>().OnClick += action;
+                clickCallbackComponent = meshCollider.gameObject.AddComponent<ClickCallbackComponent>();
                 //meshCollider.gameObject.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
                 //meshCollider.gameObject.AddComponent<MeshFilter>();
             }
@@ -297,7 +330,7 @@ namespace Buildings.District
             meshCollider.transform.position = pos;
             meshCollider.sharedMesh = mesh;
             
-            return;
+            return clickCallbackComponent;
             
             // Helper function to add a vertex if it doesn't already exist
             int AddVertex(Vector3 vertex)

@@ -1,8 +1,10 @@
+using Effects.ECS;
 using Unity.Entities;
 
 namespace DataStructures.Queue.ECS
 {
-    [UpdateInGroup(typeof(VariableRateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(SpawnerSystem)), 
+     UpdateBefore(typeof(CollisionSystem)), UpdateBefore(typeof(EnemyHashGridSystem))]
     public partial class EnemyCountSystem : SystemBase
     {
         private EntityQuery enemyQuery;

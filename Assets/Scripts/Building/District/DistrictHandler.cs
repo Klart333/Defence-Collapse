@@ -22,9 +22,6 @@ namespace Buildings.District
         [SerializeField]
         private DistrictGenerator districtGenerator;
         
-        [OdinSerialize]
-        private Dictionary<DistrictType, PrototypeInfoData> districtInfoData = new Dictionary<DistrictType, PrototypeInfoData>();
-        
         [Title("Debug")]
         [OdinSerialize, ReadOnly]
         private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
@@ -32,6 +29,8 @@ namespace Buildings.District
         [OdinSerialize, ReadOnly]
         private readonly List<DistrictData> uniqueDistricts = new List<DistrictData>();
 
+        private readonly Dictionary<int2, HashSet<District>> districtObjects = new Dictionary<int2, HashSet<District>>();
+        
         private readonly Dictionary<DistrictType, int> districtAmounts = new Dictionary<DistrictType, int>();
         
         private DistrictData townHallDistrict;
@@ -99,20 +98,23 @@ namespace Buildings.District
 
         public void AddBuiltDistrict(HashSet<QueryChunk> chunks, DistrictType districtType)
         {
-            if (!districtInfoData.TryGetValue(districtType, out PrototypeInfoData prototypeInfo))
+            if (CheckMerge(chunks, out HashSet<DistrictData> overlappingDistricts) > 0)
             {
-                Debug.LogError("Could not find PrototypeInfoData for DistrictType: " + districtType);
-                return;
-            }
-            
-            if (CheckMerge(chunks, out DistrictData existingData))
-            {
-                foreach (QueryChunk chunk in chunks)
+                DistrictData districtToMergeInto = GetHighestLevel(overlappingDistricts);
+                overlappingDistricts.Remove(districtToMergeInto);
+
+                foreach (DistrictData data in overlappingDistricts)
                 {
-                    districts.TryAdd(chunk.ChunkIndex.xz, existingData);
+                    chunks.AddRange(data.DistrictChunks.Values);
+                    data.Dispose();
                 }
                 
-                existingData.ExpandDistrict(chunks);
+                foreach (QueryChunk chunk in chunks)
+                {
+                    districts.TryAdd(chunk.ChunkIndex.xz, districtToMergeInto);
+                }
+                
+                districtToMergeInto.ExpandDistrict(chunks);
             }
             else
             {
@@ -136,18 +138,33 @@ namespace Buildings.District
             Events.OnDistrictBuilt?.Invoke(districtType);
         }
 
-        private bool CheckMerge(HashSet<QueryChunk> chunks, out DistrictData districtData)
+        private DistrictData GetHighestLevel(HashSet<DistrictData> datas)
         {
+            int highest = -1;
+            DistrictData highestDistrict = null;
+            foreach (DistrictData data in datas)
+            {
+                if (data.State.Level <= highest) continue;
+                
+                highest = data.State.Level;
+                highestDistrict = data;
+            }
+            
+            return highestDistrict;
+        }
+
+        private int CheckMerge(HashSet<QueryChunk> chunks, out HashSet<DistrictData> overlappingDistricts)
+        {
+            overlappingDistricts = new HashSet<DistrictData>();
             foreach (QueryChunk chunk in chunks)
             {
-                if (districts.TryGetValue(chunk.ChunkIndex.xz, out districtData))
+                if (districts.TryGetValue(chunk.ChunkIndex.xz, out var districtData))
                 {
-                    return true;
+                    overlappingDistricts.Add(districtData);
                 }
             }
 
-            districtData = null;
-            return false;
+            return overlappingDistricts.Count;
         }
 
         private DistrictData GetDistrictData(DistrictType districtType, HashSet<QueryChunk> chunks)
@@ -155,7 +172,8 @@ namespace Buildings.District
             Vector3 position = GetAveragePosition(chunks);
             DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator, districtKey++)
             {
-                GameSpeed = GameSpeedManager.Instance
+                GameSpeed = GameSpeedManager.Instance,
+                DistrictHandler = this
             };
             
             uniqueDistricts.Add(districtData);
@@ -171,7 +189,6 @@ namespace Buildings.District
             districtData.OnDisposed += OnDispose;
             districtData.OnChunksLost += OnChunksLost;
             return districtData;
-            
             
             void OnDispose()
             {
@@ -192,19 +209,12 @@ namespace Buildings.District
 
             void OnChunksLost(HashSet<int3> chunkIndexes)
             {
-                List<int2> toRemove = new List<int2>(chunkIndexes.Count);
-                foreach (KeyValuePair<int2, DistrictData> kvp in districts)
+                foreach (int3 chunkIndex in chunkIndexes)
                 {
-                    if (kvp.Value != districtData) continue;
-                    if (chunkIndexes.Any(chunkIndex => math.all(kvp.Key == chunkIndex.xz)))
-                    {
-                        toRemove.Add(kvp.Key);
-                    }
-                }
-
-                for (int i = 0; i < toRemove.Count; i++)
-                {
-                    districts.Remove(toRemove[i]);
+                    if (!districts.TryGetValue(chunkIndex.xz, out var data)) continue;
+                    if (data != districtData) continue;
+                    
+                    districts.Remove(chunkIndex.xz);
                 }
             }
         }
@@ -290,6 +300,34 @@ namespace Buildings.District
             
             districtGenerator.ChunkWaveFunction.Propagate();
             await districtGenerator.Run(addedChunks);
+        }
+
+        public void SetHoverOnObjects(ICollection<QueryChunk> chunks, bool isHover)
+        {
+            foreach (QueryChunk chunk in chunks)
+            {
+                if (!districtObjects.TryGetValue(chunk.ChunkIndex.xz, out HashSet<District> objects)) continue;
+                
+                foreach (District district in objects)
+                {
+                    district.Highlight(isHover);
+                }
+            }
+        }
+
+        public void AddDistrictObject(District district)
+        {
+            if (districtObjects.TryGetValue(district.ChunkIndex.Index.xz, out HashSet<District> list)) list.Add(district);
+            else districtObjects.Add(district.ChunkIndex.Index.xz, new HashSet<District> { district });
+
+        }
+
+        public void RemoveDistrictObject(District district)
+        {
+            if (!districtObjects.TryGetValue(district.ChunkIndex.Index.xz, out HashSet<District> list)) return;
+
+            list.Remove(district);
+            if (list.Count <= 0) districtObjects.Remove(district.ChunkIndex.Index.xz);
         }
     }
 }

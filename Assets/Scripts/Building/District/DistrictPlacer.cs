@@ -12,6 +12,7 @@ using System;
 using Gameplay;
 using Gameplay.Money;
 using InputCamera;
+using Sirenix.Serialization;
 using TMPro;
 
 namespace Buildings.District
@@ -35,7 +36,7 @@ namespace Buildings.District
         [SerializeField]
         private BuildingPlacer buildingPlacer;
         
-        [SerializeField]
+        [OdinSerialize]
         private Dictionary<DistrictType, PrototypeInfoData> districtInfoData = new Dictionary<DistrictType, PrototypeInfoData>();
 
         [SerializeField]
@@ -138,20 +139,44 @@ namespace Buildings.District
 
             if (requireQueryWalls)
             {
-                if (!QueryWalls()) return;
+                if (!QueryWalls())
+                {
+                    if (verbose)
+                    {
+                        Debug.Log("Invalid, Wall Query Failed");
+                    }
+                    SetInvalid();
+                    return;
+                }
             }
             else
             {
                 additionalBuildingAmount = 0;
                 buildingGenerator.RevertQuery();
             }
-            
+
+            if (!QueryDistrict())
+            {
+                if (verbose)
+                {
+                    Debug.Log("Invalid, District Query Failed");
+                }
+                SetInvalid();
+                return;
+            }
+
+            isPlacementValid = true;
+            spawnedUnableToPlace?.gameObject.SetActive(false);
+            UpdateCost();
+        }
+
+        private bool QueryDistrict()
+        {
             int height = districtType == DistrictType.TownHall ? 1 : 2;
             Dictionary<ChunkIndex, IBuildable> districts = districtGenerator.Query(districtChunkIndexes, height, districtInfoData[districtType]);
             if (districts == null)
             {
-                SetInvalid();
-                return;
+                return false;
             }
             
             bool isDistrictValid = false;
@@ -161,19 +186,7 @@ namespace Buildings.District
                 isDistrictValid |= buildable.MeshRot.MeshIndex != -1;
             }
 
-            if (!isDistrictValid)
-            {
-                Vector3 mousePos = Utility.Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
-                spawnedUnableToPlace?.gameObject.SetActive(false);
-                spawnedUnableToPlace = unableToPlacePrefab.GetAtPosAndRot<PooledMonoBehaviour>(mousePos, Quaternion.identity);
-                
-                isPlacementValid = false;
-                return;
-            }
-
-            isPlacementValid = true;
-            spawnedUnableToPlace?.gameObject.SetActive(false);
-            UpdateCost();
+            return isDistrictValid;
         }
 
         private bool QueryWalls()
@@ -190,11 +203,7 @@ namespace Buildings.District
                 }
             }
 
-            if (isValid) return true;
-            
-            SetInvalid();
-            return false;
-
+            return isValid;
         }
         
         private void SetInvalid()
@@ -267,6 +276,10 @@ namespace Buildings.District
                 {
                     if (!buildingPlacer.SpawnedSpawnPlaces.TryGetValue(builtIndex, out var spawnPlace))
                     {
+                        if (verbose)
+                        {
+                            Debug.Log("Invalid, Could not find PlaceSquare at index");
+                        }
                         return false;
                     }
                     
@@ -282,6 +295,10 @@ namespace Buildings.District
                         continue;
                     }
 
+                    if (verbose)
+                    {
+                        Debug.Log("Invalid, builtIndex is not buildable");
+                    }
                     return false;
                 }
             
@@ -350,7 +367,10 @@ namespace Buildings.District
 
         private void CancelPerformed(InputAction.CallbackContext obj)
         {
-            CancelPlacement();
+            if (Placing)
+            {
+                CancelPlacement();
+            }
         }
 
         private void CancelPlacement()
@@ -391,10 +411,7 @@ namespace Buildings.District
             
             if (districtType == DistrictType.TownHall)
             {
-                spawnedUnableToPlace?.gameObject.SetActive(false);
-                isPlacementValid = false;
-                Placing = false;
-                OnPlacingCanceled?.Invoke();
+                CancelPlacement();
             }
             else
             {
