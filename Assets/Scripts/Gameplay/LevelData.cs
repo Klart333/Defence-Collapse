@@ -67,19 +67,26 @@ namespace Gameplay
         [Title("Debug")]
         [SerializeField]
         private AnimationCurve debugDisplayCurve;
+        
+        [SerializeField]
+        private AnimationCurve debugTotalDisplayCurve;
 
         [Button]
-        private void DebugDisplay(int upper)
+        private void DebugDisplay(int upper = 100)
         {
             debugDisplayCurve.ClearKeys();
+            float total = 0;
             for (int i = 0; i < upper; i++)
             {
+                total += Calculate(i);
+                debugTotalDisplayCurve.AddKey(new Keyframe(i, total));
                 debugDisplayCurve.AddKey(new Keyframe(i, Calculate(i)));
             }
 
             for (int i = 0; i < debugDisplayCurve.keys.Length; ++i) 
             {
                 debugDisplayCurve.SmoothTangents(i, 0); 
+                debugTotalDisplayCurve.SmoothTangents(i, 0);
             }
         }
 #endif

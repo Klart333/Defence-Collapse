@@ -79,13 +79,13 @@ namespace Pathfinding.ECS
             ref BlobArray<int> movementCosts = ref valuePathChunk.MovementCosts;
             if (movementCosts[flowField.PathIndex.GridIndex] < int.MaxValue)
             {
-                movementCosts[flowField.PathIndex.GridIndex]++;
+                movementCosts[flowField.PathIndex.GridIndex] += flowField.Importance;
             }
             
-            ref BlobArray<short> units = ref valuePathChunk.Units;
+            ref BlobArray<int> units = ref valuePathChunk.Units;
             if (units[flowField.PathIndex.GridIndex] < short.MaxValue)
             {
-                units[flowField.PathIndex.GridIndex]++;
+                units[flowField.PathIndex.GridIndex] += flowField.Importance;
             }
         }
     }

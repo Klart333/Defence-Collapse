@@ -15,6 +15,14 @@ namespace WaveFunctionCollapse
 
     public static class DirectionUtility
     {
+        public static readonly int2[] BuildableCorners =
+        {
+            new int2(-1, 1),
+            new int2(1, 1),
+            new int2(1, -1),
+            new int2(-1, -1),
+        };
+        
         public static Direction Int2ToDirection(int2 dir)
         {
             return dir switch

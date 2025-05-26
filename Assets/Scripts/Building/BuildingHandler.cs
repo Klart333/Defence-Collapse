@@ -90,7 +90,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         foreach (var build in buildingQueue)
         {
             build.BuildingGroupIndex = groupIndexCounter;
-            build.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 1);
+            build.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 10);
         }
         buildingQueue.Clear();
 
@@ -144,7 +144,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         foreach (Building building in BuildingGroups[targetGroup])
         {
             building.BuildingGroupIndex = targetGroup;
-            building.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 1);
+            building.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 10);
         }
         BuildingGroups.Remove(groupToMerge);
     }
@@ -186,7 +186,7 @@ public class BuildingHandler : SerializedMonoBehaviour
             int count = builds.Count;
             foreach (Building groupBuilding in builds)  
             {
-                groupBuilding.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 1);
+                groupBuilding.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 10);
             }
         }
     }

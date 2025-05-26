@@ -47,6 +47,8 @@ namespace Enemy
                     TargetUp = new float3(0, 1, 0),
                     Forward = new float3(0, 0, 1),
                     TurnSpeed = authoring.turnSpeed,
+                    
+                    Importance = authoring.enemyData.Importance,
                     //LayerMask = authoring.groundMask,
                 });
                 

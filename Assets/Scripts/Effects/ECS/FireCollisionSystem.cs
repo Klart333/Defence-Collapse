@@ -56,18 +56,13 @@ namespace Effects.ECS
         {
             if (!FireLookup.TryGetComponent(pendingDamage.SourceEntity, out FireComponent sourceFire)) return;
             
-            if (FireLookup.TryGetComponent(entity, out FireComponent fire))
+            if (!FireLookup.TryGetComponent(entity, out FireComponent fire))
             {
-                fire.TotalDamage += sourceFire.TotalDamage;
-                ECB.SetComponent(sortKey, entity, fire);
+                fire = new FireComponent();
             }
-            else
-            {
-                ECB.AddComponent(sortKey, entity, new FireComponent
-                {
-                    TotalDamage = sourceFire.TotalDamage,
-                });
-            }
+            
+            fire.TotalDamage += sourceFire.TotalDamage;
+            ECB.AddComponent(sortKey, entity, fire);
         }
     }
 }

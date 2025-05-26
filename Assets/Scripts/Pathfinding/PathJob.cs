@@ -45,35 +45,74 @@ public struct PathJob : IJob
 
             if (pathChunk.NotWalkableIndexes[i])
             {
-                pathChunk.Distances[i] = int.MaxValue;
+                pathChunk.Distances[i] = 400000000; // Int.MaxValue / 4
                 continue;
             }
 
-            int2 currentChunkIndex = pathChunk.ChunkIndex;
-            GetNeighbours(currentChunkIndex, i, neighbours);
-            
-            int shortestDistance = int.MaxValue;
-            int dirIndex = 0;
-            for (int j = 0; j < 8; j++)
-            {
-                PathIndex neighbourIndex = neighbours[j];
-                if (neighbourIndex.GridIndex == -1) continue;
-                
-                ref PathChunk neighbour = ref neighbourIndex.ChunkIndex.Equals(currentChunkIndex) 
-                    ? ref pathChunk 
-                    : ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[neighbourIndex.ChunkIndex]];
-                
-                int manhattanDist = j % 2 == 0 ? 5 : 7;
-                int dist = neighbour.Distances[neighbourIndex.GridIndex] + neighbour.MovementCosts[neighbourIndex.GridIndex] * manhattanDist;
-                if (dist >= shortestDistance) continue;
-                
-                shortestDistance = dist;
-                dirIndex = j;
-            }
-            
-            pathChunk.Distances[i] = shortestDistance;
+            if (GetClosestNeighbour(neighbours, ref pathChunk, i, out int shortestDistance, out int dirIndex)) continue;
+
             pathChunk.Directions[i] = GetDirection(PathManager.NeighbourDirections[dirIndex]);
+            pathChunk.Distances[i] = shortestDistance;
         }
+    }
+
+    private bool GetClosestNeighbour(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int gridIndex, out int shortestDistance, out int dirIndex)
+    {
+        int2 currentChunkIndex = pathChunk.ChunkIndex;
+        GetNeighbours(currentChunkIndex, gridIndex, neighbours);
+            
+        shortestDistance = int.MaxValue;
+        dirIndex = 0;
+        for (int j = 0; j < 8; j++)
+        {
+            PathIndex neighbourIndex = neighbours[j];
+            if (neighbourIndex.GridIndex == -1) continue;
+                
+            ref PathChunk neighbour = ref neighbourIndex.ChunkIndex.Equals(currentChunkIndex) 
+                ? ref pathChunk 
+                : ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[neighbourIndex.ChunkIndex]];
+                
+            int manhattanDist = j % 2 == 0 ? 5 : 7;
+            int dist = neighbour.Distances[neighbourIndex.GridIndex] + neighbour.MovementCosts[neighbourIndex.GridIndex] * manhattanDist;
+            if (dist >= shortestDistance) continue;
+                
+            shortestDistance = dist;
+            dirIndex = j;
+        }
+
+        if (shortestDistance <= 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    
+    private int GetFurthestNeighbour(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int gridIndex)
+    {
+        int2 currentChunkIndex = pathChunk.ChunkIndex;
+        GetNeighbours(currentChunkIndex, gridIndex, neighbours);
+            
+        int furthestDistance = 0;
+        int dirIndex = 0;
+        for (int j = 0; j < 8; j++)
+        {
+            PathIndex neighbourIndex = neighbours[j];
+            if (neighbourIndex.GridIndex == -1) continue;
+                
+            ref PathChunk neighbour = ref neighbourIndex.ChunkIndex.Equals(currentChunkIndex) 
+                ? ref pathChunk 
+                : ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[neighbourIndex.ChunkIndex]];
+                
+            int manhattanDist = j % 2 == 0 ? 5 : 7;
+            int dist = neighbour.Distances[neighbourIndex.GridIndex] + neighbour.MovementCosts[neighbourIndex.GridIndex] * manhattanDist;
+            if (dist < furthestDistance) continue;
+                
+            furthestDistance = dist;
+            dirIndex = j;
+        }
+
+        return dirIndex;
     }
 
     private void GetNeighbours(int2 chunkIndex, int gridIndex, NativeArray<PathIndex> array)

@@ -642,7 +642,7 @@ namespace Buildings.District
             stats = new Stats(townHallData.Stats);
             TownHallUpgradeStat townHall = new TownHallUpgradeStat(new Stat(1), townHallData.LevelDatas[0],
                 "Level",
-                new string[] { "Increase Level by {0}", "Current Level: {0}" },
+                new string[] { "+1 Level\nChoose 1 of 2 districts to unlock. ", "Current Level: {0}" },
                 townHallData.UpgradeIcons[0]){
                 DistrictState = this
             };

@@ -45,17 +45,10 @@ namespace InputCamera
         private const float startDraggingThreshold = 64; // 8^2 px
         
         private EntityManager entityManager;
+        private InputManager inputManager;
+        private Camera controlledCamera;
         private Entity cameraEntity;
 
-        // Input actions
-        private InputAction fastMoveAction;
-        private InputActions inputActions;
-        private InputAction rotateAction;
-        private InputAction moveAction;
-        private InputAction zoomAction;
-        private InputAction panAction;
-
-        private Camera controlledCamera;
         private Vector3 panStartPosition;
         private Vector2 panStartScreenPosition;
 
@@ -64,53 +57,38 @@ namespace InputCamera
         private void Awake()
         {
             controlledCamera = GetComponent<Camera>();
-            InitializeInputActions();
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             cameraEntity = entityManager.CreateEntity();
             entityManager.AddComponentData(cameraEntity, new CameraPositionComponent { Position = transform.position });
         }
 
-        private void InitializeInputActions()
+        private async UniTaskVoid GetInput()
         {
-            inputActions = new InputActions();
+            inputManager = await InputManager.Get();
+            
+            // Subscribe to pan start/end events
+            inputManager.Fire.started += StartPan;
+            inputManager.Fire.canceled += EndPan;
 
-            // Set up input actions
-            moveAction = inputActions.Player.Move;
-            zoomAction = inputActions.Player.Scroll;
-            rotateAction = inputActions.Player.Rotate;
-            panAction = inputActions.Player.Fire;
-            fastMoveAction = inputActions.Player.Shift;
+            inputManager.PanCamera.started += StartPan;
+            inputManager.PanCamera.canceled += EndPan;
         }
 
         private void OnEnable()
-        {
-            // Enable all actions
-            moveAction.Enable();
-            zoomAction.Enable();
-            rotateAction.Enable();
-            panAction.Enable();
-            fastMoveAction.Enable();
-
-            // Subscribe to pan start/end events
-            panAction.started += StartPan;
-            panAction.canceled += EndPan;
+        { 
+            GetInput().Forget();
 
             Events.OnGameReset += OnGameReset;
         }
 
         private void OnDisable()
         {
-            // Disable all actions
-            moveAction.Disable();
-            zoomAction.Disable();
-            rotateAction.Disable();
-            panAction.Disable();
-            fastMoveAction.Disable();
+            inputManager.Fire.started -= StartPan;
+            inputManager.Fire.canceled -= EndPan;
 
-            // Unsubscribe from events
-            panAction.started -= StartPan;
-            panAction.canceled -= EndPan;
-
+            inputManager.PanCamera.started -= StartPan;
+            inputManager.PanCamera.canceled -= EndPan;
+            
             Events.OnGameReset -= OnGameReset;
         }
 
@@ -126,10 +104,10 @@ namespace InputCamera
 
         private void HandleMovement()
         {
-            Vector2 moveInput = moveAction.ReadValue<Vector2>();
+            Vector2 moveInput = inputManager.Move.ReadValue<Vector2>();
             if (moveInput == Vector2.zero) return;
 
-            float speedMultiplier = fastMoveAction.IsPressed() ? fastMoveMultiplier : 1f;
+            float speedMultiplier = inputManager.Shift.IsPressed() ? fastMoveMultiplier : 1f;
             float currentSpeed = moveSpeed * speedMultiplier * Time.deltaTime;
 
             // Forward/back movement (relative to camera rotation)
@@ -146,7 +124,7 @@ namespace InputCamera
 
         private void HandleZoom()
         {
-            float zoomInput = zoomAction.ReadValue<Vector2>().y;
+            float zoomInput = inputManager.Scroll.ReadValue<Vector2>().y;
             if (Mathf.Abs(zoomInput) < 0.1f) return;
 
             float zoomDirection = Mathf.Sign(zoomInput);
@@ -163,13 +141,13 @@ namespace InputCamera
 
         private void HandleRotation()
         {
-            float rotateInput = rotateAction.ReadValue<float>();
+            float rotateInput = inputManager.Rotate.ReadValue<float>();
             if (rotateInput == 0) return;
 
             Vector3 currentMousePoint = Utility.Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
             if (currentMousePoint == Vector3.zero) return;
 
-            float rotationAmount = rotationSpeed * Time.deltaTime * (fastMoveAction.IsPressed() ? fastMoveMultiplier : 1f);
+            float rotationAmount = rotationSpeed * Time.deltaTime * (inputManager.Shift.IsPressed() ? fastMoveMultiplier : 1f);
             float yaw = rotateInput * rotationAmount;
 
             transform.RotateAround(currentMousePoint, Vector3.up, yaw);

@@ -6,8 +6,11 @@ public class InputManager : Singleton<InputManager>
     private InputActions InputActions;
 
     public InputAction Move { get; private set; }
+    public InputAction Scroll { get; private set; }
     public InputAction Mouse { get; private set; }
     public InputAction Fire { get; private set; }
+    public InputAction PanCamera { get; private set; }
+    public InputAction Rotate { get; private set; }
     public InputAction Shift { get; private set; }
     public InputAction Cancel {  get; private set; }
     public InputAction Space {  get; private set; }
@@ -35,6 +38,15 @@ public class InputManager : Singleton<InputManager>
         
         Space = InputActions.Player.Space;
         Space.Enable();
+
+        PanCamera = InputActions.Player.PanCamera;
+        PanCamera.Enable();
+        
+        Scroll = InputActions.Player.Scroll;
+        Scroll.Enable();
+        
+        Rotate = InputActions.Player.Rotate;
+        Rotate.Enable();
     }
     
     private void OnDisable()
@@ -45,6 +57,9 @@ public class InputManager : Singleton<InputManager>
         Cancel.Disable();
         Mouse.Disable();
         Space.Disable();
+        PanCamera.Disable();
+        Scroll.Disable();
+        Rotate.Disable();
     }
 
     public bool MouseOverUI()

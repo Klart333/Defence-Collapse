@@ -52,11 +52,7 @@ namespace Pathfinding
 
         public NativeHashMap<int2, int> ChunkIndexToListIndex => chunkIndexToListIndex;
         public BlobAssetReference<PathChunkArray> PathChunks => pathChunks;
-        public float GridWorldHeight => gridSize.y * CellScale;
-        public float GridWorldWidth => gridSize.x * CellScale;
-        public int ArrayLength => arrayLength;
         public float CellScale => cellScale;
-        public Vector2Int GridSize => gridSize;
 
         public BoolPathSet BlockerPathSet { get; private set; }
         public BytePathSet TargetPathSet { get; private set; }
@@ -66,7 +62,7 @@ namespace Pathfinding
         {
             arrayLength = gridSize.x * gridSize.y;
             
-            chunkIndexToListIndex = new NativeHashMap<int2, int>(1000, Allocator.Persistent);
+            chunkIndexToListIndex = new NativeHashMap<int2, int>(200, Allocator.Persistent);
             
             chunkAmount = 0;
             chunkIndexToListIndex.Add(int2.zero, chunkAmount);    
@@ -139,7 +135,7 @@ namespace Pathfinding
                 ref PathChunk oldChunk = ref oldPathChunks.Value.PathChunks[i];
                 newChunk.ChunkIndex = oldChunk.ChunkIndex;
                 
-                BlobBuilderArray<short> units = builder.Allocate(ref newChunk.Units, arrayLength);
+                BlobBuilderArray<int> units = builder.Allocate(ref newChunk.Units, arrayLength);
                 for (int j = 0; j < arrayLength; j++)
                 {
                     units[j] = oldChunk.Units[j];
@@ -352,7 +348,7 @@ namespace Pathfinding
     public struct PathChunk
     {
         public BlobArray<int> MovementCosts;
-        public BlobArray<short> Units;
+        public BlobArray<int> Units;
         
         public BlobArray<bool> NotWalkableIndexes;
         public BlobArray<byte> TargetIndexes;

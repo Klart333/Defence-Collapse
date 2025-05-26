@@ -56,12 +56,12 @@ namespace Effects.ECS
         {
             if (!PoisonLookup.TryGetComponent(pendingDamage.SourceEntity, out PoisonComponent sourcePoison)) return;
             
-            if (!PoisonLookup.TryGetComponent(entity, out PoisonComponent fire))
+            if (!PoisonLookup.TryGetComponent(entity, out PoisonComponent poison))
             {
-                fire = new PoisonComponent();                
+                poison = new PoisonComponent();                
             }
             
-            fire.TotalDamage += sourcePoison.TotalDamage;
+            poison.TotalDamage += sourcePoison.TotalDamage;
             ECB.AddComponent(sortKey, entity, sourcePoison);
         }
     }

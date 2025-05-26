@@ -6,6 +6,7 @@ using WaveFunctionCollapse;
 using UnityEngine.Events;
 using System.Linq;
 using Pathfinding;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class Building : PooledMonoBehaviour, IBuildable
@@ -48,14 +49,6 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     [SerializeField]
     private UnityEvent OnResetEvent;
-
-    private readonly Vector2Int[] corners =
-    {
-        new Vector2Int(-1, 1),
-        new Vector2Int(1, 1),
-        new Vector2Int(1, -1),
-        new Vector2Int(-1, -1),
-    };
     
     private readonly List<Material> transparentRemoveMaterials = new List<Material>();
     private readonly List<Material> transparentMaterials = new List<Material>();
@@ -79,7 +72,6 @@ public class Building : PooledMonoBehaviour, IBuildable
     public BuildingHandler BuildingHandler => buildingHandler ??= FindAnyObjectByType<BuildingHandler>();
     public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
     public MeshFilter MeshFilter => meshFilter ??= GetComponentInChildren<MeshFilter>();
-    private bool Hovered => cornerColliders.Any(x => x.IsHovered);
     public MeshWithRotation MeshRot => Prototype.MeshRot;
     public Transform MeshTransform => meshTransform;
     public PathTarget PathTarget => pathTarget;
@@ -117,6 +109,11 @@ public class Building : PooledMonoBehaviour, IBuildable
         purchasing = true;
         selected = false;
         MeshRenderer.gameObject.layer = originalLayer;
+
+        for (int i = 0; i < cornerColliders.Length; i++)
+        {
+            cornerColliders[i].gameObject.SetActive(false);
+        }
         
         OnResetEvent?.Invoke();
     }
@@ -174,7 +171,15 @@ public class Building : PooledMonoBehaviour, IBuildable
             return;
         }
 
-        bool hovered = Hovered;
+        bool hovered = false;
+        for (int i = 0; i < cornerColliders.Length; i++)
+        {
+            if (!cornerColliders[i].IsHovered) continue;
+            
+            hovered = true;
+            break;
+        }
+        
         if (hovered && InputManager.Instance.GetShift)
         {
             BuildingHandler.HighlightGroup(this);
@@ -245,7 +250,7 @@ public class Building : PooledMonoBehaviour, IBuildable
         {
             if (MeshRot.MeshIndex != -1 && buildableCornerData.BuildableDictionary.TryGetValue(protoypeMeshes[MeshRot.MeshIndex], out BuildableCorners cornerData))
             {
-                bool value = cornerData.CornerDictionary[BuildableCornerData.VectorToCorner(corners[i].x, corners[i].y)].Buildable;
+                bool value = cornerData.CornerDictionary[BuildableCornerData.VectorToCorner(DirectionUtility.BuildableCorners[i].x, DirectionUtility.BuildableCorners[i].y)].Buildable;
                 cornerColliders[i].gameObject.SetActive(value);
             }
             else
