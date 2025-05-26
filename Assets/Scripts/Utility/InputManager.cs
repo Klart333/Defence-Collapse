@@ -14,6 +14,7 @@ public class InputManager : Singleton<InputManager>
     public InputAction Shift { get; private set; }
     public InputAction Cancel {  get; private set; }
     public InputAction Space {  get; private set; }
+    public InputAction Tab {  get; private set; }
 
     public bool GetShift => Shift.IsPressed();
 
@@ -47,19 +48,23 @@ public class InputManager : Singleton<InputManager>
         
         Rotate = InputActions.Player.Rotate;
         Rotate.Enable();
+        
+        Tab = InputActions.Player.Tab;
+        Tab.Enable();
     }
     
     private void OnDisable()
     {
-        Move.Disable();
-        Fire.Disable();
-        Shift.Disable();
+        PanCamera.Disable();
         Cancel.Disable();
+        Rotate.Disable();
+        Scroll.Disable();
+        Shift.Disable();
         Mouse.Disable();
         Space.Disable();
-        PanCamera.Disable();
-        Scroll.Disable();
-        Rotate.Disable();
+        Move.Disable();
+        Fire.Disable();
+        Tab.Disable();
     }
 
     public bool MouseOverUI()

@@ -1,14 +1,13 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Unity.Collections;
 using Unity.Mathematics;
-using UnityEngine;
-using Unity.Jobs;
-using System;
-using System.Collections.Generic;
 using Pathfinding.ECS;
 using Unity.Entities;
+using Unity.Jobs;
+using UnityEngine;
+using System;
 
 namespace Pathfinding
 {
@@ -39,6 +38,10 @@ namespace Pathfinding
         [SerializeField]
         private GroundGenerator groundGenerator;
         
+        [Title("Debug")]
+        [SerializeField]
+        private Gradient debugGradient;
+        
         private readonly Dictionary<int, int2> listIndexToChunkIndex = new Dictionary<int, int2>();
         private BlobAssetReference<PathChunkArray> pathChunks;
         private NativeHashMap<int2, int> chunkIndexToListIndex;
@@ -56,7 +59,7 @@ namespace Pathfinding
 
         public BoolPathSet BlockerPathSet { get; private set; }
         public BytePathSet TargetPathSet { get; private set; }
-        public IntPathSet PathPathSet { get; private set; }
+        public IntPathSet BarricadePathSet { get; private set; }
 
         private void OnEnable()
         {
@@ -83,8 +86,8 @@ namespace Pathfinding
             TargetPathSet = new BytePathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].TargetIndexes);
             GetPathInformation += TargetPathSet.RebuildTargetHashSet;
 
-            PathPathSet = new IntPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].MovementCosts, -94);
-            GetPathInformation += PathPathSet.RebuildTargetHashSet;
+            BarricadePathSet = new IntPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].MovementCosts, 3_000);
+            GetPathInformation += BarricadePathSet.RebuildTargetHashSet;
             
             groundGenerator.OnLockedChunkGenerated += OnChunkGenerated;
         }
@@ -96,7 +99,7 @@ namespace Pathfinding
             
             GetPathInformation -= BlockerPathSet.RebuildTargetHashSet;
             GetPathInformation -= TargetPathSet.RebuildTargetHashSet;
-            GetPathInformation -= PathPathSet.RebuildTargetHashSet;
+            GetPathInformation -= BarricadePathSet.RebuildTargetHashSet;
             
             groundGenerator.OnLockedChunkGenerated -= OnChunkGenerated;
         }
@@ -225,7 +228,7 @@ namespace Pathfinding
             {
                 return;
             }
-            
+    
             for (int i = 0; i < chunkAmount; i++)
             {
                 ref PathChunk pathChunk = ref pathChunks.Value.PathChunks[i];
@@ -239,10 +242,30 @@ namespace Pathfinding
                         Gizmos.DrawWireCube(pos, Vector3.one * cellScale);
                         continue;
                     }
-                
-                    Gizmos.color = Color.Lerp(Color.red, Color.black, pathChunk.Distances[j] / (float)10000);
+        
+                    Gizmos.color = debugGradient.Evaluate(pathChunk.Distances[j] / 100_000f);
                     float2 dir = ByteToDirection(pathChunk.Directions[j]);
-                    Gizmos.DrawLine(pos, pos + new Vector3(dir.x, 0, dir.y) * cellScale);
+                    Vector3 direction = new Vector3(dir.x, 0, dir.y);
+            
+                    // Main line (shorter)
+                    float mainLineLength = cellScale * 0.7f;
+                    Gizmos.DrawLine(pos, pos + direction * mainLineLength);
+            
+                    // Arrowhead lines
+                    float arrowHeadLength = cellScale * 0.3f;
+                    float arrowHeadAngle = 30f; // degrees
+            
+                    // Calculate perpendicular directions for arrowhead
+                    Quaternion leftRot = Quaternion.Euler(0, arrowHeadAngle, 0);
+                    Quaternion rightRot = Quaternion.Euler(0, -arrowHeadAngle, 0);
+            
+                    Vector3 arrowLeft = leftRot * direction * arrowHeadLength;
+                    Vector3 arrowRight = rightRot * direction * arrowHeadLength;
+            
+                    // Draw arrowhead lines
+                    Vector3 arrowStart = pos + direction * mainLineLength;
+                    Gizmos.DrawLine(arrowStart, arrowStart + arrowLeft);
+                    Gizmos.DrawLine(arrowStart, arrowStart + arrowRight);
                 }
             }
         }

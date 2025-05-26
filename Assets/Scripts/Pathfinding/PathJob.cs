@@ -43,16 +43,17 @@ public struct PathJob : IJob
                 continue;
             }
 
+            if (GetClosestNeighbour(neighbours, ref pathChunk, i, out int shortestDistance, out int dirIndex)) continue;
+            
+            pathChunk.Directions[i] = GetDirection(PathManager.NeighbourDirections[dirIndex]);
             if (pathChunk.NotWalkableIndexes[i])
             {
-                pathChunk.Distances[i] = 400000000; // Int.MaxValue / 4
-                continue;
+                pathChunk.Distances[i] = 1_000_000_000;  
             }
-
-            if (GetClosestNeighbour(neighbours, ref pathChunk, i, out int shortestDistance, out int dirIndex)) continue;
-
-            pathChunk.Directions[i] = GetDirection(PathManager.NeighbourDirections[dirIndex]);
-            pathChunk.Distances[i] = shortestDistance;
+            else
+            {
+                pathChunk.Distances[i] = shortestDistance;
+            }
         }
     }
 
@@ -80,41 +81,9 @@ public struct PathJob : IJob
             dirIndex = j;
         }
 
-        if (shortestDistance <= 0)
-        {
-            return true;
-        }
-
-        return false;
+        return shortestDistance <= 0;
     }
     
-    private int GetFurthestNeighbour(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int gridIndex)
-    {
-        int2 currentChunkIndex = pathChunk.ChunkIndex;
-        GetNeighbours(currentChunkIndex, gridIndex, neighbours);
-            
-        int furthestDistance = 0;
-        int dirIndex = 0;
-        for (int j = 0; j < 8; j++)
-        {
-            PathIndex neighbourIndex = neighbours[j];
-            if (neighbourIndex.GridIndex == -1) continue;
-                
-            ref PathChunk neighbour = ref neighbourIndex.ChunkIndex.Equals(currentChunkIndex) 
-                ? ref pathChunk 
-                : ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[neighbourIndex.ChunkIndex]];
-                
-            int manhattanDist = j % 2 == 0 ? 5 : 7;
-            int dist = neighbour.Distances[neighbourIndex.GridIndex] + neighbour.MovementCosts[neighbourIndex.GridIndex] * manhattanDist;
-            if (dist < furthestDistance) continue;
-                
-            furthestDistance = dist;
-            dirIndex = j;
-        }
-
-        return dirIndex;
-    }
-
     private void GetNeighbours(int2 chunkIndex, int gridIndex, NativeArray<PathIndex> array)
     {
         int x = gridIndex % PathManager.GRID_WIDTH;

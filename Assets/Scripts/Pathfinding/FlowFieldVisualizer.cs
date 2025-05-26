@@ -26,6 +26,7 @@ namespace Pathfinding
         private readonly List<LineVisualizer> spawnedLines = new List<LineVisualizer>();
         
         private PathManager pathManager;
+        private InputManager inputManager;
 
         private bool isDisplaying;
         private float updateTimer;
@@ -36,16 +37,22 @@ namespace Pathfinding
         private void OnEnable()
         {
             GetPathManager().Forget();
+            GetInputManager().Forget();
         }
 
         private async UniTaskVoid GetPathManager()
         {
             pathManager = await PathManager.Get();
         }
+        
+        private async UniTaskVoid GetInputManager()
+        {
+            inputManager = await InputManager.Get();
+        }
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Tab))
+            if (inputManager.Tab.WasPerformedThisFrame())
             {
                 isDisplaying = !isDisplaying;
             }
@@ -119,22 +126,21 @@ namespace Pathfinding
             int chunkIndex = pathManager.ChunkIndexToListIndex[index.ChunkIndex];
             byte direction = pathManager.PathChunks.Value.PathChunks[chunkIndex].Directions[index.GridIndex];
             bool pointsAreUnique = true;
-            int i = 100;
+            int i = 256;
             while (direction != byte.MaxValue && i-- > 0 && pointsAreUnique)
             {
-                float2 dir = PathManager.ByteToDirection(direction);
-                index = PathManager.GetIndex(PathManager.GetPos(index).xz + dir);
-                
-                byte lastDirection = direction;
                 if (!pathManager.ChunkIndexToListIndex.TryGetValue(index.ChunkIndex, out chunkIndex) 
                     || index.GridIndex < 0 || index.GridIndex >= PathManager.GRID_Length) return path.ToList();
                 
+                byte lastDirection = direction;
                 direction = pathManager.PathChunks.Value.PathChunks[chunkIndex].Directions[index.GridIndex];
-
                 if (direction != lastDirection)
                 {
                     pointsAreUnique = path.Add(PathManager.GetPos(index));
                 }
+                
+                float2 dir = PathManager.ByteToDirection(direction);
+                index = PathManager.GetIndex(PathManager.GetPos(index).xz + dir);
             }
 
             return path.ToList();

@@ -13,7 +13,7 @@ namespace Pathfinding
         {
             Blocker,
             Target,
-            Path,
+            Barricade,
         }
 
         public event Action OnIndexerRebuild;
@@ -60,7 +60,7 @@ namespace Pathfinding
             {
                 case PathTargetType.Blocker: PathManager.Instance.BlockerPathSet.Unregister(this); break;
                 case PathTargetType.Target: PathManager.Instance.TargetPathSet.Unregister(this); break;
-                case PathTargetType.Path: PathManager.Instance.PathPathSet.Unregister(this); break;
+                case PathTargetType.Barricade: PathManager.Instance.BarricadePathSet.Unregister(this); break;
             }
 
             indexer.OnRebuilt -= OnRebuilt;
@@ -78,7 +78,7 @@ namespace Pathfinding
             {
                 case PathTargetType.Blocker: PathManager.Instance.BlockerPathSet.Register(this); break;
                 case PathTargetType.Target: PathManager.Instance.TargetPathSet.Register(this); break;
-                case PathTargetType.Path: PathManager.Instance.PathPathSet.Register(this); break;
+                case PathTargetType.Barricade: PathManager.Instance.BarricadePathSet.Register(this); break;
             }
         }
 
