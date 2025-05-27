@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -17,7 +18,21 @@ namespace Gameplay.Upgrades
         [SerializeField]
         private UpgradeCardDataUtility upgradeDataUtility;
 
+        [Title("Animation")]
+        [SerializeField]
+        private float fadeInDuration = 0.25f;
+        
+        [SerializeField]
+        private Ease fadeInEase = Ease.Linear;
+        
+        [SerializeField]
+        private float fadeOutDuration = 0.3f;
+        
+        [SerializeField]
+        private Ease fadeOutEase = Ease.Linear;
+        
         private GameManager gameManager;
+        private CanvasGroup canvasGroup;
         
         private int waveCount = 0; 
 
@@ -35,6 +50,7 @@ namespace Gameplay.Upgrades
         {
             Events.OnWaveEnded += OnWaveEnded;
             
+            canvasGroup = upgradeCardParent.GetComponentInChildren<CanvasGroup>();
             for (int i = 0; i < upgradeCards.Length; i++)
             {
                 upgradeCards[i].OnUpgradePicked += OnOnUpgradePicked;
@@ -65,6 +81,10 @@ namespace Gameplay.Upgrades
         
         public void DisplayUpgradeCards()
         {
+            canvasGroup.alpha = 0;
+            canvasGroup.interactable = true;
+            canvasGroup.DOFade(1, fadeInDuration).SetEase(fadeInEase);
+            
             int seed = gameManager.Seed + waveCount;
             List<UpgradeCardData> datas = upgradeDataUtility.GetRandomData(seed, upgradeCards.Length);
 
@@ -78,7 +98,13 @@ namespace Gameplay.Upgrades
 
         private void HideCards()
         {
-            upgradeCardParent.SetActive(false);
+            canvasGroup.DOKill();
+            canvasGroup.interactable = false;
+            
+            canvasGroup.DOFade(0, fadeOutDuration).SetEase(fadeOutEase).onComplete = () =>
+            {
+                upgradeCardParent.SetActive(false);
+            };
         }
     }
 }
