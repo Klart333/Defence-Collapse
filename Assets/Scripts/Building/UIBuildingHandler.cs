@@ -18,6 +18,7 @@ public class UIBuildingHandler : MonoBehaviour
         Events.OnDistrictClicked?.Invoke(district, district switch
         {
             DistrictType.Bomb => 3,
+            DistrictType.Lightning => 1,
             _ => 2, 
         });
     }

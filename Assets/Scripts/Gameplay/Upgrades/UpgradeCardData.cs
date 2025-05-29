@@ -63,6 +63,7 @@ namespace Gameplay.Upgrades
         TownHall = 1 << 3,
         Mine = 1 << 4,
         Flame = 1 << 5,
+        Lightning = 1 << 10,
         AllDistrict = 1 << 6,
         
         // Attack

@@ -1064,4 +1064,137 @@ namespace Buildings.District
     }
      
      #endregion
+     
+     #region Lightning
+     public class LightningState : DistrictState
+     { 
+         private readonly TowerData lightningData;
+ 
+         private GameObject rangeIndicator;
+         private bool selected;
+         
+         private readonly int2[] corners =
+         {
+             new int2(-1, 1),
+             new int2(1, 1),
+             new int2(-1, -1),
+             new int2(1, -1),
+         };
+         
+         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
+         public override CategoryType CategoryType => CategoryType.Lightning;
+         protected override bool UseTargetMeshes => false;
+         protected override float AttackAngle => 360;
+         public override Attack Attack { get; }
+         
+         public LightningState(DistrictData districtData, TowerData lightningData, Vector3 position, int key) : base(districtData, position, key)
+         {
+             this.lightningData = lightningData;
+  
+             CreateStats();
+             SpawnEntities();
+  
+             Attack = new Attack(lightningData.BaseAttack);
+             stats.Range.OnValueChanged += RangeChanged;
+         }
+         
+         protected override List<QueryChunk> GetEntityChunks(out List<Vector2> offsets, out List<Vector2> directions)
+         {
+             List<QueryChunk> chunks = new List<QueryChunk>();
+             offsets = new List<Vector2>();
+             directions = new List<Vector2>();
+
+             foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
+             {
+                 for (int i = 0; i < chunk.AdjacentChunks.Length; i++)
+                 {
+                     if (i is 2 or 3 || (chunk.AdjacentChunks[i] != null && chunk.AdjacentChunks[i].PrototypeInfoData == chunk.PrototypeInfoData)) continue;
+                    
+                     chunks.Add(chunk);
+                     Vector2 offset = i switch
+                     {
+                         0 => new Vector2(0.25f, 0),
+                         1 => new Vector2(-0.25f, 0),
+                         4 => new Vector2(0, 0.25f),
+                         5 => new Vector2(0, -0.25f),
+                         _ => throw new ArgumentOutOfRangeException()
+                     };
+                     offsets.Add(offset);
+                     directions.Add(offset.normalized);
+                 }
+             }
+
+             return chunks;
+         }
+        
+         protected override DistrictTargetMesh GetTargetMesh(Vector3 position, Vector2 direction)
+         {
+             Quaternion rot = Quaternion.LookRotation(direction.ToXyZ(-0.2f).normalized);
+             return lightningData.DistrictTargetMesh.GetAtPosAndRot<DistrictTargetMesh>(position, rot);
+         }
+  
+         private void RangeChanged()
+         {
+             if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
+             {
+                 rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+             }
+         }
+  
+         private void CreateStats()
+         {
+             stats = new Stats(lightningData.Stats);
+             UpgradeStat healthDamage = new UpgradeStat(stats.HealthDamage, lightningData.LevelDatas[0],
+                 "Health Damage",
+                 new string[] { "Increase <b>Health Damage Multiplier</b> by {0}", "Current <b>Health Damage Multiplier</b>: <color=green>{0}</color>x" },
+                 lightningData.UpgradeIcons[0]){
+                 DistrictState = this
+             };
+             UpgradeStat armorDamage = new UpgradeStat(stats.ArmorDamage, lightningData.LevelDatas[1],
+                 "Armor Damage",
+                 new string[] { "Increase <b>Armor Damage Multiplier</b> by {0}", "Current <b>Armor Damage Multiplier</b>: <color=yellow>{0}</color>x" },
+                 lightningData.UpgradeIcons[1]){
+                 DistrictState = this
+             };
+             UpgradeStat shieldDamage = new UpgradeStat(stats.ShieldDamage, lightningData.LevelDatas[2],
+                 "Shield Damage",
+                 new string[] { "Increase <b>Shield Damage Multiplier</b> by {0}", "Current <b>Shield Damage Multiplier</b>: <color=blue>{0}</color>x" },
+                 lightningData.UpgradeIcons[2]){
+                 DistrictState = this
+             };
+  
+             UpgradeStats.Add(healthDamage);
+             UpgradeStats.Add(armorDamage);
+             UpgradeStats.Add(shieldDamage);
+         }
+         
+         public override void OnSelected(Vector3 pos)
+         {
+             if (selected) return;
+             
+             selected = true;
+             rangeIndicator = lightningData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
+             rangeIndicator.transform.position = pos;
+             rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+             rangeIndicator.gameObject.SetActive(true);
+         }
+  
+         public override void OnDeselected()
+         {
+             selected = false;
+             
+             if (rangeIndicator != null)
+             {
+                 rangeIndicator.SetActive(false);
+                 rangeIndicator = null;
+             }
+         }
+  
+         public override void Update()
+         {
+             UpdateEntities();
+         }
+     }
+     
+     #endregion
 }

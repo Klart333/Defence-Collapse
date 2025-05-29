@@ -28,6 +28,9 @@ namespace Buildings.District
         [SerializeField]
         private TowerData townHallData;
 
+        [SerializeField]
+        private TowerData lightningData;
+        
         [Title("UI", "Upgrade")]
         [SerializeField]
         private UIDistrictUpgrade districtUpgrade;
@@ -46,6 +49,7 @@ namespace Buildings.District
         public TowerData FlameData => flameData;
         public TowerData MineData => mineData;
         public TowerData TownHallData => townHallData;
+        public TowerData LightningData => lightningData;
 
         private void OnEnable()
         {

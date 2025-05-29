@@ -60,6 +60,7 @@ namespace Buildings.District
                 DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, position, key),
                 DistrictType.Mine => new MineState(this, DistrictUpgradeManager.Instance.MineData, position, key),
                 DistrictType.Flame => new FlameState(this, DistrictUpgradeManager.Instance.FlameData, position, key),
+                DistrictType.Lightning => new LightningState(this, DistrictUpgradeManager.Instance.LightningData, position, key),
                 _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
             };
 
