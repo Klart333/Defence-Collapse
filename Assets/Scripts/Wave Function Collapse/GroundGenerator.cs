@@ -83,6 +83,7 @@ namespace WaveFunctionCollapse
         public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
         public PrototypeInfoData DefaultPrototypeInfoData => defaultPrototypeInfoData;
         public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.CellSize.x, chunkSize.y * ChunkWaveFunction.CellSize.y, chunkSize.z * ChunkWaveFunction.CellSize.z);
+        public Vector3Int ChunkSize => chunkSize;
         
 #if UNITY_EDITOR
         private async UniTaskVoid Start()

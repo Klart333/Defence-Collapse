@@ -98,7 +98,7 @@ namespace InputCamera
             HandleZoom();
             HandleRotation();
             HandlePan();
-            
+
             entityManager.AddComponentData(cameraEntity, new CameraPositionComponent { Position = transform.position });
         }
 

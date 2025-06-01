@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using DataStructures.Queue.ECS;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
@@ -9,6 +7,7 @@ using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using Pathfinding;
+using System.Linq;
 using Sirenix.Utilities;
 using UI;
 
@@ -41,7 +40,7 @@ public class BuildingHandler : SerializedMonoBehaviour
     private bool verbose = true;
 
     public readonly Dictionary<ChunkIndex, HashSet<Building>> Buildings = new Dictionary<ChunkIndex, HashSet<Building>>();
-    public readonly Dictionary<int, List<Building>> BuildingGroups = new Dictionary<int, List<Building>>();
+    public readonly Dictionary<int, HashSet<Building>> BuildingGroups = new Dictionary<int, HashSet<Building>>();
     public readonly Dictionary<ChunkIndex, WallState> WallStates = new Dictionary<ChunkIndex, WallState>();
 
     private HashSet<ChunkIndex> wallStatesWithHealth = new HashSet<ChunkIndex>();
@@ -49,8 +48,8 @@ public class BuildingHandler : SerializedMonoBehaviour
     private List<Building> buildingQueue = new List<Building>();
     
     private int selectedGroupIndex = -1;
-    private int groupIndexCounter;
     private bool isAddingBuildings;
+    private int groupIndexCounter;
     
     #region Handling Groups
 
@@ -85,16 +84,16 @@ public class BuildingHandler : SerializedMonoBehaviour
             }
         }
 
-        BuildingGroups.Add(++groupIndexCounter, new List<Building>(buildingQueue));
-        int count = buildingQueue.Count;
-        foreach (var build in buildingQueue)
+        for (int i = 0; i < buildingQueue.Count; i++)
         {
+            Building build = buildingQueue[i];
+            BuildingGroups.Add(++groupIndexCounter, new HashSet<Building> { build });
             build.BuildingGroupIndex = groupIndexCounter;
-            build.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 10);
+            build.PathTarget.Importance = 250;
+            CheckMerge(groupIndexCounter);
         }
+        
         buildingQueue.Clear();
-
-        CheckMerge(groupIndexCounter);
         isAddingBuildings = false;
     }
 
@@ -107,31 +106,23 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private void CheckMerge(int groupToCheck)
     {
-        List<Building> buildings = BuildingGroups[groupToCheck];
-        int adjacenyCount = 0;
+        HashSet<Building> buildings = BuildingGroups[groupToCheck];
 
-        foreach (KeyValuePair<int, List<Building>> group in BuildingGroups)
+        foreach (KeyValuePair<int, HashSet<Building>> group in BuildingGroups)
         {
             if (group.Key == groupToCheck) continue;
-            
-            for (int i = buildings.Count - 1; i >= 0; i--)
+
+            foreach (Building building in buildings)
             {
-                Building building = buildings[i];
-                bool any = false;
-                for (int j = 0; j < group.Value.Count && !any; j++)
+                foreach (Building otherBuilding in group.Value)
                 {
-                    Building otherBuilding = group.Value[j];
                     if (!IsAdjacent(building, otherBuilding)) continue;
-                    if (++adjacenyCount < 1) continue;
-
-                    any = true;
+                    
+                    Debug.Log("Merging");
+                    Merge(groupToCheck, group.Key);
+                    CheckMerge(group.Key);
+                    return;
                 }
-
-                if (!any) continue;
-                
-                Merge(groupToCheck, group.Key);
-                CheckMerge(group.Key);
-                return;
             }
         }
     }
@@ -151,21 +142,25 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private bool IsAdjacent(Building building1, Building building2)
     {
-        int2 indexDiff = building1.ChunkIndex.CellIndex.xz - building2.ChunkIndex.CellIndex.xz;
-        if (math.abs(indexDiff.x) + math.abs(indexDiff.y) > 1) return false;
-        
-        Vector2Int dir = indexDiff.y == 0 
-            ? new Vector2Int(indexDiff.x, 1)
-            : new Vector2Int(1, indexDiff.y);
-        Vector2Int otherDir = indexDiff.y == 0 
-            ? new Vector2Int(indexDiff.x, -1)
-            : new Vector2Int(-1, indexDiff.y);
-        return cornerData.IsCornerBuildable(building1.MeshRot, dir, out _) || cornerData.IsCornerBuildable(building1.MeshRot, otherDir, out _);
+        if (!ChunkWaveUtility.AreIndexesAdjacent(building1.ChunkIndex, building2.ChunkIndex, BuildingManager.Instance.ChunkSize.x, out int3 indexDiff))
+        {
+            return false;
+        }
+        int2 dir = indexDiff.z == 0 
+            ? new int2(indexDiff.x, 1)
+            : new int2(1, indexDiff.z);
+        int2 otherDir = indexDiff.z == 0 
+            ? new int2(indexDiff.x, -1)
+            : new int2(-1, indexDiff.z);
+        bool isCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, dir, out _);
+        bool otherCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, otherDir, out _);
+        Debug.Log($"{building1.ChunkIndex}\n{building2.ChunkIndex}\n{BuildableCornerData.VectorToCorner(dir.x, dir.y)}: {isCornerBuildable}\n{BuildableCornerData.VectorToCorner(otherDir.x, otherDir.y)}: {otherCornerBuildable}");
+        return isCornerBuildable || otherCornerBuildable;
     }
 
     public void RemoveBuilding(Building building)
     {
-        if (!BuildingGroups.TryGetValue(building.BuildingGroupIndex, out List<Building> builds)) return;
+        if (!BuildingGroups.TryGetValue(building.BuildingGroupIndex, out HashSet<Building> builds)) return;
 
         List<ChunkIndex> builtIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(building.ChunkIndex);
         foreach (ChunkIndex chunkIndex in builtIndexes)
@@ -176,7 +171,7 @@ public class BuildingHandler : SerializedMonoBehaviour
             }    
         }
         
-        builds.RemoveSwapBack(building);
+        builds.Remove(building);
         if (builds.Count == 0)
         {
             BuildingGroups.Remove(building.BuildingGroupIndex);
@@ -277,13 +272,16 @@ public class BuildingHandler : SerializedMonoBehaviour
     }
 
     #endregion
-
-
+    
     #region Visual
 
     public void HighlightGroup(Building building)
     {
-        if (building.BuildingGroupIndex == -1) return;
+        if (building.BuildingGroupIndex == -1)
+        {
+            Debug.LogError("Building Group Index was not found");
+            return;
+        }
 
         if (selectedGroupIndex != building.BuildingGroupIndex)
         {
@@ -292,7 +290,7 @@ public class BuildingHandler : SerializedMonoBehaviour
 
         selectedGroupIndex = building.BuildingGroupIndex;
 
-        List<Building> buildings = BuildingGroups[building.BuildingGroupIndex];
+        HashSet<Building> buildings = BuildingGroups[building.BuildingGroupIndex];
         foreach (Building built in buildings)
         {
             built.Highlight().Forget();
@@ -323,9 +321,9 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private void LowLightBuildings()
     {
-        if (selectedGroupIndex == -1 || !BuildingGroups.TryGetValue(selectedGroupIndex, out List<Building> group)) return;
+        if (selectedGroupIndex == -1 || !BuildingGroups.TryGetValue(selectedGroupIndex, out HashSet<Building> group)) return;
 
-        foreach (var item in group)
+        foreach (Building item in group)
         {
             item.Lowlight();
         }

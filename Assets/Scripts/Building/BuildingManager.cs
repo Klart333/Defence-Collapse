@@ -47,6 +47,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     public ChunkWaveFunction<QueryMarchedChunk> ChunkWaveFunction => waveFunction;
     public PrototypeInfoData PrototypeInfo => townPrototypeInfo;
     public Vector3 ChunkScale => groundGenerator.ChunkScale;
+    public int3 ChunkSize => new int3(Mathf.FloorToInt(groundGenerator.ChunkSize.x / waveFunction.CellSize.x), 1, Mathf.FloorToInt(groundGenerator.ChunkSize.z / waveFunction.CellSize.z));
     public bool IsGenerating { get; private set; }
     
     public Vector3 CellSize

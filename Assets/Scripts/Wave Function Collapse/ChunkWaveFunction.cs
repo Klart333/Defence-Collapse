@@ -877,6 +877,21 @@ namespace WaveFunctionCollapse
             }
             return neighbours;
         }
+        
+        public static bool AreIndexesAdjacent(ChunkIndex chunkA, ChunkIndex chunkB, int chunkSize, out int3 diff)
+        {
+            int3 chunkAIndex = chunkA.Index * chunkSize + chunkA.CellIndex;
+            int3 chunkBIndex = chunkB.Index * chunkSize + chunkB.CellIndex;
+            diff = chunkBIndex - chunkAIndex;
+            return math.cmax(math.abs(diff)) == 1 && math.csum(math.abs(diff)) == 1;
+        }
+
+        private static bool IsBorderCell(int chunkCoordA, int chunkCoordB, int cellCoordA, int cellCoordB, int chunkSize)
+        {
+            bool aOnBorder = (chunkCoordA < chunkCoordB) ? (cellCoordA == chunkSize - 1) : (cellCoordA == 0);
+            bool bOnBorder = (chunkCoordA < chunkCoordB) ? (cellCoordB == 0) : (cellCoordB == chunkSize - 1);
+            return aOnBorder && bOnBorder;
+        }
     }
 
     public interface IChunkWaveFunction<TChunk> where TChunk : IChunk, new()

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Unity.Mathematics;
 using UnityEngine;
-using System;
 
 namespace WaveFunctionCollapse
 {
@@ -16,7 +16,7 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private ProtoypeMeshes protoypeMeshes;
 
-        public bool IsCornerBuildable(MeshWithRotation meshRot, Vector2Int corner, out bool meshIsBuildable)
+        public bool IsCornerBuildable(MeshWithRotation meshRot, int2 corner, out bool meshIsBuildable)
         {
             if (meshRot.MeshIndex == -1 || !BuildableDictionary.TryGetValue(protoypeMeshes.Meshes[meshRot.MeshIndex], out BuildableCorners buildableCorners))
             {
@@ -29,11 +29,11 @@ namespace WaveFunctionCollapse
             return buildableCorners.CornerDictionary[rotatedCorner].Buildable;
         }
 
-        public static Corner RotateCorner(int rot, Vector2Int corner)
+        public static Corner RotateCorner(int rot, int2 corner)
         {
             float angle = rot * 90 * Mathf.Deg2Rad;
-            int x = -Mathf.RoundToInt(corner.x * Mathf.Cos(angle) - corner.y * Mathf.Sin(angle));
-            int y = -Mathf.RoundToInt(corner.x * Mathf.Sin(angle) + corner.y * Mathf.Cos(angle));
+            int x = Mathf.RoundToInt(corner.x * Mathf.Cos(angle) - corner.y * Mathf.Sin(angle));
+            int y = Mathf.RoundToInt(corner.x * Mathf.Sin(angle) + corner.y * Mathf.Cos(angle));
 
             return VectorToCorner(x, y);
         }

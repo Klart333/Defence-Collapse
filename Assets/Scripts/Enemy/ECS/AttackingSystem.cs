@@ -18,6 +18,7 @@ namespace DataStructures.Queue.ECS
         protected override void OnCreate()
         {
             damageQueue = new NativeQueue<DamageIndex>(Allocator.Persistent);
+            RequireForUpdate<GameSpeedComponent>();
         }
 
         protected override void OnUpdate()

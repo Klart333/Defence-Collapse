@@ -192,8 +192,8 @@ namespace WaveFunctionCollapse
             {
                 for (int i = 0; i < WaveFunctionUtility.Corners.Length; i++)
                 {
-                    bool isBuildable = buildableCornerData.IsCornerBuildable(buildable.MeshRot, WaveFunctionUtility.Corners[i].ToVector2Int(), out bool meshIsBuildable);
-                    if (!isBuildable && !meshIsBuildable) continue;
+                    bool isBuildable = buildableCornerData.IsCornerBuildable(buildable.MeshRot, -WaveFunctionUtility.Corners[i], out bool meshIsBuildable);
+                    if (!isBuildable && !meshIsBuildable) continue; 
 
                     Vector3 cornerOffset = new Vector3(WaveFunctionUtility.Corners[i].x * chunkSize.x * waveFunction.CellSize.x, 0, WaveFunctionUtility.Corners[i].y * chunkSize.z * waveFunction.CellSize.z) * 0.5f;
                     Vector3 pos = buildable.gameObject.transform.position - cornerOffset - offset;

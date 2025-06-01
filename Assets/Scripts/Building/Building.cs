@@ -59,7 +59,6 @@ public class Building : PooledMonoBehaviour, IBuildable
     private MeshFilter meshFilter;
     private PathTarget pathTarget;
 
-    private bool purchasing = true;
     private int originalLayer;
     private bool highlighted;
     private bool selected;
@@ -85,7 +84,6 @@ public class Building : PooledMonoBehaviour, IBuildable
     private void OnEnable()
     {
         Events.OnBuildingClicked += OnBuildingClicked;
-        Events.OnBuildingCanceled += () => purchasing = false;
     }
 
     protected override void OnDisable()
@@ -95,7 +93,6 @@ public class Building : PooledMonoBehaviour, IBuildable
         ResetState();
 
         Events.OnBuildingClicked -= OnBuildingClicked;
-        Events.OnBuildingCanceled -= () => purchasing = false;
     }
 
     private void ResetState()
@@ -106,7 +103,6 @@ public class Building : PooledMonoBehaviour, IBuildable
         BuildingHandler?.RemoveBuilding(this);
         BuildingGroupIndex = -1;
 
-        purchasing = true;
         selected = false;
         MeshRenderer.gameObject.layer = originalLayer;
 
@@ -122,7 +118,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public async UniTaskVoid Highlight()
     {
-        if (purchasing || highlighted) return;
+        if (highlighted) return;
 
         BuildingAnimator.BounceInOut(meshTransform);
         MeshRenderer.gameObject.layer = (int)Mathf.Log(highlightedLayer.value, 2);
@@ -139,7 +135,7 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     public void OnSelected()
     {
-        if (purchasing || selected) return;
+        if (selected) return;
 
         if (highlighted)
         {
@@ -223,7 +219,6 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void OnBuildingClicked(BuildingType arg0)
     {
-        purchasing = true;
         BuildingHandler.LowlightGroup(this);
     }
 
