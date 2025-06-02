@@ -6,6 +6,7 @@ using DG.Tweening;
 using Gameplay.Money;
 using Sirenix.OdinInspector;
 using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
@@ -66,7 +67,7 @@ namespace Juice
 
         public async UniTaskVoid CollectCrystals(float moneyAmount, Vector3 origin)
         {
-            int amount = (int)moneyAmount;
+            int amount = (int)math.log2(moneyAmount);
             if (amount <= 0)
             {
                 MoneyManager.Instance.AddMoney(moneyAmount);

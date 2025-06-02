@@ -7,53 +7,52 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 
 [BurstCompile(FloatPrecision.Low, FloatMode.Fast, OptimizeFor = OptimizeFor.Performance)]
-public struct PathJob : IJob
+public struct PathJob : IJobFor
 {
+    [NativeDisableParallelForRestriction]
     public BlobAssetReference<PathChunkArray> PathChunks;
 
     [ReadOnly, NativeDisableContainerSafetyRestriction]
     public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
 
     public int Start;
-    public int ArrayLength;
-    public int ChunkAmount;
+    public int QuadrantWidth;
+    public int QuadrantHeight;
     
     [BurstCompile]
-    public void Execute()
+    public void Execute(int index)
     {
         NativeArray<PathIndex> neighbours = new NativeArray<PathIndex>(8, Allocator.Temp);
 
-        for (int i = Start; i < Start + 2; i++)
+        for (int y = 0; y < QuadrantHeight; y++)
+        for (int x = QuadrantWidth * y; x < QuadrantWidth * (y + 1); x++)
         {
-            int index = i % ChunkAmount;
-            CalculatePath(neighbours, ref PathChunks.Value.PathChunks[index]);
+            int i = Start + y * QuadrantWidth + x;
+            CalculatePathAtIndex(neighbours, ref PathChunks.Value.PathChunks[index], i);
         }
 
         neighbours.Dispose();
     }
     
-    private void CalculatePath(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk)
+    private void CalculatePathAtIndex(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int index)
     {
-        for (int i = 0; i < ArrayLength; i++)
+        if (pathChunk.TargetIndexes[index] != 0)
         {
-            if (pathChunk.TargetIndexes[i] != 0)
-            {
-                pathChunk.Distances[i] = pathChunk.TargetIndexes[i] * 50; // 100 is the weight of one tile
-                pathChunk.Directions[i] = byte.MaxValue;
-                continue;
-            }
+            pathChunk.Distances[index] = pathChunk.TargetIndexes[index] * 50; // 100 is the weight of one tile
+            pathChunk.Directions[index] = byte.MaxValue;
+            return;
+        }
 
-            if (GetClosestNeighbour(neighbours, ref pathChunk, i, out int shortestDistance, out int dirIndex)) continue;
+        if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int shortestDistance, out int dirIndex)) return;
             
-            pathChunk.Directions[i] = GetDirection(PathManager.NeighbourDirections[dirIndex]);
-            if (pathChunk.NotWalkableIndexes[i])
-            {
-                pathChunk.Distances[i] = 1_000_000_000;  
-            }
-            else
-            {
-                pathChunk.Distances[i] = shortestDistance;
-            }
+        pathChunk.Directions[index] = GetDirection(PathManager.NeighbourDirections[dirIndex]);
+        if (pathChunk.NotWalkableIndexes[index])
+        {
+            pathChunk.Distances[index] = 1_000_000_000;  
+        }
+        else
+        {
+            pathChunk.Distances[index] = shortestDistance;
         }
     }
 

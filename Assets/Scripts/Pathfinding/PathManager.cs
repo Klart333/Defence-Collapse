@@ -104,7 +104,7 @@ namespace Pathfinding
             groundGenerator.OnLockedChunkGenerated -= OnChunkGenerated;
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             UpdateFlowField();
         }
@@ -207,17 +207,33 @@ namespace Pathfinding
         private void UpdateFlowField()
         {
             GetPathInformation?.Invoke();
-            
-            new PathJob
-            {
-                PathChunks = pathChunks,
-                ChunkIndexToListIndex = chunkIndexToListIndex.AsReadOnly(),
-                Start = jobStartIndex,
-                ArrayLength = arrayLength,
-                ChunkAmount = chunkAmount,
-            }.Schedule().Complete();
 
-            jobStartIndex = (jobStartIndex + 1) % chunkAmount;
+            int quadrantWidth = GRID_WIDTH / 2;
+            int quadrantHeight = GRID_WIDTH / 2;
+            int chunksLength = pathChunks.Value.PathChunks.Length;
+
+            for (int i = 3; i >= 0; i--)
+            {
+                int start = i switch
+                {
+                    0 => 0,
+                    1 => quadrantWidth,
+                    2 => quadrantWidth * quadrantHeight * 2,
+                    3 => quadrantWidth * quadrantHeight * 2 + quadrantWidth,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                
+                var job = new PathJob
+                {
+                    Start = start,
+                    PathChunks = pathChunks,
+                    ChunkIndexToListIndex = chunkIndexToListIndex.AsReadOnly(),
+                    QuadrantHeight = quadrantWidth,
+                    QuadrantWidth = quadrantWidth,
+                };
+                JobHandle handle = job.ScheduleParallelByRef(chunksLength, chunksLength, default);
+                handle.Complete();
+            }
         }
 
         #region Debug
