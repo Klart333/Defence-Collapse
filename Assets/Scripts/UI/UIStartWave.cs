@@ -1,6 +1,7 @@
 using System;
 using Buildings.District;
 using Cysharp.Threading.Tasks;
+using Gameplay;
 using UnityEngine.UI;
 using UnityEngine;
 
@@ -41,6 +42,7 @@ public class UIStartWave : MonoBehaviour
         animator.SetBool(Interactable, true);
 
         SetInteractableAfterDelay().Forget();
+        PersistantGameStats.CurrentPersistantGameStats.WaveCount++;
     }
 
     private async UniTaskVoid SetInteractableAfterDelay()

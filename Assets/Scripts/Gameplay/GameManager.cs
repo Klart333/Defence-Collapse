@@ -14,9 +14,7 @@ namespace Gameplay
         
         private void OnEnable()
         {
-#if UNITY_EDITOR
-            SetupGame(new Random().Next());  
-#endif   
+            SetupGame(new Random().Next()); // TODO: Call from proper place, or maybe this is fine?
             
             Events.OnCapitolDestroyed += OnCapitolDestroyed;
         }
@@ -30,12 +28,15 @@ namespace Gameplay
         private void OnCapitolDestroyed(DistrictData destroyedDistrict)
         {
             IsGameOver = true;
+            PersistantGameStats.SaveCurrentGameStats();
         }
 
         public void SetupGame(int seed)
         {
             IsGameOver = false;
             Seed = seed;
+            
+            PersistantGameStats.CreateNewGameStats(0);
         }
 
         public void ResetWorld()

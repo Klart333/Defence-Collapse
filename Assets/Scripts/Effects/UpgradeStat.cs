@@ -172,6 +172,8 @@ public class TownHallUpgradeStat : IUpgradeStat
         
         UIEvents.OnFocusChanged?.Invoke();
         Object.FindFirstObjectByType<DistrictUnlockHandler>().DisplayUnlockableDistricts();
+
+        PersistantGameStats.CurrentPersistantGameStats.TownHallLevel++;
     }
 
     private void IncreaseDistrictHeight()

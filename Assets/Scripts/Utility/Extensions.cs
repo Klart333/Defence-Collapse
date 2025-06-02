@@ -1,3 +1,5 @@
+using DG.Tweening;
+using Gameplay;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -61,6 +63,12 @@ public static class Extensions
     public static Vector3 MultiplyByAxis(this Vector3 a, int3 b)
     {
         return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
+    }
+
+    public static Tween IgnoreGameSpeed(this Tween tween, IGameSpeed gameSpeed)
+    {
+        tween.timeScale = 1.0f / gameSpeed.Value;
+        return tween;
     }
 }
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Gameplay;
 using UnityEngine.InputSystem;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
@@ -98,6 +99,8 @@ namespace Chunks
                 unlocker.Cost = Cost;
                 unlocker.DisplayCost();
             }
+
+            PersistantGameStats.CurrentPersistantGameStats.ChunksExplored++;
         }
     }
 }
