@@ -15,7 +15,8 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects: []
+    ReferencedUnityObjects:
+    - {fileID: 4101095332268814299, guid: 819d7919224ac574bbb41b0f383493c8, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -152,7 +153,67 @@ MonoBehaviour:
       Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 16|Effects.DamageColliderEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 20
+    - Name: LimitedHits
+      Entry: 5
+      Data: true
+    - Name: Hits
+      Entry: 3
+      Data: 1
+    - Name: Radius
+      Entry: 4
+      Data: 1
+    - Name: HasLifetime
+      Entry: 5
+      Data: false
+    - Name: Lifetime
+      Entry: 4
+      Data: 0.5
+    - Name: TriggerDamageDone
+      Entry: 5
+      Data: true
+    - Name: hasFireComponent
+      Entry: 5
+      Data: false
+    - Name: fireTotalDamage
+      Entry: 4
+      Data: 50
+    - Name: hasLightningComponent
+      Entry: 5
+      Data: true
+    - Name: lightningDamage
+      Entry: 4
+      Data: 6
+    - Name: lightningBounces
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 17|Effects.VisualEffectEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 1
+    - Name: AttackEffect
+      Entry: 10
       Data: 0
+    - Name: spawnAtUnitOrigin
+      Entry: 5
+      Data: true
+    - Name: orientEffectToAttackPosition
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -161,7 +222,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0

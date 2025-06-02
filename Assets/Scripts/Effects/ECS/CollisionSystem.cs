@@ -1,13 +1,12 @@
-using System;
 using System.Collections.Generic;
 using DataStructures.Queue.ECS;
-using Unity.Burst;
 using Unity.Collections;
-using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
+using Unity.Entities;
+using Unity.Burst;
+using Unity.Jobs;
+using System;
 
 namespace Effects.ECS
 {
@@ -87,7 +86,7 @@ namespace Effects.ECS
 
     }
 
-    [BurstCompile]
+    [BurstCompile(FloatPrecision.Low, FloatMode.Fast)]
     public partial struct CollisionJob : IJobEntity
     {
         [ReadOnly]

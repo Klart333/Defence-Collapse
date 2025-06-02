@@ -3,12 +3,11 @@ using DataStructures.Queue.ECS;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
-using Unity.Collections;
+using Sirenix.Utilities;
 using Unity.Mathematics;
 using UnityEngine;
 using Pathfinding;
 using System.Linq;
-using Sirenix.Utilities;
 using UI;
 
 public class BuildingHandler : SerializedMonoBehaviour 
@@ -118,7 +117,6 @@ public class BuildingHandler : SerializedMonoBehaviour
                 {
                     if (!IsAdjacent(building, otherBuilding)) continue;
                     
-                    Debug.Log("Merging");
                     Merge(groupToCheck, group.Key);
                     CheckMerge(group.Key);
                     return;
@@ -154,7 +152,7 @@ public class BuildingHandler : SerializedMonoBehaviour
             : new int2(-1, indexDiff.z);
         bool isCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, dir, out _);
         bool otherCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, otherDir, out _);
-        Debug.Log($"{building1.ChunkIndex}\n{building2.ChunkIndex}\n{BuildableCornerData.VectorToCorner(dir.x, dir.y)}: {isCornerBuildable}\n{BuildableCornerData.VectorToCorner(otherDir.x, otherDir.y)}: {otherCornerBuildable}");
+        //Debug.Log($"{building1.ChunkIndex}\n{building2.ChunkIndex}\n{BuildableCornerData.VectorToCorner(dir.x, dir.y)}: {isCornerBuildable}\n{BuildableCornerData.VectorToCorner(otherDir.x, otherDir.y)}: {otherCornerBuildable}");
         return isCornerBuildable || otherCornerBuildable;
     }
 

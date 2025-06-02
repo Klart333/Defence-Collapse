@@ -277,6 +277,16 @@ namespace Effects
         [SerializeField, ShowIf(nameof(hasFireComponent))]
         private float fireTotalDamage = 50;
         
+        [Title("Lightning")]
+        [SerializeField]
+        private bool hasLightningComponent;
+        
+        [SerializeField, ShowIf(nameof(hasLightningComponent))]
+        private float lightningDamage = 5;
+        
+        [SerializeField, ShowIf(nameof(hasLightningComponent))]
+        private int lightningBounces = 5;
+        
         public bool IsDamageEffect => true;
 
         public void Perform(IAttacker unit) => Perform(unit, 0);
@@ -344,6 +354,16 @@ namespace Effects
                 if (hasFireComponent)
                 {
                     entityManager.AddComponentData(spawned, new FireComponent { TotalDamage = fireTotalDamage });
+                }
+                
+                if (hasLightningComponent)
+                {
+                    entityManager.AddComponentData(spawned, new LightningComponent
+                    {
+                        Damage = lightningDamage,
+                        Bounces = lightningBounces,
+                        Radius = 1,
+                    });
                 }
             
                 return spawned;
@@ -1062,7 +1082,7 @@ namespace Effects
 
         public void Perform(IAttacker unit)
         {
-            Vector3 pos = spawnAtUnitOrigin 
+            Vector3 targetPosition = spawnAtUnitOrigin 
                     ? unit.OriginPosition
                     : unit.AttackPosition;
             
@@ -1070,7 +1090,7 @@ namespace Effects
                 ? Quaternion.LookRotation((unit.AttackPosition - unit.OriginPosition).normalized) 
                 : Quaternion.identity;
 
-            AttackEffect.Spawn(pos, rot, ModifierValue);
+            AttackEffect.Spawn(targetPosition, unit.OriginPosition, unit.AttackPosition, rot, ModifierValue);
         }
 
         public void Revert(IAttacker unit)

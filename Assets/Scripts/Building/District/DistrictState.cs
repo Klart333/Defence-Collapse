@@ -1066,20 +1066,13 @@ namespace Buildings.District
      #endregion
      
      #region Lightning
+     
      public class LightningState : DistrictState
      { 
          private readonly TowerData lightningData;
  
          private GameObject rangeIndicator;
          private bool selected;
-         
-         private readonly int2[] corners =
-         {
-             new int2(-1, 1),
-             new int2(1, 1),
-             new int2(-1, -1),
-             new int2(1, -1),
-         };
          
          public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
          public override CategoryType CategoryType => CategoryType.Lightning;
@@ -1106,33 +1099,14 @@ namespace Buildings.District
 
              foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
              {
-                 for (int i = 0; i < chunk.AdjacentChunks.Length; i++)
-                 {
-                     if (i is 2 or 3 || (chunk.AdjacentChunks[i] != null && chunk.AdjacentChunks[i].PrototypeInfoData == chunk.PrototypeInfoData)) continue;
-                    
-                     chunks.Add(chunk);
-                     Vector2 offset = i switch
-                     {
-                         0 => new Vector2(0.25f, 0),
-                         1 => new Vector2(-0.25f, 0),
-                         4 => new Vector2(0, 0.25f),
-                         5 => new Vector2(0, -0.25f),
-                         _ => throw new ArgumentOutOfRangeException()
-                     };
-                     offsets.Add(offset);
-                     directions.Add(offset.normalized);
-                 }
+                 chunks.Add(chunk);
+                 offsets.Add(DistrictData.DistrictGenerator.ChunkScale / 2.0f);
+                 directions.Add(Vector2.zero);
              }
 
              return chunks;
          }
-        
-         protected override DistrictTargetMesh GetTargetMesh(Vector3 position, Vector2 direction)
-         {
-             Quaternion rot = Quaternion.LookRotation(direction.ToXyZ(-0.2f).normalized);
-             return lightningData.DistrictTargetMesh.GetAtPosAndRot<DistrictTargetMesh>(position, rot);
-         }
-  
+         
          private void RangeChanged()
          {
              if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
@@ -1194,6 +1168,8 @@ namespace Buildings.District
          {
              UpdateEntities();
          }
+     
+         protected override DistrictTargetMesh GetTargetMesh(Vector3 position, Vector2 direction) => throw new NotImplementedException();
      }
      
      #endregion
