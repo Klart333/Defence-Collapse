@@ -77,7 +77,7 @@ namespace Gameplay
 
         private void OnCapitolDestroyed(DistrictData destroyedDistrict)
         {
-            SetGameSpeed(0, slowDownDuration);
+            SetGameSpeed(0.001f, slowDownDuration);
         }
         
         public void SetGameSpeed(float targetSpeed, float lerpDuration)

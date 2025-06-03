@@ -76,7 +76,7 @@ namespace Gameplay.Upgrades
             }
         }
         
-        private void AddUpgradeEffect(CategoryType appliedDistrict, IEffect effect)
+        public void AddUpgradeEffect(CategoryType appliedDistrict, IEffect effect)
         {
             foreach (DistrictData district in districtHandler.Districts)
             {

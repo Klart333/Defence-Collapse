@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Gameplay;
 using UnityEngine;
 
 namespace Juice
@@ -16,8 +17,8 @@ namespace Juice
 
         public void Spin()
         {
-            transform.DOKill();
-            transform.DOLocalRotate(new Vector3(0, 0, totalDegrees), duration).SetEase(ease);
+            transform.DOKill(); 
+            transform.DOBlendableLocalRotateBy(new Vector3(0, 0, totalDegrees), duration).SetEase(ease).IgnoreGameSpeed(GameSpeedManager.Instance);
         } 
     }
 }

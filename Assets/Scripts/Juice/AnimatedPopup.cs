@@ -49,7 +49,7 @@ namespace Juice
             PopupTween = transform.DOScale(endValue, lifetime.Random()).SetEase(easeType);
             if (!useGameSpeed)
             {
-                PopupTween.timeScale = 1.0f / gameSpeed.Value;
+                PopupTween.IgnoreGameSpeed(gameSpeed);
             }
         }
 

@@ -46,7 +46,7 @@ namespace Chunks
 
         private void Update()
         {
-            if (groundGenerator.IsGenerating)
+            if (groundGenerator.IsGenerating || GameManager.Instance.IsGameOver)
             {
                 foreach (ChunkUnlocker unlocker in unlockers.Values)
                 {

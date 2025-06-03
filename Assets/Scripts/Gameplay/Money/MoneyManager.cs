@@ -53,6 +53,11 @@ namespace Gameplay.Money
         
         private void Update()
         {
+            if (GameManager.Instance.IsGameOver)
+            {
+                return;
+            }
+            
             float amount = entityManager.GetComponentData<MoneyToAddComponent>(moneyEntity).Money;
             if (amount > 0)
             {

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
+using Gameplay;
 using InputCamera.ECS;
 using Sirenix.OdinInspector;
 using Unity.Entities;
@@ -77,7 +78,7 @@ namespace InputCamera
         private void OnEnable()
         { 
             GetInput().Forget();
-
+            
             Events.OnGameReset += OnGameReset;
         }
 
@@ -99,7 +100,10 @@ namespace InputCamera
             HandleRotation();
             HandlePan();
 
-            entityManager.AddComponentData(cameraEntity, new CameraPositionComponent { Position = transform.position });
+            if (!GameManager.Instance.IsGameOver)
+            {
+                entityManager.AddComponentData(cameraEntity, new CameraPositionComponent { Position = transform.position });
+            }
         }
 
         private void HandleMovement()

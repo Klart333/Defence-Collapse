@@ -3,7 +3,6 @@ using Sirenix.OdinInspector;
 using DG.Tweening;
 using UnityEngine;
 using System;
-using System.Globalization;
 using TMPro;
 using Exp;
 
@@ -38,6 +37,8 @@ namespace Gameplay.GameOver
         [SerializeField]
         private float textCountingDuration = 0.2f;
         
+        public int ExpGained { get; private set; }
+        
         private void OnEnable()
         {
             CalculateExp();
@@ -58,7 +59,8 @@ namespace Gameplay.GameOver
                 };
             }
             
-            ExpManager.Instance.AddExp((int)totalExp);
+            ExpGained = (int)totalExp;
+            ExpManager.Instance.AddExp(ExpGained);
         }
 
         private async UniTaskVoid AnimateDisplayExp()
@@ -85,6 +87,9 @@ namespace Gameplay.GameOver
                 }
                 
                 TextMeshProUGUI factorText = Instantiate(expTextFactorPrefab, expTextParent);
+                float targetHeight = factorText.rectTransform.rect.height;
+                factorText.rectTransform.sizeDelta = new Vector2(factorText.rectTransform.sizeDelta.x, 0);
+                factorText.rectTransform.DOSizeDelta(new Vector2(factorText.rectTransform.sizeDelta.x, targetHeight), fadeInFactorDuration * 0.6f).IgnoreGameSpeed(GameSpeedManager.Instance);
                 factorText.transform.SetAsFirstSibling();
                 string format = expFactors[i].FactorType switch
                 {
