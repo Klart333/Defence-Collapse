@@ -24,9 +24,7 @@ public class UIFlexibleLayoutGroup : MonoBehaviour
 
     [SerializeField]
     private bool useParentRect;
-
-    private RectTransform rect;
-
+    
     void Start()
     {
         if (CalculateOnStart)
@@ -49,26 +47,24 @@ public class UIFlexibleLayoutGroup : MonoBehaviour
         GridLayoutGroup layoutGroup = GetComponent<GridLayoutGroup>();
 
         float x = coloumns == 0
-            ? layoutGroup.cellSize.x - layoutGroup.spacing.x
+            ? layoutGroup.cellSize.x
             : (width - (layoutGroup.padding.left + layoutGroup.padding.right)) / coloumns - layoutGroup.spacing.x / Mathf.Max(rows, 1);
 
         float y = rows == 0 
-            ? layoutGroup.cellSize.y - layoutGroup.spacing.y 
+            ? layoutGroup.cellSize.y 
             : (height - (layoutGroup.padding.top + layoutGroup.padding.bottom)) / rows - layoutGroup.spacing.y  / Mathf.Max(coloumns, 1);
 
         layoutGroup.cellSize = new Vector2(x, y);
 
-        if (useElasticClamping)
+        if (useElasticClamping && transform is RectTransform rect)
         {
-            rect = transform as RectTransform;
-
             if (!clampingX)
             {
-                rect.offsetMin = new Vector2(rect.offsetMin.x, Mathf.Min(0, transform.childCount * -(layoutGroup.cellSize.y + layoutGroup.spacing.y) - layoutGroup.padding.bottom + height));
+                rect.offsetMin = new Vector2(rect.offsetMin.x, Mathf.Min(0, Mathf.Ceil(transform.childCount / (float)coloumns) * -(layoutGroup.cellSize.y + layoutGroup.spacing.y) - layoutGroup.padding.bottom + height));
             }
             else
             {
-                rect.offsetMax = new Vector2(transform.childCount * (layoutGroup.cellSize.x + layoutGroup.spacing.x) - width + layoutGroup.padding.right, rect.offsetMin.y);
+                rect.offsetMax = new Vector2(Mathf.Ceil(transform.childCount / (float)rows) * (layoutGroup.cellSize.x + layoutGroup.spacing.x) - width + layoutGroup.padding.right, rect.offsetMin.y);
             }
         }
 

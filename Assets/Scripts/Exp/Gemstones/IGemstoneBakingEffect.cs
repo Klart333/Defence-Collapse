@@ -11,7 +11,6 @@ namespace Exp.Gemstones
         public IGemstoneEffect GetEffect(int level);
     }
     
-    
     [System.Serializable]
     public class StatIncreaseBakeEffect : IGemstoneBakingEffect
     {

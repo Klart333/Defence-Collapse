@@ -23,7 +23,7 @@ public class UIMenuPanel : MonoBehaviour
     {
         selector.DOKill();
 
-        selector.DOAnchorPosY(rectTransform.localPosition.y - startOffset, duration).SetEase(Ease.OutCirc);
+        selector.DOAnchorPosY(rectTransform.anchoredPosition.y, duration).SetEase(Ease.OutSine);
     }
 
     public void StartGame()
