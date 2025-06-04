@@ -139,7 +139,7 @@ namespace Gameplay.Money
         [Button]
         private void AddMoneyDebug(float money = 1000)
         {
-            this.money += money;
+            AddMoney(money);
         }
 
         #endregion

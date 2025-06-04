@@ -32,8 +32,8 @@ public static class ECSEvents
 
 public static class UIEvents
 {
-    public static UnityAction<UIEffectDisplay> OnBeginDrag;
-    public static UnityAction<UIEffectDisplay> OnEndDrag;
+    public static UnityAction<IDraggable> OnBeginDrag;
+    public static UnityAction<IDraggable> OnEndDrag;
     
     public static UnityAction OnFocusChanged;
 }

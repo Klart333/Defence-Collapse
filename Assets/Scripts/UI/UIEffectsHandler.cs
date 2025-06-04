@@ -6,7 +6,7 @@ using System;
 using TMPro;
 using Loot;
 
-public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class UIEffectsHandler : MonoBehaviour, IContainer, IPointerEnterHandler, IPointerExitHandler
 {
     public event Action<EffectModifier> OnEffectAdded;
     public event Action<EffectModifier> OnEffectRemoved;
@@ -73,7 +73,7 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
         UIEffectDisplay effect = effectDisplayPrefab.Get<UIEffectDisplay>();
         effect.transform.SetParent(displayParent, false);
-        effect.Handler = this;
+        effect.Container = this;
         effect.Display(effectModifier);
 
         spawnedDisplays.Add(effect);
@@ -88,12 +88,23 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
         flexGroup?.CalculateNewBounds();
     }
 
-    public void AddEffectDisplay(UIEffectDisplay effectDisplay)
+    public void AddDraggable(IDraggable draggable)
+    {
+        if (draggable is not UIEffectDisplay effectDisplay)
+        {
+            Debug.LogError("Draggable is not a UIEffectDisplay");
+            return;
+        }
+        
+        AddEffect(effectDisplay);
+    }
+
+    private void AddEffect(UIEffectDisplay effectDisplay)
     {
         emptyText.gameObject.SetActive(false);
 
         effectDisplay.transform.SetParent(displayParent);
-        effectDisplay.Handler = this;
+        effectDisplay.Container = this;
 
         spawnedDisplays.Add(effectDisplay);
 
@@ -102,19 +113,29 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
         flexGroup?.CalculateNewBounds();
     }
 
-    private void OnBeginDrag(UIEffectDisplay display)
+    private void OnBeginDrag(IDraggable display)
     {
-        if (spawnedDisplays.Contains(display))
+        if (display is not UIEffectDisplay effectDisplay)
         {
-            RemoveEffect(display);
+            return;
+        }
+        
+        if (spawnedDisplays.Contains(effectDisplay))
+        {
+            RemoveEffect(effectDisplay);
         }
     }
 
-    public void OnEndDrag(UIEffectDisplay display)
+    public void OnEndDrag(IDraggable display)
     {
+        if (display is not UIEffectDisplay)
+        {
+            return;
+        }
+        
         if (hovered && (!restrictedAmount || spawnedDisplays.Count < maxAmount))
         {
-            display.Handler = this;
+            display.Container = this;
         }
     }
 
@@ -127,4 +148,14 @@ public class UIEffectsHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         hovered = true;
     }
+}
+
+public interface IDraggable
+{
+    public IContainer Container { get; set; }
+}
+
+public interface IContainer
+{
+    public void AddDraggable(IDraggable draggable);
 }

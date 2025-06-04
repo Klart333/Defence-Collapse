@@ -13,6 +13,7 @@ namespace Juice.Ecs
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<GameSpeedComponent>();
+            state.RequireForUpdate<FloatAwayComponent>();
         }
 
         [BurstCompile]

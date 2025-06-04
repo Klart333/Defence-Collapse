@@ -4,4 +4,9 @@ namespace Gameplay
     {
         public float Value { get; }
     }
+
+    public class SimpleGameSpeed : IGameSpeed
+    {
+        public float Value => 1.0f;
+    }
 }

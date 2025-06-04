@@ -571,7 +571,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f9cd7ca7cee44628d0231b53caa71a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shouldDestroyOnLoad: 0
+  shouldDestroyOnLoad: 1
+  gemstoneGenerator: {fileID: 11400000, guid: 070a969621402dd4c81a3fb45df8c2b2, type: 2}
 --- !u!33 &46426848 stripped
 MeshFilter:
   m_CorrespondingSourceObject: {fileID: 3347878687871088552, guid: f8d6d4cb9e7edcc48afdf101345acab7,
@@ -11189,6 +11190,7 @@ Transform:
   - {fileID: 2072288133}
   - {fileID: 134512422}
   - {fileID: 163547865}
+  - {fileID: 1721988427}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1416224650
@@ -11279,25 +11281,35 @@ PrefabInstance:
       propertyPath: m_Name
       value: TooltipPanel
       objectReference: {fileID: 0}
+    - target: {fileID: 5463728254046700676, guid: 2be4cf0d4912e2143bc09c559fc5ba37,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 4.200012
+      objectReference: {fileID: 0}
+    - target: {fileID: 9219457892140205176, guid: 2be4cf0d4912e2143bc09c559fc5ba37,
+        type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9219457892140205176, guid: 2be4cf0d4912e2143bc09c559fc5ba37,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9219457892140205176, guid: 2be4cf0d4912e2143bc09c559fc5ba37,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9219457892140205176, guid: 2be4cf0d4912e2143bc09c559fc5ba37,
         type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9219457892140205176, guid: 2be4cf0d4912e2143bc09c559fc5ba37,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9219457892140205176, guid: 2be4cf0d4912e2143bc09c559fc5ba37,
         type: 3}
@@ -11347,12 +11359,12 @@ PrefabInstance:
     - target: {fileID: 9219457892140205176, guid: 2be4cf0d4912e2143bc09c559fc5ba37,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -173.8
+      value: 776.2
       objectReference: {fileID: 0}
     - target: {fileID: 9219457892140205176, guid: 2be4cf0d4912e2143bc09c559fc5ba37,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 743
       objectReference: {fileID: 0}
     - target: {fileID: 9219457892140205176, guid: 2be4cf0d4912e2143bc09c559fc5ba37,
         type: 3}
@@ -13566,6 +13578,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1682227230}
   m_CullTransparentMesh: 1
+--- !u!1 &1721988426
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1721988427}
+  - component: {fileID: 1721988428}
+  m_Layer: 0
+  m_Name: GemstoneEffectHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1721988427
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1721988426}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1411626119}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1721988428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1721988426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa004da4e9ea4b459743096c92a2dfaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  appliedEffectsHandler: {fileID: 163547866}
 --- !u!1 &1766702496
 GameObject:
   m_ObjectHideFlags: 0

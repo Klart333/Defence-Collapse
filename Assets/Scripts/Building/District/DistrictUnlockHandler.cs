@@ -52,7 +52,7 @@ namespace Buildings.District
                 return;
             }
 
-            GameSpeedManager.Instance.SetGameSpeed(0.01f);
+            GameSpeedManager.Instance.SetBaseGameSpeed(0.01f);
             canvasGroup.interactable = true;
             canvasGroup.DOKill();
             canvasGroup.alpha = 0;
@@ -83,7 +83,7 @@ namespace Buildings.District
             canvasGroup.interactable = false;
             canvasGroup.DOKill();
 
-            GameSpeedManager.Instance.SetGameSpeed(1);
+            GameSpeedManager.Instance.SetBaseGameSpeed(1);
             canvasGroup.DOFade(0.0f, fadeOutDuration).SetEase(fadeOutEase).onComplete = () =>
             {
                 canvasGameObject.SetActive(false);

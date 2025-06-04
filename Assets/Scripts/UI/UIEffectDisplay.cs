@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine.EventSystems;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
@@ -6,7 +7,7 @@ using UnityEngine;
 using TMPro;
 using Loot;
 
-public class UIEffectDisplay : PooledMonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class UIEffectDisplay : PooledMonoBehaviour, IDraggable, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Title("References")]
     [SerializeField]
@@ -22,7 +23,7 @@ public class UIEffectDisplay : PooledMonoBehaviour, IBeginDragHandler, IDragHand
     private RectTransform rectTransform;
     private Canvas canvas;
 
-    public UIEffectsHandler Handler { get; set; }
+    public IContainer Container { get; set; }
     public EffectModifier EffectModifier {  get; private set; }
 
     private void Awake()
@@ -47,14 +48,19 @@ public class UIEffectDisplay : PooledMonoBehaviour, IBeginDragHandler, IDragHand
         rectTransform.localPosition = position;
     }
 
-    public async void OnEndDrag(PointerEventData eventData)
+    public void OnEndDrag(PointerEventData eventData)
     {
         UIEvents.OnEndDrag?.Invoke(this);
         canvasGroup.blocksRaycasts = true;
 
+        DelayedAdd().Forget();
+    }
+
+    private async UniTaskVoid DelayedAdd()
+    {
         await UniTask.Yield();
 
-        Handler.AddEffectDisplay(this);
+        Container.AddDraggable(this);
     }
 
     public void Display(EffectModifier effectModifier)
@@ -67,5 +73,4 @@ public class UIEffectDisplay : PooledMonoBehaviour, IBeginDragHandler, IDragHand
         iconImage.sprite = effectModifier.Icon;
         title.text = effectModifier.Title;
     }
-
 }

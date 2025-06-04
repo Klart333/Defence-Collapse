@@ -1,5 +1,6 @@
 using Gameplay.Upgrades;
 using UnityEngine;
+using Gameplay;
 using Effects;
 
 namespace Exp.Gemstones
@@ -34,5 +35,22 @@ namespace Exp.Gemstones
         {
             return EffectDescription;
         }
+    }
+    
+    public class IncreaseGameSpeedEffect : IGemstoneEffect
+    {
+        public string EffectDescription;
+        public float Value;
+
+        public void PerformEffect()
+        {
+            GameSpeedManager.Instance.AddModifier(new Modifier
+            {
+                Value = Value,
+                Type = Modifier.ModifierType.Multiplicative
+            });
+        }
+
+        public string GetDescription() => EffectDescription;
     }
 }

@@ -2,7 +2,6 @@ using DataStructures.Queue.ECS;
 using Random = System.Random;
 using Buildings.District;
 using Unity.Entities;
-using DG.Tweening;
 using Effects.ECS;
 
 namespace Gameplay

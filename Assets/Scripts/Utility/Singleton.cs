@@ -9,7 +9,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     [Title("Singleton")]
     [SerializeField]
     private bool shouldDestroyOnLoad = true;
-
+    
     protected virtual void Awake()
     {
         if (Instance != null)
@@ -19,7 +19,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         else
         {
             Instance = this as T;
-
+            
             if (!shouldDestroyOnLoad)
             {
                DontDestroyOnLoad(Instance.gameObject);

@@ -44,10 +44,11 @@ namespace Exp.Gemstones
             
             int exp = FindFirstObjectByType<UIGameOverExpHandler>().ExpGained;
             int level = (int)expToLevelCurve.Evaluate(exp);
-
             for (int i = 0; i < 3; i++)
             {
-                Gemstone gemstone = gemstoneGenerator.GetGemstone((GemstoneType)i, level);
+                int seed = Random.Range(0, int.MaxValue);
+
+                Gemstone gemstone = gemstoneGenerator.GetGemstone((GemstoneType)i, level, seed);
                 gemstones[i].DisplayGemstone(gemstone);
                 gemstones[i].OnClick += SelectGemstone;
             }

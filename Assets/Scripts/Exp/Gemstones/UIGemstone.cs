@@ -7,11 +7,12 @@ using UnityEngine;
 using DG.Tweening;
 using Gameplay;
 using System;
+using Cysharp.Threading.Tasks;
 using UI;
 
 namespace Exp.Gemstones
 {
-    public class UIGemstone : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+    public class UIGemstone : MonoBehaviour, IDraggable, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IBeginDragHandler, IEndDragHandler
     { 
         public event Action<Gemstone> OnClick;
         
@@ -38,28 +39,46 @@ namespace Exp.Gemstones
         [SerializeField]
         private Ease hoverEase = Ease.OutElastic;
 
+        [Title("Click")]
         [SerializeField]
+        private bool isClickable = true;
+        
+        [SerializeField, ShowIf(nameof(isClickable))]
         private Image whiteOutImage;
         
-        [SerializeField]
+        [SerializeField, ShowIf(nameof(isClickable))]
         private float whiteOutDuration = 0.2f;
         
-        [SerializeField]
+        [SerializeField, ShowIf(nameof(isClickable))]
         private Ease whiteOutEase = Ease.OutSine;
+        
+        [Title("Drag")]
+        [SerializeField]
+        private bool isDraggable;
         
         private UITooltipHandler tooltipHandler;
         private RectTransform rectTransform;
-        private Gemstone gemstone;
+        private CanvasGroup canvasGroup;
+        private Canvas canvas;
+        
+        private IGameSpeed gameSpeed;
+        
+        public IContainer Container { get; set; }
+        public Gemstone Gemstone { get; private set; }
 
         private void Awake()
         {
             tooltipHandler = FindFirstObjectByType<UITooltipHandler>();
             rectTransform = transform as RectTransform;
+            canvasGroup = GetComponent<CanvasGroup>();
+            canvas = GetComponentInParent<Canvas>();
+            
+            gameSpeed = GameSpeedManager.Instance ?? (IGameSpeed)new SimpleGameSpeed();
         }
 
         public void DisplayGemstone(Gemstone gemstone)
         {
-            this.gemstone = gemstone;
+            Gemstone = gemstone;
             
             Sprite gemstoneIcon = iconArray[(int)gemstone.GemstoneType];
             Color color = stoneColorArray[(int)gemstone.GemstoneType];
@@ -71,39 +90,79 @@ namespace Exp.Gemstones
         public void OnPointerEnter(PointerEventData eventData)
         {
             transform.DOKill();
-            transform.DOScale(hoverTargetScale, hoverDuration).SetEase(hoverEase).IgnoreGameSpeed(GameSpeedManager.Instance);
+            transform.DOScale(hoverTargetScale, hoverDuration).SetEase(hoverEase).IgnoreGameSpeed(gameSpeed);
+            
+            if (Gemstone == null) return;
             
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < gemstone.Effects.Length; i++)
+            for (int i = 0; i < Gemstone.Effects.Length; i++)
             {
-                sb.AppendLine(gemstone.Effects[i].GetDescription());
+                sb.AppendLine(Gemstone.Effects[i].GetDescription());
             }
             
             List<Tuple<string, int>> gemstoneDescription = new List<Tuple<string, int>>
             {
-                Tuple.Create($"{gemstone.GemstoneType.ToString()} Lvl. {gemstone.Level:N0}", 60),
+                Tuple.Create($"{Gemstone.GemstoneType.ToString()} Lvl. {Gemstone.Level:N0}", 60),
                 Tuple.Create(sb.ToString(), 30),
             };
             
-            Vector2 position = rectTransform.anchoredPosition + Vector2.up * rectTransform.rect.height / 2.0f;
+            Vector2 position = (Vector2)rectTransform.position + Vector2.up * rectTransform.rect.height / 2.0f;
+            position /= canvas.scaleFactor;
             tooltipHandler.DisplayTooltip(gemstoneDescription, position);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             transform.DOKill();
-            transform.DOScale(1, hoverDuration).SetEase(hoverEase).IgnoreGameSpeed(GameSpeedManager.Instance);
+            transform.DOScale(1, hoverDuration).SetEase(hoverEase).IgnoreGameSpeed(gameSpeed);
 
             tooltipHandler.HideTooltip();
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            if (!isClickable)
+            {
+                return;
+            }
+            
             whiteOutImage.gameObject.SetActive(true);
-            whiteOutImage.DOFade(0, whiteOutDuration).SetEase(whiteOutEase).IgnoreGameSpeed(GameSpeedManager.Instance);
+            whiteOutImage.DOFade(0, whiteOutDuration).SetEase(whiteOutEase).IgnoreGameSpeed(gameSpeed);
             
             tooltipHandler.HideTooltip();
-            OnClick?.Invoke(gemstone);
+            OnClick?.Invoke(Gemstone);
+        }
+
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            if (!isDraggable)
+            {
+                return;
+            }
+            
+            UIEvents.OnBeginDrag?.Invoke(this);
+            
+            tooltipHandler.HideTooltip();
+            canvasGroup.blocksRaycasts = false;
+        }
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            if (!isDraggable)
+            {
+                return;
+            }
+            
+            UIEvents.OnEndDrag?.Invoke(this);
+            canvasGroup.blocksRaycasts = true;
+
+            DelayedAdd().Forget();
+        }
+
+        private async UniTaskVoid DelayedAdd()
+        {
+            await UniTask.Yield();
+            Container.AddDraggable(this);
         }
     }
 }

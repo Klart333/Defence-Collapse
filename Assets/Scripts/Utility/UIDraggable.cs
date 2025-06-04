@@ -1,6 +1,6 @@
+using UnityEngine.EventSystems;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class UIDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -19,11 +19,11 @@ public class UIDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     private Canvas canvas;
 
     private bool isDragging = false;
-
+    
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
-        canvas = GetComponentInParent<Canvas>(); // Ensure there is a Canvas in the parent hierarchy.
+        canvas = GetComponentInParent<Canvas>(); 
 
         if (connectedElement != null)
         {
@@ -33,8 +33,8 @@ public class UIDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out pointerOffset);
-
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, null, out pointerOffset);
+        pointerOffset *= canvas.scaleFactor;
         if (pointerOffset.y < (rectTransform.rect.height / 2f) * percentClickable)
         {
             return;
@@ -74,8 +74,7 @@ public class UIDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     // Ensure the UI element stays within the canvas bounds
     private Vector2 ClampToCanvas(Vector2 position)
     {
-        Vector2 localPointerPosition;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, position, canvas.worldCamera, out localPointerPosition);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, position, canvas.worldCamera, out Vector2 localPointerPosition);
         Rect canvasRect = canvas.GetComponent<RectTransform>().rect;
         Vector2 clampedPosition = new Vector2(
             Mathf.Clamp(localPointerPosition.x, canvasRect.xMin, canvasRect.xMax),
