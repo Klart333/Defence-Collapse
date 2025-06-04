@@ -24,10 +24,21 @@ namespace Exp.Gemstones
         public string EffectDescription;
         public float Value;
 
+        public StatIncreaseEffect() { }
+        
+        public StatIncreaseEffect(StatIncreaseEffect statEffect)
+        {
+            EffectDescription = statEffect.EffectDescription;
+            AppliedCategory = statEffect.AppliedCategory;
+            Effect = statEffect.Effect;
+            Value = statEffect.Value;
+        }
+
         public void PerformEffect() => PerformEffect(Object.FindFirstObjectByType<AppliedEffectsHandler>());
         
         public void PerformEffect(AppliedEffectsHandler handler)
         {
+            Effect.ModifierValue = Value;
             handler.AddUpgradeEffect(AppliedCategory, Effect);
         }
         

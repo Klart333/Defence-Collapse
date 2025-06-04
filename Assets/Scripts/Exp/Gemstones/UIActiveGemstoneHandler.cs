@@ -1,8 +1,8 @@
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
-using TMPro;
 using UnityEngine.UI;
 using UnityEngine;
+using TMPro;
 
 namespace Exp.Gemstones
 {

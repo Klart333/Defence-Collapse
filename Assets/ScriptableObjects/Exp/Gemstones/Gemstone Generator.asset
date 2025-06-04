@@ -15,7 +15,8 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects: []
+    ReferencedUnityObjects:
+    - {fileID: 11400000, guid: 3ad26b4d4538c514ba23939f8abaf1f8, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -79,10 +80,10 @@ MonoBehaviour:
       Data: 0.01
     - Name: m_InTangent
       Entry: 4
-      Data: 0.0050543393
+      Data: 0.02456805
     - Name: m_OutTangent
       Entry: 4
-      Data: 0.0050543393
+      Data: 0.02456805
     - Name: m_TangentMode
       Entry: 3
       Data: 0
@@ -94,7 +95,7 @@ MonoBehaviour:
       Data: 0
     - Name: m_OutWeight
       Entry: 4
-      Data: 0.07077205
+      Data: 0.08823529
     - Name: 
       Entry: 8
       Data: 
@@ -109,13 +110,13 @@ MonoBehaviour:
       Data: 100
     - Name: m_Value
       Entry: 4
-      Data: 1
+      Data: 1.5
     - Name: m_InTangent
       Entry: 4
-      Data: 0.007986271
+      Data: 0
     - Name: m_OutTangent
       Entry: 4
-      Data: 0.007986271
+      Data: 0
     - Name: m_TangentMode
       Entry: 3
       Data: 0
@@ -124,7 +125,7 @@ MonoBehaviour:
       Data: 0
     - Name: m_InWeight
       Entry: 4
-      Data: 0.0680147558
+      Data: 0
     - Name: m_OutWeight
       Entry: 4
       Data: 0
@@ -149,12 +150,9 @@ MonoBehaviour:
     - Name: randomness
       Entry: 4
       Data: 0.05
-    - Name: description
-      Entry: 1
-      Data: "\u2022 +{0} Crit Chance"
-    - Name: isPercentage
-      Entry: 5
-      Data: true
+    - Name: statNameUtility
+      Entry: 10
+      Data: 0
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -202,7 +200,7 @@ MonoBehaviour:
       Data: 0
     - Name: m_Value
       Entry: 4
-      Data: 1.2
+      Data: 0.2
     - Name: m_InTangent
       Entry: 4
       Data: 0.02456805
@@ -235,7 +233,7 @@ MonoBehaviour:
       Data: 100
     - Name: m_Value
       Entry: 4
-      Data: 2.5
+      Data: 1.5
     - Name: m_InTangent
       Entry: 4
       Data: 0
@@ -277,7 +275,7 @@ MonoBehaviour:
       Data: 0.05
     - Name: description
       Entry: 1
-      Data: "\u2022 {0}x Game Speed"
+      Data: +{0} Game Speed
     - Name: 
       Entry: 8
       Data: 
@@ -304,7 +302,7 @@ MonoBehaviour:
       Data: 0
     - Name: m_Value
       Entry: 4
-      Data: 1.01
+      Data: 0.01
     - Name: m_InTangent
       Entry: 4
       Data: 0.02456805
@@ -337,7 +335,7 @@ MonoBehaviour:
       Data: 100
     - Name: m_Value
       Entry: 4
-      Data: 3
+      Data: 1.5
     - Name: m_InTangent
       Entry: 4
       Data: 0
@@ -377,12 +375,9 @@ MonoBehaviour:
     - Name: randomness
       Entry: 4
       Data: 0.05
-    - Name: description
-      Entry: 1
-      Data: "\u2022 {0}x Attack Speed"
-    - Name: isPercentage
-      Entry: 5
-      Data: false
+    - Name: statNameUtility
+      Entry: 10
+      Data: 0
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -430,7 +425,7 @@ MonoBehaviour:
       Data: 0
     - Name: m_Value
       Entry: 4
-      Data: 1.01
+      Data: 0.05
     - Name: m_InTangent
       Entry: 4
       Data: 0.02456805
@@ -463,7 +458,7 @@ MonoBehaviour:
       Data: 100
     - Name: m_Value
       Entry: 4
-      Data: 3
+      Data: 1
     - Name: m_InTangent
       Entry: 4
       Data: 0
@@ -503,12 +498,9 @@ MonoBehaviour:
     - Name: randomness
       Entry: 4
       Data: 0.05
-    - Name: description
-      Entry: 1
-      Data: "\u2022 {0}x District Range"
-    - Name: isPercentage
-      Entry: 5
-      Data: false
+    - Name: statNameUtility
+      Entry: 10
+      Data: 0
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -577,7 +569,7 @@ MonoBehaviour:
       Data: 0
     - Name: m_Value
       Entry: 4
-      Data: 1.01
+      Data: 0.01
     - Name: m_InTangent
       Entry: 4
       Data: 0.02456805
@@ -610,7 +602,7 @@ MonoBehaviour:
       Data: 100
     - Name: m_Value
       Entry: 4
-      Data: 3
+      Data: 1.5
     - Name: m_InTangent
       Entry: 4
       Data: 0
@@ -650,12 +642,9 @@ MonoBehaviour:
     - Name: randomness
       Entry: 4
       Data: 0.05
-    - Name: description
-      Entry: 1
-      Data: "\u2022 {0}x Health Damage"
-    - Name: isPercentage
-      Entry: 5
-      Data: false
+    - Name: statNameUtility
+      Entry: 10
+      Data: 0
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -703,7 +692,7 @@ MonoBehaviour:
       Data: 0
     - Name: m_Value
       Entry: 4
-      Data: 1.01
+      Data: 0.01
     - Name: m_InTangent
       Entry: 4
       Data: 0.02456805
@@ -736,7 +725,7 @@ MonoBehaviour:
       Data: 100
     - Name: m_Value
       Entry: 4
-      Data: 3
+      Data: 1.5
     - Name: m_InTangent
       Entry: 4
       Data: 0
@@ -776,12 +765,9 @@ MonoBehaviour:
     - Name: randomness
       Entry: 4
       Data: 0.05
-    - Name: description
-      Entry: 1
-      Data: "\u2022 {0}x Armor Damage"
-    - Name: isPercentage
-      Entry: 5
-      Data: false
+    - Name: statNameUtility
+      Entry: 10
+      Data: 0
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -829,7 +815,7 @@ MonoBehaviour:
       Data: 0
     - Name: m_Value
       Entry: 4
-      Data: 1.01
+      Data: 0.01
     - Name: m_InTangent
       Entry: 4
       Data: 0.02456805
@@ -862,7 +848,7 @@ MonoBehaviour:
       Data: 100
     - Name: m_Value
       Entry: 4
-      Data: 3
+      Data: 1.5
     - Name: m_InTangent
       Entry: 4
       Data: 0
@@ -902,12 +888,9 @@ MonoBehaviour:
     - Name: randomness
       Entry: 4
       Data: 0.05
-    - Name: description
-      Entry: 1
-      Data: "\u2022 {0}x Shield Damage"
-    - Name: isPercentage
-      Entry: 5
-      Data: false
+    - Name: statNameUtility
+      Entry: 10
+      Data: 0
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -955,7 +938,7 @@ MonoBehaviour:
       Data: 0
     - Name: m_Value
       Entry: 4
-      Data: 1.01
+      Data: 0.01
     - Name: m_InTangent
       Entry: 4
       Data: 0.02456805
@@ -988,7 +971,7 @@ MonoBehaviour:
       Data: 100
     - Name: m_Value
       Entry: 4
-      Data: 3
+      Data: 1.5
     - Name: m_InTangent
       Entry: 4
       Data: 0
@@ -1028,12 +1011,9 @@ MonoBehaviour:
     - Name: randomness
       Entry: 4
       Data: 0.1
-    - Name: description
-      Entry: 1
-      Data: "\u2022 {0}x Crit Damage"
-    - Name: isPercentage
-      Entry: 5
-      Data: false
+    - Name: statNameUtility
+      Entry: 10
+      Data: 0
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -1175,12 +1155,9 @@ MonoBehaviour:
     - Name: randomness
       Entry: 4
       Data: 0.05
-    - Name: description
-      Entry: 1
-      Data: "\u2022 {0}x :("
-    - Name: isPercentage
-      Entry: 5
-      Data: false
+    - Name: statNameUtility
+      Entry: 10
+      Data: 0
     - Name: appliedCategory
       Entry: 3
       Data: 64

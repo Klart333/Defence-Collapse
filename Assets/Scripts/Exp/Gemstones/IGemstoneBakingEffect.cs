@@ -25,10 +25,7 @@ namespace Exp.Gemstones
         
         [Title("Description")]
         [SerializeField]
-        private string description = "• {0}x Attack Speed";
-        
-        [SerializeField]
-        private bool isPercentage = false;
+        private StatNameUtility statNameUtility;
         
         [Title("Effect")]
         [SerializeField]
@@ -56,7 +53,7 @@ namespace Exp.Gemstones
             {
                 AppliedCategory = appliedCategory,
                 Value = value,
-                EffectDescription = string.Format(description, value.ToString(isPercentage ? "P" : "N")),
+                EffectDescription = statNameUtility.GetDescription(increaseStatEffect.StatType, value),
                 Effect = new IncreaseStatEffect
                 {
                     ModifierType = increaseStatEffect.ModifierType,
@@ -79,7 +76,7 @@ namespace Exp.Gemstones
         
         [Title("Description")]
         [SerializeField]
-        private string description = "• {0}x Game Speed";
+        private string description = "+{0} Game Speed";
         
         public float GetEffectValue(int level, Random random)
         {
@@ -93,7 +90,7 @@ namespace Exp.Gemstones
             return new IncreaseGameSpeedEffect
             {
                 Value = value,
-                EffectDescription = string.Format(description, value.ToString("N")),
+                EffectDescription = string.Format(description, value.ToString("P")),
             };
         }
     }

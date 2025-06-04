@@ -12,6 +12,7 @@ namespace Exp
     public class ExpManager : Singleton<ExpManager>
     {
         public event Action OnExpChanged;
+        public event Action OnActiveGemstonesChanged;
         
         [Title("Gemstone")]
         [SerializeField]
@@ -97,6 +98,23 @@ namespace Exp
             Gemstones.Add(gemstone);
         }
 
+        public void RemoveGemstone(Gemstone gemstone)
+        {
+            Gemstones.Remove(gemstone);
+        }
+        
+        public void AddActiveGemstone(Gemstone gem)
+        {
+            ActiveGemstones.Add(gem);
+            OnActiveGemstonesChanged?.Invoke();
+        }
+
+        public void RemoveActiveGemstone(Gemstone gem)
+        {
+            ActiveGemstones.Remove(gem);
+            OnActiveGemstonesChanged?.Invoke();
+        }
+            
         private void OnApplicationQuit()
         {
             if (Instance != this) return;

@@ -116,11 +116,11 @@ namespace Exp.Gemstones
             handledDraggables.Add(gemstone);
             if (isActiveGemstones)
             {
-                expManager.ActiveGemstones.Add(gemstone.Gemstone);
+                expManager.AddActiveGemstone(gemstone.Gemstone);
             }
             else
             {
-                expManager.Gemstones.Add(gemstone.Gemstone);
+                expManager.AddGemstone(gemstone.Gemstone);
             }
 
             flexGroup?.CalculateNewBounds();
@@ -132,11 +132,11 @@ namespace Exp.Gemstones
             
             if (isActiveGemstones)
             {
-                expManager.ActiveGemstones.Remove(gemstone.Gemstone);
+                expManager.RemoveActiveGemstone(gemstone.Gemstone);
             }
             else
             {
-                expManager.Gemstones.Remove(gemstone.Gemstone);
+                expManager.RemoveGemstone(gemstone.Gemstone);
             }
             
             flexGroup?.CalculateNewBounds();
