@@ -40,11 +40,6 @@ namespace Effects
         public IEffectHolder Clone();
     }
 
-    public interface IEntityEffect : IEffect
-    {
-        public void Perform(IAttacker attacker, CategoryType extraCategory);
-    }
-
     #region Increase Stat
 
     [Serializable]
@@ -248,7 +243,7 @@ namespace Effects
     #region Damage Collider
 
     [Serializable]
-    public class DamageColliderEffect : IEntityEffect
+    public class DamageColliderEffect : IEffect
     {
         [Title("Attack Damage")]
         [OdinSerialize]
@@ -288,10 +283,8 @@ namespace Effects
         private int lightningBounces = 5;
         
         public bool IsDamageEffect => true;
-
-        public void Perform(IAttacker unit) => Perform(unit, 0);
         
-        public void Perform(IAttacker unit, CategoryType extraCategory)
+        public void Perform(IAttacker unit)
         {
             Vector3 pos = unit.AttackPosition;
             
@@ -343,7 +336,7 @@ namespace Effects
 
                 entityManager.SetComponentData(spawned, new AddComponentInitComponent
                 {
-                    CategoryType = unit.CategoryType | extraCategory | (LimitedHits ? 0 : CategoryType.AoE),
+                    CategoryType = unit.CategoryType | (LimitedHits ? 0 : CategoryType.AoE),
                 });
                 
                 if (HasLifetime)
@@ -381,7 +374,7 @@ namespace Effects
     #region Arched Damage Collider
 
     [Serializable]
-    public class ArchedDamageColliderEffect : IEntityEffect
+    public class ArchedDamageColliderEffect : IEffect
     {
         [FoldoutGroup("Attack Damage", order: 1)]
         [OdinSerialize]
@@ -418,10 +411,8 @@ namespace Effects
         public float TrailScaleFactor = 1;
 
         public bool IsDamageEffect => true;
-
-        public void Perform(IAttacker unit) => Perform(unit, 0);
         
-        public void Perform(IAttacker unit, CategoryType extraCategory)
+        public void Perform(IAttacker unit)
         {
             float3 targetPosition = unit.AttackPosition;
             
@@ -462,7 +453,7 @@ namespace Effects
                 entityManager.SetComponentData(spawned, new InitTrailComponent { ScaleFactor = TrailScaleFactor });
                 entityManager.SetComponentData(spawned, new AddComponentInitComponent
                 {
-                    CategoryType = unit.CategoryType | CategoryType.Projectile | extraCategory,
+                    CategoryType = unit.CategoryType | CategoryType.Projectile,
                 });
 
                 entityManager.SetComponentData(spawned, new RandomComponent
@@ -528,14 +519,7 @@ namespace Effects
 
                 for (int i = 0; i < Effects.Count; i++)
                 {
-                    if (Effects[i] is IEntityEffect entityEffect)
-                    {
-                        entityEffect.Perform(unit, CategoryType.Projectile | extraCategory);
-                    }
-                    else
-                    {
-                        Effects[i].Perform(unit);
-                    }
+                    Effects[i].Perform(unit);
                 }
             }
         }
@@ -652,7 +636,6 @@ namespace Effects
             {
                 Source = unit,
                 Damage = damage,
-                TargetHit = damageToDOT.TargetHit,
                 CritMultiplier = unit.Stats.GetCritMultiplier(),
                 SpecialEffectSet = damageToDOT.SpecialEffectSet,
                 AttackPosition = damageToDOT.AttackPosition,
@@ -663,16 +646,16 @@ namespace Effects
             for (int i = 0; i < ticks; i++)
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(tickRate));
-                if (dotInstance.TargetHit == null)
-                {
-                    break;
-                }
-
+                //if (dotInstance.TargetHit == null)
+                //{
+                //    break;
+                //}
+                //
                 //dotInstance.AttackPosition = dotInstance.TargetHit.OriginPosition;
-                dotInstance.TargetHit.TakeDamage(dotInstance, out DamageInstance damageDone);
+                //dotInstance.TargetHit.TakeDamage(dotInstance, out DamageInstance damageDone);
 
-                damageDone.SpecialEffectSet.Add(EffectKey);
-                unit.OnUnitDoneDamage(damageDone);
+                //damageDone.SpecialEffectSet.Add(EffectKey);
+                //unit.OnUnitDoneDamage(damageDone);
             }
         }
 
@@ -748,77 +731,6 @@ namespace Effects
             }
 
             ModifierDictionary.Remove(unit);
-        }
-    }
-
-    #endregion
-
-    #region Health Condition
-
-    [Serializable]
-    public class HealthConditionalEffect : IEffect
-    {
-        [TitleGroup("Health Percent")]
-        [OdinSerialize]
-        public float ModifierValue { get; set; } = 0.5f;
-
-        [TitleGroup("Health Percent")]
-        [OdinSerialize]
-        private IEffect EffectToTrigger;
-
-        [TitleGroup("Health Percent")]
-        public bool TriggerOnce = true;
-
-        private HashSet<IAttacker> TriggeredUnits;
-        
-        public bool IsDamageEffect => false;
-
-        public void Perform(IAttacker unit)
-        {
-            if (unit is not IHealth health)
-            {
-                return;
-            }
-            
-            if (TriggeredUnits == null)
-            {
-                TriggeredUnits = new HashSet<IAttacker>();
-            }
-
-            if (TriggerOnce && TriggeredUnits.Contains(unit))
-            {
-                return;
-            }
-
-            if (health.Health.HealthPercentage <= ModifierValue)
-            {
-                EffectToTrigger.Perform(unit);
-
-                if (TriggerOnce)
-                {
-                    TriggeredUnits.Add(unit);
-                }
-            }
-        }
-
-        public void Revert(IAttacker unit)
-        {
-            if (TriggeredUnits == null)
-            {
-                return;
-            }
-
-            if (TriggerOnce)
-            {
-                if (!TriggeredUnits.Contains(unit))
-                {
-                    return;
-                }
-
-                TriggeredUnits.Remove(unit);
-            }
-
-            EffectToTrigger.Revert(unit);
         }
     }
 
@@ -949,52 +861,7 @@ namespace Effects
     }
 
     #endregion
-
-    #region Status Effect
-
-    [Serializable]
-    public class StatusEffectEffect : IEffect
-    {
-        [Title("Duration")]
-        [OdinSerialize]
-        public float ModifierValue { get; set; } = 1;
-
-        [InfoBox("Applies the effect to the user of the skill")]
-        [SerializeField]
-        private StatusEffect statusEffect;
-
-        public bool IsDamageEffect => false;
-
-        public async void Perform(IAttacker unit)
-        {
-            try // Because of async
-            {
-                if (unit is not IHealth health)
-                {
-                    return;
-                }
-            
-                health.Health.StatusEffects.Add(statusEffect);
-
-                await UniTask.Delay(TimeSpan.FromSeconds(ModifierValue));
-
-                health.Health.StatusEffects.Remove(statusEffect);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-            }
-        }
-
-        public void Revert(IAttacker unit)
-        {
-            
-        }
-    }
-
-
-    #endregion
-
+    
     #region Targeted Effect
 
     [Serializable]

@@ -1,3 +1,4 @@
+using System;
 using Unity.Entities;
 using Unity.Rendering;
 
@@ -23,10 +24,11 @@ namespace Health
         public float Value;
     }
     
+    [Flags]
     public enum HealthType : byte
     {
-        Health,
-        Armor,
-        Shield
+        Health = 1 << 0,
+        Armor = 1 << 1,
+        Shield = 1 << 2
     }
 }

@@ -3,6 +3,8 @@ using UnityEngine;
 using Gameplay;
 using Effects;
 using Gameplay.Money;
+using Gameplay.Upgrades.ECS;
+using Health;
 
 namespace Exp.Gemstones
 {
@@ -122,5 +124,57 @@ namespace Exp.Gemstones
 
         public string GetDescription() => EffectDescription;
         public IGemstoneEffect Copy() => new IncreaseExpEffect(this);
+    }
+    
+    public class IncreaseProjectileDamageEffect : IGemstoneEffect
+    {
+        public string EffectDescription;
+        public float Value { get; set; }
+
+        public IncreaseProjectileDamageEffect() { }
+        public IncreaseProjectileDamageEffect(IncreaseProjectileDamageEffect copy)
+        {
+            EffectDescription = copy.EffectDescription;
+            Value = copy.Value;
+        }
+
+        public void PerformEffect()
+        {
+            GameDataManager.Instance.IncreaseGameData(new MultiplyDamageComponent
+            {
+                AppliedCategory = CategoryType.Projectile,
+                AppliedHealthType = HealthType.Health | HealthType.Armor | HealthType.Shield,
+                DamageMultiplier = Value,
+            });
+        }
+
+        public string GetDescription() => EffectDescription;
+        public IGemstoneEffect Copy() => new IncreaseProjectileDamageEffect(this);
+    }
+    
+    public class IncreaseSplashDamageEffect : IGemstoneEffect
+    {
+        public string EffectDescription;
+        public float Value { get; set; }
+
+        public IncreaseSplashDamageEffect() { }
+        public IncreaseSplashDamageEffect(IncreaseSplashDamageEffect copy)
+        {
+            EffectDescription = copy.EffectDescription;
+            Value = copy.Value;
+        }
+
+        public void PerformEffect()
+        {
+            GameDataManager.Instance.IncreaseGameData(new MultiplyDamageComponent
+            {
+                AppliedCategory = CategoryType.AoE,
+                AppliedHealthType = HealthType.Health | HealthType.Armor | HealthType.Shield,
+                DamageMultiplier = Value,
+            });
+        }
+
+        public string GetDescription() => EffectDescription;
+        public IGemstoneEffect Copy() => new IncreaseSplashDamageEffect(this);
     }
 }

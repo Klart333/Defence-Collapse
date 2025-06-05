@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Gameplay.Upgrades;
 using UnityEngine;
 using Effects;
+using System;
 
 namespace Exp.Gemstones
 {
@@ -22,13 +22,18 @@ namespace Exp.Gemstones
         private async UniTaskVoid GetExpManager()
         {
             expManager = await ExpManager.Get();
-            
+
+            ActivateGemstones(expManager.ActiveGemstones);
+        }
+
+        private void ActivateGemstones(List<Gemstone> gemstones)
+        {
             Dictionary<StatType, float> stats = new Dictionary<StatType, float>();
             Dictionary<StatType, StatIncreaseEffect> statIncreaseEffects = new Dictionary<StatType, StatIncreaseEffect>();
             
             Dictionary<Type, IGemstoneEffect> uniqueGemEffects = new Dictionary<Type, IGemstoneEffect>();
 
-            foreach (Gemstone activeGemstone in expManager.ActiveGemstones)
+            foreach (Gemstone activeGemstone in gemstones)
             {
                 ActivateGemstoneEffect(activeGemstone);
             }

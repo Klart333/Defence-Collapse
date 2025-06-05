@@ -4,7 +4,6 @@ using UnityEngine;
 public class DamageInstance
 {
     public IAttacker Source;
-    public IHealth TargetHit;
 
     public float Damage;
     public float CritMultiplier;
@@ -17,7 +16,6 @@ public class DamageInstance
     public DamageInstance(DamageInstance damage)
     {
         Source = damage.Source;
-        TargetHit = damage.TargetHit;
         Damage = damage.Damage;
         CritMultiplier = damage.CritMultiplier;
         AttackPosition = damage.AttackPosition;
@@ -31,7 +29,6 @@ public class DamageInstance
         
         AttackPosition = default;
         SpecialEffectSet = null;
-        TargetHit = null;
         Source = null;
     }
 

@@ -1,9 +1,10 @@
 using WaveFunctionCollapse;
+using Health;
 
 namespace Buildings
 {
     [System.Serializable]
-    public class BarricadeState : IHealth, IHealthState
+    public class BarricadeState : IHealthState
     {
         private BarricadeHandler handler;
 

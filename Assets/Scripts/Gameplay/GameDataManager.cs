@@ -1,7 +1,12 @@
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Gameplay.Upgrades.ECS;
+using Gameplay.Upgrades;
 using Unity.Entities;
 using Effects.ECS;
 using UnityEngine;
+using Health;
+using System;
 
 namespace Gameplay
 {
@@ -15,6 +20,9 @@ namespace Gameplay
         [SerializeField]
         private PoisonTickDataComponent defaultPoisonTickData;
         
+        private Dictionary<Tuple<CategoryType, HealthType>, MultiplyDamageComponent> multiplyDamageComponents = new Dictionary<Tuple<CategoryType, HealthType>, MultiplyDamageComponent>(); 
+        private Dictionary<Tuple<CategoryType, HealthType>, Entity> multiplyDamageEntities = new Dictionary<Tuple<CategoryType, HealthType>, Entity>();
+            
         private EntityManager entityManager;
         private Entity fireDataEntity;
         private Entity poisonDataEntity;
@@ -58,11 +66,32 @@ namespace Gameplay
                     fireTickData.TickRate = 1.0f / ((1.0f / fireTickData.TickRate) * fireTickDataIncrease.TickRate);
                     entityManager.SetComponentData(fireDataEntity, fireTickData);
                     break;
+                
                 case PoisonTickDataComponent poisonTickDataIncrease:
                     poisonTickData.TickDamage += poisonTickDataIncrease.TickDamage;
                     poisonTickData.TickRate = 1.0f / ((1.0f / poisonTickData.TickRate) * poisonTickDataIncrease.TickRate);
                     entityManager.SetComponentData(poisonDataEntity, poisonTickData);
                     break;
+                case MultiplyDamageComponent damageComponent:
+                    AddMultiplyDamageComponent(damageComponent);
+                    break;
+            }
+        }
+
+        private void AddMultiplyDamageComponent(MultiplyDamageComponent damageComponent)
+        {
+            Tuple<CategoryType, HealthType> key = Tuple.Create(damageComponent.AppliedCategory, damageComponent.AppliedHealthType);
+            if (multiplyDamageComponents.TryGetValue(key, out MultiplyDamageComponent multiplyDamageComponent))
+            {
+                multiplyDamageComponent.DamageMultiplier *= damageComponent.DamageMultiplier;
+                entityManager.SetComponentData(multiplyDamageEntities[key], multiplyDamageComponent);
+            }
+            else
+            {
+                Entity entity = entityManager.CreateEntity();
+                entityManager.AddComponentData(entity, damageComponent);
+                multiplyDamageComponents.Add(key, damageComponent);
+                multiplyDamageEntities.Add(key, entity);
             }
         }
     }

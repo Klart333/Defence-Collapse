@@ -5,22 +5,26 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
-[InlineEditor, CreateAssetMenu(fileName = "New StatusEffect", menuName = "StatusEffect/StatusEffect")]
-public class StatusEffect : SerializedScriptableObject
+namespace Effects
 {
-    [Title("Info")]
-    public Sprite Icon;
-    public string Description;
-
-    [Title("Effects")]
-    [OdinSerialize, NonSerialized]
-    public List<IStatusEffect> Effects;
-
-    public void TriggerEFfect(ref DamageInstance damageInstance)
+    [InlineEditor, CreateAssetMenu(fileName = "New StatusEffect", menuName = "StatusEffect/StatusEffect")]
+    public class StatusEffect : SerializedScriptableObject
     {
-        for (int i = 0; i < Effects.Count; i++)
+        [Title("Info")]
+        public Sprite Icon;
+
+        public string Description;
+
+        [Title("Effects")]
+        [OdinSerialize, NonSerialized]
+        public List<IStatusEffect> Effects;
+
+        public void TriggerEFfect(ref DamageInstance damageInstance)
         {
-            Effects[i].Perform(ref damageInstance);
+            for (int i = 0; i < Effects.Count; i++)
+            {
+                Effects[i].Perform(ref damageInstance);
+            }
         }
     }
 }

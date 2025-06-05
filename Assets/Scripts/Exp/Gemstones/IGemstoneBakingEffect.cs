@@ -1,10 +1,10 @@
-using System;
 using Random = System.Random;
-using Sirenix.Serialization;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using Gameplay.Upgrades;
 using UnityEngine;
 using Effects;
+using System;
 
 namespace Exp.Gemstones
 {
@@ -13,7 +13,7 @@ namespace Exp.Gemstones
         public IGemstoneEffect GetEffect(int level, Random random);
     }
     
-    [System.Serializable]
+    [Serializable]
     public class StatIncreaseBakeEffect : IGemstoneBakingEffect
     {
         [Title("Curve")]
@@ -64,7 +64,7 @@ namespace Exp.Gemstones
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class GameSpeedIncreaseBakeEffect : IGemstoneBakingEffect
     {
         [Title("Curve")]
@@ -95,7 +95,7 @@ namespace Exp.Gemstones
         }
     }
     
-    [System.Serializable]
+    [Serializable]
     public class MoneyIncreaseBakeEffect : IGemstoneBakingEffect
     {
         [Title("Curve")]
@@ -153,6 +153,51 @@ namespace Exp.Gemstones
             {
                 Value = value,
                 EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseExpEffect), value),
+            };
+        }
+    }
+    
+    [Serializable]
+    public class CategoryDamageIncreaseBakeEffect : IGemstoneBakingEffect
+    {
+        [Title("Curve")]
+        [SerializeField]
+        private AnimationCurve levelToGainCurve;
+
+        [SerializeField]
+        private float randomness = 0.05f;
+        
+        [Title("Description")]
+        [SerializeField]
+        private GemstoneEffectDescriptions effectDescriptions;
+        
+        [Title("Category")]
+        [SerializeField]
+        private CategoryType appliedCategory;
+        
+        public float GetEffectValue(int level, Random random)
+        {
+            float value = levelToGainCurve.Evaluate(level);
+            return value + value * (float)(random.NextDouble() * 2.0f - 1.0f) * randomness;        
+        }
+
+        public IGemstoneEffect GetEffect(int level, Random random)
+        {
+            float value = GetEffectValue(level, random);
+
+            return appliedCategory switch
+            {
+                CategoryType.Projectile => new IncreaseProjectileDamageEffect
+                {
+                    Value = value,
+                    EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseProjectileDamageEffect), value),
+                },
+                CategoryType.AoE => new IncreaseSplashDamageEffect
+                {
+                    Value = value,
+                    EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseSplashDamageEffect), value),
+                },
+                _ => throw new ArgumentOutOfRangeException()
             };
         }
     }
