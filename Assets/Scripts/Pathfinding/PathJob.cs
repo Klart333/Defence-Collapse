@@ -36,23 +36,35 @@ public struct PathJob : IJobFor
     
     private void CalculatePathAtIndex(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int index)
     {
-        if (pathChunk.TargetIndexes[index] != 0)
-        {
-            pathChunk.Distances[index] = pathChunk.TargetIndexes[index] * 50; // 100 is the weight of one tile
-            pathChunk.Directions[index] = byte.MaxValue;
-            return;
-        }
+        byte targetIndex = pathChunk.TargetIndexes[index];
 
-        if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int shortestDistance, out int dirIndex)) return;
-            
-        pathChunk.Directions[index] = GetDirection(PathManager.NeighbourDirections[dirIndex]);
-        if (pathChunk.NotWalkableIndexes[index])
+        switch (targetIndex)
         {
-            pathChunk.Distances[index] = 1_000_000_000;  
-        }
-        else
-        {
-            pathChunk.Distances[index] = shortestDistance;
+            // Handle common case first (targetIndex == 0, ~99%)
+            case 0:
+            {
+                if (!GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out int dirIdx))
+                {
+                    pathChunk.Directions[index] = GetDirection(PathManager.NeighbourDirections[dirIdx]);
+                    pathChunk.Distances[index] = pathChunk.NotWalkableIndexes[index] ? 1_000_000_000 : dist;
+                }
+                return;
+            }
+            // Handle barricade case (targetIndex == 255)
+            case byte.MaxValue:
+            {
+                if (!GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out _))
+                {
+                    pathChunk.Directions[index] = byte.MaxValue;
+                    pathChunk.Distances[index] = dist;
+                }
+                return;
+            }
+            default:
+                // Handle building case (targetIndex 1-254)
+                pathChunk.Distances[index] = targetIndex * 50;
+                pathChunk.Directions[index] = byte.MaxValue;
+                break;
         }
     }
 

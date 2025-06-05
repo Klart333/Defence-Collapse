@@ -42,7 +42,7 @@ public class BuildingAnimator : MonoBehaviour
 
     public void Animate(IBuildable building)
     {
-        if (building is Building or Path)
+        if (building is Building or Barricade)
         {
             SpawnParticle(building);
         }

@@ -96,6 +96,11 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
     public void RemoveBuiltIndex(ChunkIndex builtIndex)
     {
+        if (!waveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z])
+        {
+            return; // Index is not built
+        }
+        
         // Reset Indexes
         waveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z] = false;
         List<ChunkIndex> chunkIndexes = this.GetCellsSurroundingMarchedIndex(builtIndex);

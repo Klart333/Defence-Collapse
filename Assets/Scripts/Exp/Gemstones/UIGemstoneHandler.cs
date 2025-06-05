@@ -40,7 +40,7 @@ namespace Exp.Gemstones
             gameObject.SetActive(true);
             canvasGroup.alpha = 0;
             canvasGroup.interactable = false;
-            canvasGroup.DOFade(1, fadeInDuration).SetEase(fadeInEase).IgnoreGameSpeed(GameSpeedManager.Instance).onComplete = () => canvasGroup.interactable = true;
+            canvasGroup.DOFade(1, fadeInDuration).SetEase(fadeInEase).onComplete = () => canvasGroup.interactable = true;
             
             int exp = FindFirstObjectByType<UIGameOverExpHandler>().ExpGained;
             int level = (int)expToLevelCurve.Evaluate(exp);
@@ -57,7 +57,7 @@ namespace Exp.Gemstones
         public void SelectGemstone(Gemstone gemstone)
         {
             canvasGroup.DOKill();
-            canvasGroup.DOFade(0, fadeOutDuration).SetEase(fadeOutEase).IgnoreGameSpeed(GameSpeedManager.Instance).onComplete = () => gameObject.SetActive(false);
+            canvasGroup.DOFade(0, fadeOutDuration).SetEase(fadeOutEase).onComplete = () => gameObject.SetActive(false);
             ExpManager.Instance.AddGemstone(gemstone);
         }
     }

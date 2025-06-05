@@ -65,9 +65,9 @@ public static class Extensions
         return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
     }
 
-    public static Tween IgnoreGameSpeed(this Tween tween, IGameSpeed gameSpeed)
+    public static Tween ScaleWithGameSpeed(this Tween tween, IGameSpeed gameSpeed)
     {
-        tween.timeScale = 1.0f / gameSpeed.Value;
+        tween.timeScale *= gameSpeed.Value;
         return tween;
     }
 }

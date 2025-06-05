@@ -375,7 +375,7 @@ public class BuildingPlacer : MonoBehaviour
         
         MoneyManager.Instance.AddMoneyParticles(MoneyManager.Instance.BuildingCost, hoveredSquare.transform.position);
         
-        buildingHandler.BuildingDestroyed(SquareIndex.Value).Forget();
+        buildingHandler.BuildingDestroyed(SquareIndex.Value);
     }
 
     private void OnBuiltIndexDestroyed(ChunkIndex chunkIndex)

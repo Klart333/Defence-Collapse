@@ -18,7 +18,7 @@ namespace Juice
         public void Spin()
         {
             transform.DOKill(); 
-            transform.DOBlendableLocalRotateBy(new Vector3(0, 0, totalDegrees), duration).SetEase(ease).IgnoreGameSpeed(GameSpeedManager.Instance);
+            transform.DOBlendableLocalRotateBy(new Vector3(0, 0, totalDegrees), duration).SetEase(ease).ScaleWithGameSpeed(GameSpeedManager.Instance);
         } 
     }
 }

@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
+using DataStructures.Queue.ECS;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using UnityEngine.Events;
+using Pathfinding;
 using UnityEngine;
 
 namespace Buildings
 {
-    public class Path : PooledMonoBehaviour, IBuildable
+    public class Barricade : PooledMonoBehaviour, IBuildable
     {
         [Title("Visual")]
         [SerializeField]
@@ -29,6 +31,9 @@ namespace Buildings
         private Collider[] cornerColliders;
 
         [SerializeField]
+        private Indexer indexer;
+        
+        [SerializeField]
         private BuildableCornerData buildableCornerData;
         
         [Title("Events")]
@@ -42,10 +47,12 @@ namespace Buildings
         private readonly List<Material> transparentRemoveMaterials = new List<Material>();
 
         private MeshRenderer meshRenderer;
+        private BarricadeHandler barricadeHandler;
         
         public PrototypeData PrototypeData { get; private set; }
         public ChunkIndex ChunkIndex { get; private set; }
 
+        public BarricadeHandler BarricadeHandler => barricadeHandler ??= FindAnyObjectByType<BarricadeHandler>();
         public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
         public MeshWithRotation MeshRot => PrototypeData.MeshRot;
         public Transform MeshTransform => meshTransform;
@@ -66,12 +73,16 @@ namespace Buildings
             {
                 cornerColliders[i].gameObject.SetActive(false);
             }
+
+            BarricadeHandler?.RemoveBarricade(this);
             
             OnResetEvent?.Invoke();
         }
 
         public void Setup(PrototypeData prototypeData, ChunkIndex index, Vector3 scale)
         {
+            if (prototypeData.MeshRot.MeshIndex == -1) return;
+            
             ChunkIndex = index;
             PrototypeData = prototypeData;
             transform.localScale = scale;
@@ -98,8 +109,31 @@ namespace Buildings
             {
                 MeshRenderer.SetMaterials(materialData.GetMaterials(PrototypeData.MaterialIndexes));
 
-                SetColliders();
-                OnPlacedEvent?.Invoke();
+                Place();
+            }
+        }
+
+        private void Place()
+        { 
+            SetColliders();
+
+            indexer.OnRebuilt += IndexerOnOnRebuilt;
+            indexer.NeedsRebuilding = true;
+            indexer.DelayFrames = 1;
+
+            BarricadeHandler.AddBarricade(this);
+            OnPlacedEvent?.Invoke();
+        }
+
+        private void IndexerOnOnRebuilt()
+        {
+            indexer.OnRebuilt -= IndexerOnOnRebuilt;
+        
+            ChunkIndex chunkIndex = ChunkIndex;
+            for (int i = 0; i < indexer.Indexes.Count; i++)
+            {
+                PathIndex index = indexer.Indexes[i];
+                AttackingSystem.DamageEvent.TryAdd(index, x => BarricadeHandler.BarricadeTakeDamage(chunkIndex, x, index));
             }
         }
 

@@ -32,7 +32,7 @@ namespace Pathfinding
         private float updateTimer;
         private int updateIndex;
         
-        private bool Displaying => isDisplaying || PathPlacer.Displaying;
+        private bool Displaying => isDisplaying || BarricadePlacer.Displaying;
         
         private void OnEnable()
         {

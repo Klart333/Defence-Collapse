@@ -85,7 +85,7 @@ namespace Pathfinding
 
             TargetPathSet = new BytePathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].TargetIndexes);
             GetPathInformation += TargetPathSet.RebuildTargetHashSet;
-
+            
             BarricadePathSet = new IntPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].MovementCosts, 3_000);
             GetPathInformation += BarricadePathSet.RebuildTargetHashSet;
             

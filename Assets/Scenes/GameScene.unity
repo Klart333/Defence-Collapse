@@ -2127,9 +2127,9 @@ MonoBehaviour:
   lifetime:
     minValue: 0.2924257
     maxValue: 0.37727287
-  useGameSpeed: 1
   readScale: 0
   targetScale: {x: 1, y: 1, z: 1}
+  useGameSpeed: 1
   verbose: 0
 --- !u!1 &231546244
 GameObject:
@@ -2228,7 +2228,7 @@ MonoBehaviour:
     - Name: WallStates
       Entry: 7
       Data: 4|System.Collections.Generic.Dictionary`2[[WaveFunctionCollapse.ChunkIndex,
-        Core],[WallState, Core]], mscorlib
+        Core],[Buildings.WallState, Core]], mscorlib
     - Name: comparer
       Entry: 7
       Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[WaveFunctionCollapse.ChunkIndex,
@@ -6090,7 +6090,7 @@ GameObject:
   - component: {fileID: 678610538}
   - component: {fileID: 678610539}
   m_Layer: 0
-  m_Name: PathGenerator
+  m_Name: Barricade Generator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6129,7 +6129,7 @@ MonoBehaviour:
     protoypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
   townPrototypeInfo: {fileID: 11400000, guid: 06448ddcf14d33643a6d82f2600a6aba, type: 2}
   prototypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
-  pathPrefab: {fileID: 4495732854823147107, guid: 484727eef20b98044ad4c2a101b87638,
+  barricadePrefab: {fileID: 4495732854823147107, guid: 484727eef20b98044ad4c2a101b87638,
     type: 3}
   unableToPlacePrefab: {fileID: -7155613184035295475, guid: 37457fca56525af4bab8884b7e239b05,
     type: 3}
@@ -9293,6 +9293,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1139055278}
   m_CullTransparentMesh: 1
+--- !u!1 &1149199776
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1149199777}
+  - component: {fileID: 1149199778}
+  m_Layer: 0
+  m_Name: BarricadeHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1149199777
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1149199776}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1411626119}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1149199778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1149199776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdd807e1e03946a1add9c7818bca5af9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  barricadeGenerator: {fileID: 678610539}
+  barricadeData: {fileID: 11400000, guid: d21335498d9239f40a7e2d361a9cd75b, type: 2}
+  wallHealthPrefab: {fileID: 8076456587786540754, guid: 8bcb529399dcaa64db959cd50af7de59,
+    type: 3}
+  canvasParent: {fileID: 448074541}
 --- !u!33 &1154437998 stripped
 MeshFilter:
   m_CorrespondingSourceObject: {fileID: 6009450562813160446, guid: f8d6d4cb9e7edcc48afdf101345acab7,
@@ -11191,6 +11240,7 @@ Transform:
   - {fileID: 134512422}
   - {fileID: 163547865}
   - {fileID: 1721988427}
+  - {fileID: 1149199777}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1416224650

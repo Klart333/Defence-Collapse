@@ -15,13 +15,13 @@ namespace Juice
         private RangedFloat lifetime = new RangedFloat(0, 3);
 
         [SerializeField]
-        private bool useGameSpeed = true;
-
-        [SerializeField]
-        private bool readScale = false;
+        private bool readScale;
 
         [SerializeField, HideIf(nameof(readScale))]
         private Vector3 targetScale = Vector3.one;
+
+        [SerializeField]
+        private bool useGameSpeed;
         
         [Title("Debug")]
         [SerializeField]
@@ -47,9 +47,9 @@ namespace Juice
             
             transform.localScale = Vector3.zero;
             PopupTween = transform.DOScale(endValue, lifetime.Random()).SetEase(easeType);
-            if (!useGameSpeed)
+            if (useGameSpeed)
             {
-                PopupTween.IgnoreGameSpeed(gameSpeed);
+                PopupTween.ScaleWithGameSpeed(gameSpeed);
             }
         }
 

@@ -99,7 +99,7 @@ GameObject:
   - component: {fileID: 1649696581304670774}
   - component: {fileID: 7240555027245093624}
   m_Layer: 7
-  m_Name: PathPrefab
+  m_Name: BarricadePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -148,6 +148,7 @@ MonoBehaviour:
   - {fileID: 2965888784788425425}
   - {fileID: 1355913624577011758}
   - {fileID: 1074454691882807340}
+  indexer: {fileID: 1649696581304670774}
   buildableCornerData: {fileID: 11400000, guid: bdd32e464bbc9544c97b006854095cdc,
     type: 2}
   OnPlacedEvent:

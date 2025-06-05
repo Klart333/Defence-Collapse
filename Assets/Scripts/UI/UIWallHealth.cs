@@ -1,3 +1,4 @@
+using Buildings;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using UnityEngine.UI;
@@ -57,7 +58,7 @@ namespace UI
         [SerializeField]
         private Vector2 canvasPivot;
 
-        private WallState wallState;
+        private IHealthState healthState;
         private Vector3 targetPosition;
         private Canvas canvas;
         private Tween dangerTween;
@@ -74,20 +75,20 @@ namespace UI
             cam = Camera.main;
         }
         
-        public void Setup(WallState wallData, float startHealth, Canvas canvas)
+        public void Setup(IHealthState state, float startHealth, Canvas canvas)
         {
-            wallState = wallData;
+            healthState = state;
 
             this.canvas = canvas;
-            fillImage.fillAmount = startHealth / wallState.Health.MaxHealth;
+            fillImage.fillAmount = startHealth / healthState.Health.MaxHealth;
             fillImage.color = fillGradient.Evaluate(fillImage.fillAmount);
             canvasGroup.DOFade(1, fadeInDuration).SetEase(fadeInEase);
-            targetPosition = BuildingManager.Instance.GetPos(wallState.Index) + BuildingManager.Instance.CellSize / 2.0f;
-            inDanger = wallState.Health.HealthPercentage < dangerThreshold;
+            targetPosition = BuildingManager.Instance.GetPos(healthState.Index) + BuildingManager.Instance.CellSize / 2.0f;
+            inDanger = healthState.Health.HealthPercentage < dangerThreshold;
             
             Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
-            wallState.Health.OnHealthChanged += OnHealthChanged;
-            wallState.Health.OnDeath += OnDeath;
+            healthState.Health.OnHealthChanged += OnHealthChanged;
+            healthState.Health.OnDeath += OnDeath;
         }
 
         protected override void OnDisable()
@@ -106,11 +107,11 @@ namespace UI
             dangerGroup.alpha = 0;
             fadeOutTimer = fadeOutDelay;
             
-            if (wallState != null)
+            if (healthState != null)
             {
-                wallState.Health.OnHealthChanged -= OnHealthChanged;
-                wallState.Health.OnDeath -= OnDeath;
-                wallState = null;
+                healthState.Health.OnHealthChanged -= OnHealthChanged;
+                healthState.Health.OnDeath -= OnDeath;
+                healthState = null;
             }
             
             Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
@@ -139,7 +140,7 @@ namespace UI
         {
             if (inDanger)
             {
-                float percent = 1.0f - (wallState.Health.HealthPercentage / dangerThreshold);
+                float percent = 1.0f - (healthState.Health.HealthPercentage / dangerThreshold);
                 Color col = dangerImage.color;
                 col.a = percent;
                 dangerImage.color = col;
@@ -160,7 +161,7 @@ namespace UI
 
         private void OnBuiltIndexDestroyed(ChunkIndex chunkIndex)
         {
-            if (wallState.Index.Equals(chunkIndex))
+            if (healthState.Index.Equals(chunkIndex))
             {
                 OnDeath();
             }
@@ -175,14 +176,14 @@ namespace UI
         {
             fadeOutTimer = fadeOutDelay;
             canvasGroup.alpha = 1;
-            inDanger = wallState.Health.HealthPercentage < dangerThreshold;
+            inDanger = healthState.Health.HealthPercentage < dangerThreshold;
             
             TweenFill();
         }
 
         public void TweenFill()
         {
-            float percent = wallState.Health.HealthPercentage;
+            float percent = healthState.Health.HealthPercentage;
             float diff = fillImage.fillAmount - percent;
             float duration = diff / fillSpeed;
             fillImage.DOKill();

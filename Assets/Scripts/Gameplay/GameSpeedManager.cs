@@ -26,8 +26,6 @@ namespace Gameplay
         private Modifier speedUpModifier;
         private Stat gameSpeedStat;
         
-        private bool updatingGameSpeed = false;
-
         public float Value => gameSpeedStat.Value;
 
         protected override void Awake()
@@ -70,14 +68,6 @@ namespace Gameplay
             inputManager.Space.canceled -= SpaceCanceled;
         }
 
-        private void Update()
-        {
-            if (!updatingGameSpeed && !Mathf.Approximately(DOTween.timeScale, Value))
-            {
-                DOTween.timeScale = Value;
-            }
-        }
-
         private void SpaceStarted(InputAction.CallbackContext obj)
         {
             gameSpeedStat.AddModifier(speedUpModifier);
@@ -102,32 +92,23 @@ namespace Gameplay
                 slowDownTween.Kill();
             }
             
-            updatingGameSpeed = true;
-            
             slowDownTween = DOTween.To(() => gameSpeedStat.BaseValue, v =>
             {
                 gameSpeedStat.BaseValue = v;
                 entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
-            }, targetSpeed, lerpDuration).SetEase(Ease.OutSine).SetUpdate(true);
-            
-            slowDownTween.onComplete = () =>
-            {
-                updatingGameSpeed = false;
-            };
+            }, targetSpeed, lerpDuration).SetEase(Ease.OutSine);
         }
         
         public void SetBaseGameSpeed(float targetSpeed)
         {
             gameSpeedStat.BaseValue = targetSpeed;
             entityManager.AddComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
-            DOTween.timeScale = Value;
         }
         
         private void OnGameReset()
         {
             gameSpeedStat.BaseValue = 1;
             gameSpeedStat.RemoveAllModifiers();
-            DOTween.timeScale = 1;
         }
 
         public void AddModifier(Modifier modifier)

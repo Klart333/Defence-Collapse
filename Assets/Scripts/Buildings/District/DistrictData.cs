@@ -180,7 +180,7 @@ namespace Buildings.District
 
         private void OnHoverEnter()
         {
-            if (DistrictPlacer.Placing || BuildingPlacer.Displaying || PathPlacer.Displaying)
+            if (DistrictPlacer.Placing || BuildingPlacer.Displaying || BarricadePlacer.Displaying)
             {
                 return;
             }
@@ -197,7 +197,7 @@ namespace Buildings.District
         {
             if (CameraController.IsDragging 
                 || UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()
-                || BuildingPlacer.Displaying || PathPlacer.Displaying || DistrictPlacer.Placing)
+                || BuildingPlacer.Displaying || BarricadePlacer.Displaying || DistrictPlacer.Placing)
             {
                 return;
             }

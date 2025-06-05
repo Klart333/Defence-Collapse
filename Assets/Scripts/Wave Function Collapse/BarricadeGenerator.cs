@@ -5,10 +5,11 @@ using UnityEngine;
 using System.Linq;
 using Buildings;
 using System;
+using UnityEngine.Serialization;
 
 namespace WaveFunctionCollapse
 {
-    public class PathGenerator : MonoBehaviour, IQueryWaveFunction
+    public class BarricadeGenerator : MonoBehaviour, IQueryWaveFunction
     {
         public event Action<QueryMarchedChunk> OnLoaded;
 
@@ -23,9 +24,10 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private ProtoypeMeshes prototypeMeshes;
 
+        [FormerlySerializedAs("pathPrefab")]
         [Title("Mesh")]
         [SerializeField]
-        private Path pathPrefab;
+        private Barricade barricadePrefab;
 
         [Title("Debug")]
         [SerializeField]
@@ -61,11 +63,13 @@ namespace WaveFunctionCollapse
             buildingAnimator = GetComponent<BuildingAnimator>();
 
             groundGenerator.OnChunkGenerated += LoadCells;
+            Events.OnBuiltIndexDestroyed += RemoveBuiltIndex;
         }
 
         private void OnDisable()
         {
             groundGenerator.OnChunkGenerated -= LoadCells;
+            Events.OnBuiltIndexDestroyed -= RemoveBuiltIndex;
         }
 
         private void LoadCells(Chunk chunk)
@@ -90,6 +94,11 @@ namespace WaveFunctionCollapse
 
         public void RemoveBuiltIndex(ChunkIndex builtIndex)
         {
+            if (!waveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z])
+            {
+                return; // Index is not built
+            }
+            
             // Reset Indexes
             waveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z] = false;
             List<ChunkIndex> chunkIndexes = this.GetCellsSurroundingMarchedIndex(builtIndex);
@@ -234,7 +243,7 @@ namespace WaveFunctionCollapse
 
         public IBuildable GenerateMesh(Vector3 position, ChunkIndex index, PrototypeData prototypeData, bool animate = false)
         {
-            Path building = pathPrefab.GetAtPosAndRot<Path>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
+            Barricade building = barricadePrefab.GetAtPosAndRot<Barricade>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0));
 
             building.Setup(prototypeData, index, waveFunction.CellSize);
 

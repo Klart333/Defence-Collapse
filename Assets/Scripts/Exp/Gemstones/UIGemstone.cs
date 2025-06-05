@@ -90,7 +90,7 @@ namespace Exp.Gemstones
         public void OnPointerEnter(PointerEventData eventData)
         {
             transform.DOKill();
-            transform.DOScale(hoverTargetScale, hoverDuration).SetEase(hoverEase).IgnoreGameSpeed(gameSpeed);
+            transform.DOScale(hoverTargetScale, hoverDuration).SetEase(hoverEase);
             
             if (Gemstone == null) return;
             
@@ -114,7 +114,7 @@ namespace Exp.Gemstones
         public void OnPointerExit(PointerEventData eventData)
         {
             transform.DOKill();
-            transform.DOScale(1, hoverDuration).SetEase(hoverEase).IgnoreGameSpeed(gameSpeed);
+            transform.DOScale(1, hoverDuration).SetEase(hoverEase);
 
             tooltipHandler.HideTooltip();
         }
@@ -127,7 +127,7 @@ namespace Exp.Gemstones
             }
             
             whiteOutImage.gameObject.SetActive(true);
-            whiteOutImage.DOFade(0, whiteOutDuration).SetEase(whiteOutEase).IgnoreGameSpeed(gameSpeed);
+            whiteOutImage.DOFade(0, whiteOutDuration).SetEase(whiteOutEase);
             
             tooltipHandler.HideTooltip();
             OnClick?.Invoke(Gemstone);

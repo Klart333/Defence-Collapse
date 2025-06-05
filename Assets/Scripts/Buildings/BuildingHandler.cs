@@ -8,6 +8,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using Pathfinding;
 using System.Linq;
+using Buildings;
 using UI;
 
 public class BuildingHandler : SerializedMonoBehaviour 
@@ -44,56 +45,50 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private HashSet<ChunkIndex> wallStatesWithHealth = new HashSet<ChunkIndex>();
     private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
-    private List<Building> buildingQueue = new List<Building>();
+    
+    private BuildingManager buildingManager;
     
     private int selectedGroupIndex = -1;
-    private bool isAddingBuildings;
     private int groupIndexCounter;
-    
+
+    private void OnEnable()
+    {
+        GetBuildingManager().Forget();
+    }
+
+    private async UniTaskVoid GetBuildingManager()
+    {
+        buildingManager = await BuildingManager.Get();
+    }
+
     #region Handling Groups
 
-    public async UniTaskVoid AddBuilding(Building building)
+    public void AddBuilding(Building building)
     {
-        buildingQueue.Add(building);
-        if (isAddingBuildings) return;
+        List<ChunkIndex> damageIndexes = buildingManager.GetSurroundingMarchedIndexes(building.ChunkIndex);
 
-        isAddingBuildings = true;
-        await UniTask.Yield();
-        
-        for (int i = 0; i < buildingQueue.Count; i++)
+        for (int j = 0; j < damageIndexes.Count; j++)
         {
-            List<ChunkIndex> damageIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(buildingQueue[i].ChunkIndex);
-
-            for (int j = 0; j < damageIndexes.Count; j++)
+            ChunkIndex damageIndex = damageIndexes[j];
+            if (!WallStates.ContainsKey(damageIndex))
             {
-                ChunkIndex damageIndex = damageIndexes[j];
-                if (!WallStates.ContainsKey(damageIndex))
-                {
-                    WallStates.Add(damageIndex, CreateData(damageIndex));
-                }
+                WallStates.Add(damageIndex, CreateData(damageIndex));
+            }
 
-                if (Buildings.TryGetValue(damageIndex, out HashSet<Building> buildings))
-                {
-                    buildings.Add(buildingQueue[i]);
-                }
-                else
-                {
-                    Buildings.Add(damageIndex, new HashSet<Building>(4) { buildingQueue[i] });
-                }
+            if (Buildings.TryGetValue(damageIndex, out HashSet<Building> buildings))
+            {
+                buildings.Add(building);
+            }
+            else
+            {
+                Buildings.Add(damageIndex, new HashSet<Building>(4) { building });
             }
         }
 
-        for (int i = 0; i < buildingQueue.Count; i++)
-        {
-            Building build = buildingQueue[i];
-            BuildingGroups.Add(++groupIndexCounter, new HashSet<Building> { build });
-            build.BuildingGroupIndex = groupIndexCounter;
-            build.PathTarget.Importance = 250;
-            CheckMerge(groupIndexCounter);
-        }
-        
-        buildingQueue.Clear();
-        isAddingBuildings = false;
+        BuildingGroups.Add(++groupIndexCounter, new HashSet<Building> { building });
+        building.BuildingGroupIndex = groupIndexCounter;
+        building.PathTarget.Importance = 250;
+        CheckMerge(groupIndexCounter);
     }
 
     private WallState CreateData(ChunkIndex chunkIndex)
@@ -133,14 +128,14 @@ public class BuildingHandler : SerializedMonoBehaviour
         foreach (Building building in BuildingGroups[targetGroup])
         {
             building.BuildingGroupIndex = targetGroup;
-            building.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 10);
+            building.PathTarget.Importance = (byte)Mathf.Max(254 - count * 5, 10);
         }
         BuildingGroups.Remove(groupToMerge);
     }
 
     private bool IsAdjacent(Building building1, Building building2)
     {
-        if (!ChunkWaveUtility.AreIndexesAdjacent(building1.ChunkIndex, building2.ChunkIndex, BuildingManager.Instance.ChunkSize.x, out int3 indexDiff))
+        if (!ChunkWaveUtility.AreIndexesAdjacent(building1.ChunkIndex, building2.ChunkIndex, buildingManager.ChunkSize.x, out int3 indexDiff))
         {
             return false;
         }
@@ -160,7 +155,7 @@ public class BuildingHandler : SerializedMonoBehaviour
     {
         if (!BuildingGroups.TryGetValue(building.BuildingGroupIndex, out HashSet<Building> builds)) return;
 
-        List<ChunkIndex> builtIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(building.ChunkIndex);
+        List<ChunkIndex> builtIndexes = buildingManager.GetSurroundingMarchedIndexes(building.ChunkIndex);
         foreach (ChunkIndex chunkIndex in builtIndexes)
         {
             if (Buildings.TryGetValue(chunkIndex, out HashSet<Building> buildings))
@@ -179,7 +174,7 @@ public class BuildingHandler : SerializedMonoBehaviour
             int count = builds.Count;
             foreach (Building groupBuilding in builds)  
             {
-                groupBuilding.PathTarget.Importance = (byte)Mathf.Max(255 - count * 5, 10);
+                groupBuilding.PathTarget.Importance = (byte)Mathf.Max(254 - count * 5, 10);
             }
         }
     }
@@ -191,7 +186,7 @@ public class BuildingHandler : SerializedMonoBehaviour
             //Debug.Log($"Damaged {damage} at {index}");
         }
         
-        List<ChunkIndex> damageIndexes = BuildingManager.Instance.GetSurroundingMarchedIndexes(index);
+        List<ChunkIndex> damageIndexes = buildingManager.GetSurroundingMarchedIndexes(index);
         damage /= damageIndexes.Count;
         bool didDamage = false;
         for (int i = 0; i < damageIndexes.Count; i++)
@@ -220,25 +215,20 @@ public class BuildingHandler : SerializedMonoBehaviour
             wallHealth.transform.SetParent(canvasParent.transform, false);
             wallHealth.Setup(state, startingHealth, canvasParent);
             wallHealth.TweenFill();
-            wallHealth.OnReturnToPool += WallHealthOnOnReturnToPool;
+            wallHealth.OnReturnToPool += OnReturnToPool;
 
-            void WallHealthOnOnReturnToPool(PooledMonoBehaviour obj)
+            void OnReturnToPool(PooledMonoBehaviour obj)
             {
-                wallHealth.OnReturnToPool -= WallHealthOnOnReturnToPool;
+                wallHealth.OnReturnToPool -= OnReturnToPool;
                 wallStatesWithHealth.Remove(damageIndex); 
             }
         }
     }
 
-    public async UniTaskVoid BuildingDestroyed(ChunkIndex chunkIndex)
+    public void BuildingDestroyed(ChunkIndex chunkIndex)
     {
-        BuildingManager.Instance.RevertQuery();
+        buildingManager.RevertQuery();
         districtGenerator.RevertQuery();
-        if (isAddingBuildings)
-        {
-            await UniTask.WaitWhile(() => isAddingBuildings);
-        }
-
         
         if (!Buildings.Remove(chunkIndex, out HashSet<Building> buildings))
         {
@@ -250,7 +240,7 @@ public class BuildingHandler : SerializedMonoBehaviour
         List<ChunkIndex> destroyedIndexes = new List<ChunkIndex>();
         foreach (Building building in buildings)
         {
-            if (BuildingManager.Instance.GetSurroundingMarchedIndexes(building.ChunkIndex).Any(x => !x.Equals(chunkIndex)))
+            if (buildingManager.GetSurroundingMarchedIndexes(building.ChunkIndex).Any(x => !x.Equals(chunkIndex)))
             {
                 continue;
             }
@@ -263,7 +253,6 @@ public class BuildingHandler : SerializedMonoBehaviour
         {
             Events.OnWallsDestroyed?.Invoke(destroyedIndexes);
         }
-        
         
         WallStates.Remove(chunkIndex);
         Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);

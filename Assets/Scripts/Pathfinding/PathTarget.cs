@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
-using System.Threading.Tasks;
-using Sirenix.OdinInspector;
 
 namespace Pathfinding
 {
@@ -60,7 +59,10 @@ namespace Pathfinding
             {
                 case PathTargetType.Blocker: PathManager.Instance.BlockerPathSet.Unregister(this); break;
                 case PathTargetType.Target: PathManager.Instance.TargetPathSet.Unregister(this); break;
-                case PathTargetType.Barricade: PathManager.Instance.BarricadePathSet.Unregister(this); break;
+                case PathTargetType.Barricade: 
+                    PathManager.Instance.TargetPathSet.Unregister(this);
+                    PathManager.Instance.BarricadePathSet.Unregister(this);
+                    break;
             }
 
             indexer.OnRebuilt -= OnRebuilt;
@@ -78,7 +80,11 @@ namespace Pathfinding
             {
                 case PathTargetType.Blocker: PathManager.Instance.BlockerPathSet.Register(this); break;
                 case PathTargetType.Target: PathManager.Instance.TargetPathSet.Register(this); break;
-                case PathTargetType.Barricade: PathManager.Instance.BarricadePathSet.Register(this); break;
+                case PathTargetType.Barricade: 
+                    Importance = byte.MaxValue;
+                    PathManager.Instance.BarricadePathSet.Register(this); 
+                    PathManager.Instance.TargetPathSet.Register(this);
+                    break;
             }
         }
 

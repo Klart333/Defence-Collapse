@@ -89,7 +89,7 @@ namespace Gameplay.GameOver
                 TextMeshProUGUI factorText = Instantiate(expTextFactorPrefab, expTextParent);
                 float targetHeight = factorText.rectTransform.rect.height;
                 factorText.rectTransform.sizeDelta = new Vector2(factorText.rectTransform.sizeDelta.x, 0);
-                factorText.rectTransform.DOSizeDelta(new Vector2(factorText.rectTransform.sizeDelta.x, targetHeight), fadeInFactorDuration * 0.6f).IgnoreGameSpeed(GameSpeedManager.Instance);
+                factorText.rectTransform.DOSizeDelta(new Vector2(factorText.rectTransform.sizeDelta.x, targetHeight), fadeInFactorDuration * 0.6f);
                 factorText.transform.SetAsFirstSibling();
                 string format = expFactors[i].FactorType switch
                 {
@@ -99,16 +99,16 @@ namespace Gameplay.GameOver
                 factorText.text = string.Format(expFactors[i].DisplayText, expFactors[i].GetDisplayLevel(level), exp.ToString(format));
                 
                 CanvasGroup canvasGroup = factorText.GetComponent<CanvasGroup>();
-                canvasGroup.DOFade(1, fadeInFactorDuration).SetEase(fadeInFactorEase).IgnoreGameSpeed(GameSpeedManager.Instance);
+                canvasGroup.DOFade(1, fadeInFactorDuration).SetEase(fadeInFactorEase);
                 await UniTask.Delay(TimeSpan.FromSeconds(fadeInFactorDuration * 0.9f));
                 
-                DOTween.To(x => expText.text = $"Exp: {x:N0}", currentExp, totalExp, textCountingDuration).SetEase(textCountingEase).IgnoreGameSpeed(GameSpeedManager.Instance);
+                DOTween.To(x => expText.text = $"Exp: {x:N0}", currentExp, totalExp, textCountingDuration).SetEase(textCountingEase);
                 await UniTask.Delay(TimeSpan.FromSeconds(textCountingDuration * 1f));
-                expText.transform.DOPunchScale(Vector3.one * 0.05f, 0.1f).IgnoreGameSpeed(GameSpeedManager.Instance);;
+                expText.transform.DOPunchScale(Vector3.one * 0.05f, 0.1f);;
             }
 
             await UniTask.Delay(TimeSpan.FromSeconds(textCountingDuration * 0.15f));
-            expText.transform.DOPunchScale(Vector3.one * 0.2f, 0.2f).IgnoreGameSpeed(GameSpeedManager.Instance);;
+            expText.transform.DOPunchScale(Vector3.one * 0.2f, 0.2f);;
         }
     }
 }

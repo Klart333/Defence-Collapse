@@ -241,6 +241,18 @@ public class Building : PooledMonoBehaviour, IBuildable
 
     private void Place()
     {
+        SetColliders();
+        
+        indexer.OnRebuilt += IndexerOnOnRebuilt;
+        indexer.NeedsRebuilding = true;
+        indexer.DelayFrames = 1;
+        
+        BuildingHandler.AddBuilding(this);
+        OnPlacedEvent?.Invoke();
+    }
+
+    private void SetColliders()
+    {
         for (int i = 0; i < cornerColliders.Length; i++)
         {
             if (MeshRot.MeshIndex != -1 && buildableCornerData.BuildableDictionary.TryGetValue(protoypeMeshes[MeshRot.MeshIndex], out BuildableCorners cornerData))
@@ -253,13 +265,6 @@ public class Building : PooledMonoBehaviour, IBuildable
                 cornerColliders[i].gameObject.SetActive(false);
             }
         }
-        
-        indexer.OnRebuilt += IndexerOnOnRebuilt;
-        indexer.NeedsRebuilding = true;
-        indexer.DelayFrames = 1;
-        
-        BuildingHandler.AddBuilding(this).Forget();
-        OnPlacedEvent?.Invoke();
     }
 
     private void IndexerOnOnRebuilt()
