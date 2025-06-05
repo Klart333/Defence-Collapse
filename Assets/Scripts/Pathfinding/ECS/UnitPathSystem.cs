@@ -1,10 +1,11 @@
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
+using Enemy.ECS;
 
 namespace Pathfinding.ECS
 {

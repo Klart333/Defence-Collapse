@@ -5,11 +5,37 @@ using Gameplay.Upgrades;
 using Unity.Entities;
 using Effects.ECS;
 using UnityEngine;
+using Enemy.ECS;
 using Health;
 using System;
 
 namespace Gameplay
 {
+    public static class GameData
+    {
+        public static Stat WallHealthMultiplier { get; set; }
+        public static Stat WallHealing { get; set; }
+        
+        public static Stat BarricadeHealthMultiplier { get; private set; }
+        public static Stat BarricadeHealing { get; private set; }
+
+        public static void InitializeStats()
+        {
+            BarricadeHealthMultiplier = new Stat(1);
+            WallHealthMultiplier = new Stat(1);
+            BarricadeHealing = new Stat(1);
+            WallHealing = new Stat(1);
+        }
+
+        public static void ResetStats()
+        {
+            BarricadeHealthMultiplier = null;
+            WallHealthMultiplier = null;
+            BarricadeHealing = null;
+            WallHealing = null;
+        }
+    }
+    
     public class GameDataManager : Singleton<GameDataManager>
     {
         [Title("Fire")]
@@ -26,15 +52,35 @@ namespace Gameplay
         private EntityManager entityManager;
         private Entity fireDataEntity;
         private Entity poisonDataEntity;
+        private Entity enemySpeedModifierEntity;
+        private Entity enemyDamageModifierEntity;
         
         private FireTickDataComponent fireTickData;
         private PoisonTickDataComponent poisonTickData;
+        private EnemySpeedModifierComponent speedComponent;
+        private EnemyDamageModifierComponent damageComponent;
         
         protected override void Awake()
         {
             base.Awake();
-
+            
+            GameData.InitializeStats();
             InitailizeGameData();
+        }
+
+        private void OnEnable()
+        {
+            Events.OnGameReset += OnGameReset;
+        }
+
+        private void OnDisable()
+        {
+            Events.OnGameReset -= OnGameReset;
+        }
+
+        private void OnGameReset()
+        {
+            GameData.ResetStats();
         }
 
         private void InitailizeGameData()
@@ -72,8 +118,37 @@ namespace Gameplay
                     poisonTickData.TickRate = 1.0f / ((1.0f / poisonTickData.TickRate) * poisonTickDataIncrease.TickRate);
                     entityManager.SetComponentData(poisonDataEntity, poisonTickData);
                     break;
-                case MultiplyDamageComponent damageComponent:
-                    AddMultiplyDamageComponent(damageComponent);
+                
+                case MultiplyDamageComponent multiplyDamageComponent:
+                    AddMultiplyDamageComponent(multiplyDamageComponent);
+                    break;
+                
+                case EnemySpeedModifierComponent speedModifierComponent:
+                    if (entityManager.Exists(enemySpeedModifierEntity))
+                    {
+                        speedComponent.SpeedMultiplier *= speedModifierComponent.SpeedMultiplier;
+                        entityManager.SetComponentData(enemySpeedModifierEntity, speedComponent);
+                    }
+                    else
+                    {
+                        enemySpeedModifierEntity = entityManager.CreateEntity();
+                        speedComponent = speedModifierComponent;
+                        entityManager.AddComponentData(enemySpeedModifierEntity, speedComponent);
+                    }
+                    break;
+
+                case EnemyDamageModifierComponent damageModifierComponent:
+                    if (entityManager.Exists(enemyDamageModifierEntity))
+                    {
+                        damageComponent.DamageMultiplier *= damageModifierComponent.DamageMultiplier;
+                        entityManager.SetComponentData(enemyDamageModifierEntity, damageComponent);
+                    }
+                    else
+                    {
+                        enemyDamageModifierEntity = entityManager.CreateEntity();
+                        damageComponent = damageModifierComponent;
+                        entityManager.AddComponentData(enemyDamageModifierEntity, damageComponent);
+                    }
                     break;
             }
         }

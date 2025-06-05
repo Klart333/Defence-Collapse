@@ -7,7 +7,7 @@ using Unity.Burst;
 using Gameplay;
 using Enemy;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     [UpdateAfter(typeof(DeathSystem))]
     public partial struct SpawnerSystem : ISystem
@@ -17,9 +17,7 @@ namespace DataStructures.Queue.ECS
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<GameSpeedComponent>();
-            spawnerQuery = SystemAPI.QueryBuilder()
-                .WithAspect<SpawnPointAspect>()
-                .Build();
+            spawnerQuery = SystemAPI.QueryBuilder().WithAspect<SpawnPointAspect>().Build();
 
             state.RequireForUpdate<EnemyDatabaseTag>();
         }
@@ -95,10 +93,11 @@ namespace DataStructures.Queue.ECS
             LocalTransform prefabTransform = TransformLookup[prefabEntity];
 
             float3 spawnPosition = spawnPointAspect.Transform.ValueRO.Position + spawnPointAspect.RandomComponent.ValueRW.Random.NextFloat3(MinRandomPosition, MaxRandomPosition);
+            quaternion spawnRotation = math.mul(prefabTransform.Rotation, quaternion.AxisAngle(new float3(0, 1, 0), spawnPointAspect.RandomComponent.ValueRW.Random.NextFloat(360)));
 
             LocalTransform newTransform = LocalTransform.FromPositionRotationScale(
                 spawnPosition,       
-                prefabTransform.Rotation, 
+                spawnRotation, 
                 prefabTransform.Scale     
             );
             ECB.SetComponent(index, spawnedEntity, newTransform);

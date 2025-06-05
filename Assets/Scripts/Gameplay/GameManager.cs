@@ -1,8 +1,8 @@
-using DataStructures.Queue.ECS;
 using Random = System.Random;
 using Buildings.District;
 using Unity.Entities;
 using Effects.ECS;
+using Enemy.ECS;
 
 namespace Gameplay
 {

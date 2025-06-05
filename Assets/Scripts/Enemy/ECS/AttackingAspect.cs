@@ -1,7 +1,7 @@
 using Effects.ECS;
 using Unity.Entities;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     public readonly partial struct AttackingAspect : IAspect
     {

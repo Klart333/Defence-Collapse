@@ -26,8 +26,11 @@ namespace Exp.Gemstones
         [Title("Description")]
         [SerializeField]
         private StatNameUtility statNameUtility;
-        
+
         [Title("Effect")]
+        [SerializeField]
+        private bool isAdditivePercent = true;
+        
         [SerializeField]
         private CategoryType appliedCategory;
         
@@ -51,6 +54,7 @@ namespace Exp.Gemstones
             float value = GetEffectValue(level, random);
             return new StatIncreaseEffect
             {
+                IsAdditivePercent = isAdditivePercent,
                 AppliedCategory = appliedCategory,
                 Value = value,
                 EffectDescription = statNameUtility.GetDescription(increaseStatEffect.StatType, value),
@@ -198,6 +202,158 @@ namespace Exp.Gemstones
                     EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseSplashDamageEffect), value),
                 },
                 _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+    }
+    
+    [Serializable]
+    public class WallStatIncreaseBakeEffect : IGemstoneBakingEffect
+    {
+        [Title("Curve")]
+        [SerializeField]
+        private AnimationCurve levelToGainCurve;
+
+        [SerializeField]
+        private float randomness = 0.05f;
+        
+        [Title("Description")]
+        [SerializeField]
+        private GemstoneEffectDescriptions effectDescriptions;
+        
+        [Title("Category")]
+        [SerializeField]
+        private StatType statType;
+        
+        public float GetEffectValue(int level, Random random)
+        {
+            float value = levelToGainCurve.Evaluate(level);
+            return value + value * (float)(random.NextDouble() * 2.0f - 1.0f) * randomness;        
+        }
+
+        public IGemstoneEffect GetEffect(int level, Random random)
+        {
+            float value = GetEffectValue(level, random);
+
+            return statType switch
+            {
+                StatType.MaxHealth => new IncreaseWallHealthEffect()
+                {
+                    Value = value,
+                    EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseWallHealthEffect), value),
+                },
+                StatType.Healing => new IncreaseWallHealingEffect
+                {
+                    Value = value,
+                    EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseWallHealingEffect), value),
+                },
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+    }
+    
+    [Serializable]
+    public class BarricadeStatIncreaseBakeEffect : IGemstoneBakingEffect
+    {
+        [Title("Curve")]
+        [SerializeField]
+        private AnimationCurve levelToGainCurve;
+
+        [SerializeField]
+        private float randomness = 0.05f;
+        
+        [Title("Description")]
+        [SerializeField]
+        private GemstoneEffectDescriptions effectDescriptions;
+        
+        [Title("Category")]
+        [SerializeField]
+        private StatType statType;
+        
+        public float GetEffectValue(int level, Random random)
+        {
+            float value = levelToGainCurve.Evaluate(level);
+            return value + value * (float)(random.NextDouble() * 2.0f - 1.0f) * randomness;        
+        }
+
+        public IGemstoneEffect GetEffect(int level, Random random)
+        {
+            float value = GetEffectValue(level, random);
+
+            return statType switch
+            {
+                StatType.MaxHealth => new IncreaseBarricadeHealthEffect()
+                {
+                    Value = value,
+                    EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseBarricadeHealthEffect), value),
+                },
+                StatType.Healing => new IncreaseBarricadeHealingEffect
+                {
+                    Value = value,
+                    EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseBarricadeHealingEffect), value),
+                },
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+    }
+    
+    [Serializable]
+    public class EnemySpeedModifierBakeEffect : IGemstoneBakingEffect
+    {
+        [Title("Curve")]
+        [SerializeField]
+        private AnimationCurve levelToGainCurve;
+
+        [SerializeField]
+        private float randomness = 0.05f;
+        
+        [Title("Description")]
+        [SerializeField]
+        private GemstoneEffectDescriptions effectDescriptions;
+        
+        public float GetEffectValue(int level, Random random)
+        {
+            float value = levelToGainCurve.Evaluate(level);
+            return value + value * (float)(random.NextDouble() * 2.0f - 1.0f) * randomness;        
+        }
+
+        public IGemstoneEffect GetEffect(int level, Random random)
+        {
+            float value = GetEffectValue(level, random);
+            return new EnemySpeedModifierEffect()
+            {
+                Value = value,
+                EffectDescription = effectDescriptions.GetDescription(typeof(EnemySpeedModifierEffect), value),
+            };
+        }
+    }
+    
+    [Serializable]
+    public class EnemyDamageModifierBakeEffect : IGemstoneBakingEffect
+    {
+        [Title("Curve")]
+        [SerializeField]
+        private AnimationCurve levelToGainCurve;
+
+        [SerializeField]
+        private float randomness = 0.05f;
+        
+        [Title("Description")]
+        [SerializeField]
+        private GemstoneEffectDescriptions effectDescriptions;
+        
+        public float GetEffectValue(int level, Random random)
+        {
+            float value = levelToGainCurve.Evaluate(level);
+            return value + value * (float)(random.NextDouble() * 2.0f - 1.0f) * randomness;        
+        }
+
+        public IGemstoneEffect GetEffect(int level, Random random)
+        {
+            float value = GetEffectValue(level, random);
+            return new EnemyDamageModifierEffect()
+            {
+                Value = value,
+                EffectDescription = effectDescriptions.GetDescription(typeof(EnemyDamageModifierEffect), value),
             };
         }
     }

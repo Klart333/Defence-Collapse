@@ -1,7 +1,7 @@
 using Effects.ECS;
 using Unity.Entities;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(SpawnerSystem)), 
      UpdateBefore(typeof(CollisionSystem)), UpdateBefore(typeof(EnemyHashGridSystem))]

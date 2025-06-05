@@ -6,7 +6,7 @@ using Unity.Entities;
 using Unity.Physics;
 using Unity.Burst;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     [UpdateInGroup(typeof(PhysicsSimulationGroup))]
     public partial struct GroundSystem : ISystem

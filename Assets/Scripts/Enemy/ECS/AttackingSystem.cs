@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Burst;
-using UnityEngine;
-using System;
-using Gameplay;
 using Pathfinding;
+using Gameplay;
+using System;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     public partial class AttackingSystem : SystemBase 
     {

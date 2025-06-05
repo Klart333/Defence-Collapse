@@ -1,7 +1,7 @@
 using Unity.Entities;
 using Unity.Transforms;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     public readonly partial struct EnemyTargetAspect : IAspect
     {

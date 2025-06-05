@@ -5,6 +5,7 @@ using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
 using Effects.ECS;
+using Enemy.ECS;
 
 namespace VFX.ECS
 {

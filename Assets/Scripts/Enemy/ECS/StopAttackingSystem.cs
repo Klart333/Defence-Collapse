@@ -1,12 +1,10 @@
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using Pathfinding;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using UnityEngine;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     [UpdateAfter(typeof(CheckAttackingSystem))]
     public partial class StopAttackingSystem : SystemBase   

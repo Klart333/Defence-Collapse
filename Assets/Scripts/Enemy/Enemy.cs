@@ -1,10 +1,11 @@
-using Effects.ECS;
+using Random = Unity.Mathematics.Random;
 using Sirenix.OdinInspector;
-using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Entities;
+using Effects.ECS;
+using Enemy.ECS;
 using UnityEngine;
 using VFX.ECS;
-using Random = Unity.Mathematics.Random;
 
 namespace Enemy
 {
@@ -36,10 +37,14 @@ namespace Enemy
                 Stats stats = new Stats(authoring.enemyData.Stats);
                 Entity enemyEntity = GetEntity(TransformUsageFlags.Dynamic);
                 
-                AddComponent(enemyEntity, new SpeedComponent { Speed = stats.MovementSpeed.Value });
+                AddComponent<EnemySpawnedTag>(enemyEntity);
+                
                 AddComponent(enemyEntity, new RandomComponent { Random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 1000000)) });
-                AddComponent(enemyEntity, new FresnelComponent { Value = 5f});
                 AddComponent(enemyEntity, new AttackSpeedComponent { AttackSpeed = 1.0f / stats.AttackSpeed.Value });
+                AddComponent(enemyEntity, new MoneyOnDeathComponent { Amount = authoring.enemyData.MoneyOnDeath});
+                AddComponent(enemyEntity, new SimpleDamageComponent { Damage = stats.HealthDamage.Value, });
+                AddComponent(enemyEntity, new SpeedComponent { Speed = stats.MovementSpeed.Value });
+                AddComponent(enemyEntity, new FresnelComponent { Value = 5f});
 
                 AddComponent(enemyEntity, new FlowFieldComponent
                 {
@@ -52,7 +57,7 @@ namespace Enemy
                     //LayerMask = authoring.groundMask,
                 });
                 
-                AddComponent(enemyEntity, new Effects.ECS.HealthComponent
+                AddComponent(enemyEntity, new HealthComponent
                 {
                     Health = stats.MaxHealth.Value,
                     Armor = stats.MaxArmor.Value,
@@ -70,13 +75,6 @@ namespace Enemy
                 {
                     Multiplier = authoring.EnemyData.HealthScalingMultiplier
                 });
-                
-                AddComponent(enemyEntity, new SimpleDamageComponent
-                {
-                    Damage = stats.HealthDamage.Value,
-                });
-
-                AddComponent(enemyEntity, new MoneyOnDeathComponent { Amount = authoring.enemyData.MoneyOnDeath});
 
                 if (authoring.enemyData.ExplodeOnDeath)
                 {
@@ -89,5 +87,10 @@ namespace Enemy
                 }
             }
         }
+    }
+
+    public struct EnemySpawnedTag : IComponentData
+    {
+        
     }
 }

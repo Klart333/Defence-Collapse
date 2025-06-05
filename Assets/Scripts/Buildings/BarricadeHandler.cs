@@ -1,12 +1,10 @@
 using System.Collections.Generic;
-using DataStructures.Queue.ECS;
-using Cysharp.Threading.Tasks;
-using WaveFunctionCollapse;
-using Unity.Mathematics;
-using Pathfinding;
-using System.Linq;
 using Sirenix.OdinInspector;
+using WaveFunctionCollapse;
+using Pathfinding;
 using UnityEngine;
+using Enemy.ECS;
+using Gameplay;
 using UI;
 
 namespace Buildings
@@ -57,11 +55,14 @@ namespace Buildings
 
         private BarricadeState CreateData(ChunkIndex chunkIndex)
         {
-            BarricadeState data = new BarricadeState(this, barricadeData.Stats, chunkIndex);
+            Stats stats = new Stats(barricadeData.Stats);
+            stats.MaxHealth.BaseValue *= GameData.BarricadeHealthMultiplier.Value;
+            stats.Healing.BaseValue += GameData.BarricadeHealing.Value;
+            BarricadeState data = new BarricadeState(this, stats, chunkIndex);
 
             return data;
         }
-
+        
         public void RemoveBarricade(Barricade barricade)
         {
             List<ChunkIndex> builtIndexes = barricadeGenerator.GetSurroundingMarchedIndexes(barricade.ChunkIndex);

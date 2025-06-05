@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using DataStructures.Queue.ECS;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
 using Unity.Jobs;
+using Enemy.ECS;
 using System;
 
 namespace Effects.ECS

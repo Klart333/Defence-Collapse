@@ -2,7 +2,7 @@ using Unity.Entities;
 using UnityEngine;
 using Enemy;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     public class EnemiesAuthoring : MonoBehaviour
     {

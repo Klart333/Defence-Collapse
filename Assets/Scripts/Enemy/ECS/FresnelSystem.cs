@@ -3,7 +3,7 @@ using Effects.ECS;
 using Unity.Burst;
 using Gameplay;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     [UpdateAfter(typeof(HealthSystem))]
     public partial struct FresnelSystem : ISystem

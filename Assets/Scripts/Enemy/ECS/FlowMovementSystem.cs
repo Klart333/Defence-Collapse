@@ -1,4 +1,3 @@
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
@@ -8,7 +7,7 @@ using Unity.Burst;
 using Pathfinding;
 using Gameplay;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     [UpdateInGroup(typeof(TransformSystemGroup))]
     public partial struct FlowMovementSystem : ISystem

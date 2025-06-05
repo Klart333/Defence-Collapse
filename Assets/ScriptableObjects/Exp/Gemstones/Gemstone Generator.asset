@@ -154,6 +154,9 @@ MonoBehaviour:
     - Name: statNameUtility
       Entry: 10
       Data: 0
+    - Name: isAdditivePercent
+      Entry: 5
+      Data: false
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -379,6 +382,9 @@ MonoBehaviour:
     - Name: statNameUtility
       Entry: 10
       Data: 0
+    - Name: isAdditivePercent
+      Entry: 5
+      Data: false
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -502,6 +508,9 @@ MonoBehaviour:
     - Name: statNameUtility
       Entry: 10
       Data: 0
+    - Name: isAdditivePercent
+      Entry: 5
+      Data: false
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -1060,6 +1069,9 @@ MonoBehaviour:
     - Name: statNameUtility
       Entry: 10
       Data: 0
+    - Name: isAdditivePercent
+      Entry: 5
+      Data: false
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -1183,6 +1195,9 @@ MonoBehaviour:
     - Name: statNameUtility
       Entry: 10
       Data: 0
+    - Name: isAdditivePercent
+      Entry: 5
+      Data: false
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -1306,6 +1321,9 @@ MonoBehaviour:
     - Name: statNameUtility
       Entry: 10
       Data: 0
+    - Name: isAdditivePercent
+      Entry: 5
+      Data: false
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -1429,6 +1447,9 @@ MonoBehaviour:
     - Name: statNameUtility
       Entry: 10
       Data: 0
+    - Name: isAdditivePercent
+      Entry: 5
+      Data: false
     - Name: appliedCategory
       Entry: 3
       Data: 64
@@ -1473,10 +1494,10 @@ MonoBehaviour:
       Data: 47|Exp.Gemstones.IGemstoneBakingEffect[], Core
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 6
     - Name: 
       Entry: 7
-      Data: 48|Exp.Gemstones.StatIncreaseBakeEffect, Core
+      Data: 48|Exp.Gemstones.WallStatIncreaseBakeEffect, Core
     - Name: levelToGainCurve
       Entry: 7
       Data: 49|UnityEngine.AnimationCurve, UnityEngine.CoreModule
@@ -1497,13 +1518,13 @@ MonoBehaviour:
       Data: 0
     - Name: m_Value
       Entry: 4
-      Data: 1.01
+      Data: 0.3
     - Name: m_InTangent
       Entry: 4
-      Data: 0.02456805
+      Data: 0.2577622
     - Name: m_OutTangent
       Entry: 4
-      Data: 0.02456805
+      Data: 0.2577622
     - Name: m_TangentMode
       Entry: 3
       Data: 0
@@ -1515,7 +1536,7 @@ MonoBehaviour:
       Data: 0
     - Name: m_OutWeight
       Entry: 4
-      Data: 0.08823529
+      Data: 0.0652573556
     - Name: 
       Entry: 8
       Data: 
@@ -1530,7 +1551,7 @@ MonoBehaviour:
       Data: 100
     - Name: m_Value
       Entry: 4
-      Data: 3
+      Data: 10
     - Name: m_InTangent
       Entry: 4
       Data: 0
@@ -1569,31 +1590,532 @@ MonoBehaviour:
       Data: 
     - Name: randomness
       Entry: 4
-      Data: 0.05
-    - Name: statNameUtility
+      Data: 0.1
+    - Name: effectDescriptions
       Entry: 10
-      Data: 0
-    - Name: appliedCategory
-      Entry: 3
-      Data: 64
-    - Name: effect
-      Entry: 7
-      Data: 51|Effects.IncreaseStatEffect, Core
-    - Name: ModifierValue
-      Entry: 4
       Data: 1
-    - Name: ModifierType
+    - Name: statType
       Entry: 3
-      Data: 1
-    - Name: StatType
-      Entry: 3
-      Data: 0
-    - Name: CanIncrease
-      Entry: 5
-      Data: true
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 7
+      Data: 51|Exp.Gemstones.WallStatIncreaseBakeEffect, Core
+    - Name: levelToGainCurve
+      Entry: 7
+      Data: 52|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+    - Name: 
+      Entry: 7
+      Data: 53|UnityEngine.Keyframe[], UnityEngine.CoreModule
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
+    - Name: ver
+      Entry: 3
+      Data: 1
+    - Name: m_Time
+      Entry: 4
+      Data: 0
+    - Name: m_Value
+      Entry: 4
+      Data: 0.25
+    - Name: m_InTangent
+      Entry: 4
+      Data: 0.0925217
+    - Name: m_OutTangent
+      Entry: 4
+      Data: 0.0925217
+    - Name: m_TangentMode
+      Entry: 3
+      Data: 0
+    - Name: m_WeightedMode
+      Entry: 3
+      Data: 0
+    - Name: m_InWeight
+      Entry: 4
+      Data: 0
+    - Name: m_OutWeight
+      Entry: 4
+      Data: 0.0699172
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
+    - Name: ver
+      Entry: 3
+      Data: 1
+    - Name: m_Time
+      Entry: 4
+      Data: 100
+    - Name: m_Value
+      Entry: 4
+      Data: 20
+    - Name: m_InTangent
+      Entry: 4
+      Data: 0
+    - Name: m_OutTangent
+      Entry: 4
+      Data: 0
+    - Name: m_TangentMode
+      Entry: 3
+      Data: 0
+    - Name: m_WeightedMode
+      Entry: 3
+      Data: 0
+    - Name: m_InWeight
+      Entry: 4
+      Data: 0
+    - Name: m_OutWeight
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: randomness
+      Entry: 4
+      Data: 0.1
+    - Name: effectDescriptions
+      Entry: 10
+      Data: 1
+    - Name: statType
+      Entry: 3
+      Data: 11
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 54|Exp.Gemstones.BarricadeStatIncreaseBakeEffect, Core
+    - Name: levelToGainCurve
+      Entry: 7
+      Data: 55|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+    - Name: 
+      Entry: 7
+      Data: 56|UnityEngine.Keyframe[], UnityEngine.CoreModule
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
+    - Name: ver
+      Entry: 3
+      Data: 1
+    - Name: m_Time
+      Entry: 4
+      Data: 0
+    - Name: m_Value
+      Entry: 4
+      Data: 0.3
+    - Name: m_InTangent
+      Entry: 4
+      Data: 0.2577622
+    - Name: m_OutTangent
+      Entry: 4
+      Data: 0.2577622
+    - Name: m_TangentMode
+      Entry: 3
+      Data: 0
+    - Name: m_WeightedMode
+      Entry: 3
+      Data: 0
+    - Name: m_InWeight
+      Entry: 4
+      Data: 0
+    - Name: m_OutWeight
+      Entry: 4
+      Data: 0.0652573556
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
+    - Name: ver
+      Entry: 3
+      Data: 1
+    - Name: m_Time
+      Entry: 4
+      Data: 100
+    - Name: m_Value
+      Entry: 4
+      Data: 10
+    - Name: m_InTangent
+      Entry: 4
+      Data: 0
+    - Name: m_OutTangent
+      Entry: 4
+      Data: 0
+    - Name: m_TangentMode
+      Entry: 3
+      Data: 0
+    - Name: m_WeightedMode
+      Entry: 3
+      Data: 0
+    - Name: m_InWeight
+      Entry: 4
+      Data: 0
+    - Name: m_OutWeight
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: randomness
+      Entry: 4
+      Data: 0.1
+    - Name: effectDescriptions
+      Entry: 10
+      Data: 1
+    - Name: statType
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 57|Exp.Gemstones.BarricadeStatIncreaseBakeEffect, Core
+    - Name: levelToGainCurve
+      Entry: 7
+      Data: 58|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+    - Name: 
+      Entry: 7
+      Data: 59|UnityEngine.Keyframe[], UnityEngine.CoreModule
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
+    - Name: ver
+      Entry: 3
+      Data: 1
+    - Name: m_Time
+      Entry: 4
+      Data: 0
+    - Name: m_Value
+      Entry: 4
+      Data: 0.25
+    - Name: m_InTangent
+      Entry: 4
+      Data: 0.0925217
+    - Name: m_OutTangent
+      Entry: 4
+      Data: 0.0925217
+    - Name: m_TangentMode
+      Entry: 3
+      Data: 0
+    - Name: m_WeightedMode
+      Entry: 3
+      Data: 0
+    - Name: m_InWeight
+      Entry: 4
+      Data: 0
+    - Name: m_OutWeight
+      Entry: 4
+      Data: 0.0699172
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
+    - Name: ver
+      Entry: 3
+      Data: 1
+    - Name: m_Time
+      Entry: 4
+      Data: 100
+    - Name: m_Value
+      Entry: 4
+      Data: 20
+    - Name: m_InTangent
+      Entry: 4
+      Data: 0
+    - Name: m_OutTangent
+      Entry: 4
+      Data: 0
+    - Name: m_TangentMode
+      Entry: 3
+      Data: 0
+    - Name: m_WeightedMode
+      Entry: 3
+      Data: 0
+    - Name: m_InWeight
+      Entry: 4
+      Data: 0
+    - Name: m_OutWeight
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: randomness
+      Entry: 4
+      Data: 0.1
+    - Name: effectDescriptions
+      Entry: 10
+      Data: 1
+    - Name: statType
+      Entry: 3
+      Data: 11
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 60|Exp.Gemstones.EnemySpeedModifierBakeEffect, Core
+    - Name: levelToGainCurve
+      Entry: 7
+      Data: 61|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+    - Name: 
+      Entry: 7
+      Data: 62|UnityEngine.Keyframe[], UnityEngine.CoreModule
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
+    - Name: ver
+      Entry: 3
+      Data: 1
+    - Name: m_Time
+      Entry: 4
+      Data: 0
+    - Name: m_Value
+      Entry: 4
+      Data: 0.9906409
+    - Name: m_InTangent
+      Entry: 4
+      Data: -0.0108265644
+    - Name: m_OutTangent
+      Entry: 4
+      Data: -0.0108265644
+    - Name: m_TangentMode
+      Entry: 3
+      Data: 0
+    - Name: m_WeightedMode
+      Entry: 3
+      Data: 0
+    - Name: m_InWeight
+      Entry: 4
+      Data: 0
+    - Name: m_OutWeight
+      Entry: 4
+      Data: 0.03492647
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
+    - Name: ver
+      Entry: 3
+      Data: 1
+    - Name: m_Time
+      Entry: 4
+      Data: 100
+    - Name: m_Value
+      Entry: 4
+      Data: 0.65
+    - Name: m_InTangent
+      Entry: 4
+      Data: -0.0044425
+    - Name: m_OutTangent
+      Entry: 4
+      Data: -0.0044425
+    - Name: m_TangentMode
+      Entry: 3
+      Data: 0
+    - Name: m_WeightedMode
+      Entry: 3
+      Data: 0
+    - Name: m_InWeight
+      Entry: 4
+      Data: 0.0569853969
+    - Name: m_OutWeight
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: randomness
+      Entry: 4
+      Data: 0.01
+    - Name: effectDescriptions
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 63|Exp.Gemstones.EnemyDamageModifierBakeEffect, Core
+    - Name: levelToGainCurve
+      Entry: 7
+      Data: 64|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+    - Name: 
+      Entry: 7
+      Data: 65|UnityEngine.Keyframe[], UnityEngine.CoreModule
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
+    - Name: ver
+      Entry: 3
+      Data: 1
+    - Name: m_Time
+      Entry: 4
+      Data: 0
+    - Name: m_Value
+      Entry: 4
+      Data: 0.98
+    - Name: m_InTangent
+      Entry: 4
+      Data: -0.020508118
+    - Name: m_OutTangent
+      Entry: 4
+      Data: -0.020508118
+    - Name: m_TangentMode
+      Entry: 3
+      Data: 0
+    - Name: m_WeightedMode
+      Entry: 3
+      Data: 0
+    - Name: m_InWeight
+      Entry: 4
+      Data: 0
+    - Name: m_OutWeight
+      Entry: 4
+      Data: 0.048713237
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
+    - Name: ver
+      Entry: 3
+      Data: 1
+    - Name: m_Time
+      Entry: 4
+      Data: 100
+    - Name: m_Value
+      Entry: 4
+      Data: 0.3
+    - Name: m_InTangent
+      Entry: 4
+      Data: -0.01283107
+    - Name: m_OutTangent
+      Entry: 4
+      Data: -0.01283107
+    - Name: m_TangentMode
+      Entry: 3
+      Data: 0
+    - Name: m_WeightedMode
+      Entry: 3
+      Data: 0
+    - Name: m_InWeight
+      Entry: 4
+      Data: 0.0514705665
+    - Name: m_OutWeight
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: randomness
+      Entry: 4
+      Data: 0.02
+    - Name: effectDescriptions
+      Entry: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 

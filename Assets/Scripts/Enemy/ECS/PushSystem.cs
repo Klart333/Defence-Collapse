@@ -6,7 +6,7 @@ using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     [UpdateAfter(typeof(EnemyHashGridSystem))]
     public partial struct PushSystem : ISystem

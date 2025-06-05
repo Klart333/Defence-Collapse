@@ -1,6 +1,6 @@
-﻿using System;
+﻿using WaveFunctionCollapse;
+using System;
 using Health;
-using WaveFunctionCollapse;
 
 namespace Buildings
 {

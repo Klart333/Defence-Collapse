@@ -6,7 +6,7 @@ using Unity.Burst;
 using Effects.ECS;
 using System;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     [BurstCompile, UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(DeathSystem))]
     public partial struct EnemyHashGridSystem : ISystem

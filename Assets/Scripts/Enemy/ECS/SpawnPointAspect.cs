@@ -3,7 +3,7 @@ using Enemy;
 using Unity.Entities;
 using Unity.Transforms;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     public readonly partial struct SpawnPointAspect : IAspect
     {

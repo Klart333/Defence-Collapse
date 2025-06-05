@@ -1,6 +1,5 @@
 ﻿using Vector2 = UnityEngine.Vector2;
 using System.Collections.Generic;
-using DataStructures.Queue.ECS;
 using WaveFunctionCollapse;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -10,6 +9,7 @@ using Unity.Entities;
 using System.Linq;
 using Effects.ECS;
 using UnityEngine;
+using Enemy.ECS;
 using Effects;
 using System;
 using Juice;

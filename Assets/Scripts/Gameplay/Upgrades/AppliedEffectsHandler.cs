@@ -50,6 +50,25 @@ namespace Gameplay.Upgrades
             
             districtHandler.OnDistrictCreated -= OnDistrictCreated;
         }
+        
+        private void OnDistrictCreated(DistrictData district)
+        {
+            if (appliedEffects.TryGetValue(CategoryType.AllDistrict, out List<IEffect> effects))
+            {
+                foreach (IEffect effect in effects)
+                {
+                    effect.Perform(district.State);
+                }
+            }
+            
+            if (appliedEffects.TryGetValue(district.State.CategoryType, out List<IEffect> moreEffects))
+            {
+                foreach (IEffect effect in moreEffects)
+                {
+                    effect.Perform(district.State);
+                }
+            }
+        }
 
         private void PerformUpgrade(UpgradeCardData upgradeData)
         {
@@ -93,25 +112,6 @@ namespace Gameplay.Upgrades
             else
             {
                 appliedEffects.Add(appliedDistrict, new List<IEffect> { effect });
-            }
-        }
-        
-        private void OnDistrictCreated(DistrictData district)
-        {
-            if (appliedEffects.TryGetValue(CategoryType.AllDistrict, out List<IEffect> effects))
-            {
-                foreach (IEffect effect in effects)
-                {
-                    effect.Perform(district.State);
-                }
-            }
-            
-            if (appliedEffects.TryGetValue(district.State.CategoryType, out List<IEffect> moreEffects))
-            {
-                foreach (IEffect effect in moreEffects)
-                {
-                    effect.Perform(district.State);
-                }
             }
         }
         

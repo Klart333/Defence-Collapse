@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using DataStructures.Queue.ECS;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
@@ -9,6 +8,8 @@ using UnityEngine;
 using Pathfinding;
 using System.Linq;
 using Buildings;
+using Enemy.ECS;
+using Gameplay;
 using UI;
 
 public class BuildingHandler : SerializedMonoBehaviour 
@@ -50,7 +51,7 @@ public class BuildingHandler : SerializedMonoBehaviour
     
     private int selectedGroupIndex = -1;
     private int groupIndexCounter;
-
+    
     private void OnEnable()
     {
         GetBuildingManager().Forget();
@@ -93,7 +94,10 @@ public class BuildingHandler : SerializedMonoBehaviour
 
     private WallState CreateData(ChunkIndex chunkIndex)
     {
-        WallState data = new WallState(this, wallData.Stats, chunkIndex);
+        Stats stats = new Stats(wallData.Stats);
+        stats.MaxHealth.BaseValue *= GameData.WallHealthMultiplier.Value;
+        stats.Healing.BaseValue += GameData.WallHealing.Value;
+        WallState data = new WallState(this, stats, chunkIndex);
 
         return data;
     }

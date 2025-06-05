@@ -40,13 +40,19 @@ namespace Exp.Gemstones
             
             foreach (StatIncreaseEffect effectCopy in statIncreaseEffects.Values)
             {
-                effectCopy.Value += 1;
+                if (effectCopy.IsAdditivePercent)
+                {
+                    effectCopy.Value += 1;
+                }
                 effectCopy.PerformEffect();
             }
 
             foreach (IGemstoneEffect effectCopy in uniqueGemEffects.Values)
             {
-                effectCopy.Value += 1;
+                if (effectCopy.IsAdditivePercent)
+                {
+                    effectCopy.Value += 1;
+                }
                 effectCopy.PerformEffect();
             }
             
@@ -58,15 +64,21 @@ namespace Exp.Gemstones
                     {
                         case StatIncreaseEffect { Effect: IncreaseStatEffect stat } statEffect:
                         {
-                            if (!stats.ContainsKey(stat.StatType))
+                            if (stats.TryGetValue(stat.StatType, out float value))
                             {
-                                stats.Add(stat.StatType, statEffect.Value);
-                                statIncreaseEffects.Add(stat.StatType, statEffect.Copy() as StatIncreaseEffect);
+                                stats[stat.StatType] = effect.CumulativeType switch
+                                {
+                                    Modifier.ModifierType.Additive => value + effect.Value,
+                                    Modifier.ModifierType.Multiplicative => value * effect.Value,
+                                    _ => throw new ArgumentOutOfRangeException()
+                                };
+                                
+                                statIncreaseEffects[stat.StatType].Value = stats[stat.StatType];
                             }
                             else
                             {
-                                stats[stat.StatType] += statEffect.Value;
-                                statIncreaseEffects[stat.StatType].Value = stats[stat.StatType];
+                                stats.Add(stat.StatType, statEffect.Value);
+                                statIncreaseEffects.Add(stat.StatType, statEffect.Copy() as StatIncreaseEffect);
                             }
                         
                             continue;
@@ -74,7 +86,12 @@ namespace Exp.Gemstones
                         default:
                             if (uniqueGemEffects.TryGetValue(effect.GetType(), out IGemstoneEffect gemEffect))
                             {
-                                gemEffect.Value += effect.Value;
+                                gemEffect.Value = effect.CumulativeType switch
+                                {
+                                    Modifier.ModifierType.Additive => effect.Value + gemEffect.Value,
+                                    Modifier.ModifierType.Multiplicative => effect.Value * gemEffect.Value,
+                                    _ => throw new ArgumentOutOfRangeException()
+                                };
                             }
                             else
                             {

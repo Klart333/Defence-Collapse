@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
-using DataStructures.Queue.ECS;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using UnityEngine.Events;
-using System.Linq;
 using Pathfinding;
-using Unity.Mathematics;
 using UnityEngine;
+using Enemy.ECS;
 
 public class Building : PooledMonoBehaviour, IBuildable
 {

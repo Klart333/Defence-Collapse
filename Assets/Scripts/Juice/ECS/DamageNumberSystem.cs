@@ -1,6 +1,4 @@
-using System;
 using Random = Unity.Mathematics.Random;
-using DataStructures.Queue.ECS;
 using Unity.Entities.Graphics;
 using TextMeshDOTS.Rendering;
 using UnityEngine.Rendering;
@@ -13,9 +11,9 @@ using InputCamera.ECS;
 using Unity.Entities;
 using UnityEngine;
 using Effects.ECS;
-using Health;
 using Unity.Burst;
 using Juice.Ecs;
+using Health;
 
 namespace TextMeshDOTS.Authoring
 {

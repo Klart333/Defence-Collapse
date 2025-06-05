@@ -54,7 +54,12 @@ namespace Exp.Gemstones
                         {
                             if (stats.TryGetValue(stat.StatType, out float value))
                             {
-                                stats[stat.StatType] = value + effect.Value;
+                                stats[stat.StatType] = effect.CumulativeType switch
+                                {
+                                    Modifier.ModifierType.Additive => value + effect.Value,
+                                    Modifier.ModifierType.Multiplicative => value * effect.Value,
+                                    _ => throw new ArgumentOutOfRangeException()
+                                };
                             }
                             else
                             {
@@ -66,7 +71,12 @@ namespace Exp.Gemstones
                         default:
                             if (uniqueEffects.TryGetValue(effect.GetType(), out float uniqueValue))
                             {
-                                uniqueEffects[effect.GetType()] = uniqueValue + effect.Value;
+                                uniqueEffects[effect.GetType()] = effect.CumulativeType switch
+                                {
+                                   Modifier.ModifierType.Additive => uniqueValue + effect.Value,
+                                   Modifier.ModifierType.Multiplicative => uniqueValue * effect.Value,
+                                   _ => throw new ArgumentOutOfRangeException()
+                                };
                             }
                             else
                             {

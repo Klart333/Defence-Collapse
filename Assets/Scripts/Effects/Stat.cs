@@ -145,6 +145,11 @@ public class Stat : IStat
     }
 
     public static implicit operator float(Stat stat) => stat.Value;
+
+    public override string ToString()
+    {
+        return $"BaseValue: {BaseValue:N}, Value: {Value:N}";
+    }
 }
 
 [Serializable]

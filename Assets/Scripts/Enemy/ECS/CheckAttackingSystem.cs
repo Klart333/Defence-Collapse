@@ -7,7 +7,7 @@ using Unity.Entities;
 using Unity.Burst;
 using Pathfinding;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     public partial struct CheckAttackingSystem : ISystem
     {

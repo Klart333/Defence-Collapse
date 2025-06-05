@@ -7,7 +7,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-namespace DataStructures.Queue.ECS
+namespace Enemy.ECS
 {
     [UpdateAfter(typeof(EnemyHashGridSystem))]
     public partial struct ClosestTargetingSystem : ISystem

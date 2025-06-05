@@ -15,6 +15,7 @@ using UnityEngine;
 using Gameplay;
 using VFX.ECS;
 using System;
+using Enemy.ECS;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable ConvertToConstant.Global
@@ -122,12 +123,14 @@ namespace Effects
 
         public bool IsDamageEffect => false;
 
-        public async void Perform(IAttacker unit)
+        public void Perform(IAttacker unit)
         {
-            if (ModifierDictionary == null)
-            {
-                ModifierDictionary = new Dictionary<IAttacker, Modifier>();
-            }
+            PerformAsync(unit).Forget();
+        }
+
+        private async UniTaskVoid PerformAsync(IAttacker unit)
+        {
+            ModifierDictionary ??= new Dictionary<IAttacker, Modifier>();
 
             if (ModifierDictionary.TryGetValue(unit, out Modifier value))
             {
