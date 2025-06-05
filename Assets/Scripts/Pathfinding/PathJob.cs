@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using System.Runtime.CompilerServices;
+using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Entities;
 using Pathfinding;
@@ -68,6 +69,7 @@ public struct PathJob : IJobFor
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool GetClosestNeighbour(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int gridIndex, out int shortestDistance, out int dirIndex)
     {
         int2 currentChunkIndex = pathChunk.ChunkIndex;
@@ -95,6 +97,7 @@ public struct PathJob : IJobFor
         return shortestDistance <= 0;
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void GetNeighbours(int2 chunkIndex, int gridIndex, NativeArray<PathIndex> array)
     {
         int x = gridIndex % PathManager.GRID_WIDTH;
@@ -124,6 +127,7 @@ public struct PathJob : IJobFor
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static byte GetDirection(int2 direction)
     {
         // Directly map the 8 possible int2 values to corresponding byte values

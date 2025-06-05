@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 86802fb682484d6aa87e699315dfd2b8, type: 3}
-  m_Name: Chunk_ExpFactor
+  m_Name: ExpMult_ExpFactor
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -23,7 +23,7 @@ MonoBehaviour:
     SerializationNodes:
     - Name: factor
       Entry: 7
-      Data: 0|Gameplay.GameOver.ChunkFactor, Core
+      Data: 0|Gameplay.GameOver.ExpMultiplierFactor, Core
     - Name: 
       Entry: 8
       Data: 
@@ -31,52 +31,25 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 2.0081086
+      time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 3.0081086
-      value: 50
-      inSlope: 110.70895
-      outSlope: 110.70895
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.051090557
-    - serializedVersion: 3
-      time: 4.0081086
-      value: 200
-      inSlope: 122.54337
-      outSlope: 122.54337
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 10
+      time: 1000
       value: 1000
-      inSlope: 200.1014
-      outSlope: 200.1014
-      tangentMode: 136
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 20
-      value: 10000
-      inSlope: 1771.0526
-      outSlope: 1771.0526
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.060661696
-      outWeight: 0.33333334
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  displayText: '{0} Chunks Explored - {1} Exp'
-  factorType: 0
+  displayText: '{0}Exp Multiplier - {1}x'
+  factorType: 1

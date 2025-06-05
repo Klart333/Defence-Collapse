@@ -76,7 +76,7 @@ namespace Exp.Gemstones
         
         [Title("Description")]
         [SerializeField]
-        private string description = "+{0} Game Speed";
+        private GemstoneEffectDescriptions effectDescriptions;
         
         public float GetEffectValue(int level, Random random)
         {
@@ -90,7 +90,69 @@ namespace Exp.Gemstones
             return new IncreaseGameSpeedEffect
             {
                 Value = value,
-                EffectDescription = string.Format(description, value.ToString("P")),
+                EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseGameSpeedEffect), value),
+            };
+        }
+    }
+    
+    [System.Serializable]
+    public class MoneyIncreaseBakeEffect : IGemstoneBakingEffect
+    {
+        [Title("Curve")]
+        [SerializeField]
+        private AnimationCurve levelToGainCurve;
+
+        [SerializeField]
+        private float randomness = 0.05f;
+        
+        [Title("Description")]
+        [SerializeField]
+        private GemstoneEffectDescriptions effectDescriptions;
+        
+        public float GetEffectValue(int level, Random random)
+        {
+            float value = levelToGainCurve.Evaluate(level);
+            return value + value * (float)(random.NextDouble() * 2.0f - 1.0f) * randomness;        
+        }
+
+        public IGemstoneEffect GetEffect(int level, Random random)
+        {
+            float value = GetEffectValue(level, random);
+            return new IncreaseMoneyEffect
+            {
+                Value = value,
+                EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseMoneyEffect), value),
+            };
+        }
+    }
+    
+    [Serializable]
+    public class ExpIncreaseBakeEffect : IGemstoneBakingEffect
+    {
+        [Title("Curve")]
+        [SerializeField]
+        private AnimationCurve levelToGainCurve;
+
+        [SerializeField]
+        private float randomness = 0.05f;
+        
+        [Title("Description")]
+        [SerializeField]
+        private GemstoneEffectDescriptions effectDescriptions;
+        
+        public float GetEffectValue(int level, Random random)
+        {
+            float value = levelToGainCurve.Evaluate(level);
+            return value + value * (float)(random.NextDouble() * 2.0f - 1.0f) * randomness;        
+        }
+
+        public IGemstoneEffect GetEffect(int level, Random random)
+        {
+            float value = GetEffectValue(level, random);
+            return new IncreaseExpEffect
+            {
+                Value = value,
+                EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseExpEffect), value),
             };
         }
     }

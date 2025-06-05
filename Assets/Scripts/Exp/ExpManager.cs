@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Sirenix.OdinInspector;
 using Exp.Gemstones;
 using UnityEngine;
 using Saving;
-using Debug = UnityEngine.Debug;
+using System;
 
 namespace Exp
 {
@@ -23,6 +21,8 @@ namespace Exp
         public int SlotsUnlocked { get; private set; }
         public int Exp { get; private set; }
         
+        public Stat ExpMultiplier { get; private set; }
+        
         private ExpSaveLoad saveLoad;
 
         protected override void Awake()
@@ -34,11 +34,18 @@ namespace Exp
             saveLoad = new ExpSaveLoad(new MessagePackSaveSystem());
             LoadSaveData();
 
-            //Gemstones = new List<Gemstone>();
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    Gemstones.Add(gemstoneGenerator.GetGemstone((GemstoneType)UnityEngine.Random.Range(0, 3), UnityEngine.Random.Range(1, 100), UnityEngine.Random.Range(0, int.MaxValue)));
-            //}
+            ExpMultiplier = new Stat(1);
+            Events.OnGameReset += OnGameReset;
+        }
+
+        private void OnDisable()
+        {
+            Events.OnGameReset -= OnGameReset;
+        }
+
+        private void OnGameReset()
+        {
+            ExpMultiplier = new Stat(1);
         }
 
         private void LoadSaveData()

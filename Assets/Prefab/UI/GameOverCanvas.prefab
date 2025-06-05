@@ -597,7 +597,7 @@ RectTransform:
   m_GameObject: {fileID: 1311063069036662377}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5720156092417810932}
@@ -630,9 +630,9 @@ MonoBehaviour:
   lifetime:
     minValue: 0.7248314
     maxValue: 0.99999875
-  useGameSpeed: 0
   readScale: 1
   targetScale: {x: 1, y: 1, z: 1}
+  useGameSpeed: 0
   verbose: 0
 --- !u!114 &1402132235394561470
 MonoBehaviour:
@@ -1514,8 +1514,8 @@ RectTransform:
   m_GameObject: {fileID: 6324931445898556671}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2730124329358426866}
   - {fileID: 9167595942996428975}
@@ -1958,6 +1958,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a9ef341cc5e658046a80dce2afaf7629, type: 2}
   - {fileID: 11400000, guid: 8000a3c49895a364ca826f41274bce06, type: 2}
   - {fileID: 11400000, guid: 1d74d9b93ec903545b07fa0e0eae9113, type: 2}
+  - {fileID: 11400000, guid: 3f40c20ea52db9849bec078be28450e1, type: 2}
   fadeInFactorEase: 2
   fadeInFactorDuration: 1
   textCountingEase: 4

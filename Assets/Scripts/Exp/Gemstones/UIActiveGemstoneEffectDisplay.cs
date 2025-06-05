@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using System.Text;
 using UnityEngine;
 using Effects;
+using System;
 using TMPro;
 
 namespace Exp.Gemstones
@@ -14,6 +15,9 @@ namespace Exp.Gemstones
 
         [SerializeField]
         private StatNameUtility statNameUtility;
+        
+        [SerializeField]
+        private GemstoneEffectDescriptions gemstoneEffectDescriptions;
         
         private ExpManager expManager;
         
@@ -39,34 +43,49 @@ namespace Exp.Gemstones
         {
             StringBuilder stringBuilder = new StringBuilder();
             Dictionary<StatType, float> stats = new Dictionary<StatType, float>();
+            Dictionary<Type, float> uniqueEffects = new Dictionary<Type, float>();
             foreach (Gemstone gemstone in expManager.ActiveGemstones)
             {
-                for (int i = 0; i < gemstone.Effects.Length; i++)
+                foreach (IGemstoneEffect effect in gemstone.Effects)
                 {
-                    if (gemstone.Effects[i] is StatIncreaseEffect { Effect: IncreaseStatEffect stat })
+                    switch (effect)
                     {
-                        bool exists = stats.TryGetValue(stat.StatType, out float value);
-                        value += stat.ModifierValue;
-
-                        if (exists)
+                        case StatIncreaseEffect { Effect: IncreaseStatEffect stat }:
                         {
-                            stats[stat.StatType] = value;
-                        }
-                        else
-                        {
-                            stats.Add(stat.StatType, value);
-                        }
+                            if (stats.TryGetValue(stat.StatType, out float value))
+                            {
+                                stats[stat.StatType] = value + effect.Value;
+                            }
+                            else
+                            {
+                                stats.Add(stat.StatType, effect.Value);
+                            }
                         
-                        continue;
+                            continue;
+                        }
+                        default:
+                            if (uniqueEffects.TryGetValue(effect.GetType(), out float uniqueValue))
+                            {
+                                uniqueEffects[effect.GetType()] = uniqueValue + effect.Value;
+                            }
+                            else
+                            {
+                                uniqueEffects.Add(effect.GetType(), effect.Value);
+                            }
+                            continue;
                     }
-                    
-                    stringBuilder.AppendLine(gemstone.Effects[i].GetDescription());
                 }
+                
             }
 
             foreach (KeyValuePair<StatType, float> stat in stats)
             {
                 stringBuilder.AppendLine(statNameUtility.GetDescription(stat.Key, stat.Value));
+            }
+
+            foreach (KeyValuePair<Type, float> uniqueEffect in uniqueEffects)
+            {
+                stringBuilder.AppendLine(gemstoneEffectDescriptions.GetDescription(uniqueEffect.Key, uniqueEffect.Value));
             }
             
             bonusText.text = stringBuilder.ToString();

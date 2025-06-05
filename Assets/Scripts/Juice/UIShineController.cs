@@ -18,7 +18,7 @@ namespace Juice
         
         [Title("Additional Settings")]
         [SerializeField]
-        private bool useGameSpeed = false;
+        private bool useGameSpeed;
         
         private GraphicPropertyOverrideRange materialOverride;
         private Tween tween; 
@@ -54,9 +54,9 @@ namespace Juice
             tween = DOTween.To(x => materialOverride.PropertyValue = x, 0.0f, 1.0f, duration).SetEase(easeType);
             tween.OnComplete(() => shining = false);
             
-            if (!useGameSpeed)
+            if (useGameSpeed)
             {
-                tween.timeScale = 1.0f / gameSpeed.Value;
+                tween.ScaleWithGameSpeed(gameSpeed);
             }
         }
     }

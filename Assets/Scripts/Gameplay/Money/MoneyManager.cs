@@ -41,13 +41,15 @@ namespace Gameplay.Money
         public float PathCost => costData.GetCost(BuildingType.Path);
 
         public float Money => money;
+        public Stat MoneyMultiplier { get; private set; }
 
         private void OnEnable()
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             moneyEntity = entityManager.CreateEntity(); 
             entityManager.AddComponent<MoneyToAddComponent>(moneyEntity);
-            
+
+            MoneyMultiplier = new Stat(1);
             money = startingMoney;
         }
         
@@ -71,8 +73,6 @@ namespace Gameplay.Money
             }
         }
         
-        #region Public
-
         public bool CanPurchase(BuildingType buildingType)
         {
             if (Money >= costData.GetCost(buildingType))
@@ -105,6 +105,7 @@ namespace Gameplay.Money
         
         public void AddMoney(float amount)
         {
+            amount *= MoneyMultiplier.Value;
             money += amount;
 
             OnMoneyChanged?.Invoke(money);
@@ -131,9 +132,7 @@ namespace Gameplay.Money
         {
             Debug.Log("Insufficient funds, " + (Money - cost));
         }
-
-        #endregion
-
+        
         #region Debug
 
         [Button]

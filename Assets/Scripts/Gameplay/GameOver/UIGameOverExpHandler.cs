@@ -93,7 +93,7 @@ namespace Gameplay.GameOver
                 factorText.transform.SetAsFirstSibling();
                 string format = expFactors[i].FactorType switch
                 {
-                    FactorType.Multiplier => "N1",
+                    FactorType.Multiplier => "N",
                     _ => "N0",
                 };
                 factorText.text = string.Format(expFactors[i].DisplayText, expFactors[i].GetDisplayLevel(level), exp.ToString(format));

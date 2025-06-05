@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Effects;
 using Gameplay.Upgrades;
 using UnityEngine;
+using Effects;
 
 namespace Exp.Gemstones
 {
@@ -24,6 +25,8 @@ namespace Exp.Gemstones
             
             Dictionary<StatType, float> stats = new Dictionary<StatType, float>();
             Dictionary<StatType, StatIncreaseEffect> statIncreaseEffects = new Dictionary<StatType, StatIncreaseEffect>();
+            
+            Dictionary<Type, IGemstoneEffect> uniqueGemEffects = new Dictionary<Type, IGemstoneEffect>();
 
             foreach (Gemstone activeGemstone in expManager.ActiveGemstones)
             {
@@ -35,20 +38,25 @@ namespace Exp.Gemstones
                 effectCopy.Value += 1;
                 effectCopy.PerformEffect();
             }
+
+            foreach (IGemstoneEffect effectCopy in uniqueGemEffects.Values)
+            {
+                effectCopy.Value += 1;
+                effectCopy.PerformEffect();
+            }
             
             void ActivateGemstoneEffect(Gemstone gem)
             {
-                foreach (IGemstoneEffect effect in gem.Effects)   
+                foreach (IGemstoneEffect effect in gem.Effects)
                 {
-                    if (effect is IGemstoneAppliedEffect appliedEffect)
+                    switch (effect)
                     {
-                        if (appliedEffect is StatIncreaseEffect { Effect: IncreaseStatEffect stat } statEffect)
+                        case StatIncreaseEffect { Effect: IncreaseStatEffect stat } statEffect:
                         {
                             if (!stats.ContainsKey(stat.StatType))
                             {
                                 stats.Add(stat.StatType, statEffect.Value);
-                                StatIncreaseEffect effectCopy = new StatIncreaseEffect(statEffect); 
-                                statIncreaseEffects.Add(stat.StatType, effectCopy);
+                                statIncreaseEffects.Add(stat.StatType, statEffect.Copy() as StatIncreaseEffect);
                             }
                             else
                             {
@@ -58,12 +66,17 @@ namespace Exp.Gemstones
                         
                             continue;
                         }
-                    
-                        appliedEffect.PerformEffect(appliedEffectsHandler);
-                        continue;
+                        default:
+                            if (uniqueGemEffects.TryGetValue(effect.GetType(), out IGemstoneEffect gemEffect))
+                            {
+                                gemEffect.Value += effect.Value;
+                            }
+                            else
+                            {
+                                uniqueGemEffects.Add(effect.GetType(), effect.Copy());
+                            }
+                            continue;
                     }
-                
-                    effect.PerformEffect();
                 }
             }
         }

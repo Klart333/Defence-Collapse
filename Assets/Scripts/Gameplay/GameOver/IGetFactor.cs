@@ -1,3 +1,4 @@
+using Exp;
 using UnityEngine;
 
 namespace Gameplay.GameOver
@@ -65,5 +66,16 @@ namespace Gameplay.GameOver
             };
         }
 
+    }
+
+    public class ExpMultiplierFactor : IGetFactor
+    {
+        public float GetFactor(AnimationCurve curve, out float level)
+        {
+            level = ExpManager.Instance.ExpMultiplier.Value;
+            return curve.Evaluate(level);
+        }
+        
+        public string GetDisplayText(float level) => "";
     }
 }
