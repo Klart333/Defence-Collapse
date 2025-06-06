@@ -534,7 +534,7 @@ namespace WaveFunctionCollapse
             foreach (var cell in cells)
             {
                 Vector3 pos = cell.Position;
-                Gizmos.color = cell.Buildable ? Color.white : Color.red;
+                Gizmos.color = Color.white;
                 Gizmos.DrawWireCube(pos, new Vector3(GridScale.x, GridScale.y, GridScale.z) * 0.75f);
             }
         }
@@ -615,19 +615,17 @@ namespace WaveFunctionCollapse
     public struct Cell : IEquatable<Cell>
     {
         public bool Collapsed;
-        public bool Buildable;
 
         public Vector3 Position;
 
         public List<PrototypeData> PossiblePrototypes; // SHOULD BE AN ARRAY, 
         // SHOULD PROBABLY DIRTY CACHE THE TOTAL WEIGHT
 
-        public Cell(bool collapsed, Vector3 position, List<PrototypeData> possiblePrototypes, bool buildable = true)
+        public Cell(bool collapsed, Vector3 position, List<PrototypeData> possiblePrototypes)
         {
             Collapsed = collapsed;
             Position = position;
             PossiblePrototypes = possiblePrototypes;
-            Buildable = buildable;
         }
 
         public override bool Equals([CanBeNull] object obj)
@@ -651,7 +649,7 @@ namespace WaveFunctionCollapse
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append($"Cell(Position: {Position}, Buildable: {Buildable}, Collapsed: {Collapsed}, PossiblePrototypes: [");
+            sb.Append($"Cell(Position: {Position}, Collapsed: {Collapsed}, PossiblePrototypes: [");
 
             if (PossiblePrototypes != null)
             {

@@ -154,10 +154,11 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
             List<ChunkIndex> neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, gridSize.x, gridSize.z);
             for (int j = 0; j < neighbours.Count; j++)
             {
+                int3 index = neighbours[j].CellIndex;
                 if (cellsToUpdate.Contains(neighbours[j])
                     || !waveFunction.Chunks.TryGetValue(neighbours[j].Index, out QueryMarchedChunk neihbourChunk)
-                    || !neihbourChunk[neighbours[j].CellIndex].Collapsed
-                    || !neihbourChunk[neighbours[j].CellIndex].Buildable) continue;
+                    || !neihbourChunk[index].Collapsed
+                    || !IsBuildable(neihbourChunk, index)) continue;
                 cellsToUpdate.Add(neighbours[j]);
 
                   if (depth <= 0) continue;
@@ -273,6 +274,20 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         if (animate) buildingAnimator.Animate(building);
 
         return building;
+    }
+    
+    #endregion
+
+    #region Utility
+    
+    public bool IsBuildable(ChunkIndex chunkIndex)
+    {
+        return IsBuildable(waveFunction.Chunks[chunkIndex.Index], chunkIndex.CellIndex);
+    }
+    
+    public bool IsBuildable(QueryMarchedChunk chunk, int3 index)
+    {
+        return (chunk.GroundTypes[index.x, index.y, index.z] & (GroundType.Grass | GroundType.Crystal)) != 0;
     }
     
     #endregion

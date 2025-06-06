@@ -84,13 +84,6 @@ public class GroundObjectPlacer : MonoBehaviour
                             valid = false;
                             break;
                         }
-                        
-                        Cell cell = chunk.Cells[xIndex, y, zIndex];
-                        if (!cell.Buildable)
-                        {
-                            valid = false;
-                            break;
-                        }
                     }
                 }
                 

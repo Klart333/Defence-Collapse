@@ -106,6 +106,11 @@ namespace Buildings.District
             
         }
         
+        public virtual void OnWaveEnd()
+        {
+            
+        }
+        
         private void OnDamageDone(Entity entity)
         {
             DamageComponent damageComp = entityManager.GetComponentData<DamageComponent>(entity);
@@ -237,7 +242,7 @@ namespace Buildings.District
             }
         }
 
-        protected virtual void UpdateEntities(bool shouldAttack = true)
+        protected virtual void UpdateEntities()
         {
             foreach (KeyValuePair<int2, List<Entity>> keyValuePair in entityIndexes)
             {
@@ -256,14 +261,7 @@ namespace Buildings.District
 
                     aspect.RestTimer();
                     OriginPosition = aspect.LocalTransform.ValueRO.Position;
-                    if (shouldAttack)
-                    {
-                        PerformAttack(targetPosition);
-                    }
-                    else
-                    {
-                        AttackPosition = targetPosition;
-                    }   
+                    PerformAttack(targetPosition);
                 }
             }
         }
@@ -702,22 +700,6 @@ namespace Buildings.District
 
     public sealed class MineState : DistrictState
     {
-        private struct MineInstance
-        {
-            public float Timer;
-            public readonly Vector3 Position;
-            public readonly int3 ChunkIndex;
-
-            public MineInstance(Vector3 position, float timer, int3 chunkIndex)
-            {
-                Position = position;
-                Timer = timer;
-                ChunkIndex = chunkIndex;
-            }
-        }
-        
-        private readonly List<MineInstance> mineChunks = new List<MineInstance>();
-        
         private readonly TowerData mineData;
         private GameObject rangeIndicator;
 
@@ -735,17 +717,8 @@ namespace Buildings.District
             this.mineData = mineData;
 
             CreateStats();
+            SpawnEntities();
             Attack = new Attack(mineData.BaseAttack);
-
-            foreach (QueryChunk chunk in districtData.DistrictChunks.Values)
-            {
-                if (chunk.AdjacentChunks[2] != null)
-                {
-                    continue;
-                }
-                
-                mineChunks.Add(new MineInstance(chunk.Position, 0, chunk.ChunkIndex));
-            }
             
             Attack.OnEffectsAdded += AttackEffectsAdded;
             stats.Range.OnValueChanged += RangeChanged;
@@ -766,7 +739,6 @@ namespace Buildings.District
             
             Attack.OnEffectsAdded -= AttackEffectsAdded;
             requireTargeting = true;
-            SpawnEntities();
         }
 
         private bool SearchEffects(List<IEffect> effects)
@@ -807,7 +779,6 @@ namespace Buildings.District
             UpgradeStats.Add(damage);
         }
         
-        
         public override void OnSelected(Vector3 pos)
         {
             if (!requireTargeting || selected) return;
@@ -832,47 +803,20 @@ namespace Buildings.District
         {
             if (requireTargeting)
             {
-                UpdateEntities(false);
-            }
-            
-            float mineSpeed = 1.0f / stats.AttackSpeed.Value;
-            for (int i = 0; i < mineChunks.Count; i++)
-            {
-                MineInstance instance = mineChunks[i];
-                
-                instance.Timer += Time.deltaTime * DistrictData.GameSpeed.Value;
-                if (mineChunks[i].Timer >= mineSpeed)
-                {
-                    OriginPosition = mineChunks[i].Position;
-                    PerformAttack();
-                    
-                    instance.Timer = 0;
-                }
-
-                mineChunks[i] = instance;
+                UpdateEntities();
             }
         }
 
-        private void PerformAttack()
+        public override void OnWaveEnd()
         {
-            Attack.TriggerAttack(this);
-        }
+            base.OnWaveEnd();
 
-        public override void OnWaveStart()
-        {
-            
-        }
-
-        public override void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
-        {
-            foreach (int3 destroyedIndex in destroyedIndexes)
+            foreach (Entity spawnedEntity in spawnedEntities)    
             {
-                for (int i = 0; i < mineChunks.Count; i++)
+                OriginPosition = entityManager.GetAspect<EnemyTargetAspect>(spawnedEntity).LocalTransform.ValueRO.Position;
+                foreach (IEffect effect in mineData.EndWaveEffects)
                 {
-                    if (!math.all(mineChunks[i].ChunkIndex == destroyedIndex)) continue;
-                    
-                    mineChunks.RemoveAtSwapBack(i);
-                    break;
+                    effect.Perform(this);
                 }
             }
         }
@@ -1065,112 +1009,112 @@ namespace Buildings.District
      
      #endregion
      
-     #region Lightning
+    #region Lightning
      
-     public class LightningState : DistrictState
-     { 
-         private readonly TowerData lightningData;
- 
-         private GameObject rangeIndicator;
-         private bool selected;
-         
-         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
-         public override CategoryType CategoryType => CategoryType.Lightning;
-         protected override bool UseTargetMeshes => false;
-         protected override float AttackAngle => 360;
-         public override Attack Attack { get; }
-         
-         public LightningState(DistrictData districtData, TowerData lightningData, Vector3 position, int key) : base(districtData, position, key)
-         {
-             this.lightningData = lightningData;
-  
-             CreateStats();
-             SpawnEntities();
-  
-             Attack = new Attack(lightningData.BaseAttack);
-             stats.Range.OnValueChanged += RangeChanged;
-         }
-         
-         protected override List<QueryChunk> GetEntityChunks(out List<Vector2> offsets, out List<Vector2> directions)
-         {
-             List<QueryChunk> chunks = new List<QueryChunk>();
-             offsets = new List<Vector2>();
-             directions = new List<Vector2>();
+    public class LightningState : DistrictState
+    { 
+        private readonly TowerData lightningData;
 
-             foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
-             {
-                 chunks.Add(chunk);
-                 offsets.Add(DistrictData.DistrictGenerator.ChunkScale / 2.0f);
-                 directions.Add(Vector2.zero);
-             }
+        private GameObject rangeIndicator;
+        private bool selected;
+        
+        public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
+        public override CategoryType CategoryType => CategoryType.Lightning;
+        protected override bool UseTargetMeshes => false;
+        protected override float AttackAngle => 360;
+        public override Attack Attack { get; }
+        
+        public LightningState(DistrictData districtData, TowerData lightningData, Vector3 position, int key) : base(districtData, position, key)
+        {
+            this.lightningData = lightningData;
 
-             return chunks;
-         }
-         
-         private void RangeChanged()
-         {
-             if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
-             {
-                 rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
-             }
-         }
-  
-         private void CreateStats()
-         {
-             stats = new Stats(lightningData.Stats);
-             UpgradeStat healthDamage = new UpgradeStat(stats.HealthDamage, lightningData.LevelDatas[0],
-                 "Health Damage",
-                 new string[] { "Increase <b>Health Damage Multiplier</b> by {0}", "Current <b>Health Damage Multiplier</b>: <color=green>{0}</color>x" },
-                 lightningData.UpgradeIcons[0]){
-                 DistrictState = this
-             };
-             UpgradeStat armorDamage = new UpgradeStat(stats.ArmorDamage, lightningData.LevelDatas[1],
-                 "Armor Damage",
-                 new string[] { "Increase <b>Armor Damage Multiplier</b> by {0}", "Current <b>Armor Damage Multiplier</b>: <color=yellow>{0}</color>x" },
-                 lightningData.UpgradeIcons[1]){
-                 DistrictState = this
-             };
-             UpgradeStat shieldDamage = new UpgradeStat(stats.ShieldDamage, lightningData.LevelDatas[2],
-                 "Shield Damage",
-                 new string[] { "Increase <b>Shield Damage Multiplier</b> by {0}", "Current <b>Shield Damage Multiplier</b>: <color=blue>{0}</color>x" },
-                 lightningData.UpgradeIcons[2]){
-                 DistrictState = this
-             };
-  
-             UpgradeStats.Add(healthDamage);
-             UpgradeStats.Add(armorDamage);
-             UpgradeStats.Add(shieldDamage);
-         }
-         
-         public override void OnSelected(Vector3 pos)
-         {
-             if (selected) return;
-             
-             selected = true;
-             rangeIndicator = lightningData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
-             rangeIndicator.transform.position = pos;
-             rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
-             rangeIndicator.gameObject.SetActive(true);
-         }
-  
-         public override void OnDeselected()
-         {
-             selected = false;
-             
-             if (rangeIndicator != null)
-             {
-                 rangeIndicator.SetActive(false);
-                 rangeIndicator = null;
-             }
-         }
-  
-         public override void Update()
-         {
-             UpdateEntities();
-         }
-     
-         protected override DistrictTargetMesh GetTargetMesh(Vector3 position, Vector2 direction) => throw new NotImplementedException();
-     }
+            CreateStats();
+            SpawnEntities();
+
+            Attack = new Attack(lightningData.BaseAttack);
+            stats.Range.OnValueChanged += RangeChanged;
+        }
+        
+        protected override List<QueryChunk> GetEntityChunks(out List<Vector2> offsets, out List<Vector2> directions)
+        {
+            List<QueryChunk> chunks = new List<QueryChunk>();
+            offsets = new List<Vector2>();
+            directions = new List<Vector2>();
+
+            foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
+            {
+                chunks.Add(chunk);
+                offsets.Add(DistrictData.DistrictGenerator.ChunkScale / 2.0f);
+                directions.Add(Vector2.zero);
+            }
+
+            return chunks;
+        }
+        
+        private void RangeChanged()
+        {
+            if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
+            {
+                rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            }
+        }
+
+        private void CreateStats()
+        {
+            stats = new Stats(lightningData.Stats);
+            UpgradeStat healthDamage = new UpgradeStat(stats.HealthDamage, lightningData.LevelDatas[0],
+                "Health Damage",
+                new string[] { "Increase <b>Health Damage Multiplier</b> by {0}", "Current <b>Health Damage Multiplier</b>: <color=green>{0}</color>x" },
+                lightningData.UpgradeIcons[0]){
+                DistrictState = this
+            };
+            UpgradeStat armorDamage = new UpgradeStat(stats.ArmorDamage, lightningData.LevelDatas[1],
+                "Armor Damage",
+                new string[] { "Increase <b>Armor Damage Multiplier</b> by {0}", "Current <b>Armor Damage Multiplier</b>: <color=yellow>{0}</color>x" },
+                lightningData.UpgradeIcons[1]){
+                DistrictState = this
+            };
+            UpgradeStat shieldDamage = new UpgradeStat(stats.ShieldDamage, lightningData.LevelDatas[2],
+                "Shield Damage",
+                new string[] { "Increase <b>Shield Damage Multiplier</b> by {0}", "Current <b>Shield Damage Multiplier</b>: <color=blue>{0}</color>x" },
+                lightningData.UpgradeIcons[2]){
+                DistrictState = this
+            };
+
+            UpgradeStats.Add(healthDamage);
+            UpgradeStats.Add(armorDamage);
+            UpgradeStats.Add(shieldDamage);
+        }
+        
+        public override void OnSelected(Vector3 pos)
+        {
+            if (selected) return;
+            
+            selected = true;
+            rangeIndicator = lightningData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
+            rangeIndicator.transform.position = pos;
+            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            rangeIndicator.gameObject.SetActive(true);
+        }
+
+        public override void OnDeselected()
+        {
+            selected = false;
+            
+            if (rangeIndicator != null)
+            {
+                rangeIndicator.SetActive(false);
+                rangeIndicator = null;
+            }
+        }
+
+        public override void Update()
+        {
+            UpdateEntities();
+        }
+    
+        protected override DistrictTargetMesh GetTargetMesh(Vector3 position, Vector2 direction) => throw new NotImplementedException();
+    }
      
      #endregion
 }

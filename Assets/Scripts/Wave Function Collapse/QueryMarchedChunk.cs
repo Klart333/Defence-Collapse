@@ -28,6 +28,7 @@ namespace WaveFunctionCollapse
         public IQueryWaveFunction Handler { get; set; }
         public Cell[,,] Cells { get; private set; }
         public bool[,,] BuiltCells { get; private set; }
+        public GroundType[,,] GroundTypes { get; private set; }
         public List<GameObject> SpawnedMeshes { get; } = new List<GameObject>();
         public Vector3 Position { get; private set;}
         public int Width { get; private set;}
@@ -95,6 +96,11 @@ namespace WaveFunctionCollapse
 
         public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Stack<ChunkIndex> cellStack)
         {
+            LoadCells(prototypeInfoData, gridScale, Vector3.zero);
+        }
+        
+        public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Vector3 offset)
+        {
             PrototypeInfoData = prototypeInfoData;
             IsClear = false;
 
@@ -102,12 +108,12 @@ namespace WaveFunctionCollapse
             for (int y = 0; y < Height; y++)
             for (int x = 0; x < Width; x++)
             {
-                Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z);
+                Vector3 pos = new Vector3(x * gridScale.x, y * gridScale.y, z * gridScale.z) - offset;
                 Cells[x, y, z] = new Cell(false, Position + pos, new List<PrototypeData> { PrototypeData.Empty });
             }
         }
         
-        public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Chunk groundChunk, Vector3 offset, BuildableCornerData cellBuildableCornerData = null)
+        public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Chunk groundChunk, Vector3 offset, BuildableCornerData cellBuildableCornerData)
         {
             PrototypeInfoData = prototypeInfoData;
             IsClear = false;
@@ -120,16 +126,18 @@ namespace WaveFunctionCollapse
                 Cells[x, y, z] = new Cell(false, Position + pos, new List<PrototypeData> { PrototypeData.Empty });
             }
             
+            GroundTypes = new GroundType[Width, Height, Depth];
             for (int z = 0; z < Depth; z++)
             for (int y = 0; y < Height; y++)
             for (int x = 0; x < Width; x++)
             {
                 int3 cellIndex = new int3(x, y, z);
                 int3 gridIndex = new int3(Mathf.FloorToInt(x * gridScale.x / 2.0f), 0, Mathf.FloorToInt(z * gridScale.z / 2.0f));
-                SetCellDependingOnGround(cellIndex, gridIndex); 
+                // Set GroundTypes
+                SetGroundType(cellIndex, gridIndex); 
             }
             
-            void SetCellDependingOnGround(int3 cellIndex, int3 groundIndex)
+            void SetGroundType(int3 cellIndex, int3 groundIndex)
             {
                 Vector3 cellPosition = Cells[cellIndex.x, cellIndex.y, cellIndex.z].Position;
 
@@ -141,13 +149,9 @@ namespace WaveFunctionCollapse
                 Cell groundCell = groundChunk.Cells[groundIndex.x, 0, groundIndex.z];
                 int2 corner = new int2((int)Mathf.Sign(groundCell.Position.x - cellPosition.x), (int)Mathf.Sign(groundCell.Position.z - cellPosition.z));
 
-                if (cellBuildableCornerData != null && !cellBuildableCornerData.IsCornerBuildable(groundCell.PossiblePrototypes[0].MeshRot, -corner, out _))
+                if (cellBuildableCornerData.IsCornerBuildable(groundCell.PossiblePrototypes[0].MeshRot, -corner, out GroundType type))
                 {
-                    Cells[cellIndex.x, cellIndex.y, cellIndex.z] = new Cell(
-                        true,
-                        cellPosition,
-                        unbuildablePrototypeList,
-                        false);
+                    GroundTypes[cellIndex.x, cellIndex.y, cellIndex.z] = type;
                 }
             }
         }

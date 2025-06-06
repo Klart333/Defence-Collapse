@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
@@ -16,6 +17,17 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private ProtoypeMeshes protoypeMeshes;
 
+        public bool IsCornerBuildable(MeshWithRotation meshRot, int2 corner)
+        {
+            if (meshRot.MeshIndex == -1 || !BuildableDictionary.TryGetValue(protoypeMeshes.Meshes[meshRot.MeshIndex], out BuildableCorners buildableCorners))
+            {
+                return false;
+            }
+
+            Corner rotatedCorner = RotateCorner(meshRot.Rot, corner);
+            return buildableCorners.CornerDictionary[rotatedCorner].Buildable;
+        }
+        
         public bool IsCornerBuildable(MeshWithRotation meshRot, int2 corner, out bool meshIsBuildable)
         {
             if (meshRot.MeshIndex == -1 || !BuildableDictionary.TryGetValue(protoypeMeshes.Meshes[meshRot.MeshIndex], out BuildableCorners buildableCorners))
@@ -27,6 +39,20 @@ namespace WaveFunctionCollapse
             meshIsBuildable = true;
             Corner rotatedCorner = RotateCorner(meshRot.Rot, corner);
             return buildableCorners.CornerDictionary[rotatedCorner].Buildable;
+        }
+        
+        public bool IsCornerBuildable(MeshWithRotation meshRot, int2 corner, out GroundType groundType)
+        {
+            if (meshRot.MeshIndex == -1 || !BuildableDictionary.TryGetValue(protoypeMeshes.Meshes[meshRot.MeshIndex], out BuildableCorners buildableCorners))
+            {
+                groundType = default;
+                return false;
+            }
+
+            Corner rotatedCorner = RotateCorner(meshRot.Rot, corner);
+            CornerData cornerData = buildableCorners.CornerDictionary[rotatedCorner];
+            groundType = cornerData.GroundType;
+            return cornerData.Buildable;
         }
 
         public static Corner RotateCorner(int rot, int2 corner)
@@ -105,10 +131,11 @@ namespace WaveFunctionCollapse
         }
     }
 
+    [Flags]
     public enum GroundType
     {
-        Grass, 
-        Crystal,
+        Grass = 1 << 0, 
+        Crystal = 1 << 1,
     }
 
     public enum Corner

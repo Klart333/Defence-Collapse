@@ -149,8 +149,8 @@ public class BuildingHandler : SerializedMonoBehaviour
         int2 otherDir = indexDiff.z == 0 
             ? new int2(indexDiff.x, -1)
             : new int2(-1, indexDiff.z);
-        bool isCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, dir, out _);
-        bool otherCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, otherDir, out _);
+        bool isCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, dir);
+        bool otherCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, otherDir);
         //Debug.Log($"{building1.ChunkIndex}\n{building2.ChunkIndex}\n{BuildableCornerData.VectorToCorner(dir.x, dir.y)}: {isCornerBuildable}\n{BuildableCornerData.VectorToCorner(otherDir.x, otherDir.y)}: {otherCornerBuildable}");
         return isCornerBuildable || otherCornerBuildable;
     }

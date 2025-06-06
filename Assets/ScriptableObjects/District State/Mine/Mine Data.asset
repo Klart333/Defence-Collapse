@@ -29,7 +29,7 @@ MonoBehaviour:
       Data: 1|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -38,7 +38,7 @@ MonoBehaviour:
       Data: 2|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -47,7 +47,7 @@ MonoBehaviour:
       Data: 3|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -56,7 +56,7 @@ MonoBehaviour:
       Data: 4|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0.2
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -65,7 +65,7 @@ MonoBehaviour:
       Data: 5|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 5
+      Data: 4
     - Name: 
       Entry: 8
       Data: 
@@ -83,7 +83,7 @@ MonoBehaviour:
       Data: 7|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -92,7 +92,7 @@ MonoBehaviour:
       Data: 8|Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 2
+      Data: 5
     - Name: 
       Entry: 8
       Data: 
@@ -152,16 +152,7 @@ MonoBehaviour:
       Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 16|Effects.AddMoneyEffect, Core
-    - Name: ModifierValue
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -170,7 +161,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 16|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -183,10 +174,34 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: endWaveEffects
+      Entry: 7
+      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 18|Effects.AddMoneyEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 5
+    - Name: multiplyWithAttackSpeed
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   districtName: Mine District
   icon: {fileID: 21300000, guid: 34aa25191b04edd4ab4ab2b1c6c25c09, type: 3}
-  description: "Place on crystal deposits to passively generate income. \n\nSize:
-    2 x 2\nCost : 50"
+  description: "Place on crystal deposits to generate gold at the end of every wave.
+    \n\nSize: 1 x 1\nCost : 50"
   districtType: 4
   LevelDatas:
   - {fileID: 11400000, guid: e55eb16e32ce1fd4a91679522ad38316, type: 2}

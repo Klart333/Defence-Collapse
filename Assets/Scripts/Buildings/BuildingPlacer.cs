@@ -39,8 +39,10 @@ namespace Buildings
         private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
 
         private BuildingHandler buildingHandler;
+        private BuildingManager buildingManager;
         private GroundGenerator groundGenerator;
         private PlaceSquare hoveredSquare;
+        private InputManager inputManager;
         private PlaceSquare pressedSquare;
         private Vector3 targetScale;
         private Camera cam;
@@ -48,7 +50,7 @@ namespace Buildings
         private bool manualCancel;
 
         public Dictionary<ChunkIndex, PlaceSquare> SpawnedSpawnPlaces => spawnedSpawnPlaces;
-        private bool Canceled => InputManager.Instance.Cancel.WasPerformedThisFrame() || manualCancel;
+        private bool Canceled => inputManager.Cancel.WasPerformedThisFrame() || manualCancel;
         public bool SquareWasPressed { get; set; }
         public ChunkIndex? SquareIndex { get; set; }
 
@@ -71,20 +73,22 @@ namespace Buildings
 
         private async UniTaskVoid AwaitManagers()
         {
-            await UniTask.WaitUntil(() => BuildingManager.Instance != null && InputManager.Instance != null);
-            BuildingManager.Instance.OnLoaded += InitializeSpawnPlaces;
-            InputManager.Instance.Fire.started += MouseOnDown;
-            InputManager.Instance.Fire.canceled += MouseOnUp;
+            buildingManager = await BuildingManager.Get();
+            buildingManager.OnLoaded += InitializeSpawnPlaces;
+            
+            inputManager = await InputManager.Get();
+            inputManager.Fire.started += MouseOnDown;
+            inputManager.Fire.canceled += MouseOnUp;
         }
 
         private void OnDisable()
         {
-            BuildingManager.Instance.OnLoaded -= InitializeSpawnPlaces;
+            buildingManager.OnLoaded -= InitializeSpawnPlaces;
             Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
             barricadePlacer.OnIndexBuilt -= BarricadeIndexBuilt;
             barricadePlacer.OnIndexSold -= BarricadeIndexSold;
-            InputManager.Instance.Fire.started -= MouseOnDown;
-            InputManager.Instance.Fire.canceled -= MouseOnUp;
+            inputManager.Fire.started -= MouseOnDown;
+            inputManager.Fire.canceled -= MouseOnUp;
             UIEvents.OnFocusChanged -= OnBuildingCanceled;
             Events.OnBuildingClicked -= BuildingClicked;
             Events.OnBuiltIndexBuilt -= OnBuildingBuilt;
@@ -99,7 +103,7 @@ namespace Buildings
             }
 
             Vector3 mousePoint = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
-            ChunkIndex? chunkIndex = BuildingManager.Instance.GetIndex(mousePoint);
+            ChunkIndex? chunkIndex = buildingManager.GetIndex(mousePoint);
             if (!chunkIndex.HasValue)
             {
                 SquareIndex = null;
@@ -141,24 +145,24 @@ namespace Buildings
 
         private void InitializeSpawnPlaces(QueryMarchedChunk chunk)
         {
-            targetScale = groundGenerator.ChunkWaveFunction.CellSize.MultiplyByAxis(BuildingManager.Instance.ChunkWaveFunction.CellSize);
+            targetScale = groundGenerator.ChunkWaveFunction.CellSize.MultiplyByAxis(buildingManager.ChunkWaveFunction.CellSize);
             for (int x = 0; x < chunk.Width - 1; x++)
             {
                 for (int z = 0; z < chunk.Depth - 1; z++)
                 {
                     ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
                     if (spawnedSpawnPlaces.ContainsKey(chunkIndex)
-                        || !chunk.Cells[x, 0, z].Buildable
-                        || !chunk.Cells[x + 1, 0, z].Buildable
-                        || !chunk.Cells[x, 0, z + 1].Buildable
-                        || !chunk.Cells[x + 1, 0, z + 1].Buildable) continue;
+                        || !buildingManager.IsBuildable(chunk, new int3(x    , 0, z    ))
+                        || !buildingManager.IsBuildable(chunk, new int3(x + 1, 0, z    ))
+                        || !buildingManager.IsBuildable(chunk, new int3(x    , 0, z + 1))
+                        || !buildingManager.IsBuildable(chunk, new int3(x + 1, 0, z + 1))) continue;
 
                     Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
                     SpawnSquare(pos, chunkIndex);
                 }
             }
 
-            Dictionary<int3, QueryMarchedChunk> chunks = BuildingManager.Instance.ChunkWaveFunction.Chunks;
+            Dictionary<int3, QueryMarchedChunk> chunks = buildingManager.ChunkWaveFunction.Chunks;
             CheckIntersection(chunk);
             if (chunks.TryGetValue(chunk.ChunkIndex - new int3(0, 0, 1), out QueryMarchedChunk bottomChunk))
                 CheckIntersection(bottomChunk);
@@ -177,10 +181,10 @@ namespace Buildings
                     {
                         ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
                         if (spawnedSpawnPlaces.ContainsKey(chunkIndex)
-                            || !chunk.Cells[x, 0, z].Buildable
-                            || !chunk.Cells[x + 1, 0, z].Buildable
-                            || !topChunk.Cells[x, 0, 0].Buildable
-                            || !topChunk.Cells[x + 1, 0, 0].Buildable) continue;
+                            || !buildingManager.IsBuildable(chunk   , new int3(x    , 0, z))
+                            || !buildingManager.IsBuildable(chunk   , new int3(x + 1, 0, z))
+                            || !buildingManager.IsBuildable(topChunk, new int3(x    , 0, 0))
+                            || !buildingManager.IsBuildable(topChunk, new int3(x + 1, 0, 0))) continue;
 
                         Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
                         SpawnSquare(pos, chunkIndex);
@@ -195,10 +199,10 @@ namespace Buildings
                     {
                         ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
                         if (spawnedSpawnPlaces.ContainsKey(chunkIndex)
-                            || !chunk.Cells[x, 0, z].Buildable
-                            || !chunk.Cells[x, 0, z + 1].Buildable
-                            || !rightChunk.Cells[0, 0, z].Buildable
-                            || !rightChunk.Cells[0, 0, z + 1].Buildable) continue;
+                            || !buildingManager.IsBuildable(chunk     , new int3(x, 0, z    ))
+                            || !buildingManager.IsBuildable(chunk     , new int3(x, 0, z + 1))
+                            || !buildingManager.IsBuildable(rightChunk, new int3(0, 0, z    ))
+                            || !buildingManager.IsBuildable(rightChunk, new int3(0, 0, z + 1))) continue;
 
                         Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
                         SpawnSquare(pos, chunkIndex);
@@ -213,10 +217,10 @@ namespace Buildings
                     int z = chunk.Depth - 1;
                     ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
                     if (spawnedSpawnPlaces.ContainsKey(chunkIndex)
-                        || !chunk.Cells[x, 0, z].Buildable
-                        || !rightChunk.Cells[0, 0, z].Buildable
-                        || !topChunk.Cells[x, 0, 0].Buildable
-                        || !topRightChunk.Cells[0, 0, 0].Buildable) return;
+                        || !buildingManager.IsBuildable(chunk        , new int3(x, 0, z))
+                        || !buildingManager.IsBuildable(rightChunk   , new int3(0, 0, z))
+                        || !buildingManager.IsBuildable(topChunk     , new int3(x, 0, 0))
+                        || !buildingManager.IsBuildable(topRightChunk, new int3(0, 0, 0))) return;
 
                     Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
                     SpawnSquare(pos, chunkIndex);
@@ -262,7 +266,7 @@ namespace Buildings
 
                 if (!SquareIndex.HasValue)
                 {
-                    BuildingManager.Instance.RevertQuery();
+                    buildingManager.RevertQuery();
                     queryIndex = default;
                     continue;
                 }
@@ -284,12 +288,12 @@ namespace Buildings
                     continue;
                 }
 
-                BuildingManager.Instance.RevertQuery();
+                buildingManager.RevertQuery();
                 await UniTask.NextFrame();
                 if (!SquareIndex.HasValue || spawnedSpawnPlaces[SquareIndex.Value].Locked) continue;
 
                 queryIndex = SquareIndex.Value;
-                buildables = BuildingManager.Instance.Query(queryIndex);
+                buildables = buildingManager.Query(queryIndex);
 
                 foreach (IBuildable item in buildables.Values)
                 {
@@ -298,7 +302,7 @@ namespace Buildings
 
                 if (buildables.Count == 0)
                 {
-                    ShowUnablePlaces(BuildingManager.Instance.GetCellsToCollapse(queryIndex).Select(x => BuildingManager.Instance.GetPos(x) + Vector3.up * BuildingManager.Instance.ChunkScale.y / 2.0f)
+                    ShowUnablePlaces(buildingManager.GetCellsToCollapse(queryIndex).Select(x => buildingManager.GetPos(x) + Vector3.up * buildingManager.ChunkScale.y / 2.0f)
                         .ToList());
                     continue;
                 }
@@ -321,7 +325,7 @@ namespace Buildings
                 SquareIndex = null;
                 ToggleSpawnPlaces(false);
                 DisablePlaces();
-                BuildingManager.Instance.RevertQuery();
+                buildingManager.RevertQuery();
 
                 if (!manualCancel)
                 {
@@ -359,13 +363,13 @@ namespace Buildings
 
             if (!MoneyManager.Instance.CanPurchase(BuildingType.Building))
             {
-                //BuildingManager.Instance.RevertQuery();
+                //buildingManager.RevertQuery();
                 return;
             }
 
             MoneyManager.Instance.Purchase(BuildingType.Building);
 
-            BuildingManager.Instance.Place();
+            buildingManager.Place();
             
             OnIndexBuilt?.Invoke(SquareIndex.Value);
         }

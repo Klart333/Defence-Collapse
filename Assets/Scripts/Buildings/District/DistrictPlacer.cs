@@ -3,18 +3,17 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using WaveFunctionCollapse;
 using Sirenix.Utilities;
 using Unity.Mathematics;
-using System.Linq;
-using UnityEngine;
-using System;
-using Gameplay;
 using Gameplay.Money;
+using UnityEngine;
+using System.Linq;
 using InputCamera;
-using Sirenix.Serialization;
+using Gameplay;
+using System;
 using TMPro;
-using UnityEngine.Serialization;
 
 namespace Buildings.District
 {
@@ -265,10 +264,7 @@ namespace Buildings.District
                 ChunkIndex? buildIndex = buildingGenerator.GetIndex(districtPos);// + buildingGenerator.CellSize.XyZ(0) / 2.0f);
                 if (!buildIndex.HasValue)
                 {
-                    if (verbose)
-                    {
-                        Debug.Log("Invalid, Can't find build index");
-                    }
+                    if (verbose) Debug.Log("Invalid, Can't find build index");
                     return false;
                 }
 
@@ -277,6 +273,12 @@ namespace Buildings.District
                 
                 if (TryGetBuiltIndex(buildingCellPosition, buildIndex.Value, districtPos, out ChunkIndex builtIndex))
                 {
+                    if (!buildingGenerator.IsBuildable(builtIndex))
+                    {
+                        if (verbose) Debug.Log($"Invalid, builtIndex: {builtIndex} is not buildable");
+                        return false;
+                    }
+                    
                     if (!buildingPlacer.SpawnedSpawnPlaces.TryGetValue(builtIndex, out var spawnPlace) || spawnPlace.Locked)
                     {
                         if (verbose)
@@ -293,22 +295,18 @@ namespace Buildings.District
                 }
                 else
                 {
-                    if (buildingGenerator.ChunkWaveFunction[builtIndex].Buildable)
+                    if (!buildingGenerator.IsBuildable(builtIndex))
                     {
-                        continue;
+                        if (verbose) Debug.Log($"Invalid, builtIndex: {builtIndex} is not buildable");
+                        return false;
                     }
-
-                    if (verbose)
-                    {
-                        Debug.Log("Invalid, builtIndex is not buildable");
-                    }
-                    return false;
                 }
             
             }
             requireQueryWalls = builtIndexes.Count > 0;
             return true;
 
+            // Returns false if index is already built
             bool TryGetBuiltIndex(Vector3 buildingCellPosition, ChunkIndex buildIndex, Vector3 districtPos, out ChunkIndex builtIndex)
             {
                 Vector2 dir = (buildingCellPosition.XZ() - districtPos.XZ()).normalized;
@@ -331,6 +329,7 @@ namespace Buildings.District
                 if (!buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].QueryBuiltCells.Contains(builtIndex.CellIndex) 
                     && buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z])
                 {
+                    // BuiltIndex is alread built
                     return false;
                 }
                 
@@ -344,14 +343,25 @@ namespace Buildings.District
                 districtChunkIndexes[x, z] = ChunkWaveUtility.GetDistrictIndex2(districtPos, districtGenerator.ChunkScale);
                 if (districtHandler.IsBuilt(districtChunkIndexes[x, z]))
                 {
-                    if (verbose)
-                    {
-                        Debug.Log("Invalid, District index is already built");
-                    }
+                    if (verbose) Debug.Log("Invalid, District index is already built");
                     return false;
                 }
                 
                 districtPos = ChunkWaveUtility.GetPosition(districtChunkIndexes[x, z].XyZ(0), districtGenerator.ChunkScale);
+                ChunkIndex? buildingIndex = buildingGenerator.GetIndex(districtPos + buildingGenerator.CellSize / 2.0f);
+                if (!buildingIndex.HasValue)
+                {
+                    if (verbose) Debug.Log("Invalid, District index is out of bounds");
+                    return false;
+                }
+                
+                GroundType groundType = buildingGenerator.ChunkWaveFunction.Chunks[buildingIndex.Value.Index].GroundTypes[buildingIndex.Value.CellIndex.x, buildingIndex.Value.CellIndex.y, buildingIndex.Value.CellIndex.z];
+                if (!IsBuildable(groundType))
+                {
+                    if (verbose) Debug.Log($"Invalid, The groundType: {groundType} does not match the district's restrictions");
+                    return false;
+                }
+
                 return true;
             }
         }
@@ -366,6 +376,15 @@ namespace Buildings.District
             districtRadius = radius;
             Placing = true;
             isPlacementValid = false;
+        }
+
+        public bool IsBuildable(GroundType groundType)
+        {
+            return districtType switch
+            {
+                DistrictType.Mine => groundType is GroundType.Crystal,
+                _ => groundType is GroundType.Grass or GroundType.Crystal
+            };
         }
 
         private void CancelPerformed(InputAction.CallbackContext obj)

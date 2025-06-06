@@ -46,7 +46,7 @@ namespace WaveFunctionCollapse
             foreach (ChunkIndex index in cellsToCollapse)
             {
                 QueryMarchedChunk chunk = ChunkWaveFunction.Chunks[index.Index];
-                if (!ChunkWaveFunction[index].Buildable) continue;
+                if (!IsBuildable(index)) continue;
 
                 int marchedIndex = GetMarchIndex(index);
                 chunk.QueryChangedCells.Add((index.CellIndex, chunk[index.CellIndex]));
@@ -64,6 +64,8 @@ namespace WaveFunctionCollapse
                 }
             }
         }
+
+        public bool IsBuildable(ChunkIndex index);
         
         private int GetMarchIndex(ChunkIndex index)
         {

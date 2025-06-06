@@ -63,6 +63,7 @@ namespace Buildings.District
             };
 
             Events.OnWaveStarted += OnWaveStarted;
+            Events.OnWaveEnded += OnWaveEnded;
             Events.OnWallsDestroyed += OnWallsDestroyed;
         }
 
@@ -94,7 +95,7 @@ namespace Buildings.District
             }
         }
 
-        public void ExpandDistrict(HashSet<QueryChunk> chunks) // To-do: Add callback to DistrictState in case of further merging
+        public void ExpandDistrict(HashSet<QueryChunk> chunks) // To-do: Add callback to DistrictState
         {
             foreach (QueryChunk chunk in chunks)
             {
@@ -224,6 +225,11 @@ namespace Buildings.District
             State.OnWaveStart();
         }
 
+        private void OnWaveEnded()
+        {
+            State.OnWaveEnd();
+        }
+        
         public void LevelUp()
         {
             OnLevelup?.Invoke();
@@ -238,10 +244,12 @@ namespace Buildings.District
         {
             State.Die();
             
-            Events.OnWallsDestroyed -= OnWallsDestroyed;
             InputManager.Instance.Cancel.performed -= OnDeselected;
+            Events.OnWallsDestroyed -= OnWallsDestroyed;
             UIEvents.OnFocusChanged -= Deselect;
             Events.OnWaveStarted -= OnWaveStarted;
+            Events.OnWaveEnded -= OnWaveEnded;
+            
             if (meshCollider)
             {
                 Object.Destroy(meshCollider.gameObject);

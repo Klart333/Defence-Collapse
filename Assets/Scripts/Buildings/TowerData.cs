@@ -3,6 +3,8 @@ using Sirenix.Serialization;
 using UnityEngine;
 using Gameplay;
 using System;
+using System.Collections.Generic;
+using Effects;
 using Juice;
 
 [InlineEditor, CreateAssetMenu(fileName = "New Tower Data", menuName = "Building/Tower Data")]
@@ -39,8 +41,13 @@ public class TowerData : SerializedScriptableObject
     [Title("Attack")]
     [OdinSerialize, NonSerialized]
     public Attack BaseAttack;
+
+    [Title("End Wave")]
+    [OdinSerialize]
+    private List<IEffect> endWaveEffects = new List<IEffect>();
     
     public DistrictTargetMesh DistrictTargetMesh => districtTargetMesh;
+    public List<IEffect> EndWaveEffects => endWaveEffects;
     public string DistrictName => districtName;
     public string Description => description;
     public Sprite Icon => icon;

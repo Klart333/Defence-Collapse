@@ -86,7 +86,7 @@ namespace WaveFunctionCollapse
 
             queryChunk.Handler = this;
             Vector3 offset = new Vector3(CellSize.x / 2.0f, 0, CellSize.z / 2.0f);
-            queryChunk.LoadCells(townPrototypeInfo, CellSize, chunk, offset);
+            queryChunk.LoadCells(townPrototypeInfo, CellSize, offset);
             waveFunction.LoadChunk(index, queryChunk);
 
             OnLoaded?.Invoke(queryChunk);
@@ -153,8 +153,7 @@ namespace WaveFunctionCollapse
                 {
                     if (cellsToUpdate.Contains(neighbours[j])
                         || !waveFunction.Chunks.TryGetValue(neighbours[j].Index, out QueryMarchedChunk neihbourChunk)
-                        || !neihbourChunk[neighbours[j].CellIndex].Collapsed
-                        || !neihbourChunk[neighbours[j].CellIndex].Buildable) continue;
+                        || !neihbourChunk[neighbours[j].CellIndex].Collapsed) continue;
                     cellsToUpdate.Add(neighbours[j]);
 
                     if (depth <= 0) continue;
@@ -251,6 +250,8 @@ namespace WaveFunctionCollapse
 
             return building;
         }
+
+        public bool IsBuildable(ChunkIndex index) => true;
 
         #endregion
 

@@ -20,6 +20,7 @@ public class UIBuildingHandler : MonoBehaviour
         {
             DistrictType.Bomb => 3,
             DistrictType.Lightning => 1,
+            DistrictType.Mine => 1,
             _ => 2, 
         });
     }

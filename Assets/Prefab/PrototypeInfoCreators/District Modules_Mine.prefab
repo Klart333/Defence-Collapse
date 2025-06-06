@@ -150,12 +150,11 @@ MonoBehaviour:
   onlyAllowedBottomIndexes: 00000000010000000200000003000000
   notAllowedSideIndexes: 
   moduleScale: {x: 2, y: 2, z: 2}
-  startKeyNumber: 11
   useVerticiesOutsideUnitCube: 0
   useMCode: 0
   useMCodeHeight: 0
   useBuildableCorners: 0
-  rightBuildableCode: 0
+  rightBuildableCodes: 
   buildableCornerData: {fileID: 0}
   prototypeData: {fileID: 11400000, guid: d94a6d5c1a8128544a4b6388e09ea944, type: 2}
   materialData: {fileID: 11400000, guid: d607b7626b2ef464cbaa6473ec1fb6ef, type: 2}
@@ -163,13 +162,13 @@ MonoBehaviour:
   - Name: Mine_Corner
     Weight: 1
   - Name: Mine_Full
-    Weight: 1
+    Weight: 100
   - Name: Mine_InCorner
     Weight: 1
   - Name: Mine_Side
-    Weight: 1
+    Weight: 10
   - Name: Air
-    Weight: 1
+    Weight: 0.001
 --- !u!1 &1149898460534655034
 GameObject:
   m_ObjectHideFlags: 0
