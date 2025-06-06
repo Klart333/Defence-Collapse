@@ -457,6 +457,7 @@ namespace WaveFunctionCollapse
         }
     }
 
+    [System.Serializable]
     public struct ChunkIndex : IEquatable<ChunkIndex>
     {
         public int3 Index;

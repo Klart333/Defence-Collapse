@@ -9,19 +9,26 @@ using System.Linq;
 using DG.Tweening;
 using InputCamera;
 using UnityEngine;
+using System;
 
 namespace Buildings
 {
     public class BarricadePlacer : MonoBehaviour
     {
         public static bool Displaying = false;
-    
+
+        public event Action<ChunkIndex> OnIndexBuilt;
+        public event Action<ChunkIndex> OnIndexSold;
+        
         [Title("Placing")]
         [SerializeField]
         private PooledMonoBehaviour unableToPlacePrefab;
 
         [SerializeField]
         private PlaceSquare placeSquarePrefab;
+
+        [SerializeField]
+        private BuildingPlacer buildingPlacer;
 
         private readonly Dictionary<ChunkIndex, PlaceSquare> spawnedSpawnPlaces = new Dictionary<ChunkIndex, PlaceSquare>();
         private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
@@ -50,6 +57,9 @@ namespace Buildings
 
             UIEvents.OnFocusChanged += OnPathCanceled;
             Events.OnBuildingClicked += BuildingClicked;
+            
+            buildingPlacer.OnIndexBuilt += BuildingIndexBuilt;
+            buildingPlacer.OnIndexSold += BuildingIndexSold;
 
             GetInput().Forget();
         }
@@ -65,16 +75,18 @@ namespace Buildings
         {
             Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
             barricadeGenerator.OnLoaded -= InitializeSpawnPlaces;
+            buildingPlacer.OnIndexBuilt -= BuildingIndexBuilt;
+            buildingPlacer.OnIndexSold -= BuildingIndexSold;
+            Events.OnBuildingClicked -= BuildingClicked;
+            UIEvents.OnFocusChanged -= OnPathCanceled;
             inputManager.Fire.started -= MouseOnDown;
             inputManager.Fire.canceled -= MouseOnUp;
-            UIEvents.OnFocusChanged -= OnPathCanceled;
-            Events.OnBuildingClicked -= BuildingClicked;
         }
         
         private void OnBuiltIndexDestroyed(ChunkIndex chunkIndex)
         {
             if (!spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare square)) return;
-        
+            
             if (Displaying)
             {
                 square.UnPlaced();
@@ -109,7 +121,7 @@ namespace Buildings
                 return;
             }
 
-            if (hoveredSquare != placeSquare)
+            if (hoveredSquare != placeSquare && !placeSquare.Locked)
             {
                 SquareWasPressed = false;
                 SquareIndex = chunkIndex;
@@ -265,7 +277,7 @@ namespace Buildings
                 DisablePlaces();
                 barricadeGenerator.RevertQuery();
                 await UniTask.NextFrame();
-                if (!SquareIndex.HasValue) continue;
+                if (!SquareIndex.HasValue || spawnedSpawnPlaces[SquareIndex.Value].Locked) continue;
 
                 queryIndex = SquareIndex.Value;
                 buildables = barricadeGenerator.Query(queryIndex);
@@ -343,6 +355,8 @@ namespace Buildings
             
             spawnedSpawnPlaces[SquareIndex.Value].OnPlaced();
             barricadeGenerator.Place();
+            
+            OnIndexBuilt?.Invoke(SquareIndex.Value);
         }
 
         private void RemoveBarricade()
@@ -357,6 +371,24 @@ namespace Buildings
             barricadeGenerator.RevertQuery();
             barricadeGenerator.RemoveBuiltIndex(SquareIndex.Value);
             pressedSquare.UnPlaced();
+            
+            OnIndexSold?.Invoke(SquareIndex.Value);
+        }
+        
+        private void BuildingIndexBuilt(ChunkIndex index)
+        {
+            if (spawnedSpawnPlaces.TryGetValue(index, out PlaceSquare square))
+            {
+                square.Locked = true;
+            }   
+        }
+        
+        private void BuildingIndexSold(ChunkIndex index)
+        {
+            if (spawnedSpawnPlaces.TryGetValue(index, out PlaceSquare square))
+            {
+                square.Locked = false;
+            }
         }
 
         private void ShowUnablePlaces(List<Vector3> positions)

@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalScale: {x: 0.04, y: 0.04, z: 0.04}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -99,9 +99,9 @@ MonoBehaviour:
   lifetime:
     minValue: 0.16176492
     maxValue: 0.2500001
-  useGameSpeed: 1
   readScale: 0
-  targetScale: {x: 0.05, y: 0.05, z: 0.05}
+  targetScale: {x: 0.04, y: 0.04, z: 0.04}
+  useGameSpeed: 1
   verbose: 0
 --- !u!23 &931013900563922422
 MeshRenderer:

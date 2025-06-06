@@ -1,18 +1,16 @@
 using Object = UnityEngine.Object;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using Cysharp.Threading.Tasks;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
 using Unity.Collections;
-using Unity.Assertions;
 using UnityEngine;
 using System.Linq;
 using InputCamera;
 using Gameplay;
 using Utility;
 using System;
-using Cysharp.Threading.Tasks;
-using Debug = System.Diagnostics.Debug;
 
 namespace Buildings.District
 {
@@ -180,7 +178,7 @@ namespace Buildings.District
 
         private void OnHoverEnter()
         {
-            if (DistrictPlacer.Placing || BuildingPlacer.Displaying || BarricadePlacer.Displaying)
+            if (DistrictPlacer.Placing || BarricadePlacer.Displaying || BuildingPlacer.Displaying)
             {
                 return;
             }
@@ -197,7 +195,7 @@ namespace Buildings.District
         {
             if (CameraController.IsDragging 
                 || UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()
-                || BuildingPlacer.Displaying || BarricadePlacer.Displaying || DistrictPlacer.Placing)
+                || BarricadePlacer.Displaying || BuildingPlacer.Displaying || DistrictPlacer.Placing)
             {
                 return;
             }

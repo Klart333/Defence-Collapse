@@ -11,6 +11,7 @@ using UnityEngine;
 using System.Linq;
 using Gameplay;
 using System;
+using Buildings;
 
 namespace WaveFunctionCollapse
 {

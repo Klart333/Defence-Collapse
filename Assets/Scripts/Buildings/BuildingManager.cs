@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEditor;
 using System;
+using Buildings;
 
 public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 {

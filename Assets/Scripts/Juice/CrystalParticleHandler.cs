@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Gameplay;
 using Gameplay.Money;
 using Sirenix.OdinInspector;
 using Unity.Collections;
@@ -37,11 +38,13 @@ namespace Juice
         
         private readonly List<Tuple<PooledMonoBehaviour, Vector3>> spawnedCrystals = new List<Tuple<PooledMonoBehaviour, Vector3>>();
 
+        private IGameSpeed gameSpeed;
         private Camera cam;
 
         private void Start()
         {
             cam = Camera.main;
+            gameSpeed = GameSpeedManager.Instance;
         }
 
         private void Update()
@@ -112,7 +115,7 @@ namespace Juice
                 Stopwatch timer = Stopwatch.StartNew();
                 await popup.PopupTween.AsyncWaitForCompletion();
                 timer.Stop();
-                spawned.transform.DOScale(Vector3.zero, duration - (float)timer.Elapsed.TotalSeconds).SetEase(Ease.InSine);
+                spawned.transform.DOScale(Vector3.zero, duration - (float)timer.Elapsed.TotalSeconds).SetEase(Ease.InSine).ScaleWithGameSpeed(gameSpeed);
             }
         }
     }

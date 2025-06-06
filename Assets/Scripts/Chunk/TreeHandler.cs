@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
+using Unity.Collections;
 using System.Linq;
 using UnityEngine;
 
@@ -44,17 +45,18 @@ namespace Chunks
             if (!cell.PossiblePrototypes[0].MaterialIndexes.Contains(treeMaterialIndex)) return;
             
             TreeGrower spawned = treeGrowerPrefab.GetAtPosAndRot<TreeGrower>(cell.Position, Quaternion.identity);
+            spawned.ChunkKey = chunkIndex.Index;
             spawned.Cell = cell;
 
             Chunk chunk = groundGenerator.ChunkWaveFunction.Chunks[chunkIndex.Index];
 
-            if (treeGrowersByChunk.TryGetValue(chunk.ChunkIndex, out List<TreeGrower> value))
+            if (treeGrowersByChunk.TryGetValue(chunkIndex.Index, out List<TreeGrower> value))
             {
                 value.Add(spawned);
             }
             else
             {
-                treeGrowersByChunk.Add(chunk.ChunkIndex, new List<TreeGrower> { spawned });
+                treeGrowersByChunk.Add(chunkIndex.Index, new List<TreeGrower> { spawned });
                 chunk.OnCleared += ChunkCleared;
             }
 
@@ -99,11 +101,40 @@ namespace Chunks
             
             if (treeGrowersByChunk.TryGetValue(chunkIndex, out List<TreeGrower> value))
             {
+                bool removeChunk = true;
                 foreach (TreeGrower grower in value)
                 {
+                    if (grower.ShouldRemoveWhenPlaced)
+                    {
+                        removeChunk = false;
+                        grower.OnPlaced += GrowerOnPlaced;
+
+                        continue;
+                    }
+                    
                     grower.gameObject.SetActive(false);
                 }
-                treeGrowersByChunk.Remove(chunkIndex);
+
+                if (removeChunk)
+                {
+                    treeGrowersByChunk.Remove(chunkIndex);
+                }
+            }
+        }
+
+        private void GrowerOnPlaced(TreeGrower grower)
+        {
+            grower.OnPlaced -= GrowerOnPlaced;
+            grower.gameObject.SetActive(false);
+            
+            int3 key = grower.ChunkKey;
+            if (treeGrowersByChunk.TryGetValue(key, out List<TreeGrower> list))
+            {
+                list.RemoveSwapBack(grower);
+                if (list.Count == 0)
+                {
+                    treeGrowersByChunk.Remove(key);
+                }
             }
         }
     }

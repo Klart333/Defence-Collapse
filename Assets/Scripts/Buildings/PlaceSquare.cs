@@ -19,6 +19,7 @@ public class PlaceSquare : MonoBehaviour
     private MaterialPropertyBlock block;
     
     public bool Placed { get; set; }
+    public bool Locked { get; set; }
 
     private void Awake()
     {
@@ -27,7 +28,7 @@ public class PlaceSquare : MonoBehaviour
 
     private void OnEnable()
     {
-        if (Placed)
+        if (Placed || Locked)
         {
             gameObject.SetActive(false);
             return;
@@ -40,7 +41,7 @@ public class PlaceSquare : MonoBehaviour
 
     public void OnHover()
     {
-        if (Placed) return;
+        if (Placed || Locked) return;
         
         block.SetColor(Color1, hoveredColor);
         meshRenderer.SetPropertyBlock(block);
@@ -48,7 +49,7 @@ public class PlaceSquare : MonoBehaviour
 
     public void OnHoverExit()
     {
-        if (Placed) return;
+        if (Placed || Locked) return;
         
         block.SetColor(Color1, defaultColor);
         meshRenderer.SetPropertyBlock(block);

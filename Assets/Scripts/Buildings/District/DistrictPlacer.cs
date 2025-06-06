@@ -14,6 +14,7 @@ using Gameplay.Money;
 using InputCamera;
 using Sirenix.Serialization;
 using TMPro;
+using UnityEngine.Serialization;
 
 namespace Buildings.District
 {
@@ -81,8 +82,9 @@ namespace Buildings.District
             cam = Camera.main;
             offset = new Vector3(districtGenerator.CellSize.x, 0, districtGenerator.CellSize.z) / -2.0f;
 
-            Events.OnDistrictClicked += DistrictClicked;
+            Events.OnGameReset += OnGameReset;
             UIEvents.OnFocusChanged += CancelPlacement;
+            Events.OnDistrictClicked += DistrictClicked;
 
             GetInput().Forget();
             GetMoney().Forget();
@@ -102,6 +104,7 @@ namespace Buildings.District
 
         private void OnDisable()
         {
+            Events.OnGameReset -= OnGameReset;
             UIEvents.OnFocusChanged -= CancelPlacement;
             Events.OnDistrictClicked -= DistrictClicked;
             inputManager.Fire.performed -= FirePerformed;
@@ -274,7 +277,7 @@ namespace Buildings.District
                 
                 if (TryGetBuiltIndex(buildingCellPosition, buildIndex.Value, districtPos, out ChunkIndex builtIndex))
                 {
-                    if (!buildingPlacer.SpawnedSpawnPlaces.TryGetValue(builtIndex, out var spawnPlace))
+                    if (!buildingPlacer.SpawnedSpawnPlaces.TryGetValue(builtIndex, out var spawnPlace) || spawnPlace.Locked)
                     {
                         if (verbose)
                         {
@@ -417,6 +420,11 @@ namespace Buildings.District
             {
                 SetInvalid();
             }
+        }
+        
+        private void OnGameReset()
+        {
+            Placing = false;
         }
         
         #region Debug

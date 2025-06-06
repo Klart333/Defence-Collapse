@@ -49,5 +49,7 @@ MonoBehaviour:
   - {fileID: 5879582959376992463, guid: 12b75eb0eda7b2b4bb4bded9c619c10c, type: 3}
   treeMaterial: {fileID: 2100000, guid: c36a4497441bc1d48ad8c03477895bc7, type: 2}
   raycastArea: {x: 2, y: 2}
-  treeRadius: 0.4
-  raycastCount: 20
+  treeRadius: 0.2
+  raycastCount: 80
+  shouldRemoveWhenPlaced: 1
+  goldPerTree: 25
