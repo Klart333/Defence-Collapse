@@ -93,7 +93,8 @@ namespace WaveFunctionCollapse
 
             for (int i = 0; i < cells.Count; i++)
             {
-                if (cells[i].Collapsed)
+                Cell cell = cells[i];
+                if (cell.Collapsed)
                 {
                     continue;
                 }
@@ -104,8 +105,9 @@ namespace WaveFunctionCollapse
                     continue;
                 }
 
-                cellEntropy += WaveFunctionUtility.CalculateEntropy(cells[i]);
-
+                cellEntropy += cell.Entropy;
+                cells[i] = cell;
+                
                 if (cellEntropy < lowestEntropy)
                 {
                     lowestEntropy = cellEntropy;
@@ -618,14 +620,38 @@ namespace WaveFunctionCollapse
 
         public Vector3 Position;
 
-        public List<PrototypeData> PossiblePrototypes; // SHOULD BE AN ARRAY, 
-        // SHOULD PROBABLY DIRTY CACHE THE TOTAL WEIGHT
+        public List<PrototypeData> PossiblePrototypes; // SHOULD BE AN ARRAY 
+
+        private float entropy;
+        private bool isEntropyDirty;
+        
+        public float Entropy
+        {
+            get
+            {
+                if (isEntropyDirty)
+                {
+                    entropy = WaveFunctionUtility.CalculateEntropy(this);
+                    isEntropyDirty = false;
+                }
+
+                return entropy;
+            }
+        }
 
         public Cell(bool collapsed, Vector3 position, List<PrototypeData> possiblePrototypes)
         {
             Collapsed = collapsed;
             Position = position;
             PossiblePrototypes = possiblePrototypes;
+            
+            isEntropyDirty = true;
+            entropy = 0.0f;
+        }
+
+        public void SetDirty()
+        {
+            isEntropyDirty = true;
         }
 
         public override bool Equals([CanBeNull] object obj)
@@ -727,8 +753,9 @@ namespace WaveFunctionCollapse
             changed = false;
             if (affectedCell.Collapsed) return;
 
-            HashSet<short> validKeys = new HashSet<short>();
-            for (int i = 0; i < changedCell.PossiblePrototypes.Count; i++)
+            int count = changedCell.PossiblePrototypes.Count;
+            HashSet<short> validKeys = new HashSet<short>(count);
+            for (int i = 0; i < count; i++)
             {
                 validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
             }
@@ -745,6 +772,11 @@ namespace WaveFunctionCollapse
             if (affectedCell.PossiblePrototypes.Count == 0)
             {
                 affectedCell.PossiblePrototypes.Add(PrototypeData.Empty);
+            }
+
+            if (changed)
+            {
+                affectedCell.SetDirty();
             }
         }
 

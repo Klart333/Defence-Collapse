@@ -11,10 +11,11 @@ using InputCamera;
 using Gameplay;
 using Utility;
 using System;
+using Gameplay.Buffs;
 
 namespace Buildings.District
 {
-    public class DistrictData : IDisposable
+    public class DistrictData : IDisposable, IBuffable
     {
         public event Action<DistrictData> OnClicked;
         public event Action<HashSet<int3>> OnChunksLost;
@@ -31,6 +32,7 @@ namespace Buildings.District
         public DistrictHandler DistrictHandler { get; set; }
         public IGameSpeed GameSpeed { get; set; }
         public DistrictState State { get; }
+        public Stats Stats => State.Stats;
         public Vector3 Position { get; }
         
         public IChunkWaveFunction<QueryChunk> DistrictGenerator { get; }
@@ -59,6 +61,7 @@ namespace Buildings.District
                 DistrictType.Mine => new MineState(this, DistrictUpgradeManager.Instance.MineData, position, key),
                 DistrictType.Flame => new FlameState(this, DistrictUpgradeManager.Instance.FlameData, position, key),
                 DistrictType.Lightning => new LightningState(this, DistrictUpgradeManager.Instance.LightningData, position, key),
+                DistrictType.Church => new ChurchState(this, DistrictUpgradeManager.Instance.ChurchData, position, key),
                 _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
             };
 
@@ -242,7 +245,7 @@ namespace Buildings.District
 
         public void Dispose()
         {
-            State.Die();
+            State.Dispose();
             
             InputManager.Instance.Cancel.performed -= OnDeselected;
             Events.OnWallsDestroyed -= OnWallsDestroyed;

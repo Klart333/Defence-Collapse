@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
@@ -12,315 +13,326 @@ using Enemy.ECS;
 using Gameplay;
 using UI;
 
-public class BuildingHandler : SerializedMonoBehaviour 
+namespace Buildings
 {
-    [Title("Mesh Information")]
-    [SerializeField]
-    private BuildableCornerData cornerData;
-    
-    [SerializeField]
-    private ProtoypeMeshes protoypeMeshes;
-    
-    [Title("Data")]
-    [SerializeField]
-    private WallData wallData;
-    
-    [Title("Health")]
-    [SerializeField]
-    private UIWallHealth wallHealthPrefab;
-
-    [SerializeField]
-    private Canvas canvasParent;
-
-    [Title("References")]
-    [SerializeField]
-    private DistrictGenerator districtGenerator;
-    
-    [Title("Debug")]
-    [SerializeField]
-    private bool verbose = true;
-
-    public readonly Dictionary<ChunkIndex, HashSet<Building>> Buildings = new Dictionary<ChunkIndex, HashSet<Building>>();
-    public readonly Dictionary<int, HashSet<Building>> BuildingGroups = new Dictionary<int, HashSet<Building>>();
-    public readonly Dictionary<ChunkIndex, WallState> WallStates = new Dictionary<ChunkIndex, WallState>();
-
-    private HashSet<ChunkIndex> wallStatesWithHealth = new HashSet<ChunkIndex>();
-    private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
-    
-    private BuildingManager buildingManager;
-    
-    private int selectedGroupIndex = -1;
-    private int groupIndexCounter;
-    
-    private void OnEnable()
+    public class BuildingHandler : SerializedMonoBehaviour
     {
-        GetBuildingManager().Forget();
-    }
+        public event Action<WallState> OnWallStateCreated;
+        
+        [Title("Mesh Information")]
+        [SerializeField]
+        private BuildableCornerData cornerData;
 
-    private async UniTaskVoid GetBuildingManager()
-    {
-        buildingManager = await BuildingManager.Get();
-    }
+        [SerializeField]
+        private ProtoypeMeshes protoypeMeshes;
 
-    #region Handling Groups
+        [Title("Data")]
+        [SerializeField]
+        private WallData wallData;
 
-    public void AddBuilding(Building building)
-    {
-        List<ChunkIndex> damageIndexes = buildingManager.GetSurroundingMarchedIndexes(building.ChunkIndex);
+        [Title("Health")]
+        [SerializeField]
+        private UIWallHealth wallHealthPrefab;
 
-        for (int j = 0; j < damageIndexes.Count; j++)
+        [SerializeField]
+        private Canvas canvasParent;
+
+        [Title("References")]
+        [SerializeField]
+        private DistrictGenerator districtGenerator;
+
+        [Title("Debug")]
+        [SerializeField]
+        private bool verbose = true;
+
+        public readonly Dictionary<ChunkIndex, HashSet<Building>> Buildings = new Dictionary<ChunkIndex, HashSet<Building>>();
+        public readonly Dictionary<int, HashSet<Building>> BuildingGroups = new Dictionary<int, HashSet<Building>>();
+        public readonly Dictionary<ChunkIndex, WallState> WallStates = new Dictionary<ChunkIndex, WallState>();
+
+        private HashSet<ChunkIndex> wallStatesWithHealth = new HashSet<ChunkIndex>();
+        private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
+
+        private BuildingManager buildingManager;
+
+        private int selectedGroupIndex = -1;
+        private int groupIndexCounter;
+
+        private void OnEnable()
         {
-            ChunkIndex damageIndex = damageIndexes[j];
-            if (!WallStates.ContainsKey(damageIndex))
-            {
-                WallStates.Add(damageIndex, CreateData(damageIndex));
-            }
-
-            if (Buildings.TryGetValue(damageIndex, out HashSet<Building> buildings))
-            {
-                buildings.Add(building);
-            }
-            else
-            {
-                Buildings.Add(damageIndex, new HashSet<Building>(4) { building });
-            }
+            GetBuildingManager().Forget();
         }
 
-        BuildingGroups.Add(++groupIndexCounter, new HashSet<Building> { building });
-        building.BuildingGroupIndex = groupIndexCounter;
-        building.PathTarget.Importance = 250;
-        CheckMerge(groupIndexCounter);
-    }
-
-    private WallState CreateData(ChunkIndex chunkIndex)
-    {
-        Stats stats = new Stats(wallData.Stats);
-        stats.MaxHealth.BaseValue *= GameData.WallHealthMultiplier.Value;
-        stats.Healing.BaseValue += GameData.WallHealing.Value;
-        WallState data = new WallState(this, stats, chunkIndex);
-
-        return data;
-    }
-
-    private void CheckMerge(int groupToCheck)
-    {
-        HashSet<Building> buildings = BuildingGroups[groupToCheck];
-
-        foreach (KeyValuePair<int, HashSet<Building>> group in BuildingGroups)
+        private async UniTaskVoid GetBuildingManager()
         {
-            if (group.Key == groupToCheck) continue;
+            buildingManager = await BuildingManager.Get();
+        }
 
-            foreach (Building building in buildings)
+        #region Handling Groups
+
+        public void AddBuilding(Building building)
+        {
+            List<ChunkIndex> damageIndexes = buildingManager.GetSurroundingMarchedIndexes(building.ChunkIndex);
+
+            for (int j = 0; j < damageIndexes.Count; j++)
             {
-                foreach (Building otherBuilding in group.Value)
+                ChunkIndex damageIndex = damageIndexes[j];
+                if (!WallStates.ContainsKey(damageIndex))
                 {
-                    if (!IsAdjacent(building, otherBuilding)) continue;
-                    
-                    Merge(groupToCheck, group.Key);
-                    CheckMerge(group.Key);
-                    return;
+                    WallStates.Add(damageIndex, CreateData(damageIndex));
+                }
+
+                if (Buildings.TryGetValue(damageIndex, out HashSet<Building> buildings))
+                {
+                    buildings.Add(building);
+                }
+                else
+                {
+                    Buildings.Add(damageIndex, new HashSet<Building>(4) { building });
+                }
+            }
+
+            BuildingGroups.Add(++groupIndexCounter, new HashSet<Building> { building });
+            building.BuildingGroupIndex = groupIndexCounter;
+            building.PathTarget.Importance = 250;
+            CheckMerge(groupIndexCounter);
+        }
+
+        private WallState CreateData(ChunkIndex chunkIndex)
+        {
+            Stats stats = new Stats(wallData.Stats);
+            stats.MaxHealth.BaseValue *= GameData.WallHealthMultiplier.Value;
+            stats.Healing.BaseValue += GameData.WallHealing.Value;
+            WallState data = new WallState(this, stats, chunkIndex)
+            {
+                Position = buildingManager.GetPos(chunkIndex)
+            };
+            OnWallStateCreated?.Invoke(data);
+            
+            return data;
+        }
+
+        private void CheckMerge(int groupToCheck)
+        {
+            HashSet<Building> buildings = BuildingGroups[groupToCheck];
+
+            foreach (KeyValuePair<int, HashSet<Building>> group in BuildingGroups)
+            {
+                if (group.Key == groupToCheck) continue;
+
+                foreach (Building building in buildings)
+                {
+                    foreach (Building otherBuilding in group.Value)
+                    {
+                        if (!IsAdjacent(building, otherBuilding)) continue;
+
+                        Merge(groupToCheck, group.Key);
+                        CheckMerge(group.Key);
+                        return;
+                    }
                 }
             }
         }
-    }
 
-    private void Merge(int groupToMerge, int targetGroup)
-    {
-        BuildingGroups[targetGroup].AddRange(BuildingGroups[groupToMerge]);
-        
-        int count = BuildingGroups[targetGroup].Count;
-        foreach (Building building in BuildingGroups[targetGroup])
+        private void Merge(int groupToMerge, int targetGroup)
         {
-            building.BuildingGroupIndex = targetGroup;
-            building.PathTarget.Importance = (byte)Mathf.Max(254 - count * 5, 10);
-        }
-        BuildingGroups.Remove(groupToMerge);
-    }
+            BuildingGroups[targetGroup].AddRange(BuildingGroups[groupToMerge]);
 
-    private bool IsAdjacent(Building building1, Building building2)
-    {
-        if (!ChunkWaveUtility.AreIndexesAdjacent(building1.ChunkIndex, building2.ChunkIndex, buildingManager.ChunkSize.x, out int3 indexDiff))
-        {
-            return false;
-        }
-        int2 dir = indexDiff.z == 0 
-            ? new int2(indexDiff.x, 1)
-            : new int2(1, indexDiff.z);
-        int2 otherDir = indexDiff.z == 0 
-            ? new int2(indexDiff.x, -1)
-            : new int2(-1, indexDiff.z);
-        bool isCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, dir);
-        bool otherCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, otherDir);
-        //Debug.Log($"{building1.ChunkIndex}\n{building2.ChunkIndex}\n{BuildableCornerData.VectorToCorner(dir.x, dir.y)}: {isCornerBuildable}\n{BuildableCornerData.VectorToCorner(otherDir.x, otherDir.y)}: {otherCornerBuildable}");
-        return isCornerBuildable || otherCornerBuildable;
-    }
-
-    public void RemoveBuilding(Building building)
-    {
-        if (!BuildingGroups.TryGetValue(building.BuildingGroupIndex, out HashSet<Building> builds)) return;
-
-        List<ChunkIndex> builtIndexes = buildingManager.GetSurroundingMarchedIndexes(building.ChunkIndex);
-        foreach (ChunkIndex chunkIndex in builtIndexes)
-        {
-            if (Buildings.TryGetValue(chunkIndex, out HashSet<Building> buildings))
+            int count = BuildingGroups[targetGroup].Count;
+            foreach (Building building in BuildingGroups[targetGroup])
             {
-                buildings.Remove(building);
-            }    
+                building.BuildingGroupIndex = targetGroup;
+                building.PathTarget.Importance = (byte)Mathf.Max(254 - count * 5, 10);
+            }
+
+            BuildingGroups.Remove(groupToMerge);
         }
-        
-        builds.Remove(building);
-        if (builds.Count == 0)
+
+        private bool IsAdjacent(Building building1, Building building2)
         {
-            BuildingGroups.Remove(building.BuildingGroupIndex);
-        }
-        else
-        {
-            int count = builds.Count;
-            foreach (Building groupBuilding in builds)  
+            if (!ChunkWaveUtility.AreIndexesAdjacent(building1.ChunkIndex, building2.ChunkIndex, buildingManager.ChunkSize.x, out int3 indexDiff))
             {
-                groupBuilding.PathTarget.Importance = (byte)Mathf.Max(254 - count * 5, 10);
+                return false;
+            }
+
+            int2 dir = indexDiff.z == 0
+                ? new int2(indexDiff.x, 1)
+                : new int2(1, indexDiff.z);
+            int2 otherDir = indexDiff.z == 0
+                ? new int2(indexDiff.x, -1)
+                : new int2(-1, indexDiff.z);
+            bool isCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, dir);
+            bool otherCornerBuildable = cornerData.IsCornerBuildable(building1.MeshRot, otherDir);
+            //Debug.Log($"{building1.ChunkIndex}\n{building2.ChunkIndex}\n{BuildableCornerData.VectorToCorner(dir.x, dir.y)}: {isCornerBuildable}\n{BuildableCornerData.VectorToCorner(otherDir.x, otherDir.y)}: {otherCornerBuildable}");
+            return isCornerBuildable || otherCornerBuildable;
+        }
+
+        public void RemoveBuilding(Building building)
+        {
+            if (!BuildingGroups.TryGetValue(building.BuildingGroupIndex, out HashSet<Building> builds)) return;
+
+            List<ChunkIndex> builtIndexes = buildingManager.GetSurroundingMarchedIndexes(building.ChunkIndex);
+            foreach (ChunkIndex chunkIndex in builtIndexes)
+            {
+                if (Buildings.TryGetValue(chunkIndex, out HashSet<Building> buildings))
+                {
+                    buildings.Remove(building);
+                }
+            }
+
+            builds.Remove(building);
+            if (builds.Count == 0)
+            {
+                BuildingGroups.Remove(building.BuildingGroupIndex);
+            }
+            else
+            {
+                int count = builds.Count;
+                foreach (Building groupBuilding in builds)
+                {
+                    groupBuilding.PathTarget.Importance = (byte)Mathf.Max(254 - count * 5, 10);
+                }
             }
         }
-    }
-    
-    public void BuildingTakeDamage(ChunkIndex index, float damage, PathIndex pathIndex)
-    {
-        if (verbose)
-        {
-            //Debug.Log($"Damaged {damage} at {index}");
-        }
-        
-        List<ChunkIndex> damageIndexes = buildingManager.GetSurroundingMarchedIndexes(index);
-        damage /= damageIndexes.Count;
-        bool didDamage = false;
-        for (int i = 0; i < damageIndexes.Count; i++)
-        {
-            ChunkIndex damageIndex = damageIndexes[i];
-            if (!WallStates.TryGetValue(damageIndex, out WallState state)) continue;
-            
-            float startingHealth = state.Health.CurrentHealth;
-            state.TakeDamage(damage);
-            didDamage = true;
 
-            DisplayHealth(state, damageIndex, startingHealth);
-        }
-
-        if (!didDamage)
+        public void BuildingTakeDamage(ChunkIndex index, float damage, PathIndex pathIndex)
         {
-            AttackingSystem.DamageEvent.Remove(pathIndex);
-            StopAttackingSystem.KilledIndexes.Enqueue(pathIndex);
-        }
-
-        void DisplayHealth(WallState state, ChunkIndex damageIndex, float startingHealth)
-        {
-            if (!state.Health.Alive || !wallStatesWithHealth.Add(damageIndex)) return;
-            
-            UIWallHealth wallHealth = wallHealthPrefab.Get<UIWallHealth>();
-            wallHealth.transform.SetParent(canvasParent.transform, false);
-            wallHealth.Setup(state, startingHealth, canvasParent);
-            wallHealth.TweenFill();
-            wallHealth.OnReturnToPool += OnReturnToPool;
-
-            void OnReturnToPool(PooledMonoBehaviour obj)
+            if (verbose)
             {
-                wallHealth.OnReturnToPool -= OnReturnToPool;
-                wallStatesWithHealth.Remove(damageIndex); 
+                //Debug.Log($"Damaged {damage} at {index}");
+            }
+
+            List<ChunkIndex> damageIndexes = buildingManager.GetSurroundingMarchedIndexes(index);
+            damage /= damageIndexes.Count;
+            bool didDamage = false;
+            for (int i = 0; i < damageIndexes.Count; i++)
+            {
+                ChunkIndex damageIndex = damageIndexes[i];
+                if (!WallStates.TryGetValue(damageIndex, out WallState state)) continue;
+
+                float startingHealth = state.Health.CurrentHealth;
+                state.TakeDamage(damage);
+                didDamage = true;
+
+                DisplayHealth(state, damageIndex, startingHealth);
+            }
+
+            if (!didDamage)
+            {
+                AttackingSystem.DamageEvent.Remove(pathIndex);
+                StopAttackingSystem.KilledIndexes.Enqueue(pathIndex);
+            }
+
+            void DisplayHealth(WallState state, ChunkIndex damageIndex, float startingHealth)
+            {
+                if (!state.Health.Alive || !wallStatesWithHealth.Add(damageIndex)) return;
+
+                UIWallHealth wallHealth = wallHealthPrefab.Get<UIWallHealth>();
+                wallHealth.transform.SetParent(canvasParent.transform, false);
+                wallHealth.Setup(state, startingHealth, canvasParent);
+                wallHealth.TweenFill();
+                wallHealth.OnReturnToPool += OnReturnToPool;
+
+                void OnReturnToPool(PooledMonoBehaviour obj)
+                {
+                    wallHealth.OnReturnToPool -= OnReturnToPool;
+                    wallStatesWithHealth.Remove(damageIndex);
+                }
             }
         }
-    }
 
-    public void BuildingDestroyed(ChunkIndex chunkIndex)
-    {
-        buildingManager.RevertQuery();
-        districtGenerator.RevertQuery();
-        
-        if (!Buildings.Remove(chunkIndex, out HashSet<Building> buildings))
+        public void BuildingDestroyed(ChunkIndex chunkIndex)
         {
+            buildingManager.RevertQuery();
+            districtGenerator.RevertQuery();
+
+            if (!Buildings.Remove(chunkIndex, out HashSet<Building> buildings))
+            {
+                WallStates.Remove(chunkIndex);
+                Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
+                return;
+            }
+
+            List<ChunkIndex> destroyedIndexes = new List<ChunkIndex>();
+            foreach (Building building in buildings)
+            {
+                if (buildingManager.GetSurroundingMarchedIndexes(building.ChunkIndex).Any(x => !x.Equals(chunkIndex)))
+                {
+                    continue;
+                }
+
+                //building.OnDestroyed();
+                destroyedIndexes.Add(building.ChunkIndex);
+            }
+
+            if (destroyedIndexes.Count > 0)
+            {
+                Events.OnWallsDestroyed?.Invoke(destroyedIndexes);
+            }
+
             WallStates.Remove(chunkIndex);
             Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
-            return;
         }
-        
-        List<ChunkIndex> destroyedIndexes = new List<ChunkIndex>();
-        foreach (Building building in buildings)
+
+        #endregion
+
+        #region Visual
+
+        public void HighlightGroup(Building building)
         {
-            if (buildingManager.GetSurroundingMarchedIndexes(building.ChunkIndex).Any(x => !x.Equals(chunkIndex)))
+            if (building.BuildingGroupIndex == -1)
             {
-                continue;
+                Debug.LogError("Building Group Index was not found");
+                return;
             }
-            
-            //building.OnDestroyed();
-            destroyedIndexes.Add(building.ChunkIndex);
-        }
-        
-        if (destroyedIndexes.Count > 0)
-        {
-            Events.OnWallsDestroyed?.Invoke(destroyedIndexes);
-        }
-        
-        WallStates.Remove(chunkIndex);
-        Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
-    }
 
-    #endregion
-    
-    #region Visual
+            if (selectedGroupIndex != building.BuildingGroupIndex)
+            {
+                LowLightBuildings();
+            }
 
-    public void HighlightGroup(Building building)
-    {
-        if (building.BuildingGroupIndex == -1)
-        {
-            Debug.LogError("Building Group Index was not found");
-            return;
+            selectedGroupIndex = building.BuildingGroupIndex;
+
+            HashSet<Building> buildings = BuildingGroups[building.BuildingGroupIndex];
+            foreach (Building built in buildings)
+            {
+                built.Highlight().Forget();
+            }
+
+            building.OnSelected();
+
+            if (unSelectedBuildings.Contains(building))
+            {
+                unSelectedBuildings.Remove(building);
+            }
         }
 
-        if (selectedGroupIndex != building.BuildingGroupIndex)
+        public void LowlightGroup(Building building)
         {
+            if (selectedGroupIndex == -1) return;
+
+            unSelectedBuildings.Add(building);
+            building.OnDeselected();
+
+            if (BuildingGroups.ContainsKey(selectedGroupIndex) && unSelectedBuildings.Count < BuildingGroups[selectedGroupIndex].Count)
+            {
+                return;
+            }
+
             LowLightBuildings();
         }
 
-        selectedGroupIndex = building.BuildingGroupIndex;
-
-        HashSet<Building> buildings = BuildingGroups[building.BuildingGroupIndex];
-        foreach (Building built in buildings)
+        private void LowLightBuildings()
         {
-            built.Highlight().Forget();
+            if (selectedGroupIndex == -1 || !BuildingGroups.TryGetValue(selectedGroupIndex, out HashSet<Building> group)) return;
+
+            foreach (Building item in group)
+            {
+                item.Lowlight();
+            }
+
+            unSelectedBuildings.Clear();
         }
 
-        building.OnSelected();
-
-        if (unSelectedBuildings.Contains(building))
-        {
-            unSelectedBuildings.Remove(building);
-        }
+        #endregion
     }
-
-    public void LowlightGroup(Building building)
-    { 
-        if (selectedGroupIndex == -1) return;
-
-        unSelectedBuildings.Add(building);
-        building.OnDeselected();
-
-        if (BuildingGroups.ContainsKey(selectedGroupIndex) && unSelectedBuildings.Count < BuildingGroups[selectedGroupIndex].Count)
-        {
-            return;
-        }
-
-        LowLightBuildings();
-    }
-
-    private void LowLightBuildings()
-    {
-        if (selectedGroupIndex == -1 || !BuildingGroups.TryGetValue(selectedGroupIndex, out HashSet<Building> group)) return;
-
-        foreach (Building item in group)
-        {
-            item.Lowlight();
-        }
-
-        unSelectedBuildings.Clear();
-    }
-
-    #endregion
 }

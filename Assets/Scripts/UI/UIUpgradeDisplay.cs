@@ -3,63 +3,66 @@ using Gameplay.Money;
 using UnityEngine.UI;
 using UnityEngine;
 
-public class UIUpgradeDisplay : PooledMonoBehaviour
+namespace UI
 {
-    [Title("References")]
-    [SerializeField]
-    private StupidButton button;
-
-    [SerializeField]
-    private Image iconImage;
-    
-    private IUpgradeStat upgradeStat;
-
-    private bool hoveredLastFrame;
-    
-    public UIDistrictUpgrade DistrictUpgrade { get; set; }
-    
-    protected override void OnDisable()
+    public class UIUpgradeDisplay : PooledMonoBehaviour
     {
-        base.OnDisable();
+        [Title("References")]
+        [SerializeField]
+        private StupidButton button;
 
-        MoneyManager.Instance.OnMoneyChanged -= UpdateTheButton;
-    }
+        [SerializeField]
+        private Image iconImage;
 
-    private void Update()
-    {
-        if (!hoveredLastFrame && button.Hovered)
+        private IUpgradeStat upgradeStat;
+
+        private bool hoveredLastFrame;
+
+        public UIDistrictUpgrade DistrictUpgrade { get; set; }
+
+        protected override void OnDisable()
         {
-            DistrictUpgrade.DisplayUpgrade(upgradeStat);
+            base.OnDisable();
+
+            MoneyManager.Instance.OnMoneyChanged -= UpdateTheButton;
         }
 
-        hoveredLastFrame = button.Hovered;
-    }
-    
-    private void UpdateTheButton(float _)
-    {
-        UpdateButton();
-    }
-
-    public void DisplayStat(IUpgradeStat stat)
-    {
-        upgradeStat = stat;
-        iconImage.sprite = upgradeStat.Icon;
-
-        UpdateButton();
-
-        MoneyManager.Instance.OnMoneyChanged += UpdateTheButton;
-    }
-    
-    private void UpdateButton()
-    {
-        button.interactable = DistrictUpgrade.CanPurchase(upgradeStat);
-    }
-
-    public void ClickUpgrade()
-    {
-        if (DistrictUpgrade.CanPurchase(upgradeStat))
+        private void Update()
         {
-            DistrictUpgrade.UpgradeStat(upgradeStat);
+            if (!hoveredLastFrame && button.Hovered)
+            {
+                DistrictUpgrade.DisplayUpgrade(upgradeStat);
+            }
+
+            hoveredLastFrame = button.Hovered;
+        }
+
+        private void UpdateTheButton(float _)
+        {
+            UpdateButton();
+        }
+
+        public void DisplayStat(IUpgradeStat stat)
+        {
+            upgradeStat = stat;
+            iconImage.sprite = upgradeStat.Icon;
+
+            UpdateButton();
+
+            MoneyManager.Instance.OnMoneyChanged += UpdateTheButton;
+        }
+
+        private void UpdateButton()
+        {
+            button.interactable = DistrictUpgrade.CanPurchase(upgradeStat);
+        }
+
+        public void ClickUpgrade()
+        {
+            if (DistrictUpgrade.CanPurchase(upgradeStat))
+            {
+                DistrictUpgrade.UpgradeStat(upgradeStat);
+            }
         }
     }
 }

@@ -1,8 +1,9 @@
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using Sirenix.OdinInspector;
-using TMPro;
 using UnityEngine;
+using DG.Tweening;
+using Effects;
+using TMPro;
 
 public class DamageNumber : PooledMonoBehaviour
 {
@@ -27,7 +28,12 @@ public class DamageNumber : PooledMonoBehaviour
         }
     }
 
-    private async void OnEnable()
+    private void OnEnable()
+    {
+        DelayedEnable().Forget();
+    }
+
+    private async UniTaskVoid DelayedEnable()
     {
         await UniTask.Yield();
         await UniTask.Yield();
@@ -39,7 +45,7 @@ public class DamageNumber : PooledMonoBehaviour
         color.a = 1f;
         Color targetColor = color;
         targetColor.a = 0;
-        DOTween.To(() => color, x => { color = x; Text.color = color; }, targetColor, duration + 0.1f).SetEase(Ease.OutCirc); 
+        DOTween.To(() => color, x => { color = x; Text.color = color; }, targetColor, duration + 0.1f).SetEase(Ease.OutCirc);
     }
 
     protected override void OnDisable()
@@ -51,6 +57,6 @@ public class DamageNumber : PooledMonoBehaviour
 
     public void SetDamage(DamageInstance damage)
     {
-        Text.text = damage.GetTotal().ToString();
+        Text.text = damage.GetTotal().ToString("N");
     }
 }

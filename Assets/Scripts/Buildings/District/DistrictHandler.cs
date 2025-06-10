@@ -27,18 +27,16 @@ namespace Buildings.District
         private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
 
         [OdinSerialize, ReadOnly]
-        private readonly List<DistrictData> uniqueDistricts = new List<DistrictData>();
+        private readonly HashSet<DistrictData> uniqueDistricts = new HashSet<DistrictData>();
 
         private readonly Dictionary<int2, HashSet<District>> districtObjects = new Dictionary<int2, HashSet<District>>();
         
         private readonly Dictionary<DistrictType, int> districtAmounts = new Dictionary<DistrictType, int>();
         
-        private DistrictData townHallDistrict;
-
         private int districtKey;
         private bool inWave;
         
-        public List<DistrictData> Districts => uniqueDistricts;
+        public HashSet<DistrictData> Districts => uniqueDistricts;
 
         private void OnEnable()
         {
@@ -89,10 +87,10 @@ namespace Buildings.District
         private void Update()
         {
             if (!inWave || GameManager.Instance.IsGameOver) return;
-            
-            for (int i = 0; i < uniqueDistricts.Count; i++)
+
+            foreach (DistrictData districtData in uniqueDistricts)
             {
-                uniqueDistricts[i].Update();
+                districtData.Update();
             }
         }
 
@@ -118,7 +116,7 @@ namespace Buildings.District
             }
             else
             {
-                GetDistrictData(districtType, chunks);
+                CreateDistrictData(districtType, chunks);
             }
 
             foreach (QueryChunk chunk in chunks)
@@ -167,7 +165,7 @@ namespace Buildings.District
             return overlappingDistricts.Count;
         }
 
-        private DistrictData GetDistrictData(DistrictType districtType, HashSet<QueryChunk> chunks)
+        private DistrictData CreateDistrictData(DistrictType districtType, HashSet<QueryChunk> chunks)
         {
             Vector3 position = GetAveragePosition(chunks);
             DistrictData districtData = new DistrictData(districtType, chunks, position, districtGenerator, districtKey++)
@@ -177,7 +175,6 @@ namespace Buildings.District
             };
             
             uniqueDistricts.Add(districtData);
-            if (districtType == DistrictType.TownHall) townHallDistrict = districtData;
                 
             foreach (QueryChunk chunk in chunks)
             {

@@ -449,6 +449,6 @@ namespace Buildings
     public enum BuildingType
     {
         Building,
-        Path
+        Barricade
     }
 }

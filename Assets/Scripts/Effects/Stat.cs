@@ -2,166 +2,179 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
+using UnityEditor;
 
-public interface IStat
+namespace Effects
 {
-    public event Action OnValueChanged;
-    public float Value { get; }
-    public float BaseValue { get; }
-
-    public void AddModifier(Modifier mod);
-    public void RemoveModifier(Modifier mod);
-    public void RemoveAllModifiers();
-}
-
-[Serializable, InlineProperty]
-public class Stat : IStat
-{
-    public event Action OnValueChanged;
-
-    public float BaseValue
+    public interface IStat
     {
-        get => baseValue;
-        set
-        {
-            if (Mathf.Approximately(baseValue, value)) return;
+        public event Action OnValueChanged;
+        public float Value { get; }
+        public float BaseValue { get; }
 
-            baseValue = value;
-            isDirty = true;
-            OnValueChanged?.Invoke();
-        }
+        public void AddModifier(Modifier mod);
+        public void RemoveModifier(Modifier mod);
+        public void RemoveAllModifiers();
     }
 
-    [SerializeField]
-    private float baseValue;
-
-    private HashSet<Modifier> modifiers = new HashSet<Modifier>();
-
-    private float value;
-    private bool isDirty = true;
-
-    private readonly Modifier.ModifierType[] ModifierTypes =
+    [Serializable, InlineProperty]
+    public class Stat : IStat
     {
-        Modifier.ModifierType.Additive,
-        Modifier.ModifierType.Multiplicative,
-    };
+        public event Action OnValueChanged;
 
-    [ShowInInspector, ReadOnly]
-    public float Value
-    {
-        get
+        public float BaseValue
         {
-#if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlaying)
+            get => baseValue;
+            set
             {
+                if (Mathf.Approximately(baseValue, value)) return;
+
+                baseValue = value;
                 isDirty = true;
-                value = GetValue();
-                return value;
+                OnValueChanged?.Invoke();
             }
-#endif
-            
-            if (!isDirty)
-            {
-                return value;
-            }
-            
-            value = GetValue();
-            isDirty = false;
-
-            return value;
         }
-    }
 
-    public float GetValue()
-    {
-        float val = BaseValue;
-        if (modifiers == null)
+        [SerializeField]
+        private float baseValue;
+
+        private HashSet<Modifier> modifiers = new HashSet<Modifier>();
+
+        private float value;
+        private bool isDirty = true;
+
+        private readonly Modifier.ModifierType[] ModifierTypes =
         {
+            Modifier.ModifierType.Additive,
+            Modifier.ModifierType.Multiplicative,
+        };
+
+        [ShowInInspector, ReadOnly]
+        public float Value
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (!EditorApplication.isPlaying)
+                {
+                    isDirty = true;
+                    value = GetValue();
+                    return value;
+                }
+#endif
+
+                if (!isDirty)
+                {
+                    return value;
+                }
+
+                value = GetValue();
+                isDirty = false;
+
+                return value;
+            }
+        }
+
+        public float GetValue()
+        {
+            float val = BaseValue;
+            if (modifiers == null)
+            {
+                return val;
+            }
+
+            foreach (Modifier.ModifierType modifierType in ModifierTypes)
+            {
+                foreach (Modifier modifier in modifiers)
+                {
+                    if (modifier.Type != modifierType)
+                    {
+                        continue;
+                    }
+
+                    val = modifier.Type switch
+                    {
+                        Modifier.ModifierType.Multiplicative => val * modifier.Value,
+                        Modifier.ModifierType.Additive => val + modifier.Value,
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+                }
+            }
+
             return val;
         }
 
-        foreach (Modifier.ModifierType modifierType in ModifierTypes)
+        public Stat(float baseValue)
         {
-            foreach (Modifier modifier in modifiers)
+            BaseValue = baseValue;
+        }
+
+        public void AddModifier(Modifier mod)
+        {
+            modifiers.Add(mod);
+
+            isDirty = true;
+            OnValueChanged?.Invoke();
+        }
+
+        public void RemoveModifier(Modifier mod)
+        {
+            if (!modifiers.Remove(mod))
             {
-                if (modifier.Type != modifierType)
-                {
-                    continue;
-                }
-                
-                val = modifier.Type switch
-                {
-                    Modifier.ModifierType.Multiplicative => val * modifier.Value,
-                    Modifier.ModifierType.Additive => val + modifier.Value,
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                Debug.LogError("Could not find modifier to remove");
+                return;
+            }
+
+            isDirty = true;
+            OnValueChanged?.Invoke();
+        }
+
+        public void RemoveAllModifiers()
+        {
+            modifiers.Clear();
+
+            isDirty = true;
+            OnValueChanged?.Invoke();
+        }
+
+        public void SetDirty(bool silent = true)
+        {
+            isDirty = true;
+
+            if (!silent)
+            {
+                OnValueChanged?.Invoke();
             }
         }
 
-        return val;
-    }
+        public static implicit operator float(Stat stat) => stat.Value;
 
-    public Stat(float baseValue)
-    {
-        BaseValue = baseValue;
-    }
-
-    public void AddModifier(Modifier mod)
-    {
-        modifiers.Add(mod);
-
-        isDirty = true;
-        OnValueChanged?.Invoke();
-    }
-
-    public void RemoveModifier(Modifier mod)
-    {
-        if (!modifiers.Remove(mod))
+        public override string ToString()
         {
-            Debug.LogError("Could not find modifier to remove");
-            return;
-        }
-
-        isDirty = true;
-        OnValueChanged?.Invoke();
-    }
-
-    public void RemoveAllModifiers()
-    {
-        modifiers.Clear();
-
-        isDirty = true;
-        OnValueChanged?.Invoke();
-    }
-
-    public void SetDirty(bool silent = true)
-    {
-        isDirty = true;
-        
-        if (!silent)
-        {
-            OnValueChanged?.Invoke();
+            return $"BaseValue: {BaseValue:N}, Value: {Value:N}";
         }
     }
 
-    public static implicit operator float(Stat stat) => stat.Value;
-
-    public override string ToString()
+    [Serializable]
+    public class Modifier
     {
-        return $"BaseValue: {BaseValue:N}, Value: {Value:N}";
-    }
-}
+        public enum ModifierType
+        {
+            Additive = 0,
+            Multiplicative = 1,
+        }
 
-[Serializable]
-public class Modifier
-{
-    public ModifierType Type;
+        public ModifierType Type;
 
-    public float Value;
+        public float Value;
 
-    public enum ModifierType
-    {
-        Additive = 0,
-        Multiplicative = 1,
+
+        public Modifier() { }
+
+        public Modifier(Modifier copy)
+        {
+            Type = copy.Type;
+            Value = copy.Value;
+        }
     }
 }

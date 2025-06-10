@@ -2,7 +2,6 @@ using MeshCollider = Unity.Physics.MeshCollider;
 using Material = Unity.Physics.Material;
 using Collider = Unity.Physics.Collider;
 using System.Collections.Generic;
-using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using UnityEngine.Assertions;

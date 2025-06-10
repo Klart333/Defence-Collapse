@@ -8,9 +8,12 @@ public class UIDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     [SerializeField]
     private float percentClickable = 0.7f;
 
-    [Title("Connected")]
+    [Title("Settings")]
     [SerializeField]
     private RectTransform connectedElement;
+
+    [SerializeField]
+    private bool shouldSetParentToCanvas = true;
 
     private Vector2 connectedDelta;
     private Vector2 pointerOffset;
@@ -42,9 +45,12 @@ public class UIDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
         isDragging = true;
 
-        transform.SetParent(canvas.transform);
+        if (shouldSetParentToCanvas)
+        {
+            transform.SetParent(canvas.transform);
+        }
 
-        if (connectedElement != null)
+        if (connectedElement != null && shouldSetParentToCanvas)
         {
             connectedElement.SetParent(canvas.transform);
         }

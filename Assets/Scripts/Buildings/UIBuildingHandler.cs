@@ -10,7 +10,7 @@ public class UIBuildingHandler : MonoBehaviour
 
     public void ClickPath()
     {
-        Events.OnBuildingClicked?.Invoke(BuildingType.Path);
+        Events.OnBuildingClicked?.Invoke(BuildingType.Barricade);
     }
 
     public void ClickDistrict(int type)
@@ -19,6 +19,7 @@ public class UIBuildingHandler : MonoBehaviour
         Events.OnDistrictClicked?.Invoke(district, district switch
         {
             DistrictType.Bomb => 3,
+            DistrictType.Church => 3,
             DistrictType.Lightning => 1,
             DistrictType.Mine => 1,
             _ => 2, 

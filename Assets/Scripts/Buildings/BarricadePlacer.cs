@@ -231,7 +231,7 @@ namespace Buildings
 
         private void BuildingClicked(BuildingType buildingType)
         {
-            if (Displaying || buildingType is not BuildingType.Path) return;
+            if (Displaying || buildingType is not BuildingType.Barricade) return;
 
             UIEvents.OnFocusChanged?.Invoke();
             PlacingTower().Forget();
@@ -345,13 +345,13 @@ namespace Buildings
                 return;
             }
             
-            if (!MoneyManager.Instance.CanPurchase(BuildingType.Path))
+            if (!MoneyManager.Instance.CanPurchase(BuildingType.Barricade))
             {
                 //pathGenerator.RevertQuery();
                 return;
             }
 
-            MoneyManager.Instance.Purchase(BuildingType.Path);
+            MoneyManager.Instance.Purchase(BuildingType.Barricade);
             
             spawnedSpawnPlaces[SquareIndex.Value].OnPlaced();
             barricadeGenerator.Place();

@@ -1,25 +1,29 @@
-using System;
 using Gameplay.Upgrades;
 using UnityEngine;
+using System;
 
-public interface IAttacker
+namespace Effects
 {
-    // Info
-    public Stats Stats { get; }
-    public CategoryType CategoryType { get; }
+    public interface IAttacker
+    {
+        // Info
+        public Stats Stats { get; }
+        public CategoryType CategoryType { get; }
 
-    // Position
-    public Vector3 AttackPosition { get; set; }
-    public Vector3 OriginPosition { get; set; }
+        // Position
+        public Vector3 AttackPosition { get; set; }
+        public Vector3 OriginPosition { get; set; }
 
-    // Attack
-    public DamageInstance LastDamageDone {  get; }
-    public int Key { get; }
+        // Attack
+        public DamageInstance LastDamageDone { get; }
+        public int Key { get; }
 
-    // Events
-    public event Action OnAttack;
+        // Events
+        public event Action OnAttack;
 
-    // Callbacks
-    public void OnUnitDoneDamage(DamageInstance damageInstance);
-    public void OnUnitKill();
+        // Callbacks
+        public void OnUnitDoneDamage(DamageInstance damageInstance);
+        public void OnUnitKill();
+    }
+
 }

@@ -37,17 +37,22 @@ public class TowerData : SerializedScriptableObject
     
     [SerializeField]
     private DistrictTargetMesh districtTargetMesh;
-
+    
     [Title("Attack")]
     [OdinSerialize, NonSerialized]
     public Attack BaseAttack;
+    
+    [Title("On Created")]
+    [OdinSerialize]
+    private List<IEffect> createdEffects = new List<IEffect>();
 
-    [Title("End Wave")]
+    [Title("On End Wave")]
     [OdinSerialize]
     private List<IEffect> endWaveEffects = new List<IEffect>();
     
     public DistrictTargetMesh DistrictTargetMesh => districtTargetMesh;
     public List<IEffect> EndWaveEffects => endWaveEffects;
+    public List<IEffect> CreatedEffects => createdEffects;
     public string DistrictName => districtName;
     public string Description => description;
     public Sprite Icon => icon;

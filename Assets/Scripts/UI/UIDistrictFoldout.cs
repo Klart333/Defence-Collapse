@@ -11,6 +11,18 @@ namespace UI
         [SerializeField]
         private RectTransform foldoutTransform;
 
+        [SerializeField]
+        private float headerButtonWidth = 120;
+        
+        [SerializeField]
+        private float districtButtonWidth = 110;
+        
+        [SerializeField]
+        private float buttonSpacing = 10;
+        
+        [SerializeField]
+        private float padding = 10;
+
         [Title("Animation Settings")]
         [SerializeField]
         private float openDuration = 0.5f;
@@ -24,22 +36,7 @@ namespace UI
         [SerializeField]
         private Ease closeEase = Ease.Linear;
 
-        [SerializeField]
-        private bool useGameSpeed;
-        
-        private IGameSpeed gameSpeed;
-        
         public bool IsOpen { get; private set; }
-
-        private void Awake()
-        {
-            GetGameSpeed().Forget();
-        }
-
-        private async UniTaskVoid GetGameSpeed()
-        {
-            gameSpeed = await GameSpeedManager.Get();
-        }
 
         public void ToggleOpen(bool isOpen)
         {
@@ -66,22 +63,14 @@ namespace UI
                 }
             }
             
-            float targetX = buttonCount * 140 + 5;
-            Tween tween = foldoutTransform.DOAnchorPosX(targetX, openDuration).SetEase(openEase);
-            if (!useGameSpeed)
-            {
-                tween.timeScale = 1.0f / gameSpeed.Value;
-            }
+            float targetX = headerButtonWidth + buttonCount * (districtButtonWidth + buttonSpacing) + padding;
+            foldoutTransform.DOAnchorPosX(targetX, openDuration).SetEase(openEase);
         }
 
         private void CloseFoldout()
         {
             foldoutTransform.DOKill();
-            Tween tween = foldoutTransform.DOAnchorPosX(0, closeDuration).SetEase(closeEase);
-            if (!useGameSpeed)
-            {
-                tween.timeScale = 1.0f / gameSpeed.Value;
-            }
+            foldoutTransform.DOAnchorPosX(districtButtonWidth, closeDuration).SetEase(closeEase);
         }
     }
 }

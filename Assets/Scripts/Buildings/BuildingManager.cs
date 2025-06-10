@@ -128,6 +128,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
             {
                 Cell cell = waveFunction[index];
                 cell.PossiblePrototypes = new List<PrototypeData> { PrototypeData.Empty };
+                cell.SetDirty();
                 waveFunction[index] = cell;
                 cellsToUpdate.Remove(index);
                 QuerySpawnedBuildings.Remove(index);

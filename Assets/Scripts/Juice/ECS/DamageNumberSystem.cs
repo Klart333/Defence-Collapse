@@ -167,7 +167,8 @@ namespace TextMeshDOTS.Authoring
             
             DynamicBuffer<CalliByte> calliByteBuffer = ECB.AddBuffer<CalliByte>(entityIndex, textEntity);
             CalliString calliString = new CalliString(calliByteBuffer);
-            calliString.Append(math.round(damageTaken.DamageTaken * 100) / 100f);
+            float damageText = math.round(damageTaken.DamageTaken * 10) / 10f;
+            calliString.Append(damageText);
             if (damageTaken.IsCrit)
             {
                 calliString.Append('!');

@@ -1,5 +1,6 @@
 ﻿using Sirenix.OdinInspector;
 using System;
+using Effects;
 
 [Serializable]
 public class Stats

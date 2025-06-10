@@ -2,6 +2,7 @@
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
+using Effects;
 using UnityEngine;
 
 namespace Enemy

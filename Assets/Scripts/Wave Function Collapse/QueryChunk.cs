@@ -260,6 +260,7 @@ namespace WaveFunctionCollapse
                 bool isBottom = AdjacentChunks[3] == null && y == 0;
                 List<PrototypeData> prots = new List<PrototypeData>(isBottom ? PrototypeInfoData.Prototypes : PrototypeInfoData.NotBottomPrototypes);
                 cell.PossiblePrototypes = new List<PrototypeData>( prots);
+                cell.SetDirty();
                 cell.Collapsed = false;
                 Cells[x, y, z] = cell;
             }

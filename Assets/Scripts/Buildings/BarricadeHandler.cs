@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
@@ -11,6 +12,8 @@ namespace Buildings
 {
     public class BarricadeHandler : MonoBehaviour
     {
+        public event Action<BarricadeState> OnBarricadeStateCreated; 
+        
         [Title("Barricade")]
         [SerializeField]
         private BarricadeGenerator barricadeGenerator;
@@ -26,7 +29,8 @@ namespace Buildings
         [SerializeField]
         private Canvas canvasParent;
 
-        private Dictionary<ChunkIndex, BarricadeState> barricadeStates = new Dictionary<ChunkIndex, BarricadeState>();
+        public readonly Dictionary<ChunkIndex, BarricadeState> BarricadeStates = new Dictionary<ChunkIndex, BarricadeState>();
+        
         private Dictionary<ChunkIndex, HashSet<Barricade>> barricades = new Dictionary<ChunkIndex, HashSet<Barricade>>();
         private HashSet<ChunkIndex> wallStatesWithHealth = new HashSet<ChunkIndex>();
         
@@ -37,9 +41,9 @@ namespace Buildings
             for (int j = 0; j < damageIndexes.Count; j++)
             {
                 ChunkIndex damageIndex = damageIndexes[j];
-                if (!barricadeStates.ContainsKey(damageIndex))
+                if (!BarricadeStates.ContainsKey(damageIndex))
                 {
-                    barricadeStates.Add(damageIndex, CreateData(damageIndex));
+                    BarricadeStates.Add(damageIndex, CreateData(damageIndex));
                 }
 
                 if (barricades.TryGetValue(damageIndex, out HashSet<Barricade> barricadeSet))
@@ -58,8 +62,12 @@ namespace Buildings
             Stats stats = new Stats(barricadeData.Stats);
             stats.MaxHealth.BaseValue *= GameData.BarricadeHealthMultiplier.Value;
             stats.Healing.BaseValue += GameData.BarricadeHealing.Value;
-            BarricadeState data = new BarricadeState(this, stats, chunkIndex);
-
+            BarricadeState data = new BarricadeState(this, stats, chunkIndex)
+            {
+                Position = barricadeGenerator.GetPos(chunkIndex)
+            };
+            OnBarricadeStateCreated?.Invoke(data);
+            
             return data;
         }
         
@@ -83,7 +91,7 @@ namespace Buildings
             for (int i = 0; i < damageIndexes.Count; i++)
             {
                 ChunkIndex damageIndex = damageIndexes[i];
-                if (!barricadeStates.TryGetValue(damageIndex, out BarricadeState state)) continue;
+                if (!BarricadeStates.TryGetValue(damageIndex, out BarricadeState state)) continue;
                 
                 float startingHealth = state.Health.CurrentHealth;
                 state.TakeDamage(damage);
@@ -121,7 +129,7 @@ namespace Buildings
             barricadeGenerator.RevertQuery();
 
             barricades.Remove(chunkIndex);
-            barricadeStates.Remove(chunkIndex);
+            BarricadeStates.Remove(chunkIndex);
             Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
         }
     }

@@ -4,6 +4,7 @@ using Unity.Entities;
 using UnityEngine;
 using System;
 using Buildings;
+using Effects;
 using Juice;
 
 namespace Gameplay.Money
@@ -39,7 +40,7 @@ namespace Gameplay.Money
         private Entity moneyEntity;
 
         public int BuildingCost => costData.GetCost(BuildingType.Building);
-        public float PathCost => costData.GetCost(BuildingType.Path);
+        public float PathCost => costData.GetCost(BuildingType.Barricade);
 
         public float Money => money;
         public Stat MoneyMultiplier { get; private set; }

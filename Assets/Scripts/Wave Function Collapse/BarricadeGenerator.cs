@@ -125,6 +125,7 @@ namespace WaveFunctionCollapse
                 {
                     Cell cell = waveFunction[index];
                     cell.PossiblePrototypes = new List<PrototypeData> { PrototypeData.Empty };
+                    cell.SetDirty();
                     waveFunction[index] = cell;
                     cellsToUpdate.Remove(index);
                 }

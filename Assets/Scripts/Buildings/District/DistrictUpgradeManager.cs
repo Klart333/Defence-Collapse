@@ -30,10 +30,13 @@ namespace Buildings.District
 
         [SerializeField]
         private TowerData lightningData;
-        
+
+        [SerializeField]
+        private TowerData churchData;
+
         [Title("UI", "Upgrade")]
         [SerializeField]
-        private UIDistrictUpgrade districtUpgrade;
+        private UI.UIDistrictUpgrade districtUpgrade;
 
 #if UNITY_EDITOR
         [Title("Debug")]
@@ -50,6 +53,7 @@ namespace Buildings.District
         public TowerData MineData => mineData;
         public TowerData TownHallData => townHallData;
         public TowerData LightningData => lightningData;
+        public TowerData ChurchData => churchData;
 
         private void OnEnable()
         {

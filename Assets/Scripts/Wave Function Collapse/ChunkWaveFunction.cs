@@ -231,7 +231,8 @@ namespace WaveFunctionCollapse
                     float cellEntropy = cell.Position.y * 10;
                     if (cellEntropy > lowestEntropy) continue;
 
-                    cellEntropy += WaveFunctionUtility.CalculateEntropy(cell);
+                    cellEntropy += cell.Entropy;
+                    chunk.Cells[x, y, z] = cell;
                     if (cellEntropy >= lowestEntropy) continue;
 
                     lowestEntropy = cellEntropy;
@@ -260,7 +261,9 @@ namespace WaveFunctionCollapse
                 float cellEntropy = y * 10;
                 if (cellEntropy > lowestEntropy) continue;
 
-                cellEntropy += WaveFunctionUtility.CalculateEntropy(cell);
+                cellEntropy += cell.Entropy;
+                chunk.Cells[x, y, z] = cell;
+
                 if (cellEntropy >= lowestEntropy) continue;
 
                 lowestEntropy = cellEntropy;
@@ -289,7 +292,9 @@ namespace WaveFunctionCollapse
                     float cellEntropy = y * 10;
                     if (cellEntropy > lowestEntropy) continue;
 
-                    cellEntropy += WaveFunctionUtility.CalculateEntropy(cell);
+                    cellEntropy += cell.Entropy;
+                    chunk.Cells[x, y, z] = cell;
+
                     if (cellEntropy >= lowestEntropy) continue;
 
                     lowestEntropy = cellEntropy;
@@ -312,7 +317,9 @@ namespace WaveFunctionCollapse
                     continue;
                 }
 
-                float cellEntropy = WaveFunctionUtility.CalculateEntropy(cell);
+                float cellEntropy = cell.Entropy;
+                this[chunkIndex] = cell;
+
                 if (cellEntropy >= lowestEntropy) continue;
 
                 lowestEntropy = cellEntropy;

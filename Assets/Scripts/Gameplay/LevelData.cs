@@ -75,6 +75,7 @@ namespace Gameplay
         private void DebugDisplay(int upper = 100)
         {
             debugDisplayCurve.ClearKeys();
+            debugTotalDisplayCurve.ClearKeys();
             float total = 0;
             for (int i = 0; i < upper; i++)
             {

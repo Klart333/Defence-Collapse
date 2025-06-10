@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Effects
 {
-    [CreateAssetMenu(fileName = "Stat Name Utility", menuName = "Stat/Stat Name Utility", order = 0)]
+    [InlineEditor, CreateAssetMenu(fileName = "Stat Name Utility", menuName = "Stat/Stat Name Utility", order = 0)]
     public class StatNameUtility : SerializedScriptableObject
     {
         [Title("Names")]

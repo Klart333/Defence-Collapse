@@ -1,6 +1,9 @@
 ﻿using WaveFunctionCollapse;
 using System;
+using Effects;
+using Gameplay.Buffs;
 using Health;
+using UnityEngine;
 
 namespace Buildings
 {
@@ -11,17 +14,21 @@ namespace Buildings
     }
 
     [Serializable]
-    public class WallState : IHealthState
+    public class WallState : IHealthState, IBuffable
     {
         private BuildingHandler handler;
 
-        public ChunkIndex Index { get; set; }
-        public HealthComponent Health { get; set; }
+        public ChunkIndex Index { get; }
+        public HealthComponent Health { get; }
+        public Stats Stats { get; }
+        
+        public Vector3 Position { get; set; }
 
         public WallState(BuildingHandler buildingHandler, Stats stats, ChunkIndex index)
         {
+            Stats = stats;
             handler = buildingHandler;
-            Health = new HealthComponent(stats);
+            Health = new HealthComponent(Stats);
             Index = index;
         }
 

@@ -4,6 +4,7 @@ using Exp.Gemstones;
 using UnityEngine;
 using Saving;
 using System;
+using Effects;
 
 namespace Exp
 {

@@ -1,20 +1,27 @@
+using Effects;
+using Gameplay.Buffs;
 using WaveFunctionCollapse;
 using Health;
+using UnityEngine;
 
 namespace Buildings
 {
     [System.Serializable]
-    public class BarricadeState : IHealthState
+    public class BarricadeState : IHealthState, IBuffable
     {
         private BarricadeHandler handler;
 
-        public ChunkIndex Index { get; set; }
-        public HealthComponent Health { get; set; }
+        public ChunkIndex Index { get; }
+        public HealthComponent Health { get; }
+        public Stats Stats { get; }
+        
+        public Vector3 Position { get; set; }
 
         public BarricadeState(BarricadeHandler buildingHandler, Stats stats, ChunkIndex index)
         {
+            Stats = stats;
             handler = buildingHandler;
-            Health = new HealthComponent(stats);
+            Health = new HealthComponent(Stats);
             Index = index;
         }
     
