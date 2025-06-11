@@ -5,12 +5,12 @@ namespace WaveFunctionCollapse
 {
     public enum Direction
     {
-        Right,
-        Left,
-        Up,
-        Down,
-        Forward,
-        Backward
+        Right = 0,
+        Left = 1,
+        Up = 2,
+        Down = 3,
+        Forward = 4,
+        Backward = 5
     }
 
     public static class DirectionUtility

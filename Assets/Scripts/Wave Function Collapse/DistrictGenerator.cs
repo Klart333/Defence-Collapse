@@ -12,6 +12,7 @@ using System.Linq;
 using Gameplay;
 using System;
 using Buildings;
+using UnityEngine.Assertions;
 
 namespace WaveFunctionCollapse
 {
@@ -199,21 +200,18 @@ namespace WaveFunctionCollapse
                     Vector3 cornerOffset = new Vector3(WaveFunctionUtility.Corners[i].x * chunkSize.x * waveFunction.CellSize.x, 0, WaveFunctionUtility.Corners[i].y * chunkSize.z * waveFunction.CellSize.z) * 0.5f;
                     Vector3 pos = buildable.gameObject.transform.position - cornerOffset - offset;
                     int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, ChunkScale);
+                    ChunkIndex? chunkIndex = GetBuildingCell(index);
+                    Assert.IsTrue(chunkIndex.HasValue);
+                    
                     if (waveFunction.Chunks.TryGetValue(index, out QueryChunk chunk))
                     {
-                        HandleBuiltChunk(chunk, isBuildable, overrideChunks, buildable.ChunkIndex);
+                        HandleBuiltChunk(chunk, isBuildable, overrideChunks, chunkIndex.Value);
                     }
                     else if (isBuildable)
                     {
                         positions.Add(pos);
-                        if (ChunkIndexToChunks.TryGetValue(buildable.ChunkIndex, out HashSet<int3> list))
-                        {
-                            list.Add(index);
-                        }
-                        else
-                        {
-                            ChunkIndexToChunks.Add(buildable.ChunkIndex, new HashSet<int3> { index });
-                        }
+                        if (ChunkIndexToChunks.TryGetValue(chunkIndex.Value, out HashSet<int3> list)) list.Add(index);
+                        else ChunkIndexToChunks.Add(chunkIndex.Value, new HashSet<int3> { index });
                     }
                 }
             }
@@ -585,7 +583,7 @@ namespace WaveFunctionCollapse
             foreach (KeyValuePair<ChunkIndex, HashSet<int3>> chunkIndexToChunk in ChunkIndexToChunks)
             {
                 Gizmos.color = Color.blue;
-                Vector3 buildingIndex = BuildingManager.Instance.ChunkWaveFunction[chunkIndexToChunk.Key].Position + Vector3.up;
+                Vector3 buildingIndex = BuildingManager.Instance.ChunkWaveFunction[chunkIndexToChunk.Key].Position + Vector3.up * 0.25f;
                 Gizmos.DrawWireCube(buildingIndex, BuildingManager.Instance.CellSize * 0.75f);
 
                 foreach (int3 int3 in chunkIndexToChunk.Value)
@@ -596,7 +594,7 @@ namespace WaveFunctionCollapse
                         Debug.LogError("Index: " + int3 + " not in Chunk List");
                         continue;
                     }
-                    Vector3 districtpos = ChunkWaveFunction.Chunks[int3].Position + ChunkScale.XyZ(0) / 2.0f + Vector3.up;
+                    Vector3 districtpos = ChunkWaveFunction.Chunks[int3].Position + ChunkScale.XyZ(0) / 2.0f + Vector3.up * 0.25f;
                     Gizmos.DrawWireCube(districtpos, ChunkScale * 0.75f);
                     Gizmos.DrawLine(Vector3.Lerp(buildingIndex, districtpos, 0.1f), districtpos);
                 }
@@ -627,9 +625,9 @@ namespace WaveFunctionCollapse
 #endif
         #endregion
 
-        public ChunkIndex? GetBuildingCell(int3 chunkChunkIndex)
+        public ChunkIndex? GetBuildingCell(int3 districtChunkIndex)
         {
-            Vector3 pos = ChunkWaveUtility.GetPosition(chunkChunkIndex, ChunkScale);
+            Vector3 pos = ChunkWaveUtility.GetPosition(districtChunkIndex, ChunkScale);
             return BuildingManager.Instance.GetIndex(pos + BuildingManager.Instance.CellSize.XyZ(0) / 2.0f);
         }
     }

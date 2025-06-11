@@ -1,4 +1,5 @@
-﻿using Chunks;
+﻿using System.Collections.Specialized;
+using Chunks;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -26,11 +27,6 @@ namespace Utility
         public static int GetMultipleFloored(float x, float multiple)
         {
             return Mathf.FloorToInt(x / multiple);
-        }
-
-        public static short GetSecondSocketValue(short socket)
-        {
-            return (short)(socket / 100 % 10);
         }
 
         public static float3 CubicLerp(float3 a, float3 b, float3 c, float t)

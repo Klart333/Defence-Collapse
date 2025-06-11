@@ -61,8 +61,8 @@ namespace WaveFunctionCollapse
 
             Cells = new Cell[Width, Height, Depth];
             BuiltCells = new bool[Width, Height, Depth];
-            
-            unbuildablePrototype = new PrototypeData(new MeshWithRotation(-1, 0), -1, -1, -1, -1, -1, -1, 0, Array.Empty<int>());
+
+            unbuildablePrototype = PrototypeData.Empty;
             unbuildablePrototypeList = new List<PrototypeData> { unbuildablePrototype };
             
 #if UNITY_EDITOR
@@ -128,7 +128,7 @@ namespace WaveFunctionCollapse
                 {
                     for (int i = prots.Count - 1; i >= 0; i--)
                     {
-                        if (prots[i].DirectionToKey(direction) == -1) continue;
+                        if (prots[i].DirectionToKey(direction) == 1) continue;
 
                         prots.RemoveAtSwapBack(i);
                         changed = true;
@@ -187,7 +187,7 @@ namespace WaveFunctionCollapse
                 {
                     for (int i = prots.Count - 1; i >= 0; i--)
                     {
-                        if (prots[i].DirectionToKey(direction) == -1) continue;
+                        if (prots[i].DirectionToKey(direction) == 1) continue;
 
                         prots.RemoveAtSwapBack(i);
                         changed = true;

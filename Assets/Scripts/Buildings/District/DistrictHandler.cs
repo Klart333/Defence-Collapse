@@ -123,14 +123,8 @@ namespace Buildings.District
             {
                 ChunkIndex? chunkIndex = districtGenerator.GetBuildingCell(chunk.ChunkIndex);
                 Debug.Assert(chunkIndex != null, nameof(chunkIndex) + " != null");
-                if (districtGenerator.ChunkIndexToChunks.TryGetValue(chunkIndex.Value, out HashSet<int3> list))
-                {
-                    list.Add(chunk.ChunkIndex);
-                }
-                else
-                {
-                    districtGenerator.ChunkIndexToChunks.Add(chunkIndex.Value, new HashSet<int3> { chunk.ChunkIndex });
-                }
+                if (districtGenerator.ChunkIndexToChunks.TryGetValue(chunkIndex.Value, out HashSet<int3> list)) list.Add(chunk.ChunkIndex);
+                else districtGenerator.ChunkIndexToChunks.Add(chunkIndex.Value, new HashSet<int3> { chunk.ChunkIndex });
             }
             
             Events.OnDistrictBuilt?.Invoke(districtType);
@@ -273,7 +267,7 @@ namespace Buildings.District
                         continue;
                     }
 
-                    ChunkIndex? buildingChunkIndex = BuildingManager.Instance.GetIndex(queryChunk.Position);
+                    ChunkIndex? buildingChunkIndex = districtGenerator.GetBuildingCell(queryChunk.ChunkIndex);
                     Assert.IsTrue(buildingChunkIndex.HasValue);
                     
                     int heightLevel = queryChunk.ChunkIndex.y + 1;

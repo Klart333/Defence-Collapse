@@ -9,6 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Linq;
 using System;
+using System.Collections.Specialized;
 using Unity.Mathematics;
 using UnityEngine.Serialization;
 
@@ -48,9 +49,7 @@ namespace WaveFunctionCollapse
         private List<PrototypeData> prototypes = new List<PrototypeData>();
         private readonly Stack<int> cellStack = new Stack<int>();
         private readonly List<Cell> cells = new List<Cell>();
-
-        private PrototypeData emptyPrototype;
-
+        
         public Vector3Int GridSize => new Vector3Int(gridSizeX, gridSizeY, gridSizeZ);
         public bool AllCollapsed => cells.All(cell => cell.Collapsed);
         public List<Cell> Cells => cells;
@@ -122,7 +121,7 @@ namespace WaveFunctionCollapse
         {
             if (cell.PossiblePrototypes.Count == 0)
             {
-                return emptyPrototype;
+                return PrototypeData.Empty;
             }
 
             float totalCount = 0;
@@ -205,12 +204,12 @@ namespace WaveFunctionCollapse
                 bool hasConnections = false;
                 foreach (PrototypeData proto in cells[directIndex].PossiblePrototypes)
                 {
-                    if (!hasConnections && proto.PosY != -1)
+                    if (!hasConnections && proto.PosY != 1)
                     {
                         hasConnections = true;
                     }
 
-                    if (proto.NegY != -1 || proto.PosX != -1 || proto.NegX != -1 || proto.NegZ != -1 || proto.PosZ != -1)
+                    if ((proto.NegY | proto.PosX | proto.NegX | proto.NegZ | proto.PosZ) > 1)
                     {
                         onlyAir = false;
                     }
@@ -221,7 +220,7 @@ namespace WaveFunctionCollapse
 
             if (!onlyAir && noConnectionsUp)
             {
-                SetCell(index, emptyPrototype);
+                SetCell(index, PrototypeData.Empty);
                 changed = false;
                 return null;
             }
@@ -230,15 +229,14 @@ namespace WaveFunctionCollapse
             // Rule is Below flat tile is only air
             if (IsDirectionValid(index, Direction.Up, out int aboveIndex)
                 && cells[aboveIndex].Collapsed
-                && cells[aboveIndex].PossiblePrototypes[0].NegY == -1)
+                && cells[aboveIndex].PossiblePrototypes[0].NegY == 1)
             {
-                bool airAbove = !(cells[aboveIndex].PossiblePrototypes[0].PosY != -1 || cells[aboveIndex].PossiblePrototypes[0].PosX != -1 ||
-                                  cells[aboveIndex].PossiblePrototypes[0].NegX != -1 || cells[aboveIndex].PossiblePrototypes[0].NegZ != -1 ||
-                                  cells[aboveIndex].PossiblePrototypes[0].PosZ != -1);
+                PrototypeData proto = cells[aboveIndex].PossiblePrototypes[0];
+                bool airAbove = (proto.PosY | proto.PosX | proto.NegX | proto.NegZ | proto.PosZ) <= 1;
 
                 if (!airAbove)
                 {
-                    SetCell(index, emptyPrototype);
+                    SetCell(index, PrototypeData.Empty);
                     changed = false;
                     return null;
                 }
@@ -400,8 +398,6 @@ namespace WaveFunctionCollapse
 
         private void LoadCells()
         {
-            emptyPrototype = new PrototypeData(new MeshWithRotation(-1, 0), -1, -1, -1, -1, -1, -1, 20, Array.Empty<int>());
-
             for (int z = 0; z < gridSizeZ; z++)
             for (int y = 0; y < gridSizeY; y++)
             for (int x = 0; x < gridSizeX; x++)
@@ -416,7 +412,7 @@ namespace WaveFunctionCollapse
                 {
                     for (int i = prots.Count - 1; i >= 0; i--)
                     {
-                        bool shouldRemove = prots[i].DirectionToKey(direction) != -1;
+                        bool shouldRemove = prots[i].DirectionToKey(direction) != 1;
 
                         if (shouldRemove) prots.RemoveAt(i);
                     }
@@ -730,6 +726,10 @@ namespace WaveFunctionCollapse
             new int2(-1, 1),
         };
         
+        public const ulong SymmetricalMask = 0x0000_0000_FFFF_FFFF;
+        public const ulong NotFMask        = 0x0000_FFFF_0000_0000;
+        public const ulong FMask           = 0xFFFF_0000_0000_0000;
+        
         public static float CalculateEntropy(Cell cell)
         {
             float totalWeight = 0;
@@ -742,7 +742,7 @@ namespace WaveFunctionCollapse
             for (int i = 0; i < cell.PossiblePrototypes.Count; i++)
             {
                 float probability = cell.PossiblePrototypes[i].Weight / totalWeight;
-                entropy += probability * Unity.Mathematics.math.log(probability);
+                entropy += probability * math.log(probability);
             }
 
             return -entropy;
@@ -753,11 +753,11 @@ namespace WaveFunctionCollapse
             changed = false;
             if (affectedCell.Collapsed) return;
 
-            int count = changedCell.PossiblePrototypes.Count;
-            HashSet<short> validKeys = new HashSet<short>(count);
-            for (int i = 0; i < count; i++)
+            ulong validKeys = 0;
+            foreach (PrototypeData prot in changedCell.PossiblePrototypes)
             {
-                validKeys.Add(changedCell.PossiblePrototypes[i].DirectionToKey(direction));
+                ulong mask = prot.DirectionToKey(direction);
+                validKeys |= mask;
             }
 
             Direction oppositeDirection = OppositeDirection(direction);
@@ -780,43 +780,32 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public static bool CheckValidSocket(short key, HashSet<short> validKeys)
+        public static bool CheckValidSocket(ulong key, ulong validKeys)
         {
-            return key switch
-            {
-                //>= 5000 => validKeys.Contains(key), // Ex. v0_0
-                >= 2000 or -1 => validKeys.Contains(key), // Ex. 0s, v0_0, or -1
-                >= 1000 => validKeys.Contains((short)(key - 1000)), // Ex. 0f
-                _       => validKeys.Contains((short)(key + 1000)) // Ex. 0
-            };
+            return (key & SymmetricalMask & validKeys) > 0
+                   || ((key & FMask) >> 16 & validKeys) > 0
+                   || ((key & NotFMask) << 16 & validKeys) > 0;
         }
-
+        
         public static Direction OppositeDirection(Direction direction)
         {
-            return direction switch
-            {
-                Direction.Right => Direction.Left,
-                Direction.Left => Direction.Right,
-                Direction.Up => Direction.Down,
-                Direction.Down => Direction.Up,
-                Direction.Forward => Direction.Backward,
-                Direction.Backward => Direction.Forward,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
+            int intDirection = (int)direction;
+            return (Direction)(intDirection + 1 - intDirection % 2 * 2);
+            
+            //return direction switch
+            //{
+            //    Direction.Right => Direction.Left,
+            //    Direction.Left => Direction.Right,
+            //    Direction.Up => Direction.Down,
+            //    Direction.Down => Direction.Up,
+            //    Direction.Forward => Direction.Backward,
+            //    Direction.Backward => Direction.Forward,
+            //};
         }
 
         public static Direction OppositeDirection(int direction)
         {
-            return direction switch
-            {
-                0 => Direction.Left,
-                1 => Direction.Right,
-                2 => Direction.Down,
-                3 => Direction.Up,
-                4 => Direction.Backward,
-                5 => Direction.Forward,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
+            return (Direction)(direction + 1 - direction % 2 * 2);
         }
     }
 }

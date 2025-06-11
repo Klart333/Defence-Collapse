@@ -248,23 +248,23 @@ MonoBehaviour:
   useMCode: 0
   useMCodeHeight: 0
   useBuildableCorners: 0
-  rightBuildableCode: 0
+  rightBuildableCodes: 
   buildableCornerData: {fileID: 0}
   prototypeData: {fileID: 11400000, guid: 245db626b31676a4183321c87b450a27, type: 2}
   materialData: {fileID: 11400000, guid: d607b7626b2ef464cbaa6473ec1fb6ef, type: 2}
   pieceWeights:
   - Name: CornerBot_Archer
-    Weight: 1
+    Weight: 3
   - Name: InCornerBot_Archer
     Weight: 1
   - Name: SideWall_Archer
     Weight: 100
   - Name: Floor_Archer
-    Weight: 30
+    Weight: 0.1
   - Name: WallCorner_Archer
     Weight: 30
   - Name: WallInCorner_Archer
-    Weight: 30
+    Weight: 1
   - Name: WallSide_Archer
     Weight: 30
   - Name: CornerTop_Archer

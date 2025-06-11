@@ -47,7 +47,7 @@ namespace WaveFunctionCollapse
         private bool useBuildableCorners = false;
 
         [SerializeField, ShowIf(nameof(useBuildableCorners))]
-        private List<short> rightBuildableCodes;
+        private List<ulong> rightBuildableCodes;
         
         [SerializeField, ShowIf(nameof(useBuildableCorners))]
         private BuildableCornerData buildableCornerData;
@@ -66,7 +66,8 @@ namespace WaveFunctionCollapse
 
         private List<GameObject> spawnedPrototypes = new List<GameObject>();
 
-        private short currentSideIndex = 0;
+        private int currentSideSymmetricalIndex = 0;
+        private int currentSideIndex = 0;
         private short currentTopIndex = 0;
 
         [TitleGroup("Creation", Order = -100)]
@@ -75,6 +76,7 @@ namespace WaveFunctionCollapse
         {
             Reset();
 
+            currentSideSymmetricalIndex = 0;
             currentSideIndex = 0;
             currentTopIndex = 0;
 
@@ -120,13 +122,13 @@ namespace WaveFunctionCollapse
                     }
                 }
 
-                short posX = GetSideKey(posXs, 0, 1);
-                short negX = GetSideKey(negXs, 0, -1);
-                short posZ = GetSideKey(posZs, 1, -1);
-                short negZ = GetSideKey(negZs, 1, 1);
+                ulong posX = GetSideKey(posXs, 0, 1);
+                ulong negX = GetSideKey(negXs, 0, -1);
+                ulong posZ = GetSideKey(posZs, 1, -1);
+                ulong negZ = GetSideKey(negZs, 1, 1);
 
-                short[] posY = GetTopKeys(posYs);
-                short[] negY = GetTopKeys(negYs);
+                ulong[] negY = GetTopKeys(negYs);
+                ulong[] posY = GetTopKeys(posYs);
 
                 int[] matIndexes = meshes[i].gameObject.GetComponent<MeshRenderer>().sharedMaterials.Select((x) => materialData.Materials.IndexOf(x)).ToArray();
                 // Add all rotations
@@ -186,7 +188,7 @@ namespace WaveFunctionCollapse
             }
 
             // Empty
-            PrototypeData air = new PrototypeData(new MeshWithRotation(-1, 0), -1, -1, -1, -1, -1, -1, pieceWeights[meshes.Length].Weight, System.Array.Empty<int>());
+            PrototypeData air = new PrototypeData(new MeshWithRotation(-1, 0), 1, pieceWeights[meshes.Length].Weight, System.Array.Empty<int>());
             prototypeData.Prototypes.Add(air);
 
             if (useMCode && !useMCodeHeight)
@@ -299,11 +301,11 @@ namespace WaveFunctionCollapse
             return corner;
         }
 
-        private short GetSideKey(List<Vector3> vertexPositions, int mainAxis, int positiveDirection)
+        private ulong GetSideKey(List<Vector3> vertexPositions, int mainAxis, int positiveDirection)
         {
             if (vertexPositions.Count == 0)
             {
-                return -1;
+                return 1;
             }
 
             // Project on 2 Dimensional plane
@@ -341,8 +343,7 @@ namespace WaveFunctionCollapse
                 }
             }
 
-            short key = currentSideIndex++;
-
+            ulong key = 0;
             // Check for symmetry
             List<Vector2> negPositions = new List<Vector2>();
             for (int h = 0; h < positions.Count; h++)
@@ -352,21 +353,25 @@ namespace WaveFunctionCollapse
 
             if (LooseEquals(positions, negPositions))
             {
-                key += 2000;
+                key = (ulong)1 << (2 + currentSideSymmetricalIndex++);
+                prototypeData.SocketList.Add(new DicData(positions.ToArray(), key));
             }
             else
             {
-                prototypeData.SocketList.Add(new DicData(negPositions.ToArray(), (short)(key + 1000)));
+                key = (ulong)1 << (33 + currentSideIndex++);
+                prototypeData.SocketList.Add(new DicData(positions.ToArray(), key));
+                prototypeData.SocketList.Add(new DicData(negPositions.ToArray(), key << 16));
             }
-
-            prototypeData.SocketList.Add(new DicData(positions.ToArray(), key));
 
             return key;
         }
 
-        private short[] GetTopKeys(List<Vector3> vertexPositions)
+        private ulong[] GetTopKeys(List<Vector3> vertexPositions)
         {
-            if ( vertexPositions.Count == 0) return new short[] { -1, -1, -1, -1 };
+            if ( vertexPositions.Count == 0) return new ulong[]
+            {
+                1, 1, 1, 1
+            };
 
             // Project on 2 Dimensional plane
             List<Vector2> positions = new List<Vector2>();
@@ -379,35 +384,43 @@ namespace WaveFunctionCollapse
             // Check only the first one then copy for the rest
             List<Vector2> poses = Rounded(positions);
 
-            for (int g = 0; g < prototypeData.VerticalSocketList.Count; g++)
+            if (TryMatchExistingVerticalKeys(poses, out ulong[] keys))
             {
-                if (!LooseEquals(prototypeData.VerticalSocketList[g].positions.ToList(), poses)) continue;
-                
-                short[] existingKeys = new short[4];
-                existingKeys[0] = prototypeData.VerticalSocketList[g].socketname;
-                short index = Utility.Math.GetSecondSocketValue(existingKeys[0]);
-                short keyValue = (short)(existingKeys[0] % 100);
-                
-                for (int i = 1; i < 4; i++)
+                return keys;
+            }
+
+            bool TryMatchExistingVerticalKeys(List<Vector2> positionList, out ulong[] keys)
+            {
+                keys = new ulong[4];
+                bool4 valid = new bool4();
+
+                for (int i = 0; i < 4; i++)
                 {
-                    int newdex = (index + i) % 4;
-                    existingKeys[i] = (short)(5000 + newdex * 100 +  keyValue);
+                    Vector2[] pos = Rotated(positionList, i);
+
+                    for (int g = 0; g < prototypeData.VerticalSocketList.Count; g++)
+                    {
+                        if (!LooseEquals(prototypeData.VerticalSocketList[g].positions, pos)) continue;
+                
+                        keys[i] = prototypeData.VerticalSocketList[g].socketname;
+                        valid[i] = true;
+                        break;
+                    }
                 }
 
-                return existingKeys;
+                return math.all(valid);
             }
 
             // Add all four rotations
-            short[] keys = new short[4];
             for (int i = 0; i < 4; i++)
             {
-                short key = (short)(5000 + i * 100 + currentTopIndex);
+                ulong key = ((ulong)1 << (currentTopIndex + 2 + i));
                 Vector2[] pos = Rotated(positions, i);
                 keys[i] = key;
                 prototypeData.VerticalSocketList.Add(new DicData(pos, key));
             }
 
-            currentTopIndex++;
+            currentTopIndex += 4;
 
             return keys;
         }
@@ -585,6 +598,27 @@ namespace WaveFunctionCollapse
 
             return true;
         }
+        
+        public bool LooseEquals(Vector2[] vec1, Vector2[] vec2)
+        {
+            if (vec1.Length != vec2.Length)
+            {
+                return false;
+            }
+
+            vec1 = Rounded(vec1);
+            vec2 = Rounded(vec2);
+
+            for (int i = 0; i < vec2.Length; i++)
+            {
+                if (!vec1.Contains(vec2[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         private List<Vector2> Rounded(List<Vector2> vec)
         {
@@ -592,6 +626,16 @@ namespace WaveFunctionCollapse
             for (int i = 0; i < vec.Count; i++)
             {
                 rounded.Add(new Vector2(math.round(vec[i].x * divider) / divider, math.round(vec[i].y * divider) / divider));
+            }
+            return rounded;
+        }
+        
+        private Vector2[] Rounded(Vector2[] vec)
+        {
+            Vector2[] rounded = new Vector2[vec.Length];
+            for (int i = 0; i < vec.Length; i++)
+            {
+                rounded[i] = (new Vector2(math.round(vec[i].x * divider) / divider, math.round(vec[i].y * divider) / divider));
             }
             return rounded;
         }
@@ -637,9 +681,9 @@ namespace WaveFunctionCollapse
     public struct DicData
     {
         public Vector2[] positions;
-        public short socketname;
+        public ulong socketname;
 
-        public DicData(Vector2[] positions, short socketname)
+        public DicData(Vector2[] positions, ulong socketname)
         {
             this.positions = positions;
             this.socketname = socketname;
@@ -656,35 +700,26 @@ namespace WaveFunctionCollapse
         
         public MeshWithRotation MeshRot;
 
-        public short PosX;
-        public short NegX;
-        public short PosZ;
-        public short NegZ;
-        public short PosY;
-        public short NegY;
+        public ulong PosX;
+        public ulong NegX;
+        public ulong PosZ;
+        public ulong NegZ;
+        public ulong PosY;
+        public ulong NegY;
         public float Weight;
 
         public int[] MaterialIndexes;
 
-        public readonly short[] Keys => new short[6] 
+        public readonly ulong[] Keys => new ulong[6] 
         {
             PosX, NegX, PosY, NegY, PosZ, NegZ
         };
 
-        public static PrototypeData Empty { get; set; } = new PrototypeData(new MeshWithRotation(-1, 0), -1, -1, -1, -1, -1, -1, 1, Array.Empty<int>());
+        public static PrototypeData Empty { get; set; } = new PrototypeData(new MeshWithRotation(-1, 0), 1, 1, Array.Empty<int>());
 
-        public readonly short DirectionToKey(Direction direction) => direction switch 
-        {
-            Direction.Right => PosX,
-            Direction.Left => NegX,
-            Direction.Up => PosY,
-            Direction.Down => NegY,
-            Direction.Forward => PosZ,
-            Direction.Backward => NegZ,
-            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-        }; 
+        public readonly ulong DirectionToKey(Direction direction) => Keys[(int)direction]; 
 
-        public PrototypeData(MeshWithRotation mesh, short posX, short negX, short posY, short negY, short posZ, short negZ, float weight, int[] mats)
+        public PrototypeData(MeshWithRotation mesh, ulong posX, ulong negX, ulong posY, ulong negY, ulong posZ, ulong negZ, float weight, int[] mats)
         {
             MaterialIndexes = mats;
             MeshRot = mesh;
@@ -694,6 +729,23 @@ namespace WaveFunctionCollapse
             NegY = negY;
             PosZ = posZ;
             NegZ = negZ;
+
+            Weight = weight;
+#if UNITY_EDITOR
+            Name_EditorOnly = "";
+#endif
+        }
+        
+        public PrototypeData(MeshWithRotation mesh, ulong allKeys, float weight, int[] mats)
+        {
+            MaterialIndexes = mats;
+            MeshRot = mesh;
+            PosX = allKeys;
+            NegX = allKeys;
+            PosY = allKeys;
+            NegY = allKeys;
+            PosZ = allKeys;
+            NegZ = allKeys;
 
             Weight = weight;
 #if UNITY_EDITOR

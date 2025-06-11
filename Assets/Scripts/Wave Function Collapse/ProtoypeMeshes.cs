@@ -50,9 +50,11 @@ namespace WaveFunctionCollapse
                     PrototypeData prototypeData = new PrototypeData(
                         new MeshWithRotation(meshIndex, prot.MeshRot.Rot),
                         prot.PosX, prot.NegX, prot.PosY, prot.NegY, prot.PosZ, prot.NegZ,
-                        prot.Weight, prot.MaterialIndexes);
-                    prototypeData.Name_EditorOnly = Meshes[meshIndex].name;
-                        
+                        prot.Weight, prot.MaterialIndexes)
+                    {
+                        Name_EditorOnly = Meshes[meshIndex].name
+                    };
+
                     protoypeInfos[i].Prototypes[j] = prototypeData;
                         
                 }
@@ -69,8 +71,10 @@ namespace WaveFunctionCollapse
                         PrototypeData prototypeData = new PrototypeData(
                             new MeshWithRotation(meshIndex, prot.MeshRot.Rot),
                             prot.PosX, prot.NegX, prot.PosY, prot.NegY, prot.PosZ, prot.NegZ,
-                            prot.Weight, prot.MaterialIndexes);
-                        prototypeData.Name_EditorOnly = Meshes[meshIndex].name;
+                            prot.Weight, prot.MaterialIndexes)
+                        {
+                            Name_EditorOnly = Meshes[meshIndex].name
+                        };
                         protoypeInfos[i].MarchingTable[j][k] = prototypeData;
                     }
                 }

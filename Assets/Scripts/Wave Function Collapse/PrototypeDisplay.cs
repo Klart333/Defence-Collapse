@@ -33,22 +33,24 @@ namespace WaveFunctionCollapse
             }
             mesh.transform.rotation = Quaternion.Euler(0, 90 * prototype.MeshRot.Rot, 0);
 
-            posX.text = GetString(prototype.PosX);
-            negX.text = GetString(prototype.NegX);
-            posY.text = GetString(prototype.PosY);
-            negY.text = GetString(prototype.NegY);
-            posZ.text = GetString(prototype.PosZ);
-            negZ.text = GetString(prototype.NegZ);
+            posX.text = KeyIndexToLabel(prototype.PosX);
+            negX.text = KeyIndexToLabel(prototype.NegX);
+            posY.text = KeyIndexToLabel(prototype.PosY);
+            negY.text = KeyIndexToLabel(prototype.NegY);
+            posZ.text = KeyIndexToLabel(prototype.PosZ);
+            negZ.text = KeyIndexToLabel(prototype.NegZ);
         }
 
-        private string GetString(short key)
+        private string KeyIndexToLabel(ulong key)
         {
-            return key switch
+            int index = (int)Math.Log(key, 2);
+            
+            return index switch
             {
-                >= 5000 => $"v{key % 100}_{Utility.Math.GetSecondSocketValue(key)}",
-                >= 2000 => $"{key - 2000}s",
-                >= 1000 => $"{key - 1000}f", 
-                _ => key.ToString()
+                <= 32 => $"{index:N0}s",
+                <= 48 => $"{index - 32:N0}",
+                <= 64 => $"{index - 48:N0}f",
+                _ => $"bit{index}"
             };
         }
     }

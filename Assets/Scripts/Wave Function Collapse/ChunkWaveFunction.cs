@@ -5,9 +5,8 @@ using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using Unity.Collections;
 using UnityEngine;
-using System;
 using System.Linq;
-using Pathfinding;
+using System;
 
 namespace WaveFunctionCollapse
 {
@@ -258,7 +257,7 @@ namespace WaveFunctionCollapse
                     continue;
                 }
 
-                float cellEntropy = y * 10;
+                float cellEntropy = cell.Position.y * 10;
                 if (cellEntropy > lowestEntropy) continue;
 
                 cellEntropy += cell.Entropy;
@@ -289,7 +288,7 @@ namespace WaveFunctionCollapse
                         continue;
                     }
 
-                    float cellEntropy = y * 10;
+                    float cellEntropy = cell.Position.y * 10;
                     if (cellEntropy > lowestEntropy) continue;
 
                     cellEntropy += cell.Entropy;
@@ -316,8 +315,11 @@ namespace WaveFunctionCollapse
                 {
                     continue;
                 }
-
-                float cellEntropy = cell.Entropy;
+                
+                float cellEntropy = cell.Position.y * 10;
+                if (cellEntropy > lowestEntropy) continue;
+                
+                cellEntropy += cell.Entropy;
                 this[chunkIndex] = cell;
 
                 if (cellEntropy >= lowestEntropy) continue;
@@ -608,7 +610,7 @@ namespace WaveFunctionCollapse
                 {
                     for (int i = prots.Count - 1; i >= 0; i--)
                     {
-                        if (prots[i].DirectionToKey(direction) == -1) continue;
+                        if (prots[i].DirectionToKey(direction) == 1) continue;
 
                         prots.RemoveAtSwapBack(i);
                         changed = true;
@@ -667,7 +669,7 @@ namespace WaveFunctionCollapse
                 {
                     for (int i = prots.Count - 1; i >= 0; i--)
                     {
-                        if (prots[i].DirectionToKey(direction) == -1) continue;
+                        if (prots[i].DirectionToKey(direction) == 1) continue;
 
                         prots.RemoveAtSwapBack(i);
                         changed = true;
@@ -794,7 +796,7 @@ namespace WaveFunctionCollapse
                 Cell cell = AdjacentChunks[i][adjacentIndex];
                 if (!cell.Collapsed) continue;
 
-                if (cell.PossiblePrototypes[0].Keys[(int)WaveFunctionUtility.OppositeDirection(i)] == -1)
+                if (cell.PossiblePrototypes[0].Keys[(int)WaveFunctionUtility.OppositeDirection(i)] == 1)
                 {
                     adjacentDirections.Add((Direction)i);
                 }
