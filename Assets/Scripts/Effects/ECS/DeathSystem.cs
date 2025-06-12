@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Entities;
 using System;
+using Unity.Collections;
 using UnityEngine;
 
 namespace Effects.ECS
@@ -36,7 +37,9 @@ namespace Effects.ECS
                 }
             }
 
-            EntityManager.DestroyEntity(deathQuery.ToEntityArray(WorldUpdateAllocator));
+            NativeArray<Entity> deathEntities = deathQuery.ToEntityArray(Allocator.Temp);
+            EntityManager.DestroyEntity(deathEntities);
+            deathEntities.Dispose();
         }
     }
 }

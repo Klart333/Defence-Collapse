@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
@@ -8,9 +7,9 @@ using Unity.Mathematics;
 using UnityEngine;
 using Pathfinding;
 using System.Linq;
-using Buildings;
 using Enemy.ECS;
 using Gameplay;
+using System;
 using UI;
 
 namespace Buildings
@@ -53,18 +52,58 @@ namespace Buildings
         private HashSet<Building> unSelectedBuildings = new HashSet<Building>();
 
         private BuildingManager buildingManager;
+        private IGameSpeed gameSpeed;
 
+        private bool inWave;
         private int selectedGroupIndex = -1;
         private int groupIndexCounter;
 
         private void OnEnable()
         {
+            Events.OnWaveStarted += OnWaveStarted;
+            Events.OnWaveEnded += OnWaveEnded;
+            
             GetBuildingManager().Forget();
+            GetGameSpeed().Forget();
+        }
+
+        private void OnDisable()
+        {
+            Events.OnWaveStarted -= OnWaveStarted;
+            Events.OnWaveEnded -= OnWaveEnded;
+        }
+
+        private void OnWaveStarted()
+        {
+            inWave = true;
+        }
+
+        private void OnWaveEnded()
+        {
+            inWave = false;
         }
 
         private async UniTaskVoid GetBuildingManager()
         {
             buildingManager = await BuildingManager.Get();
+        }
+
+        private async UniTaskVoid GetGameSpeed()
+        {
+            gameSpeed = await GameSpeedManager.Get();
+        }
+        
+        private void Update()
+        {
+            if (!inWave)
+            {
+                return;
+            }
+            
+            foreach (WallState wallState in WallStates.Values)
+            {
+                wallState.Update(Time.deltaTime * gameSpeed.Value);
+            }
         }
 
         #region Handling Groups

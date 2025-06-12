@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using Effects;
+using UnityEngine;
 
 namespace Health
 {
@@ -12,6 +13,9 @@ namespace Health
 
         public float CurrentHealth;
         public float MaxHealth;
+
+        private float healingTimer;
+        private const float healingFrequency = 2f; 
 
         public bool Alive => CurrentHealth > 0;
         public float HealthPercentage => CurrentHealth / Stats.MaxHealth.Value;
@@ -28,6 +32,22 @@ namespace Health
 
             Stats.MaxHealth.OnValueChanged += UpdateMaxHealth;
             UpdateMaxHealth();
+        }
+
+        public void Update(float deltaTime)
+        {
+            if (CurrentHealth >= MaxHealth) return;
+            
+            healingTimer += deltaTime;
+
+            if (healingTimer > healingFrequency)
+            {
+                float heal = Stats.Healing.Value * healingTimer;
+                CurrentHealth = Mathf.Min(CurrentHealth + heal, MaxHealth);
+                
+                OnHealthChanged?.Invoke();
+                healingTimer = 0;
+            }
         }
 
         private void UpdateMaxHealth()

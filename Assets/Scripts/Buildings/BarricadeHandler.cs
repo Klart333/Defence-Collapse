@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Pathfinding;
@@ -33,6 +34,26 @@ namespace Buildings
         
         private Dictionary<ChunkIndex, HashSet<Barricade>> barricades = new Dictionary<ChunkIndex, HashSet<Barricade>>();
         private HashSet<ChunkIndex> wallStatesWithHealth = new HashSet<ChunkIndex>();
+
+        private IGameSpeed gameSpeed;
+        
+        private void Awake()
+        {
+            GetGameSpeed().Forget();
+        }
+
+        private async UniTaskVoid GetGameSpeed()
+        {
+            gameSpeed = await GameSpeedManager.Get();
+        }
+        
+        private void Update()
+        {
+            foreach (BarricadeState barricadeState in BarricadeStates.Values)
+            {
+                barricadeState.Update(Time.deltaTime * gameSpeed.Value);
+            }
+        }
         
         public void AddBarricade(Barricade barricade)
         {

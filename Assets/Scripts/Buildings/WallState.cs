@@ -32,6 +32,11 @@ namespace Buildings
             Index = index;
         }
 
+        public void Update(float dt)
+        {
+            Health.Update(dt);
+        }
+
         public void TakeDamage(DamageInstance damage, out DamageInstance damageDone)
         {
             Health.TakeDamage(damage, out damageDone);
