@@ -40,7 +40,10 @@ namespace Chunks
         private bool shouldRemoveWhenPlaced = true;
 
         [SerializeField, ShowIf(nameof(shouldRemoveWhenPlaced))]
-        private float goldPerTree;
+        private float goldPerTree = 5;
+
+        [SerializeField, ShowIf(nameof(shouldRemoveWhenPlaced))]
+        private float distanceMultiplier = 3;
 
         private readonly List<PooledMonoBehaviour> spawnedTrees = new List<PooledMonoBehaviour>();
         
@@ -141,19 +144,21 @@ namespace Chunks
                 if (buildable is not Building building) continue;
                 foreach (ChunkIndex chunkIndex in chunkIndexes)
                 {
-                    if (chunkIndex.Equals(buildable.ChunkIndex))
-                    {
-                        Placed();
-                        return;
-                    }
+                    if (!chunkIndex.Equals(buildable.ChunkIndex)) continue;
+                    
+                    Placed();
+                    return;
                 }
             }
 
             void Placed()
             {
+                int distance = Mathf.Abs(ChunkKey.x) + Mathf.Abs(ChunkKey.z);
+                float gold = goldPerTree * (distance + 1);
+
                 foreach (PooledMonoBehaviour tree in spawnedTrees)  
                 {
-                    MoneyManager.Instance.AddMoneyParticles(goldPerTree, tree.transform.position);
+                    MoneyManager.Instance.AddMoneyParticles(gold, tree.transform.position);
                 }
                     
                 ClearTrees();

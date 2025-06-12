@@ -46,11 +46,14 @@ namespace Chunks
 
         private void Update()
         {
-            if (groundGenerator.IsGenerating || GameManager.Instance.IsGameOver)
+            if (groundGenerator.IsGenerating || InputManager.Instance.MouseOverUI() || GameManager.Instance.IsGameOver)
             {
                 foreach (ChunkUnlocker unlocker in unlockers.Values)
                 {
-                    unlocker.SetShowing(false);
+                    if (!unlocker.Hovered)
+                    {
+                        unlocker.SetShowing(false);
+                    }
                 }
 
                 return;

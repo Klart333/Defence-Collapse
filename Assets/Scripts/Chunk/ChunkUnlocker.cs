@@ -36,6 +36,7 @@ namespace Chunks
         public Vector3 TargetPosition { get; set; }
         public Canvas Canvas { get; set; }
         public float Cost { get; set; }
+        public bool Hovered { get; set; }
 
         private void Awake()
         {
@@ -71,11 +72,13 @@ namespace Chunks
         public void OnPointerEnter(PointerEventData eventData)
         {
             selectedImage.gameObject.SetActive(true);
+            Hovered = true;
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             selectedImage.gameObject.SetActive(false);
+            Hovered = false;
         }
 
         public void OnPointerDown(PointerEventData eventData)
