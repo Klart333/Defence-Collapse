@@ -39,6 +39,7 @@ namespace Effects
         private float baseValue;
 
         private HashSet<Modifier> modifiers = new HashSet<Modifier>();
+        private Modifier percentModifier = null;
 
         private float value;
         private bool isDirty = true;
@@ -47,6 +48,7 @@ namespace Effects
         {
             Modifier.ModifierType.Additive,
             Modifier.ModifierType.Multiplicative,
+            Modifier.ModifierType.PercentCumulative,
         };
 
         [ShowInInspector, ReadOnly]
@@ -96,6 +98,7 @@ namespace Effects
                     {
                         Modifier.ModifierType.Multiplicative => val * modifier.Value,
                         Modifier.ModifierType.Additive => val + modifier.Value,
+                        Modifier.ModifierType.PercentCumulative => val + val * modifier.Value,
                         _ => throw new ArgumentOutOfRangeException()
                     };
                 }
@@ -111,7 +114,20 @@ namespace Effects
 
         public void AddModifier(Modifier mod)
         {
-            modifiers.Add(mod);
+            if (mod.Type == Modifier.ModifierType.PercentCumulative && percentModifier != null)
+            {
+                percentModifier.Value += mod.Value;
+            }
+            else
+            {
+                if (mod.Type == Modifier.ModifierType.PercentCumulative)
+                {
+                    mod = new Modifier(mod);
+                    percentModifier = mod;
+                }
+                modifiers.Add(mod);
+
+            }
 
             isDirty = true;
             OnValueChanged?.Invoke();
@@ -119,10 +135,17 @@ namespace Effects
 
         public void RemoveModifier(Modifier mod)
         {
-            if (!modifiers.Remove(mod))
+            if (mod.Type == Modifier.ModifierType.PercentCumulative && percentModifier != null)
             {
-                Debug.LogError("Could not find modifier to remove");
-                return;
+                percentModifier.Value -= mod.Value;
+            }
+            else
+            {
+                if (!modifiers.Remove(mod))
+                {
+                    Debug.LogError("Could not find modifier to remove");
+                    return;
+                }   
             }
 
             isDirty = true;
@@ -131,6 +154,11 @@ namespace Effects
 
         public void RemoveAllModifiers()
         {
+            if (modifiers.Count == 0)
+            {
+                return;
+            }
+            
             modifiers.Clear();
 
             isDirty = true;
@@ -162,6 +190,7 @@ namespace Effects
         {
             Additive = 0,
             Multiplicative = 1,
+            PercentCumulative = 2,
         }
 
         public ModifierType Type;

@@ -80,9 +80,6 @@ namespace Effects
         [SerializeField]
         private Buff[] buffs;
 
-        [SerializeField]
-        private bool isPercentageIncrease = true;
-        
         public bool IsDamageEffect => false;
 
         private Dictionary<IAttacker, List<BuffEmitter>> buffEmitters;
@@ -97,14 +94,7 @@ namespace Effects
             for (int i = 0; i < copiedBuffs.Length; i++)
             {
                 copiedBuffs[i] = new Buff(buffs[i]);
-                if (isPercentageIncrease && copiedBuffs[i].Modifier.Type == Modifier.ModifierType.Multiplicative)
-                {
-                    copiedBuffs[i].Modifier.Value = 1.0f + buffs[i].Modifier.Value * ModifierValue * unit.Stats.Productivity.Value;
-                }
-                else
-                {
-                    copiedBuffs[i].Modifier.Value *= ModifierValue * unit.Stats.Productivity.Value;
-                }
+                copiedBuffs[i].Modifier.Value *= ModifierValue * unit.Stats.Productivity.Value;
             }
 
             BuffEmitter buffEmitter = new BuffEmitter

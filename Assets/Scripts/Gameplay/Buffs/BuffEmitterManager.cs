@@ -139,6 +139,11 @@ namespace Gameplay.Buffs
         public Buff[] Buffs;
         public float RangeSquared;
         public float3 Position;
+
+        public override string ToString()
+        {
+            return $"BuffEmitter: {Buffs.Length} Buffs, {Position} pos, {RangeSquared} rangesq";
+        }
     }
 
     [Serializable]
