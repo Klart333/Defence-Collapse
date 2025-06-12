@@ -35,6 +35,7 @@ namespace Gameplay.Upgrades
         private CanvasGroup canvasGroup;
         
         private int waveCount = 0; 
+        private int rerollCount = 0;
 
         private void Awake()
         {
@@ -76,6 +77,8 @@ namespace Gameplay.Upgrades
             UIEvents.OnFocusChanged?.Invoke();
 
             waveCount++;
+            rerollCount = 0;
+
             DisplayUpgradeCards();
         }
         
@@ -94,6 +97,18 @@ namespace Gameplay.Upgrades
             }
 
             upgradeCardParent.SetActive(true);
+        }
+
+        public void RerollUpgradeCards()
+        {
+            rerollCount++;
+            int seed = gameManager.Seed + waveCount + rerollCount;
+            List<UpgradeCardData> datas = upgradeDataUtility.GetRandomData(seed, upgradeCards.Length);
+
+            for (int i = 0; i < upgradeCards.Length; i++)
+            {
+                upgradeCards[i].DisplayUpgrade(datas[i]);
+            }
         }
 
         private void HideCards()

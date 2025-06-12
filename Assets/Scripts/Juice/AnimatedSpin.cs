@@ -1,11 +1,14 @@
 using DG.Tweening;
-using Gameplay;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Juice
 {
     public class AnimatedSpin : MonoBehaviour
     {
+        [SerializeField]
+        private Vector3 rotationAxis = Vector3.forward;
+        
         [SerializeField]
         private float totalDegrees = 360;
 
@@ -14,11 +17,12 @@ namespace Juice
         
         [SerializeField]
         private Ease ease = Ease.Linear;
-
+        
+        [Button]
         public void Spin()
         {
             transform.DOKill(); 
-            transform.DOBlendableLocalRotateBy(new Vector3(0, 0, totalDegrees), duration).SetEase(ease).ScaleWithGameSpeed(GameSpeedManager.Instance);
+            transform.DOBlendableLocalRotateBy(rotationAxis * totalDegrees, duration, RotateMode.FastBeyond360).SetEase(ease);
         } 
     }
 }

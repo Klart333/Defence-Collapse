@@ -154,7 +154,7 @@ namespace Chunks
             void Placed()
             {
                 int distance = Mathf.Abs(ChunkKey.x) + Mathf.Abs(ChunkKey.z);
-                float gold = goldPerTree * (distance + 1);
+                float gold = goldPerTree + goldPerTree * distanceMultiplier * distance;
 
                 foreach (PooledMonoBehaviour tree in spawnedTrees)  
                 {
