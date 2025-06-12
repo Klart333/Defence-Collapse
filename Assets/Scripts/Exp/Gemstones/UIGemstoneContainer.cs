@@ -3,11 +3,14 @@ using UnityEngine.EventSystems;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using System;
 
 namespace Exp.Gemstones
 {
     public class UIGemstoneContainer : MonoBehaviour, IContainer, IPointerEnterHandler, IPointerExitHandler
     {
+        public event Action<Gemstone> OnGemstoneEnter;
+        
         [Title("Prefabs")]
         [SerializeField]
         private UIGemstone gemstonePrefab;
@@ -124,9 +127,10 @@ namespace Exp.Gemstones
             }
 
             flexGroup?.CalculateNewBounds();
+            OnGemstoneEnter?.Invoke(gemstone.Gemstone);
         }
         
-        private void RemoveGemstone(UIGemstone gemstone)
+        public void RemoveGemstone(UIGemstone gemstone)
         {
             handledDraggables.Remove(gemstone);
             
