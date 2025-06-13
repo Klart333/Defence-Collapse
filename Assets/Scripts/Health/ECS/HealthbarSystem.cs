@@ -1,16 +1,13 @@
 using Unity.Collections;
-using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
 using Effects.ECS;
-using UnityEngine;
 
 namespace Health.ECS
 {
     [BurstCompile, UpdateAfter(typeof(HealthSystem))]
     public partial struct HealthbarSystem : ISystem
     {
-        private BufferLookup<Child> childLookup;
         private ComponentLookup<HealthPropertyComponent> healthLookup;
         private ComponentLookup<ArmorPropertyComponent> armorLookup;
         private ComponentLookup<ShieldPropertyComponent> shieldLookup;
@@ -19,7 +16,6 @@ namespace Health.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            childLookup = state.GetBufferLookup<Child>(true);
             healthLookup = state.GetComponentLookup<HealthPropertyComponent>();
             armorLookup = state.GetComponentLookup<ArmorPropertyComponent>();
             shieldLookup = state.GetComponentLookup<ShieldPropertyComponent>();
@@ -38,7 +34,6 @@ namespace Health.ECS
                 return;
             }
             
-            childLookup.Update(ref state);
             healthLookup.Update(ref state);
             armorLookup.Update(ref state);
             shieldLookup.Update(ref state);
@@ -46,7 +41,6 @@ namespace Health.ECS
             state.Dependency = new UpdateBarsJob
             {
                 HealthLookup = healthLookup,
-                ChildLookup = childLookup,
                 ShieldLookup =  shieldLookup,
                 ArmorLookup = armorLookup
             }.Schedule(state.Dependency);
@@ -70,14 +64,11 @@ namespace Health.ECS
         
         [WriteOnly]
         public ComponentLookup<ShieldPropertyComponent> ShieldLookup;
-        
-        [ReadOnly]
-        public BufferLookup<Child> ChildLookup;
 
         [BurstCompile]
-        public void Execute(Entity entity, in Effects.ECS.HealthComponent health, in MaxHealthComponent maxHealth, in DamageTakenComponent damageTaken)
+        public void Execute(in Effects.ECS.HealthComponent health, in MaxHealthComponent maxHealth, in DamageTakenComponent damageTaken)
         {
-            Entity childEntity = ChildLookup[entity][0].Value;
+            Entity childEntity = health.Bar;
 
             float totalHealth = maxHealth.Health + maxHealth.Armor + maxHealth.Shield;
             switch (damageTaken.DamageTakenType)

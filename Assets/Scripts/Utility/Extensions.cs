@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using DG.Tweening;
 using Gameplay;
 using Unity.Mathematics;
 using UnityEngine;
+using Random = System.Random;
 
 public static class Extensions
 {
@@ -69,6 +71,18 @@ public static class Extensions
     {
         tween.timeScale *= gameSpeed.Value;
         return tween;
+    }
+
+    public static void Shuffle<T>(this IList<T> list, Random random)
+    {
+        int count = list.Count;
+        for (int i = 0; i < count - 1; i++)
+        {
+            int swapIndex = random.Next(i, count);
+            if (swapIndex == i) continue;
+            
+            (list[i], list[swapIndex]) = (list[swapIndex], list[i]);
+        }
     }
 }
 

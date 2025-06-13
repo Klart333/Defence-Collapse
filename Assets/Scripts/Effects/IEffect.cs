@@ -450,7 +450,7 @@ namespace Effects
 
                 Entity spawned = entityManager.CreateEntity(componentTypes);
                 entityManager.SetComponentData(spawned, new SpeedComponent { Speed = 1.0f / lifetime });
-                entityManager.SetComponentData(spawned, new LifetimeComponent { Lifetime = lifetime + 0.02f });
+                entityManager.SetComponentData(spawned, new LifetimeComponent { Lifetime = lifetime + 0.1f });
                 entityManager.SetComponentData(spawned, new PositionComponent { Position = pos });
                 entityManager.SetComponentData(spawned, new ColliderComponent { Radius = Radius });
                 entityManager.SetComponentData(spawned, new InitTrailComponent { ScaleFactor = TrailScaleFactor });

@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace Effects.ECS
 {
@@ -48,7 +49,8 @@ namespace Effects.ECS
         
         public void Execute(in LocalTransform transform, in LootOnDeathComponent loot, ref RandomComponent random)
         {
-            if (random.Random.NextFloat() > loot.Probability)
+            float nextFloat = random.Random.NextFloat();
+            if (nextFloat > loot.Probability)
             {
                 return;
             }

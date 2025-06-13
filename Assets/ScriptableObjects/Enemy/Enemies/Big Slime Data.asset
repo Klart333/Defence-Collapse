@@ -1,0 +1,246 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a39d9e0847bee9147a0e20c8ac4e2d3e, type: 3}
+  m_Name: Big Slime Data
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 6245472720060021658, guid: c7b1bdefc0a9bdd4db8c00a84c721c62, type: 3}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: Stats
+      Entry: 7
+      Data: 0|Stats, Core
+    - Name: HealthDamage
+      Entry: 7
+      Data: 1|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 4
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ArmorDamage
+      Entry: 7
+      Data: 2|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ShieldDamage
+      Entry: 7
+      Data: 3|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AttackSpeed
+      Entry: 7
+      Data: 4|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0.7
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Range
+      Entry: 7
+      Data: 5|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MovementSpeed
+      Entry: 7
+      Data: 6|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0.2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritChance
+      Entry: 7
+      Data: 7|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritMultiplier
+      Entry: 7
+      Data: 8|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxHealth
+      Entry: 7
+      Data: 9|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 600
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxArmor
+      Entry: 7
+      Data: 10|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxShield
+      Entry: 7
+      Data: 11|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Healing
+      Entry: 7
+      Data: 12|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Productivity
+      Entry: 7
+      Data: 13|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: BaseAttack
+      Entry: 7
+      Data: 14|Attack, Core
+    - Name: Effects
+      Entry: 7
+      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 16|Effects.DamageColliderEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 1
+    - Name: LimitedHits
+      Entry: 5
+      Data: true
+    - Name: Hits
+      Entry: 3
+      Data: 1
+    - Name: Radius
+      Entry: 4
+      Data: 0.3
+    - Name: HasLifetime
+      Entry: 5
+      Data: false
+    - Name: Lifetime
+      Entry: 4
+      Data: 0
+    - Name: TriggerDamageDone
+      Entry: 5
+      Data: false
+    - Name: hasFireComponent
+      Entry: 5
+      Data: false
+    - Name: fireTotalDamage
+      Entry: 4
+      Data: 0
+    - Name: hasLightningComponent
+      Entry: 5
+      Data: false
+    - Name: lightningDamage
+      Entry: 4
+      Data: 0
+    - Name: lightningBounces
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 17|Effects.VisualEffectEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 0.3
+    - Name: AttackEffect
+      Entry: 10
+      Data: 0
+    - Name: spawnAtUnitOrigin
+      Entry: 5
+      Data: false
+    - Name: orientEffectToAttackPosition
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DoneDamageEffects
+      Entry: 7
+      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  healthScalingMultiplier: 1.4
+  UnlockedThreshold: 50
+  CreditCost: 20
+  flowFieldImportance: 50
+  moneyOnDeath: 100
+  explodeOnDeath: 0
+  explosionSize: 0.5
+  canDropLoot: 1
+  dropLootChance: 0.2

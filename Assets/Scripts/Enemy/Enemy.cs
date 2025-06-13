@@ -1,11 +1,14 @@
 using Random = Unity.Mathematics.Random;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
+using Unity.Collections;
 using Unity.Entities;
 using Effects.ECS;
-using Enemy.ECS;
 using UnityEngine;
+using Enemy.ECS;
+using Health;
 using VFX.ECS;
+using HealthComponent = Effects.ECS.HealthComponent;
 
 namespace Enemy
 {
@@ -15,14 +18,16 @@ namespace Enemy
         [SerializeField]
         private EnemyData enemyData;
         
-        [Title("Authoring", "Ground Collision")]
         [SerializeField]
-        private LayerMask groundMask;
+        private HealthbarAuthoring healthbar;
 
         [Title("Authoring", "Movement")]
         [SerializeField]
         private float turnSpeed = 2;
         
+        [SerializeField]
+        private LayerMask groundMask;
+
         public EnemyData EnemyData => enemyData;
         
         public class EnemyBaker : Baker<Enemy>
@@ -59,6 +64,7 @@ namespace Enemy
                 
                 AddComponent(enemyEntity, new HealthComponent
                 {
+                    Bar = GetEntity(authoring.healthbar, TransformUsageFlags.Dynamic),
                     Health = stats.MaxHealth.Value,
                     Armor = stats.MaxArmor.Value,
                     Shield = stats.MaxShield.Value,
@@ -85,6 +91,16 @@ namespace Enemy
                 {
                     AddComponent(enemyEntity, new LootOnDeathComponent { Probability = authoring.enemyData.DropLootChance });
                 }
+
+                if (authoring.enemyData.IsBoss)
+                {
+                    AddComponent(enemyEntity, new EnemyBossComponent
+                    {
+                        Name = authoring.enemyData.BossName,
+                        Offset = authoring.enemyData.VerticalNameOffset,
+                    });
+
+                }
             }
         }
     }
@@ -92,5 +108,11 @@ namespace Enemy
     public struct EnemySpawnedTag : IComponentData
     {
         
+    }
+
+    public struct EnemyBossComponent : IComponentData
+    {
+        public FixedString64Bytes Name;
+        public float Offset;
     }
 }

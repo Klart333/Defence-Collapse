@@ -1,39 +1,38 @@
 using Unity.Entities;
 using UnityEngine;
-using Enemy;
 
 namespace Enemy.ECS
 {
-    public class EnemiesAuthoring : MonoBehaviour
+    public class EnemyBossAuthoring : MonoBehaviour
     {
         public EnemyUtility EnemyUtility;
         
-        private class EnemiesAuthoringBaker : Baker<EnemiesAuthoring>
+        private class EnemyBossAuthoringBaker : Baker<EnemyBossAuthoring>
         {
-            public override void Bake(EnemiesAuthoring authoring)
+            public override void Bake(EnemyBossAuthoring authoring)
             {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
-                DynamicBuffer<EnemyBufferElement> buffer = AddBuffer<EnemyBufferElement>(entity);
+                DynamicBuffer<EnemyBossElement> buffer = AddBuffer<EnemyBossElement>(entity);
                 for (int i = 0; i < authoring.EnemyUtility.Enemies.Count; i++)
                 {
-                    buffer.Add(new EnemyBufferElement
+                    buffer.Add(new EnemyBossElement
                     {
                         EnemyEntity = GetEntity(authoring.EnemyUtility.Enemies[i], TransformUsageFlags.Dynamic)
                     });
                 }
 
-                AddComponent<EnemyDatabaseTag>(entity);
+                AddComponent<EnemyBossDatabaseTag>(entity);
             }
         }
     }
-
-    [InternalBufferCapacity(4)]
-    public struct EnemyBufferElement: IBufferElementData
+    
+    [InternalBufferCapacity(1)]
+    public struct EnemyBossElement: IBufferElementData
     {
         public Entity EnemyEntity;
     }
 
-    public struct EnemyDatabaseTag : IComponentData
+    public struct EnemyBossDatabaseTag : IComponentData
     {
     }
 }

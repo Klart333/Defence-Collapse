@@ -8614,6 +8614,7 @@ Transform:
   - {fileID: 1115667078}
   - {fileID: 629965933}
   - {fileID: 342113230}
+  - {fileID: 1786098203}
   - {fileID: 266661675}
   - {fileID: 2072288133}
   - {fileID: 134512422}
@@ -10610,6 +10611,54 @@ MeshFilter:
     type: 3}
   m_PrefabInstance: {fileID: 2327644223070698346}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1786098202
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1786098203}
+  - component: {fileID: 1786098204}
+  m_Layer: 0
+  m_Name: BossSpawnHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1786098203
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786098202}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1411626119}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1786098204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786098202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28ed967c15764d1ba3f04855aec4c3b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnHandler: {fileID: 342113231}
+  groundGenerator: {fileID: 1024001993}
+  bossData: {fileID: 11400000, guid: 044c8039edcb2c0448e78cb816ba2851, type: 2}
+  spawnDataUtility: {fileID: 11400000, guid: 14e0cdc191631d54d99384f21e9b5d6f, type: 2}
 --- !u!33 &1792958820 stripped
 MeshFilter:
   m_CorrespondingSourceObject: {fileID: 8311908471625367820, guid: f8d6d4cb9e7edcc48afdf101345acab7,

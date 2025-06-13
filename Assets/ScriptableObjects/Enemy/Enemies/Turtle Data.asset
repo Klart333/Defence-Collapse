@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a39d9e0847bee9147a0e20c8ac4e2d3e, type: 3}
-  m_Name: Big Slime Data
+  m_Name: Turtle Data
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -27,16 +27,16 @@ MonoBehaviour:
       Data: 0|Stats, Core
     - Name: HealthDamage
       Entry: 7
-      Data: 1|Stat, Core
+      Data: 1|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 4
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
     - Name: ArmorDamage
       Entry: 7
-      Data: 2|Stat, Core
+      Data: 2|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -45,7 +45,7 @@ MonoBehaviour:
       Data: 
     - Name: ShieldDamage
       Entry: 7
-      Data: 3|Stat, Core
+      Data: 3|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -54,16 +54,16 @@ MonoBehaviour:
       Data: 
     - Name: AttackSpeed
       Entry: 7
-      Data: 4|Stat, Core
+      Data: 4|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0.8
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
     - Name: Range
       Entry: 7
-      Data: 5|Stat, Core
+      Data: 5|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -72,16 +72,16 @@ MonoBehaviour:
       Data: 
     - Name: MovementSpeed
       Entry: 7
-      Data: 6|Stat, Core
+      Data: 6|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0.2
+      Data: 0.1
     - Name: 
       Entry: 8
       Data: 
     - Name: CritChance
       Entry: 7
-      Data: 7|Stat, Core
+      Data: 7|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -90,7 +90,7 @@ MonoBehaviour:
       Data: 
     - Name: CritMultiplier
       Entry: 7
-      Data: 8|Stat, Core
+      Data: 8|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -99,16 +99,16 @@ MonoBehaviour:
       Data: 
     - Name: MaxHealth
       Entry: 7
-      Data: 9|Stat, Core
+      Data: 9|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1000
+      Data: 200
     - Name: 
       Entry: 8
       Data: 
     - Name: MaxArmor
       Entry: 7
-      Data: 10|Stat, Core
+      Data: 10|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 200
@@ -117,7 +117,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxShield
       Entry: 7
-      Data: 11|Stat, Core
+      Data: 11|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -126,7 +126,7 @@ MonoBehaviour:
       Data: 
     - Name: Healing
       Entry: 7
-      Data: 12|Stat, Core
+      Data: 12|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -135,7 +135,7 @@ MonoBehaviour:
       Data: 
     - Name: Productivity
       Entry: 7
-      Data: 13|Stat, Core
+      Data: 13|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -162,10 +162,10 @@ MonoBehaviour:
       Data: 1
     - Name: LimitedHits
       Entry: 5
-      Data: true
+      Data: false
     - Name: Hits
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: Radius
       Entry: 4
       Data: 0.3
@@ -183,6 +183,15 @@ MonoBehaviour:
       Data: false
     - Name: fireTotalDamage
       Entry: 4
+      Data: 0
+    - Name: hasLightningComponent
+      Entry: 5
+      Data: false
+    - Name: lightningDamage
+      Entry: 4
+      Data: 0
+    - Name: lightningBounces
+      Entry: 3
       Data: 0
     - Name: 
       Entry: 8
@@ -226,12 +235,12 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  healthScalingMultiplier: 1
-  UnlockedThreshold: 50
-  CreditCost: 20
-  flowFieldImportance: 50
-  moneyOnDeath: 100
+  healthScalingMultiplier: 1.2
+  UnlockedThreshold: 0
+  CreditCost: 2
+  flowFieldImportance: 2
+  moneyOnDeath: 8
   explodeOnDeath: 0
   explosionSize: 0.5
-  canDropLoot: 1
-  dropLootChance: 0.2
+  canDropLoot: 0
+  dropLootChance: 0.5

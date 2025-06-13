@@ -15,20 +15,22 @@ namespace Health
             public override void Bake(HealthbarAuthoring authoring)
             {
                 Entity bar = GetEntity(authoring, TransformUsageFlags.Dynamic);
-                float totalHealth = authoring.enemyData.Stats.MaxHealth.Value + authoring.enemyData.Stats.MaxArmor.Value + authoring.enemyData.Stats.MaxShield.Value; 
+                Stats stats = new Stats(authoring.enemyData.Stats);
+                float totalHealth = stats.MaxHealth.Value + stats.MaxArmor.Value + stats.MaxShield.Value; 
+
                 AddComponent(bar, new HealthPropertyComponent
                 {
-                    Value = authoring.enemyData.Stats.MaxHealth.Value / totalHealth,
+                    Value = stats.MaxHealth.Value / totalHealth,
                 });
                 
                 AddComponent(bar, new ArmorPropertyComponent
                 {
-                    Value = authoring.enemyData.Stats.MaxArmor.Value / totalHealth,
+                    Value = stats.MaxArmor.Value / totalHealth,
                 });
                 
                 AddComponent(bar, new ShieldPropertyComponent
                 {
-                    Value = authoring.enemyData.Stats.MaxShield.Value / totalHealth,
+                    Value = stats.MaxShield.Value / totalHealth,
                 });
                 
                 AddComponent<RotateTowardCameraLTWTag>(bar);

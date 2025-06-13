@@ -15,13 +15,8 @@ namespace Enemy.ECS
     
         protected override void OnCreate()
         {
-            enemyQuery = new EntityQueryBuilder(WorldUpdateAllocator)
-                .WithAll<FlowFieldComponent>()
-                .Build(this);
-            
-            spawnerQuery = SystemAPI.QueryBuilder()
-                .WithAspect<SpawnPointAspect>()
-                .Build();
+            enemyQuery = SystemAPI.QueryBuilder().WithAll<FlowFieldComponent>().Build();
+            spawnerQuery = SystemAPI.QueryBuilder().WithAspect<SpawnPointAspect>().Build();
             
             Events.OnWaveStarted += OnWaveStarted;
 

@@ -1,11 +1,10 @@
-using Effects.ECS;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Entities;
+using Effects.ECS;
 using Unity.Burst;
 using Gameplay;
-using Enemy;
 
 namespace Enemy.ECS
 {
@@ -16,9 +15,10 @@ namespace Enemy.ECS
 
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<GameSpeedComponent>();
             spawnerQuery = SystemAPI.QueryBuilder().WithAspect<SpawnPointAspect>().Build();
-
+            
+            state.RequireForUpdate<EnemyBossDatabaseTag>();
+            state.RequireForUpdate<GameSpeedComponent>();
             state.RequireForUpdate<EnemyDatabaseTag>();
         }
 
@@ -31,7 +31,9 @@ namespace Enemy.ECS
             }
             
             Entity enemyDatabase = SystemAPI.GetSingletonEntity<EnemyDatabaseTag>();
-            NativeArray<ItemBufferElement> enemyBuffer = SystemAPI.GetBuffer<ItemBufferElement>(enemyDatabase).AsNativeArray();
+            Entity bossDatabase = SystemAPI.GetSingletonEntity<EnemyBossDatabaseTag>();
+            NativeArray<EnemyBufferElement> enemyBuffer = SystemAPI.GetBuffer<EnemyBufferElement>(enemyDatabase).AsNativeArray();
+            NativeArray<EnemyBossElement> bossBuffer = SystemAPI.GetBuffer<EnemyBossElement>(bossDatabase).AsNativeArray();
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
             
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
@@ -39,9 +41,11 @@ namespace Enemy.ECS
             new SpawnJob
             {
                 EnemyBuffer = enemyBuffer,
+                BossBuffer = bossBuffer,
                 DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
                 ECB = ecb.AsParallelWriter(),
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                Seed = UnityEngine.Random.Range(1, 200000000),
                 MinRandomPosition = new float3(-0.5f, 0, -0.5f),
                 MaxRandomPosition = new float3(0.5f, 0, 0.5f),
             }.ScheduleParallel();
@@ -49,6 +53,9 @@ namespace Enemy.ECS
             state.Dependency.Complete(); 
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
+
+            enemyBuffer.Dispose();
+            bossBuffer.Dispose();
         }
 
         [BurstCompile]
@@ -62,7 +69,10 @@ namespace Enemy.ECS
     public partial struct SpawnJob : IJobEntity
     {
         [ReadOnly]
-        public NativeArray<ItemBufferElement> EnemyBuffer;
+        public NativeArray<EnemyBufferElement> EnemyBuffer;
+        
+        [ReadOnly]
+        public NativeArray<EnemyBossElement> BossBuffer;
 
         [ReadOnly]
         public float DeltaTime;
@@ -72,6 +82,8 @@ namespace Enemy.ECS
         
         public EntityCommandBuffer.ParallelWriter ECB;
 
+        public float Seed;
+        
         public float3 MinRandomPosition;
         public float3 MaxRandomPosition;
         
@@ -87,19 +99,23 @@ namespace Enemy.ECS
             spawnPointAspect.SpawnPointComponent.ValueRW.Timer = spawnPointAspect.SpawnPointComponent.ValueRO.SpawnRate;
             spawnPointAspect.SpawnPointComponent.ValueRW.Amount--;
 
-            Entity prefabEntity = EnemyBuffer[spawnPointAspect.SpawnPointComponent.ValueRO.EnemyIndex].EnemyEntity;
+            int enemyIndex = spawnPointAspect.SpawnPointComponent.ValueRO.EnemyIndex;
+            Entity prefabEntity = enemyIndex >= 100 ? BossBuffer[enemyIndex - 100].EnemyEntity : EnemyBuffer[enemyIndex].EnemyEntity;
             Entity spawnedEntity = ECB.Instantiate(index, prefabEntity);
             
             LocalTransform prefabTransform = TransformLookup[prefabEntity];
 
-            float3 spawnPosition = spawnPointAspect.Transform.ValueRO.Position + spawnPointAspect.RandomComponent.ValueRW.Random.NextFloat3(MinRandomPosition, MaxRandomPosition);
-            quaternion spawnRotation = math.mul(prefabTransform.Rotation, quaternion.AxisAngle(new float3(0, 1, 0), spawnPointAspect.RandomComponent.ValueRW.Random.NextFloat(360)));
+            Random random = Random.CreateFromIndex((uint)(Seed + index));
+            
+            float3 spawnPosition = spawnPointAspect.Transform.ValueRO.Position + random.NextFloat3(MinRandomPosition, MaxRandomPosition);
+            quaternion spawnRotation = math.mul(prefabTransform.Rotation, quaternion.AxisAngle(new float3(0, 1, 0), random.NextFloat(360)));
 
             LocalTransform newTransform = LocalTransform.FromPositionRotationScale(
                 spawnPosition,       
                 spawnRotation, 
                 prefabTransform.Scale     
             );
+            ECB.SetComponent(index, spawnedEntity, new RandomComponent { Random = random });
             ECB.SetComponent(index, spawnedEntity, newTransform);
 
             if (spawnPointAspect.SpawnPointComponent.ValueRO.Amount <= 0)

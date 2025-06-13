@@ -5,7 +5,7 @@ using Gameplay;
 
 namespace Effects.ECS
 {
-    [UpdateAfter(typeof(DeathSystem))]
+    [UpdateAfter(typeof(DeathSystem)), UpdateBefore(typeof(ArchedMovementSystem))]
     public partial struct LifetimeSystem : ISystem
     {
         [BurstCompile]

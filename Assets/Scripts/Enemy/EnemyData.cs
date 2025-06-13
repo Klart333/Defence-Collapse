@@ -1,14 +1,13 @@
 ﻿using Sirenix.OdinInspector;
 using Sirenix.Serialization;
-using System;
-using System.Collections.Generic;
-using Effects;
 using UnityEngine;
+using Effects;
+using System;
 
 namespace Enemy
 {
     
-    [InlineEditor, CreateAssetMenu(fileName = "New Data", menuName = "Enemy/Attack Data")]
+    [InlineEditor, CreateAssetMenu(fileName = "New Enemy Data", menuName = "Enemy/Enemy Data")]
     public class EnemyData : SerializedScriptableObject
     {
         [TitleGroup("Stats")]
@@ -24,8 +23,19 @@ namespace Enemy
         public Attack BaseAttack;
 
         [Title("Spawning")]
+        [SerializeField]
+        private bool isBoss = false;
+
+        [SerializeField, ShowIf(nameof(isBoss))]
+        private string bossName;
+
+        [SerializeField, ShowIf(nameof(isBoss))]
+        private float verticalNameOffset;
+        
+        [HideIf(nameof(isBoss))]
         public int UnlockedThreshold = 0;
 
+        [HideIf(nameof(isBoss))]
         public int CreditCost = 1;
 
         [Title("Movement")]
@@ -53,12 +63,15 @@ namespace Enemy
         private float dropLootChance = 0.5f;
 
         public float HealthScalingMultiplier => healthScalingMultiplier;
+        public float VerticalNameOffset => verticalNameOffset;
         public float DropLootChance => dropLootChance;
         public int Importance => flowFieldImportance;
         public bool ExplodeOnDeath => explodeOnDeath;
         public float ExplosionSize => explosionSize;
         public float MoneyOnDeath => moneyOnDeath;
         public bool CanDropLoot => canDropLoot;
+        public string BossName => bossName;
+        public bool IsBoss => isBoss;
 
         [TitleGroup("Stats")]
         [Button]

@@ -44,12 +44,16 @@ namespace Effects.ECS
         public EntityCommandBuffer.ParallelWriter ECB;
 
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in HealthScalingComponent scalingComponent, ref HealthComponent health)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in HealthScalingComponent scalingComponent, ref HealthComponent health, ref MaxHealthComponent maxHealth)
         {
             float multiplier = scalingComponent.Multiplier * 0.02f * WaveCount * WaveCount + -0.04f * WaveCount + 1; // 0.02x^2 + -0.04x + 1
             health.Health *= multiplier;
             health.Armor *= multiplier;
             health.Shield *= multiplier;
+            
+            maxHealth.Health *= multiplier;
+            maxHealth.Armor *= multiplier;
+            maxHealth.Shield *= multiplier;
             
             ECB.RemoveComponent<HealthScalingComponent>(sortKey, entity);
         }

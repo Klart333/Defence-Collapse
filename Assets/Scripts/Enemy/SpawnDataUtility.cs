@@ -24,6 +24,8 @@ namespace Enemy
         [SerializeField]
         private float creditExponent = 1.5f;
         
+        public AnimationCurve TargetWaveDuration => targetWaveDuration;
+        
         public SpawnPointComponent GetSpawnPointData(int spawnPointLevel, int waveLevel)
         {
             float combinedWaveLevel = (spawnPointLevel + waveLevel) * creditBaseMultiplier;

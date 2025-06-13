@@ -1,24 +1,23 @@
-using Random = Unity.Mathematics.Random;
 using Unity.Entities.Graphics;
 using TextMeshDOTS.Rendering;
-using UnityEngine.Rendering;
+using TextMeshDOTS.Authoring;
 using TextMeshDOTS.HarfBuzz;
+using UnityEngine.Rendering;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
-using Unity.Rendering;
 using InputCamera.ECS;
+using Unity.Rendering;
 using Unity.Entities;
+using TextMeshDOTS;
 using UnityEngine;
 using Effects.ECS;
 using Unity.Burst;
-using Juice.Ecs;
-using Health;
 
-namespace TextMeshDOTS.Authoring
+namespace Enemy.ECS
 {
-    [BurstCompile, UpdateInGroup(typeof(LateSimulationSystemGroup))]
-    public partial struct DamageNumberSystem : ISystem
+    [BurstCompile, UpdateAfter(typeof(SpawnerSystem)), UpdateBefore(typeof(EnemyModifierSystem))]
+    public partial struct BossNameSystem : ISystem
     {
         private BlobAssetReference<FontBlob> fontReference;
         private EntityArchetype textRenderArchetype;
@@ -36,7 +35,7 @@ namespace TextMeshDOTS.Authoring
             
             textBaseConfiguration = new TextBaseConfiguration
             {
-                fontSize = 1.6f,
+                fontSize = 4f,
                 color= Color.white,
                 fontStyles = FontStyles.Normal,
                 maxLineWidth = 300,
@@ -58,7 +57,11 @@ namespace TextMeshDOTS.Authoring
                 MotionMode = MotionVectorGenerationMode.ForceNoMotion,
                 StaticShadowCaster = false,
             };
+            
             textRenderControl = new TextRenderControl { flags = TextRenderControl.Flags.Dirty };            
+            
+            EntityQuery query = SystemAPI.QueryBuilder().WithAll<EnemyBossComponent, EnemySpawnedTag>().Build();
+            state.RequireForUpdate(query);
         }
 
         [BurstCompile]
@@ -66,7 +69,7 @@ namespace TextMeshDOTS.Authoring
         {
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
 
-            state.Dependency = new SpawnNumbersJob
+            state.Dependency = new BossNameJob
             {
                 ECB = ecb.AsParallelWriter(),
                 FontReference = fontReference, 
@@ -74,8 +77,6 @@ namespace TextMeshDOTS.Authoring
                 RenderFilterSettings = renderFilterSettings,
                 TextRenderControl = textRenderControl,
                 TextArchetype = textRenderArchetype,
-                SpawnOffset = new float3(0, 0.5f, 0),
-                BaseSeed = UnityEngine.Random.Range(0, 100000),
             }.ScheduleParallel(state.Dependency);
             
             state.Dependency.Complete(); 
@@ -86,7 +87,7 @@ namespace TextMeshDOTS.Authoring
         [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
-            if (fontReference.IsCreated) fontReference.Dispose();
+            fontReference.Dispose();
         }
         
         private FontRequest GetFontRequest()
@@ -112,7 +113,7 @@ namespace TextMeshDOTS.Authoring
         
         private EntityArchetype GetSingleFontTextArchetype(ref SystemState state)
         {
-            NativeArray<ComponentType> componentTypeStaging = new NativeArray<ComponentType>(20, Allocator.Temp);
+            NativeArray<ComponentType> componentTypeStaging = new NativeArray<ComponentType>(18, Allocator.Temp);
             componentTypeStaging[0]  = ComponentType.ReadWrite<FontBlobReference>();            
             componentTypeStaging[1]  = ComponentType.ReadWrite<TextBaseConfiguration>();
             componentTypeStaging[2]  = ComponentType.ReadWrite<TextRenderControl>();
@@ -129,17 +130,15 @@ namespace TextMeshDOTS.Authoring
             componentTypeStaging[13] = ComponentType.ReadWrite<PerInstanceCullingTag>();
             componentTypeStaging[14] = ComponentType.ReadWrite<MaterialMeshInfo>();
             componentTypeStaging[15] = ComponentType.ReadWrite<RenderFilterSettings>();            
-            componentTypeStaging[16] = ComponentType.ReadWrite<LifetimeComponent>();            
-            componentTypeStaging[17] = ComponentType.ReadWrite<RotateTowardCameraTag>();            
-            componentTypeStaging[18] = ComponentType.ReadWrite<FloatAwayComponent>();            
-            componentTypeStaging[19] = ComponentType.ReadWrite<RandomComponent>();            
+            componentTypeStaging[16] = ComponentType.ReadOnly<RotateTowardCameraLTWTag>();       
+            componentTypeStaging[17] = ComponentType.ReadWrite<Parent>();       
 
-            return state.EntityManager.CreateArchetype(componentTypeStaging);
+            return state.EntityManager.CreateArchetype(componentTypeStaging); 
         }
     }
-    
-    [BurstCompile]
-    public partial struct SpawnNumbersJob : IJobEntity
+
+    [BurstCompile, WithAll(typeof(EnemySpawnedTag))]
+    public partial struct BossNameJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter ECB;
         
@@ -149,45 +148,25 @@ namespace TextMeshDOTS.Authoring
         public TextRenderControl TextRenderControl;
         
         public BlobAssetReference<FontBlob> FontReference;
-        public float3 SpawnOffset;
-        public int BaseSeed;
 
         [BurstCompile]
-        public void Execute([EntityIndexInQuery] int entityIndex, Entity entity, in LocalTransform transform, in DamageTakenComponent damageTaken)
+        public void Execute([EntityIndexInQuery] int entityIndex, Entity entity, in LocalTransform transform, in EnemyBossComponent bossComponent)
         {
-            TextBaseConfiguration.color = damageTaken.DamageTakenType switch
-            {
-                HealthType.Health => Color.green,
-                HealthType.Armor => Color.yellow,
-                HealthType.Shield => Color.blue,
-                _ => Color.black,
-            };
-
-            ECB.RemoveComponent<DamageTakenComponent>(entityIndex, entity);
-
             Entity textEntity = ECB.CreateEntity(entityIndex, TextArchetype);
             ECB.SetSharedComponent(entityIndex, textEntity, RenderFilterSettings);
             
             DynamicBuffer<CalliByte> calliByteBuffer = ECB.AddBuffer<CalliByte>(entityIndex, textEntity);
             CalliString calliString = new CalliString(calliByteBuffer);
-            float damageText = math.round(damageTaken.DamageTaken * 10) / 10f;
-            calliString.Append(damageText);
-            if (damageTaken.IsCrit)
-            {
-                calliString.Append('!');
-            }
+            calliString.Append(bossComponent.Name);
 
             ECB.SetComponent(entityIndex, textEntity, TextBaseConfiguration);
             ECB.SetComponent(entityIndex, textEntity, new FontBlobReference { value = FontReference });
-            ECB.SetComponent(entityIndex, textEntity, LocalTransform.FromPosition(transform.Position + SpawnOffset));
+            ECB.SetComponent(entityIndex, textEntity, LocalTransform.FromPosition(new float3(0, bossComponent.Offset, 0)));
             ECB.SetComponent(entityIndex, textEntity, TextRenderControl);
+            ECB.SetComponent(entityIndex, textEntity, new Parent { Value = entity });
             
-            RandomComponent random = new RandomComponent { Random = Random.CreateFromIndex((uint)(BaseSeed + entityIndex)) };
-            ECB.SetComponent(entityIndex, textEntity, random);
-            float lifeTime = 0.7f + random.Random.NextFloat(0.2f);
-            ECB.SetComponent(entityIndex, textEntity, new LifetimeComponent { Lifetime = lifeTime });
-            ECB.SetComponent(entityIndex, textEntity, new FloatAwayComponent { Duration = lifeTime, Speed = 0.5f, Direction = random.Random.NextFloat3Direction() });
-
+            ECB.AppendToBuffer(entityIndex, entity, new LinkedEntityGroup { Value = textEntity });
+            
             ECB.SetComponentEnabled(entityIndex, textEntity, ComponentType.ReadWrite<MaterialMeshInfo>(), false);
         }
     }

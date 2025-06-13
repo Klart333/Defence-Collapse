@@ -5,6 +5,7 @@ using Unity.Entities;
 
 namespace Effects.ECS
 {
+    [UpdateBefore(typeof(CollisionSystem))]
     public partial struct ArchedMovementSystem : ISystem
     {
         [BurstCompile]

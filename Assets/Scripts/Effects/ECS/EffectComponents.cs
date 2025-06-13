@@ -60,8 +60,9 @@ namespace Effects.ECS
 		public float Value;
 	}
 
-	public struct HealthComponent : IComponentData 
+	public struct HealthComponent : IComponentData
 	{
+		public Entity Bar; 
 		public float Health;
 		public float Armor;
 		public float Shield;

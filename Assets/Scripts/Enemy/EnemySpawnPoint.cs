@@ -1,11 +1,11 @@
+using Random = Unity.Mathematics.Random;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
+using Unity.Transforms;
+using Unity.Entities;
+using UnityEngine;
 using Effects.ECS;
 using Gameplay;
-using Sirenix.OdinInspector;
-using Unity.Entities;
-using Unity.Transforms;
-using UnityEngine;
-using Random = Unity.Mathematics.Random;
 
 namespace Enemy
 {
@@ -88,19 +88,10 @@ namespace Enemy
             {
                 typeof(LocalTransform),
                 typeof(SpawnPointComponent),
-                typeof(RandomComponent),
             };
         
-            var entity = entityManager.CreateEntity(componentTypes);
-            entityManager.SetComponentData(entity, new LocalTransform
-            {
-                Position = transform.position,
-            });
-            
-            entityManager.SetComponentData(entity, new RandomComponent
-            {
-                Random = new Random((uint)Time.time)
-            });
+            Entity entity = entityManager.CreateEntity(componentTypes);
+            entityManager.SetComponentData(entity, LocalTransform.FromPosition(transform.position));
                 
             entities.Add(entity);
         }
