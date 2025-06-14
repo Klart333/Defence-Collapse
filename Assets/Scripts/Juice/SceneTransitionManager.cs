@@ -53,19 +53,21 @@ namespace Juice
             OnSceneBeginChange?.Invoke();
             
             await SlideInAnimation();
-            FadeInAndSpinIcon();
+            await FadeInAndSpinIcon();
             
             await SceneManager.LoadSceneAsync(index);
             
             OnSceneLoaded?.Invoke(index);
             
-            SlideOutAnimation();
+            SlideOutAnimation().Forget();
         }
 
-        private void FadeInAndSpinIcon()
+        private async UniTask FadeInAndSpinIcon()
         {
             iconImage.sprite = iconSprites[Random.Range(0, iconSprites.Length)];
             iconImage.DOFade(1f, 0.4f);
+            await UniTask.Delay(400);
+
             iconImage.transform.DOBlendableLocalRotateBy(new Vector3(0, 0, 360), spinDuation, RotateMode.FastBeyond360).SetEase(spinEase).SetLoops(-1, LoopType.Restart);
         }
 
@@ -76,12 +78,15 @@ namespace Juice
             await UniTask.Delay(TimeSpan.FromSeconds(slideInDuration));
         }
 
-        private void SlideOutAnimation()
+        private async UniTaskVoid SlideOutAnimation()
         {
             float width = transitionTransform.rect.width;
+
+            iconImage.DOFade(0f, 0.4f);
+            await UniTask.Delay(400);
+            
             iconImage.DOKill();
             iconImage.transform.rotation = Quaternion.identity;
-            iconImage.DOFade(0f, 0.1f);
             transitionTransform.DOAnchorPosX(width, slideInDuration).SetEase(slideInEase).onComplete += () =>
             {
                 canvas.gameObject.SetActive(false);

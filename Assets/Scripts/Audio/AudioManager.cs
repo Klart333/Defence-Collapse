@@ -40,7 +40,7 @@ public class AudioManager : Singleton<AudioManager>
         {
             audioSources.Enqueue(gameObject.AddComponent<AudioSource>());
         }
-        var source = audioSources.Dequeue();
+        AudioSource source = audioSources.Dequeue();
         AudioClip clip = audio.Play(source);
 
         StartCoroutine(ReturnToQueue(source, clip.length));
