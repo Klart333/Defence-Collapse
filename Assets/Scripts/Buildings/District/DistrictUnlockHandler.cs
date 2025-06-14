@@ -52,7 +52,7 @@ namespace Buildings.District
                 return;
             }
 
-            GameSpeedManager.Instance.SetBaseGameSpeed(0.01f);
+            GameSpeedManager.Instance.SetBaseGameSpeed(0, 0.2f);
             canvasGroup.interactable = true;
             canvasGroup.DOKill();
             canvasGroup.alpha = 0;

@@ -1,7 +1,5 @@
-using Gameplay;
-using Unity.Entities;
-using UnityEngine.SceneManagement;
 using UnityEngine;
+using Juice;
 
 namespace Utility
 {
@@ -9,8 +7,7 @@ namespace Utility
     {
         public void LoadSceneIndex(int index)
         {
-            GameManager.Instance.ResetWorld();
-            SceneManager.LoadScene(index);
+            SceneTransitionManager.Instance.LoadScene(index).Forget();
         }
     }
 }

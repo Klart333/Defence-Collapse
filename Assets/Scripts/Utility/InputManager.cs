@@ -6,6 +6,7 @@ public class InputManager : Singleton<InputManager>
     private InputActions InputActions;
 
     public InputAction Move { get; private set; }
+    public InputAction Escape { get; private set; }
     public InputAction Scroll { get; private set; }
     public InputAction Mouse { get; private set; }
     public InputAction Fire { get; private set; }
@@ -51,6 +52,9 @@ public class InputManager : Singleton<InputManager>
         
         Tab = InputActions.Player.Tab;
         Tab.Enable();
+        
+        Escape = InputActions.Player.Escape;
+        Escape.Enable();
     }
     
     private void OnDisable()
@@ -58,6 +62,7 @@ public class InputManager : Singleton<InputManager>
         PanCamera.Disable();
         Cancel.Disable();
         Rotate.Disable();
+        Escape.Disable();
         Scroll.Disable();
         Shift.Disable();
         Mouse.Disable();

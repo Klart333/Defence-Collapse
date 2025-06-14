@@ -1,6 +1,6 @@
-using UnityEngine.SceneManagement;
 using Sirenix.OdinInspector;
 using DG.Tweening;
+using Juice;
 using UnityEngine;
 
 public class UIMenuPanel : MonoBehaviour
@@ -12,22 +12,20 @@ public class UIMenuPanel : MonoBehaviour
     [SerializeField]
     private float duration = 0.2f;
 
+    [SerializeField]
+    private Ease ease = Ease.OutSine;
+    
     private float startOffset;
-
-    private void Awake()
-    {
-        startOffset = selector.localPosition.y;
-    }
 
     public void HoverOption(RectTransform rectTransform)
     {
         selector.DOKill();
 
-        selector.DOAnchorPosY(rectTransform.anchoredPosition.y, duration).SetEase(Ease.OutSine);
+        selector.DOAnchorPosY(rectTransform.anchoredPosition.y, duration).SetEase(ease);
     }
 
     public void StartGame()
     {
-        SceneManager.LoadScene(1);
+        SceneTransitionManager.Instance.LoadScene(1).Forget();
     }
 }

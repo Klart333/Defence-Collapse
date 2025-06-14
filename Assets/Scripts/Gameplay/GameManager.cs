@@ -1,14 +1,18 @@
 using Random = System.Random;
 using Buildings.District;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Unity.Entities;
 using Effects.ECS;
 using Enemy.ECS;
+using Juice;
 
 namespace Gameplay
 {
     public class GameManager : Singleton<GameManager>
     {
+        private SceneTransitionManager sceneTransitionManager; 
+            
         public int Seed { get; private set; }
         public bool IsGameOver { get; private set; }
         
@@ -17,14 +21,29 @@ namespace Gameplay
             SetupGame(new Random().Next()); // TODO: Call from proper place, or maybe this is fine?
             
             Events.OnCapitolDestroyed += OnCapitolDestroyed;
+            
+            GetSceneManager().Forget();
         }
 
         private void OnDisable()
         {
             Events.OnCapitolDestroyed -= OnCapitolDestroyed;
+            sceneTransitionManager.OnSceneBeginChange -= OnBeginSceneChange;
             Pool.Clear();
         }
+        
+        private async UniTaskVoid GetSceneManager()
+        {
+            sceneTransitionManager = await SceneTransitionManager.Get();
+            sceneTransitionManager.OnSceneBeginChange += OnBeginSceneChange;
+        }
 
+        private void OnBeginSceneChange()
+        {
+            IsGameOver = true;
+            ResetWorld();
+        }
+        
         private void OnCapitolDestroyed(DistrictData destroyedDistrict)
         {
             IsGameOver = true;
