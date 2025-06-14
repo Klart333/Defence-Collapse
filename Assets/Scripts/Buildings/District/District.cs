@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using WaveFunctionCollapse;
 using UnityEngine;
 
@@ -37,10 +38,10 @@ namespace Buildings.District
         private MeshFilter meshFilter;
         private DistrictHandler districtHandler;
         
+        public ChunkIndex ChunkIndex { get; private set; }
         public PrototypeData Prototype { get; private set; }
         public MeshWithRotation MeshRot { get; private set; }
         public Transform MeshTransform => meshTransform;
-        public ChunkIndex ChunkIndex { get; private set; }
         public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
         public MeshFilter MeshFilter => meshFilter ??= GetComponentInChildren<MeshFilter>();
 

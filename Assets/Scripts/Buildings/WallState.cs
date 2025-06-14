@@ -59,7 +59,7 @@ namespace Buildings
 
         public void OnBuildingDeath()
         {
-            handler.BuildingDestroyed(Index);
+            handler.BuildingDestroyed(Index);  
         }
 
         public void OnWaveEnded()

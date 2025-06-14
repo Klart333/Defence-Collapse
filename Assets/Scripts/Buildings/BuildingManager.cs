@@ -45,10 +45,11 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     private GroundGenerator groundGenerator;
     private Vector3? gridScale;
     
+    public int3 ChunkSize => new int3(Mathf.FloorToInt(groundGenerator.ChunkSize.x / waveFunction.CellSize.x), 1, Mathf.FloorToInt(groundGenerator.ChunkSize.z / waveFunction.CellSize.z));
     public ChunkWaveFunction<QueryMarchedChunk> ChunkWaveFunction => waveFunction;
+    public IEnumerable<ChunkIndex> QueryBuiltIndexes => queryBuiltIndexes;
     public PrototypeInfoData PrototypeInfo => townPrototypeInfo;
     public Vector3 ChunkScale => groundGenerator.ChunkScale;
-    public int3 ChunkSize => new int3(Mathf.FloorToInt(groundGenerator.ChunkSize.x / waveFunction.CellSize.x), 1, Mathf.FloorToInt(groundGenerator.ChunkSize.z / waveFunction.CellSize.z));
     public bool IsGenerating { get; private set; }
     
     public Vector3 CellSize
@@ -75,6 +76,28 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         Events.OnBuiltIndexDestroyed -= RemoveBuiltIndex;
     }
     
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            int total = 0;
+            int queryChangedCount = 0;
+            foreach (QueryMarchedChunk chunk in waveFunction.Chunks.Values)
+            {
+                queryChangedCount += chunk.QueryChangedCells.Count;
+                foreach (Cell cell in chunk.Cells)
+                {
+                    if (cell.Collapsed)
+                    {
+                        total++;
+                    }
+                }
+            }
+            Debug.Log($"Collapsed Count: {total}");
+            Debug.Log($"QueryChanged Count: {queryChangedCount}");
+        }
+    }
+
     private void LoadCells(Chunk chunk)
     {
         int3 index = chunk.ChunkIndex;
@@ -114,6 +137,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
             GetNeighbours(chunkIndexes[i], 1);
         }
         
+        queriedChunks = this.GetChunks(cellsToUpdate);
         this.MakeBuildable(cellsToUpdate, PrototypeInfo);
         
         waveFunction.Propagate();
@@ -153,17 +177,17 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         void GetNeighbours(ChunkIndex chunkIndex, int depth)
         {
             List<ChunkIndex> neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, gridSize.x, gridSize.z);
-            for (int j = 0; j < neighbours.Count; j++)
+            for (int i = 0; i < neighbours.Count; i++)
             {
-                int3 index = neighbours[j].CellIndex;
-                if (cellsToUpdate.Contains(neighbours[j])
-                    || !waveFunction.Chunks.TryGetValue(neighbours[j].Index, out QueryMarchedChunk neihbourChunk)
-                    || !neihbourChunk[index].Collapsed
-                    || !IsBuildable(neihbourChunk, index)) continue;
-                cellsToUpdate.Add(neighbours[j]);
+                if (cellsToUpdate.Contains(neighbours[i])
+                    || !waveFunction.Chunks.TryGetValue(neighbours[i].Index, out QueryMarchedChunk neihbourChunk)
+                    || !neihbourChunk[neighbours[i].CellIndex].Collapsed
+                    || !IsBuildable(neihbourChunk, neighbours[i].CellIndex)) continue;
+                
+                cellsToUpdate.Add(neighbours[i]);
 
-                  if (depth <= 0) continue;
-                GetNeighbours(neighbours[j], depth - 1);
+                if (depth <= 0) continue;
+                GetNeighbours(neighbours[i], depth - 1);
             }
         }
     }

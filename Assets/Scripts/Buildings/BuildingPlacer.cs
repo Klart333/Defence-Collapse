@@ -18,9 +18,6 @@ namespace Buildings
     {
         public static bool Displaying = false;
         
-        public event Action<ChunkIndex> OnIndexBuilt;
-        public event Action<ChunkIndex> OnIndexSold;
-
         [Title("Placing")]
         [SerializeField]
         private PooledMonoBehaviour unableToPlacePrefab;
@@ -63,11 +60,8 @@ namespace Buildings
             Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
             UIEvents.OnFocusChanged += OnBuildingCanceled;
             Events.OnBuildingClicked += BuildingClicked;
-            Events.OnBuiltIndexBuilt += OnBuildingBuilt;
+            Events.OnBuiltIndexBuilt += OnBuiltIndexBuilt;
             
-            barricadePlacer.OnIndexBuilt += BarricadeIndexBuilt;
-            barricadePlacer.OnIndexSold += BarricadeIndexSold;
-
             AwaitManagers().Forget();
         }
 
@@ -85,13 +79,11 @@ namespace Buildings
         {
             buildingManager.OnLoaded -= InitializeSpawnPlaces;
             Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
-            barricadePlacer.OnIndexBuilt -= BarricadeIndexBuilt;
-            barricadePlacer.OnIndexSold -= BarricadeIndexSold;
             inputManager.Fire.started -= MouseOnDown;
             inputManager.Fire.canceled -= MouseOnUp;
             UIEvents.OnFocusChanged -= OnBuildingCanceled;
             Events.OnBuildingClicked -= BuildingClicked;
-            Events.OnBuiltIndexBuilt -= OnBuildingBuilt;
+            Events.OnBuiltIndexBuilt -= OnBuiltIndexBuilt;
         }
 
         private void Update()
@@ -368,19 +360,20 @@ namespace Buildings
             }
 
             MoneyManager.Instance.Purchase(BuildingType.Building);
-
+            spawnedSpawnPlaces[SquareIndex.Value].OnPlaced();
             buildingManager.Place();
-            
-            OnIndexBuilt?.Invoke(SquareIndex.Value);
         }
 
-        private void OnBuildingBuilt(IEnumerable<ChunkIndex> indexes)
+        private void OnBuiltIndexBuilt(IEnumerable<ChunkIndex> indexes)
         {
             foreach (ChunkIndex chunkIndex in indexes)
             {
                 if (spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare square))
                 {
-                    square.OnPlaced();
+                    if (!square.Placed)
+                    {
+                        square.Locked = true;
+                    }
                 }
             }
         }
@@ -396,12 +389,13 @@ namespace Buildings
             MoneyManager.Instance.AddMoneyParticles(MoneyManager.Instance.BuildingCost, hoveredSquare.transform.position);
 
             buildingHandler.BuildingDestroyed(SquareIndex.Value);
-            OnIndexSold?.Invoke(SquareIndex.Value);
         }
 
         private void OnBuiltIndexDestroyed(ChunkIndex chunkIndex)
         {
             if (!spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare square)) return;
+
+            square.Locked = false;
 
             if (Displaying)
             {
@@ -433,7 +427,6 @@ namespace Buildings
         {
             if (spawnedSpawnPlaces.TryGetValue(index, out PlaceSquare square))
             {
-                square.Locked = true;
             }   
         }
         

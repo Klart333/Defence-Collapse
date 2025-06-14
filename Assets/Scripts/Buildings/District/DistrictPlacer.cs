@@ -326,8 +326,8 @@ namespace Buildings.District
                 }
                 
                 builtIndex = builtIndexNullable.Value;
-                if (!buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].QueryBuiltCells.Contains(builtIndex.CellIndex) 
-                    && buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z])
+                if (buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z] 
+                    && !buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].QueryBuiltCells.Contains(builtIndex.CellIndex))
                 {
                     // BuiltIndex is alread built
                     return false;
@@ -427,6 +427,14 @@ namespace Buildings.District
             PrototypeInfoData protInfo = districtInfoData[districtType];
             HashSet<QueryChunk> chunks = districtGenerator.QueriedChunks.Where(x => x.PrototypeInfoData == protInfo).ToHashSet();
             districtHandler.AddBuiltDistrict(chunks, districtType);
+
+            foreach (ChunkIndex chunkIndex in buildingGenerator.QueryBuiltIndexes)
+            {
+                if (buildingPlacer.SpawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare spawnPlace))
+                {
+                    spawnPlace.OnPlaced();
+                }
+            }
             districtGenerator.Place();
             buildingGenerator.Place();
             costText.gameObject.SetActive(false);

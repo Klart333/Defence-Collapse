@@ -15,6 +15,7 @@ using Gameplay.Buffs;
 
 namespace Buildings.District
 {
+    [Serializable]
     public class DistrictData : IDisposable, IBuffable
     {
         public event Action<DistrictData> OnClicked;

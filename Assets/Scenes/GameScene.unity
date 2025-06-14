@@ -10656,7 +10656,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnHandler: {fileID: 342113231}
-  groundGenerator: {fileID: 1024001993}
   bossData: {fileID: 11400000, guid: 044c8039edcb2c0448e78cb816ba2851, type: 2}
   spawnDataUtility: {fileID: 11400000, guid: 14e0cdc191631d54d99384f21e9b5d6f, type: 2}
 --- !u!33 &1792958820 stripped
@@ -12239,7 +12238,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 655a07dadef02e24c8bf1ce537df38a5, type: 2}
   - {fileID: 11400000, guid: 42eb147ba1b06a04c92f1b3e953f27c4, type: 2}
   - {fileID: 11400000, guid: fe23badb5416a0047a9fff8d174e06cd, type: 2}
-  giveStartingLootData: 1
+  giveStartingLootData: 0
 --- !u!33 &2100797625 stripped
 MeshFilter:
   m_CorrespondingSourceObject: {fileID: 5442042725639951420, guid: f8d6d4cb9e7edcc48afdf101345acab7,

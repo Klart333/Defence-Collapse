@@ -24,8 +24,8 @@ namespace Gameplay
         {
             BarricadeHealthMultiplier = new Stat(1);
             WallHealthMultiplier = new Stat(1);
-            BarricadeHealing = new Stat(1);
-            WallHealing = new Stat(1);
+            BarricadeHealing = new Stat(0);
+            WallHealing = new Stat(0);
         }
 
         public static void ResetStats()

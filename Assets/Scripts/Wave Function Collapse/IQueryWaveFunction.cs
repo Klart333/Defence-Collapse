@@ -162,7 +162,8 @@ namespace WaveFunctionCollapse
             for (int i = builtIndexes.Count - 1; i >= 0; i--)
             {
                 QueryMarchedChunk chunk = ChunkWaveFunction.Chunks[builtIndexes[i].Index];
-                if (!chunk.BuiltCells[builtIndexes[i].CellIndex.x, builtIndexes[i].CellIndex.y, builtIndexes[i].CellIndex.z])
+                if (!chunk.BuiltCells[builtIndexes[i].CellIndex.x, builtIndexes[i].CellIndex.y, builtIndexes[i].CellIndex.z]
+                    || chunk.QueryBuiltCells.Contains(builtIndexes[i].CellIndex)) // If it's not built or only query built
                 {
                     builtIndexes.RemoveAt(i);
                 }

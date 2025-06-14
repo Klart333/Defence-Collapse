@@ -110,7 +110,7 @@ namespace WaveFunctionCollapse
             {
                 GetNeighbours(chunkIndexes[i], 1);
             }
-
+            queriedChunks = this.GetChunks(cellsToUpdate);
             this.MakeBuildable(cellsToUpdate, PrototypeInfo);
 
             waveFunction.Propagate();
@@ -214,6 +214,8 @@ namespace WaveFunctionCollapse
             List<ChunkIndex> cellsToCollapse = this.GetCellsToCollapse(queryIndex);
             if (cellsToCollapse.Count <= 0) return QuerySpawnedBuildings;
 
+            this.queryIndex = queryIndex;
+            
             queriedChunks = this.GetChunks(cellsToCollapse);
             waveFunction.Chunks[queryIndex.Index].SetBuiltCells(queryIndex.CellIndex);
             this.MakeBuildable(cellsToCollapse, PrototypeInfo);

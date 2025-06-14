@@ -112,22 +112,17 @@ namespace Buildings
         {
             List<ChunkIndex> damageIndexes = buildingManager.GetSurroundingMarchedIndexes(building.ChunkIndex);
 
-            for (int j = 0; j < damageIndexes.Count; j++)
+            for (int i = 0; i < damageIndexes.Count; i++)
             {
-                ChunkIndex damageIndex = damageIndexes[j];
+                ChunkIndex damageIndex = damageIndexes[i];
+
                 if (!WallStates.ContainsKey(damageIndex))
                 {
                     WallStates.Add(damageIndex, CreateData(damageIndex));
                 }
 
-                if (Buildings.TryGetValue(damageIndex, out HashSet<Building> buildings))
-                {
-                    buildings.Add(building);
-                }
-                else
-                {
-                    Buildings.Add(damageIndex, new HashSet<Building>(4) { building });
-                }
+                if (Buildings.TryGetValue(damageIndex, out HashSet<Building> buildings)) buildings.Add(building);
+                else Buildings.Add(damageIndex, new HashSet<Building>(4) { building });
             }
 
             BuildingGroups.Add(++groupIndexCounter, new HashSet<Building> { building });
@@ -215,6 +210,11 @@ namespace Buildings
                 if (Buildings.TryGetValue(chunkIndex, out HashSet<Building> buildings))
                 {
                     buildings.Remove(building);
+                    
+                    if (buildings.Count == 0)
+                    {
+                        WallStates.Remove(chunkIndex);
+                    }
                 }
             }
 
@@ -283,9 +283,10 @@ namespace Buildings
         {
             buildingManager.RevertQuery();
             districtGenerator.RevertQuery();
-
+            
             if (!Buildings.Remove(chunkIndex, out HashSet<Building> buildings))
             {
+                Debug.LogError("Could not find building");
                 WallStates.Remove(chunkIndex);
                 Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
                 return;
@@ -298,8 +299,7 @@ namespace Buildings
                 {
                     continue;
                 }
-
-                //building.OnDestroyed();
+                
                 destroyedIndexes.Add(building.ChunkIndex);
             }
 

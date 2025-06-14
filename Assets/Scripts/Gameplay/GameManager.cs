@@ -1,5 +1,6 @@
 using Random = System.Random;
 using Buildings.District;
+using DG.Tweening;
 using Unity.Entities;
 using Effects.ECS;
 using Enemy.ECS;
@@ -40,6 +41,7 @@ namespace Gameplay
 
         public void ResetWorld()
         {
+            DOTween.Clear();
             Pool.Clear();
             AttackingSystem.DamageEvent.Clear();
             StopAttackingSystem.KilledIndexes.Clear();
