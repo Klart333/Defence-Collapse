@@ -52,11 +52,11 @@ namespace Buildings.District
                 return;
             }
 
-            GameSpeedManager.Instance.SetBaseGameSpeed(0, 0.2f);
+            GameSpeedManager.Instance.SetBaseGameSpeed(0, 0.5f);
             canvasGroup.interactable = true;
             canvasGroup.DOKill();
             canvasGroup.alpha = 0;
-            canvasGroup.DOFade(1.0f, fadeInDuration).SetEase(fadeInEase).timeScale = 1.0f / GameSpeedManager.Instance.Value;
+            canvasGroup.DOFade(1.0f, fadeInDuration).SetEase(fadeInEase);
             
             canvasGameObject.SetActive(true);
             for (int i = 0; i < unlockPanels.Length; i++)
@@ -83,7 +83,7 @@ namespace Buildings.District
             canvasGroup.interactable = false;
             canvasGroup.DOKill();
 
-            GameSpeedManager.Instance.SetBaseGameSpeed(1);
+            GameSpeedManager.Instance.SetBaseGameSpeed(1, 0.5f);
             canvasGroup.DOFade(0.0f, fadeOutDuration).SetEase(fadeOutEase).onComplete = () =>
             {
                 canvasGameObject.SetActive(false);
