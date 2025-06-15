@@ -196,6 +196,10 @@ namespace UI
         public void ShowUpgrades(DistrictData districtData)
         {
             this.districtData = districtData;
+            if (districtData.State is IAttackerStatistics stats)
+            {
+                stats.OnStatisticsChanged += OnStatisticsChanged;
+            }
 
             parentPanel.SetActive(true);
 
@@ -238,8 +242,6 @@ namespace UI
             {
                 return;
             }
-            
-            stats.OnStatisticsChanged += OnStatisticsChanged;
             
             bool spawned = false;
             if (stats.DamageDone > 0)
