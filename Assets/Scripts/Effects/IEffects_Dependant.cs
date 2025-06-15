@@ -28,10 +28,15 @@ namespace Effects
         public void Perform(IAttacker unit)
         {
             Vector3 pos = unit.OriginPosition;
-            float amount = ModifierValue * unit.Stats.Productivity.Value;
+            float amount = ModifierValue * unit.Stats.Productivity.Value * MoneyManager.Instance.MoneyMultiplier.Value;
             if (multiplyWithAttackSpeed) amount *= unit.Stats.AttackSpeed.Value;
             
             MoneyManager.Instance.AddMoneyParticles(amount, pos);
+
+            if (unit is IAttackerStatistics stats)
+            {
+                stats.GoldGained += amount;
+            }
         }
 
         public void Revert(IAttacker unit)

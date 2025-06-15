@@ -2,6 +2,8 @@ using Health;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 
 namespace Effects.ECS
 {
@@ -11,18 +13,20 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            
+            state.RequireForUpdate<DamageCallbackSingletonTag>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            Entity bufferEntity = SystemAPI.GetSingletonEntity<DamageCallbackSingletonTag>();
+            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
 
-            new HealthJob
+            state.Dependency = new HealthJob
             {
                 ECB = ecb.AsParallelWriter(),
-            }.ScheduleParallel();
+                BufferEntity = bufferEntity,
+            }.ScheduleParallel(state.Dependency);
             
             state.Dependency.Complete(); 
             ecb.Playback(state.EntityManager);
@@ -39,10 +43,12 @@ namespace Effects.ECS
     [BurstCompile]
     public partial struct HealthJob : IJobEntity
     {
+        public Entity BufferEntity;
+        
         public EntityCommandBuffer.ParallelWriter ECB;
         
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent health, in PendingDamageComponent pendingDamage)
+        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent health, in PendingDamageComponent pendingDamage, in LocalTransform transform)
         {
             float damageTaken;
             HealthType damageType;
@@ -72,6 +78,16 @@ namespace Effects.ECS
                 DamageTakenType = damageType,
                 IsCrit = pendingDamage.IsCrit,
             });
+
+            ECB.AppendToBuffer(index, BufferEntity, new DamageCallbackComponent
+            {
+                DamageTaken = damageTaken,
+                DamageTakenType = damageType,
+                Position = transform.Position,
+                
+                Key = pendingDamage.Key,
+                TriggerDamageDone = pendingDamage.TriggerDamageDone
+            });
             
             if (health.Health <= 0)
             {
@@ -79,4 +95,17 @@ namespace Effects.ECS
             }
         }
     }
+
+    [InternalBufferCapacity(0)]
+    public struct DamageCallbackComponent : IBufferElementData
+    {
+        public int Key;
+        public float DamageTaken;
+        public HealthType DamageTakenType;
+        public float3 Position;
+
+        public bool TriggerDamageDone;
+    }
+    
+    public struct DamageCallbackSingletonTag : IComponentData { }
 }

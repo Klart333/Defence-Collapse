@@ -10,6 +10,7 @@ using UnityEngine;
 using DG.Tweening;
 using InputCamera;
 using System;
+using Effects;
 using TMPro;
 using Loot;
 
@@ -33,10 +34,7 @@ namespace UI
 
         [SerializeField]
         private TextMeshProUGUI[] descriptions;
-
-        [SerializeField]
-        private Image[] points;
-
+        
         [Title("Upgrade Displays")]
         [SerializeField]
         private TextMeshProUGUI panelTitleText;
@@ -46,9 +44,6 @@ namespace UI
 
         [SerializeField]
         private Transform upgradeDisplayParent;
-
-        [SerializeField]
-        private UIFlexibleLayoutGroup flexibleLayoutGroup;
 
         [Title("Sections")]
         [SerializeField]
@@ -62,6 +57,9 @@ namespace UI
 
         [Title("Effect Panels")]
         [SerializeField]
+        private RectTransform effectsPanelParent;
+        
+        [SerializeField]
         private float startX = -325;
         
         [SerializeField]
@@ -73,6 +71,13 @@ namespace UI
         [SerializeField]
         private UIEffectsHandler towerEffectsPanel;
         
+        [Title("Extra Info")]
+        [SerializeField]
+        private Transform extraInfoParent;
+        
+        [SerializeField]
+        private PooledText extraInfoTextPrefab;
+        
         [Title("Stat Panel")]
         [SerializeField]
         private UIDistrictStatPanel statPanel;
@@ -81,13 +86,14 @@ namespace UI
 
         private readonly List<EffectModifier> availableEffectModifiers = new List<EffectModifier>();
         private readonly List<UIUpgradeDisplay> spawnedDisplays = new List<UIUpgradeDisplay>();
+        private readonly List<PooledText> spawnedTexts = new List<PooledText>();
 
         private DistrictUpgradeManager upgradeManager;
         private InputManager inputManager;
         private DistrictData districtData;
         private Canvas canvas;
         private Camera cam;
-
+        
         private void OnEnable()
         {
             canvas = GetComponentInParent<Canvas>();
@@ -148,13 +154,38 @@ namespace UI
 
         public void ShowSection(bool isUpgrade)
         {
+            if (upgradeSection.activeSelf == isUpgrade)
+            {
+                return;
+            }
+            
             upgradeSection.SetActive(isUpgrade);
             modifySection.SetActive(!isUpgrade);
 
             line.DOKill();
-            line.DOAnchorPosX(isUpgrade ? -100 : 100, 0.2f).SetEase(Ease.OutCirc);
+            line.DOAnchorPosX(isUpgrade ? -100 : 100, 0.2f).SetEase(Ease.OutSine);
 
-            (ownedEffectsPanel.transform.parent as RectTransform).DOAnchorPosX(isUpgrade ? startX : endX, 0.5f).SetEase(Ease.OutCirc);
+            effectsPanelParent.DOKill();
+            if (isUpgrade)
+            {
+                if (effectsPanelParent.gameObject.activeSelf)
+                {
+                    effectsPanelParent.DOComplete();
+                    effectsPanelParent.DOAnchorPosX(startX, 0.5f).SetEase(Ease.OutSine).onComplete += () =>
+                    {
+                        effectsPanelParent.gameObject.SetActive(false);
+                    };
+                }
+            }
+            else
+            {
+                effectsPanelParent.DOComplete();
+                effectsPanelParent.anchoredPosition = new Vector2(startX, effectsPanelParent.anchoredPosition.y);
+                effectsPanelParent.gameObject.SetActive(true);
+                ownedEffectsPanel.SpawnEffects(availableEffectModifiers);
+
+                effectsPanelParent.DOAnchorPosX(endX, 0.5f).SetEase(Ease.OutSine);
+            }
 
             if (!isUpgrade && effectModifiers.TryGetValue(districtData, out List<EffectModifier> effects))
             {
@@ -167,13 +198,13 @@ namespace UI
             this.districtData = districtData;
 
             parentPanel.SetActive(true);
-            ownedEffectsPanel.SpawnEffects(availableEffectModifiers);
 
             (ownedEffectsPanel.transform.parent as RectTransform).anchoredPosition = Vector2.zero;
 
             ShowSection(true);
 
             SpawnUpgradeDisplays(districtData);
+            DisplayExtraInfo(districtData);
             panelTitleText.text = GetDistrictName(districtData);
 
             districtData.OnDisposed += DistrictDataOnOnDisposed;
@@ -201,6 +232,53 @@ namespace UI
             }
         }
 
+        private void DisplayExtraInfo(DistrictData districtData)
+        {
+            if (districtData.State is not IAttackerStatistics stats)
+            {
+                return;
+            }
+            
+            stats.OnStatisticsChanged += OnStatisticsChanged;
+            
+            bool spawned = false;
+            if (stats.DamageDone > 0)
+            {
+                AddText($"Damage Dealt - {stats.DamageDone:N0}");
+            }
+
+            if (stats.GoldGained > 0)
+            {
+                AddText($"Gold Gained - {stats.GoldGained:N0}");
+            }
+
+            if (spawned)
+            {
+                extraInfoParent.gameObject.SetActive(true);
+            }
+
+            void AddText(string textContent)
+            {
+                spawned = true;
+
+                PooledText text = extraInfoTextPrefab.GetDisabled<PooledText>();
+                text.transform.SetParent(extraInfoParent, false);
+                text.Text.text = textContent;
+                text.gameObject.SetActive(true);
+                spawnedTexts.Add(text);
+            }
+        }
+
+        private void OnStatisticsChanged()
+        {
+            for (int i = 0; i < spawnedTexts.Count; i++)
+            {
+                spawnedTexts[i].gameObject.SetActive(false);
+            }
+            spawnedTexts.Clear();
+            DisplayExtraInfo(districtData);
+        }
+
         private void SpawnUpgradeDisplays(DistrictData districtData)
         {
             for (int i = 0; i < districtData.UpgradeStats.Count; i++)
@@ -212,9 +290,6 @@ namespace UI
                 spawned.transform.SetSiblingIndex(i);
                 spawnedDisplays.Add(spawned);
             }
-
-            flexibleLayoutGroup.coloumns = districtData.UpgradeStats.Count;
-            flexibleLayoutGroup.CalculateNewBounds();
 
             DisplayUpgrade(districtData.UpgradeStats[0]);
         }
@@ -228,13 +303,10 @@ namespace UI
                 if (i >= stat.Descriptions.Length)
                 {
                     descriptions[i].text = "";
-                    points[i].gameObject.SetActive(false);
+                    continue;
                 }
-                else
-                {
-                    descriptions[i].text = string.Format(stat.Descriptions[i], i == 1 ? stat.Value.ToString("N") : stat.GetIncrease().ToString("N"));
-                    points[i].gameObject.SetActive(true);
-                }
+                
+                descriptions[i].text = string.Format(stat.Descriptions[i], i == 1 ? stat.Value.ToString("N") : stat.GetIncrease().ToString(stat.GetFormat()));
             }
 
             costText.text = $"Cost: {stat.GetCost()}";
@@ -251,7 +323,19 @@ namespace UI
             {
                 spawnedDisplays[i].gameObject.SetActive(false);
             }
+            effectsPanelParent.gameObject.SetActive(false);
 
+            for (int i = 0; i < spawnedTexts.Count; i++)
+            {
+                spawnedTexts[i].gameObject.SetActive(false);
+            }
+            extraInfoParent.gameObject.SetActive(false);
+            
+            if (districtData.State is IAttackerStatistics stats)
+            {
+                stats.OnStatisticsChanged -= OnStatisticsChanged;
+            }
+            
             parentPanel.SetActive(false);
         }
 

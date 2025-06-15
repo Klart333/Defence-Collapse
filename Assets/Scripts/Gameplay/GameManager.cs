@@ -2,6 +2,7 @@ using Random = System.Random;
 using Buildings.District;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Effects;
 using Unity.Entities;
 using Effects.ECS;
 using Enemy.ECS;
@@ -64,7 +65,7 @@ namespace Gameplay
             Pool.Clear();
             AttackingSystem.DamageEvent.Clear();
             StopAttackingSystem.KilledIndexes.Clear();
-            CollisionSystem.DamageDoneEvent.Clear();
+            DamageCallbackHandler.DamageDoneEvent.Clear();
             
             World defaultWorld = World.DefaultGameObjectInjectionWorld;
             defaultWorld.EntityManager.CompleteAllTrackedJobs();

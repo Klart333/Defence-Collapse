@@ -82,7 +82,7 @@ namespace Enemy
             float averageLevel = totalLevels / (float)amount;
             int seed = gameManager.Seed;
             float roundDuration = spawnDataUtility.TargetWaveDuration.Evaluate(waveCount + averageLevel);
-            List<EnemyBossData.SpawnPointInfo> pointInfos = bossData.GetBossSpawnPoints(points, totalLevels, seed, roundDuration, entityManager);
+            List<EnemyBossData.SpawnPointInfo> pointInfos = bossData.GetBossSpawnPoints(points, totalLevels, seed, roundDuration);
 
             ComponentType[] componentTypes =
             {

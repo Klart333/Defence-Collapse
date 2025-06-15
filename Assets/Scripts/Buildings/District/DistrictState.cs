@@ -16,8 +16,9 @@ using Juice;
 
 namespace Buildings.District
 {
-    public abstract class DistrictState : IAttacker, IDisposable
+    public abstract class DistrictState : IAttacker, IAttackerStatistics, IDisposable
     {
+        public event Action OnStatisticsChanged;
         public event Action OnAttack;
         
         protected readonly Dictionary<int2, List<DistrictTargetMesh>> targetMeshes = new Dictionary<int2, List<DistrictTargetMesh>>();
@@ -28,7 +29,6 @@ namespace Buildings.District
         protected EntityManager entityManager;
         protected Stats stats;
 
-        private float totalDamageDealt;
 
         public DamageInstance LastDamageDone => lastDamageDone;
         public Stats Stats => stats;
@@ -37,10 +37,12 @@ namespace Buildings.District
         public abstract CategoryType CategoryType { get; }
         protected abstract bool UseTargetMeshes { get; }
         protected abstract float AttackAngle { get; }
+        protected DistrictData DistrictData { get; }
         public Vector3 OriginPosition { get; set; }
         public Vector3 AttackPosition { get; set; }
-        public DistrictData DistrictData { get; }
         public abstract Attack Attack { get; }
+        public float DamageDone { get; set; }
+        public float GoldGained { get; set; }
         public int Level { get; set; } = 1;
         public int Key { get; set; }
 
@@ -52,7 +54,7 @@ namespace Buildings.District
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             Key = key;
             
-            CollisionSystem.DamageDoneEvent.Add(key, OnDamageDone);
+            DamageCallbackHandler.DamageDoneEvent.Add(key, OnDamageDone);
         }
         
         public abstract void Update();
@@ -99,19 +101,16 @@ namespace Buildings.District
             
         }
         
-        private void OnDamageDone(Entity entity)
+        private void OnDamageDone(DamageCallbackComponent damageCallback)
         {
-            DamageComponent damageComp = entityManager.GetComponentData<DamageComponent>(entity);
-            PositionComponent transform = entityManager.GetComponentData<PositionComponent>(entity);
-
-            float damage = damageComp.HealthDamage + damageComp.ShieldDamage + damageComp.ShieldDamage;
-            totalDamageDealt += damage;
-            if (!damageComp.TriggerDamageDone) return;
+            DamageDone += damageCallback.DamageTaken;
+            OnStatisticsChanged?.Invoke();
+            if (!damageCallback.TriggerDamageDone) return;
             
             lastDamageDone = new DamageInstance
             {
-                Damage = damage,
-                AttackPosition = transform.Position,
+                Damage = damageCallback.DamageTaken,
+                AttackPosition = damageCallback.Position,
                 Source = this,
             };
             
@@ -129,10 +128,15 @@ namespace Buildings.District
         {
 
         }
+
+        protected void InvokeStatisticsChanged()
+        {
+            OnStatisticsChanged?.Invoke();
+        }
         
         public virtual void Dispose()
         {
-            CollisionSystem.DamageDoneEvent.Remove(Key);
+            DamageCallbackHandler.DamageDoneEvent.Remove(Key);
                 
             foreach (List<DistrictTargetMesh> meshes in targetMeshes.Values)
             {
@@ -643,7 +647,7 @@ namespace Buildings.District
             stats = new Stats(townHallData.Stats);
             TownHallUpgradeStat townHall = new TownHallUpgradeStat(new Stat(1), townHallData.LevelDatas[0],
                 "Level",
-                new string[] { "+1 Level\nChoose 1 of 2 districts to unlock. ", "Current Level: {0}" },
+                new string[] { "+1 Level - Choose 1 of 2 districts to unlock. ", "Current Level: {0}" },
                 townHallData.UpgradeIcons[0]){
                 DistrictState = this
             };
@@ -822,6 +826,8 @@ namespace Buildings.District
                 {
                     effect.Perform(this);
                 }
+                
+                InvokeStatisticsChanged();
             }
         }
 

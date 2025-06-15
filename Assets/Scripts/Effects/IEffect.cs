@@ -12,10 +12,10 @@ using Unity.Rendering;
 using Unity.Entities;
 using Effects.ECS;
 using UnityEngine;
+using Enemy.ECS;
 using Gameplay;
 using VFX.ECS;
 using System;
-using Enemy.ECS;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable ConvertToConstant.Global

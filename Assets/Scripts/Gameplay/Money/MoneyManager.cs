@@ -105,9 +105,12 @@ namespace Gameplay.Money
             RemoveMoney(costData.GetCost(buildingType));
         }
         
-        public void AddMoney(float amount)
+        public void AddMoney(float amount, bool addMultiplier = true)
         {
-            amount *= MoneyMultiplier.Value;
+            if (addMultiplier)
+            {
+                amount *= MoneyMultiplier.Value;
+            }
             money += amount;
 
             OnMoneyChanged?.Invoke(money);

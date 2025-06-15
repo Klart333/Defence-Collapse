@@ -26,7 +26,7 @@ namespace Enemy
         public int BossSpawnFrequency => bossSpawnFrequency;
         public float FrequencyDecrease => frequencyDecrease;
 
-        public List<SpawnPointInfo> GetBossSpawnPoints(List<Vector3> spawnPoints, int totalLevels, int seed, float roundDuration, EntityManager entityManager)
+        public List<SpawnPointInfo> GetBossSpawnPoints(List<Vector3> spawnPoints, int totalLevels, int seed, float roundDuration)
         {
             roundDuration = Mathf.Max(5, roundDuration - 10);
             List<SpawnPointInfo> bossSpawnPoints = new List<SpawnPointInfo>();

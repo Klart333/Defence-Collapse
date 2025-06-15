@@ -105,7 +105,7 @@ namespace Juice
             {
                 spawned.OnReturnToPool -= SpawnedOnOnReturnToPool;
                 spawned.DOKill();
-                MoneyManager.Instance.AddMoney(moneyShare);
+                MoneyManager.Instance.AddMoney(moneyShare, false);
             }
 
             async UniTaskVoid SetDoScale(PooledMonoBehaviour spawned, float duration)

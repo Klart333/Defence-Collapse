@@ -73,7 +73,10 @@ namespace Effects.ECS
 		public float HealthDamage;
 		public float ArmorDamage;
 		public float ShieldDamage;
-		public bool IsCrit; // Can make into flag for different effects
+		public bool IsCrit;
+		
+		public bool TriggerDamageDone;
+		public int Key;
 
 		public Entity SourceEntity;
 	}

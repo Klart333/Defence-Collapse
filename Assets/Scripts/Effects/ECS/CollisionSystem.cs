@@ -6,33 +6,27 @@ using Unity.Entities;
 using Unity.Burst;
 using Unity.Jobs;
 using Enemy.ECS;
-using System;
 
 namespace Effects.ECS
 {
-    [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(EnemyHashGridSystem))]
-    public partial class CollisionSystem : SystemBase
+    [BurstCompile, UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(EnemyHashGridSystem))]
+    public partial struct CollisionSystem : ISystem
     {
-        public static readonly Dictionary<int, Action<Entity>> DamageDoneEvent = new Dictionary<int, Action<Entity>>();
-            
         private ComponentLookup<LocalTransform> transformLookup;
-        private NativeQueue<Entity> collisionQueue;
         private EntityQuery collisionQuery;
 
-        protected override void OnCreate()
+        [BurstCompile]
+        public void OnCreate(ref SystemState state)
         {
-            base.OnCreate();
-            
             collisionQuery = SystemAPI.QueryBuilder().WithAspect<ColliderAspect>().Build();
-
             transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
-            collisionQueue = new NativeQueue<Entity>(Allocator.Persistent);
             
-            RequireForUpdate<WaveStateComponent>();
-            RequireForUpdate<SpatialHashMapSingleton>();
+            state.RequireForUpdate<WaveStateComponent>();
+            state.RequireForUpdate<SpatialHashMapSingleton>();        
         }
-        
-        protected override void OnUpdate()
+
+        [BurstCompile]
+        public void OnUpdate(ref SystemState state)
         {
             if (collisionQuery.IsEmpty)
             {
@@ -40,50 +34,39 @@ namespace Effects.ECS
             }
 
             int enemyCount = SystemAPI.GetSingleton<WaveStateComponent>().EnemyCount;
-            NativeParallelMultiHashMap<Entity, PendingDamageComponent> pendingDamageMap = new NativeParallelMultiHashMap<Entity, PendingDamageComponent>(enemyCount * 2 + 10, WorldUpdateAllocator);
+            NativeParallelMultiHashMap<Entity, PendingDamageComponent> pendingDamageMap = new NativeParallelMultiHashMap<Entity, PendingDamageComponent>(enemyCount * 2 + 10, state.WorldUpdateAllocator);
 
             NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            transformLookup.Update(this);
+            transformLookup.Update(ref state);
              
-            Dependency = new CollisionJob
+            state.Dependency = new CollisionJob
             {
                 PendingDamageMap = pendingDamageMap.AsParallelWriter(),
-                CollisionQueue = collisionQueue.AsParallelWriter(),
                 SpatialGrid = spatialGrid.AsReadOnly(),
                 TransformLookup = transformLookup,
                 ECB = ecb.AsParallelWriter(),
-            }.ScheduleParallel(Dependency);
-            Dependency.Complete(); 
+            }.ScheduleParallel(state.Dependency);
+            state.Dependency.Complete(); 
 
-            Dependency = new SumCollisionJob
+            state.Dependency = new SumCollisionJob
             {
                 ECB = ecb,
                 PendingDamageMap = pendingDamageMap.AsReadOnly(),
-            }.Schedule(Dependency);
+            }.Schedule(state.Dependency);
+            state.Dependency.Complete(); 
             
-            Dependency.Complete(); 
-            ecb.Playback(EntityManager);
+            ecb.Playback(state.EntityManager);
             ecb.Dispose();
 
             pendingDamageMap.Dispose();
-            
-            while (collisionQueue.TryDequeue(out Entity entity))
-            {
-                if (DamageDoneEvent.TryGetValue(EntityManager.GetComponentData<DamageComponent>(entity).Key, out var action))
-                {
-                    action.Invoke(entity);
-                }
-            }
         }
 
-        protected override void OnDestroy()
+        [BurstCompile]
+        public void OnDestroy(ref SystemState state)
         {
-            base.OnDestroy();
-
-            collisionQueue.Dispose();
+            
         }
-
     }
 
     [BurstCompile(FloatPrecision.Low, FloatMode.Fast)]
@@ -98,8 +81,6 @@ namespace Effects.ECS
         public NativeParallelMultiHashMap<Entity, PendingDamageComponent>.ParallelWriter PendingDamageMap;
 
         public EntityCommandBuffer.ParallelWriter ECB;
-
-        public NativeQueue<Entity>.ParallelWriter CollisionQueue;
 
         [BurstCompile]
         public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ColliderAspect colliderAspect) // Cellsize = 1
@@ -169,8 +150,6 @@ namespace Effects.ECS
                 PendingDamageComponent pendingDamage = GetDamage(colliderAspect, entity);
                 PendingDamageMap.Add(enemy, pendingDamage);
 
-                CollisionQueue.Enqueue(entity);
-
                 if (colliderAspect.DamageComponent.ValueRO.HasLimitedHits)
                 {
                     colliderAspect.DamageComponent.ValueRW.LimitedHits--;
@@ -195,6 +174,8 @@ namespace Effects.ECS
                 ArmorDamage = colliderAspect.DamageComponent.ValueRO.ArmorDamage * critMultiplier,
                 ShieldDamage = colliderAspect.DamageComponent.ValueRO.ShieldDamage * critMultiplier,
                 IsCrit = isCrit,
+                Key = colliderAspect.DamageComponent.ValueRO.Key,
+                TriggerDamageDone = colliderAspect.DamageComponent.ValueRO.TriggerDamageDone,
                 
                 SourceEntity = sourceEntity,
             };
@@ -214,7 +195,6 @@ namespace Effects.ECS
             // Get all unique keys (entities that were hit)
             NativeArray<Entity> keys = PendingDamageMap.GetKeyArray(Allocator.Temp);
             
-            // Proper iteration pattern for NativeMultiHashMap
             foreach (Entity entity in keys)
             {
                 if (!PendingDamageMap.TryGetFirstValue(entity, out PendingDamageComponent damage, out var iterator)) continue;
@@ -230,6 +210,9 @@ namespace Effects.ECS
                     pendingDamage.ArmorDamage += damage.ArmorDamage;
                     pendingDamage.ShieldDamage += damage.ShieldDamage;
                     pendingDamage.IsCrit |= damage.IsCrit;
+                    
+                    pendingDamage.Key = damage.Key; // A bit inaccurate
+                    pendingDamage.TriggerDamageDone = damage.TriggerDamageDone;
                 } 
                 while (PendingDamageMap.TryGetNextValue(out damage, ref iterator));
                     

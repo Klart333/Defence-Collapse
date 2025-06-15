@@ -155,6 +155,7 @@ namespace Chunks
             {
                 int distance = Mathf.Abs(ChunkKey.x) + Mathf.Abs(ChunkKey.z);
                 float gold = goldPerTree + goldPerTree * distanceMultiplier * distance;
+                gold *= MoneyManager.Instance.MoneyMultiplier.Value;
 
                 foreach (PooledMonoBehaviour tree in spawnedTrees)  
                 {

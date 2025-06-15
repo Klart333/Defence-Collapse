@@ -19,6 +19,7 @@ public interface IUpgradeStat : IStat
     public float GetCost();
     public float GetIncrease();
     public void IncreaseLevel();
+    public string GetFormat();
 }
 
 [Serializable, InlineProperty]
@@ -102,6 +103,8 @@ public class UpgradeStat : IUpgradeStat
     {
         return LevelData.GetIncrease(Level);
     }
+
+    public string GetFormat() => "N";
 }
 
 [Serializable, InlineProperty]
@@ -191,4 +194,6 @@ public class TownHallUpgradeStat : IUpgradeStat
     {
         return LevelData.GetIncrease(Level);
     }
+    
+    public string GetFormat() => "N0";
 }
