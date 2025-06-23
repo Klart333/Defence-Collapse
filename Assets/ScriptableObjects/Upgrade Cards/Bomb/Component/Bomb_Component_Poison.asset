@@ -36,7 +36,14 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: a973648b3fa6b4f4b94d515f5893d6bc, type: 3}
   description: Bomb Districts shoot <color=green>Poison Bombs</color> (+50 Poison
     Damage)
+  upgradeRank: 2
+  upgradeCardType: 2
+  weight: -2
+  weightStrategy: 38
+  weightChangeOnPicked: 1
+  weightChangeOnCardsPicked: 1
+  weightChangeOnDistrictBuilt: 0.5
   appliedCategories: 2
   upgradeType: 1
   componentType: 4
-  componentStrength: 50
+  componentStrength: 75

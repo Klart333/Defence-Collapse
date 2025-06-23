@@ -34,9 +34,15 @@ MonoBehaviour:
       Entry: 8
       Data: 
   icon: {fileID: 21300000, guid: a973648b3fa6b4f4b94d515f5893d6bc, type: 3}
-  description: Bomb Districts fire <color=red>Incendiary Bombs</color> (+20 Fire
-    Damage)
+  description: Bomb Districts fire <color=red>Incendiary Bombs</color>
+  upgradeRank: 2
+  upgradeCardType: 2
+  weight: -2
+  weightStrategy: 38
+  weightChangeOnPicked: 1
+  weightChangeOnCardsPicked: 1
+  weightChangeOnDistrictBuilt: 0.5
   appliedCategories: 2
   upgradeType: 1
   componentType: 0
-  componentStrength: 20
+  componentStrength: 30

@@ -6,7 +6,7 @@ using System;
 
 namespace Gameplay.Upgrades
 {
-    [CreateAssetMenu(fileName = "Upgrade Card Data", menuName = "Upgrade/Upgrade Card Data", order = 0)]
+    [InlineEditor, CreateAssetMenu(fileName = "Upgrade Card Data", menuName = "Upgrade/Upgrade Card Data", order = 0)]
     public class UpgradeCardData : SerializedScriptableObject
     {
         [Title("Description")]
@@ -16,7 +16,7 @@ namespace Gameplay.Upgrades
         [SerializeField, TextArea]
         private string description;
 
-        [Title("Weight Settings")]
+        [Title("Weight Settings")] // MAKE IT ACTUALLY UNLOCK 
         [SerializeField]
         private UpgradeRank upgradeRank;
         
@@ -149,7 +149,7 @@ namespace Gameplay.Upgrades
         Mine = 1 << 4,
         Flame = 1 << 5,
         LightningDistrict = 1 << 10,
-        AllDistrict = 1 << 6,
+        AllDistrict = Archer | Bomb | Church | TownHall | Mine | Flame | LightningDistrict,
         
         // Attack
         Projectile = 1 << 7,

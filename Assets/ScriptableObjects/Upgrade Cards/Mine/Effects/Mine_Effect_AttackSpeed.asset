@@ -52,7 +52,14 @@ MonoBehaviour:
       Entry: 8
       Data: 
   icon: {fileID: 21300000, guid: 34aa25191b04edd4ab4ab2b1c6c25c09, type: 3}
-  description: +20% Mining Speed on Mine Disitrcts.
+  description: +20% Mining Speed (Attack Speed) on Mine Disitrcts.
+  upgradeRank: 1
+  upgradeCardType: 16
+  weight: 0
+  weightStrategy: 20
+  weightChangeOnPicked: -0.5
+  weightChangeOnCardsPicked: 1
+  weightChangeOnDistrictBuilt: 0.25
   appliedCategories: 16
   upgradeType: 0
   componentType: 0

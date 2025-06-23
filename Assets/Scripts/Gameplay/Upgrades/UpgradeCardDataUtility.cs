@@ -126,7 +126,7 @@ namespace Gameplay.Upgrades
                 DistrictType.Mine when (upgradeType & UpgradeCardType.Mine) > 0 => true,
                 DistrictType.Flame when (upgradeType & UpgradeCardType.Flame) > 0 => true,
                 DistrictType.Lightning when (upgradeType & UpgradeCardType.Lightning) > 0 => true,
-                _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
+                _ => false
             };
         }
         

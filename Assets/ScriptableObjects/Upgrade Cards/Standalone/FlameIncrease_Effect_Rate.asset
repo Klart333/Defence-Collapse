@@ -55,6 +55,13 @@ MonoBehaviour:
   description: '+20% <color=red>Fire Tick Rate</color>.
 
 '
+  upgradeRank: 1
+  upgradeCardType: 2048
+  weight: 1
+  weightStrategy: 16
+  weightChangeOnPicked: -0.1
+  weightChangeOnCardsPicked: 1
+  weightChangeOnDistrictBuilt: 1
   appliedCategories: 0
   upgradeType: 2
   componentType: 0

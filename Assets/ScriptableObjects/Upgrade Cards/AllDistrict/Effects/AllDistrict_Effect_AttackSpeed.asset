@@ -52,14 +52,14 @@ MonoBehaviour:
       Entry: 8
       Data: 
   icon: {fileID: 21300000, guid: f3d374d9c382df344b627716c212132a, type: 3}
-  description: +3% AttackSpeed on All Districts.
+  description: +5% AttackSpeed on All Districts.
   upgradeRank: 2
-  upgradeCardType: 0
-  weight: 0
-  weightStrategy: 0
-  weightChangeOnPicked: 0
+  upgradeCardType: 1151
+  weight: 0.5
+  weightStrategy: 20
+  weightChangeOnPicked: -0.5
   weightChangeOnCardsPicked: 1
-  weightChangeOnDistrictBuilt: 1
+  weightChangeOnDistrictBuilt: 0.1
   appliedCategories: 64
   upgradeType: 0
   componentType: 0
