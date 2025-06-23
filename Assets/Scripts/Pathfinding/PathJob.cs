@@ -1,10 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Unity.Collections.LowLevel.Unsafe;
+using System.Runtime.CompilerServices;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Entities;
 using Pathfinding;
 using Unity.Burst;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 
 [BurstCompile(FloatPrecision.Low, FloatMode.Fast, OptimizeFor = OptimizeFor.Performance)]
@@ -41,10 +41,10 @@ public struct PathJob : IJobFor
 
         switch (targetIndex)
         {
-            // Handle common case first (targetIndex == 0, ~99%)
+            // Handle common case (~99%)
             case 0:
             {
-                if (!GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out int dirIdx))
+                if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out int dirIdx))
                 {
                     pathChunk.Directions[index] = GetDirection(PathManager.NeighbourDirections[dirIdx]);
                     pathChunk.Distances[index] = pathChunk.NotWalkableIndexes[index] ? 1_000_000_000 : dist;
@@ -54,7 +54,7 @@ public struct PathJob : IJobFor
             // Handle barricade case (targetIndex == 255)
             case byte.MaxValue:
             {
-                if (!GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out _))
+                if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out _))
                 {
                     pathChunk.Directions[index] = byte.MaxValue;
                     pathChunk.Distances[index] = dist;
@@ -87,14 +87,17 @@ public struct PathJob : IJobFor
                 : ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[neighbourIndex.ChunkIndex]];
                 
             int manhattanDist = j % 2 == 0 ? 5 : 7;
-            int dist = neighbour.Distances[neighbourIndex.GridIndex] + neighbour.MovementCosts[neighbourIndex.GridIndex] * manhattanDist;
+            int dist = neighbour.Distances[neighbourIndex.GridIndex] 
+                       + neighbour.MovementCosts[neighbourIndex.GridIndex] * manhattanDist 
+                       + neighbour.ExtraDistance[neighbourIndex.GridIndex];
+            
             if (dist >= shortestDistance) continue;
                 
             shortestDistance = dist;
             dirIndex = j;
         }
 
-        return shortestDistance <= 0;
+        return shortestDistance < int.MaxValue;
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -111,15 +114,15 @@ public struct PathJob : IJobFor
             array[i] = neighbour switch // Grid width / height = 16, // NO DIAGONALS BUT IT'S FINE
             {
                 {x: < 0} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x - 1, chunkIndex.y)) 
-                    ? new PathIndex(new int2(chunkIndex.x - 1, chunkIndex.y), 15 + y * PathManager.GRID_WIDTH )
+                    ? new PathIndex(new int2(chunkIndex.x - 1, chunkIndex.y), PathManager.GRID_WIDTH - 1 + y * PathManager.GRID_WIDTH )
                     : new PathIndex(default, -1),
-                {x: > 15} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x + 1, chunkIndex.y)) 
+                {x: >= PathManager.GRID_WIDTH} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x + 1, chunkIndex.y)) 
                     ? new PathIndex(new int2(chunkIndex.x + 1, chunkIndex.y), 0 + y * PathManager.GRID_WIDTH )
                     : new PathIndex(default, -1),
                 {y: < 0} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y - 1)) 
-                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y - 1), x + 15 * PathManager.GRID_WIDTH  ) 
+                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y - 1), x + (PathManager.GRID_WIDTH - 1) * PathManager.GRID_WIDTH  ) 
                     : new PathIndex(default, -1),
-                {y: > 15} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y + 1)) 
+                {y: >= PathManager.GRID_WIDTH} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y + 1)) 
                     ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y + 1), x + 0 * PathManager.GRID_WIDTH ) 
                     : new PathIndex(default, -1),
                 _ => new PathIndex(chunkIndex, neighbour.x + neighbour.y * PathManager.GRID_WIDTH),

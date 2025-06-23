@@ -16,9 +16,6 @@ namespace Gameplay.Upgrades
         [SerializeField]
         private DistrictHandler districtHandler;
         
-        [SerializeField]
-        private UpgradeCardDataUtility upgradeUtility;
-        
         public readonly Dictionary<UpgradeComponentType, List<CategoryType>> spawnedEffects = new Dictionary<UpgradeComponentType, List<CategoryType>>();
         
         private EntityManager entityManager;
@@ -28,10 +25,8 @@ namespace Gameplay.Upgrades
         
         private void OnEnable()
         {
-            foreach (UpgradeCardData data in upgradeUtility.UpgradeCards)
-            {
-                data.OnUpgradePerformed += PerformUpgrade;
-            }
+            Events.OnUpgradeCardPicked += PerformUpgrade;
+           
             districtHandler.OnDistrictCreated += OnDistrictCreated;
             
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -43,10 +38,7 @@ namespace Gameplay.Upgrades
         
         private void OnDisable()
         {
-            foreach (UpgradeCardData data in upgradeUtility.UpgradeCards)
-            {
-                data.OnUpgradePerformed -= PerformUpgrade;
-            }
+            Events.OnUpgradeCardPicked -= PerformUpgrade;
             
             districtHandler.OnDistrictCreated -= OnDistrictCreated;
         }
@@ -70,24 +62,24 @@ namespace Gameplay.Upgrades
             }
         }
 
-        private void PerformUpgrade(UpgradeCardData upgradeData)
+        private void PerformUpgrade(UpgradeCardData.UpgradeCardInstance upgradeInstance)
         {
-            switch (upgradeData.UpgradeType)
+            switch (upgradeInstance.UpgradeType)
             {
                 case UpgradeType.Effect:
                 {
-                    foreach (IEffect effect in upgradeData.Effects)
+                    foreach (IEffect effect in upgradeInstance.Effects)
                     {
-                        AddUpgradeEffect(upgradeData.AppliedCategories, effect);
+                        AddUpgradeEffect(upgradeInstance.AppliedCategories, effect);
                     }
 
                     break;
                 }
                 case UpgradeType.Component:
-                    AddComponentEffect(upgradeData.AppliedCategories, upgradeData.ComponentType, upgradeData.ComponentStrength);
+                    AddComponentEffect(upgradeInstance.AppliedCategories, upgradeInstance.ComponentType, upgradeInstance.ComponentStrength);
                     break;
                 case UpgradeType.StandAloneEffect:
-                    foreach (IEffect effect in upgradeData.Effects)
+                    foreach (IEffect effect in upgradeInstance.Effects)
                     {
                         effect.Perform(null);
                     }

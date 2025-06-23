@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Unity.Collections;
 using UnityEngine;
+using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
 using System.IO;
-using System.Linq;
 #endif
 
 namespace Gameplay.Upgrades
@@ -16,20 +17,117 @@ namespace Gameplay.Upgrades
         [SerializeField]
         private UpgradeCardData[] upgradeCards;
         
-        public UpgradeCardData[] UpgradeCards => upgradeCards;
+        public readonly List<UpgradeCardData.UpgradeCardInstance> UpgradeCardInstances = new List<UpgradeCardData.UpgradeCardInstance>();
         
-        public List<UpgradeCardData> GetRandomData(int seed, int amount)
+        public void InitializeUpgrades()
         {
-            List<UpgradeCardData> availableDatas = new List<UpgradeCardData>(upgradeCards);
-            List<UpgradeCardData> result = new List<UpgradeCardData>();
+            for (int i = 0; i < upgradeCards.Length; i++)
+            {
+                UpgradeCardInstances.Add(upgradeCards[i].GetUpgradeCardInstance());
+            }
+        }
+        
+        public List<UpgradeCardData.UpgradeCardInstance> GetRandomData(int seed, int amount)
+        {
+            List<UpgradeCardData.UpgradeCardInstance> availableUpgrades = new List<UpgradeCardData.UpgradeCardInstance>(UpgradeCardInstances);
+            List<UpgradeCardData.UpgradeCardInstance> result = new List<UpgradeCardData.UpgradeCardInstance>();
+            
             System.Random random = new System.Random(seed);
             for (int i = 0; i < amount; i++)
             {
-                int index = random.Next(0, availableDatas.Count);
-                result.Add(availableDatas[index]);
-                availableDatas.RemoveAt(index);
+                float totalWeight = 0;
+                for (int j = availableUpgrades.Count - 1; j >= 0; j--)
+                {
+                    if (availableUpgrades[j].Weight <= 0)
+                    {
+                        availableUpgrades.RemoveAt(j);
+                        continue;
+                    }
+                    
+                    totalWeight += availableUpgrades[j].Weight;
+                }
+                
+                float randomValue = (float)random.NextDouble() * totalWeight;
+                for (int j = availableUpgrades.Count - 1; j >= 0; j--)
+                {
+                    if (randomValue <= availableUpgrades[j].Weight)
+                    {
+                        result.Add(availableUpgrades[j]);
+                        availableUpgrades.RemoveAtSwapBack(j);
+                        break;
+                    }                    
+                    randomValue -= availableUpgrades[j].Weight;
+                }
             }
             return result;
+        }
+        
+        public void StartObserving()
+        {
+            Events.OnDistrictBuilt += OnDistrictBuilt;
+            Events.OnUpgradeCardPicked += OnUpgradePicked;
+        }
+
+        public void StopObserving()
+        {
+            Events.OnDistrictBuilt -= OnDistrictBuilt;
+            Events.OnUpgradeCardPicked -= OnUpgradePicked;
+        }
+
+        private void OnUpgradePicked(UpgradeCardData.UpgradeCardInstance pickedUpgradeInstance)
+        {
+            for (int i = UpgradeCardInstances.Count - 1; i >= 0; i--)
+            {
+                var upgradeInstance = UpgradeCardInstances[i];
+                if (upgradeInstance == pickedUpgradeInstance)
+                {
+                    if (upgradeInstance.WeightStrategy.HasFlag(WeightStrategy.RemoveOnPicked))
+                    {
+                        UpgradeCardInstances.RemoveAtSwapBack(i);         
+                        continue;
+                    }
+
+                    if (upgradeInstance.WeightStrategy.HasFlag(WeightStrategy.ChangeOnPicked))
+                    {
+                        upgradeInstance.Weight += upgradeInstance.WeightChangeOnPicked;
+                    }
+                }
+                
+                if (upgradeInstance.WeightStrategy.HasFlag(WeightStrategy.ChangeWithCardsPicked) 
+                    && (pickedUpgradeInstance.UpgradeCardType & upgradeInstance.UpgradeCardType) > 0)
+                {
+                    upgradeInstance.Weight += upgradeInstance.WeightChangeOnCardsPicked;
+                }
+            }
+        }
+
+        private void OnDistrictBuilt(DistrictType type)
+        {
+            for (int i = UpgradeCardInstances.Count - 1; i >= 0; i--)
+            {
+                var upgradeInstance = UpgradeCardInstances[i];
+             
+                if (upgradeInstance.WeightStrategy.HasFlag(WeightStrategy.ChangeWithDistrictsBuilt) 
+                    && DoesMatch(type, upgradeInstance.UpgradeCardType))
+                {
+                    upgradeInstance.Weight += upgradeInstance.WeightChangeOnDistrictBuilt;
+                }
+            }
+        }
+
+        private static bool DoesMatch(DistrictType districtType, UpgradeCardType upgradeType)
+        {
+            return districtType switch
+            {
+                DistrictType.Archer when (upgradeType & UpgradeCardType.Archer) > 0 => true,
+                DistrictType.Bomb when (upgradeType & UpgradeCardType.Bomb) > 0 => true,
+                DistrictType.Church when (upgradeType & UpgradeCardType.Church) > 0 => true,
+                DistrictType.TownHall when (upgradeType & UpgradeCardType.TownHall) > 0 => true,
+                DistrictType.Mine when (upgradeType & UpgradeCardType.Mine) > 0 => true,
+                DistrictType.Flame when (upgradeType & UpgradeCardType.Flame) > 0 => true,
+                DistrictType.Lightning when (upgradeType & UpgradeCardType.Lightning) > 0 => true,
+                _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
+            };
         }
         
         #if UNITY_EDITOR
@@ -67,5 +165,6 @@ namespace Gameplay.Upgrades
             Debug.Log($"Found {upgradeCardDatas.Count} UpgradeCardData assets in {directoryPath} and its subfolders.");
         }
 #endif
+        
     }
 }

@@ -58,10 +58,11 @@ namespace Pathfinding
             switch (targetType)
             {
                 case PathTargetType.Blocker: PathManager.Instance.BlockerPathSet.Unregister(this); break;
-                case PathTargetType.Target: PathManager.Instance.TargetPathSet.Unregister(this); break;
+                case PathTargetType.Target: PathManager.Instance.TargetTargetPathSet.Unregister(this); break;
                 case PathTargetType.Barricade: 
-                    PathManager.Instance.TargetPathSet.Unregister(this);
+                    PathManager.Instance.TargetTargetPathSet.Unregister(this);
                     PathManager.Instance.BarricadePathSet.Unregister(this);
+                    PathManager.Instance.ExtraDistanceSet.Unregister(this);
                     break;
             }
 
@@ -79,11 +80,12 @@ namespace Pathfinding
             switch (targetType)
             {
                 case PathTargetType.Blocker: PathManager.Instance.BlockerPathSet.Register(this); break;
-                case PathTargetType.Target: PathManager.Instance.TargetPathSet.Register(this); break;
+                case PathTargetType.Target: PathManager.Instance.TargetTargetPathSet.Register(this); break;
                 case PathTargetType.Barricade: 
                     Importance = byte.MaxValue;
                     PathManager.Instance.BarricadePathSet.Register(this); 
-                    PathManager.Instance.TargetPathSet.Register(this);
+                    PathManager.Instance.TargetTargetPathSet.Register(this);
+                    PathManager.Instance.ExtraDistanceSet.Register(this);
                     break;
             }
         }

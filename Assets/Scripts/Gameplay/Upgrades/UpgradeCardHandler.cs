@@ -49,25 +49,24 @@ namespace Gameplay.Upgrades
 
         private void OnEnable()
         {
+            upgradeDataUtility.InitializeUpgrades();
+            upgradeDataUtility.StartObserving();
+
+            Events.OnUpgradeCardPicked += OnUpgradePicked;
             Events.OnWaveEnded += OnWaveEnded;
             
             canvasGroup = upgradeCardParent.GetComponentInChildren<CanvasGroup>();
-            for (int i = 0; i < upgradeCards.Length; i++)
-            {
-                upgradeCards[i].OnUpgradePicked += OnOnUpgradePicked;
-            }
         }
+        
         private void OnDisable()
         {
-            Events.OnWaveEnded -= OnWaveEnded;
+            upgradeDataUtility.StopObserving();
             
-            for (int i = 0; i < upgradeCards.Length; i++)
-            {
-                upgradeCards[i].OnUpgradePicked -= OnOnUpgradePicked;
-            }
+            Events.OnUpgradeCardPicked -= OnUpgradePicked;
+            Events.OnWaveEnded -= OnWaveEnded;
         }
 
-        private void OnOnUpgradePicked()
+        private void OnUpgradePicked(UpgradeCardData.UpgradeCardInstance _)
         {
             HideCards();
         }
@@ -89,7 +88,7 @@ namespace Gameplay.Upgrades
             canvasGroup.DOFade(1, fadeInDuration).SetEase(fadeInEase);
             
             int seed = gameManager.Seed + waveCount;
-            List<UpgradeCardData> datas = upgradeDataUtility.GetRandomData(seed, upgradeCards.Length);
+            List<UpgradeCardData.UpgradeCardInstance> datas = upgradeDataUtility.GetRandomData(seed, upgradeCards.Length);
 
             for (int i = 0; i < upgradeCards.Length; i++)
             {
@@ -103,7 +102,7 @@ namespace Gameplay.Upgrades
         {
             rerollCount++;
             int seed = gameManager.Seed + waveCount + rerollCount;
-            List<UpgradeCardData> datas = upgradeDataUtility.GetRandomData(seed, upgradeCards.Length);
+            List<UpgradeCardData.UpgradeCardInstance> datas = upgradeDataUtility.GetRandomData(seed, upgradeCards.Length);
 
             for (int i = 0; i < upgradeCards.Length; i++)
             {

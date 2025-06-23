@@ -4,6 +4,7 @@ using UnityEngine.Events;
 using Buildings.District;
 using Unity.Mathematics;
 using Buildings;
+using Gameplay.Upgrades;
 
 public static class Events
 {
@@ -22,6 +23,8 @@ public static class Events
     public static UnityAction<DistrictType, int> OnDistrictClicked;
     public static UnityAction<DistrictType> OnDistrictBuilt;
     public static UnityAction<TowerData> OnDistrictUnlocked;
+    
+    public static UnityAction<UpgradeCardData.UpgradeCardInstance> OnUpgradeCardPicked;
     
     public static UnityAction OnGameReset;
 }

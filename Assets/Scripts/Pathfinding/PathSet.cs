@@ -106,7 +106,7 @@ namespace Pathfinding
             foreach (PathIndex index in TargetIndexes)
             {
                 ref BlobArray<int> blobArray = ref targetArray.Invoke(index.ChunkIndex);
-                blobArray[index.GridIndex] = (short)(blobArray[index.GridIndex] - value);
+                blobArray[index.GridIndex] -= value;
             }
 
             TargetIndexes.Clear();
@@ -125,9 +125,9 @@ namespace Pathfinding
         }
     }
     
-    public class BytePathSet : PathSet<byte>
+    public class BuildingTargetPathSet : PathSet<byte>
     {
-        public BytePathSet(RefFunc<int2, BlobArray<byte>> targetArray) : base(targetArray)
+        public BuildingTargetPathSet(RefFunc<int2, BlobArray<byte>> targetArray) : base(targetArray)
         {
         }
 
@@ -155,6 +155,50 @@ namespace Pathfinding
 
                     ref BlobArray<byte> blobArray = ref targetArray.Invoke(index.ChunkIndex);
                     blobArray[index.GridIndex] = target.Importance;
+                }
+            }
+        }
+    }
+    
+    public class ExtraDistancePathSet : PathSet<int>
+    {
+        private readonly int value;
+
+        public ExtraDistancePathSet(RefFunc<int2, BlobArray<int>> targetArray, int value) : base(targetArray)
+        {
+            this.value = value;
+        }
+
+        public override void RebuildTargetHashSet()
+        {
+            if (!isDirty)
+            {
+                return;
+            }
+
+            isDirty = false;
+            foreach (PathIndex index in TargetIndexes)
+            {
+                ref BlobArray<int> blobArray = ref targetArray.Invoke(index.ChunkIndex);
+                blobArray[index.GridIndex] = 0;
+            }
+
+            TargetIndexes.Clear();
+            foreach (IPathTarget target in targets)
+            {
+                for (int i = 0; i < target.TargetIndexes.Count; i++)
+                {
+                    PathIndex index = target.TargetIndexes[i];
+                    for (int x = -1; x <= 1; x++)
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        PathIndex neighbour = new PathIndex(index.ChunkIndex, index.GridIndex + x + y * PathManager.GRID_WIDTH);
+                        if (neighbour.GridIndex is < 0 or > PathManager.GRID_LENGTH) continue;
+
+                        TargetIndexes.Add(neighbour);
+                        ref BlobArray<int> blobArray = ref targetArray.Invoke(neighbour.ChunkIndex);
+                        blobArray[neighbour.GridIndex] += value;    
+                    }
                 }
             }
         }

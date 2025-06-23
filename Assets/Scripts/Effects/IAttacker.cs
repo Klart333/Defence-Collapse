@@ -26,11 +26,11 @@ namespace Effects
         public void OnUnitKill();
     }
 
-    public interface IAttackerStatistics
+    public interface IAttackerStatistics 
     {
         public event Action OnStatisticsChanged;
         
-        public float DamageDone { get; set; }
+        public float DamageDone { get; set; } // Make into a seperate class
         public float GoldGained { get; set; }
     }
 }

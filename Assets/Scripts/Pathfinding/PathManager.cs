@@ -5,8 +5,8 @@ using Unity.Collections;
 using Unity.Mathematics;
 using Pathfinding.ECS;
 using Unity.Entities;
-using Unity.Jobs;
 using UnityEngine;
+using Unity.Jobs;
 using System;
 
 namespace Pathfinding
@@ -57,9 +57,10 @@ namespace Pathfinding
         public BlobAssetReference<PathChunkArray> PathChunks => pathChunks;
         public float CellScale => cellScale;
 
-        public BoolPathSet BlockerPathSet { get; private set; }
-        public BytePathSet TargetPathSet { get; private set; }
+        public BuildingTargetPathSet TargetTargetPathSet { get; private set; }
+        public ExtraDistancePathSet ExtraDistanceSet { get; private set; }
         public IntPathSet BarricadePathSet { get; private set; }
+        public BoolPathSet BlockerPathSet { get; private set; }
 
         private void OnEnable()
         {
@@ -83,11 +84,14 @@ namespace Pathfinding
             BlockerPathSet = new BoolPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].NotWalkableIndexes);
             GetPathInformation += BlockerPathSet.RebuildTargetHashSet;
 
-            TargetPathSet = new BytePathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].TargetIndexes);
-            GetPathInformation += TargetPathSet.RebuildTargetHashSet;
+            TargetTargetPathSet = new BuildingTargetPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].TargetIndexes);
+            GetPathInformation += TargetTargetPathSet.RebuildTargetHashSet;
             
             BarricadePathSet = new IntPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].MovementCosts, 3_000);
             GetPathInformation += BarricadePathSet.RebuildTargetHashSet;
+            
+            ExtraDistanceSet = new ExtraDistancePathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].ExtraDistance, 200);
+            GetPathInformation += ExtraDistanceSet.RebuildTargetHashSet;
             
             groundGenerator.OnLockedChunkGenerated += OnChunkGenerated;
         }
@@ -98,8 +102,9 @@ namespace Pathfinding
             pathChunks.Dispose();
             
             GetPathInformation -= BlockerPathSet.RebuildTargetHashSet;
-            GetPathInformation -= TargetPathSet.RebuildTargetHashSet;
+            GetPathInformation -= TargetTargetPathSet.RebuildTargetHashSet;
             GetPathInformation -= BarricadePathSet.RebuildTargetHashSet;
+            GetPathInformation -= ExtraDistanceSet.RebuildTargetHashSet;
             
             groundGenerator.OnLockedChunkGenerated -= OnChunkGenerated;
         }
@@ -173,6 +178,12 @@ namespace Pathfinding
                 {
                     notWalkableIndexes[j] = oldChunk.NotWalkableIndexes[j];
                 }
+                
+                BlobBuilderArray<int> extraDistance = builder.Allocate(ref newChunk.ExtraDistance, arrayLength);
+                for (int j = 0; j < arrayLength; j++)
+                {
+                    extraDistance[j] = oldChunk.ExtraDistance[j];
+                }
             }
             
             ref PathChunk pathChunk = ref arrayBuilder[chunkAmount - 1];
@@ -193,6 +204,7 @@ namespace Pathfinding
                 builder.Allocate(ref pathChunk.Directions, arrayLength);
                 builder.Allocate(ref pathChunk.TargetIndexes, arrayLength);
                 builder.Allocate(ref pathChunk.NotWalkableIndexes, arrayLength);
+                builder.Allocate(ref pathChunk.ExtraDistance, arrayLength);
                 BlobBuilderArray<int> distances = builder.Allocate(ref pathChunk.Distances, arrayLength);
                 BlobBuilderArray<int> movements = builder.Allocate(ref pathChunk.MovementCosts, arrayLength);
 
@@ -295,7 +307,7 @@ namespace Pathfinding
         public const float CELL_SCALE = 0.5f;
         public const float CHUNK_SIZE = 8;
         public const int GRID_WIDTH = 16; // Also change GetNeighbours inside PathJob
-        public const int GRID_Length = 256; // Width * Width
+        public const int GRID_LENGTH = 256; // Width * Width
         public static float2 ByteToDirection(byte directionByte)
         {
             float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees
@@ -391,6 +403,7 @@ namespace Pathfinding
         
         public BlobArray<bool> NotWalkableIndexes;
         public BlobArray<byte> TargetIndexes;
+        public BlobArray<int> ExtraDistance;
         
         public BlobArray<byte> Directions;
         public BlobArray<int> Distances;

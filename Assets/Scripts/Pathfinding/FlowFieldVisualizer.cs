@@ -130,7 +130,7 @@ namespace Pathfinding
             while (direction != byte.MaxValue && i-- > 0 && pointsAreUnique)
             {
                 if (!pathManager.ChunkIndexToListIndex.TryGetValue(index.ChunkIndex, out chunkIndex) 
-                    || index.GridIndex < 0 || index.GridIndex >= PathManager.GRID_Length) return path.ToList();
+                    || index.GridIndex < 0 || index.GridIndex >= PathManager.GRID_LENGTH) return path.ToList();
                 
                 byte lastDirection = direction;
                 direction = pathManager.PathChunks.Value.PathChunks[chunkIndex].Directions[index.GridIndex];
@@ -140,7 +140,7 @@ namespace Pathfinding
                 }
                 
                 float2 dir = PathManager.ByteToDirection(direction);
-                index = PathManager.GetIndex(PathManager.GetPos(index).xz + dir);
+                index = PathManager.GetIndex(PathManager.GetPos(index).xz + dir * PathManager.Instance.CellScale);
             }
 
             return path.ToList();

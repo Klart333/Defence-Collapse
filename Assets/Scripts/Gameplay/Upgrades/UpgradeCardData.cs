@@ -9,15 +9,38 @@ namespace Gameplay.Upgrades
     [CreateAssetMenu(fileName = "Upgrade Card Data", menuName = "Upgrade/Upgrade Card Data", order = 0)]
     public class UpgradeCardData : SerializedScriptableObject
     {
-        public event Action<UpgradeCardData> OnUpgradePerformed;
-        
         [Title("Description")]
         [SerializeField]
         private Sprite icon;
-        
+
         [SerializeField, TextArea]
         private string description;
 
+        [Title("Weight Settings")]
+        [SerializeField]
+        private UpgradeRank upgradeRank;
+        
+        [SerializeField]
+        private UpgradeCardType upgradeCardType;
+        
+        [SerializeField]
+        private float weight = 1;
+
+        [SerializeField]
+        private WeightStrategy weightStrategy = WeightStrategy.DontChange;
+
+        [SerializeField]
+        [ShowIf(nameof(isChangeOnPicked))]
+        private float weightChangeOnPicked = 1;
+        
+        [SerializeField]
+        [ShowIf(nameof(isChangeOnCardPicked))]
+        private float weightChangeOnCardsPicked = 1;
+
+        [SerializeField]
+        [ShowIf(nameof(isChangeOnDistrictPlaced))]
+        private float weightChangeOnDistrictBuilt = 1;
+        
         [Title("Effect")]
         [SerializeField]
         private CategoryType appliedCategories;
@@ -36,21 +59,64 @@ namespace Gameplay.Upgrades
 
         private bool isEffectType => upgradeType is UpgradeType.Effect or UpgradeType.StandAloneEffect;
         private bool isComponent => upgradeType == UpgradeType.Component;
-        
-        public string Description => description;
-        public Sprite Icon => icon;
-        
-        public CategoryType AppliedCategories => appliedCategories;
-        public UpgradeComponentType ComponentType => componentType;
-        public float ComponentStrength => componentStrength;
-        public UpgradeType UpgradeType => upgradeType;
-        public List<IEffect> Effects => effects;
-        
-        [Button, TitleGroup("Debug")]
-        public void Perform()
+        private bool isChangeOnPicked => weightStrategy.HasFlag(WeightStrategy.ChangeOnPicked);
+        private bool isChangeOnCardPicked => weightStrategy.HasFlag(WeightStrategy.ChangeWithCardsPicked);
+        private bool isChangeOnDistrictPlaced => weightStrategy.HasFlag(WeightStrategy.ChangeWithDistrictsBuilt);
+
+        public UpgradeCardInstance GetUpgradeCardInstance() => new UpgradeCardInstance(this);
+            
+        public class UpgradeCardInstance
         {
-            OnUpgradePerformed?.Invoke(this);
+            public List<IEffect> Effects;
+        
+            public Sprite Icon;
+        
+            public UpgradeComponentType ComponentType;
+            public UpgradeCardType UpgradeCardType;
+            public CategoryType AppliedCategories;
+            public WeightStrategy WeightStrategy;
+            public UpgradeRank UpgradeRank;
+            public UpgradeType UpgradeType;
+        
+            public float WeightChangeOnDistrictBuilt;
+            public float WeightChangeOnCardsPicked;
+            public float WeightChangeOnPicked;
+            public float ComponentStrength;
+            public string Description;
+            public float Weight;
+
+            public UpgradeCardInstance(UpgradeCardData upgradeCardData)
+            {
+                Effects = upgradeCardData.effects;
+                Icon = upgradeCardData.icon;
+                
+                ComponentType = upgradeCardData.componentType;
+                UpgradeCardType = upgradeCardData.upgradeCardType;
+                AppliedCategories = upgradeCardData.appliedCategories;
+                WeightStrategy = upgradeCardData.weightStrategy;
+                UpgradeRank = upgradeCardData.upgradeRank;
+                UpgradeType = upgradeCardData.upgradeType;
+                
+                WeightChangeOnDistrictBuilt = upgradeCardData.weightChangeOnDistrictBuilt;
+                WeightChangeOnCardsPicked = upgradeCardData.weightChangeOnCardsPicked;
+                WeightChangeOnPicked = upgradeCardData.weightChangeOnPicked;
+                ComponentStrength = upgradeCardData.componentStrength;
+                Description = upgradeCardData.description;
+                Weight = upgradeCardData.weight;
+            }
         }
+    }
+
+    
+
+    [Flags]
+    public enum WeightStrategy
+    {
+        DontChange = 1 << 0,
+        ChangeWithCardsPicked = 1 << 1,
+        ChangeWithDistrictsBuilt = 1 << 2,
+        ChangeOnPicked = 1 << 4,
+        RemoveOnPicked = 1 << 5,
     }
 
     [Flags]
@@ -71,6 +137,30 @@ namespace Gameplay.Upgrades
         AoE = 1 << 8,
         AllAttacks = 1 << 9,
     }
+    
+    [Flags]
+    public enum UpgradeCardType
+    {
+        // District
+        Archer = 1 << 0,
+        Bomb = 1 << 1,
+        Church = 1 << 2,
+        TownHall = 1 << 3,
+        Mine = 1 << 4,
+        Flame = 1 << 5,
+        LightningDistrict = 1 << 10,
+        AllDistrict = 1 << 6,
+        
+        // Attack
+        Projectile = 1 << 7,
+        AoE = 1 << 8,
+        AllAttacks = 1 << 9,
+        
+        // Standalone
+        Fire = 1 << 11,
+        Poison = 1 << 12,
+        Lightning = 1 << 13,
+    }
 
     public enum UpgradeType
     {
@@ -87,5 +177,14 @@ namespace Gameplay.Upgrades
         Explosion,
         MoneyOnDeath,
         Poison,
+    }
+
+    public enum UpgradeRank
+    {
+        Common,
+        Uncommon,
+        Rare,
+        Epic,
+        Legendary,
     }
 }

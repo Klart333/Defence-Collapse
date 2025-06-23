@@ -36,6 +36,13 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: c4396d10cbb0c2b48abd871ce597c62d, type: 3}
   description: Flame Districts shoot <color=green>Poisonous Flames</color> (+50 Poison
     Damage)
+  upgradeRank: 4
+  upgradeCardType: 32
+  weight: 100
+  weightStrategy: 32
+  weightChangeOnPicked: 1
+  weightChangeOnCardsPicked: 1
+  weightChangeOnDistrictBuilt: 1
   appliedCategories: 32
   upgradeType: 1
   componentType: 4
