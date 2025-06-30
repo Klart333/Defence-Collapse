@@ -283,6 +283,11 @@ namespace UI
 
         private void SpawnUpgradeDisplays(DistrictData districtData)
         {
+            if (districtData.UpgradeStats.Count <= 0)
+            {
+                return;
+            }
+
             for (int i = 0; i < districtData.UpgradeStats.Count; i++)
             {
                 UIUpgradeDisplay spawned = upgradeDisplayPrefab.Get<UIUpgradeDisplay>();
@@ -425,6 +430,7 @@ namespace UI
                 FlameState => "Flame District",
                 LightningState => "Lightning District",
                 ChurchState => "Church District",
+                BarracksState => "Barrack District",
 
                 _ => throw new ArgumentOutOfRangeException()
             };

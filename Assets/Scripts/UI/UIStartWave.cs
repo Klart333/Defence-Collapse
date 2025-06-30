@@ -18,6 +18,8 @@ public class UIStartWave : MonoBehaviour
 
     [SerializeField]
     private AnimationClip unFlipAnimation;
+
+    private bool inWave;
     
     private void OnEnable()
     {
@@ -43,6 +45,8 @@ public class UIStartWave : MonoBehaviour
 
         SetInteractableAfterDelay().Forget();
         PersistantGameStats.CurrentPersistantGameStats.WaveCount++;
+
+        inWave = false;
     }
 
     private async UniTaskVoid SetInteractableAfterDelay()
@@ -53,12 +57,13 @@ public class UIStartWave : MonoBehaviour
     
     public void StartWave()
     {
-        if (false) // Maybe require townhall placed
+        if (inWave) 
         {
-            Debug.Log("Tell player to place a capitol");
-            //return;
+            return;
         }
-        
+
+        inWave = true;
+
         Events.OnWaveStarted?.Invoke();
 
         waveButton.interactable = false;

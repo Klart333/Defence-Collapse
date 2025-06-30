@@ -1,8 +1,7 @@
-using Pathfinding;
-using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
-using UnityEngine;
+using Unity.Entities;
+using Pathfinding;
 
 namespace Enemy.ECS
 {
@@ -15,9 +14,9 @@ namespace Enemy.ECS
     {
         public PathIndex PathIndex;
         public float TurnSpeed;
+        public float3 TargetUp;
         public float3 Forward;
         public float3 Up;
-        public float3 TargetUp;
 
         public int Importance;
     }

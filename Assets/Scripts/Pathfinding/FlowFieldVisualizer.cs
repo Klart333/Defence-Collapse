@@ -108,7 +108,7 @@ namespace Pathfinding
                 foreach (EnemySpawnPoint enemySpawnPoint in spawnPoints)
                 {
                     Vector3 position = enemySpawnPoint.transform.position;
-                    PathIndex startIndex = PathManager.GetIndex(position.x, position.z);
+                    PathIndex startIndex = PathUtility.GetIndex(position.x, position.z);
 
                     List<Vector3> positions = GetLine(startIndex);
                     LineVisualizer spawned = linePrefab.GetAtPosAndRot<LineVisualizer>(Vector3.up * .2f, linePrefab.transform.rotation);
@@ -121,7 +121,7 @@ namespace Pathfinding
 
         private List<Vector3> GetLine(PathIndex startIndex)
         {
-            HashSet<Vector3> path = new HashSet<Vector3> {PathManager.GetPos(startIndex)};
+            HashSet<Vector3> path = new HashSet<Vector3> {PathUtility.GetPos(startIndex)};
             PathIndex index = startIndex;
             int chunkIndex = pathManager.ChunkIndexToListIndex[index.ChunkIndex];
             byte direction = pathManager.PathChunks.Value.PathChunks[chunkIndex].Directions[index.GridIndex];
@@ -130,17 +130,17 @@ namespace Pathfinding
             while (direction != byte.MaxValue && i-- > 0 && pointsAreUnique)
             {
                 if (!pathManager.ChunkIndexToListIndex.TryGetValue(index.ChunkIndex, out chunkIndex) 
-                    || index.GridIndex < 0 || index.GridIndex >= PathManager.GRID_LENGTH) return path.ToList();
+                    || index.GridIndex < 0 || index.GridIndex >= PathUtility.GRID_LENGTH) return path.ToList();
                 
                 byte lastDirection = direction;
                 direction = pathManager.PathChunks.Value.PathChunks[chunkIndex].Directions[index.GridIndex];
                 if (direction != lastDirection)
                 {
-                    pointsAreUnique = path.Add(PathManager.GetPos(index));
+                    pointsAreUnique = path.Add(PathUtility.GetPos(index));
                 }
                 
-                float2 dir = PathManager.ByteToDirection(direction);
-                index = PathManager.GetIndex(PathManager.GetPos(index).xz + dir * PathManager.Instance.CellScale);
+                float2 dir = PathUtility.ByteToDirection(direction);
+                index = PathUtility.GetIndex(PathUtility.GetPos(index).xz + dir * pathManager.CellScale);
             }
 
             return path.ToList();

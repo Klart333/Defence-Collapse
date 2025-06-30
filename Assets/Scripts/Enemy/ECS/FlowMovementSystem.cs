@@ -1,3 +1,4 @@
+using Effects.LittleDudes;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
@@ -9,7 +10,7 @@ using Gameplay;
 
 namespace Enemy.ECS
 {
-    [UpdateInGroup(typeof(TransformSystemGroup))]
+    [UpdateInGroup(typeof(TransformSystemGroup)), UpdateAfter(typeof(GroundSystem))]
     public partial struct FlowMovementSystem : ISystem
     {
         [BurstCompile]
@@ -43,7 +44,7 @@ namespace Enemy.ECS
         }
     }
 
-    [BurstCompile, WithNone(typeof(AttackingComponent))]
+    [BurstCompile, WithNone(typeof(AttackingComponent), typeof(LittleDudeComponent))]
     internal partial struct FlowMovementJob : IJobEntity
     {
         [ReadOnly]
@@ -58,14 +59,14 @@ namespace Enemy.ECS
         private void Execute(in SpeedComponent speed, ref FlowFieldComponent flowField, ref LocalTransform transform)
         {
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
-            float3 direction = PathManager.ByteToDirectionFloat3(valuePathChunk.Directions[flowField.PathIndex.GridIndex], flowField.Forward.y);
+            float3 direction = PathUtility.ByteToDirectionFloat3(valuePathChunk.Directions[flowField.PathIndex.GridIndex], flowField.Forward.y);
             
             flowField.Forward = math.normalize(flowField.Forward + direction * (flowField.TurnSpeed * DeltaTime));
             flowField.Up = math.normalize(flowField.Up + flowField.TargetUp * flowField.TurnSpeed * DeltaTime * 5);
             transform.Rotation = quaternion.LookRotation(flowField.Forward, flowField.Up);
 
             float3 movement = transform.Forward() * speed.Speed * DeltaTime;
-            PathIndex movedPathIndex = PathManager.GetIndex(transform.Position.x, transform.Position.z);
+            PathIndex movedPathIndex = PathUtility.GetIndex(transform.Position.x, transform.Position.z);
             if (!ChunkIndexToListIndex.ContainsKey(movedPathIndex.ChunkIndex))
             {
                 return;

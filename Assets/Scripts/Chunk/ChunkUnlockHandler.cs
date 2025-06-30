@@ -33,7 +33,7 @@ namespace Chunks
         
         private void OnEnable()
         {
-            groundGenerator.OnLockedChunkGenerated += SetupLockedChunk; 
+            Events.OnGroundChunkGenerated += SetupLockedChunk; 
             
             cam = Camera.main;
             Cost = startingChunkCost;
@@ -41,7 +41,7 @@ namespace Chunks
 
         private void OnDisable()
         {
-            groundGenerator.OnLockedChunkGenerated -= SetupLockedChunk;
+            Events.OnGroundChunkGenerated -= SetupLockedChunk;
         }
 
         private void Update()

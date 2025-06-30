@@ -80,7 +80,7 @@ namespace Pathfinding
                 if (indexColliderCenter)
                 {
                     Vector2 pos = colliders[i].bounds.center.XZ();
-                    PathIndex index = PathManager.GetIndex(pos.x, pos.y);
+                    PathIndex index = PathUtility.GetIndex(pos.x, pos.y);
                     Indexes.Add(index);
                 }
                 else
@@ -113,7 +113,7 @@ namespace Pathfinding
             Gizmos.color = Color.blue;
             for (int i = 0; i < Indexes.Count; i++)
             {
-                Gizmos.DrawCube(PathManager.GetPos(Indexes[i]), Vector3.one * 0.5f * PathManager.Instance.CellScale);
+                Gizmos.DrawCube(PathUtility.GetPos(Indexes[i]), Vector3.one * 0.5f * PathManager.Instance.CellScale);
             }
         }
     }
@@ -169,7 +169,7 @@ namespace Pathfinding
                             float zDistance = zPos * 2 - zMax - zMin + 1;
                             if (xDistance * xDistance + zDistance * zDistance <= xRange * zRange)
                             {
-                                indexes.Add(PathManager.GetIndex(xPos, zPos));
+                                indexes.Add(PathUtility.GetIndex(xPos, zPos));
                             }
 
                             break;
@@ -181,7 +181,7 @@ namespace Pathfinding
                             // Check if the point lies within the rectangle's bounds in local space
                             if (Mathf.Abs(localPoint.x) <= boxSize.x / 2 && Mathf.Abs(localPoint.z) <= boxSize.z / 2)
                             {
-                                indexes.Add(PathManager.GetIndex(xPos, zPos));
+                                indexes.Add(PathUtility.GetIndex(xPos, zPos));
                             }
 
                             break;
@@ -193,7 +193,7 @@ namespace Pathfinding
                             // Check if the closest point is effectively the same as the original point (inside the mesh)
                             if (Vector3.Distance(point, closestPoint) < 0.01f)
                             {
-                                indexes.Add(PathManager.GetIndex(xPos, zPos));
+                                indexes.Add(PathUtility.GetIndex(xPos, zPos));
                             }
 
                             break;

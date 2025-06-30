@@ -16,7 +16,7 @@ namespace Gameplay.Upgrades
         [SerializeField, TextArea]
         private string description;
 
-        [Title("Weight Settings")] // MAKE IT ACTUALLY UNLOCK 
+        [Title("Weight Settings")]
         [SerializeField]
         private UpgradeRank upgradeRank;
         
@@ -41,6 +41,10 @@ namespace Gameplay.Upgrades
         [ShowIf(nameof(isChangeOnDistrictPlaced))]
         private float weightChangeOnDistrictBuilt = 1;
         
+        [SerializeField]
+        [ShowIf(nameof(isLockedToDistrictType))]
+        private DistrictType districtType;
+
         [Title("Effect")]
         [SerializeField]
         private CategoryType appliedCategories;
@@ -62,28 +66,31 @@ namespace Gameplay.Upgrades
         private bool isChangeOnPicked => weightStrategy.HasFlag(WeightStrategy.ChangeOnPicked);
         private bool isChangeOnCardPicked => weightStrategy.HasFlag(WeightStrategy.ChangeWithCardsPicked);
         private bool isChangeOnDistrictPlaced => weightStrategy.HasFlag(WeightStrategy.ChangeWithDistrictsBuilt);
+        private bool isLockedToDistrictType => weightStrategy.HasFlag(WeightStrategy.LockToDistrictType);
 
         public UpgradeCardInstance GetUpgradeCardInstance() => new UpgradeCardInstance(this);
             
         public class UpgradeCardInstance
         {
-            public List<IEffect> Effects;
-        
-            public Sprite Icon;
-        
-            public UpgradeComponentType ComponentType;
-            public UpgradeCardType UpgradeCardType;
-            public CategoryType AppliedCategories;
-            public WeightStrategy WeightStrategy;
-            public UpgradeRank UpgradeRank;
-            public UpgradeType UpgradeType;
-        
-            public float WeightChangeOnDistrictBuilt;
-            public float WeightChangeOnCardsPicked;
-            public float WeightChangeOnPicked;
-            public float ComponentStrength;
-            public string Description;
+            public readonly List<IEffect> Effects;
+
+            public readonly Sprite Icon;
+
+            public readonly UpgradeComponentType ComponentType;
+            public readonly UpgradeCardType UpgradeCardType;
+            public readonly CategoryType AppliedCategories;
+            public readonly WeightStrategy WeightStrategy;
+            public readonly DistrictType DistrictType;
+            public readonly UpgradeRank UpgradeRank;
+            public readonly UpgradeType UpgradeType;
+
+            public readonly float WeightChangeOnDistrictBuilt;
+            public readonly float WeightChangeOnCardsPicked;
+            public readonly float WeightChangeOnPicked;
+            public readonly float ComponentStrength;
+            public readonly string Description;
             public float Weight;
+            
 
             public UpgradeCardInstance(UpgradeCardData upgradeCardData)
             {
@@ -94,6 +101,7 @@ namespace Gameplay.Upgrades
                 UpgradeCardType = upgradeCardData.upgradeCardType;
                 AppliedCategories = upgradeCardData.appliedCategories;
                 WeightStrategy = upgradeCardData.weightStrategy;
+                DistrictType = upgradeCardData.districtType;
                 UpgradeRank = upgradeCardData.upgradeRank;
                 UpgradeType = upgradeCardData.upgradeType;
                 
@@ -117,6 +125,7 @@ namespace Gameplay.Upgrades
         ChangeWithDistrictsBuilt = 1 << 2,
         ChangeOnPicked = 1 << 4,
         RemoveOnPicked = 1 << 5,
+        LockToDistrictType = 1 << 6,
     }
 
     [Flags]
@@ -130,6 +139,7 @@ namespace Gameplay.Upgrades
         Mine = 1 << 4,
         Flame = 1 << 5,
         Lightning = 1 << 10,
+        Barracks = 1 << 11,
         AllDistrict = 1 << 6,
         
         // Attack
@@ -149,7 +159,8 @@ namespace Gameplay.Upgrades
         Mine = 1 << 4,
         Flame = 1 << 5,
         LightningDistrict = 1 << 10,
-        AllDistrict = Archer | Bomb | Church | TownHall | Mine | Flame | LightningDistrict,
+        Barracks = 1 << 14,
+        AllDistrict = Archer | Bomb | Church | TownHall | Mine | Flame | LightningDistrict | Barracks,
         
         // Attack
         Projectile = 1 << 7,

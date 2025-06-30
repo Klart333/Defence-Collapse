@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine.InputSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using System;
 using Loot;
 
 namespace Buildings.District
@@ -34,6 +34,9 @@ namespace Buildings.District
         [SerializeField]
         private TowerData churchData;
 
+        [SerializeField]
+        private TowerData barracksData;
+
         [Title("UI", "Upgrade")]
         [SerializeField]
         private UI.UIDistrictUpgrade districtUpgrade;
@@ -46,14 +49,6 @@ namespace Buildings.District
         [SerializeField]
         private bool giveStartingLootData;
 #endif
-        
-        public TowerData ArcherData => archerData;
-        public TowerData BombData => bombData;
-        public TowerData FlameData => flameData;
-        public TowerData MineData => mineData;
-        public TowerData TownHallData => townHallData;
-        public TowerData LightningData => lightningData;
-        public TowerData ChurchData => churchData;
 
         private void OnEnable()
         {
@@ -116,6 +111,5 @@ namespace Buildings.District
         }
 
         #endregion
-
     }
 }

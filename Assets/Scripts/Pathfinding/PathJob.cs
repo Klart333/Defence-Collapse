@@ -46,7 +46,7 @@ public struct PathJob : IJobFor
             {
                 if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out int dirIdx))
                 {
-                    pathChunk.Directions[index] = GetDirection(PathManager.NeighbourDirections[dirIdx]);
+                    pathChunk.Directions[index] = PathUtility.GetDirection(PathUtility.NeighbourDirections[dirIdx]);
                     pathChunk.Distances[index] = pathChunk.NotWalkableIndexes[index] ? 1_000_000_000 : dist;
                 }
                 return;
@@ -103,48 +103,30 @@ public struct PathJob : IJobFor
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void GetNeighbours(int2 chunkIndex, int gridIndex, NativeArray<PathIndex> array)
     {
-        int x = gridIndex % PathManager.GRID_WIDTH;
-        int y = gridIndex /  PathManager.GRID_WIDTH;
+        int x = gridIndex % PathUtility.GRID_WIDTH;
+        int y = gridIndex /  PathUtility.GRID_WIDTH;
 
         for (int i = 0; i < 8; i++)
         {
-            int2 dir = PathManager.NeighbourDirections[i];
+            int2 dir = PathUtility.NeighbourDirections[i];
             int2 neighbour = new int2(x + dir.x, y + dir.y);
 
             array[i] = neighbour switch // Grid width / height = 16, // NO DIAGONALS BUT IT'S FINE
             {
                 {x: < 0} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x - 1, chunkIndex.y)) 
-                    ? new PathIndex(new int2(chunkIndex.x - 1, chunkIndex.y), PathManager.GRID_WIDTH - 1 + y * PathManager.GRID_WIDTH )
+                    ? new PathIndex(new int2(chunkIndex.x - 1, chunkIndex.y), PathUtility.GRID_WIDTH - 1 + y * PathUtility.GRID_WIDTH )
                     : new PathIndex(default, -1),
-                {x: >= PathManager.GRID_WIDTH} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x + 1, chunkIndex.y)) 
-                    ? new PathIndex(new int2(chunkIndex.x + 1, chunkIndex.y), 0 + y * PathManager.GRID_WIDTH )
+                {x: >= PathUtility.GRID_WIDTH} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x + 1, chunkIndex.y)) 
+                    ? new PathIndex(new int2(chunkIndex.x + 1, chunkIndex.y), 0 + y * PathUtility.GRID_WIDTH )
                     : new PathIndex(default, -1),
                 {y: < 0} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y - 1)) 
-                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y - 1), x + (PathManager.GRID_WIDTH - 1) * PathManager.GRID_WIDTH  ) 
+                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y - 1), x + (PathUtility.GRID_WIDTH - 1) * PathUtility.GRID_WIDTH  ) 
                     : new PathIndex(default, -1),
-                {y: >= PathManager.GRID_WIDTH} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y + 1)) 
-                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y + 1), x + 0 * PathManager.GRID_WIDTH ) 
+                {y: >= PathUtility.GRID_WIDTH} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y + 1)) 
+                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y + 1), x + 0 * PathUtility.GRID_WIDTH ) 
                     : new PathIndex(default, -1),
-                _ => new PathIndex(chunkIndex, neighbour.x + neighbour.y * PathManager.GRID_WIDTH),
+                _ => new PathIndex(chunkIndex, neighbour.x + neighbour.y * PathUtility.GRID_WIDTH),
             };
         }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static byte GetDirection(int2 direction)
-    {
-        // Directly map the 8 possible int2 values to corresponding byte values
-        return (direction.x, direction.y) switch
-        {
-            (1, 0) => 0,       // Right
-            (1, 1) => 32,      // Up-Right
-            (0, 1) => 64,      // Up
-            (-1, 1) => 96,     // Up-Left
-            (-1, 0) => 128,    // Left
-            (-1, -1) => 160,   // Down-Left
-            (0, -1) => 192,    // Down
-            (1, -1) => 224,    // Down-Right
-            _ => 0             
-        };
     }
 }

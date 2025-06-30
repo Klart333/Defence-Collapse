@@ -8,6 +8,8 @@ using Gameplay.Upgrades;
 
 public static class Events
 {
+    public static UnityAction<Chunk> OnGroundChunkGenerated;
+    
     public static UnityAction<IEnumerable<ChunkIndex>> OnBuiltIndexBuilt;
     public static UnityAction<ICollection<IBuildable>> OnBuildingBuilt;
     public static UnityAction<BuildingType> OnBuildingClicked;

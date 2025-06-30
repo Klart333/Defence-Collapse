@@ -1,10 +1,11 @@
-using Gameplay;
 using Unity.Collections.LowLevel.Unsafe;
+using Effects.LittleDudes;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
+using Gameplay;
 
 namespace Enemy.ECS
 {
@@ -42,7 +43,7 @@ namespace Enemy.ECS
         }
     }
 
-    [BurstCompile]
+    [BurstCompile, WithNone(typeof(LittleDudeComponent))]
     public partial struct PushJob : IJobEntity
     {
         [ReadOnly, NativeDisableContainerSafetyRestriction]

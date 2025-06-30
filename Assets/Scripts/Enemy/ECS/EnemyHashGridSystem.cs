@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Burst;
 using Effects.ECS;
 using System;
+using Effects.LittleDudes;
 
 namespace Enemy.ECS
 {
@@ -46,7 +47,7 @@ namespace Enemy.ECS
     }
     
     [BurstCompile]
-    [WithAll(typeof(FlowFieldComponent))]
+    [WithAll(typeof(FlowFieldComponent)), WithNone(typeof(LittleDudeComponent))]
     public partial struct BuildEnemyHashGridJob : IJobEntity
     {
         [WriteOnly]

@@ -12,10 +12,13 @@ namespace Enemy.ECS
     public partial struct SpawnerSystem : ISystem
     {
         private EntityQuery spawnerQuery;
+        private ComponentLookup<LocalTransform> transformLookup;
 
         public void OnCreate(ref SystemState state)
         {
             spawnerQuery = SystemAPI.QueryBuilder().WithAspect<SpawnPointAspect>().Build();
+
+            transformLookup = SystemAPI.GetComponentLookup<LocalTransform>();
             
             state.RequireForUpdate<EnemyBossDatabaseTag>();
             state.RequireForUpdate<GameSpeedComponent>();
@@ -35,7 +38,7 @@ namespace Enemy.ECS
             NativeArray<EnemyBufferElement> enemyBuffer = SystemAPI.GetBuffer<EnemyBufferElement>(enemyDatabase).AsNativeArray();
             NativeArray<EnemyBossElement> bossBuffer = SystemAPI.GetBuffer<EnemyBossElement>(bossDatabase).AsNativeArray();
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
-            
+            transformLookup.Update(ref state);
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
 
             new SpawnJob
@@ -44,7 +47,7 @@ namespace Enemy.ECS
                 BossBuffer = bossBuffer,
                 DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
                 ECB = ecb.AsParallelWriter(),
-                TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                TransformLookup = transformLookup,
                 Seed = UnityEngine.Random.Range(1, 200000000),
                 MinRandomPosition = new float3(-0.5f, 0, -0.5f),
                 MaxRandomPosition = new float3(0.5f, 0, 0.5f),

@@ -27,7 +27,7 @@ MonoBehaviour:
       Data: 0|Stats, Core
     - Name: HealthDamage
       Entry: 7
-      Data: 1|Stat, Core
+      Data: 1|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 5
@@ -36,7 +36,7 @@ MonoBehaviour:
       Data: 
     - Name: ArmorDamage
       Entry: 7
-      Data: 2|Stat, Core
+      Data: 2|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 2
@@ -45,7 +45,7 @@ MonoBehaviour:
       Data: 
     - Name: ShieldDamage
       Entry: 7
-      Data: 3|Stat, Core
+      Data: 3|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 2
@@ -54,7 +54,7 @@ MonoBehaviour:
       Data: 
     - Name: AttackSpeed
       Entry: 7
-      Data: 4|Stat, Core
+      Data: 4|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 2.5
@@ -63,7 +63,7 @@ MonoBehaviour:
       Data: 
     - Name: Range
       Entry: 7
-      Data: 5|Stat, Core
+      Data: 5|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 2.5
@@ -72,7 +72,7 @@ MonoBehaviour:
       Data: 
     - Name: MovementSpeed
       Entry: 7
-      Data: 6|Stat, Core
+      Data: 6|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -81,7 +81,7 @@ MonoBehaviour:
       Data: 
     - Name: CritChance
       Entry: 7
-      Data: 7|Stat, Core
+      Data: 7|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0.01
@@ -90,7 +90,7 @@ MonoBehaviour:
       Data: 
     - Name: CritMultiplier
       Entry: 7
-      Data: 8|Stat, Core
+      Data: 8|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 2
@@ -99,7 +99,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxHealth
       Entry: 7
-      Data: 9|Stat, Core
+      Data: 9|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -108,7 +108,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxArmor
       Entry: 7
-      Data: 10|Stat, Core
+      Data: 10|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -117,7 +117,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxShield
       Entry: 7
-      Data: 11|Stat, Core
+      Data: 11|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -126,7 +126,7 @@ MonoBehaviour:
       Data: 
     - Name: Healing
       Entry: 7
-      Data: 12|Stat, Core
+      Data: 12|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -135,7 +135,7 @@ MonoBehaviour:
       Data: 
     - Name: Productivity
       Entry: 7
-      Data: 13|Stat, Core
+      Data: 13|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -184,6 +184,15 @@ MonoBehaviour:
     - Name: fireTotalDamage
       Entry: 4
       Data: 10
+    - Name: hasLightningComponent
+      Entry: 5
+      Data: false
+    - Name: lightningDamage
+      Entry: 4
+      Data: 0
+    - Name: lightningBounces
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -226,6 +235,30 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: createdEffects
+      Entry: 7
+      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: endWaveEffects
+      Entry: 7
+      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   districtName: Flame District
   icon: {fileID: 21300000, guid: c4396d10cbb0c2b48abd871ce597c62d, type: 3}
   description: 'Burns enemies with fire, dealing AoE damage and applies <b>Burn</b>.
@@ -235,7 +268,7 @@ MonoBehaviour:
     3 x 3
 
     Cost: 500'
-  districtType: 1
+  districtType: 5
   LevelDatas:
   - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
   - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}

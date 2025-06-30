@@ -1,0 +1,268 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e365721dcb580ea40b5bdb0b995bd4ec, type: 3}
+  m_Name: Barracks Data
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: -7929139438592967118, guid: b81e4778696bab64387c2007f044d4c1, type: 3}
+    - {fileID: 2100000, guid: af2e22e44379fcb4d823d8e8068359c0, type: 2}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: Stats
+      Entry: 7
+      Data: 0|Stats, Core
+    - Name: HealthDamage
+      Entry: 7
+      Data: 1|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ArmorDamage
+      Entry: 7
+      Data: 2|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ShieldDamage
+      Entry: 7
+      Data: 3|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AttackSpeed
+      Entry: 7
+      Data: 4|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0.2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Range
+      Entry: 7
+      Data: 5|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MovementSpeed
+      Entry: 7
+      Data: 6|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritChance
+      Entry: 7
+      Data: 7|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0.01
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritMultiplier
+      Entry: 7
+      Data: 8|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxHealth
+      Entry: 7
+      Data: 9|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxArmor
+      Entry: 7
+      Data: 10|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxShield
+      Entry: 7
+      Data: 11|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Healing
+      Entry: 7
+      Data: 12|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Productivity
+      Entry: 7
+      Data: 13|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: BaseAttack
+      Entry: 7
+      Data: 14|Attack, Core
+    - Name: Effects
+      Entry: 7
+      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 16|Effects.ArchedDamageColliderEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 5
+    - Name: LimitedHits
+      Entry: 5
+      Data: true
+    - Name: Hits
+      Entry: 3
+      Data: 1
+    - Name: TriggerDamageDone
+      Entry: 5
+      Data: true
+    - Name: Radius
+      Entry: 4
+      Data: 0.35
+    - Name: Height
+      Entry: 4
+      Data: 0.3
+    - Name: UnitsPerSecond
+      Entry: 4
+      Data: 10
+    - Name: Effects
+      Entry: 7
+      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Mesh
+      Entry: 10
+      Data: 0
+    - Name: Material
+      Entry: 10
+      Data: 1
+    - Name: Scale
+      Entry: 4
+      Data: 0.5
+    - Name: TrailScaleFactor
+      Entry: 4
+      Data: 0.8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DoneDamageEffects
+      Entry: 7
+      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: createdEffects
+      Entry: 7
+      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: endWaveEffects
+      Entry: 7
+      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  districtName: Barrack District
+  icon: {fileID: 21300000, guid: 879bb8283866e4f428bc69ebcfd459a2, type: 3}
+  description: 'Spawns little dudes.
+
+
+    Min size: 2 x 2
+
+    Cost: 250'
+  districtType: 7
+  LevelDatas: []
+  UpgradeIcons: []
+  RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
+    type: 3}
+  districtTargetMesh: {fileID: 5266014834842158584, guid: 506c3054aca518a43bea27bc5a35569a,
+    type: 3}

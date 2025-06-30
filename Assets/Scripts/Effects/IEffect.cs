@@ -16,6 +16,7 @@ using Enemy.ECS;
 using Gameplay;
 using VFX.ECS;
 using System;
+using Effects.LittleDudes;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable ConvertToConstant.Global
@@ -373,7 +374,7 @@ namespace Effects
     }
 
     #endregion
-
+    
     #region Arched Damage Collider
 
     [Serializable]
@@ -536,6 +537,59 @@ namespace Effects
 
     #endregion
 
+    #region Spawn Dudes
+
+    [Serializable]
+    public class SpawnLittleDudeEffect : IEffect
+    {
+        [Title("Amount")]
+        [OdinSerialize]
+        public float ModifierValue { get; set; } = 1;
+
+        [Title("Callbacks")]
+        public bool TriggerDamageDone = true;
+
+        public bool IsDamageEffect => false;
+        
+        public void Perform(IAttacker unit)
+        {
+            Vector3 pos = unit.OriginPosition;
+            
+            Entity dudeEntity = CreateEntity();
+            
+            Entity CreateEntity()
+            {
+                EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+
+                ComponentType[] componentTypes = {
+                    typeof(AddComponentInitComponent),
+                    typeof(LittleDudeSpawnerDataComponent),
+                };
+
+                Entity spawned = entityManager.CreateEntity(componentTypes);
+                entityManager.SetComponentData(spawned, new LittleDudeSpawnerDataComponent
+                {
+                    Position = pos,
+                    Amount = (int)ModifierValue
+                });
+                
+                entityManager.SetComponentData(spawned, new AddComponentInitComponent
+                {
+                    CategoryType = unit.CategoryType | CategoryType.Projectile,
+                });
+            
+                return spawned;
+            }
+        }
+        
+        public void Revert(IAttacker unit)
+        {
+            // Cant revert
+        }
+    }
+
+    #endregion
+    
     #region Stacking Effect
 
     [Serializable]

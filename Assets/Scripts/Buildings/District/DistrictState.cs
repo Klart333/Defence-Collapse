@@ -743,28 +743,10 @@ namespace Buildings.District
         private void AttackEffectsAdded(List<IEffect> effects)
         {
             if (requireTargeting) return;
-            if (!SearchEffects(effects)) return; 
+            if (!DistrictStateUtility.SearchEffects(effects)) return; 
             
             Attack.OnEffectsAdded -= AttackEffectsAdded;
             requireTargeting = true;
-        }
-
-        private bool SearchEffects(List<IEffect> effects)
-        {
-            foreach (IEffect effect in effects)
-            {
-                if (effect.IsDamageEffect)
-                {
-                    return true;
-                }
-                
-                if (effect is IEffectHolder holder && SearchEffects(holder.Effects))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private void CreateStats()
@@ -1365,4 +1347,130 @@ namespace Buildings.District
     }
 
     #endregion
+
+    #region Barracks
+
+    public sealed class BarracksState : DistrictState
+    {
+        private readonly TowerData barracksData;
+        private GameObject rangeIndicator;
+
+        private bool selected;
+        private bool requireTargeting;
+
+        public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
+        public override Attack Attack { get; }
+        
+        public override CategoryType CategoryType => CategoryType.Barracks;
+        protected override bool UseTargetMeshes => false;
+        protected override float AttackAngle => 360;
+
+        public BarracksState(DistrictData districtData, TowerData data, Vector3 position, int key) : base(districtData, position, key)
+        {
+            barracksData = data;
+
+            CreateStats();
+            SpawnEntities();
+            
+            Attack = new Attack(barracksData.BaseAttack);
+            Attack.OnEffectsAdded += AttackEffectsAdded;
+        }
+
+        private void AttackEffectsAdded(List<IEffect> effects)
+        {
+            if (requireTargeting) return;
+            if (!DistrictStateUtility.SearchEffects(effects)) return; 
+            
+            Attack.OnEffectsAdded -= AttackEffectsAdded;
+            requireTargeting = true;
+        }
+
+        private void CreateStats()
+        {
+            stats = new Stats(barracksData.Stats);
+        }
+
+        protected override List<QueryChunk> GetEntityChunks(out List<Vector2> offsets, out List<Vector2> directions)
+        {
+            List<QueryChunk> chunks = new List<QueryChunk>();
+            offsets = new List<Vector2>();
+            directions = new List<Vector2>();
+
+            foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
+            {
+                for (int i = 0; i < chunk.AdjacentChunks.Length; i++)
+                {
+                    if (i is 2 or 3 || (chunk.AdjacentChunks[i] != null && chunk.AdjacentChunks[i].PrototypeInfoData == chunk.PrototypeInfoData)) continue;
+                    
+                    chunks.Add(chunk);
+                    Vector2 offset = i switch
+                    {
+                        0 => new Vector2(0.25f, 0),
+                        1 => new Vector2(-0.25f, 0),
+                        4 => new Vector2(0, 0.25f),
+                        5 => new Vector2(0, -0.25f),
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+                    offsets.Add(offset);
+                    directions.Add(offset.normalized);
+                }
+            }
+
+            return chunks;
+        }
+        
+        public override void OnSelected(Vector3 pos)
+        {
+            if (!requireTargeting || selected) return;
+            
+            selected = true;
+            rangeIndicator = barracksData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
+            rangeIndicator.transform.position = pos;
+            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            rangeIndicator.gameObject.SetActive(true);
+        }
+
+        public override void OnDeselected()
+        {
+            if (!requireTargeting || rangeIndicator is null) return;
+            
+            selected = false;
+            rangeIndicator.SetActive(false);
+            rangeIndicator = null;
+        }
+
+
+        public override void Update()
+        {
+            if (requireTargeting)
+            {
+                UpdateEntities();
+            }
+        }
+
+        protected override DistrictTargetMesh GetTargetMesh(Vector3 position, Vector2 direction) => throw new NotImplementedException();
+    }
+
+    #endregion
+
+    public static class DistrictStateUtility
+    {
+        public static bool SearchEffects(List<IEffect> effects)
+        {
+            foreach (IEffect effect in effects)
+            {
+                if (effect.IsDamageEffect)
+                {
+                    return true;
+                }
+                
+                if (effect is IEffectHolder holder && SearchEffects(holder.Effects))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
 }

@@ -1,4 +1,5 @@
 using Unity.Collections.LowLevel.Unsafe;
+using Effects.LittleDudes;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -44,7 +45,7 @@ namespace Enemy.ECS
         }
     }
 
-    [BurstCompile, WithNone(typeof(AttackingComponent))]
+    [BurstCompile, WithNone(typeof(AttackingComponent), typeof(LittleDudeComponent))]
     public partial struct CheckAttackingJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter ECB;

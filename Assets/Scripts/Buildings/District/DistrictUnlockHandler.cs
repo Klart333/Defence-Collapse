@@ -1,10 +1,10 @@
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
+using Unity.Collections;
 using DG.Tweening;
 using UnityEngine;
 using Gameplay;
-using Sirenix.OdinInspector;
 using UI;
-using Unity.Collections;
 
 namespace Buildings.District
 {

@@ -22,7 +22,6 @@ namespace WaveFunctionCollapse
     public class GroundGenerator : MonoBehaviour, IChunkWaveFunction<Chunk>
     {
         public event Action<Chunk> OnChunkGenerated;
-        public event Action<Chunk> OnLockedChunkGenerated;
         public event Action<ChunkIndex> OnCellCollapsed;
 
         [Title("Wave Function")]
@@ -253,7 +252,7 @@ namespace WaveFunctionCollapse
             for (int i = 0; i < adjacentChunks.Count; i++)
             {
                 await Run(adjacentChunks[i]);
-                OnLockedChunkGenerated?.Invoke(adjacentChunks[i]);
+                Events.OnGroundChunkGenerated?.Invoke(adjacentChunks[i]);
                 if (shouldCombine)
                 {
                     await CombineChunk(adjacentChunks[i]);

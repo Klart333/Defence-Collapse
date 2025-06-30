@@ -55,11 +55,12 @@ MonoBehaviour:
   description: +20% Mining Speed (Attack Speed) on Mine Disitrcts.
   upgradeRank: 1
   upgradeCardType: 16
-  weight: 0
-  weightStrategy: 20
+  weight: 1
+  weightStrategy: 84
   weightChangeOnPicked: -0.5
   weightChangeOnCardsPicked: 1
   weightChangeOnDistrictBuilt: 0.25
+  districtType: 4
   appliedCategories: 16
   upgradeType: 0
   componentType: 0

@@ -7,4 +7,5 @@ public enum DistrictType
     Mine = 4,
     Flame = 5,
     Lightning = 6,
+    Barracks = 7,
 }

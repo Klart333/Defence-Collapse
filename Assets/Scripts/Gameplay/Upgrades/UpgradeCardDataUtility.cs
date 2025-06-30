@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using Unity.Collections;
 using UnityEngine;
 using System;
+using Buildings.District;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -11,13 +12,15 @@ using System.IO;
 
 namespace Gameplay.Upgrades
 {
-    [CreateAssetMenu(fileName = "Upgrade Card Utility", menuName = "Upgrade/Upgrade Card Utility", order = 0)]
+    [InlineEditor, CreateAssetMenu(fileName = "Upgrade Card Utility", menuName = "Upgrade/Upgrade Card Utility", order = 0)]
     public class UpgradeCardDataUtility : ScriptableObject
     {
         [SerializeField]
         private UpgradeCardData[] upgradeCards;
         
         public readonly List<UpgradeCardData.UpgradeCardInstance> UpgradeCardInstances = new List<UpgradeCardData.UpgradeCardInstance>();
+
+        private readonly HashSet<DistrictType> unlockedDistricts = new HashSet<DistrictType> { DistrictType.Archer };
         
         public void InitializeUpgrades()
         {
@@ -38,7 +41,9 @@ namespace Gameplay.Upgrades
                 float totalWeight = 0;
                 for (int j = availableUpgrades.Count - 1; j >= 0; j--)
                 {
-                    if (availableUpgrades[j].Weight <= 0)
+                    bool unlocked = !availableUpgrades[j].WeightStrategy.HasFlag(WeightStrategy.LockToDistrictType) 
+                                    || unlockedDistricts.Contains(availableUpgrades[j].DistrictType); 
+                    if (availableUpgrades[j].Weight <= 0 || !unlocked)
                     {
                         availableUpgrades.RemoveAt(j);
                         continue;
@@ -66,12 +71,21 @@ namespace Gameplay.Upgrades
         {
             Events.OnDistrictBuilt += OnDistrictBuilt;
             Events.OnUpgradeCardPicked += OnUpgradePicked;
+            Events.OnDistrictUnlocked += OnDistrictUnlocked;
         }
 
         public void StopObserving()
         {
             Events.OnDistrictBuilt -= OnDistrictBuilt;
             Events.OnUpgradeCardPicked -= OnUpgradePicked;
+            Events.OnDistrictUnlocked -= OnDistrictUnlocked;
+            
+            unlockedDistricts.Clear();
+        }
+
+        private void OnDistrictUnlocked(TowerData towerData)
+        {
+            unlockedDistricts.Add(towerData.DistrictType);
         }
 
         private void OnUpgradePicked(UpgradeCardData.UpgradeCardInstance pickedUpgradeInstance)
@@ -119,13 +133,13 @@ namespace Gameplay.Upgrades
         {
             return districtType switch
             {
-                DistrictType.Archer when (upgradeType & UpgradeCardType.Archer) > 0 => true,
-                DistrictType.Bomb when (upgradeType & UpgradeCardType.Bomb) > 0 => true,
-                DistrictType.Church when (upgradeType & UpgradeCardType.Church) > 0 => true,
-                DistrictType.TownHall when (upgradeType & UpgradeCardType.TownHall) > 0 => true,
-                DistrictType.Mine when (upgradeType & UpgradeCardType.Mine) > 0 => true,
-                DistrictType.Flame when (upgradeType & UpgradeCardType.Flame) > 0 => true,
                 DistrictType.Lightning when (upgradeType & UpgradeCardType.Lightning) > 0 => true,
+                DistrictType.TownHall when (upgradeType & UpgradeCardType.TownHall) > 0 => true,
+                DistrictType.Archer when (upgradeType & UpgradeCardType.Archer) > 0 => true,
+                DistrictType.Church when (upgradeType & UpgradeCardType.Church) > 0 => true,
+                DistrictType.Flame when (upgradeType & UpgradeCardType.Flame) > 0 => true,
+                DistrictType.Bomb when (upgradeType & UpgradeCardType.Bomb) > 0 => true,
+                DistrictType.Mine when (upgradeType & UpgradeCardType.Mine) > 0 => true,
                 _ => false
             };
         }

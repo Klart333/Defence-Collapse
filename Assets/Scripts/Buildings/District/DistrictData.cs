@@ -27,10 +27,12 @@ namespace Buildings.District
         protected readonly Dictionary<ChunkIndex, List<int3>> cachedChunkIndexes = new Dictionary<ChunkIndex, List<int3>>();
 
         private MeshCollider meshCollider;
+        protected TowerData towerData;
 
         public List<IUpgradeStat> UpgradeStats => State.UpgradeStats;
         public Dictionary<int3, QueryChunk> DistrictChunks { get; } 
         public DistrictHandler DistrictHandler { get; set; }
+        public TowerData TowerData => towerData;
         public IGameSpeed GameSpeed { get; set; }
         public DistrictState State { get; }
         public Stats Stats => State.Stats;
@@ -38,7 +40,7 @@ namespace Buildings.District
         
         public IChunkWaveFunction<QueryChunk> DistrictGenerator { get; }
 
-        public DistrictData(DistrictType districtType, HashSet<QueryChunk> chunks, Vector3 position, IChunkWaveFunction<QueryChunk> chunkDistrictGenerator, int key)
+        public DistrictData(TowerData towerData, HashSet<QueryChunk> chunks, Vector3 position, IChunkWaveFunction<QueryChunk> chunkDistrictGenerator, int key)
         {
             DistrictChunks = new Dictionary<int3, QueryChunk>();
             foreach (QueryChunk chunk in chunks)
@@ -53,17 +55,19 @@ namespace Buildings.District
             Position = position;
             GenerateCollider();
             CreateChunkIndexCache();
+            this.towerData = towerData;
             
-            State = districtType switch
+            State = towerData.DistrictType switch
             {
-                DistrictType.TownHall => new TownHallState(this, DistrictUpgradeManager.Instance.TownHallData, position, key),
-                DistrictType.Archer => new ArcherState(this, DistrictUpgradeManager.Instance.ArcherData, position, key),
-                DistrictType.Bomb => new BombState(this, DistrictUpgradeManager.Instance.BombData, position, key),
-                DistrictType.Mine => new MineState(this, DistrictUpgradeManager.Instance.MineData, position, key),
-                DistrictType.Flame => new FlameState(this, DistrictUpgradeManager.Instance.FlameData, position, key),
-                DistrictType.Lightning => new LightningState(this, DistrictUpgradeManager.Instance.LightningData, position, key),
-                DistrictType.Church => new ChurchState(this, DistrictUpgradeManager.Instance.ChurchData, position, key),
-                _ => throw new ArgumentOutOfRangeException(nameof(districtType), districtType, null)
+                DistrictType.TownHall => new TownHallState(this, towerData, position, key),
+                DistrictType.Archer => new ArcherState(this, towerData, position, key),
+                DistrictType.Bomb => new BombState(this, towerData, position, key),
+                DistrictType.Mine => new MineState(this, towerData, position, key),
+                DistrictType.Flame => new FlameState(this, towerData, position, key),
+                DistrictType.Lightning => new LightningState(this, towerData, position, key),
+                DistrictType.Church => new ChurchState(this, towerData, position, key),
+                DistrictType.Barracks => new BarracksState(this, towerData, position, key),
+                _ => throw new ArgumentOutOfRangeException(nameof(towerData.DistrictType), towerData.DistrictType, null)
             };
 
             Events.OnWaveStarted += OnWaveStarted;

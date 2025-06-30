@@ -192,8 +192,8 @@ namespace Pathfinding
                     for (int x = -1; x <= 1; x++)
                     for (int y = -1; y <= 1; y++)
                     {
-                        PathIndex neighbour = new PathIndex(index.ChunkIndex, index.GridIndex + x + y * PathManager.GRID_WIDTH);
-                        if (neighbour.GridIndex is < 0 or > PathManager.GRID_LENGTH) continue;
+                        PathIndex neighbour = new PathIndex(index.ChunkIndex, index.GridIndex + x + y * PathUtility.GRID_WIDTH);
+                        if (neighbour.GridIndex is < 0 or >= PathUtility.GRID_LENGTH) continue;
 
                         TargetIndexes.Add(neighbour);
                         ref BlobArray<int> blobArray = ref targetArray.Invoke(neighbour.ChunkIndex);

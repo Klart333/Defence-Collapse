@@ -1,4 +1,5 @@
 using Effects.ECS;
+using Effects.LittleDudes;
 using Unity.Entities;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace Enemy.ECS
     
         protected override void OnCreate()
         {
-            enemyQuery = SystemAPI.QueryBuilder().WithAll<FlowFieldComponent>().Build();
+            enemyQuery = SystemAPI.QueryBuilder().WithAll<FlowFieldComponent>().WithNone<LittleDudeComponent>().Build();
             spawnerQuery = SystemAPI.QueryBuilder().WithAspect<SpawnPointAspect>().Build();
             
             Events.OnWaveStarted += OnWaveStarted;

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
+using Effects.LittleDudes;
 using Unity.Collections;
 using Unity.Mathematics;
 using Pathfinding.ECS;
@@ -8,41 +9,22 @@ using Unity.Entities;
 using UnityEngine;
 using Unity.Jobs;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Pathfinding
 {
     public class PathManager : Singleton<PathManager>
     {
-        public static readonly int2[] NeighbourDirections =
-        {
-            new int2(1, 0),
-            new int2(1, 1),
-            new int2(0, 1),
-            new int2(-1, 1),
-            new int2(-1, 0),
-            new int2(-1, -1),
-            new int2(0, -1),
-            new int2(1, -1),
-        };
-
         public event Action GetPathInformation;
 
         [Title("Flow Field")]
         [SerializeField]
-        private Vector2Int gridSize;
-
-        [SerializeField]
         private float cellScale;
 
-        [Title("Reference")]
-        [SerializeField]
-        private GroundGenerator groundGenerator;
-        
         [Title("Debug")]
         [SerializeField]
         private Gradient debugGradient;
         
-        private readonly Dictionary<int, int2> listIndexToChunkIndex = new Dictionary<int, int2>();
         private BlobAssetReference<PathChunkArray> pathChunks;
         private NativeHashMap<int2, int> chunkIndexToListIndex;
 
@@ -64,14 +46,12 @@ namespace Pathfinding
 
         private void OnEnable()
         {
-            arrayLength = gridSize.x * gridSize.y;
-            
             chunkIndexToListIndex = new NativeHashMap<int2, int>(200, Allocator.Persistent);
             
             chunkAmount = 0;
             chunkIndexToListIndex.Add(int2.zero, chunkAmount);    
-            listIndexToChunkIndex.Add(chunkAmount, int2.zero);
-            pathChunks = CreatePathChunks(++chunkAmount, default);
+            //listIndexToChunkIndex.Add(chunkAmount, int2.zero);
+            pathChunks = PathUtility.CreatePathChunks(++chunkAmount, int2.zero, (BlobAssetReference<PathChunkArray>)default);
             
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             blobEntity = entityManager.CreateEntity();
@@ -93,7 +73,7 @@ namespace Pathfinding
             ExtraDistanceSet = new ExtraDistancePathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].ExtraDistance, 200);
             GetPathInformation += ExtraDistanceSet.RebuildTargetHashSet;
             
-            groundGenerator.OnLockedChunkGenerated += OnChunkGenerated;
+            Events.OnGroundChunkGenerated += OnChunkGenerated;
         }
         
         private void OnDisable()
@@ -106,7 +86,7 @@ namespace Pathfinding
             GetPathInformation -= BarricadePathSet.RebuildTargetHashSet;
             GetPathInformation -= ExtraDistanceSet.RebuildTargetHashSet;
             
-            groundGenerator.OnLockedChunkGenerated -= OnChunkGenerated;
+            Events.OnGroundChunkGenerated -= OnChunkGenerated;
         }
 
         private void LateUpdate()
@@ -117,8 +97,8 @@ namespace Pathfinding
         private void OnChunkGenerated(Chunk chunk)
         {
             chunkIndexToListIndex.Add(chunk.ChunkIndex.xz, chunkAmount);
-            listIndexToChunkIndex.Add(chunkAmount, chunk.ChunkIndex.xz);
-            pathChunks = CreatePathChunks(++chunkAmount, pathChunks);
+            //listIndexToChunkIndex.Add(chunkAmount, chunk.ChunkIndex.xz);
+            pathChunks = PathUtility.CreatePathChunks(++chunkAmount, chunk.ChunkIndex.xz, pathChunks);
             
             entityManager.AddComponentData(blobEntity, new PathBlobber
             {
@@ -127,101 +107,12 @@ namespace Pathfinding
             });
         }
         
-        private BlobAssetReference<PathChunkArray> CreatePathChunks(int chunkAmount, BlobAssetReference<PathChunkArray> oldPathChunks)
-        {
-            var builder = new BlobBuilder(Allocator.Temp);
-            ref PathChunkArray pathChunkArray = ref builder.ConstructRoot<PathChunkArray>();
-
-            BlobBuilderArray<PathChunk> arrayBuilder = builder.Allocate(
-                ref pathChunkArray.PathChunks,
-                chunkAmount
-            );
-
-            for (int i = 0; i < chunkAmount - 1; i++)
-            {
-                ref PathChunk newChunk = ref arrayBuilder[i];
-                ref PathChunk oldChunk = ref oldPathChunks.Value.PathChunks[i];
-                newChunk.ChunkIndex = oldChunk.ChunkIndex;
-                
-                BlobBuilderArray<int> units = builder.Allocate(ref newChunk.Units, arrayLength);
-                for (int j = 0; j < arrayLength; j++)
-                {
-                    units[j] = oldChunk.Units[j];
-                }
-                
-                BlobBuilderArray<int> distances = builder.Allocate(ref newChunk.Distances, arrayLength);
-                for (int j = 0; j < arrayLength; j++)
-                {
-                    distances[j] = oldChunk.Distances[j];
-                }
-                
-                BlobBuilderArray<byte> directions = builder.Allocate(ref newChunk.Directions, arrayLength);
-                for (int j = 0; j < arrayLength; j++)
-                {
-                    directions[j] = oldChunk.Directions[j];
-                }
-                
-                BlobBuilderArray<int> movementCosts = builder.Allocate(ref newChunk.MovementCosts, arrayLength);
-                for (int j = 0; j < arrayLength; j++)
-                {
-                    movementCosts[j] = oldChunk.MovementCosts[j];
-                }
-                
-                BlobBuilderArray<byte> targetIndexes = builder.Allocate(ref newChunk.TargetIndexes, arrayLength);
-                for (int j = 0; j < arrayLength; j++)
-                {
-                    targetIndexes[j] = oldChunk.TargetIndexes[j];
-                }
-                
-                BlobBuilderArray<bool> notWalkableIndexes = builder.Allocate(ref newChunk.NotWalkableIndexes, arrayLength);
-                for (int j = 0; j < arrayLength; j++)
-                {
-                    notWalkableIndexes[j] = oldChunk.NotWalkableIndexes[j];
-                }
-                
-                BlobBuilderArray<int> extraDistance = builder.Allocate(ref newChunk.ExtraDistance, arrayLength);
-                for (int j = 0; j < arrayLength; j++)
-                {
-                    extraDistance[j] = oldChunk.ExtraDistance[j];
-                }
-            }
-            
-            ref PathChunk pathChunk = ref arrayBuilder[chunkAmount - 1];
-            BuildPathChunk(ref pathChunk, chunkAmount - 1);
-            
-            BlobAssetReference<PathChunkArray> result = builder.CreateBlobAssetReference<PathChunkArray>(Allocator.Persistent);
-            builder.Dispose();
-            if (oldPathChunks.IsCreated)
-            {
-                oldPathChunks.Dispose();
-            }
-            return result;
-            
-            void BuildPathChunk(ref PathChunk pathChunk, int index)
-            {
-                pathChunk.ChunkIndex = listIndexToChunkIndex[index];
-                builder.Allocate(ref pathChunk.Units, arrayLength);
-                builder.Allocate(ref pathChunk.Directions, arrayLength);
-                builder.Allocate(ref pathChunk.TargetIndexes, arrayLength);
-                builder.Allocate(ref pathChunk.NotWalkableIndexes, arrayLength);
-                builder.Allocate(ref pathChunk.ExtraDistance, arrayLength);
-                BlobBuilderArray<int> distances = builder.Allocate(ref pathChunk.Distances, arrayLength);
-                BlobBuilderArray<int> movements = builder.Allocate(ref pathChunk.MovementCosts, arrayLength);
-
-                for (int i = 0; i < arrayLength; i++)
-                {
-                    distances[i] = 1000000;
-                    movements[i] = 100;
-                }
-            }
-        }
-        
         private void UpdateFlowField()
         {
             GetPathInformation?.Invoke();
 
-            int quadrantWidth = GRID_WIDTH / 2;
-            int quadrantHeight = GRID_WIDTH / 2;
+            int quadrantWidth = PathUtility.GRID_WIDTH / 2;
+            int quadrantHeight = PathUtility.GRID_WIDTH / 2;
             int chunksLength = pathChunks.Value.PathChunks.Length;
 
             for (int i = 3; i >= 0; i--)
@@ -263,7 +154,7 @@ namespace Pathfinding
                 for (int j = 0; j < arrayLength; j++)
                 {
                     PathIndex index = new PathIndex(pathChunk.ChunkIndex, j);
-                    Vector3 pos = (Vector3)GetPos(index) + Vector3.up * 0.1f;
+                    Vector3 pos = (Vector3)PathUtility.GetPos(index) + Vector3.up * 0.1f;
                     if (pathChunk.Directions[j] == byte.MaxValue)
                     {
                         Gizmos.color = Color.green;
@@ -272,7 +163,7 @@ namespace Pathfinding
                     }
         
                     Gizmos.color = debugGradient.Evaluate(pathChunk.Distances[j] / 100_000f);
-                    float2 dir = ByteToDirection(pathChunk.Directions[j]);
+                    float2 dir = PathUtility.ByteToDirection(pathChunk.Directions[j]);
                     Vector3 direction = new Vector3(dir.x, 0, dir.y);
             
                     // Main line (shorter)
@@ -300,7 +191,21 @@ namespace Pathfinding
 
         #endregion
 
-        #region Utility
+        }
+
+    public static class PathUtility
+    {
+        public static readonly int2[] NeighbourDirections =
+        {
+            new int2(1, 0),
+            new int2(1, 1),
+            new int2(0, 1),
+            new int2(-1, 1),
+            new int2(-1, 0),
+            new int2(-1, -1),
+            new int2(0, -1),
+            new int2(1, -1),
+        };
         
         public const float HALF_BUILDING_CELL = 0.25f;
         public const float FULL_BUILDING_CELL = 0.5f;
@@ -355,8 +260,174 @@ namespace Pathfinding
         
             return new PathIndex(chunkIndex, targetIndex);
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static byte GetDirection(int2 direction)
+        {
+            // Directly map the 8 possible int2 values to corresponding byte values
+            return (direction.x, direction.y) switch
+            {
+                (1, 0) => 0,       // Right
+                (1, 1) => 32,      // Up-Right
+                (0, 1) => 64,      // Up
+                (-1, 1) => 96,     // Up-Left
+                (-1, 0) => 128,    // Left
+                (-1, -1) => 160,   // Down-Left
+                (0, -1) => 192,    // Down
+                (1, -1) => 224,    // Down-Right
+                _ => 0             
+            };
+        }
+        
+        public static BlobAssetReference<PathChunkArray> CreatePathChunks(int chunkAmount, int2 chunkIndex, BlobAssetReference<PathChunkArray> oldPathChunks)
+        {
+            var builder = new BlobBuilder(Allocator.Temp);
+            ref PathChunkArray pathChunkArray = ref builder.ConstructRoot<PathChunkArray>();
 
-        #endregion
+            BlobBuilderArray<PathChunk> arrayBuilder = builder.Allocate(
+                ref pathChunkArray.PathChunks,
+                chunkAmount
+            );
+
+            for (int i = 0; i < chunkAmount - 1; i++)
+            {
+                ref PathChunk newChunk = ref arrayBuilder[i];
+                ref PathChunk oldChunk = ref oldPathChunks.Value.PathChunks[i];
+                newChunk.ChunkIndex = oldChunk.ChunkIndex;
+                
+                BlobBuilderArray<int> units = builder.Allocate(ref newChunk.Units, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    units[j] = oldChunk.Units[j];
+                }
+                
+                BlobBuilderArray<int> distances = builder.Allocate(ref newChunk.Distances, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    distances[j] = oldChunk.Distances[j];
+                }
+                
+                BlobBuilderArray<byte> directions = builder.Allocate(ref newChunk.Directions, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    directions[j] = oldChunk.Directions[j];
+                }
+                
+                BlobBuilderArray<int> movementCosts = builder.Allocate(ref newChunk.MovementCosts, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    movementCosts[j] = oldChunk.MovementCosts[j];
+                }
+                
+                BlobBuilderArray<byte> targetIndexes = builder.Allocate(ref newChunk.TargetIndexes, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    targetIndexes[j] = oldChunk.TargetIndexes[j];
+                }
+                
+                BlobBuilderArray<bool> notWalkableIndexes = builder.Allocate(ref newChunk.NotWalkableIndexes, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    notWalkableIndexes[j] = oldChunk.NotWalkableIndexes[j];
+                }
+                
+                BlobBuilderArray<int> extraDistance = builder.Allocate(ref newChunk.ExtraDistance, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    extraDistance[j] = oldChunk.ExtraDistance[j];
+                }
+            }
+            
+            ref PathChunk pathChunk = ref arrayBuilder[chunkAmount - 1];
+            BuildPathChunk(ref pathChunk);
+            
+            BlobAssetReference<PathChunkArray> result = builder.CreateBlobAssetReference<PathChunkArray>(Allocator.Persistent);
+            builder.Dispose();
+            if (oldPathChunks.IsCreated)
+            {
+                oldPathChunks.Dispose();
+            }
+            return result;
+            
+            void BuildPathChunk(ref PathChunk pathChunk)
+            {
+                pathChunk.ChunkIndex = chunkIndex;
+                
+                builder.Allocate(ref pathChunk.Units, GRID_LENGTH);
+                builder.Allocate(ref pathChunk.Directions, GRID_LENGTH);
+                builder.Allocate(ref pathChunk.TargetIndexes, GRID_LENGTH);
+                builder.Allocate(ref pathChunk.NotWalkableIndexes, GRID_LENGTH);
+                builder.Allocate(ref pathChunk.ExtraDistance, GRID_LENGTH);
+                BlobBuilderArray<int> distances = builder.Allocate(ref pathChunk.Distances, GRID_LENGTH);
+                BlobBuilderArray<int> movements = builder.Allocate(ref pathChunk.MovementCosts, GRID_LENGTH);
+
+                for (int i = 0; i < GRID_LENGTH; i++)
+                {
+                    distances[i] = 1000000;
+                    movements[i] = 100;
+                }
+            }
+        }
+        public static BlobAssetReference<LittleDudePathChunkArray> CreatePathChunks(int chunkAmount, int2 chunkIndex, BlobAssetReference<LittleDudePathChunkArray> oldPathChunks)
+        {
+            var builder = new BlobBuilder(Allocator.Temp);
+            ref LittleDudePathChunkArray littleDudePathChunkArray = ref builder.ConstructRoot<LittleDudePathChunkArray>();
+
+            BlobBuilderArray<LittleDudePathChunk> arrayBuilder = builder.Allocate(
+                ref littleDudePathChunkArray.PathChunks,
+                chunkAmount
+            );
+
+            for (int i = 0; i < chunkAmount - 1; i++)
+            {
+                ref LittleDudePathChunk newChunk = ref arrayBuilder[i];
+                ref LittleDudePathChunk oldChunk = ref oldPathChunks.Value.PathChunks[i];
+                newChunk.ChunkIndex = oldChunk.ChunkIndex;
+                
+                BlobBuilderArray<int> distances = builder.Allocate(ref newChunk.Distances, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    distances[j] = oldChunk.Distances[j];
+                }
+                
+                BlobBuilderArray<byte> directions = builder.Allocate(ref newChunk.Directions, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    directions[j] = oldChunk.Directions[j];
+                }
+                
+                BlobBuilderArray<int> targetIndexes = builder.Allocate(ref newChunk.TargetIndexes, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    targetIndexes[j] = oldChunk.TargetIndexes[j];
+                }
+            }
+            
+            ref LittleDudePathChunk littleDudePathChunk = ref arrayBuilder[chunkAmount - 1];
+            BuildPathChunk(ref littleDudePathChunk);
+            
+            BlobAssetReference<LittleDudePathChunkArray> result = builder.CreateBlobAssetReference<LittleDudePathChunkArray>(Allocator.Persistent);
+            builder.Dispose();
+            if (oldPathChunks.IsCreated)
+            {
+                oldPathChunks.Dispose();
+            }
+            return result;
+            
+            void BuildPathChunk(ref LittleDudePathChunk pathChunk)
+            {
+                pathChunk.ChunkIndex = chunkIndex;
+                
+                builder.Allocate(ref pathChunk.Directions, GRID_LENGTH);
+                builder.Allocate(ref pathChunk.TargetIndexes, GRID_LENGTH);
+                BlobBuilderArray<int> distances = builder.Allocate(ref pathChunk.Distances, GRID_LENGTH);
+
+                for (int i = 0; i < GRID_LENGTH; i++)
+                {
+                    distances[i] = 1000000;
+                }
+            }
+        }
     }
 
     public readonly struct PathIndex : IEquatable<PathIndex>

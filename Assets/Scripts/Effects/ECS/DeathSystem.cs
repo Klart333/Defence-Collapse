@@ -1,8 +1,7 @@
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using System;
-using Unity.Collections;
-using UnityEngine;
 
 namespace Effects.ECS
 {

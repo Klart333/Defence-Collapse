@@ -1,3 +1,4 @@
+using Effects.LittleDudes;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Collections;
@@ -51,12 +52,11 @@ namespace Pathfinding.ECS
         public void Execute()
         {
             int chunksLength = PathChunks.Value.PathChunks.Length;
-            int arrayLength = PathChunks.Value.PathChunks[0].Units.Length;
             for (int i = 0; i < chunksLength; i++)
             {
                 ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[i];
 
-                for (int j = 0; j < arrayLength; j++)
+                for (int j = 0; j < PathUtility.GRID_LENGTH; j++)
                 {
                     valuePathChunk.MovementCosts[j] -= valuePathChunk.Units[j];
                     valuePathChunk.Units[j] = 0;
@@ -65,7 +65,7 @@ namespace Pathfinding.ECS
         }
     }
     
-    [BurstCompile]
+    [BurstCompile, WithNone(typeof(LittleDudeComponent))]
     public partial struct UnitPathJob : IJobEntity
     {
         public BlobAssetReference<PathChunkArray> PathChunks;
