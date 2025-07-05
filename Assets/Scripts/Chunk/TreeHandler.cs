@@ -83,12 +83,14 @@ namespace Chunks
 
         private async UniTaskVoid GrowTrees(int3 chunkIndex)
         {
+            await UniTask.Delay(1016);
             foreach (KeyValuePair<int3, List<TreeGrower>> kvp in treeGrowersByChunk)
             {
                 for (int i = 0; i < kvp.Value.Count; i++)
                 {
                     TreeGrower grower = kvp.Value[i];
-                    if (grower.HasGrown || chunkMaskHandler.IsMasked(kvp.Key, grower.Cell))
+                    if (grower.HasGrown 
+                        || (chunkMaskHandler.isActiveAndEnabled && chunkMaskHandler.IsMasked(kvp.Key, grower.Cell)))
                     {
                         continue;
                     }

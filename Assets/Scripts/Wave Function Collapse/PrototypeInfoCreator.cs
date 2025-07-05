@@ -21,13 +21,7 @@ namespace WaveFunctionCollapse
 
         [Title("Rules")]
         [SerializeField]
-        private List<int> notAllowedBottomIndexes;
-        
-        [SerializeField]
         private List<int> onlyAllowedBottomIndexes;
-
-        [SerializeField]
-        private List<int> notAllowedSideIndexes;
 
         [Title("Settings")]
         [SerializeField]
@@ -60,6 +54,12 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private MaterialData materialData;
 
+        [SerializeField]
+        private bool useMaterialForKeys;
+        
+        [SerializeField, ShowIf(nameof(useMaterialForKeys))]
+        private IMeshRayService meshRayService;
+        
         [TitleGroup("Weight")]
         [SerializeField]
         private List<StupidWeightThing> pieceWeights;
@@ -104,7 +104,11 @@ namespace WaveFunctionCollapse
                 List<Vector3> negYs = new List<Vector3>();
                 List<Vector3> posZs = new List<Vector3>();
                 List<Vector3> negZs = new List<Vector3>();
+                Material[] materials = meshes[i].gameObject.GetComponent<MeshRenderer>().sharedMaterials;
+                int[] matIndexes = materials.Select((x) => materialData.Materials.IndexOf(x)).ToArray();
 
+                Dictionary<Direction, int[]> materialInfo = useMaterialForKeys ? meshRayService.GetMeshIndices(mesh, materials) : null;
+                
                 Vector3[] verts = mesh.vertices;
                 Vector3[] noDupes = verts.Distinct().ToArray();
 
@@ -122,15 +126,14 @@ namespace WaveFunctionCollapse
                     }
                 }
 
-                ulong posX = GetSideKey(posXs, 0, 1);
-                ulong negX = GetSideKey(negXs, 0, -1);
-                ulong posZ = GetSideKey(posZs, 1, -1);
-                ulong negZ = GetSideKey(negZs, 1, 1);
+                ulong posX = GetSideKey(posXs, Direction.Right, materialInfo);
+                ulong negX = GetSideKey(negXs, Direction.Left, materialInfo);
+                ulong posZ = GetSideKey(posZs, Direction.Forward, materialInfo);
+                ulong negZ = GetSideKey(negZs, Direction.Backward, materialInfo);
 
                 ulong[] negY = GetTopKeys(negYs);
                 ulong[] posY = GetTopKeys(posYs);
 
-                int[] matIndexes = meshes[i].gameObject.GetComponent<MeshRenderer>().sharedMaterials.Select((x) => materialData.Materials.IndexOf(x)).ToArray();
                 // Add all rotations
                 // Need to rotate the vertical too
                 List<PrototypeData> prots = new List<PrototypeData>
@@ -152,14 +155,6 @@ namespace WaveFunctionCollapse
                 }
                 prototypeData.Prototypes.AddRange(prots);
 
-                if (notAllowedBottomIndexes.Contains(i))
-                {
-                    for (int j = 1; j < prots.Count + 1; j++)
-                    {
-                        prototypeData.NotAllowedForBottom.Add(prototypeData.Prototypes.Count - j);
-                    }
-                }
-                
                 if (onlyAllowedBottomIndexes.Contains(i))
                 {
                     for (int j = 1; j < prots.Count + 1; j++)
@@ -301,35 +296,35 @@ namespace WaveFunctionCollapse
             return corner;
         }
 
-        private ulong GetSideKey(List<Vector3> vertexPositions, int mainAxis, int positiveDirection)
+        private ulong GetSideKey(List<Vector3> vertexPositions, Direction direction, Dictionary<Direction, int[]> materialInfo)
         {
             if (vertexPositions.Count == 0)
             {
                 return 1;
             }
+            
+            int[] mats = useMaterialForKeys ? materialInfo[direction] : Array.Empty<int>();
 
             // Project on 2 Dimensional plane
             List<Vector2> positions = new List<Vector2>();
             for (int i = 0; i < vertexPositions.Count; i++)
             {
-                if (mainAxis == 0)
+                positions.Add(direction switch
                 {
-                    Vector2 pro = new Vector2(vertexPositions[i].z * positiveDirection, vertexPositions[i].y);
-                    positions.Add(pro);
-
-                }
-                else if (mainAxis == 1)
-                {
-                    Vector2 pro = new Vector2(vertexPositions[i].x * positiveDirection, vertexPositions[i].y);
-                    positions.Add(pro);
-                }
+                    Direction.Right => new Vector2(vertexPositions[i].z, vertexPositions[i].y),
+                    Direction.Left => new Vector2(vertexPositions[i].z * -1, vertexPositions[i].y),
+                    Direction.Forward => new Vector2(vertexPositions[i].x * -1, vertexPositions[i].y),
+                    Direction.Backward => new Vector2(vertexPositions[i].x, vertexPositions[i].y),
+                    _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+                });
             }
 
             // Check if already in dictionary
             // First check the strict equals
             for (int i = 0; i < prototypeData.SocketList.Count; i++)
             {
-                if (StrictEquals(prototypeData.SocketList[i].positions.ToList(), positions))
+                if (StrictEquals(prototypeData.SocketList[i].positions.ToList(), positions)
+                    && (!useMaterialForKeys || StrictEquals(prototypeData.SocketList[i].materialIndexes, mats)))
                 {
                     return prototypeData.SocketList[i].socketname;
                 }
@@ -337,7 +332,8 @@ namespace WaveFunctionCollapse
 
             for (int i = 0; i < prototypeData.SocketList.Count; i++)
             {
-                if (LooseEquals(prototypeData.SocketList[i].positions.ToList(), positions))
+                if (LooseEquals(prototypeData.SocketList[i].positions.ToList(), positions)
+                    && (!useMaterialForKeys || StrictEquals(prototypeData.SocketList[i].materialIndexes, mats)))
                 {
                     return prototypeData.SocketList[i].socketname;
                 }
@@ -351,16 +347,16 @@ namespace WaveFunctionCollapse
                 negPositions.Add(new Vector2((2.0f - (positions[h].x + 1) - 1), positions[h].y));
             }
 
-            if (LooseEquals(positions, negPositions))
+            if (LooseEquals(positions, negPositions) && mats.Length == 1)
             {
                 key = (ulong)1 << (2 + currentSideSymmetricalIndex++);
-                prototypeData.SocketList.Add(new DicData(positions.ToArray(), key));
+                prototypeData.SocketList.Add(new DicData(positions.ToArray(), key, mats));
             }
             else
             {
                 key = (ulong)1 << (33 + currentSideIndex++);
-                prototypeData.SocketList.Add(new DicData(positions.ToArray(), key));
-                prototypeData.SocketList.Add(new DicData(negPositions.ToArray(), key << 16));
+                prototypeData.SocketList.Add(new DicData(positions.ToArray(), key, mats));
+                prototypeData.SocketList.Add(new DicData(negPositions.ToArray(), key << 16, mats.Reverse().ToArray()));
             }
 
             return key;
@@ -417,7 +413,7 @@ namespace WaveFunctionCollapse
                 ulong key = ((ulong)1 << (currentTopIndex + 2 + i));
                 Vector2[] pos = Rotated(positions, i);
                 keys[i] = key;
-                prototypeData.VerticalSocketList.Add(new DicData(pos, key));
+                prototypeData.VerticalSocketList.Add(new DicData(pos, key, Array.Empty<int>()));
             }
 
             currentTopIndex += 4;
@@ -480,9 +476,12 @@ namespace WaveFunctionCollapse
             for (int i = 0; i < prototypeData.Prototypes.Count; i++)
             {
                 Vector3 pos = new Vector3(i * 5, 0, 0);
-                var prot = Instantiate(prefab, pos, Quaternion.identity);
+                PrototypeDisplay prot = Instantiate(prefab, pos, Quaternion.identity);
                 prot.Setup(prototypeData.Prototypes[i]);
-                prot.GetComponentInChildren<MeshRenderer>().materials = materialData.Materials.Where(x => prototypeData.Prototypes[i].MaterialIndexes.Contains(materialData.Materials.IndexOf(x))).ToArray();
+                if (!prot.UseMaterials)
+                {
+                    prot.GetComponentInChildren<MeshRenderer>().materials = materialData.Materials.Where(x => prototypeData.Prototypes[i].MaterialIndexes.Contains(materialData.Materials.IndexOf(x))).ToArray();
+                }
 
                 spawnedPrototypes.Add(prot.gameObject);
             }
@@ -557,7 +556,7 @@ namespace WaveFunctionCollapse
             buildableCornerData?.Clear();
         }
         
-        public bool StrictEquals(List<Vector2> vec1, List<Vector2> vec2)
+        private bool StrictEquals(List<Vector2> vec1, List<Vector2> vec2)
         {
             if (vec1.Count != vec2.Count)
             {
@@ -570,6 +569,24 @@ namespace WaveFunctionCollapse
             for (int i = 0; i < vec2.Count; i++)
             {
                 if (vec1[i] != vec2[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        
+        private bool StrictEquals(int[] arr1, int[] arr2)
+        {
+            if (arr1.Length != arr2.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < arr2.Length; i++)
+            {
+                if (arr1[i] != arr2[i])
                 {
                     return false;
                 }
@@ -676,17 +693,25 @@ namespace WaveFunctionCollapse
             UnityEngine.Debug.Log(transform.childCount);
         }
     }
+
+    public interface IMeshRayService
+    {
+        public Dictionary<Direction, int[]> GetMeshIndices(Mesh mesh, Material[] mats);
+    }
+    
 #endif
     [System.Serializable]
     public struct DicData
     {
         public Vector2[] positions;
         public ulong socketname;
+        public int[] materialIndexes;
 
-        public DicData(Vector2[] positions, ulong socketname)
+        public DicData(Vector2[] positions, ulong socketname, int[] materialIndexes)
         {
             this.positions = positions;
             this.socketname = socketname;
+            this.materialIndexes = materialIndexes;
         }
     }
 

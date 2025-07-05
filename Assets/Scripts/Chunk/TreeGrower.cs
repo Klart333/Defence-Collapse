@@ -52,8 +52,8 @@ namespace Chunks
         public bool ShouldRemoveWhenPlaced => shouldRemoveWhenPlaced;
         public int3 ChunkKey { get; set; }
 
-        public bool HasGrown { get; set; }
         public Cell Cell { get; set; }
+        public bool HasGrown { get; set; }
 
         private void OnEnable()
         {

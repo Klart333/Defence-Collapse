@@ -36,7 +36,10 @@ namespace WaveFunctionCollapse
         
         [Title("Settings")]
         [SerializeField]
-        private int chillTimeMs;
+        private int awaitEveryFrame = 1;
+
+        [SerializeField]
+        private int awaitTimeMs;
 
         [SerializeField]
         private float maxMillisecondsPerFrame = 4;
@@ -133,7 +136,8 @@ namespace WaveFunctionCollapse
         public async UniTaskVoid LoadChunk(Chunk chunk)
         {
             IsGenerating = true;
-            chunkMaskHandler.RemoveMask(chunk);
+            if (chunkMaskHandler.isActiveAndEnabled) chunkMaskHandler.RemoveMask(chunk);
+            
             await LoadAdjacentChunks(chunk);
 
             waveFunction.Propagate();
@@ -141,7 +145,7 @@ namespace WaveFunctionCollapse
 
             if (shouldCombine)
             {
-                await CombineChunk(chunk, false);
+                CombineChunk(chunk, false).Forget();
             }
 
             OnChunkGenerated?.Invoke(chunk);
@@ -179,10 +183,10 @@ namespace WaveFunctionCollapse
             }
         }
 
-        private async UniTask CombineChunk(Chunk chunk, bool subToEvent = true)
+        private async UniTaskVoid CombineChunk(Chunk chunk, bool subToEvent = true)
         {
-            await UniTask.DelayFrame(5);
-            CombineMeshes(chunk.ChunkIndex);
+            await UniTask.Delay(1000);
+            CombineMeshes(chunk.ChunkIndex, ChunkWaveFunction.ChunkParents[chunk.ChunkIndex]);
             chunk.ClearSpawnedMeshes(waveFunction.GameObjectPool);
 
             if (subToEvent)
@@ -196,27 +200,60 @@ namespace WaveFunctionCollapse
                 
                 spawnedChunks[chunk.ChunkIndex].SetActive(false);
                 spawnedChunks.Remove(chunk.ChunkIndex);
-                
-                entityManager.DestroyEntity(spawnedChunkColliders[chunk.ChunkIndex]);
-                spawnedChunkColliders.Remove(chunk.ChunkIndex);
+
+                if (spawnedChunkColliders.ContainsKey(chunk.ChunkIndex))
+                {
+                    entityManager.DestroyEntity(spawnedChunkColliders[chunk.ChunkIndex]);
+                    spawnedChunkColliders.Remove(chunk.ChunkIndex);   
+                }
             }
         }
 
         private async Task Run(Chunk chunk)
         {
             Stopwatch watch = Stopwatch.StartNew();
+            int frameCount = 0;
             while (!chunk.AllCollapsed)
             {
+                watch.Start();
                 ChunkIndex index = waveFunction.Iterate(chunk);
                 OnCellCollapsed?.Invoke(index);
-
+                watch.Stop();
+                
+                if (awaitEveryFrame > 0 && ++frameCount % awaitEveryFrame == 0)
+                {
+                    frameCount = 0;
+                    await UniTask.Delay(awaitTimeMs);
+                }
+                
                 if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
 
                 await UniTask.NextFrame();
-                if (chillTimeMs > 0)
+
+                watch.Restart();
+            }
+        }
+        
+        private async Task Run(List<ChunkIndex> cells)
+        {
+            Stopwatch watch = Stopwatch.StartNew();
+            int frameCount = 0;
+            while (!cells.TrueForAll((x) => ChunkWaveFunction[x].Collapsed))
+            {
+                watch.Start();
+                ChunkIndex index = waveFunction.Iterate(cells);
+                OnCellCollapsed?.Invoke(index);
+                watch.Stop();
+                
+                if (awaitEveryFrame > 0 && ++frameCount % awaitEveryFrame == 0)
                 {
-                    await UniTask.Delay(chillTimeMs);
+                    frameCount = 0;
+                    await UniTask.Delay(awaitTimeMs);
                 }
+                
+                if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
+
+                await UniTask.NextFrame();
 
                 watch.Restart();
             }
@@ -241,7 +278,7 @@ namespace WaveFunctionCollapse
                 }
                 
                 Chunk adjacent = waveFunction.LoadChunk(chunkIndex, chunkSize, defaultPrototypeInfoData, false);
-                chunkMaskHandler.CreateMask(adjacent, Utility.Math.IntToAdjacency(new int2(-x, -z)));
+                if (chunkMaskHandler.isActiveAndEnabled) chunkMaskHandler.CreateMask(adjacent, Utility.Math.IntToAdjacency(new int2(-x, -z)));
                 adjacentChunks.Add(adjacent);
                 directions.Add(DirectionUtility.Int2ToDirection(new int2(-x, -z)));
             }
@@ -251,11 +288,13 @@ namespace WaveFunctionCollapse
             waveFunction.Propagate();
             for (int i = 0; i < adjacentChunks.Count; i++)
             {
-                await Run(adjacentChunks[i]);
+                List<ChunkIndex> cells = GetSideIndexes(adjacentChunks[i], directions[i]);
+                
+                await Run(cells);
                 Events.OnGroundChunkGenerated?.Invoke(adjacentChunks[i]);
                 if (shouldCombine)
                 {
-                    await CombineChunk(adjacentChunks[i]);
+                    CombineChunk(adjacentChunks[i]).Forget();
                 }
             }
 
@@ -275,6 +314,30 @@ namespace WaveFunctionCollapse
                     SetEnemySpawn(adjacentChunks[i], directions[i], difficulty);
                 }
             }
+        }
+
+        private List<ChunkIndex> GetSideIndexes(Chunk chunk, Direction direction)
+        {
+            List<ChunkIndex> cells = new();
+            int length = chunk.Width;
+
+            for (int i = 0; i < length; i++)
+            {
+                (int3 a, int3 b) = direction switch
+                {
+                    Direction.Right    => (new int3(length - 1, 0, i),          new int3(length - 2, 0, i)),
+                    Direction.Left     => (new int3(0,          0, i),          new int3(1,          0, i)),
+                    Direction.Forward  => (new int3(i,          0, length - 1), new int3(i,          0, length - 2)),
+                    Direction.Backward => (new int3(i,          0, 0),          new int3(i,          0, 1)),
+                    _ => default
+                };
+                
+                cells.Add(new ChunkIndex(chunk.ChunkIndex, a));
+                //cells.Add(new ChunkIndex(chunk.ChunkIndex, b));
+            }
+
+            return cells;
+
         }
 
         private void SetEnemySpawn(Chunk chunk, Direction direction, int difficulty)
@@ -335,10 +398,11 @@ namespace WaveFunctionCollapse
             }    
         }
         
-        private void CombineMeshes(int3 chunkIndex)
+        private void CombineMeshes(int3 chunkIndex, Transform chunkParent)
         {
-            Mesh mesh = GetComponent<MeshCombiner>().CombineMeshes(out GameObject spawnedMesh);
+            Mesh mesh = GetComponent<MeshCombiner>().CombineMeshes(chunkParent, out GameObject spawnedMesh);
             spawnedChunks.Add(chunkIndex, spawnedMesh);
+            return;
             
             BlobAssetReference<Collider> blobCollider = MeshCollider.Create(mesh, new CollisionFilter
             {
@@ -376,6 +440,4 @@ namespace WaveFunctionCollapse
             spawnedColliders.Add(blobCollider);
         }
     }
-
-
 }

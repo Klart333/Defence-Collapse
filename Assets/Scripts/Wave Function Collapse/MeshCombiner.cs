@@ -6,14 +6,14 @@ public class MeshCombiner : MonoBehaviour
     [SerializeField]
     private PooledMonoBehaviour meshPrefab;
     
-    public Mesh CombineMeshes(out GameObject spawned)
+    public Mesh CombineMeshes(Transform parent, out GameObject spawned)
     {
         // All our children (and us)
-        MeshFilter[] filters = GetComponentsInChildren<MeshFilter>(false);
-
+        MeshFilter[] filters = parent.GetComponentsInChildren<MeshFilter>(false);
+        
         // All the meshes in our children (just a big list)
         List<Material> materials = new List<Material>();
-        MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>(false); // <-- you can optimize this
+        MeshRenderer[] renderers = parent.GetComponentsInChildren<MeshRenderer>(false); // <-- you can optimize this
         foreach (MeshRenderer meshRenderer in renderers)
         {
             Material[] localMats = meshRenderer.sharedMaterials;

@@ -3,6 +3,7 @@ using Unity.Entities;
 using UnityEngine;
 using Effects.ECS;
 using System;
+using Gameplay;
 
 namespace Effects
 {
@@ -23,6 +24,8 @@ namespace Effects
 
         private void Update()
         {
+            if (GameManager.Instance.IsGameOver) return;
+            
             DynamicBuffer<DamageCallbackComponent> damageCallbackBuffer = entityManager.GetBuffer<DamageCallbackComponent>(damageCallbackEntity);
             if (damageCallbackBuffer.IsEmpty) return;
                 

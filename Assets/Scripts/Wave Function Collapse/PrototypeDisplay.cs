@@ -1,4 +1,5 @@
 using System;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 
@@ -24,12 +25,21 @@ namespace WaveFunctionCollapse
 
         [SerializeField]
         private ProtoypeMeshes protoypeMeshes;
+
+        [SerializeField]
+        private bool useMaterials;
+        
+        [SerializeField, ShowIf(nameof(useMaterials))]
+        private MaterialData materialData;
+        
+        public bool UseMaterials => useMaterials;
         
         public void Setup(PrototypeData prototype)
         {
             if (prototype.MeshRot.MeshIndex != -1)
             {
-                mesh.GetComponent<MeshFilter>().mesh = protoypeMeshes[prototype.MeshRot.MeshIndex];
+                mesh.GetComponent<MeshFilter>().sharedMesh = protoypeMeshes[prototype.MeshRot.MeshIndex];
+                mesh.GetComponent<MeshRenderer>().sharedMaterials = materialData.GetMaterials(prototype.MaterialIndexes).ToArray();
             }
             mesh.transform.rotation = Quaternion.Euler(0, 90 * prototype.MeshRot.Rot, 0);
 

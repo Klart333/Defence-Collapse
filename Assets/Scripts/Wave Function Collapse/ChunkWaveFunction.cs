@@ -34,6 +34,7 @@ namespace WaveFunctionCollapse
         public ProtoypeMeshes ProtoypeMeshes => protoypeMeshes; 
         public Stack<ChunkIndex> CellStack { get; } = new Stack<ChunkIndex>();
         public Dictionary<int3, TChunk> Chunks { get; } = new Dictionary<int3, TChunk>();
+        public Dictionary<int3, Transform> ChunkParents { get; } = new Dictionary<int3, Transform>();
         public Stack<GameObject> GameObjectPool => gameObjectPool;
         public Transform ParentTransform { get; set; }
         public Vector3 CellSize => gridScale;
@@ -209,6 +210,18 @@ namespace WaveFunctionCollapse
             Propagate();
             return index;
         }
+        
+        public ChunkIndex Iterate(List<ChunkIndex> cells)
+        {
+            ChunkIndex index = GetLowestEntropyIndex(cells);
+
+            PrototypeData chosenPrototype = Collapse(this[index]);
+            //Debug.Log("Collapsing: " + index.CellIndex + "\n ChosenPrototype: " + chosenPrototype);
+            SetCell(index, chosenPrototype);
+
+            Propagate();
+            return index;
+        }
 
         public ChunkIndex GetLowestEntropyIndex()
         {
@@ -364,7 +377,13 @@ namespace WaveFunctionCollapse
             this[index] = new Cell(true, position, new List<PrototypeData> { chosenPrototype });
             CellStack.Push(index);
 
-            GameObject spawned = GenerateMesh(position, chosenPrototype);
+            if (!ChunkParents.TryGetValue(index.Index, out Transform parent))
+            {
+                parent = new GameObject($"Wave Function Parent - {index.Index}").transform;
+                if (ParentTransform != null) parent.SetParent(ParentTransform); 
+                ChunkParents.Add(index.Index, parent);
+            }
+            GameObject spawned = GenerateMesh(position, chosenPrototype, parent);
             if (spawned is not null)
             {
                 Chunks[index.Index].SpawnedMeshes.Add(spawned);
@@ -393,7 +412,7 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, float scale = 1)
+        public GameObject GenerateMesh(Vector3 position, PrototypeData prototypeData, Transform parent, float scale = 1)
         {
             if (prototypeData.MeshRot.MeshIndex == -1)
             {
@@ -404,8 +423,7 @@ namespace WaveFunctionCollapse
 
             gm.transform.position = position;
             gm.transform.rotation = Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0);
-            ParentTransform ??= new GameObject("Wave Function Parent").transform;
-            gm.transform.SetParent(ParentTransform, true);
+            gm.transform.SetParent(parent, true);
 
             gm.transform.localScale = CellSize / 2 * scale;
 

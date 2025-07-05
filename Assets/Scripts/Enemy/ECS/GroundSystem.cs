@@ -15,6 +15,7 @@ namespace Enemy.ECS
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<PhysicsWorldSingleton>();
+            state.Enabled = false;
         }
 
         [BurstCompile]
