@@ -123,8 +123,7 @@ namespace Buildings
 
         private void MouseOnUp(InputAction.CallbackContext obj)
         {
-            if (!CameraController.IsDragging
-                && pressedSquare != null && pressedSquare == hoveredSquare)
+            if (!CameraController.IsDragging && pressedSquare != null && pressedSquare == hoveredSquare)
             {
                 SquareWasPressed = true;
             }
@@ -236,8 +235,14 @@ namespace Buildings
 
         private void BuildingClicked(BuildingType buildingType)
         {
-            if (Displaying || buildingType is not BuildingType.Building) return;
+            if (buildingType is not BuildingType.Building) return;
 
+            if (Displaying)
+            {
+                OnBuildingCanceled();
+                return;
+            }
+            
             UIEvents.OnFocusChanged?.Invoke();
             PlacingTower().Forget();
         }

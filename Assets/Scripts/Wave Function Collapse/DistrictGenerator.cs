@@ -19,6 +19,8 @@ namespace WaveFunctionCollapse
     public class DistrictGenerator : SerializedMonoBehaviour, IChunkWaveFunction<QueryChunk>
     {
         public event Action<QueryChunk> OnDistrictChunkRemoved;
+        public event Action<ChunkIndex> OnDistrictCellBuilt;
+
         
         [Title("Wave Function")]
         [SerializeField]
@@ -555,6 +557,7 @@ namespace WaveFunctionCollapse
 
             spawned.ToggleIsBuildableVisual(false, false);
             SpawnedMeshes[index] = spawned;
+            OnDistrictCellBuilt?.Invoke(index);
         }
         
         public IBuildable GenerateMesh(Vector3 position, ChunkIndex index, PrototypeData prototypeData, bool animate = false)

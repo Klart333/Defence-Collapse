@@ -53,7 +53,7 @@ namespace Buildings
             barricadeHandler = FindFirstObjectByType<BarricadeHandler>();
             barricadeGenerator.OnLoaded += InitializeSpawnPlaces;
 
-            UIEvents.OnFocusChanged += OnPathCanceled;
+            UIEvents.OnFocusChanged += OnPlacingCanceled;
             Events.OnBuildingClicked += BuildingClicked;
             
             Events.OnBuiltIndexBuilt += BuiltIndexBuilt;
@@ -75,7 +75,7 @@ namespace Buildings
             Events.OnBuiltIndexDestroyed -= BuiltIndexRemoved;
             Events.OnBuiltIndexBuilt -= BuiltIndexBuilt;
             Events.OnBuildingClicked -= BuildingClicked;
-            UIEvents.OnFocusChanged -= OnPathCanceled;
+            UIEvents.OnFocusChanged -= OnPlacingCanceled;
             inputManager.Fire.started -= MouseOnDown;
             inputManager.Fire.canceled -= MouseOnUp;
         }
@@ -207,15 +207,21 @@ namespace Buildings
             }
         }
         
-        private void OnPathCanceled()
+        private void OnPlacingCanceled()
         {
             manualCancel = true;
         }
 
         private void BuildingClicked(BuildingType buildingType)
         {
-            if (Displaying || buildingType is not BuildingType.Barricade) return;
-
+            if (buildingType is not BuildingType.Barricade) return;
+            
+            if (Displaying)
+            {
+                OnPlacingCanceled();
+                return;
+            }
+            
             UIEvents.OnFocusChanged?.Invoke();
             PlacingTower().Forget();
         }

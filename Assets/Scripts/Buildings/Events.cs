@@ -33,7 +33,7 @@ public static class Events
 
 public static class ECSEvents
 {
-    public static UnityAction<float3> OnLootSpawn;
+    public static UnityAction<float3> OnLootSpawn; 
 }
 
 public static class UIEvents
