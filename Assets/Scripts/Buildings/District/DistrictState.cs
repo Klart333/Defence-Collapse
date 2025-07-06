@@ -20,9 +20,9 @@ namespace Buildings.District
     {
         public event Action OnStatisticsChanged;
         public event Action OnAttack;
-        
-        protected readonly Dictionary<int2, List<DistrictTargetMesh>> targetMeshes = new Dictionary<int2, List<DistrictTargetMesh>>();
-        protected readonly Dictionary<int2, List<Entity>> entityIndexes = new Dictionary<int2, List<Entity>>();
+
+        private readonly Dictionary<int2, List<DistrictTargetMesh>> targetMeshes = new Dictionary<int2, List<DistrictTargetMesh>>();
+        private readonly Dictionary<int2, List<Entity>> entityIndexes = new Dictionary<int2, List<Entity>>();
         protected readonly HashSet<Entity> spawnedEntities = new HashSet<Entity>();
         
         protected DamageInstance lastDamageDone;
@@ -1131,7 +1131,7 @@ namespace Buildings.District
         };
         
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
-        public override CategoryType CategoryType => CategoryType.Mine;
+        public override CategoryType CategoryType => CategoryType.Church;
         protected override bool UseTargetMeshes => true;
         protected override float AttackAngle => 360;
         public override Attack Attack { get; }

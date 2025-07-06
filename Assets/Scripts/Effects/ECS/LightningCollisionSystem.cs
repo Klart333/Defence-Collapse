@@ -105,17 +105,20 @@ namespace Effects.ECS
         public void Execute(Entity sourceEntity, in LocalTransform transform, in PendingDamageComponent pendingDamage)
         {
             if (!LightningLookup.TryGetComponent(pendingDamage.SourceEntity, out LightningComponent sourceLightning)) return;
+            NativeHashSet<Entity> hitEntities = new NativeHashSet<Entity>(sourceLightning.Bounces, Allocator.TempJob);
 
             float3 sourcePosition = transform.Position;
             int2 cellIndex = new int2((int)transform.Position.x, (int)transform.Position.z);
             
             for (int i = 0; i < sourceLightning.Bounces; i++)
             {
-                if (!GetClosest(sourceEntity, sourcePosition, cellIndex, out cellIndex, out sourceEntity))
+                hitEntities.Add(sourceEntity);
+                if (!GetClosest(hitEntities, sourcePosition, cellIndex, out cellIndex, out sourceEntity))
                 {
+                    hitEntities.Dispose();
                     return;
                 }
-                
+
                 float3 targetPosition = TransformLookup.GetRefRO(sourceEntity).ValueRO.Position;
                 float3 dir = math.normalize(targetPosition - sourcePosition);
                 float zAngle = math.acos(dir.x) * math.TODEGREES;
@@ -137,9 +140,11 @@ namespace Effects.ECS
                 };
                 PendingDamageMap.Add(sourceEntity, damage);
             }
+
+            hitEntities.Dispose();
         }
 
-        private bool GetClosest(Entity sourceEntity, float3 sourcePosition, int2 cellIndex, out int2 closestIndex, out Entity closestEntity)
+        private bool GetClosest(NativeHashSet<Entity> hitEntities, float3 sourcePosition, int2 cellIndex, out int2 closestIndex, out Entity closestEntity)
         {
             closestEntity = default;
             float closest = float.MaxValue;
@@ -152,7 +157,7 @@ namespace Effects.ECS
 
                 do
                 {
-                    if (!TransformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform) || enemy == sourceEntity) continue;
+                    if (!TransformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform) || hitEntities.Contains(enemy)) continue;
 
                     float distSq = math.distancesq(sourcePosition, enemyTransform.Position);
                     if (distSq > closest) continue;

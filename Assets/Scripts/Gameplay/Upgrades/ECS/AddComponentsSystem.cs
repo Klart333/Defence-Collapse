@@ -76,7 +76,7 @@ namespace Gameplay.Upgrades.ECS
                 switch (component.ComponentType)
                 {
                     case UpgradeComponentType.MoneyOnDeath: ECB.AddComponent(sortKey, entity, new MoneyOnDeathComponent { Amount = component.Strength }); break;
-                    case UpgradeComponentType.Lightning: ECB.AddComponent(sortKey, entity, new LightningComponent { Bounces = (int)component.Strength }); break;
+                    case UpgradeComponentType.Lightning: ECB.AddComponent(sortKey, entity, new LightningComponent { Bounces = (int)component.Strength, Damage = component.Strength * 5, Radius = 1}); break;
                     case UpgradeComponentType.Poison: ECB.AddComponent(sortKey, entity, new PoisonComponent { TotalDamage = component.Strength }); break;
                     case UpgradeComponentType.Fire: ECB.AddComponent(sortKey, entity, new FireComponent { TotalDamage = component.Strength }); break;
                     case UpgradeComponentType.Explosion: ECB.AddComponent(sortKey, entity, new ExplosionComponent()); break;

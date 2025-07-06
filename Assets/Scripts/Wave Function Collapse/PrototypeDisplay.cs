@@ -39,7 +39,10 @@ namespace WaveFunctionCollapse
             if (prototype.MeshRot.MeshIndex != -1)
             {
                 mesh.GetComponent<MeshFilter>().sharedMesh = protoypeMeshes[prototype.MeshRot.MeshIndex];
-                mesh.GetComponent<MeshRenderer>().sharedMaterials = materialData.GetMaterials(prototype.MaterialIndexes).ToArray();
+                if (useMaterials)
+                {
+                    mesh.GetComponent<MeshRenderer>().sharedMaterials = materialData.GetMaterials(prototype.MaterialIndexes).ToArray();
+                }
             }
             mesh.transform.rotation = Quaternion.Euler(0, 90 * prototype.MeshRot.Rot, 0);
 

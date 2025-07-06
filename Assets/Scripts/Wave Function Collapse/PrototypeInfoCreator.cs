@@ -347,7 +347,7 @@ namespace WaveFunctionCollapse
                 negPositions.Add(new Vector2((2.0f - (positions[h].x + 1) - 1), positions[h].y));
             }
 
-            if (LooseEquals(positions, negPositions) && mats.Length == 1)
+            if (LooseEquals(positions, negPositions) && mats.Length <= 1)
             {
                 key = (ulong)1 << (2 + currentSideSymmetricalIndex++);
                 prototypeData.SocketList.Add(new DicData(positions.ToArray(), key, mats));

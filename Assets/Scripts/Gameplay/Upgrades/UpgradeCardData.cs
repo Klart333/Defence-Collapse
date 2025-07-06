@@ -113,9 +113,16 @@ namespace Gameplay.Upgrades
                 Weight = upgradeCardData.weight;
             }
         }
+        
+        #if UNITY_EDITOR
+        [Button, TitleGroup("Debug")]
+        private void DebugApplyUpgradeCard()
+        {
+            Events.OnUpgradeCardPicked?.Invoke(GetUpgradeCardInstance());
+        }
+        
+        #endif
     }
-
-    
 
     [Flags]
     public enum WeightStrategy
