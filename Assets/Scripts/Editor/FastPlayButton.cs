@@ -1,3 +1,4 @@
+using Gameplay;
 using UnityEditor;
 using UnityEditor.Overlays;
 using UnityEditor.Toolbars;
@@ -58,7 +59,7 @@ namespace Editor
                 EditorApplication.ExitPlaymode();
                 return;
             }
-
+            
             // Save current settings
             wasEnterPlayModeOptionsEnabled = EditorSettings.enterPlayModeOptionsEnabled;
             previousOptions = EditorSettings.enterPlayModeOptions;
@@ -67,6 +68,9 @@ namespace Editor
             EditorSettings.enterPlayModeOptionsEnabled = true;
             EditorSettings.enterPlayModeOptions = EnterPlayModeOptions.DisableDomainReload | EnterPlayModeOptions.DisableSceneReload;
 
+            // Defence Collapse Specific Reset
+            GameManager.ResetWorld();
+            
             // Start play mode
             EditorApplication.EnterPlaymode();
         }

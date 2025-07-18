@@ -378,7 +378,7 @@ namespace Buildings.District
             isPlacementValid = false;
         }
 
-        public bool IsBuildable(GroundType groundType)
+        private bool IsBuildable(GroundType groundType)
         {
             return districtType switch
             {
@@ -416,6 +416,11 @@ namespace Buildings.District
                 return;
             }
 
+            PlaceDistrict();
+        }
+
+        private void PlaceDistrict()
+        {
             int amount = districtHandler.GetDistrictAmount(districtType);
             if (!moneyManager.CanPurchase(districtType, amount, additionalBuildingAmount, out float cost))
             {
@@ -440,7 +445,15 @@ namespace Buildings.District
             }
             
             districtGenerator.Place();
-            buildingGenerator.Place();
+
+            bool shouldUpdate = buildingGenerator.QuerySpawnedBuildings.Count <= 0;
+            buildingGenerator.Place(); 
+            
+            if (shouldUpdate)
+            {
+                UpdateBuildingIndexes();
+            }
+            
             costText.gameObject.SetActive(false);
             
             if (districtType == DistrictType.TownHall)
@@ -451,8 +464,18 @@ namespace Buildings.District
             {
                 SetInvalid();
             }
+
+            void UpdateBuildingIndexes()
+            {
+                List<IBuildable> buildables = new List<IBuildable>();
+                foreach (ChunkIndex chunkIndex in buildingIndexes)
+                {
+                    buildables.Add(buildingGenerator.SpawnedMeshes[chunkIndex]);
+                }
+                districtGenerator.UpdateChunksAtBuildables(buildables);
+            }
         }
-        
+
         private void OnGameReset()
         {
             Placing = false;

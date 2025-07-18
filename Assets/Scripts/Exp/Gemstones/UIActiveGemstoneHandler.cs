@@ -15,9 +15,6 @@ namespace Exp.Gemstones
         [SerializeField]
         private Transform containerParent;
         
-        [SerializeField]
-        private UIFlexibleLayoutGroup flexGroup;
-        
         [Title("Slot Unlock")]
         [SerializeField]
         private Button unlockButton;
@@ -69,8 +66,6 @@ namespace Exp.Gemstones
                 SpawnSlot();
             }
             unlockButton.transform.SetAsLastSibling();
-            
-            flexGroup.CalculateNewBounds();
         }
 
         private void SpawnSlot()
@@ -93,7 +88,6 @@ namespace Exp.Gemstones
 
             SpawnSlot();
             unlockButton.transform.SetAsLastSibling();
-            flexGroup.CalculateNewBounds();
             
             expManager.UnlockSlot();
         }

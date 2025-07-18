@@ -74,6 +74,10 @@ namespace Buildings.District
 
         private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
         {
+            foreach (ChunkIndex chunkIndex in chunkIndexes)
+            {
+                Debug.Log("Index: " + chunkIndex);
+            }
             districtGenerator.AddAction(async () => await districtGenerator.RemoveChunks(chunkIndexes));
         }
 

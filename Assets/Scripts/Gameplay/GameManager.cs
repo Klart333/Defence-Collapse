@@ -59,7 +59,7 @@ namespace Gameplay
             PersistantGameStats.CreateNewGameStats(0);
         }
 
-        public void ResetWorld()
+        public static void ResetWorld()
         {
             DOTween.Clear();
             Pool.Clear();

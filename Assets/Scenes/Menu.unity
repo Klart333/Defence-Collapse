@@ -1498,7 +1498,7 @@ MonoBehaviour:
   containerPefab: {fileID: 3948360801426223263, guid: 51e1c39d55d6d6c4b85d75e455d742f6,
     type: 3}
   containerParent: {fileID: 1431229885}
-  flexGroup: {fileID: 1431229886}
+  flexGroup: {fileID: 0}
   unlockButton: {fileID: 1977490807}
   costText: {fileID: 1901062460}
   baseCost: 100
@@ -4184,8 +4184,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1431229885}
-  - component: {fileID: 1431229887}
-  - component: {fileID: 1431229886}
+  - component: {fileID: 1431229888}
+  - component: {fileID: 1431229889}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -4211,9 +4211,9 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -329.7, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1431229886
+--- !u!114 &1431229888
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4222,17 +4222,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1431229884}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5cc02e0135438034d8e665a17f64938f, type: 3}
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rows: 1
-  coloumns: 0
-  useElasticClamping: 1
-  clampingX: 1
-  restrictToSquare: 1
-  CalculateOnStart: 1
-  useParentRect: 1
---- !u!114 &1431229887
+  m_HorizontalFit: 2
+  m_VerticalFit: 0
+--- !u!114 &1431229889
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4241,21 +4236,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1431229884}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 5
-    m_Right: 5
-    m_Top: 5
-    m_Bottom: 5
-  m_ChildAlignment: 0
-  m_StartCorner: 0
-  m_StartAxis: 0
-  m_CellSize: {x: 100.3, y: 100.3}
-  m_Spacing: {x: 5, y: 0}
-  m_Constraint: 2
-  m_ConstraintCount: 1
+    m_Left: 10
+    m_Right: 10
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_Spacing: 10
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &1437411814
 GameObject:
   m_ObjectHideFlags: 0
@@ -4723,7 +4720,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 55.15, y: -55.15}
+  m_AnchoredPosition: {x: 60.15, y: -55.15}
   m_SizeDelta: {x: 100.3, y: 100.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1685664646

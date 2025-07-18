@@ -16,11 +16,8 @@ namespace WaveFunctionCollapse
 #endif
         
         public event Action OnCleared;
-                
-        private PrototypeData unbuildablePrototype;
-        private List<PrototypeData> unbuildablePrototypeList;
         
-        public readonly List<Tuple<int3, Cell>> QueryChangedCells = new List<Tuple<int3, Cell>>();
+        public Tuple<int3, Cell>[,,] QueryChangedCells;
         public List<GameObject> SpawnedMeshes => throw new NotImplementedException();
 
         public bool IsChunkQueryAdded { get; private set; } = true;
@@ -30,6 +27,7 @@ namespace WaveFunctionCollapse
         public Cell[,,] Cells { get; private set; }
         public bool[,,] BuiltCells { get; private set; }
         public Vector3 Position { get; private set;}
+        private bool IsQueryLoaded { get; set; }
         public int Width { get; private set;}
         public int Height { get; private set;}
         public int Depth { get; private set;}
@@ -38,7 +36,7 @@ namespace WaveFunctionCollapse
         public bool UseSideConstraints { get; private set; }
         public bool IsClear { get; private set; } = true;
         public PrototypeInfoData PrototypeInfoData { get; set; }
-        
+
         public int3 ChunkSize => new int3(Width, Height, Depth);
         
         public bool IsTop => AdjacentChunks[2] == null;
@@ -61,9 +59,7 @@ namespace WaveFunctionCollapse
 
             Cells = new Cell[Width, Height, Depth];
             BuiltCells = new bool[Width, Height, Depth];
-
-            unbuildablePrototype = PrototypeData.Empty;
-            unbuildablePrototypeList = new List<PrototypeData> { unbuildablePrototype };
+            QueryChangedCells = new Tuple<int3, Cell>[Width, Height, Depth];
             
 #if UNITY_EDITOR
             editorOnlyPosition = position;
@@ -221,60 +217,60 @@ namespace WaveFunctionCollapse
         public void Place()
         {
             IsChunkQueryAdded = false;
-            QueryChangedCells.Clear();
+            IsQueryLoaded = false;
         }
         
-        public void RevertQuery(Action<ChunkIndex, PrototypeData, bool> setCell, Action<int3> removeChunk)
+        public void RevertQuery(Action<ChunkIndex, PrototypeData, bool, bool> setCell, Action<int3> removeChunk)
         {
             if (IsChunkQueryAdded)
             {
                 removeChunk?.Invoke(ChunkIndex);
                 return;
             }
-            
-            for (int i = 0; i < QueryChangedCells.Count; i++)
+
+            if (!IsQueryLoaded)
             {
-                int3 index = QueryChangedCells[i].Item1;
-                if (QueryChangedCells[i].Item2.Collapsed)
+                return;
+            }
+
+            for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
+            for (int z = 0; z < Depth; z++)
+            {
+                int3 index = QueryChangedCells[x, y, z].Item1;
+                if (QueryChangedCells[x, y, z].Item2.Collapsed)
                 {
-                    setCell.Invoke(new ChunkIndex(ChunkIndex, index), QueryChangedCells[i].Item2.PossiblePrototypes[0], false);
+                    setCell.Invoke(new ChunkIndex(ChunkIndex, index), QueryChangedCells[x, y, z].Item2.PossiblePrototypes[0], false, false);
                 }
                 else
                 {
-                    this[index] = QueryChangedCells[i].Item2;
+                    this[index] = QueryChangedCells[x, y, z].Item2;
                 }
             }
 
-            QueryChangedCells.Clear();
-        }
-        
-        public void QueryClear()
-        {
-            for (int z = 0; z < Depth; z++)
-            for (int y = 0; y < Height; y++)
-            for (int x = 0; x < Width; x++)
-            {
-                Cell cell = Cells[x, y, z];
-                QueryChangedCells.Add(Tuple.Create(new int3(x, y, z), cell));
-                
-                bool isBottom = AdjacentChunks[3] == null && y == 0;
-                List<PrototypeData> prots = new List<PrototypeData>(isBottom ? PrototypeInfoData.Prototypes : PrototypeInfoData.NotBottomPrototypes);
-                cell.PossiblePrototypes = new List<PrototypeData>( prots);
-                cell.SetDirty();
-                cell.Collapsed = false;
-                Cells[x, y, z] = cell;
-            }
-            
-            OnCleared?.Invoke();
+            IsQueryLoaded = false;
         }
         
         public void QueryLoad(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Stack<ChunkIndex> cellStack)
         {
+            if (IsQueryLoaded && prototypeInfoData != PrototypeInfoData)
+            {
+                LoadCells(prototypeInfoData, gridScale, cellStack);
+                return;
+            }
+
+            if (IsQueryLoaded)
+            {
+                return;
+            }
+            
+            IsQueryLoaded = true;
+            
             for (int z = 0; z < Depth; z++)
             for (int y = 0; y < Height; y++)
             for (int x = 0; x < Width; x++)
             {
-                QueryChangedCells.Add(Tuple.Create(new int3(x, y, z), Cells[x, y, z]));
+                QueryChangedCells[x, y, z] = Tuple.Create(new int3(x, y, z), Cells[x, y, z]);
             }
             
             LoadCells(prototypeInfoData, gridScale, cellStack);

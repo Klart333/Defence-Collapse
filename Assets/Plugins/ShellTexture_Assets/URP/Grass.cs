@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Grass : MonoBehaviour
 {
+    private static readonly int ShellCount = Shader.PropertyToID("_ShellCount");
     public Mesh shellMesh;
     public Shader shellShader;
 
@@ -63,12 +64,12 @@ public class Grass : MonoBehaviour
     {
         if (updateStatics) {
             for (int i = 0; i < shellCount; ++i) {
-                shells[i].GetComponent<MeshRenderer>().material.SetInt("_ShellCount", shellCount);
-                shells[i].GetComponent<MeshRenderer>().material.SetInt("_ShellIndex", i);
-                shells[i].GetComponent<MeshRenderer>().material.SetFloat("_ShellLength", shellLength);
-                shells[i].GetComponent<MeshRenderer>().material.SetVector("_Color", shellColor);
-                shells[i].GetComponent<MeshRenderer>().material.SetFloat("_Density", density);
-                shells[i].GetComponent<MeshRenderer>().material.SetFloat("_Thickness", thickness);
+                shells[i].GetComponent<MeshRenderer>().sharedMaterial.SetInt(ShellCount, shellCount);
+                shells[i].GetComponent<MeshRenderer>().sharedMaterial.SetInt("_ShellIndex", i);
+                shells[i].GetComponent<MeshRenderer>().sharedMaterial.SetFloat("_ShellLength", shellLength);
+                shells[i].GetComponent<MeshRenderer>().sharedMaterial.SetVector("_Color", shellColor);
+                shells[i].GetComponent<MeshRenderer>().sharedMaterial.SetFloat("_Density", density);
+                shells[i].GetComponent<MeshRenderer>().sharedMaterial.SetFloat("_Thickness", thickness);
             }
         }
     }

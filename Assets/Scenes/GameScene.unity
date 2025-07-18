@@ -279,9 +279,9 @@ VisualEffect:
       - m_Value: 30
         m_Name: SparksMaxCount
         m_Overridden: 1
-      - m_Value: 16
+      - m_Value: 0
         m_Name: SpawnRequestsCount
-        m_Overridden: 0
+        m_Overridden: 1
     m_Matrix4x4f:
       m_Array: []
     m_AnimationCurve:
@@ -427,7 +427,7 @@ VisualEffect:
       - m_Value: 0.1
         m_Name: FlashDuration
         m_Overridden: 0
-      - m_Value: 15
+      - m_Value: 5
         m_Name: FlashSize
         m_Overridden: 0
       - m_Value: 0.5
@@ -460,7 +460,7 @@ VisualEffect:
         m_Overridden: 1
     m_Vector4f:
       m_Array:
-      - m_Value: {x: 766.9961, y: 84.305565, z: 0, w: 0}
+      - m_Value: {x: 0, y: 0, z: 0, w: 0}
         m_Name: FlashColor
         m_Overridden: 0
       - m_Value: {x: 95.87452, y: 9.199622, z: 0, w: 1}
@@ -482,9 +482,9 @@ VisualEffect:
       - m_Value: 30
         m_Name: SparksMaxCount
         m_Overridden: 1
-      - m_Value: 16
+      - m_Value: 0
         m_Name: SpawnRequestsCount
-        m_Overridden: 0
+        m_Overridden: 1
     m_Matrix4x4f:
       m_Array: []
     m_AnimationCurve:
@@ -5054,12 +5054,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b43dc09c24734bf192791441c12e762d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &434795339 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8693940312933308598, guid: 8a01f29de8b676c49801d05975e64057,
-    type: 3}
-  m_PrefabInstance: {fileID: 5803410550800812268}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &448074538
 GameObject:
   m_ObjectHideFlags: 0
@@ -7364,9 +7358,9 @@ VisualEffect:
       - m_Value: 30
         m_Name: SparksMaxCount
         m_Overridden: 1
-      - m_Value: 77
+      - m_Value: 0
         m_Name: SpawnRequestsCount
-        m_Overridden: 0
+        m_Overridden: 1
     m_Matrix4x4f:
       m_Array: []
     m_AnimationCurve:
@@ -8678,7 +8672,6 @@ Transform:
   - {fileID: 2063588822}
   - {fileID: 43556205}
   - {fileID: 723849542}
-  - {fileID: 434795339}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &907540629
@@ -12980,9 +12973,9 @@ VisualEffect:
       - m_Value: 30
         m_Name: SparksMaxCount
         m_Overridden: 1
-      - m_Value: 77
+      - m_Value: 0
         m_Name: SpawnRequestsCount
-        m_Overridden: 0
+        m_Overridden: 1
     m_Matrix4x4f:
       m_Array: []
     m_AnimationCurve:
@@ -13423,7 +13416,7 @@ MonoBehaviour:
   buildableCornerData: {fileID: 11400000, guid: 21c6865fe1599b64699908607cd7f257,
     type: 2}
   districtHandler: {fileID: 491554922}
-  awaitEveryFrame: 1
+  awaitEveryFrame: 1000
   awaitTimeMs: 1
   maxMillisecondsPerFrame: 2
   verbose: 1
@@ -13440,6 +13433,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   districtGenerator: {fileID: 1551488502}
+  defaultDelayMs: 0.05
+  queueSpeedCapacity: 8
+  height: 1.5
   fallDuration: 1
   fallEase: 7
 --- !u!1 &1568006375
@@ -15395,9 +15391,9 @@ VisualEffect:
       - m_Value: 30
         m_Name: SparksMaxCount
         m_Overridden: 1
-      - m_Value: 77
+      - m_Value: 0
         m_Name: SpawnRequestsCount
-        m_Overridden: 0
+        m_Overridden: 1
     m_Matrix4x4f:
       m_Array: []
     m_AnimationCurve:
@@ -19968,7 +19964,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 883032810}
+    m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 8234521299740375997, guid: 8a01f29de8b676c49801d05975e64057,
         type: 3}
@@ -22356,6 +22352,7 @@ RectTransform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 5803410550800812268}
   - {fileID: 883032810}
   - {fileID: 1411626119}
   - {fileID: 2112620416}

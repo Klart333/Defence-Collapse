@@ -42,11 +42,12 @@ public class BuildingAnimator : MonoBehaviour
 
     public void Animate(IBuildable building)
     {
-        if (building is Building or Barricade)
+        if (building is not Building or Barricade)
         {
-            SpawnParticle(building);
+            return;
         }
-
+        
+        SpawnParticle(building);
         BounceInOut(building.MeshTransform);
     }
 
