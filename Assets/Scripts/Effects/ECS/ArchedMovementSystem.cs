@@ -2,6 +2,7 @@ using Enemy.ECS;
 using Gameplay;
 using Unity.Burst;
 using Unity.Entities;
+using Unity.Transforms;
 
 namespace Effects.ECS
 {
@@ -37,11 +38,11 @@ namespace Effects.ECS
         public float DeltaTime;
         
         [BurstCompile]
-        public void Execute(ref PositionComponent position, ref ArchedMovementComponent arch, in SpeedComponent speed)
+        public void Execute(ref LocalTransform transform, ref ArchedMovementComponent arch, in SpeedComponent speed)
         {
             arch.Value += speed.Speed * DeltaTime;
             
-            position.Position = Utility.Math.CubicLerp(arch.StartPosition, arch.EndPosition, arch.Pivot, arch.Value);
+            transform.Position = Utility.Math.CubicLerp(arch.StartPosition, arch.EndPosition, arch.Pivot, arch.Value);
         }
     }
 }

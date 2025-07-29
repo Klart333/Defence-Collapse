@@ -31,8 +31,8 @@ namespace Effects.LittleDudes
             Events.OnWaveEnded += OnWaveEnded;
             InitializeFlowField();
 
-            littleDudeQuery = SystemAPI.QueryBuilder().WithAll<LittleDudeComponent>().WithNone<Prefab>().Build();
-            RequireForUpdate<LittleDudeComponent>();
+            littleDudeQuery = SystemAPI.QueryBuilder().WithAll<LittleDudeComponent>().Build();
+            RequireForUpdate(littleDudeQuery);
         }
 
         private void OnGroundChunkGenerated(Chunk chunk)

@@ -9,7 +9,7 @@ using Gameplay;
 
 namespace Effects.LittleDudes
 {
-    [UpdateAfter(typeof(LittleDudeHashGridSystem))]
+    [UpdateAfter(typeof(LittleDudeHashGridSystem)), UpdateAfter(typeof(EnemyHashGridSystem))]
     public partial struct PushSystem : ISystem
     {
         private ComponentLookup<LocalTransform> transformLookup;
@@ -17,22 +17,32 @@ namespace Effects.LittleDudes
         [BurstCompile]
         public void OnCreate(ref SystemState state) 
         {
+            EntityQuery littleDudeQuery = SystemAPI.QueryBuilder().WithAll<LittleDudeComponent>().Build();
+            state.RequireForUpdate(littleDudeQuery);
             state.RequireForUpdate<GameSpeedComponent>();
+            
             transformLookup = state.GetComponentLookup<LocalTransform>(true);
         }
 
         public void OnUpdate(ref SystemState state)
         {
-            NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<LittleDudeSpatialHashMapSingleton>().ValueRO.Value;
+            NativeParallelMultiHashMap<int2, Entity> littleDudeGrid = SystemAPI.GetSingletonRW<LittleDudeSpatialHashMapSingleton>().ValueRO.Value;
+            NativeParallelMultiHashMap<int2, Entity> enemyGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             transformLookup.Update(ref state);
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
             
             new LittleDudePushJob 
             {
-                SpatialGrid = spatialGrid.AsReadOnly(),
+                SpatialGrid = littleDudeGrid.AsReadOnly(),
                 DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
                 TransformLookup = transformLookup,
-                CellSize = 1, 
+            }.ScheduleParallel();
+            
+            new LittleDudePushJob 
+            {
+                SpatialGrid = enemyGrid.AsReadOnly(),
+                DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
+                TransformLookup = transformLookup,
             }.ScheduleParallel();
         }
 
@@ -53,9 +63,6 @@ namespace Effects.LittleDudes
         public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
         
         [ReadOnly]
-        public float CellSize;
-
-        [ReadOnly]
         public float DeltaTime;
         
         private const float PUSH_STRENGTH = 3;
@@ -64,7 +71,7 @@ namespace Effects.LittleDudes
         public void Execute(Entity entity, ref FlowFieldComponent flowField, in LocalTransform transform)
         {
             float2 pusherPosition = new float2(transform.Position.x, transform.Position.z);
-            int2 cell = HashGridUtility.GetCell(pusherPosition, CellSize);
+            int2 cell = new int2((int)pusherPosition.x, (int)pusherPosition.y); // Because Cell size is 1
             if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) return;
             do
             {

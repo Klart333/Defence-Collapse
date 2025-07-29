@@ -19,10 +19,9 @@ namespace Effects.LittleDudes
         {
             Entity entity = state.EntityManager.CreateEntity(); 
             state.EntityManager.AddComponentData(entity, new LittleDudeSpatialHashMapSingleton());
-
+            
             littleDudeQuery = SystemAPI.QueryBuilder().WithAll<LittleDudeComponent>().Build();
-            state.RequireForUpdate<LittleDudeComponent>();
-        }
+            state.RequireForUpdate(littleDudeQuery);        }
         
         [BurstCompile]
         public void OnUpdate(ref SystemState state)

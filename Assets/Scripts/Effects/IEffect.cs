@@ -325,14 +325,14 @@ namespace Effects
                 ComponentType[] componentTypes = {
                     typeof(AddComponentInitComponent),
                     typeof(ColliderComponent),
-                    typeof(PositionComponent),
                     typeof(RandomComponent),
                     typeof(DamageComponent),
+                    typeof(LocalTransform),
                     typeof(CritComponent),
                 };
 
                 Entity spawned = entityManager.CreateEntity(componentTypes);
-                entityManager.SetComponentData(spawned, new PositionComponent { Position = pos });
+                entityManager.SetComponentData(spawned, new LocalTransform { Position = pos });
                 entityManager.SetComponentData(spawned, new RandomComponent { Random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 100000)) });
                 entityManager.SetComponentData(spawned, critComponent);
                 entityManager.SetComponentData(spawned, colliderComponent);
@@ -440,7 +440,6 @@ namespace Effects
                     typeof(ArchedMovementComponent),
                     typeof(InitTrailComponent),
                     typeof(ColliderComponent),
-                    typeof(PositionComponent),
                     typeof(LifetimeComponent),
                     typeof(DamageComponent),
                     typeof(RandomComponent),
@@ -452,7 +451,6 @@ namespace Effects
                 Entity spawned = entityManager.CreateEntity(componentTypes);
                 entityManager.SetComponentData(spawned, new SpeedComponent { Speed = 1.0f / lifetime });
                 entityManager.SetComponentData(spawned, new LifetimeComponent { Lifetime = lifetime + 0.1f });
-                entityManager.SetComponentData(spawned, new PositionComponent { Position = pos });
                 entityManager.SetComponentData(spawned, new ColliderComponent { Radius = Radius });
                 entityManager.SetComponentData(spawned, new InitTrailComponent { ScaleFactor = TrailScaleFactor });
                 entityManager.SetComponentData(spawned, new AddComponentInitComponent
@@ -562,14 +560,43 @@ namespace Effects
                 EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
                 ComponentType[] componentTypes = {
-                    typeof(AddComponentInitComponent),
                     typeof(LittleDudeSpawnerDataComponent),
+                    typeof(AddComponentInitComponent),
+                    typeof(ReloadHitsComponent),
+                    typeof(DamageComponent),
+                    typeof(CritComponent)
                 };
 
                 Entity spawned = entityManager.CreateEntity(componentTypes);
+                
+                entityManager.SetComponentData(spawned, new DamageComponent
+                {
+                    HealthDamage = ModifierValue * unit.Stats.HealthDamage.Value,
+                    ArmorDamage = ModifierValue * unit.Stats.ArmorDamage.Value,
+                    ShieldDamage = ModifierValue * unit.Stats.ShieldDamage.Value,
+                    
+                    Key = unit.Key,
+                    TriggerDamageDone = TriggerDamageDone,
+                    LimitedHits = 0,
+                    HasLimitedHits = true,
+                    IsOneShot = false,
+                });
+                
+                entityManager.SetComponentData(spawned, new CritComponent
+                {
+                    CritChance = unit.Stats.CritChance.Value,
+                    CritDamage = unit.Stats.CritMultiplier.Value,
+                });
+                
+                entityManager.SetComponentData(spawned, new ReloadHitsComponent
+                {
+                    MaxHitAmount = 1,
+                    ReloadInterval = 1.0f / unit.Stats.AttackSpeed.Value,
+                });
+                
                 entityManager.SetComponentData(spawned, new LittleDudeSpawnerDataComponent
                 {
-                    Position = pos,
+                    Position = pos.XyZ(0.1f),
                     Amount = (int)ModifierValue
                 });
                 

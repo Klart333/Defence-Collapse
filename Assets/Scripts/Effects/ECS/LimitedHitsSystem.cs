@@ -33,7 +33,7 @@ namespace Effects.ECS
         }
     }
 
-    [BurstCompile]
+    [BurstCompile, WithNone(typeof(ReloadHitsComponent))]
     public partial struct LimitedHitsJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter ECB;

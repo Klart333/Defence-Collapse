@@ -18,9 +18,11 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            collisionQuery = SystemAPI.QueryBuilder().WithAspect<ColliderAspect>().Build();
-            transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+            collisionQuery = SystemAPI.QueryBuilder().WithAll
+                <ColliderComponent, DamageComponent, RandomComponent, CritComponent, LocalTransform>()
+                .Build();
             
+            transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
             state.RequireForUpdate<WaveStateComponent>();
             state.RequireForUpdate<SpatialHashMapSingleton>();        
         }
@@ -82,22 +84,23 @@ namespace Effects.ECS
 
         public EntityCommandBuffer.ParallelWriter ECB;
 
+        // Cellsize = 1
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ColliderAspect colliderAspect) // Cellsize = 1
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in ColliderComponent colliderComponent, ref DamageComponent damageComponent, ref RandomComponent randomComponent, in CritComponent critComponent, in LocalTransform transform) 
         {
-            if (colliderAspect.DamageComponent.ValueRO.LimitedHits <= 0)
+            if (damageComponent.LimitedHits <= 0)
             {
                 return;
             }
 
-            float3 pos = colliderAspect.PositionComponent.ValueRO.Position;
-            float radius = colliderAspect.ColliderComponent.ValueRO.Radius;
+            float3 pos = transform.Position;
+            float radius = colliderComponent.Radius;
             float radiusSq = radius * radius;
 
             int2 centerCell = new int2((int)pos.x, (int)pos.z);
-            if (CollideWithinCell(entity, colliderAspect, centerCell, pos, radiusSq))
+            if (CollideWithinCell(entity, ref randomComponent, critComponent, ref damageComponent, centerCell, pos.xz, radiusSq))
             {
-                if (colliderAspect.DamageComponent.ValueRO.IsOneShot)
+                if (damageComponent.IsOneShot)
                 {
                     ECB.AddComponent<DeathTag>(sortKey, entity);
                 }
@@ -124,17 +127,18 @@ namespace Effects.ECS
                     
                     if (cellDistX * cellDistX + cellDistZ * cellDistZ > radiusSq) continue;
                     
-                    if (CollideWithinCell(entity, colliderAspect, cell, pos, radiusSq)) return;
+                    if (CollideWithinCell(entity, ref randomComponent, critComponent, ref damageComponent, cell, pos.xz, radiusSq)) return;
                 }
             }
 
-            if (colliderAspect.DamageComponent.ValueRO.IsOneShot)
+            if (damageComponent.IsOneShot)
             {
                 ECB.AddComponent<DeathTag>(sortKey, entity);
             }
         }
 
-        private bool CollideWithinCell(Entity entity, ColliderAspect colliderAspect, int2 cell, float3 pos, float radiusSq)
+        [BurstCompile]
+        private bool CollideWithinCell(Entity entity, ref RandomComponent randomComponent, CritComponent critComponent, ref DamageComponent damageComponent, int2 cell, float2 pos, float radiusSq)
         {
             if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) return false;
 
@@ -142,18 +146,18 @@ namespace Effects.ECS
             {
                 if (!TransformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform)) continue;
 
-                float distSq = math.distancesq(pos, enemyTransform.Position);
+                float distSq = math.distancesq(pos, enemyTransform.Position.xz);
 
                 if (distSq > radiusSq) continue;
 
                 // COLLIDE
-                PendingDamageComponent pendingDamage = GetDamage(colliderAspect, entity);
+                PendingDamageComponent pendingDamage = GetDamage(ref randomComponent, critComponent, ref damageComponent, entity);
                 PendingDamageMap.Add(enemy, pendingDamage);
 
-                if (colliderAspect.DamageComponent.ValueRO.HasLimitedHits)
+                if (damageComponent.HasLimitedHits)
                 {
-                    colliderAspect.DamageComponent.ValueRW.LimitedHits--;
-                    if (colliderAspect.DamageComponent.ValueRO.LimitedHits == 0)
+                    damageComponent.LimitedHits--;
+                    if (damageComponent.LimitedHits == 0)
                     {
                         return true;
                     }
@@ -164,18 +168,19 @@ namespace Effects.ECS
             return false;
         }
 
-        private PendingDamageComponent GetDamage(ColliderAspect colliderAspect, Entity sourceEntity)
+        [BurstCompile]
+        private PendingDamageComponent GetDamage(ref RandomComponent randomComponent, CritComponent critComponent, ref DamageComponent damageComponent, Entity sourceEntity)
         {
-            bool isCrit = colliderAspect.RandomComponent.ValueRW.Random.NextFloat() < colliderAspect.CritComponent.ValueRO.CritChance;
-            float critMultiplier = isCrit ? colliderAspect.CritComponent.ValueRO.CritDamage : 1;
+            bool isCrit = randomComponent.Random.NextFloat() < critComponent.CritChance;
+            float critMultiplier = isCrit ? critComponent.CritDamage : 1;
             return new PendingDamageComponent
             {
-                HealthDamage = colliderAspect.DamageComponent.ValueRO.HealthDamage * critMultiplier,
-                ArmorDamage = colliderAspect.DamageComponent.ValueRO.ArmorDamage * critMultiplier,
-                ShieldDamage = colliderAspect.DamageComponent.ValueRO.ShieldDamage * critMultiplier,
+                HealthDamage = damageComponent.HealthDamage * critMultiplier,
+                ArmorDamage = damageComponent.ArmorDamage * critMultiplier,
+                ShieldDamage = damageComponent.ShieldDamage * critMultiplier,
                 IsCrit = isCrit,
-                Key = colliderAspect.DamageComponent.ValueRO.Key,
-                TriggerDamageDone = colliderAspect.DamageComponent.ValueRO.TriggerDamageDone,
+                Key = damageComponent.Key,
+                TriggerDamageDone = damageComponent.TriggerDamageDone,
                 
                 SourceEntity = sourceEntity,
             };

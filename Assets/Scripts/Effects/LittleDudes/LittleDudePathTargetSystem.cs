@@ -17,7 +17,9 @@ namespace Effects.LittleDudes
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<LittleDudePathBlobber>();
-            state.RequireForUpdate<LittleDudeComponent>();
+            
+            EntityQuery littleDudeQuery = SystemAPI.QueryBuilder().WithAll<LittleDudeComponent>().Build();
+            state.RequireForUpdate(littleDudeQuery);        
         }
         
         [BurstCompile]

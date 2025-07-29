@@ -1,3 +1,4 @@
+using Effects.ECS;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -31,6 +32,7 @@ namespace Effects.LittleDudes
                 ECB = ecb.AsParallelWriter(),
                 DudePrefab = prefab,
                 TransformLookup = transformLookup,
+                BaseSeed = UnityEngine.Random.Range(1, 1000000)
             }.ScheduleParallel(state.Dependency);
             
             state.Dependency.Complete();
@@ -54,9 +56,11 @@ namespace Effects.LittleDudes
 
         [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
+
+        public int BaseSeed;
         
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in LittleDudeSpawnerDataComponent data)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in LittleDudeSpawnerDataComponent data, in DamageComponent damageComponent, in CritComponent critComponent, in ReloadHitsComponent reloadHitsComponent)
         {
             for (int i = 0; i < data.Amount; i++)
             {
@@ -65,14 +69,18 @@ namespace Effects.LittleDudes
                 float3 pos = data.Position + new float3(0.1f * i, 0, 0);
                 LocalTransform transform = TransformLookup[DudePrefab];
                 transform.Position = pos;
-                ECB.SetComponent(sortKey, dude,  transform);
+                ECB.SetComponent(sortKey, dude, transform);
+                ECB.SetComponent(sortKey, dude, damageComponent);
+                ECB.SetComponent(sortKey, dude, critComponent);
+                ECB.SetComponent(sortKey, dude, reloadHitsComponent);
+                ECB.SetComponent(sortKey, dude, new RandomComponent{Random = Random.CreateFromIndex((uint)(BaseSeed + i + sortKey))});
                 ECB.SetComponent(sortKey, dude, new LittleDudeComponent
                 {
                     HomePosition = data.Position,
                 });
-             
-                ECB.DestroyEntity(sortKey, entity);
             }
+            
+            ECB.DestroyEntity(sortKey, entity);
         }
     } 
 

@@ -1,3 +1,4 @@
+using Effects.ECS;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
@@ -18,7 +19,9 @@ namespace Effects.LittleDudes
         {
             state.RequireForUpdate<GameSpeedComponent>(); 
             state.RequireForUpdate<LittleDudePathBlobber>();
-            state.RequireForUpdate<LittleDudeComponent>();
+
+            EntityQuery littleDudeQuery = SystemAPI.QueryBuilder().WithAll<LittleDudeComponent>().Build();
+            state.RequireForUpdate(littleDudeQuery);        
         }
 
         [BurstCompile]

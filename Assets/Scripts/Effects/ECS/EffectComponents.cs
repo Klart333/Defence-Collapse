@@ -41,11 +41,6 @@ namespace Effects.ECS
 		public bool IsCrit;
 	}
 
-	public struct PositionComponent : IComponentData
-	{
-		public float3 Position;
-	}
-
 	public struct LifetimeComponent : IComponentData
 	{
 		public float Lifetime;
