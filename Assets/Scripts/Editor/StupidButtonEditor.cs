@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using UnityEditor;
 using UnityEditor.UI;
 
@@ -32,3 +34,4 @@ namespace EditorFolder
         }
     }
 }
+#endif

@@ -61,9 +61,9 @@ MonoBehaviour:
     AfterOpaque: 0
     Source: 1
     NormalSamples: 1
-    Intensity: 0.5
-    DirectLightingStrength: 0.25
-    Radius: 0.25
+    Intensity: 0.6
+    DirectLightingStrength: 0.3
+    Radius: 0.2
     Samples: 0
     BlurQuality: 0
     Falloff: 100
@@ -89,7 +89,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
   m_Name: Inverted Hull Outline
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
     passTag: Inverted Hull Outline
     Event: 300
@@ -239,7 +239,7 @@ MonoBehaviour:
       RenderQueueType: 0
       LayerMask:
         serializedVersion: 2
-        m_Bits: 467
+        m_Bits: 465
       PassNames: []
     overrideMaterial: {fileID: 2100000, guid: ad9026aa8f98b7545a6e06bfb680de63, type: 2}
     overrideMaterialPassIndex: 0

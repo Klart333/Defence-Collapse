@@ -69,6 +69,19 @@ namespace VFX
             Size = -1f;
         }
     }
+    
+    [VFXType(VFXTypeAttribute.Usage.GraphicsBuffer)]
+    public struct VFXLightningTrailData : IKillableVFX
+    {
+        public Vector3 Position;
+        public Vector3 Velocity;
+        public float Size;
+
+        public void Kill()
+        {
+            Size = -1f;
+        }
+    }
 
     public static class VFXReferences
     {
@@ -92,6 +105,10 @@ namespace VFX
         public static VisualEffect   PoisonParticleGraph;
         public static GraphicsBuffer PoisonParticleRequestsBuffer;
         public static GraphicsBuffer PoisonParticlesDatasBuffer;
+
+        public static VisualEffect LightningTrailGraph;
+        public static GraphicsBuffer LightningTrailRequestsBuffer;
+        public static GraphicsBuffer LightningTrailDatasBuffer;
     }
 
     public interface IKillableVFX
@@ -312,6 +329,11 @@ namespace VFX
         public VFXManagerParented<VFXPoisonParticleData> Manager;
     }
 
+    public struct VFXLightningTrailSingleton : IComponentData
+    {
+        public VFXManagerParented<VFXLightningTrailData> Manager;
+    }
+    
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public partial struct VFXSystem : ISystem
     {
@@ -325,11 +347,13 @@ namespace VFX
         private VFXManager<VFXHitSparksRequest> hitSparksManager;
         
         private VFXManagerParented<VFXPoisonParticleData> poisonParticleManager;
+        private VFXManagerParented<VFXLightningTrailData> lightningTrailManager;
         private VFXManagerParented<VFXFireData> fireParticleManager;
         private VFXManagerParented<VFXTrailData> trailManager;
 
         private const int PoisonParticleCapacity = 1000;
         private const int ChainLightningCapacity = 1000;
+        private const int LightningTrailCapacity = 1000;
         private const int FireParticleCapacity = 1000;
         private const int ExplosionsCapacity = 1000;
         private const int HitSparksCapacity = 1000;
@@ -349,6 +373,7 @@ namespace VFX
             explosionsManager = new VFXManager<VFXExplosionRequest>(ExplosionsCapacity, ref VFXReferences.ExplosionsRequestsBuffer);
 
             poisonParticleManager = new VFXManagerParented<VFXPoisonParticleData>(PoisonParticleCapacity, ref VFXReferences.PoisonParticleRequestsBuffer, ref VFXReferences.PoisonParticlesDatasBuffer);
+            lightningTrailManager = new VFXManagerParented<VFXLightningTrailData>(LightningTrailCapacity, ref VFXReferences.LightningTrailRequestsBuffer, ref VFXReferences.LightningTrailDatasBuffer);
             fireParticleManager = new VFXManagerParented<VFXFireData>(FireParticleCapacity, ref VFXReferences.FireParticleRequestsBuffer, ref VFXReferences.FireParticlesDatasBuffer);
             trailManager = new VFXManagerParented<VFXTrailData>(TrailCapacity, ref VFXReferences.TrailRequestsBuffer, ref VFXReferences.TrailDatasBuffer);
 
@@ -377,13 +402,19 @@ namespace VFX
             {
                 Manager = poisonParticleManager,
             });
+            state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new VFXLightningTrailSingleton()
+            {
+                Manager = lightningTrailManager,
+            });
         }
 
         public void OnDestroy(ref SystemState state)
         {
             poisonParticleManager.Dispose(ref VFXReferences.PoisonParticleRequestsBuffer, ref VFXReferences.PoisonParticlesDatasBuffer);
+            lightningTrailManager.Dispose(ref VFXReferences.LightningTrailRequestsBuffer, ref VFXReferences.LightningTrailDatasBuffer);
             fireParticleManager.Dispose(ref VFXReferences.FireParticleRequestsBuffer, ref VFXReferences.FireParticlesDatasBuffer);
             trailManager.Dispose(ref VFXReferences.TrailRequestsBuffer, ref VFXReferences.TrailDatasBuffer);
+            
             chainLightningManager.Dispose(ref VFXReferences.ChainLightningRequestsBuffer);
             explosionsManager.Dispose(ref VFXReferences.ExplosionsRequestsBuffer);
             hitSparksManager.Dispose(ref VFXReferences.HitSparksRequestsBuffer);
@@ -394,6 +425,7 @@ namespace VFX
             // This is required because we must use data in native collections on the main thread, to send it to VFXGraphs
             SystemAPI.QueryBuilder().WithAll<VFXPoisonParticlesSingleton>().Build().CompleteDependency();
             SystemAPI.QueryBuilder().WithAll<VFXChainLightningSingleton>().Build().CompleteDependency();
+            SystemAPI.QueryBuilder().WithAll<VFXLightningTrailSingleton>().Build().CompleteDependency();
             SystemAPI.QueryBuilder().WithAll<VFXFireParticlesSingleton>().Build().CompleteDependency();
             SystemAPI.QueryBuilder().WithAll<VFXExplosionsSingleton>().Build().CompleteDependency();
             SystemAPI.QueryBuilder().WithAll<VFXHitSparksSingleton>().Build().CompleteDependency();
@@ -450,6 +482,16 @@ namespace VFX
                 VFXReferences.PoisonParticleGraph,
                 ref VFXReferences.PoisonParticleRequestsBuffer,
                 ref VFXReferences.PoisonParticlesDatasBuffer,
+                rateRatio,
+                _spawnBatchId,
+                _requestsCountId,
+                _requestsBufferId,
+                _datasBufferId);
+            
+            lightningTrailManager.Update(
+                VFXReferences.LightningTrailGraph,
+                ref VFXReferences.LightningTrailRequestsBuffer,
+                ref VFXReferences.LightningTrailDatasBuffer,
                 rateRatio,
                 _spawnBatchId,
                 _requestsCountId,

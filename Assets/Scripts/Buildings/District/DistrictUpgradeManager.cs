@@ -64,6 +64,7 @@ namespace Buildings.District
             GetInput().Forget();
         }
 
+#if UNITY_EDITOR
         private async UniTaskVoid AddStartingLoot()
         {
             await UniTask.Delay(500);
@@ -72,6 +73,7 @@ namespace Buildings.District
                 lot.AddModifierEditorOnly();
             }
         }
+#endif
 
         private async UniTaskVoid GetInput()
         {

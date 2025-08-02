@@ -20,6 +20,9 @@ namespace VFX
         [SerializeField]
         private VisualEffect chainLightningEffect;
         
+        [SerializeField]
+        private VisualEffect lightningTrailEffect;
+        
         private void Awake()
         {
             VFXReferences.PoisonParticleGraph = poisonParticlesEffect;
@@ -27,6 +30,7 @@ namespace VFX
             VFXReferences.FireParticleGraph = fireParticleEffect;
             VFXReferences.ExplosionsGraph = explosionEffect;
             VFXReferences.TrailGraph = trailEffect;
+            VFXReferences.LightningTrailGraph = lightningTrailEffect;
         }
     }
 }

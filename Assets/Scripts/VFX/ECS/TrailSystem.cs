@@ -8,7 +8,7 @@ using Effects.ECS;
 
 namespace VFX.ECS
 {
-    [BurstCompile]
+    [BurstCompile, UpdateAfter(typeof(HealthSystem))]
     public partial struct TrailSystem : ISystem
     {
         private EntityQuery initTrailQuery;

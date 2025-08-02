@@ -28,6 +28,7 @@ public partial struct PoisonParticleSytem : ISystem
         EntityQueryBuilder builder3 = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<PoisonParticlesComponent>().WithNone<PoisonComponent>();
         stoppedQuery = state.GetEntityQuery(builder3);
             
+        state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<PoisonComponent, PoisonParticlesComponent>().Build());
         state.RequireForUpdate<VFXPoisonParticlesSingleton>();
     }
 

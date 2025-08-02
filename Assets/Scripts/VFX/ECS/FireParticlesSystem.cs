@@ -28,6 +28,7 @@ namespace VFX.ECS
             EntityQueryBuilder builder3 = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<FireParticlesComponent>().WithNone<FireComponent>();
             stoppedBurningQuery = state.GetEntityQuery(builder3);
             
+            state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<FireComponent, FireParticlesComponent>().Build());
             state.RequireForUpdate<VFXFireParticlesSingleton>();
         }
 

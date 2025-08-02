@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using Gameplay;
 using UnityEditor;
 using UnityEditor.Overlays;
@@ -76,3 +77,4 @@ namespace Editor
         }
     }
 }
+#endif
