@@ -398,11 +398,11 @@ namespace VFX
             {
                 Manager = fireParticleManager,
             });
-            state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new VFXPoisonParticlesSingleton()
+            state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new VFXPoisonParticlesSingleton
             {
                 Manager = poisonParticleManager,
             });
-            state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new VFXLightningTrailSingleton()
+            state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new VFXLightningTrailSingleton
             {
                 Manager = lightningTrailManager,
             });

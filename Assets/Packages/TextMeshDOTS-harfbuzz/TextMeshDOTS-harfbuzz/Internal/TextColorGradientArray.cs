@@ -15,7 +15,7 @@ namespace TextMeshDOTS
             textColorGradients.Clear();
             if (textColorGradientEntity == Entity.Null)
                 return;
-            var textColorGradientBuffer = textColorGradientLookup[textColorGradientEntity];
+            DynamicBuffer<TextColorGradient> textColorGradientBuffer = textColorGradientLookup[textColorGradientEntity];
             for (int i = 0, ii= textColorGradientBuffer.Length; i < ii; i++)
                 textColorGradients.Add(textColorGradientBuffer[i]);
         }        

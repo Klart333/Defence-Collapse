@@ -6,6 +6,7 @@ using Unity.Entities;
 using UnityEngine.TextCore;
 using UnityEngine;
 using TextMeshDOTS.HarfBuzz;
+using Font = TextMeshDOTS.HarfBuzz.Font;
 
 namespace TextMeshDOTS.TextProcessing
 {
@@ -25,25 +26,25 @@ namespace TextMeshDOTS.TextProcessing
         public ProfilerMarker marker;
         public void Execute(int i)
         {
-            var atlasData = atlasDataLookup[fontEntity];
-            var nativeFontPointer = nativeFontPointerLookup[fontEntity];
-            var usedGlyphs = usedGlyphsBuffer[fontEntity].Reinterpret<uint>();
-            var usedGlyphRects = usedGlyphRectsBuffer[fontEntity].Reinterpret<GlyphRect>();
+            AtlasData atlasData = atlasDataLookup[fontEntity];
+            NativeFontPointer nativeFontPointer = nativeFontPointerLookup[fontEntity];
+            DynamicBuffer<uint> usedGlyphs = usedGlyphsBuffer[fontEntity].Reinterpret<uint>();
+            DynamicBuffer<GlyphRect> usedGlyphRects = usedGlyphRectsBuffer[fontEntity].Reinterpret<GlyphRect>();
 
-            var glyphBlob = placedGlyphs[i];
+            GlyphBlob glyphBlob = placedGlyphs[i];
             if (glyphBlob.glyphExtents.width == 0 && glyphBlob.glyphExtents.height ==0)
                 return;//glyph has no size, nothing needs to be renderered/added to texture
 
-            var font = nativeFontPointer.font;
-            var maxDeviation = BezierMath.GetMaxDeviation(font.GetScale().x);
-            var paintData = new PaintData(nativeFontPointer.drawFunctions, 256, 4, maxDeviation, Allocator.Temp);
+            Font font = nativeFontPointer.font;
+            float maxDeviation = BezierMath.GetMaxDeviation(font.GetScale().x);
+            PaintData paintData = new PaintData(nativeFontPointer.drawFunctions, 256, 4, maxDeviation, Allocator.Temp);
             marker.Begin();
             font.PaintGlyph(glyphBlob.glyphID, ref paintData, nativeFontPointer.paintFunctions, 0, new ColorARGB(255, 0, 0, 0));
 
-            var glyphIndex = usedGlyphs.Reinterpret<uint>().AsNativeArray().IndexOf(glyphBlob.glyphID);
+            int glyphIndex = usedGlyphs.Reinterpret<uint>().AsNativeArray().IndexOf(glyphBlob.glyphID);
             if (glyphIndex != -1)
             {
-                var atlasRect = usedGlyphRects[glyphIndex]; //render Bitmap into the reserved padded atlas texture  window 
+                GlyphRect atlasRect = usedGlyphRects[glyphIndex]; //render Bitmap into the reserved padded atlas texture  window 
                 if (paintData.imageData.Length > 0)//render PNG and SVG
                 {
                     //not implemented due to managed code
@@ -61,7 +62,7 @@ namespace TextMeshDOTS.TextProcessing
                 }
                 else if (paintData.paintSurface.Length > 0) // render COLR, raw BRGA data stored in sbix, CBDT
                 {
-                    var clipRect = paintData.clipRect;
+                    BBox clipRect = paintData.clipRect;
                     //var glyphExtents = glyphBlob.glyphExtents;
                     //if (glyphExtents.width != clipRect.intWidth || glyphExtents.height != clipRect.intHeight)
                     //    Debug.LogWarning($"Dimensions of glyphRect reserved in atlas ({glyphExtents.width},{glyphExtents.height}) and painted GlyphRect ({clipRect.intWidth},{clipRect.intHeight}) do not match");

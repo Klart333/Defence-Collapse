@@ -5,6 +5,7 @@ using Unity.Entities;
 using UnityEngine.TextCore;
 using TextMeshDOTS.HarfBuzz.Bitmap;
 using UnityEngine;
+using Font = TextMeshDOTS.HarfBuzz.Font;
 
 
 namespace TextMeshDOTS.TextProcessing
@@ -27,29 +28,29 @@ namespace TextMeshDOTS.TextProcessing
 
         public void Execute()
         {
-            var atlasData = atlasDataLookup[fontEntity];
-            var nativeFontPointer = nativeFontPointerLookup[fontEntity];
-            var missingGlyphs = missingGlyphsBuffer[fontEntity].Reinterpret<uint>();
-            var usedGlyphs = usedGlyphsBuffer[fontEntity].Reinterpret<uint>();
-            var usedGlyphRects = usedGlyphRectsBuffer[fontEntity].Reinterpret<GlyphRect>();
-            var freeGlyphRects = freeGlyphRectsBuffer[fontEntity].Reinterpret<GlyphRect>();
+            AtlasData atlasData = atlasDataLookup[fontEntity];
+            NativeFontPointer nativeFontPointer = nativeFontPointerLookup[fontEntity];
+            DynamicBuffer<uint> missingGlyphs = missingGlyphsBuffer[fontEntity].Reinterpret<uint>();
+            DynamicBuffer<uint> usedGlyphs = usedGlyphsBuffer[fontEntity].Reinterpret<uint>();
+            DynamicBuffer<GlyphRect> usedGlyphRects = usedGlyphRectsBuffer[fontEntity].Reinterpret<GlyphRect>();
+            DynamicBuffer<GlyphRect> freeGlyphRects = freeGlyphRectsBuffer[fontEntity].Reinterpret<GlyphRect>();
 
-            var font = nativeFontPointer.font;
-            var glyphsToPlace = new NativeList<GlyphBlob>(256, Allocator.Temp);
+            Font font = nativeFontPointer.font;
+            NativeList<GlyphBlob> glyphsToPlace = new NativeList<GlyphBlob>(256, Allocator.Temp);
 
             for (int i = 0, ii = missingGlyphs.Length; i < ii; i++)
             {
-                var glyphID = missingGlyphs[i];
+                uint glyphID = missingGlyphs[i];
                 //GetGlyphExtends is a very costly function. For a COLR glyph, rect is determined by parsing all vertices of maybe 20 sub-glyphs
                 //calling it in parallel makes things worse (mutex lock?)
                 font.GetGlyphExtents(glyphID, out GlyphExtents extends);                
-                var hbGlyph = new GlyphBlob { glyphID = glyphID, glyphExtents = extends};
+                GlyphBlob hbGlyph = new GlyphBlob { glyphID = glyphID, glyphExtents = extends};
                 glyphsToPlace.Add(hbGlyph);
             };
-            var success = NativeAtlas.AddGlyphs(atlasData.padding, glyphsToPlace, placedGlyphs, usedGlyphs, usedGlyphRects, freeGlyphRects);
+            bool success = NativeAtlas.AddGlyphs(atlasData.padding, glyphsToPlace, placedGlyphs, usedGlyphs, usedGlyphRects, freeGlyphRects);
             if (!success)
             {
-                var fontAssetMetaData = fontAssetMetadataLookup[fontEntity];
+                FontAssetMetadata fontAssetMetaData = fontAssetMetadataLookup[fontEntity];
                 Debug.Log($"{glyphsToPlace.Length} glyphs could not be placed for font {fontAssetMetaData.family} {fontAssetMetaData.subfamily} ");
                 //for (int i = 0, ii = usedGlyphs.Length; i < ii; i++)
                 //{

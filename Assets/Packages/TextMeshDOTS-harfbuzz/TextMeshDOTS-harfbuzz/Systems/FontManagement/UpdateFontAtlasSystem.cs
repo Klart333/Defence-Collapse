@@ -41,8 +41,8 @@ namespace TextMeshDOTS.TextProcessing
             if(fontEntityQ.IsEmpty) 
                 return;
             
-            var fontsRequiringUpdate = new NativeList<Entity>(16, Allocator.TempJob);
-            foreach (var (fontAssetRef, fontAssetMetadata, missingGlyphs, entity) in SystemAPI.Query<FontAssetRef, FontAssetMetadata, DynamicBuffer<MissingGlyphs>>()
+            NativeList<Entity> fontsRequiringUpdate = new NativeList<Entity>(16, Allocator.TempJob);
+            foreach ((DynamicBuffer<MissingGlyphs> missingGlyphs, Entity entity) in SystemAPI.Query<DynamicBuffer<MissingGlyphs>>()
                 .WithAll<FontAssetRef>()
                 .WithAll<FontAssetMetadata>()
                 .WithAll<AtlasData>()
@@ -62,20 +62,20 @@ namespace TextMeshDOTS.TextProcessing
             }
 
             state.Dependency.Complete();
-            var glyphsToPlace = new NativeList<GlyphBlob>(1024, Allocator.TempJob);
-            var placedGlyphs = new NativeList<GlyphBlob> (1024, Allocator.TempJob);
-            var fontAssetMetadataLookup = SystemAPI.GetComponentLookup<FontAssetMetadata>(true);
-            var atlasDataLookup = SystemAPI.GetComponentLookup<AtlasData>(true);
-            var missingGlyphsLookup = SystemAPI.GetBufferLookup<MissingGlyphs>(false);
-            var usedGlyphsLookup = SystemAPI.GetBufferLookup<UsedGlyphs>(false);
-            var usedGlyphRectsLookup = SystemAPI.GetBufferLookup<UsedGlyphRects>(false);
-            var freeGlyphRectsLookup = SystemAPI.GetBufferLookup<FreeGlyphRects>(false);
-            var nativeFontPointerLookup = SystemAPI.GetComponentLookup<NativeFontPointer>(true);
-            var dynamicFontAssetsLookup = SystemAPI.GetComponentLookup<DynamicFontAsset>(false);
+            NativeList<GlyphBlob> glyphsToPlace = new NativeList<GlyphBlob>(1024, Allocator.TempJob);
+            NativeList<GlyphBlob> placedGlyphs = new NativeList<GlyphBlob> (1024, Allocator.TempJob);
+            ComponentLookup<FontAssetMetadata> fontAssetMetadataLookup = SystemAPI.GetComponentLookup<FontAssetMetadata>(true);
+            ComponentLookup<AtlasData> atlasDataLookup = SystemAPI.GetComponentLookup<AtlasData>(true);
+            BufferLookup<MissingGlyphs> missingGlyphsLookup = SystemAPI.GetBufferLookup<MissingGlyphs>(false);
+            BufferLookup<UsedGlyphs> usedGlyphsLookup = SystemAPI.GetBufferLookup<UsedGlyphs>(false);
+            BufferLookup<UsedGlyphRects> usedGlyphRectsLookup = SystemAPI.GetBufferLookup<UsedGlyphRects>(false);
+            BufferLookup<FreeGlyphRects> freeGlyphRectsLookup = SystemAPI.GetBufferLookup<FreeGlyphRects>(false);
+            ComponentLookup<NativeFontPointer> nativeFontPointerLookup = SystemAPI.GetComponentLookup<NativeFontPointer>(true);
+            ComponentLookup<DynamicFontAsset> dynamicFontAssetsLookup = SystemAPI.GetComponentLookup<DynamicFontAsset>(false);
 
             for (int i = 0, ii = fontsRequiringUpdate.Length; i < ii; i++)
             {
-                var fontEntity = fontsRequiringUpdate[i];
+                Entity fontEntity = fontsRequiringUpdate[i];
 
                 ////for unknown reasons, parallel processing backfires: each thread takes as long as a single job thread) 
                 //var missingGlyphsBuffer = missingGlyphsLookup[fontEntity].Reinterpret<uint>();
@@ -89,7 +89,7 @@ namespace TextMeshDOTS.TextProcessing
                 //};
                 //state.Dependency = getGlyphExtentsJob.Schedule(missingGlyphsBuffer.Length, 1, state.Dependency);
 
-                var getGlyphRectsJob = new GetGlyphRectsJob()
+                GetGlyphRectsJob getGlyphRectsJob = new GetGlyphRectsJob()
                 {
                     placedGlyphs = placedGlyphs,
 
@@ -105,43 +105,48 @@ namespace TextMeshDOTS.TextProcessing
                 };
                 state.Dependency = getGlyphRectsJob.Schedule(state.Dependency);
 
-                var dynamicFontAsset = dynamicFontAssetsLookup[fontEntity];
-                if (dynamicFontAsset.textureType == TextureType.SDF)
+                DynamicFontAsset dynamicFontAsset = dynamicFontAssetsLookup[fontEntity];
+                switch (dynamicFontAsset.textureType)
                 {
-                    var updateAtlasTextureJob = new UpdateSDFAtlasTextureJob()
+                    case TextureType.SDF:
                     {
-                        //this managed call to texture object is reason why we cannot BURST compile the update method of this system
-                        textureData = dynamicFontAsset.texture.Value.GetRawTextureData<byte>(), 
+                        UpdateSDFAtlasTextureJob updateAtlasTextureJob = new UpdateSDFAtlasTextureJob()
+                        {
+                            //this managed call to texture object is reason why we cannot BURST compile the update method of this system
+                            textureData = dynamicFontAsset.texture.Value.GetRawTextureData<byte>(), 
 
-                        fontEntity = fontEntity,
-                        placedGlyphs = placedGlyphs,
-                        atlasDataLookup = atlasDataLookup,
-                        nativeFontPointerLookup = nativeFontPointerLookup,
-                        usedGlyphsBuffer = usedGlyphsLookup,
-                        usedGlyphRectsBuffer = usedGlyphRectsLookup,
-                        marker = marker2,
-                    };
-                    state.Dependency = updateAtlasTextureJob.Schedule(placedGlyphs, 1, state.Dependency);
-                }
-                else if (dynamicFontAsset.textureType == TextureType.ARGB)
-                {
-                    var updateAtlasTextureJob = new UpdateBitmapAtlasTextureJob()
+                            fontEntity = fontEntity,
+                            placedGlyphs = placedGlyphs,
+                            atlasDataLookup = atlasDataLookup,
+                            nativeFontPointerLookup = nativeFontPointerLookup,
+                            usedGlyphsBuffer = usedGlyphsLookup,
+                            usedGlyphRectsBuffer = usedGlyphRectsLookup,
+                            marker = marker2,
+                        };
+                        state.Dependency = updateAtlasTextureJob.Schedule(placedGlyphs, 1, state.Dependency);
+                        break;
+                    }
+                    case TextureType.ARGB:
                     {
-                        //this managed call to texture object is reason why we cannot BURST compile the update method of this system
-                        textureData = dynamicFontAsset.texture.Value.GetRawTextureData<ColorARGB>(),
+                        UpdateBitmapAtlasTextureJob updateAtlasTextureJob = new UpdateBitmapAtlasTextureJob()
+                        {
+                            //this managed call to texture object is reason why we cannot BURST compile the update method of this system
+                            textureData = dynamicFontAsset.texture.Value.GetRawTextureData<ColorARGB>(),
 
-                        fontEntity = fontEntity,
-                        placedGlyphs = placedGlyphs,
-                        atlasDataLookup = atlasDataLookup,
-                        nativeFontPointerLookup = nativeFontPointerLookup,
-                        usedGlyphsBuffer = usedGlyphsLookup,
-                        usedGlyphRectsBuffer = usedGlyphRectsLookup,
-                        marker = marker,
-                    };
-                    state.Dependency = updateAtlasTextureJob.Schedule(placedGlyphs, 1, state.Dependency);
+                            fontEntity = fontEntity,
+                            placedGlyphs = placedGlyphs,
+                            atlasDataLookup = atlasDataLookup,
+                            nativeFontPointerLookup = nativeFontPointerLookup,
+                            usedGlyphsBuffer = usedGlyphsLookup,
+                            usedGlyphRectsBuffer = usedGlyphRectsLookup,
+                            marker = marker,
+                        };
+                        state.Dependency = updateAtlasTextureJob.Schedule(placedGlyphs, 1, state.Dependency);
+                        break;
+                    }
                 }
 
-                var updateNativeFontJob = new UpdateNativeFontJob()
+                UpdateNativeFontJob updateNativeFontJob = new UpdateNativeFontJob()
                 {
                     dynamicFontAssetLookup = dynamicFontAssetsLookup,
 
@@ -157,7 +162,7 @@ namespace TextMeshDOTS.TextProcessing
                 dynamicFontAsset.texture.Value.Apply();
                 placedGlyphs.Clear();
             }
-
+            
             glyphsToPlace.Dispose(state.Dependency);
             placedGlyphs.Dispose(state.Dependency);            
             fontsRequiringUpdate.Dispose(state.Dependency);

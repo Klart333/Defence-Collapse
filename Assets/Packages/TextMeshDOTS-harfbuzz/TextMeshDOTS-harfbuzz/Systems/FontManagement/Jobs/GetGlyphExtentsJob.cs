@@ -1,3 +1,4 @@
+using TextMeshDOTS.HarfBuzz;
 using Unity.Burst;
 using Unity.Jobs;
 using Unity.Collections;
@@ -17,10 +18,10 @@ namespace TextMeshDOTS.TextProcessing
 
         public void Execute(int index)
         {            
-            var nativeFontPointer = nativeFontPointerLookup[fontEntity];
-            var font = nativeFontPointer.font;
+            NativeFontPointer nativeFontPointer = nativeFontPointerLookup[fontEntity];
+            Font font = nativeFontPointer.font;
             
-            var glyphID = missingGlyphsBuffer[index];
+            uint glyphID = missingGlyphsBuffer[index];
             font.GetGlyphExtents(glyphID, out GlyphExtents glyphExtent);
             glyphExtents.AddNoResize(glyphExtent);           
         }

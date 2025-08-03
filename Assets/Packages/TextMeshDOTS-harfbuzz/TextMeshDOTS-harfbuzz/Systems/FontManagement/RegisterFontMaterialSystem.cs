@@ -29,7 +29,7 @@ namespace TextMeshDOTS.TextProcessing
             hybridRenderer = World.GetExistingSystemManaged<EntitiesGraphicsSystem>();
             backendMesh = Resources.Load<Mesh>(TextBackendBakingUtility.kTextBackendMeshResource);
             backendMeshID = BatchMeshID.Null;
-            var srpType = GraphicsSettings.defaultRenderPipeline.GetType().ToString();
+            string srpType = GraphicsSettings.defaultRenderPipeline.GetType().ToString();
             if (srpType.Contains("HDRenderPipelineAsset"))
             {
                 //Debug.Log("High Definition Render Pipeline (HDRP) is being used.");
@@ -84,20 +84,20 @@ namespace TextMeshDOTS.TextProcessing
             if (backendMeshID == BatchMeshID.Null)
                 backendMeshID = hybridRenderer.RegisterMesh(backendMesh);
 
-            var fontStateEntity = fontstateQ.GetSingletonEntity();
-            var changedFontEntities = changedFontEntitiesQ.ToEntityArray(WorldUpdateAllocator);
-            var dynamicFontAssetLookup = SystemAPI.GetComponentLookup<DynamicFontAsset>(false);
-            var fontAssetRefLookup = SystemAPI.GetComponentLookup<FontAssetRef>(false);
+            Entity fontStateEntity = fontstateQ.GetSingletonEntity();
+            NativeArray<Entity> changedFontEntities = changedFontEntitiesQ.ToEntityArray(WorldUpdateAllocator);
+            ComponentLookup<DynamicFontAsset> dynamicFontAssetLookup = SystemAPI.GetComponentLookup<DynamicFontAsset>(false);
+            ComponentLookup<FontAssetRef> fontAssetRefLookup = SystemAPI.GetComponentLookup<FontAssetRef>(false);
 
-            foreach (var entity in changedFontEntities)
+            foreach (Entity entity in changedFontEntities)
             {
-                var dynamicFontAsset = dynamicFontAssetLookup[entity];
-                var mainTexture = dynamicFontAsset.texture.Value;
+                DynamicFontAsset dynamicFontAsset = dynamicFontAssetLookup[entity];
+                Texture2D mainTexture = dynamicFontAsset.texture.Value;
                 mainTexture.Apply();
 
                 if (dynamicFontAsset.textureType == TextureType.SDF)
                 {
-                    var material = Object.Instantiate(sdfMaterial);
+                    Material material = Object.Instantiate(sdfMaterial);
                     material.mainTexture = dynamicFontAsset.texture;
                     dynamicFontAsset.debugMaterial = material;
                     dynamicFontAsset.fontMaterialID = hybridRenderer.RegisterMaterial(material);
@@ -105,7 +105,7 @@ namespace TextMeshDOTS.TextProcessing
                 }
                 else
                 {
-                    var material = Object.Instantiate(colrMaterial);
+                    Material material = Object.Instantiate(colrMaterial);
                     material.mainTexture = dynamicFontAsset.texture;
                     dynamicFontAsset.debugMaterial = material;
                     dynamicFontAsset.fontMaterialID = hybridRenderer.RegisterMaterial(material);
@@ -114,16 +114,16 @@ namespace TextMeshDOTS.TextProcessing
                 dynamicFontAssetLookup[entity] = dynamicFontAsset;
             }
 
-            var allFontEntities = fontEntitiesQ.ToEntityArray(WorldUpdateAllocator);
-            var fontEntityLookup = new NativeHashMap<FontAssetRef, Entity>(allFontEntities.Length, WorldUpdateAllocator);
+            NativeArray<Entity> allFontEntities = fontEntitiesQ.ToEntityArray(WorldUpdateAllocator);
+            NativeHashMap<FontAssetRef, Entity> fontEntityLookup = new NativeHashMap<FontAssetRef, Entity>(allFontEntities.Length, WorldUpdateAllocator);
             for(int i = 0, ii = allFontEntities.Length; i < ii; i++)
             {
-                var entity = allFontEntities[i];
-                var fontAssetRef = fontAssetRefLookup[entity];
+                Entity entity = allFontEntities[i];
+                FontAssetRef fontAssetRef = fontAssetRefLookup[entity];
                 fontEntityLookup.Add(fontAssetRef, entity);
             }
 
-            var updateMaterialMeshInfoJob = new EnableAndValidateMaterialMeshInfoJob
+            EnableAndValidateMaterialMeshInfoJob updateMaterialMeshInfoJob = new EnableAndValidateMaterialMeshInfoJob
             {
                 fontEntityLookup = fontEntityLookup,
                 dynamicFontAssetLookup = dynamicFontAssetLookup,

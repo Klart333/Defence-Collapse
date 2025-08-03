@@ -9,13 +9,13 @@ namespace TextMeshDOTS
         public void Add(in T item) => m_buffer.Add(in item);
         public T Pop()
         {
-            var result = m_buffer[^1];
+            T result = m_buffer[^1];
             m_buffer.RemoveAt(m_buffer.Length - 1);
             return result;
         }
         public T Peek()
         {
-            var result = m_buffer[^1];
+            T result = m_buffer[^1];
             return result;
         }
         /// <summary> Function to pop stack, and return the new resulting last item. Will not pop root.</summary>

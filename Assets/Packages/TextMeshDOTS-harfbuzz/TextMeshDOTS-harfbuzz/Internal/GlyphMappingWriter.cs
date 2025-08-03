@@ -52,7 +52,7 @@ namespace TextMeshDOTS
 
             if (m_startedLine)
             {
-                ref var back = ref m_glyphStartAndCountByLine.ElementAt(m_glyphStartAndCountByLine.Length - 1);
+                ref int2 back = ref m_glyphStartAndCountByLine.ElementAt(m_glyphStartAndCountByLine.Length - 1);
                 back.y       = glyphIndex - back.x;
             }
             m_glyphStartAndCountByLine.Add(new int2(glyphIndex, 0));
@@ -66,7 +66,7 @@ namespace TextMeshDOTS
 
             if (m_startedWord)
             {
-                ref var back = ref m_glyphStartAndCountByWord.ElementAt(m_glyphStartAndCountByWord.Length - 1);
+                ref int2 back = ref m_glyphStartAndCountByWord.ElementAt(m_glyphStartAndCountByWord.Length - 1);
                 back.y       = glyphIndex - back.x;
             }
             m_glyphStartAndCountByWord.Add(new int2(glyphIndex, 0));
@@ -81,21 +81,21 @@ namespace TextMeshDOTS
             while (m_charNoTagsCount < charIndex)
                 AddCharNoTags(m_charNoTagsCount, false);
 
-            var bitIndex = m_charNoTagsCount % 32;
+            int bitIndex = m_charNoTagsCount % 32;
             if (bitIndex == 0)
             {
                 if (m_charNoTagsCount == 0)
                     m_glyphIndexByCharNoTags.Add(int2.zero);
                 else
                 {
-                    var previous = m_glyphIndexByCharNoTags[m_glyphIndexByCharNoTags.Length - 1];
+                    int2 previous = m_glyphIndexByCharNoTags[m_glyphIndexByCharNoTags.Length - 1];
                     m_glyphIndexByCharNoTags.Add(new int2(previous.x + math.countbits(previous.y), 0));
                 }
             }
 
             if (hasGlyph)
             {
-                ref var back  = ref m_glyphIndexByCharNoTags.ElementAt(m_glyphIndexByCharNoTags.Length - 1);
+                ref int2 back  = ref m_glyphIndexByCharNoTags.ElementAt(m_glyphIndexByCharNoTags.Length - 1);
                 back.y       |= (1 << bitIndex);
             }
             m_charNoTagsCount++;
@@ -109,21 +109,21 @@ namespace TextMeshDOTS
             while (m_charWithTagsCount < charIndex)
                 AddCharWithTags(m_charWithTagsCount, false);
 
-            var bitIndex = m_charWithTagsCount % 32;
+            int bitIndex = m_charWithTagsCount % 32;
             if (bitIndex == 0)
             {
                 if (m_charWithTagsCount == 0)
                     m_glyphIndexByCharWithTags.Add(int2.zero);
                 else
                 {
-                    var previous = m_glyphIndexByCharWithTags[m_glyphIndexByCharWithTags.Length - 1];
+                    int2 previous = m_glyphIndexByCharWithTags[m_glyphIndexByCharWithTags.Length - 1];
                     m_glyphIndexByCharWithTags.Add(new int2(previous.x + math.countbits(previous.y), 0));
                 }
             }
 
             if (hasGlyph)
             {
-                ref var back  = ref m_glyphIndexByCharWithTags.ElementAt(m_glyphIndexByCharWithTags.Length - 1);
+                ref int2 back  = ref m_glyphIndexByCharWithTags.ElementAt(m_glyphIndexByCharWithTags.Length - 1);
                 back.y       |= (1 << bitIndex);
             }
             m_charWithTagsCount++;
@@ -141,21 +141,21 @@ namespace TextMeshDOTS
             hasGlyphs.x     = hasGlyph;
             for (int i = 0; i < byteCount; i++)
             {
-                var bitIndex = m_byteCount % 32;
+                int bitIndex = m_byteCount % 32;
                 if (bitIndex == 0)
                 {
                     if (m_byteCount == 0)
                         m_glyphIndexByByte.Add(int2.zero);
                     else
                     {
-                        var previous = m_glyphIndexByByte[m_glyphIndexByByte.Length - 1];
+                        int2 previous = m_glyphIndexByByte[m_glyphIndexByByte.Length - 1];
                         m_glyphIndexByByte.Add(new int2(previous.x + math.countbits(previous.y), 0));
                     }
                 }
 
                 if (hasGlyphs[i])
                 {
-                    ref var back  = ref m_glyphIndexByByte.ElementAt(m_glyphIndexByByte.Length - 1);
+                    ref int2 back  = ref m_glyphIndexByByte.ElementAt(m_glyphIndexByByte.Length - 1);
                     back.y       |= (1 << bitIndex);
                 }
                 m_byteCount++;
@@ -167,12 +167,12 @@ namespace TextMeshDOTS
             // Finish lines and words
             if (m_startedLine)
             {
-                ref var back = ref m_glyphStartAndCountByLine.ElementAt(m_glyphStartAndCountByLine.Length - 1);
+                ref int2 back = ref m_glyphStartAndCountByLine.ElementAt(m_glyphStartAndCountByLine.Length - 1);
                 back.y       = glyphCount - back.x;
             }
             if (m_startedWord)
             {
-                ref var back = ref m_glyphStartAndCountByWord.ElementAt(m_glyphStartAndCountByWord.Length - 1);
+                ref int2 back = ref m_glyphStartAndCountByWord.ElementAt(m_glyphStartAndCountByWord.Length - 1);
                 back.y       = glyphCount - back.x;
             }
 
@@ -200,15 +200,15 @@ namespace TextMeshDOTS
             mappingsBuffer.Add(new GlyphMappingElement { element  = new int2(elementsRequired, m_glyphIndexByByte.Length) });
             elementsRequired                                     += m_glyphIndexByByte.Length;
 
-            foreach (var element in m_glyphStartAndCountByLine)
+            foreach (int2 element in m_glyphStartAndCountByLine)
                 mappingsBuffer.Add(new GlyphMappingElement { element = element });
-            foreach (var element in m_glyphStartAndCountByWord)
+            foreach (int2 element in m_glyphStartAndCountByWord)
                 mappingsBuffer.Add(new GlyphMappingElement { element = element });
-            foreach (var element in m_glyphIndexByCharNoTags)
+            foreach (int2 element in m_glyphIndexByCharNoTags)
                 mappingsBuffer.Add(new GlyphMappingElement { element = element });
-            foreach (var element in m_glyphIndexByCharWithTags)
+            foreach (int2 element in m_glyphIndexByCharWithTags)
                 mappingsBuffer.Add(new GlyphMappingElement { element = element });
-            foreach (var element in m_glyphIndexByByte)
+            foreach (int2 element in m_glyphIndexByByte)
                 mappingsBuffer.Add(new GlyphMappingElement { element = element });
         }
     }

@@ -7,7 +7,7 @@ namespace TextMeshDOTS
     {       
         public static int GetHashCodeCaseInSensitive(FixedString128Bytes text)
         {
-            var s = text.GetEnumerator();
+            FixedString128Bytes.Enumerator s = text.GetEnumerator();
             int num = 0;
             while (s.MoveNext())
             {
@@ -17,7 +17,7 @@ namespace TextMeshDOTS
         }
         public static int GetValueHash(FixedString128Bytes text)
         {
-            var s = text.GetEnumerator();
+            FixedString128Bytes.Enumerator s = text.GetEnumerator();
             int num = 0;
             while (s.MoveNext())
             {

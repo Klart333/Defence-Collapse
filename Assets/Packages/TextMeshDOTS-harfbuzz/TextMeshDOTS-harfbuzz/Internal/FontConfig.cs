@@ -36,13 +36,13 @@ namespace TextMeshDOTS
 
             m_fontMaterialIndex = 0;
 
-            var desiredFontAssetRef = new FontAssetRef(m_fontFamilyHash, m_fontWeight, m_fontWidth, m_fontStyles);
-            var fontIndex = fontAssetArray.GetFontIndex(desiredFontAssetRef);
+            FontAssetRef desiredFontAssetRef = new FontAssetRef(m_fontFamilyHash, m_fontWeight, m_fontWidth, m_fontStyles);
+            int fontIndex = fontAssetArray.GetFontIndex(desiredFontAssetRef);
             m_fontMaterialIndex = fontIndex == -1 ? 0 : fontIndex;
         }        
         public int GetFontIndex(ref FontAssetArray fontAssetArray)
         {
-            var desiredFontAssetRef = new FontAssetRef
+            FontAssetRef desiredFontAssetRef = new FontAssetRef
             {
                 familyHash = m_fontFamilyHash,
                 weight = m_fontWeight,

@@ -14,11 +14,11 @@ namespace TextmeshDOTS
         [ReadOnly] public ComponentLookup<DynamicFontAsset> dynamicFontAssetLookup;
         public void Execute(in FontBlobReference fontBlobReference, EnabledRefRW<MaterialMeshInfo> textRendererState, ref MaterialMeshInfo textRendererMaterialMeshInfo)
         {
-            var fontAssetRef = fontBlobReference.value.Value.fontAssetRef;
-            var foundFont = fontEntityLookup.TryGetValue(fontAssetRef, out Entity fontEntity);
+            FontAssetRef fontAssetRef = fontBlobReference.value.Value.fontAssetRef;
+            bool foundFont = fontEntityLookup.TryGetValue(fontAssetRef, out Entity fontEntity);
             if (foundFont)
             {
-                var dynamicFontAsset = dynamicFontAssetLookup[fontEntity];
+                DynamicFontAsset dynamicFontAsset = dynamicFontAssetLookup[fontEntity];
                 if (textRendererState.ValueRO == false)  //if rendering is not enabled, then enable it
                 {
                     textRendererState.ValueRW = true;

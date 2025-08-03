@@ -24,8 +24,8 @@ namespace TextMeshDOTS.RichText
             int startByteIndex = enumerator.NextRuneByteIndex;
             ParserState tagIndentifierFlag = ParserState.Zero;
 
-            var tag = new XMLTag();
-            ref var tagValue = ref tag.value;
+            XMLTag tag = new XMLTag();
+            ref TagValue tagValue = ref tag.value;
             int nameHashCode = default;
             int valueHashCode = default;
 

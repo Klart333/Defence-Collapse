@@ -11,7 +11,7 @@ namespace TextMeshDOTS
         public readonly FontAssetRef this[int index] => fontAssetRefs[index];
         public void Initialize(BlobAssetReference<FontBlob> singleFont)
         {
-            var fontAssetRef = singleFont.Value.fontAssetRef;
+            FontAssetRef fontAssetRef = singleFont.Value.fontAssetRef;
             //Debug.Log($"Initialize {fontAssetRef.familyHash} italic? {fontAssetRef.isItalic} width? {fontAssetRef.width} weight? {fontAssetRef.weight}");
             fontAssetRefs.Clear();
             fontAssetRefs.Add(fontAssetRef);
@@ -23,9 +23,9 @@ namespace TextMeshDOTS
             Initialize(fontBlobReferenceLookup[rootFontMaterialEntity].value);
             for (int i = 0, ii= additionalFontMaterialEntities.Length; i <ii ; i++)
             {
-                if (fontBlobReferenceLookup.TryGetComponent(additionalFontMaterialEntities[i].entity, out var blobRef))
+                if (fontBlobReferenceLookup.TryGetComponent(additionalFontMaterialEntities[i].entity, out FontBlobReference blobRef))
                 {
-                    var fontAssetRef = blobRef.value.Value.fontAssetRef;
+                    FontAssetRef fontAssetRef = blobRef.value.Value.fontAssetRef;
                     //Debug.Log($"Initialize {fontAssetRef.familyHash} italic? {fontAssetRef.isItalic} width? {fontAssetRef.width} weight? {fontAssetRef.weight}");
                     fontAssetRefs.Add(fontAssetRef);
                 }

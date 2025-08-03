@@ -304,10 +304,10 @@ namespace TextMeshDOTS
                 case TagType.Gradient:
                     if (!tag.isClosing)
                     {                        
-                        var gradientNameHash = tag.value.valueHash;
+                        int gradientNameHash = tag.value.valueHash;
                         for (int i = 0, ii = textColorGradients.Length; i < ii; i++)
                         {
-                            var gradient = textColorGradients[i];
+                            TextColorGradient gradient = textColorGradients[i];
                             if (gradient.nameHash == gradientNameHash)
                             {
                                 m_gradient = gradient;
@@ -487,7 +487,7 @@ namespace TextMeshDOTS
                 case TagType.VOffset:
                     if (!tag.isClosing)
                     {
-                        var tmp = m_baselineOffset;
+                        float tmp = m_baselineOffset;
                         switch (tag.value.unit)
                         {
                             case TagUnitType.Pixels:
@@ -505,7 +505,7 @@ namespace TextMeshDOTS
                     }
                     else
                     {
-                        var tmp = m_baselineOffset;                        
+                        float tmp = m_baselineOffset;                        
                         m_baselineOffset = m_baselineOffsetStack.RemoveExceptRoot();
                         //Debug.Log($"revert from {tmp} to {m_baselineOffset}");
                     }

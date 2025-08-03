@@ -39,7 +39,7 @@ namespace TextMeshDOTS
         public static bool IsWhiteSpace(this Unicode.Rune rune)
         {
             // https://en.wikipedia.org/wiki/Whitespace_character#Unicode
-            var value = rune.value;
+            int value = rune.value;
             if (IsLatin1(rune))
             {
                 return value == ' '

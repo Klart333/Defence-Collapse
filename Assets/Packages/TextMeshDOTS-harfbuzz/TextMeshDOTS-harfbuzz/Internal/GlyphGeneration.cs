@@ -7,6 +7,7 @@ using TextMeshDOTS.HarfBuzz;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 using System.Globalization;
+using UnityEngine.TextCore;
 
 
 namespace TextMeshDOTS
@@ -32,11 +33,11 @@ namespace TextMeshDOTS
                 return;
             renderGlyphs.Capacity = glyphOTFBuffer.Length; //2x speedup compared to allocation of individual items
 
-            var calliString = new CalliString(calliBytesBuffer);
-            var characters = calliString.GetEnumerator();
+            CalliString calliString = new CalliString(calliBytesBuffer);
+            CalliString.Enumerator characters = calliString.GetEnumerator();
 
-            var fontAssetRefs = fontAssetArray.fontAssetRefs;
-            var layoutConfig = new LayoutConfig(in textBaseConfiguration);
+            FixedList4096Bytes<FontAssetRef> fontAssetRefs = fontAssetArray.fontAssetRefs;
+            LayoutConfig layoutConfig = new LayoutConfig(in textBaseConfiguration);
 
             XMLTag currentTag=default;
             int tagsCounter = 0;
@@ -64,14 +65,14 @@ namespace TextMeshDOTS
 
 
             Entity currentFontEntity = glyphOTFBuffer[0].fontEntity;
-            var dynamicFontBlobReference = dynamicFontAssetsLookup[currentFontEntity].blob;
+            BlobAssetReference<DynamicFontBlob> dynamicFontBlobReference = dynamicFontAssetsLookup[currentFontEntity].blob;
             if (!dynamicFontBlobReference.IsCreated)
             {
                 Debug.LogError($"Unexpected: dynamicFontBlob is missing");
                 return;
             }
-            ref var currentFont = ref dynamicFontBlobReference.Value;
-            var currentFontAssetRef = fontAssetRefLookup[currentFontEntity];
+            ref DynamicFontBlob currentFont = ref dynamicFontBlobReference.Value;
+            FontAssetRef currentFontAssetRef = fontAssetRefLookup[currentFontEntity];
 
             // Calculate the scale of the font based on selected font size and sampling point size.
             // baseScale is calculated using the font asset assigned to the text object.            
@@ -86,9 +87,9 @@ namespace TextMeshDOTS
 
             for (int k = 0, length = glyphOTFBuffer.Length; k < length; k++)
             {
-                var glyphOTF = glyphOTFBuffer[k];
+                GlyphOTF glyphOTF = glyphOTFBuffer[k];
 
-                var cluster = (int)glyphOTF.cluster; //cluster is char index in cleaned text = aligned with glyphOTF buffer
+                int cluster = (int)glyphOTF.cluster; //cluster is char index in cleaned text = aligned with glyphOTF buffer
                 if (currentFontEntity != glyphOTF.fontEntity)
                 {
                     currentFontEntity = glyphOTF.fontEntity;
@@ -125,7 +126,7 @@ namespace TextMeshDOTS
                 bottomAnchor = GetBottomAnchorForConfig(ref currentFont, textBaseConfiguration.verticalAlignment, baseScale, bottomAnchor);
 
                 #region Look up Character Data
-                if (!currentFont.glyphs.TryGetValue(glyphOTF.codepoint, out var glyphBlob))
+                if (!currentFont.glyphs.TryGetValue(glyphOTF.codepoint, out GlyphBlob glyphBlob))
                 {
                     Debug.LogError($"Glyph {currentRune.value} has not yet been added to texture atlas");
                     continue;
@@ -135,11 +136,11 @@ namespace TextMeshDOTS
                 // should not be rendered, but xAdvance should be processed
 
                 // Cache glyph metrics
-                var currentGlyphExtents = glyphBlob.glyphExtents;
-                var x_bearing = currentGlyphExtents.x_bearing;
-                var y_bearing = currentGlyphExtents.y_bearing;
-                var glyphHeight = currentGlyphExtents.height;
-                var glyphWidth = currentGlyphExtents.width;
+                GlyphExtents currentGlyphExtents = glyphBlob.glyphExtents;
+                int x_bearing = currentGlyphExtents.x_bearing;
+                int y_bearing = currentGlyphExtents.y_bearing;
+                int glyphHeight = currentGlyphExtents.height;
+                int glyphWidth = currentGlyphExtents.width;
 
                 float adjustedScale = layoutConfig.m_currentFontSize / currentFont.atlasSamplingPointSize * (textBaseConfiguration.isOrthographic ? 1 : 0.1f);
                 float elementAscentLine = currentFont.ascender;
@@ -195,7 +196,7 @@ namespace TextMeshDOTS
 
                 // Determine the position of the vertices of the Character or Sprite.
                 #region Calculate Vertices Position
-                var renderGlyph = new RenderGlyph();
+                RenderGlyph renderGlyph = new RenderGlyph();
 
                 // top left is used to position bottom left and top right
                 float2 topLeft;
@@ -214,7 +215,7 @@ namespace TextMeshDOTS
                 #endregion
 
                 #region Setup UVA
-                var glyphRect = glyphBlob.glyphRect;
+                GlyphRect glyphRect = glyphBlob.glyphRect;
                 float2 blUVA, tlUVA, trUVA, brUVA;
                 blUVA.x = (glyphRect.x - currentFont.materialPadding - style_padding) / currentFont.atlasWidth;
                 blUVA.y = (glyphRect.y - currentFont.materialPadding - style_padding) / currentFont.atlasHeight;
@@ -257,7 +258,7 @@ namespace TextMeshDOTS
                 
                 if (layoutConfig.useGradient) //&& !isColorGlyph)
                 {
-                    var gradient = layoutConfig.m_gradient;
+                    TextColorGradient gradient = layoutConfig.m_gradient;
                     renderGlyph.blColor = gradient.bottomLeft;
                     renderGlyph.tlColor = gradient.topLeft;
                     renderGlyph.trColor = gradient.topRight;
@@ -287,7 +288,7 @@ namespace TextMeshDOTS
                 #endregion
 
                 #region Pack Scale into renderGlyph.scale
-                var scale = layoutConfig.m_currentFontSize;
+                float scale = layoutConfig.m_currentFontSize;
                 if (simulateBold)
                     scale *= -1;
 
@@ -399,8 +400,8 @@ namespace TextMeshDOTS
                 //    currentRune.value == 0x2029 || textConfiguration.m_characterCount == calliString.Length - 1)
                 if (currentRune.value == 10)
                 {
-                    var glyphsLine = renderGlyphs.AsNativeArray().GetSubArray(startOfLineGlyphIndex, renderGlyphs.Length - startOfLineGlyphIndex);
-                    var overrideMode = layoutConfig.m_lineJustification;
+                    NativeArray<RenderGlyph> glyphsLine = renderGlyphs.AsNativeArray().GetSubArray(startOfLineGlyphIndex, renderGlyphs.Length - startOfLineGlyphIndex);
+                    HorizontalAlignmentOptions overrideMode = layoutConfig.m_lineJustification;
                     if ((overrideMode) == HorizontalAlignmentOptions.Justified)
                     {
                         // Don't perform justified spacing for the last line in the paragraph.
@@ -458,12 +459,12 @@ namespace TextMeshDOTS
                         accumulatedSpaces--;
                     }
 
-                    var yOffsetChange = 0f;  //font.lineHeight * currentElementScale;
-                    var xOffsetChange = renderGlyphs[lastWordStartCharacterGlyphIndex].blPosition.x - bottomShear - layoutConfig.m_tagIndent;
+                    float yOffsetChange = 0f;  //font.lineHeight * currentElementScale;
+                    float xOffsetChange = renderGlyphs[lastWordStartCharacterGlyphIndex].blPosition.x - bottomShear - layoutConfig.m_tagIndent;
                     if (xOffsetChange > 0 && !dropSpace)  // Always allow one visible character
                     {
                         // Finish line based on alignment
-                        var glyphsLine = renderGlyphs.AsNativeArray().GetSubArray(startOfLineGlyphIndex,
+                        NativeArray<RenderGlyph> glyphsLine = renderGlyphs.AsNativeArray().GetSubArray(startOfLineGlyphIndex,
                                                                                   lastWordStartCharacterGlyphIndex - startOfLineGlyphIndex);
                         ApplyHorizontalAlignmentToGlyphs(ref glyphsLine,
                                                          ref characterGlyphIndicesWithPreceedingSpacesInLine,
@@ -491,7 +492,7 @@ namespace TextMeshDOTS
                         layoutConfig.m_xAdvance -= xOffsetChange;
 
                         // Adjust the vertices of the previous render glyphs in the word
-                        var glyphPtr = (RenderGlyph*)renderGlyphs.GetUnsafePtr();
+                        RenderGlyph* glyphPtr = (RenderGlyph*)renderGlyphs.GetUnsafePtr();
                         for (int i = lastWordStartCharacterGlyphIndex; i < renderGlyphs.Length; i++)
                         {
                             glyphPtr[i].blPosition.y -= yOffsetChange;
@@ -522,9 +523,9 @@ namespace TextMeshDOTS
                 previousRune = currentRune;
             }
 
-            var finalGlyphsLine = renderGlyphs.AsNativeArray().GetSubArray(startOfLineGlyphIndex, renderGlyphs.Length - startOfLineGlyphIndex);
+            NativeArray<RenderGlyph> finalGlyphsLine = renderGlyphs.AsNativeArray().GetSubArray(startOfLineGlyphIndex, renderGlyphs.Length - startOfLineGlyphIndex);
             {
-                var overrideMode = layoutConfig.m_lineJustification;
+                HorizontalAlignmentOptions overrideMode = layoutConfig.m_lineJustification;
                 if (overrideMode == HorizontalAlignmentOptions.Justified)
                 {
                     // Don't perform justified spacing for the last line.
@@ -582,7 +583,7 @@ namespace TextMeshDOTS
                 return;
             }
 
-            var glyphsPtr = (RenderGlyph*)glyphs.GetUnsafePtr();
+            RenderGlyph* glyphsPtr = (RenderGlyph*)glyphs.GetUnsafePtr();
             if ((alignMode) == HorizontalAlignmentOptions.Center)
             {
                 float offset = glyphsPtr[glyphs.Length - 1].trPosition.x / 2f;
@@ -626,7 +627,7 @@ namespace TextMeshDOTS
         {
             for (int i = 0; i < glyphs.Length; i++)
             {
-                var glyph = glyphs[i];
+                RenderGlyph glyph = glyphs[i];
                 glyph.blPosition.y -= accumulatedVerticalOffset;
                 glyph.trPosition.y -= accumulatedVerticalOffset;
                 glyphs[i] = glyph;
@@ -639,7 +640,7 @@ namespace TextMeshDOTS
                                                           float accumulatedVerticalOffset,
                                                           VerticalAlignmentOptions alignMode)
         {
-            var glyphsPtr = (RenderGlyph*)glyphs.GetUnsafePtr();
+            RenderGlyph* glyphsPtr = (RenderGlyph*)glyphs.GetUnsafePtr();
             switch (alignMode)
             {
                 case VerticalAlignmentOptions.TopBase:
