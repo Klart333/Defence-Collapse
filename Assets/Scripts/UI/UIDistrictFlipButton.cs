@@ -8,6 +8,9 @@ namespace UI
 {
     public class UIDistrictFlipButton : MonoBehaviour
     {
+        public event Action OnClick;
+        
+        private static readonly int LockedSequence = Animator.StringToHash("LockedSequence");
         private static readonly int Interactable = Animator.StringToHash("Interactable");
         private static readonly int Flip = Animator.StringToHash("Flip");
         
@@ -21,6 +24,8 @@ namespace UI
         private AnimationClip unFlipAnimation;
         
         private DistrictPlacer districtPlacer;
+        
+        private bool isPlacing;
 
         private void OnEnable()
         {
@@ -35,27 +40,37 @@ namespace UI
 
         public void OnButtonClicked()
         {
-            districtButton.interactable = false;
-            animator.SetBool(Interactable, false);
-            animator.SetTrigger(Flip);
+            if (!isPlacing)
+            {
+                animator.SetBool(Interactable, false);
+                animator.SetBool(LockedSequence, true);
+                animator.SetTrigger(Flip);
+                OnClick?.Invoke();
+                isPlacing = true;
+            }
+            else
+            {
+                isPlacing = false;
+                UIEvents.OnFocusChanged?.Invoke();
+                
+                animator.SetBool(Interactable, true);
+                UnlockAfterDelay().Forget();
+            }
         }
 
         private void OnPlacingCanceled()
         {
-            if (districtButton.interactable)
-            {
-                return;
-            }
+            if (!isPlacing) return;
             
-            animator.SetBool(Interactable, true);
-
-            SetInteractableAfterDelay().Forget();
+            isPlacing = false;
+            animator.SetBool(Interactable, true); 
+            UnlockAfterDelay().Forget();
         }
-
-        private async UniTaskVoid SetInteractableAfterDelay()
+        
+        private async UniTaskVoid UnlockAfterDelay()
         {
             await UniTask.Delay(TimeSpan.FromSeconds(unFlipAnimation.length));
-            districtButton.interactable = true;
+            animator.SetBool(LockedSequence, false);
         }
     }
 }

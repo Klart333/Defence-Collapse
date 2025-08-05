@@ -116,7 +116,7 @@ PrefabInstance:
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
@@ -130,9 +130,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 365231240779658466}
+    - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 6372887756014903830}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
@@ -151,12 +156,12 @@ PrefabInstance:
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnClick
+      value: OnButtonClicked
       objectReference: {fileID: 0}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: OnButtonClicked
+      value: Play
       objectReference: {fileID: 0}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
@@ -166,12 +171,12 @@ PrefabInstance:
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UI.UITownHallButton, Core
+      value: UI.UIDistrictButtonHandler, Core
       objectReference: {fileID: 0}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
-      value: UI.UIDistrictButtonHandler, Core
+      value: Audio.PlayAudio, Core
       objectReference: {fileID: 0}
     - target: {fileID: 7443052484217448721, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}

@@ -11,6 +11,9 @@ namespace UI
         [SerializeField]
         private GameObject townHallButton;
 
+        [SerializeField]
+        private UIDistrictFlipButton townHallFlipButton;
+        
         private void Awake()
         {
             townHallButton.SetActive(true);
@@ -23,11 +26,13 @@ namespace UI
         private void OnEnable()
         {
             Events.OnDistrictBuilt += OnDistrictBuilt;
+            townHallFlipButton.OnClick += OnClick;
         }
 
         private void OnDisable()
         {
             Events.OnDistrictBuilt -= OnDistrictBuilt;
+            townHallFlipButton.OnClick -= OnClick;
         }
 
         private void OnDistrictBuilt(DistrictType type)

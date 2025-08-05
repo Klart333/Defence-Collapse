@@ -2198,6 +2198,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   districtHandler: {fileID: 491554922}
+--- !u!114 &180089124 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6372887756014903830, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+    type: 3}
+  m_PrefabInstance: {fileID: 935221005543819352}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f6dd00943a748a2be89520dda6e0e17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &180089125 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 365231240779658466, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+    type: 3}
+  m_PrefabInstance: {fileID: 935221005543819352}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b864bac6ebe84d229bc41740b8c92b70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &191278483
 GameObject:
   m_ObjectHideFlags: 0
@@ -3265,31 +3289,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 527352178}
     - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 527352178}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ClickDistrict
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UIBuildingHandler, Core
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
       value: 4
@@ -5372,6 +5371,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7233659faf3995438ad23c2836900e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  districtButtonParent: {fileID: 1978976919}
 --- !u!1001 &575319404
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5849,31 +5849,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 527352178}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ClickDistrict
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UIBuildingHandler, Core
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4164646658542768364, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
@@ -7119,31 +7094,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 527352178}
     - target: {fileID: 418315292022832046, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 527352178}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ClickDistrict
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UIBuildingHandler, Core
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
       value: 2
@@ -10005,6 +9955,7 @@ MonoBehaviour:
   - {fileID: 1663617816}
   - {fileID: 7129838152036704643}
   townHallButton: {fileID: 666353940}
+  townHallFlipButton: {fileID: 180089125}
 --- !u!114 &1111768941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11570,31 +11521,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
       value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 527352178}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ClickDistrict
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UIBuildingHandler, Core
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
-      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4164646658542768364, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
@@ -13367,31 +13293,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
       value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 527352178}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ClickDistrict
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UIBuildingHandler, Core
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
-      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 4164646658542768364, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
@@ -16960,31 +16861,6 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
       value: 5
       objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 527352178}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ClickDistrict
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UIBuildingHandler, Core
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
-      value: 5
-      objectReference: {fileID: 0}
     - target: {fileID: 4164646658542768364, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
       propertyPath: m_Sprite
@@ -18313,9 +18189,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 237831704842649072, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 237831704842649072, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1111768940}
+      objectReference: {fileID: 180089125}
+    - target: {fileID: 237831704842649072, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 180089124}
+    - target: {fileID: 237831704842649072, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnButtonClicked
+      objectReference: {fileID: 0}
+    - target: {fileID: 237831704842649072, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: Play
+      objectReference: {fileID: 0}
+    - target: {fileID: 237831704842649072, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UI.UIDistrictButtonHandler, Core
+      objectReference: {fileID: 0}
+    - target: {fileID: 237831704842649072, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: Audio.PlayAudio, Core
+      objectReference: {fileID: 0}
     - target: {fileID: 2863000017310811267, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
         type: 3}
       propertyPath: m_Pivot.x
@@ -21076,26 +20982,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: ClickDistrict
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 527352178}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ClickDistrict
-      objectReference: {fileID: 0}
-    - target: {fileID: 2477495159659261402, guid: 4fcc1f1d24ab33246b7047222436610a,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UIBuildingHandler, Core
       objectReference: {fileID: 0}
     - target: {fileID: 4164646658542768364, guid: 4fcc1f1d24ab33246b7047222436610a,
         type: 3}
