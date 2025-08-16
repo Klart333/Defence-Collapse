@@ -271,7 +271,14 @@ MonoBehaviour:
       Entry: 8
       Data: 
   districtName: Town Hall
-  icon: {fileID: 0}
+  icon:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: 3dd9c867991ad6f4aa0ca055e8d6fdc5, type: 2}
+  iconSmall:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: 3dd9c867991ad6f4aa0ca055e8d6fdc5, type: 2}
   description: 
   districtType: 3
   LevelDatas:

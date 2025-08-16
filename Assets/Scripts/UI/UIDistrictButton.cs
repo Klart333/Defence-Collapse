@@ -1,5 +1,6 @@
 using Sirenix.OdinInspector;
 using Buildings.District;
+using UnityEngine.UI;
 using UnityEngine;
 using Gameplay;
 using TMPro;
@@ -13,23 +14,18 @@ namespace UI
         private TextMeshProUGUI costText;
         
         [SerializeField]
-        private DistrictType districtType;
-        
+        private Image iconImage;
+
         [SerializeField]
         private DistrictCostUtility costUtility;
 
         private DistrictHandler districtHandler;
 
-        private void Awake()
-        {
-            districtHandler = FindFirstObjectByType<DistrictHandler>();
-        }
+        private DistrictType districtType;
 
         private void OnEnable()
         {
             Events.OnDistrictBuilt += OnDistrictBuilt;
-            
-            UpdateCostText();
         }
 
         private void OnDisable()
@@ -37,6 +33,16 @@ namespace UI
             Events.OnDistrictBuilt -= OnDistrictBuilt;
         }
 
+        public void Setup(DistrictHandler districtHandler, TowerData towerData)
+        {
+            this.districtHandler = districtHandler;
+            
+            districtType = towerData.DistrictType;
+            iconImage.sprite = towerData.Icon;
+
+            UpdateCostText();
+        }
+        
         private void OnDistrictBuilt(DistrictType arg0)
         {
             UpdateCostText();

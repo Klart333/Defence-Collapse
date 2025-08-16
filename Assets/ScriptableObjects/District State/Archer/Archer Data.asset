@@ -252,7 +252,14 @@ MonoBehaviour:
       Entry: 8
       Data: 
   districtName: Archer District
-  icon: {fileID: 21300000, guid: 589db224aea12884880200807e357d93, type: 3}
+  icon:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: a6649cdfba3c6d54a98cd3dab9d84466, type: 2}
+  iconSmall:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: 1ef955698bc6c6c489cfb817578bf826, type: 2}
   description: 'Fires arrows at enemies, dealing single target damage.
 
 

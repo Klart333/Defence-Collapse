@@ -6,10 +6,11 @@ using Gameplay;
 using System;
 using Effects;
 using Juice;
+using Variables;
 
 namespace Buildings.District
 {
-    [InlineEditor, CreateAssetMenu(fileName = "New Tower Data", menuName = "Building/Tower Data")]
+    [InlineEditor, CreateAssetMenu(fileName = "New District Data", menuName = "District/District Data")]
     public class TowerData : SerializedScriptableObject
     {
         [Title("Display")]
@@ -17,7 +18,10 @@ namespace Buildings.District
         private string districtName = "___ District";
 
         [SerializeField]
-        private Sprite icon;
+        private SpriteReference icon;
+        
+        [SerializeField]
+        private SpriteReference iconSmall;
 
         [SerializeField]
         [TextArea]
@@ -58,7 +62,8 @@ namespace Buildings.District
         public DistrictType DistrictType => districtType;
         public string DistrictName => districtName;
         public string Description => description;
-        public Sprite Icon => icon;
+        public Sprite IconSmall => iconSmall.Value;
+        public Sprite Icon => icon.Value;
 
         [TitleGroup("Stats")]
         [Button]

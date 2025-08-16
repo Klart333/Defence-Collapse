@@ -1,18 +1,18 @@
-using System;
-using Buildings.District;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
+using Buildings.District;
 using UnityEngine.UI;
+using UnityEngine;
+using System;
 
 namespace UI
 {
     public class UIDistrictFlipButton : MonoBehaviour
     {
-        public event Action OnClick;
-        
         private static readonly int LockedSequence = Animator.StringToHash("LockedSequence");
         private static readonly int Interactable = Animator.StringToHash("Interactable");
         private static readonly int Flip = Animator.StringToHash("Flip");
+        
+        public event Action OnClick;
         
         [SerializeField]
         private Button districtButton;

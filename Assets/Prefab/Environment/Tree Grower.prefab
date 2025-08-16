@@ -46,11 +46,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPoolSize: 50
   trees:
-  - {fileID: 6766065995153528158, guid: ffbfe27708184e3439fa59d5237a9aa4, type: 3}
-  - {fileID: 5879582959376992463, guid: 5acd1efcea94c3344aff12e6105143ed, type: 3}
+  - {fileID: 3023030644276248325, guid: 19d33c9a22d141b459665f7d82a1d53a, type: 3}
+  - {fileID: 3219902861427119727, guid: 59c9e51c7e8456c48aa511b27f1757d1, type: 3}
+  - {fileID: 1248732977792273714, guid: 75cae9092103e594da0bb7ec7cf9a587, type: 3}
   treeMaterial: {fileID: 2100000, guid: 74776aafc55c6ba4ea64717f75228d6c, type: 2}
   raycastArea: {x: 2, y: 2}
   treeRadius: 0.6
   raycastCount: 10
+  totalTime: 2
   shouldRemoveWhenPlaced: 0
   goldPerTree: 0
+  distanceMultiplier: 3

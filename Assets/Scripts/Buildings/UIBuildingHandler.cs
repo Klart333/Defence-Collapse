@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Buildings.District;
 using UnityEngine;
 using Buildings;
 using System;
@@ -6,37 +8,39 @@ using UI;
 public class UIBuildingHandler : MonoBehaviour
 {
     [SerializeField]
-    private Transform districtButtonParent;
-
-    private UIDistrictFlipButton[] districtButtons;
-    private Action[] clickActions;
+    private UIDistrictUnlockHandler districtUnlockHandler;
+    
+    private List<UIDistrictFlipButton> districtButtons = new List<UIDistrictFlipButton>();
+    private List<Action> clickActions = new List<Action>();
     
     private void OnEnable()
     {
-        districtButtons = new UIDistrictFlipButton[districtButtonParent.childCount - 1];
-        clickActions = new Action[districtButtonParent.childCount - 1];
-        for (int i = 1; i < districtButtonParent.childCount; i++)
-        {
-            if (!districtButtonParent.GetChild(i).GetChild(0).TryGetComponent(out UIDistrictFlipButton districtButton)) continue;
-            
-            int index = i - 1;
-            Action onClick = () =>
-            {
-                ClickDistrict(index);
-            };
-            districtButton.OnClick += onClick;
-                
-            districtButtons[index] = districtButton;
-            clickActions[index] = onClick;
-        }
+        districtUnlockHandler.OnDistrictButtonSpawned += SubscribeToDistrictButton;
     }
-
+    
     private void OnDisable()
     {
-        for (int i = 0; i < districtButtons.Length; i++)
+        for (int i = 0; i < districtButtons.Count; i++)
         {
             districtButtons[i].OnClick -= clickActions[i];
         }
+        
+        districtUnlockHandler.OnDistrictButtonSpawned -= SubscribeToDistrictButton;
+    }
+
+    private void SubscribeToDistrictButton(TowerData towerData, UIDistrictButton districtButton)
+    {
+        UIDistrictFlipButton flipButton = districtButton.GetComponentInChildren<UIDistrictFlipButton>();
+        
+        int index = (int)towerData.DistrictType;
+        Action onClick = () =>
+        {
+            ClickDistrict(index);
+        };
+        flipButton.OnClick += onClick;
+                
+        districtButtons.Add(flipButton);
+        clickActions.Add(onClick);
     }
 
     public void ClickBuilding()

@@ -262,7 +262,14 @@ MonoBehaviour:
       Entry: 8
       Data: 
   districtName: Church District
-  icon: {fileID: 21300000, guid: 49b78f1f23e272b4b907cc92bd62def4, type: 3}
+  icon:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: 52002f136f294334284db5b31be3bf01, type: 2}
+  iconSmall:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: e38d7310c61cca4478695c24daf47d3e, type: 2}
   description: "Heals and buffs all districts within range. \n\nSize: 3 x 3\nCost
     : 1000"
   districtType: 2

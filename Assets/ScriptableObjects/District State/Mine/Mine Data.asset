@@ -26,7 +26,7 @@ MonoBehaviour:
       Data: 0|Stats, Core
     - Name: HealthDamage
       Entry: 7
-      Data: 1|Stat, Core
+      Data: 1|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 10
@@ -35,7 +35,7 @@ MonoBehaviour:
       Data: 
     - Name: ArmorDamage
       Entry: 7
-      Data: 2|Stat, Core
+      Data: 2|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 10
@@ -44,7 +44,7 @@ MonoBehaviour:
       Data: 
     - Name: ShieldDamage
       Entry: 7
-      Data: 3|Stat, Core
+      Data: 3|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 10
@@ -53,7 +53,7 @@ MonoBehaviour:
       Data: 
     - Name: AttackSpeed
       Entry: 7
-      Data: 4|Stat, Core
+      Data: 4|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -62,7 +62,7 @@ MonoBehaviour:
       Data: 
     - Name: Range
       Entry: 7
-      Data: 5|Stat, Core
+      Data: 5|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 4
@@ -71,7 +71,7 @@ MonoBehaviour:
       Data: 
     - Name: MovementSpeed
       Entry: 7
-      Data: 6|Stat, Core
+      Data: 6|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -80,7 +80,7 @@ MonoBehaviour:
       Data: 
     - Name: CritChance
       Entry: 7
-      Data: 7|Stat, Core
+      Data: 7|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -89,7 +89,7 @@ MonoBehaviour:
       Data: 
     - Name: CritMultiplier
       Entry: 7
-      Data: 8|Stat, Core
+      Data: 8|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 5
@@ -98,7 +98,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxHealth
       Entry: 7
-      Data: 9|Stat, Core
+      Data: 9|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 10
@@ -107,7 +107,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxArmor
       Entry: 7
-      Data: 10|Stat, Core
+      Data: 10|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -116,7 +116,7 @@ MonoBehaviour:
       Data: 
     - Name: MaxShield
       Entry: 7
-      Data: 11|Stat, Core
+      Data: 11|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
@@ -125,7 +125,7 @@ MonoBehaviour:
       Data: 
     - Name: Healing
       Entry: 7
-      Data: 12|Stat, Core
+      Data: 12|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
@@ -134,7 +134,7 @@ MonoBehaviour:
       Data: 
     - Name: Productivity
       Entry: 7
-      Data: 13|Stat, Core
+      Data: 13|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
       Data: 10
@@ -174,15 +174,27 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: endWaveEffects
+    - Name: createdEffects
       Entry: 7
       Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: endWaveEffects
+      Entry: 7
+      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 18|Effects.AddMoneyEffect, Core
+      Data: 19|Effects.AddMoneyEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 4
@@ -199,7 +211,14 @@ MonoBehaviour:
       Entry: 8
       Data: 
   districtName: Mine District
-  icon: {fileID: 21300000, guid: 34aa25191b04edd4ab4ab2b1c6c25c09, type: 3}
+  icon:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: e70dacc5b879b6b4e8f77f3d0cf508f3, type: 2}
+  iconSmall:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: 536a0b9a4fc018543a732f09d052c9fa, type: 2}
   description: "Place on crystal deposits to generate gold at the end of every wave.
     \n\nSize: 1 x 1\nCost : 50"
   districtType: 4

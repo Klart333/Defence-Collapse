@@ -47,11 +47,13 @@ MonoBehaviour:
   initialPoolSize: 10
   trees:
   - {fileID: 5879582959376992463, guid: 12b75eb0eda7b2b4bb4bded9c619c10c, type: 3}
+  - {fileID: 5879582959376992463, guid: 55ab652f5934f4b45870f2b6f20631bc, type: 3}
+  - {fileID: 5879582959376992463, guid: 57fdc254eabbaf74b89de0ad7bfe8412, type: 3}
   treeMaterial: {fileID: 2100000, guid: c36a4497441bc1d48ad8c03477895bc7, type: 2}
   raycastArea: {x: 2, y: 2}
-  treeRadius: 0.2
-  raycastCount: 80
+  treeRadius: 0.7
+  raycastCount: 50
   totalTime: 2
   shouldRemoveWhenPlaced: 1
-  goldPerTree: 5
+  goldPerTree: 20
   distanceMultiplier: 4

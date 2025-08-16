@@ -252,7 +252,14 @@ MonoBehaviour:
       Entry: 8
       Data: 
   districtName: Barrack District
-  icon: {fileID: 21300000, guid: 879bb8283866e4f428bc69ebcfd459a2, type: 3}
+  icon:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: 3ad360f07fc22054b99238706f146d72, type: 2}
+  iconSmall:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: 6f100a025b12329419b208ae5e9e6513, type: 2}
   description: 'Spawns little dudes.
 
 

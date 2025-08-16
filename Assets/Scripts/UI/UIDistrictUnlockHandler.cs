@@ -1,21 +1,38 @@
-using System.Collections.Generic;
+using System;
 using Buildings.District;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace UI
 {
-    public class UIDistrictUnlockHandler : SerializedMonoBehaviour
+    public class UIDistrictUnlockHandler : MonoBehaviour
     {
-        [SerializeField]
-        private Dictionary<TowerData, Transform> towerDataDictionary = new Dictionary<TowerData, Transform>();
-
+        public event Action<TowerData, UIDistrictButton> OnDistrictButtonSpawned;
+        
+        [Title("Settings")]
         [SerializeField]
         private UIDistrictFoldout districtFoldout;
 
+        [SerializeField]
+        private UIDistrictButton districtButtonPrefab;
+        
+        [SerializeField]
+        private Transform districtContainer;
+        
+        [Title("Start up")]
+        [SerializeField]
+        private TowerData startingTowerData;
+        
+        private DistrictHandler districtHandler; 
+            
         private void OnEnable()
         {
+            districtHandler = FindFirstObjectByType<DistrictHandler>();
+            
             Events.OnDistrictUnlocked += OnDistrictUnlocked;
+            
+            
+            OnDistrictUnlocked(startingTowerData);
         }
 
         private void OnDisable()
@@ -25,8 +42,12 @@ namespace UI
 
         private void OnDistrictUnlocked(TowerData towerData)
         {
-            towerDataDictionary[towerData].SetSiblingIndex(1);
-            towerDataDictionary[towerData].gameObject.SetActive(true);
+            UIDistrictButton districtButton = Instantiate(districtButtonPrefab, districtContainer);
+            districtButton.Setup(districtHandler, towerData);
+            districtButton.transform.SetSiblingIndex(1);
+            
+            OnDistrictButtonSpawned?.Invoke(towerData, districtButton);
+
             if (districtFoldout.IsOpen)
             {
                 districtFoldout.ToggleOpen(true);
