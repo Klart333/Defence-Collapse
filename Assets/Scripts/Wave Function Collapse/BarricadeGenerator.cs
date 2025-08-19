@@ -16,7 +16,7 @@ namespace WaveFunctionCollapse
         [Title("Wave Function")]
         [SerializeField]
         private ChunkWaveFunction<QueryMarchedChunk> waveFunction;
-
+        
         [Title("Prototypes")]
         [SerializeField]
         private PrototypeInfoData townPrototypeInfo;

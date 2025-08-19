@@ -33,10 +33,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIStatButton
       objectReference: {fileID: 0}
+    - target: {fileID: 3676958435635716910, guid: 17f80363816532d44aac07d22bcb1b0e,
+        type: 3}
+      propertyPath: m_TargetGraphic
+      value: 
+      objectReference: {fileID: 8963634028494353034}
     - target: {fileID: 4170465691848077758, guid: 17f80363816532d44aac07d22bcb1b0e,
         type: 3}
       propertyPath: m_fontSize
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5237036112378478304, guid: 17f80363816532d44aac07d22bcb1b0e,
+        type: 3}
+      propertyPath: m_PreserveAspect
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6067753282475981405, guid: 17f80363816532d44aac07d22bcb1b0e,
         type: 3}
@@ -47,6 +57,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_fontSize
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6950033053244819949, guid: 17f80363816532d44aac07d22bcb1b0e,
+        type: 3}
+      propertyPath: m_PreserveAspect
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7076149390888348538, guid: 17f80363816532d44aac07d22bcb1b0e,
+        type: 3}
+      propertyPath: m_PreserveAspect
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8273016972511256441, guid: 17f80363816532d44aac07d22bcb1b0e,
         type: 3}
@@ -168,3 +188,15 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 17f80363816532d44aac07d22bcb1b0e, type: 3}
+--- !u!114 &8963634028494353034 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5237036112378478304, guid: 17f80363816532d44aac07d22bcb1b0e,
+    type: 3}
+  m_PrefabInstance: {fileID: 3803440727639477354}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 317dc00ed03d442e9886e113aa9b9643, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

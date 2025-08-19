@@ -85,7 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7096004971275505246}
   - component: {fileID: 7996560312503164651}
-  - component: {fileID: 6993892758374409856}
+  - component: {fileID: 2234848426828566579}
   m_Layer: 0
   m_Name: BackgroundOutline
   m_TagString: Untagged
@@ -120,7 +120,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4856877324633071936}
   m_CullTransparentMesh: 1
---- !u!114 &6993892758374409856
+--- !u!114 &2234848426828566579
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -129,11 +129,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4856877324633071936}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Script: {fileID: 11500000, guid: 317dc00ed03d442e9886e113aa9b9643, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.88235295, g: 0.9372549, b: 0.9019608, a: 1}
+  m_Color: {r: 0.41960788, g: 0, b: 0.027450982, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -150,6 +150,16 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+  spriteReference:
+    Mode: 0
+    ConstantValue: {fileID: 21300000, guid: 080f7095b2918bd41a6bc62cf016c065, type: 3}
+    Variable: {fileID: 0}
+    VariableValuePreview: {fileID: 0}
+  colorReference:
+    Mode: 1
+    ConstantValue: {r: 0, g: 0, b: 0, a: 0}
+    Variable: {fileID: 11400000, guid: bc5b6f93095aa15458a6f3d7573e367e, type: 2}
+    VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &5079206179540449859
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,9 +301,11 @@ MonoBehaviour:
   hoverTargetScale: 1.1
   hoverDuration: 0.25
   hoverEase: 4
+  isClickable: 1
   whiteOutImage: {fileID: 5538976961433758239}
   whiteOutDuration: 0.5
   whiteOutEase: 3
+  isDraggable: 0
 --- !u!1 &7357441538450217776
 GameObject:
   m_ObjectHideFlags: 0
@@ -326,8 +338,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 8020109692175061622}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.16969803, y: 0.13461185}
-  m_AnchorMax: {x: 0.86969805, y: 0.83461183}
+  m_AnchorMin: {x: 0.13494654, y: 0.13461185}
+  m_AnchorMax: {x: 0.86969805, y: 0.8670465}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -352,7 +364,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.74509805}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.79607844}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -379,7 +391,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4422240656214660630}
   - component: {fileID: 3924835420192516833}
-  - component: {fileID: 1488913923620077151}
+  - component: {fileID: 6515505144376250935}
   m_Layer: 0
   m_Name: Background
   m_TagString: Untagged
@@ -414,7 +426,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8164153977202902948}
   m_CullTransparentMesh: 1
---- !u!114 &1488913923620077151
+--- !u!114 &6515505144376250935
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -423,11 +435,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8164153977202902948}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Script: {fileID: 11500000, guid: 317dc00ed03d442e9886e113aa9b9643, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.6603774, g: 0.6603774, b: 0.6603774, a: 1}
+  m_Color: {r: 0.54901963, g: 0.10980393, b: 0.07450981, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -444,3 +456,13 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+  spriteReference:
+    Mode: 0
+    ConstantValue: {fileID: 21300000, guid: 080f7095b2918bd41a6bc62cf016c065, type: 3}
+    Variable: {fileID: 0}
+    VariableValuePreview: {fileID: 0}
+  colorReference:
+    Mode: 1
+    ConstantValue: {r: 0, g: 0, b: 0, a: 0}
+    Variable: {fileID: 11400000, guid: 29a79831a54fdaf4bb6cc16234e853f0, type: 2}
+    VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}

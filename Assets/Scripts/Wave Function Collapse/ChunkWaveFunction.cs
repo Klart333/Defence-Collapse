@@ -25,8 +25,10 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private ProtoypeMeshes protoypeMeshes;
 
-        private readonly Stack<GameObject> gameObjectPool = new Stack<GameObject>();
+        [SerializeField]
+        private LayerMask layerMask;
 
+        private readonly Stack<GameObject> gameObjectPool = new Stack<GameObject>();
         private PrototypeData emptyPrototype;
 
         private IChunkWaveFunction<TChunk> handler;
@@ -444,6 +446,7 @@ namespace WaveFunctionCollapse
             var gm = new GameObject(mesh.name);
             gm.AddComponent<MeshFilter>().mesh = mesh;
             gm.AddComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
+            gm.layer = (int)Mathf.Log(layerMask.value, 2);
             return gm;
         }
         

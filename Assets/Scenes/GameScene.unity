@@ -4163,7 +4163,7 @@ MonoBehaviour:
   EnableEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1351701156}
         m_TargetAssemblyTypeName: UnityEngine.UI.Selectable, UnityEngine.UI
         m_MethodName: set_interactable
         m_Mode: 6
@@ -6785,6 +6785,9 @@ MonoBehaviour:
     gridScale: {x: 0.5, y: 0.5, z: 0.5}
     materialData: {fileID: 11400000, guid: 14ade4c3253b45b4daef3e061e2fec26, type: 2}
     protoypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 128
   townPrototypeInfo: {fileID: 11400000, guid: 06448ddcf14d33643a6d82f2600a6aba, type: 2}
   prototypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
   barricadePrefab: {fileID: 4495732854823147107, guid: 484727eef20b98044ad4c2a101b87638,
@@ -7715,6 +7718,9 @@ MonoBehaviour:
     gridScale: {x: 0.5, y: 0.5, z: 0.5}
     materialData: {fileID: 11400000, guid: 64f0dca35d7079143abbf4da786afcf2, type: 2}
     protoypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 128
   townPrototypeInfo: {fileID: 11400000, guid: 02f9ef3e110b83748bc36550093a3e44, type: 2}
   prototypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
   buildingPrefab: {fileID: 9181347496856605909, guid: b8bcd53eb944bfd439964e02af899b2e,
@@ -9163,6 +9169,9 @@ MonoBehaviour:
     gridScale: {x: 2, y: 2, z: 2}
     materialData: {fileID: 11400000, guid: f205dbfe3ecf34f40bd110ce6d456c4a, type: 2}
     protoypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 64
   chunkSize: {x: 4, y: 1, z: 4}
   defaultPrototypeInfoData: {fileID: 11400000, guid: 58fb6f893a0db174cacd0d23f7e4cac6,
     type: 2}
@@ -11887,7 +11896,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.47781065, b: 0.435849, a: 1}
+  m_Color: {r: 0.54901963, g: 0.10980393, b: 0.07450981, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -12109,7 +12118,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.47781065, b: 0.435849, a: 1}
+  m_Color: {r: 0.54901963, g: 0.10980393, b: 0.07450981, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -12867,6 +12876,9 @@ MonoBehaviour:
     gridScale: {x: 0.25, y: 0.25, z: 0.25}
     materialData: {fileID: 11400000, guid: d607b7626b2ef464cbaa6473ec1fb6ef, type: 2}
     protoypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 128
   chunkSize: {x: 2, y: 2, z: 2}
   defaultPrototypeInfoData: {fileID: 11400000, guid: 75589cbb0f869c445a78f95abb2b55c3,
     type: 2}
@@ -16437,7 +16449,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 42eb147ba1b06a04c92f1b3e953f27c4, type: 2}
   - {fileID: 11400000, guid: fe23badb5416a0047a9fff8d174e06cd, type: 2}
   - {fileID: 11400000, guid: c72edacfe17715c41b6e653b8df44e57, type: 2}
-  giveStartingLootData: 0
+  giveStartingLootData: 1
 --- !u!1 &2108250015
 GameObject:
   m_ObjectHideFlags: 0
@@ -18747,6 +18759,16 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1224394952}
+    - target: {fileID: 489400556931162425, guid: b9ab819a69f7a63428875eea33494592,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ShowSection
+      objectReference: {fileID: 0}
+    - target: {fileID: 489400556931162425, guid: b9ab819a69f7a63428875eea33494592,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UI.UIDistrictUpgrade, Core
+      objectReference: {fileID: 0}
     - target: {fileID: 735904247829803155, guid: b9ab819a69f7a63428875eea33494592,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -19072,6 +19094,16 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1224394952}
+    - target: {fileID: 3584285103910790873, guid: b9ab819a69f7a63428875eea33494592,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ShowSection
+      objectReference: {fileID: 0}
+    - target: {fileID: 3584285103910790873, guid: b9ab819a69f7a63428875eea33494592,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UI.UIDistrictUpgrade, Core
+      objectReference: {fileID: 0}
     - target: {fileID: 3652034407220900999, guid: b9ab819a69f7a63428875eea33494592,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -19101,7 +19133,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 1224394952}
+      objectReference: {fileID: 0}
     - target: {fileID: 3942873601878080741, guid: b9ab819a69f7a63428875eea33494592,
         type: 3}
       propertyPath: serializationData.Prefab
