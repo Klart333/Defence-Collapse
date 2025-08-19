@@ -1,23 +1,11 @@
-using System;
-using Buildings.District;
-using Cysharp.Threading.Tasks;
-using Gameplay;
 using UnityEngine.UI;
 using UnityEngine;
+using Gameplay;
 
 public class UIStartWave : MonoBehaviour
 {
-    private static readonly int Interactable = Animator.StringToHash("Interactable");
-    private static readonly int Flip = Animator.StringToHash("Flip");
-
     [SerializeField]
     private Button waveButton;
-    
-    [SerializeField]
-    private Animator animator;
-
-    [SerializeField]
-    private AnimationClip unFlipAnimation;
 
     private bool inWave;
     
@@ -41,18 +29,15 @@ public class UIStartWave : MonoBehaviour
 
     private void OnWaveEnded()
     {
-        animator.SetBool(Interactable, true);
-
-        SetInteractableAfterDelay().Forget();
+        SetInteractable(true);
         PersistantGameStats.CurrentPersistantGameStats.WaveCount++;
 
         inWave = false;
     }
 
-    private async UniTaskVoid SetInteractableAfterDelay()
+    private void SetInteractable(bool value)
     {
-        await UniTask.Delay(TimeSpan.FromSeconds(unFlipAnimation.length));
-        waveButton.interactable = true;
+        waveButton.interactable = value;
     }
     
     public void StartWave()
@@ -62,12 +47,9 @@ public class UIStartWave : MonoBehaviour
             return;
         }
 
-        inWave = true;
-
         Events.OnWaveStarted?.Invoke();
-
-        waveButton.interactable = false;
-        animator.SetTrigger(Flip);
-        animator.SetBool(Interactable, false);
+        
+        inWave = true;
+        SetInteractable(false);
     }
 }

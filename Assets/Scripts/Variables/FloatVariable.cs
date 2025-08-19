@@ -8,12 +8,6 @@ namespace Variables
     {
         [SerializeField]
         private float value;
-        
-        [SerializeField]
-        private FloatReference variable;
-        
-        [SerializeField]
-        private SpriteReference variable1;
 
         public float Value => value; 
     }

@@ -1,4 +1,5 @@
 using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
 
 namespace Variables
@@ -7,22 +8,13 @@ namespace Variables
     [InlineProperty]
     public abstract class Reference<T, TVariable> where TVariable : ScriptableObject
     {
-        [HorizontalGroup("Split")]
-        [HideLabel, EnumToggleButtons]
         public ReferenceMode Mode = ReferenceMode.Constant;
 
-        [HorizontalGroup("Split"), HideLabel]
-        [ShowIf(nameof(Mode), ReferenceMode.Constant)]
         public T ConstantValue;
 
-        [HorizontalGroup("Split"), HideLabel, ShowIf(nameof(Mode), ReferenceMode.Variable)]
-        [InlineEditor]
         public TVariable Variable;
 
-        // Read-only preview of the runtime value when using a variable.
-        [ShowInInspector, ReadOnly, HorizontalGroup("Split2")]
-        [ShowIf(nameof(Mode), ReferenceMode.Variable), LabelText("")] 
-        private T VariableValuePreview => GetVariableValue();
+        public T VariableValuePreview;
 
         public T Value => Mode == ReferenceMode.Constant ? ConstantValue : GetVariableValue();
 
@@ -48,6 +40,24 @@ namespace Variables
     public class SpriteReference : Reference<Sprite, SpriteVariable>
     {
         protected override Sprite GetVariableValue()
+        {
+            return Variable != null ? Variable.Value : null;
+        }
+    }
+    
+    [System.Serializable]
+    public class ColorReference : Reference<Color, ColorVariable>
+    {
+        protected override Color GetVariableValue()
+        {
+            return Variable != null ? Variable.Value : Color.black;
+        }
+    }
+    
+    [System.Serializable]
+    public class FontReference : Reference<TMP_FontAsset, FontVariable>
+    {
+        protected override TMP_FontAsset GetVariableValue()
         {
             return Variable != null ? Variable.Value : null;
         }

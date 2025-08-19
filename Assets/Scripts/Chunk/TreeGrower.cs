@@ -1,25 +1,29 @@
-using System;
 using Random = UnityEngine.Random;
 using System.Collections.Generic;
-using System.Linq;
-using Buildings;
 using Cysharp.Threading.Tasks;
-using Gameplay.Money;
 using Sirenix.OdinInspector;
-using Unity.Mathematics;
-using UnityEngine;
 using WaveFunctionCollapse;
+using Gameplay.Money;
+using UnityEngine;
+using Buildings;
+using System;
 
 namespace Chunks
 {
+    [Serializable]
+    public struct PooledArray
+    {
+        public PooledMonoBehaviour[] Array;
+    }
+    
     public class TreeGrower : PooledMonoBehaviour
     {
         public event Action<TreeGrower> OnPlaced;
         
         [Title("Tree")]
         [SerializeField]
-        private PooledMonoBehaviour[] trees;
-        
+        private PooledArray[] trees;
+
         [SerializeField]
         private Material treeMaterial;
 
@@ -49,11 +53,11 @@ namespace Chunks
         
         private List<ChunkIndex> chunkIndexes = new List<ChunkIndex>();
         
-        public bool ShouldRemoveWhenPlaced => shouldRemoveWhenPlaced;
-        public int3 ChunkKey { get; set; }
-
-        public Cell Cell { get; set; }
+        public ChunkIndex ChunkIndex { get; set; }
         public bool HasGrown { get; set; }
+        public Cell Cell { get; set; }
+        
+        public bool ShouldRemoveWhenPlaced => shouldRemoveWhenPlaced;
 
         private void OnEnable()
         {
@@ -75,7 +79,7 @@ namespace Chunks
         }
 
         [Button]
-        public async UniTaskVoid GrowTrees()
+        public async UniTaskVoid GrowTrees(int groupIndex)
         {
             Vector3 offset = raycastArea.ToXyZ(1).MultiplyByAxis(transform.localScale) / 2.0f;
             Vector3 min = transform.position - offset;
@@ -94,7 +98,7 @@ namespace Chunks
                 if (mat != treeMaterial) continue;
                 
                 positions.Add(pos.XZ());
-                SpawnTree(hit.point);
+                SpawnTree(hit.point, groupIndex);
                 await UniTask.Delay(delay);
             }
 
@@ -114,9 +118,9 @@ namespace Chunks
             }
         }
         
-        private void SpawnTree(Vector3 pos)
+        private void SpawnTree(Vector3 pos, int groupIndex)
         {
-            PooledMonoBehaviour treePrefab = trees[Random.Range(0, trees.Length)];
+            PooledMonoBehaviour treePrefab = trees[groupIndex].Array[Random.Range(0, trees[groupIndex].Array.Length)];
             Quaternion rot = Quaternion.AngleAxis(Random.value * 360, Vector3.up);
             PooledMonoBehaviour spawned = treePrefab.GetAtPosAndRot<PooledMonoBehaviour>(pos, rot);
             spawnedTrees.Add(spawned);
@@ -153,7 +157,7 @@ namespace Chunks
 
             void Placed()
             {
-                int distance = Mathf.Abs(ChunkKey.x) + Mathf.Abs(ChunkKey.z);
+                int distance = Mathf.Abs(ChunkIndex.Index.x) + Mathf.Abs(ChunkIndex.Index.z);
                 float gold = goldPerTree + goldPerTree * distanceMultiplier * distance;
                 gold *= MoneyManager.Instance.MoneyMultiplier.Value;
 

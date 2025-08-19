@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace UI
 {
@@ -11,8 +12,9 @@ namespace UI
         [SerializeField]
         private GameObject townHallButton;
 
+        [FormerlySerializedAs("townHallFlipButton")]
         [SerializeField]
-        private UIDistrictFlipButton townHallFlipButton;
+        private UIDistrictToggleButton townHallToggleButton;
         
         private void Awake()
         {
@@ -26,13 +28,13 @@ namespace UI
         private void OnEnable()
         {
             Events.OnDistrictBuilt += OnDistrictBuilt;
-            townHallFlipButton.OnClick += OnClick;
+            townHallToggleButton.OnClick += OnClick;
         }
 
         private void OnDisable()
         {
             Events.OnDistrictBuilt -= OnDistrictBuilt;
-            townHallFlipButton.OnClick -= OnClick;
+            townHallToggleButton.OnClick -= OnClick;
         }
 
         private void OnDistrictBuilt(DistrictType type)

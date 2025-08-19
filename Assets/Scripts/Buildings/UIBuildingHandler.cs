@@ -10,7 +10,7 @@ public class UIBuildingHandler : MonoBehaviour
     [SerializeField]
     private UIDistrictUnlockHandler districtUnlockHandler;
     
-    private List<UIDistrictFlipButton> districtButtons = new List<UIDistrictFlipButton>();
+    private List<UIDistrictToggleButton> districtButtons = new List<UIDistrictToggleButton>();
     private List<Action> clickActions = new List<Action>();
     
     private void OnEnable()
@@ -30,16 +30,16 @@ public class UIBuildingHandler : MonoBehaviour
 
     private void SubscribeToDistrictButton(TowerData towerData, UIDistrictButton districtButton)
     {
-        UIDistrictFlipButton flipButton = districtButton.GetComponentInChildren<UIDistrictFlipButton>();
+        UIDistrictToggleButton toggleButton = districtButton.GetComponentInChildren<UIDistrictToggleButton>();
         
-        int index = (int)towerData.DistrictType;
+        DistrictType districtType = towerData.DistrictType;
         Action onClick = () =>
         {
-            ClickDistrict(index);
+            ClickDistrict(districtType);
         };
-        flipButton.OnClick += onClick;
+        toggleButton.OnClick += onClick;
                 
-        districtButtons.Add(flipButton);
+        districtButtons.Add(toggleButton);
         clickActions.Add(onClick);
     }
 
@@ -53,11 +53,8 @@ public class UIBuildingHandler : MonoBehaviour
         Events.OnBuildingClicked?.Invoke(BuildingType.Barricade);
     }
 
-    public void ClickDistrict(int type)
+    public void ClickDistrict(DistrictType district)
     {
-        if (type >= (int)DistrictType.TownHall) type++; // Don't worry about it
-        
-        DistrictType district = (DistrictType)type;
         Events.OnDistrictClicked?.Invoke(district, district switch
         {
             DistrictType.Bomb => 3,

@@ -46,9 +46,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPoolSize: 10
   trees:
-  - {fileID: 5879582959376992463, guid: 12b75eb0eda7b2b4bb4bded9c619c10c, type: 3}
-  - {fileID: 5879582959376992463, guid: 55ab652f5934f4b45870f2b6f20631bc, type: 3}
-  - {fileID: 5879582959376992463, guid: 57fdc254eabbaf74b89de0ad7bfe8412, type: 3}
+  - Array:
+    - {fileID: 2573037696340128031, guid: 8e3fb16734c965044b091e5e2ebfed04, type: 3}
+    - {fileID: 1089026275716465711, guid: 772b09e88528ecb43a16a9d133255309, type: 3}
+    - {fileID: 8282742661359379387, guid: c9a7792da0faed542b6733e12b6a7eae, type: 3}
   treeMaterial: {fileID: 2100000, guid: c36a4497441bc1d48ad8c03477895bc7, type: 2}
   raycastArea: {x: 2, y: 2}
   treeRadius: 0.7

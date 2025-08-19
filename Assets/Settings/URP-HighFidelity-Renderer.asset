@@ -231,7 +231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
   m_Name: Inverted Hull Outline
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   settings:
     passTag: Inverted Hull Outline
     Event: 300
@@ -239,7 +239,7 @@ MonoBehaviour:
       RenderQueueType: 0
       LayerMask:
         serializedVersion: 2
-        m_Bits: 465
+        m_Bits: 464
       PassNames: []
     overrideMaterial: {fileID: 2100000, guid: ad9026aa8f98b7545a6e06bfb680de63, type: 2}
     overrideMaterialPassIndex: 0

@@ -66,6 +66,11 @@ public static class Extensions
     {
         return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
     }
+    
+    public static int2 MultiplyByAxis(this int2 a, int2 b)
+    {
+        return new int2(a.x * b.x, a.y * b.y);
+    }
 
     public static Tween ScaleWithGameSpeed(this Tween tween, IGameSpeed gameSpeed)
     {

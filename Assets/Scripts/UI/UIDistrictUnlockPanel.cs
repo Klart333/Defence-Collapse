@@ -13,10 +13,10 @@ namespace UI
         
         [SerializeField]
         private Image iconImage;
-        
-        [SerializeField]
-        private TextMeshProUGUI descriptionText;
 
+        [SerializeField]
+        private Image smallIconImage;
+        
         private Action<TowerData> clickCallback;
         private TowerData towerData;
         
@@ -24,7 +24,7 @@ namespace UI
         {
             titleText.text = towerData.DistrictName;
             iconImage.sprite = towerData.Icon;
-            descriptionText.text = towerData.Description;
+            smallIconImage.sprite = towerData.IconSmall;
             
             this.towerData = towerData;
             clickCallback = callback;
