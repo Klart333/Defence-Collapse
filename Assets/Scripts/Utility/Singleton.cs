@@ -22,7 +22,8 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
             
             if (!shouldDestroyOnLoad)
             {
-               DontDestroyOnLoad(Instance.gameObject);
+                Instance.transform.SetParent(null);
+                DontDestroyOnLoad(Instance.gameObject);
             }
         }
     }

@@ -68,12 +68,16 @@ namespace Gameplay
             DamageCallbackHandler.DamageDoneEvent.Clear();
             
             World defaultWorld = World.DefaultGameObjectInjectionWorld;
-            defaultWorld.EntityManager.CompleteAllTrackedJobs();
-            foreach (ComponentSystemBase system in defaultWorld.Systems)
+            if (defaultWorld != null)
             {
-                system.Enabled = false;
+                defaultWorld.EntityManager.CompleteAllTrackedJobs();
+                foreach (ComponentSystemBase system in defaultWorld.Systems)
+                {
+                    system.Enabled = false;
+                }
+                defaultWorld.Dispose();
             }
-            defaultWorld.Dispose();
+           
             DefaultWorldInitialization.Initialize("Default World");
             if (!ScriptBehaviourUpdateOrder.IsWorldInCurrentPlayerLoop(World.DefaultGameObjectInjectionWorld))
             {

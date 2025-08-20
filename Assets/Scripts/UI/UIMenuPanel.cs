@@ -14,6 +14,9 @@ public class UIMenuPanel : MonoBehaviour
 
     [SerializeField]
     private Ease ease = Ease.OutSine;
+
+    [SerializeField]
+    private float heightOffset = 10;
     
     private float startOffset;
 
@@ -21,7 +24,7 @@ public class UIMenuPanel : MonoBehaviour
     {
         selector.DOKill();
 
-        selector.DOAnchorPosY(rectTransform.anchoredPosition.y, duration).SetEase(ease);
+        selector.DOAnchorPosY(rectTransform.anchoredPosition.y + heightOffset, duration).SetEase(ease);
     }
 
     public void StartGame()

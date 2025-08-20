@@ -76,7 +76,7 @@ namespace Buildings.District
         {
             foreach (ChunkIndex chunkIndex in chunkIndexes)
             {
-                Debug.Log("Index: " + chunkIndex);
+                //Debug.Log("Index: " + chunkIndex);
             }
             districtGenerator.AddAction(async () => await districtGenerator.RemoveChunks(chunkIndexes));
         }
