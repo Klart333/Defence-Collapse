@@ -34,7 +34,12 @@ MonoBehaviour:
       Entry: 8
       Data: 
   icon: {fileID: 21300000, guid: 589db224aea12884880200807e357d93, type: 3}
-  description: Archer Districts shoot <color=red>Fire Arrows</color>
+  description: 
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: d66d2c13c14f75843a887e5e363e7454, type: 2}
+    VariableValuePreview: 
   upgradeRank: 2
   upgradeCardType: 1
   weight: -1
@@ -42,7 +47,6 @@ MonoBehaviour:
   weightChangeOnPicked: 1
   weightChangeOnCardsPicked: 0.75
   weightChangeOnDistrictBuilt: 0.25
-  districtType: 0
   appliedCategories: 1
   upgradeType: 1
   componentType: 0

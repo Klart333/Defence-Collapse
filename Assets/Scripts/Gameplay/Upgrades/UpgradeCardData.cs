@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Variables;
 using Effects;
 using System;
 
@@ -13,8 +14,14 @@ namespace Gameplay.Upgrades
         [SerializeField]
         private Sprite icon;
 
+        [SerializeField]
+        private SpriteReference iconReference;
+
         [SerializeField, TextArea]
         private string description;
+
+        [SerializeField]
+        private StringReference descriptionReference;
 
         [Title("Weight Settings")]
         [SerializeField]
@@ -41,10 +48,6 @@ namespace Gameplay.Upgrades
         [ShowIf(nameof(isChangeOnDistrictPlaced))]
         private float weightChangeOnDistrictBuilt = 1;
         
-        [SerializeField]
-        [ShowIf(nameof(isLockedToDistrictType))]
-        private DistrictType districtType;
-
         [Title("Effect")]
         [SerializeField]
         private CategoryType appliedCategories;
@@ -69,29 +72,30 @@ namespace Gameplay.Upgrades
         private bool isLockedToDistrictType => weightStrategy.HasFlag(WeightStrategy.LockToDistrictType);
 
         public UpgradeCardInstance GetUpgradeCardInstance() => new UpgradeCardInstance(this);
-            
+
         public class UpgradeCardInstance
         {
-            public readonly List<IEffect> Effects;
+            // ReSharper disable FieldCanBeMadeReadOnly.Global
+            public List<IEffect> Effects;
 
-            public readonly Sprite Icon;
+            public StringReference Description;
+            public Sprite Icon;
 
-            public readonly UpgradeComponentType ComponentType;
-            public readonly UpgradeCardType UpgradeCardType;
-            public readonly CategoryType AppliedCategories;
-            public readonly WeightStrategy WeightStrategy;
-            public readonly DistrictType DistrictType;
-            public readonly UpgradeRank UpgradeRank;
-            public readonly UpgradeType UpgradeType;
+            public UpgradeComponentType ComponentType;
+            public UpgradeCardType UpgradeCardType;
+            public CategoryType AppliedCategories;
+            public WeightStrategy WeightStrategy;
+            public UpgradeRank UpgradeRank;
+            public UpgradeType UpgradeType;
 
-            public readonly float WeightChangeOnDistrictBuilt;
-            public readonly float WeightChangeOnCardsPicked;
-            public readonly float WeightChangeOnPicked;
-            public readonly float ComponentStrength;
-            public readonly string Description;
+            public float WeightChangeOnDistrictBuilt;
+            public float WeightChangeOnCardsPicked;
+            public float WeightChangeOnPicked;
+            public float ComponentStrength;
             public float Weight;
-            
 
+            public bool IsAppliedToDistrct => (AppliedCategories & CategoryType.AllDistrict) > 0;
+            
             public UpgradeCardInstance(UpgradeCardData upgradeCardData)
             {
                 Effects = upgradeCardData.effects;
@@ -101,7 +105,6 @@ namespace Gameplay.Upgrades
                 UpgradeCardType = upgradeCardData.upgradeCardType;
                 AppliedCategories = upgradeCardData.appliedCategories;
                 WeightStrategy = upgradeCardData.weightStrategy;
-                DistrictType = upgradeCardData.districtType;
                 UpgradeRank = upgradeCardData.upgradeRank;
                 UpgradeType = upgradeCardData.upgradeType;
                 
@@ -109,7 +112,7 @@ namespace Gameplay.Upgrades
                 WeightChangeOnCardsPicked = upgradeCardData.weightChangeOnCardsPicked;
                 WeightChangeOnPicked = upgradeCardData.weightChangeOnPicked;
                 ComponentStrength = upgradeCardData.componentStrength;
-                Description = upgradeCardData.description;
+                Description = upgradeCardData.descriptionReference;
                 Weight = upgradeCardData.weight;
             }
         }
@@ -147,8 +150,9 @@ namespace Gameplay.Upgrades
         Flame = 1 << 5,
         Lightning = 1 << 10,
         Barracks = 1 << 11,
-        AllDistrict = 1 << 6,
-        
+        Mana = 1 << 6,
+        AllDistrict = Archer | Bomb | Church | TownHall | Mine | Flame | Lightning | Barracks | Mana,
+
         // Attack
         Projectile = 1 << 7,
         AoE = 1 << 8,
@@ -204,5 +208,33 @@ namespace Gameplay.Upgrades
         Rare,
         Epic,
         Legendary,
+    }
+
+    public static class CategoryTypeUtility
+    {
+        public static bool GetDistrictType(CategoryType categoryType, out DistrictType districtType)
+        {
+             DistrictType? type = categoryType switch
+            {
+                CategoryType.Archer => DistrictType.Archer,
+                CategoryType.Bomb => DistrictType.Bomb,
+                CategoryType.Church => DistrictType.Church,
+                CategoryType.TownHall => DistrictType.TownHall,
+                CategoryType.Mine => DistrictType.Mine,
+                CategoryType.Flame => DistrictType.Flame,
+                CategoryType.Lightning => DistrictType.Lightning,
+                CategoryType.Barracks => DistrictType.Barracks,
+                _ => null
+            };
+
+            if (!type.HasValue)
+            {
+                districtType = default;
+                return false;
+            }
+            
+            districtType = type.Value;
+            return true;
+        }
     }
 }

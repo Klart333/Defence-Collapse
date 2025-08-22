@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Buildings.District;
@@ -67,14 +68,12 @@ namespace Gameplay.Upgrades
             switch (upgradeInstance.UpgradeType)
             {
                 case UpgradeType.Effect:
-                {
                     foreach (IEffect effect in upgradeInstance.Effects)
                     {
                         AddUpgradeEffect(upgradeInstance.AppliedCategories, effect);
                     }
 
                     break;
-                }
                 case UpgradeType.Component:
                     AddComponentEffect(upgradeInstance.AppliedCategories, upgradeInstance.ComponentType, upgradeInstance.ComponentStrength);
                     break;
@@ -89,21 +88,22 @@ namespace Gameplay.Upgrades
         
         public void AddUpgradeEffect(CategoryType appliedDistrict, IEffect effect)
         {
-            foreach (DistrictData district in districtHandler.Districts)
+            foreach (DistrictData district in districtHandler.Districts.Values)
             {
-                if ((appliedDistrict & (CategoryType.AllDistrict | district.State.CategoryType)) > 0)
+                if (appliedDistrict.HasFlag(district.State.CategoryType))
                 {
                     effect.Perform(district.State);
                 }
             }
-            
-            if (appliedEffects.TryGetValue(appliedDistrict, out List<IEffect> list))
+
+            Array enumValues = Enum.GetValues(typeof(CategoryType));
+            foreach (object enumValue in enumValues)
             {
-                list.Add(effect);
-            }
-            else
-            {
-                appliedEffects.Add(appliedDistrict, new List<IEffect> { effect });
+                CategoryType categoryType = (CategoryType)enumValue;
+                if (!appliedDistrict.HasFlag(categoryType)) continue;
+                
+                if (appliedEffects.TryGetValue(categoryType, out List<IEffect> list)) list.Add(effect);
+                else appliedEffects.Add(categoryType, new List<IEffect> { effect });
             }
         }
         

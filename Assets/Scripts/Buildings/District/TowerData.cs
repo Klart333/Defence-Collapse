@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using Gameplay.Upgrades;
 using UnityEngine;
-using Gameplay;
-using System;
-using Effects;
-using Juice;
 using Variables;
+using Gameplay;
+using Effects;
+using System;
 
 namespace Buildings.District
 {
@@ -18,6 +18,9 @@ namespace Buildings.District
         private string districtName = "___ District";
 
         [SerializeField]
+        private StringReference districtNameReference;
+        
+        [SerializeField]
         private SpriteReference icon;
         
         [SerializeField]
@@ -26,6 +29,9 @@ namespace Buildings.District
         [SerializeField]
         [TextArea]
         private string description;
+        
+        [SerializeField]
+        private StringReference descriptionReference;
 
         [SerializeField]
         private DistrictType districtType;
@@ -41,10 +47,23 @@ namespace Buildings.District
         [Title("References")]
         public PooledMonoBehaviour RangeIndicator;
 
+        [Title("Targeting")]
         [SerializeField]
-        private DistrictTargetMesh districtTargetMesh;
+        private bool requireTargeting = true;
 
+        [SerializeField, ShowIf(nameof(requireTargeting))]
+        private float attackAngle = 360;
+        
+        [SerializeField, ShowIf(nameof(requireTargeting))]
+        private bool useTargetMesh;
+
+        [SerializeField, ShowIf(nameof(useTargetMesh))]
+        private MeshVariable meshVariable;
+        
         [Title("Attack")]
+        [SerializeField]
+        private CategoryType categoryType;
+        
         [OdinSerialize, NonSerialized]
         public Attack BaseAttack;
 
@@ -56,13 +75,17 @@ namespace Buildings.District
         [OdinSerialize]
         private List<IEffect> endWaveEffects = new List<IEffect>();
 
-        public DistrictTargetMesh DistrictTargetMesh => districtTargetMesh;
+        public string DistrictName => districtNameReference.Value;
+        public string Description => descriptionReference.Value;
         public List<IEffect> EndWaveEffects => endWaveEffects;
         public List<IEffect> CreatedEffects => createdEffects;
+        public MeshVariable MeshVariable => meshVariable;
         public DistrictType DistrictType => districtType;
-        public string DistrictName => districtName;
-        public string Description => description;
+        public bool RequireTargeting => requireTargeting;
+        public CategoryType CategoryType => categoryType;
+        public bool UseTargetMesh => useTargetMesh;
         public Sprite IconSmall => iconSmall.Value;
+        public float AttackAngle => attackAngle;
         public Sprite Icon => icon.Value;
 
         [TitleGroup("Stats")]

@@ -39,8 +39,8 @@ MonoBehaviour:
       Entry: 10
       Data: 0
     - Name: Description
-      Entry: 6
-      Data: 
+      Entry: 1
+      Data: Lightning strikes <> On Damage Done </>
     - Name: Title
       Entry: 1
       Data: Lightning Clap Back
@@ -62,6 +62,12 @@ MonoBehaviour:
     - Name: AttackEffect
       Entry: 10
       Data: 1
+    - Name: spawnAtUnitOrigin
+      Entry: 5
+      Data: false
+    - Name: orientEffectToAttackPosition
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -95,6 +101,21 @@ MonoBehaviour:
     - Name: TriggerDamageDone
       Entry: 5
       Data: false
+    - Name: hasFireComponent
+      Entry: 5
+      Data: false
+    - Name: fireTotalDamage
+      Entry: 4
+      Data: 0
+    - Name: hasLightningComponent
+      Entry: 5
+      Data: false
+    - Name: lightningDamage
+      Entry: 4
+      Data: 0
+    - Name: lightningBounces
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 

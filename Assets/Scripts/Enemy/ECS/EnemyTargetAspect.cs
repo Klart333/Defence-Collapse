@@ -12,24 +12,11 @@ namespace Enemy.ECS
         
         private readonly RefRW<AttackSpeedComponent> AttackSpeedComponent;
         
-        public bool ShouldFindTarget(float deltaTime)
+        public bool ShouldFindTarget()
         {
-            AttackSpeedComponent.ValueRW.Timer += deltaTime;
             float delta = AttackSpeedComponent.ValueRO.AttackSpeed - AttackSpeedComponent.ValueRO.Timer;
 
             return delta < 0.2f;
-        }
-
-        public bool CanAttack()
-        {
-            return EnemyTargetComponent.ValueRO.HasTarget 
-                   && AttackSpeedComponent.ValueRO.Timer >= AttackSpeedComponent.ValueRO.AttackSpeed;
-        }
-
-        public void RestTimer()
-        {
-            AttackSpeedComponent.ValueRW.Timer = 0;
-            EnemyTargetComponent.ValueRW.HasTarget = false;
         }
     }
 }

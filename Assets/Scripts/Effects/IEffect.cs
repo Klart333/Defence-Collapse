@@ -32,7 +32,7 @@ namespace Effects
         public void Revert(IAttacker attacker);
 
         public float ModifierValue { get; set; }
-        public bool IsDamageEffect { get; } 
+        public bool IsDamageEffect { get; }
     }
 
     public interface IEffectHolder : IEffect 

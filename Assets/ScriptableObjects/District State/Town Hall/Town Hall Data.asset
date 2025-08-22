@@ -271,15 +271,29 @@ MonoBehaviour:
       Entry: 8
       Data: 
   districtName: Town Hall
+  districtNameReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: a8c703f68119adc40984f621badd0088, type: 2}
+    VariableValuePreview: 
   icon:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: e70dacc5b879b6b4e8f77f3d0cf508f3, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 2564da7b06561d24f8f75f21768e4086,
+      type: 3}
   iconSmall:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: 536a0b9a4fc018543a732f09d052c9fa, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 704c7a4eb0cdd3a4d9f95d4876635fe0,
+      type: 3}
   description: 
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: 63924b239de398c4e855789e55b14656, type: 2}
+    VariableValuePreview: 
   districtType: 3
   LevelDatas:
   - {fileID: 11400000, guid: 76b706ff9f7a73c4d8e1c7731e67264f, type: 2}
@@ -287,4 +301,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b5bf9ae6f97b5e548abe324f059a1523, type: 3}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
-  districtTargetMesh: {fileID: 0}
+  requireTargeting: 1
+  attackAngle: 360
+  useTargetMesh: 0
+  meshVariable: {fileID: 0}
+  categoryType: 8

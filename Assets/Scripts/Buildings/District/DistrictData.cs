@@ -11,6 +11,7 @@ using InputCamera;
 using Gameplay;
 using Utility;
 using System;
+using Buildings.District.ECS;
 using Gameplay.Buffs;
 
 namespace Buildings.District
@@ -264,6 +265,12 @@ namespace Buildings.District
             }
             
             OnDisposed?.Invoke();
+        }
+
+        public void PerformAttack(DistrictEntityData data)
+        {
+            State.OriginPosition = data.OriginPosition;
+            State.PerformAttack(data.TargetPosition);
         }
     }
 

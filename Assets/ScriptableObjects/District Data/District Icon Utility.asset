@@ -1,0 +1,289 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67a9afadbedb442a9d69af930b089218, type: 3}
+  m_Name: District Icon Utility
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 0}
+    - {fileID: 11400000, guid: a6649cdfba3c6d54a98cd3dab9d84466, type: 2}
+    - {fileID: 21300000, guid: 7cf737b1942c8304b9633c7d65566295, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: 5d12ae81f98d49444b4353fe6e93e351, type: 2}
+    - {fileID: 21300000, guid: b21f9bd7c666444488d53eedee236f02, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: 52002f136f294334284db5b31be3bf01, type: 2}
+    - {fileID: 21300000, guid: f933378715220c4438a9118150ab350c, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: 0aad3b5198b36844fbc604984333f363, type: 2}
+    - {fileID: 21300000, guid: 57d2c01954e69e14a86c6987fa664e61, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: e70dacc5b879b6b4e8f77f3d0cf508f3, type: 2}
+    - {fileID: 21300000, guid: 2564da7b06561d24f8f75f21768e4086, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: c018b4a1173d85d47b4c75dc19b5297b, type: 2}
+    - {fileID: 21300000, guid: 1b0b1151909de534da671ec57aa570b4, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: 6e6b6eccb959d3c48bfb80b89eed296a, type: 2}
+    - {fileID: 21300000, guid: eddc57078958b55429f9001686c50a35, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: 3ad360f07fc22054b99238706f146d72, type: 2}
+    - {fileID: 21300000, guid: b28ac96bf19605046a4ba5fe057957d1, type: 3}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: icons
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[DistrictType, Core],[Variables.SpriteReference,
+        Core]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[DistrictType, Core]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 8
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 7
+      Data: 2|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 0
+    - Name: Variable
+      Entry: 10
+      Data: 1
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: 3|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 3
+    - Name: Variable
+      Entry: 10
+      Data: 4
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: 4|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 6
+    - Name: Variable
+      Entry: 10
+      Data: 7
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 7
+      Data: 5|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 9
+    - Name: Variable
+      Entry: 10
+      Data: 10
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 11
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 4
+    - Name: $v
+      Entry: 7
+      Data: 6|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 12
+    - Name: Variable
+      Entry: 10
+      Data: 13
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 14
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 5
+    - Name: $v
+      Entry: 7
+      Data: 7|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 15
+    - Name: Variable
+      Entry: 10
+      Data: 16
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 17
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 6
+    - Name: $v
+      Entry: 7
+      Data: 8|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 18
+    - Name: Variable
+      Entry: 10
+      Data: 19
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 20
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 7
+    - Name: $v
+      Entry: 7
+      Data: 9|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 21
+    - Name: Variable
+      Entry: 10
+      Data: 22
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 23
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 

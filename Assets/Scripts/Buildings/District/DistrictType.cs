@@ -8,4 +8,5 @@ public enum DistrictType
     Flame = 5,
     Lightning = 6,
     Barracks = 7,
+    Mana = 8,
 }

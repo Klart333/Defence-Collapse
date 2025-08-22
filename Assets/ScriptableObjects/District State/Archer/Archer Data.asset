@@ -252,14 +252,23 @@ MonoBehaviour:
       Entry: 8
       Data: 
   districtName: Archer District
+  districtNameReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: ee37126f0c5752440a82fbbf126033fd, type: 2}
+    VariableValuePreview: 
   icon:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: a6649cdfba3c6d54a98cd3dab9d84466, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 7cf737b1942c8304b9633c7d65566295,
+      type: 3}
   iconSmall:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: 1ef955698bc6c6c489cfb817578bf826, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 2e014047ede1b5343a7e1d3560b493b2,
+      type: 3}
   description: 'Fires arrows at enemies, dealing single target damage.
 
 
@@ -267,6 +276,11 @@ MonoBehaviour:
     size: 1 x 1
 
     Cost: 50'
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: bd3ad041d64ead749b43fe90687bbf61, type: 2}
+    VariableValuePreview: 
   districtType: 0
   LevelDatas:
   - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
@@ -278,5 +292,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5c91aec45c337e54285b8f9e8434bec1, type: 3}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
-  districtTargetMesh: {fileID: 5266014834842158584, guid: 506c3054aca518a43bea27bc5a35569a,
-    type: 3}
+  requireTargeting: 1
+  attackAngle: 75
+  useTargetMesh: 1
+  meshVariable: {fileID: 11400000, guid: d4d5b9c8ee9a39c4bbce276cb6044a6c, type: 2}
+  categoryType: 1

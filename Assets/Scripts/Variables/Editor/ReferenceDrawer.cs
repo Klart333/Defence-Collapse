@@ -1,13 +1,17 @@
+using UnityEngine.Localization.Settings;
+using UnityEngine.Localization.Tables;
+using UnityEngine.Localization;
+using UnityEditor;
+using UnityEngine;
+using System.IO;
 using TMPro;
 
 namespace Variables.Editor
 {
-    using UnityEditor;
-    using UnityEngine;
 
-    public abstract class ReferenceDrawerBase<T> : PropertyDrawer
+    public abstract class ReferenceDrawerBase<T, T1> : PropertyDrawer where T1 : ScriptableObject
     {
-        protected abstract T GetVariableValue(Object variable);
+        protected abstract T GetVariableValue(T1 variable);
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -21,6 +25,10 @@ namespace Variables.Editor
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel(label);
             
+            
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.BeginHorizontal();
+
             // Draw toggle (as popup)
             modeProp.enumValueIndex = EditorGUILayout.Popup(modeProp.enumValueIndex, modeProp.enumDisplayNames);
 
@@ -28,17 +36,18 @@ namespace Variables.Editor
             if (modeProp.enumValueIndex == 0) // Constant
             {
                 EditorGUILayout.PropertyField(constantProp, GUIContent.none);
+                EditorGUILayout.EndHorizontal();
+
             }
             else // Variable
             {
-                EditorGUILayout.BeginVertical();
-
                 EditorGUILayout.PropertyField(variableProp, GUIContent.none);
+                EditorGUILayout.EndHorizontal();
 
                 // Draw preview label
                 if (variableProp.objectReferenceValue != null)
                 {
-                    T value = GetVariableValue(variableProp.objectReferenceValue);
+                    T value = GetVariableValue((T1)variableProp.objectReferenceValue);
 
                     switch (value)
                     {
@@ -52,51 +61,109 @@ namespace Variables.Editor
                         case float floatValue:
                             EditorGUILayout.FloatField(floatValue);
                             break;
+                        case string stringValue:
+                            EditorGUILayout.TextField(stringValue, EditorStyles.textField);
+                            break;
+                    }
+                }
+                else // Make button to create the ScriptableObject reference
+                {
+                    // Draw "Create" button when null
+                    if (GUILayout.Button($"Create {typeof(T1).Name}", GUILayout.Height(20)))
+                    {
+                        CreateAndAssignAsset(variableProp);
                     }
                 }
 
-                EditorGUILayout.EndVertical();
             }
-
+            
+            EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
+
+        }
+
+        /// <summary>
+        /// Creates a ScriptableObject asset and assigns it to the given property.
+        /// </summary>
+        private void CreateAndAssignAsset(SerializedProperty variableProp)
+        {
+            System.Type targetType = typeof(T1);
+
+            // Create instance
+            ScriptableObject newAsset = ScriptableObject.CreateInstance(targetType);
+
+            // Find parent asset path
+            string assetPath = AssetDatabase.GetAssetPath(variableProp.serializedObject.targetObject);
+            assetPath = string.IsNullOrEmpty(assetPath) ? "Assets" : Path.GetDirectoryName(assetPath);
+
+            // Auto-name based on field name for clarity
+            string safeName = ObjectNames.NicifyVariableName(variableProp.name);
+            string newPath = AssetDatabase.GenerateUniqueAssetPath(Path.Combine(assetPath, $"{safeName}_{targetType.Name}.asset"));
+
+            // Save asset
+            AssetDatabase.CreateAsset(newAsset, newPath);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            // Assign reference
+            variableProp.objectReferenceValue = newAsset;
+            variableProp.serializedObject.ApplyModifiedProperties();
+
+            // Highlight new asset
+            EditorGUIUtility.PingObject(newAsset);
+            Selection.activeObject = newAsset;
         }
     }
     
 
     [CustomPropertyDrawer(typeof(FloatReference))]
-    public class FloatReferenceDrawer : ReferenceDrawerBase<float>
+    public class FloatReferenceDrawer : ReferenceDrawerBase<float, FloatVariable>
     {
-        protected override float GetVariableValue(Object variable)
+        protected override float GetVariableValue(FloatVariable variable)
         {
-            return ((FloatVariable)variable).Value;
+            return variable.Value;
         }
     }
 
     
     [CustomPropertyDrawer(typeof(SpriteReference))]
-    public class SpriteReferenceDrawer : ReferenceDrawerBase<Sprite>
+    public class SpriteReferenceDrawer : ReferenceDrawerBase<Sprite, SpriteVariable>
     {
-        protected override Sprite GetVariableValue(Object variable)
+        protected override Sprite GetVariableValue(SpriteVariable variable)
         {
-            return ((SpriteVariable)variable).Value;
+            return variable.Value;
         }
     }
     
     [CustomPropertyDrawer(typeof(ColorReference))]
-    public class ColorReferenceDrawer : ReferenceDrawerBase<Color>
+    public class ColorReferenceDrawer : ReferenceDrawerBase<Color, ColorVariable>
     {
-        protected override Color GetVariableValue(Object variable)
+        protected override Color GetVariableValue(ColorVariable variable)
         {
-            return ((ColorVariable)variable).Value;
+            return variable.Value;
         }
     }
     
     [CustomPropertyDrawer(typeof(FontReference))]
-    public class FontReferenceDrawer : ReferenceDrawerBase<TMP_FontAsset>
+    public class FontReferenceDrawer : ReferenceDrawerBase<TMP_FontAsset, FontVariable>
     {
-        protected override TMP_FontAsset GetVariableValue(Object variable)
+        protected override TMP_FontAsset GetVariableValue(FontVariable variable)
         {
-            return ((FontVariable)variable).Value;
+            return variable.Value;
+        }
+    }
+    
+    [CustomPropertyDrawer(typeof(StringReference))]
+    public class StringReferenceDrawer : ReferenceDrawerBase<string, StringVariable>
+    {
+        protected override string GetVariableValue(StringVariable variable)
+        {
+            LocalizedString localizedString = variable.LocalizedText;
+            if (localizedString.IsEmpty) return "";
+
+            LocalizedStringDatabase sd = UnityEngine.Localization.Settings.LocalizationSettings.StringDatabase;
+            LocalizedDatabase<StringTable, StringTableEntry>.TableEntryResult entry = sd.GetTableEntry(localizedString.TableReference, localizedString.TableEntryReference);
+            return entry.Entry.Value;
         }
     }
 }

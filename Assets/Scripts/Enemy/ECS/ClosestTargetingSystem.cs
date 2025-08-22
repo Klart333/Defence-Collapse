@@ -1,11 +1,10 @@
-using Gameplay;
-using Unity.Burst;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
-using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Collections;
 using Unity.Transforms;
+using Unity.Entities;
+using Unity.Burst;
 using UnityEngine;
+using Gameplay;
 
 namespace Enemy.ECS
 {
@@ -25,7 +24,6 @@ namespace Enemy.ECS
         public void OnUpdate(ref SystemState state)
         {
             NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
-            float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
 
             // Create and schedule the job
             new ClosestTargetingJob
@@ -33,7 +31,6 @@ namespace Enemy.ECS
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
                 SpatialGrid = spatialGrid.AsReadOnly(),
                 CellSize = 1,
-                DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
             }.ScheduleParallel();
         }
 
@@ -53,13 +50,12 @@ namespace Enemy.ECS
         [ReadOnly]
         public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
 
-        public float DeltaTime;
         public float CellSize;
 
         [BurstCompile]
         public void Execute(EnemyTargetAspect enemyTargetAspect)
         {
-            if (!enemyTargetAspect.ShouldFindTarget(DeltaTime))
+            if (!enemyTargetAspect.ShouldFindTarget())
             {
                 return;
             }

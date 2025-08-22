@@ -260,14 +260,23 @@ MonoBehaviour:
       Entry: 8
       Data: 
   districtName: Lightning District
+  districtNameReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: 081685a8feb6ece44a64fd676af125ed, type: 2}
+    VariableValuePreview: 
   icon:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: 6e6b6eccb959d3c48bfb80b89eed296a, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: eddc57078958b55429f9001686c50a35,
+      type: 3}
   iconSmall:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: e68dbc97e37b07149a3d2e955677b995, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 6016784dc6005ce4db71c12333c0c7de,
+      type: 3}
   description: 'Zaps enemies with lightning, dealing chain damage.
 
 
@@ -275,6 +284,11 @@ MonoBehaviour:
     x 1
 
     Cost: 300'
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: 1f15b0b2019caa946a2e46d11eb37dd7, type: 2}
+    VariableValuePreview: 
   districtType: 6
   LevelDatas:
   - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
@@ -286,4 +300,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5c91aec45c337e54285b8f9e8434bec1, type: 3}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
-  districtTargetMesh: {fileID: 0}
+  requireTargeting: 1
+  attackAngle: 360
+  useTargetMesh: 0
+  meshVariable: {fileID: 0}
+  categoryType: 1024

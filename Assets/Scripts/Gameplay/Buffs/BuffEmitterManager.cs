@@ -32,7 +32,7 @@ namespace Gameplay.Buffs
             
             buffables.Add(buildingHandler.WallStates.Values);
             buffables.Add(barricadeHandler.BarricadeStates.Values);
-            buffables.Add(districtHandler.Districts);
+            buffables.Add(districtHandler.Districts.Values);
         }
 
         private void OnDisable()

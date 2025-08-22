@@ -20,10 +20,13 @@ namespace Gameplay.Upgrades
         
         public readonly List<UpgradeCardData.UpgradeCardInstance> UpgradeCardInstances = new List<UpgradeCardData.UpgradeCardInstance>();
 
-        private readonly HashSet<DistrictType> unlockedDistricts = new HashSet<DistrictType> { DistrictType.Archer };
+        private HashSet<DistrictType> unlockedDistricts;
         
         public void InitializeUpgrades()
         {
+            UpgradeCardInstances.Clear();
+            unlockedDistricts = new HashSet<DistrictType> { DistrictType.Archer };
+            
             for (int i = 0; i < upgradeCards.Length; i++)
             {
                 UpgradeCardInstances.Add(upgradeCards[i].GetUpgradeCardInstance());
@@ -41,8 +44,11 @@ namespace Gameplay.Upgrades
                 float totalWeight = 0;
                 for (int j = availableUpgrades.Count - 1; j >= 0; j--)
                 {
-                    bool unlocked = !availableUpgrades[j].WeightStrategy.HasFlag(WeightStrategy.LockToDistrictType) 
-                                    || unlockedDistricts.Contains(availableUpgrades[j].DistrictType); 
+                    bool isDistrict = CategoryTypeUtility.GetDistrictType(availableUpgrades[j].AppliedCategories, out DistrictType districtType);
+                    bool unlocked = !isDistrict 
+                                    || !availableUpgrades[j].WeightStrategy.HasFlag(WeightStrategy.LockToDistrictType)
+                                    || unlockedDistricts.Contains(districtType); 
+                    
                     if (availableUpgrades[j].Weight <= 0 || !unlocked)
                     {
                         availableUpgrades.RemoveAt(j);

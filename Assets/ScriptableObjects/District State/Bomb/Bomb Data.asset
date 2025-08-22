@@ -313,14 +313,23 @@ MonoBehaviour:
       Entry: 8
       Data: 
   districtName: Bomb District
+  districtNameReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: 7499b79c8cd09b74098ce3d5c3ac1b56, type: 2}
+    VariableValuePreview: 
   icon:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: 5d12ae81f98d49444b4353fe6e93e351, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: b21f9bd7c666444488d53eedee236f02,
+      type: 3}
   iconSmall:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: 16830215ead314645b9dc9f68294888c, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: a066951a319336a4ca77035477ed93a5,
+      type: 3}
   description: 'Throws bombs at enemies, dealing AoE damage.
 
 
@@ -328,6 +337,11 @@ MonoBehaviour:
     3
 
     Cost: 500'
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: bae25befa525ae0478261aa98f04ec79, type: 2}
+    VariableValuePreview: 
   districtType: 1
   LevelDatas:
   - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
@@ -339,5 +353,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5c91aec45c337e54285b8f9e8434bec1, type: 3}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
-  districtTargetMesh: {fileID: 5266014834842158584, guid: 99d1aab4a605fb045853208c15ac1eb2,
-    type: 3}
+  requireTargeting: 1
+  attackAngle: 360
+  useTargetMesh: 1
+  meshVariable: {fileID: 11400000, guid: 4ad66f62e603e2f4ea055f18cd88a44d, type: 2}
+  categoryType: 2

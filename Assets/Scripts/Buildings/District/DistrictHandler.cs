@@ -10,7 +10,10 @@ using UnityEngine;
 using System.Linq;
 using Gameplay;
 using System;
+using Buildings.District.ECS;
 using Gameplay.Upgrades;
+using Unity.Collections;
+using Unity.Entities;
 
 namespace Buildings.District
 {
@@ -26,20 +29,20 @@ namespace Buildings.District
         private TowerDataUtility towerDataUtility;
         
         [Title("Debug")]
-        [OdinSerialize, ReadOnly]
+        [OdinSerialize, Sirenix.OdinInspector.ReadOnly]
         private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
 
-        [OdinSerialize, ReadOnly]
-        private readonly HashSet<DistrictData> uniqueDistricts = new HashSet<DistrictData>();
-
         private readonly Dictionary<int2, HashSet<District>> districtObjects = new Dictionary<int2, HashSet<District>>();
-        
+        private readonly Dictionary<int, DistrictData> uniqueDistricts = new Dictionary<int, DistrictData>();
         private readonly Dictionary<DistrictType, int> districtAmounts = new Dictionary<DistrictType, int>();
+        
+        private EntityManager entityManager;
+        private EntityQuery districtEntityQuery;
         
         private int districtKey;
         private bool inWave;
         
-        public HashSet<DistrictData> Districts => uniqueDistricts;
+        public Dictionary<int, DistrictData> Districts => uniqueDistricts;
 
         private void OnEnable()
         {
@@ -49,6 +52,9 @@ namespace Buildings.District
             Events.OnWaveEnded += OnWaveEnded;
             
             districtGenerator.OnDistrictChunkRemoved += OnDistrictChunkRemoved;
+            
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            districtEntityQuery = entityManager.CreateEntityQuery(typeof(DistrictEntityData));
         }
 
         private void OnDisable()
@@ -63,7 +69,7 @@ namespace Buildings.District
 
         private void OnDistrictChunkRemoved(IChunk chunk)
         {
-            foreach (DistrictData districtData in uniqueDistricts)
+            foreach (DistrictData districtData in uniqueDistricts.Values)
             {
                 if (districtData.OnDistrictChunkRemoved(chunk))
                 {
@@ -95,10 +101,38 @@ namespace Buildings.District
         {
             if (!inWave || GameManager.Instance.IsGameOver) return;
 
-            foreach (DistrictData districtData in uniqueDistricts)
+            foreach (DistrictData districtData in uniqueDistricts.Values)
             {
                 districtData.Update();
             }
+
+            UpdateDistrictEntities().Forget();
+        }
+
+        private async UniTaskVoid UpdateDistrictEntities()
+        {
+            NativeList<DistrictEntityData> array = districtEntityQuery.ToComponentDataListAsync<DistrictEntityData>(Allocator.TempJob, out var awaitJobHandle);
+            awaitJobHandle.Complete();
+            while (!awaitJobHandle.IsCompleted)
+            {
+                await UniTask.Yield();
+            }
+
+            if (!array.IsCreated)
+            {
+                return;
+            }
+            
+            foreach (DistrictEntityData data in array)
+            {
+                if (uniqueDistricts.TryGetValue(data.DistrictID, out DistrictData districtData))
+                {
+                    districtData.PerformAttack(data);
+                }
+            }
+            
+            array.Dispose();
+            entityManager.DestroyEntity(districtEntityQuery);
         }
 
         public void AddBuiltDistrict(HashSet<QueryChunk> chunks, DistrictType districtType)
@@ -170,13 +204,14 @@ namespace Buildings.District
         {
             Vector3 position = GetAveragePosition(chunks);
             TowerData towerData = towerDataUtility.GetTowerData(districtType);
-            DistrictData districtData = new DistrictData(towerData, chunks, position, districtGenerator, districtKey++)
+            int key = districtKey++;
+            DistrictData districtData = new DistrictData(towerData, chunks, position, districtGenerator, key)
             {
                 GameSpeed = GameSpeedManager.Instance,
                 DistrictHandler = this
             };
             
-            uniqueDistricts.Add(districtData);
+            uniqueDistricts.Add(key, districtData);
                 
             foreach (QueryChunk chunk in chunks)
             {
@@ -193,7 +228,7 @@ namespace Buildings.District
             {
                 districtData.OnDisposed -= OnDispose;
                 districtData.OnChunksLost -= OnChunksLost;
-                uniqueDistricts.Remove(districtData);
+                uniqueDistricts.Remove(key);
 
                 foreach (QueryChunk chunk in chunks)
                 {
@@ -259,7 +294,7 @@ namespace Buildings.District
         {
             HashSet<QueryChunk> addedChunks = new HashSet<QueryChunk>();
 
-            foreach (DistrictData districtData in uniqueDistricts)
+            foreach (DistrictData districtData in uniqueDistricts.Values)
             {
                 if ((districtData.State.CategoryType & CategoryType.TownHall) == 0) continue;
                 

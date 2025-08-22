@@ -260,14 +260,23 @@ MonoBehaviour:
       Entry: 8
       Data: 
   districtName: Flame District
+  districtNameReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: 9173ec6b8c0ad584e99355cdfd3d9b18, type: 2}
+    VariableValuePreview: 
   icon:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: c018b4a1173d85d47b4c75dc19b5297b, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 1b0b1151909de534da671ec57aa570b4,
+      type: 3}
   iconSmall:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: 89a79b345b894154bb013437f6bdb0ef, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 21d4083274bcfb447b1ce7f615d7d136,
+      type: 3}
   description: 'Burns enemies with fire, dealing AoE damage and applies <b>Burn</b>.
 
 
@@ -275,6 +284,11 @@ MonoBehaviour:
     3 x 3
 
     Cost: 500'
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: a5f3899665cbf734b9b3ed73d66bcd56, type: 2}
+    VariableValuePreview: 
   districtType: 5
   LevelDatas:
   - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
@@ -286,5 +300,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5c91aec45c337e54285b8f9e8434bec1, type: 3}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
-  districtTargetMesh: {fileID: 5266014834842158584, guid: 99d1aab4a605fb045853208c15ac1eb2,
-    type: 3}
+  requireTargeting: 1
+  attackAngle: 90
+  useTargetMesh: 1
+  meshVariable: {fileID: 11400000, guid: d4d5b9c8ee9a39c4bbce276cb6044a6c, type: 2}
+  categoryType: 32

@@ -9,5 +9,10 @@ namespace Variables
         private Color color;
         
         public Color Value => color;
+
+        public string ToTag()
+        {
+            return $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>";
+        }
     }
 }

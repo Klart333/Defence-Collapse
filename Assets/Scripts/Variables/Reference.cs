@@ -62,4 +62,13 @@ namespace Variables
             return Variable != null ? Variable.Value : null;
         }
     }
+    
+    [System.Serializable]
+    public class StringReference : Reference<string, StringVariable>
+    {
+        protected override string GetVariableValue()
+        {
+            return Variable != null ? Variable.Value : "";
+        }
+    }
 }

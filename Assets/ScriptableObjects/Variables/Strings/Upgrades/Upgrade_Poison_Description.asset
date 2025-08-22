@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 325ce971bb8c473194576814c8c6efca, type: 3}
+  m_Name: Upgrade_Poison_Description
+  m_EditorClassIdentifier: 
+  text:
+    m_TableReference:
+      m_TableCollectionName: GUID:43f2e9d7f5b58d14dabce85ebd58fecc
+    m_TableEntryReference:
+      m_KeyId: 59724635607040
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables:
+    - name: Color
+      variable:
+        rid: 5367088374237626608
+    - name: PowerName
+      variable:
+        rid: 5367088378053394509
+  references:
+    version: 2
+    RefIds:
+    - rid: 5367088374237626608
+      type: {class: ObjectVariable, ns: UnityEngine.Localization.SmartFormat.PersistentVariables,
+        asm: Unity.Localization}
+      data:
+        m_Value: {fileID: 11400000, guid: 24d8318db82d3bc49b4a2ea801a9b3ce, type: 2}
+    - rid: 5367088378053394509
+      type: {class: LocalizedString, ns: UnityEngine.Localization, asm: Unity.Localization}
+      data:
+        m_TableReference:
+          m_TableCollectionName: GUID:43f2e9d7f5b58d14dabce85ebd58fecc
+        m_TableEntryReference:
+          m_KeyId: 61651297538048
+          m_Key: 
+        m_FallbackState: 0
+        m_WaitForCompletion: 0
+        m_LocalVariables: []

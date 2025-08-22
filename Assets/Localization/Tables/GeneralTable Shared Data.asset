@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: GeneralTable Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: GeneralTable
+  m_TableCollectionNameGuidString: 3bab26c89fedbae478d2d02b60fa09a7
+  m_Entries:
+  - m_Id: 8765083648
+    m_Key: ID_AppliesTo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23751784697856
+    m_Key: ID_All
+    m_Metadata:
+      m_Items: []
+  - m_Id: 354707640979456
+    m_Key: District_Archer_Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 354918106959872
+    m_Key: District_Archer_Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355261901475840
+    m_Key: District_Camp_Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355327861100544
+    m_Key: District_Camp_Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355541103710208
+    m_Key: District_Bomb_Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355594165850112
+    m_Key: District_Bomb_Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355651078361088
+    m_Key: District_Church_Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355654819680256
+    m_Key: District_Church_Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355707206537216
+    m_Key: District_Flame_Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355743751507968
+    m_Key: District_Flame_Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355782020337664
+    m_Key: District_Lightning_Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355828736495616
+    m_Key: District_Lightning_Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355912580632576
+    m_Key: District_Mana_Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355939378040832
+    m_Key: District_Mana_Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355974408867840
+    m_Key: District_Mine_Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355992406626304
+    m_Key: District_Mine_Description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 356021833863168
+    m_Key: District_TownHall_Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 356049449160704
+    m_Key: District_TownHall_Description
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 5367088374237626603
+  references:
+    version: 2
+    RefIds:
+    - rid: 5367088374237626603
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables,
+        asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1755775908871
