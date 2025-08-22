@@ -31,11 +31,11 @@ public class PooledMonoBehaviour : MonoBehaviour
         }
     }
 
-    public T Get<T>() where T : PooledMonoBehaviour // 2. Second step called from GetAtPosAndRot<T>, here we ask for a disabled gameobject from the Pool
+    public T Get<T>(Transform parent = null) where T : PooledMonoBehaviour // 2. Second step called from GetAtPosAndRot<T>, here we ask for a disabled gameobject from the Pool
     {
         Pool pool = Pool.GetPool(this); // 3. Calls the static method of Pool, GetPool(PooledMonoBehaviour prefab) returns the pool for the prefab, if there isn't one, a pool is created  
 
-        var pooledObject = pool.Get<T>(); // 4. The pooledObject is the one we want to show/enable in the scene. We get it from the Get<T> function of the pool of the prefab, the Get<T> Method returns the first element of the pooled queue 
+        var pooledObject = pool.Get<T>(parent); // 4. The pooledObject is the one we want to show/enable in the scene. We get it from the Get<T> function of the pool of the prefab, the Get<T> Method returns the first element of the pooled queue 
 
         pooledObject.gameObject.SetActive(true); // We now have the object we want show/enable, so all we have to do is enable it
 
@@ -51,9 +51,9 @@ public class PooledMonoBehaviour : MonoBehaviour
         return pooledObject; 
     }
     
-    public T GetAtPosAndRot<T>(Vector3 position, Quaternion rotation) where T : PooledMonoBehaviour // 1. This is the first step in spawning a prefab (kinda optional)
+    public T GetAtPosAndRot<T>(Vector3 position, Quaternion rotation, Transform parent = null) where T : PooledMonoBehaviour // 1. This is the first step in spawning a prefab (kinda optional)
     {
-        T pooledObject = Get<T>(); // What this method does is takes the pooledObject from Get<T> and assign its position and rotation
+        T pooledObject = Get<T>(parent); // What this method does is takes the pooledObject from Get<T> and assign its position and rotation
 
         pooledObject.transform.position = position;
         pooledObject.transform.rotation = rotation;

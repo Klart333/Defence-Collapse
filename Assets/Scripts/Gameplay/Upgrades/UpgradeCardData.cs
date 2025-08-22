@@ -12,13 +12,7 @@ namespace Gameplay.Upgrades
     {
         [Title("Description")]
         [SerializeField]
-        private Sprite icon;
-
-        [SerializeField]
         private SpriteReference iconReference;
-
-        [SerializeField, TextArea]
-        private string description;
 
         [SerializeField]
         private StringReference descriptionReference;
@@ -99,7 +93,7 @@ namespace Gameplay.Upgrades
             public UpgradeCardInstance(UpgradeCardData upgradeCardData)
             {
                 Effects = upgradeCardData.effects;
-                Icon = upgradeCardData.icon;
+                Icon = upgradeCardData.iconReference.Value;
                 
                 ComponentType = upgradeCardData.componentType;
                 UpgradeCardType = upgradeCardData.upgradeCardType;

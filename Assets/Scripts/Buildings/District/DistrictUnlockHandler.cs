@@ -14,7 +14,7 @@ namespace Buildings.District
         private TowerData[] unlockableTowers;
         
         [SerializeField]
-        private UIDistrictUnlockPanel[] unlockPanels;
+        private UIDistrictIcon[] unlockPanels;
         
         [SerializeField]
         private GameObject canvasGameObject;

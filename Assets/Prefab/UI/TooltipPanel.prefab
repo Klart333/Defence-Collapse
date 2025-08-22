@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 4.199997, y: -4.600006}
+  m_AnchoredPosition: {x: 4.200012, y: -4.600006}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1258893091773854661
@@ -107,14 +107,14 @@ GameObject:
   - component: {fileID: 9219457892140205176}
   - component: {fileID: 7188492982815616304}
   - component: {fileID: 5830034467504996574}
-  - component: {fileID: 8987666767407582627}
+  - component: {fileID: 6301747978653250796}
   m_Layer: 0
   m_Name: TooltipPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &9219457892140205176
 RectTransform:
   m_ObjectHideFlags: 0
@@ -132,10 +132,10 @@ RectTransform:
   - {fileID: 8237359263094467086}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -173.8, y: 62.7}
-  m_SizeDelta: {x: 20, y: 15}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 15, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &7188492982815616304
 MonoBehaviour:
@@ -164,10 +164,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 10
-    m_Right: 10
-    m_Top: 5
-    m_Bottom: 10
+    m_Left: 15
+    m_Right: 15
+    m_Top: 10
+    m_Bottom: 15
   m_ChildAlignment: 0
   m_Spacing: 5
   m_ChildForceExpandWidth: 1
@@ -177,18 +177,22 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!225 &8987666767407582627
-CanvasGroup:
+--- !u!114 &6301747978653250796
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4956670823824996570}
   m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 0
-  m_BlocksRaycasts: 0
-  m_IgnoreParentGroups: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49c5fc5a7f2942b386f8beb9a9493ac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialPoolSize: 1
+  contentParent: {fileID: 9219457892140205176}
+  tooltipTextPrefab: {fileID: 9195058496517092639, guid: 8254f39f45dc0f0459999f7a1d68489c,
+    type: 3}
 --- !u!1 &6334299118302923746
 GameObject:
   m_ObjectHideFlags: 0

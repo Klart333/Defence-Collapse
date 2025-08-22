@@ -51,12 +51,16 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  icon: {fileID: 21300000, guid: 740f5e97fe6a90547844fb62858ab085, type: 3}
-  description: +5% Crit Chance on All Districts.
+  iconReference:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: f8f4dc1ab07cbcd4aab1632328745626, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 58c8b8043ba64334094ba67ace3c6d5e,
+      type: 3}
   descriptionReference:
     Mode: 1
     ConstantValue: 
-    Variable: {fileID: 11400000, guid: 625e40dd8568b184f9ae3b57cd3bd572, type: 2}
+    Variable: {fileID: 11400000, guid: 15fefa53ac2d4694cb5b6b7aa79fb1c1, type: 2}
     VariableValuePreview: 
   upgradeRank: 2
   upgradeCardType: 1087

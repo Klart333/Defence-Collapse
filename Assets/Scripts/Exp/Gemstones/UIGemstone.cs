@@ -55,6 +55,10 @@ namespace Exp.Gemstones
         [Title("Drag")]
         [SerializeField]
         private bool isDraggable;
+
+        [Title("Tooltip")]
+        [SerializeField]
+        private float heightOffset = 10;
         
         private UITooltipHandler tooltipHandler;
         private RectTransform rectTransform;
@@ -106,7 +110,7 @@ namespace Exp.Gemstones
                 Tuple.Create(sb.ToString(), 30),
             };
             
-            Vector2 position = (Vector2)rectTransform.position + Vector2.up * rectTransform.rect.height / 2.0f;
+            Vector2 position = (Vector2)rectTransform.position + Vector2.up * (rectTransform.rect.height / 2.0f - heightOffset);
             position /= canvas.scaleFactor;
             tooltipHandler.DisplayTooltip(gemstoneDescription, position);
         }
@@ -116,7 +120,7 @@ namespace Exp.Gemstones
             transform.DOKill();
             transform.DOScale(1, hoverDuration).SetEase(hoverEase);
 
-            tooltipHandler.HideTooltip();
+            tooltipHandler.PointerExitPanel();
         }
 
         public void OnPointerClick(PointerEventData eventData)
@@ -129,7 +133,7 @@ namespace Exp.Gemstones
             whiteOutImage.gameObject.SetActive(true);
             whiteOutImage.DOFade(0, whiteOutDuration).SetEase(whiteOutEase);
             
-            tooltipHandler.HideTooltip();
+            tooltipHandler.PointerExitPanel();
             OnClick?.Invoke(Gemstone);
         }
 
@@ -142,7 +146,7 @@ namespace Exp.Gemstones
             
             UIEvents.OnBeginDrag?.Invoke(this);
             
-            tooltipHandler.HideTooltip();
+            tooltipHandler.PointerExitPanel();
             canvasGroup.blocksRaycasts = false;
         }
 

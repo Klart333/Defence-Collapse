@@ -1,61 +1,90 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Sirenix.OdinInspector;
 using TMPro;
 
 namespace UI
 {
     public class UITooltipHandler : MonoBehaviour
     {
+        [Title("References")]
         [SerializeField]
-        private Transform tooltipPanel;
-        
-        [SerializeField]
-        private Transform contentParent;
+        private UITooltipDisplay tooltipDisplayPrefab;
         
         [SerializeField]
-        private TextMeshProUGUI tooltipTextPrefab;
+        private Transform tooltipContainer;
+
+        [Title("Settings")]
+        [SerializeField]
+        private float closeTime = 0.5f;
         
-        private Queue<TextMeshProUGUI> textPool = new Queue<TextMeshProUGUI>();
-        private List<TextMeshProUGUI> spawnedTexts = new List<TextMeshProUGUI>();
+        private List<UITooltipDisplay> spawnedTooltips = new List<UITooltipDisplay>();
         
+        private bool isHovering;
+        private float closeTimer;
+
+        private void Update()
+        {
+            if (isHovering || spawnedTooltips.Count <= 0) return;
+
+            if (InputManager.Instance.Fire.WasPerformedThisFrame())
+            {
+                closeTimer = closeTime;
+            }
+            
+            closeTimer += Time.deltaTime;
+            if (closeTimer >= closeTime)
+            {
+                HideTooltips();
+            }
+        }
+
         public void DisplayTooltip(IEnumerable<Tuple<string, int>> tooltips, Vector2 position)
         {
-            (tooltipPanel as RectTransform).anchoredPosition = position;
-            
-            tooltipPanel.gameObject.SetActive(true);
-            foreach (Tuple<string, int> tooltip in tooltips)
+            if (spawnedTooltips.Count > 0)
             {
-                TextMeshProUGUI text = GetText();
-                text.transform.SetAsLastSibling();
-                text.text = tooltip.Item1;
-                text.fontSize = tooltip.Item2;
-            }
-        }
-
-        private TextMeshProUGUI GetText()
-        {
-            if (textPool.TryDequeue(out TextMeshProUGUI text))
-            {
-                text.gameObject.SetActive(true);
-                spawnedTexts.Add(text);
-                return text;
+                HideTooltips();
             }
             
-            text = Instantiate(tooltipTextPrefab, contentParent);
-            spawnedTexts.Add(text);
-            return text;
+            UITooltipDisplay tooltip = tooltipDisplayPrefab.Get<UITooltipDisplay>(tooltipContainer);
+            (tooltip.transform as RectTransform).anchoredPosition = position;
+
+            tooltip.DisplayTooltip(tooltips);
+            tooltip.OnPointerEnter += PointerEnterPanel;
+            tooltip.OnPointerExit += PointerExitPanel;
+            
+            spawnedTooltips.Add(tooltip);
+            
+            PointerEnterPanel();
         }
 
-        public void HideTooltip()
+        private void PointerEnterPanel()
         {
-            tooltipPanel.gameObject.SetActive(false);
-            for (int i = 0; i < spawnedTexts.Count; i++)
+            isHovering = true;
+            closeTimer = 0;
+        }
+
+        public void PointerExitPanel()
+        {
+            isHovering = false;
+            closeTimer = 0;
+        }
+
+        public void ForceHideTooltips() => HideTooltips(); // It's a bit stupid ik
+        
+        private void HideTooltips()
+        {
+            isHovering = false;
+            
+            foreach (UITooltipDisplay tooltip in spawnedTooltips)
             {
-                spawnedTexts[i].gameObject.SetActive(false);
-                textPool.Enqueue(spawnedTexts[i]);
+                tooltip.HideTooltip();
+                tooltip.OnPointerEnter -= PointerEnterPanel;
+                tooltip.OnPointerExit -= PointerExitPanel;
             }
-            spawnedTexts.Clear();
+            
+            spawnedTooltips.Clear();
         }
     }
 }

@@ -46,11 +46,11 @@ public class Pool : MonoBehaviour
         return pool; // We return the pool 
     }
 
-    public T Get<T>() where T : PooledMonoBehaviour // 4. Gets the object we want from the pool, and if the pool is empty we just create one
+    public T Get<T>(Transform parent = null) where T : PooledMonoBehaviour // 4. Gets the object we want from the pool, and if the pool is empty we just create one
     {
         if (queueObjects.Count == 0) // If the queue is empty we need to Grow it, becuase the need to return the an element for the queue. (Except for in the beginning, it probably won't be called, because there would need to be over 50 sharks in the scene at once for it to be necessary)
         {
-            GrowPool();
+            GrowPool(!parent ? transform : parent);    
         }
 
         var pooledObject = queueObjects.Dequeue(); // returns the first element in the queue
@@ -58,16 +58,16 @@ public class Pool : MonoBehaviour
         return pooledObject as T; // We return the element/object, passed as the type we specified
     }
 
-    private void GrowPool() // (4.5, only called in the beginning and on rare occasions) Grows the pool in the beginning of the game, or anytime it need to be expanded
+    private void GrowPool(Transform parent) // (4.5, only called in the beginning and on rare occasions) Grows the pool in the beginning of the game, or anytime it need to be expanded
     {
         for (int i = 0; i < poolPrefab.InitialPoolSize; i++) // We specify how big the pool of the prefab this script handles, and create that many disabled gameobjects, ready to be enabled whenever we want
         {
-            var pooledObject = Instantiate(poolPrefab, transform, false); 
+            PooledMonoBehaviour pooledObject = Instantiate(poolPrefab, parent, false); 
             pooledObject.gameObject.name += $" {index + i}"; // Helps keeping track
             
             pooledObject.OnReturnToPool += AddObjectToAvailableQueue;
             
-            pooledObject.gameObject.SetActive(false); // Here it when it goes into the pool, through PooledMonoBehaviour
+            pooledObject.gameObject.SetActive(false); // Here is when it goes into the pool, through PooledMonoBehaviour
         }
 
         index += poolPrefab.InitialPoolSize;
@@ -78,11 +78,6 @@ public class Pool : MonoBehaviour
     /// </summary>
     private void AddObjectToAvailableQueue(PooledMonoBehaviour pooledObject) // When we disable a gameobject we pass it here and readd it to the queue, we previoulsy 'Dequeued' it. 
     {
-        if (pooledObject.isActiveAndEnabled)
-        {
-            pooledObject.transform.SetParent(this.transform); // We also set the parent, but this is only need if we do some funky shit and move it around, but it's good to have the safety net
-        }
-
         queueObjects.Enqueue(pooledObject);
     }
 

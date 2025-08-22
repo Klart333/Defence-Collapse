@@ -52,7 +52,18 @@ MonoBehaviour:
       Entry: 8
       Data: 
   icon: {fileID: 21300000, guid: 34aa25191b04edd4ab4ab2b1c6c25c09, type: 3}
+  iconReference:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: e27e0a47199144142aa274c8e106eb8f, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 7930b4af2256e0a468d8898f2d49c639,
+      type: 3}
   description: +20% Crystal Value on Mine Disitrcts.
+  descriptionReference:
+    Mode: 0
+    ConstantValue: +20% Crystal Value on Mine Disitrcts.
+    Variable: {fileID: 0}
+    VariableValuePreview: 
   upgradeRank: 0
   upgradeCardType: 16
   weight: 1
@@ -60,7 +71,6 @@ MonoBehaviour:
   weightChangeOnPicked: -0.5
   weightChangeOnCardsPicked: 1
   weightChangeOnDistrictBuilt: 0.25
-  districtType: 4
   appliedCategories: 16
   upgradeType: 0
   componentType: 0
