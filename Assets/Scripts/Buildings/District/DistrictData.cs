@@ -55,7 +55,6 @@ namespace Buildings.District
             DistrictGenerator = chunkDistrictGenerator;
             Position = position;
             GenerateCollider();
-            CreateChunkIndexCache();
             this.towerData = towerData;
             
             State = towerData.DistrictType switch
@@ -78,6 +77,8 @@ namespace Buildings.District
 
         private void GenerateCollider()
         {
+            CreateChunkIndexCache();
+
             ClickCallbackComponent clickCallback = DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, ref meshCollider);
             if (!clickCallback) return;
             
@@ -115,7 +116,6 @@ namespace Buildings.District
             }
             
             GenerateCollider();
-            CreateChunkIndexCache();
 
             State.RemoveEntities();
             State.SpawnEntities();
@@ -148,7 +148,7 @@ namespace Buildings.District
             {
                 OnChunksLost?.Invoke(destroyedIndexes);
                 
-                //State.OnIndexesDestroyed(destroyedIndexes);
+                State.OnIndexesDestroyed(destroyedIndexes);
                 if (!isDead)
                 {
                     GenerateCollider();
@@ -164,18 +164,31 @@ namespace Buildings.District
 
         private async UniTaskVoid DelayedUpdateEntities()
         {
+            if (!DistrictGenerator.IsGenerating)
+            {
+                await UniTask.Yield();
+            }
+            
             await UniTask.WaitWhile(() => DistrictGenerator.IsGenerating);
+            
             State.RemoveEntities();
             State.SpawnEntities();
         }
 
+        /// <summary>
+        /// This is from the district generator rebuilding the district based on the shape of the walls
+        /// </summary>
+        /// <param name="chunk"></param>
+        /// <returns></returns>
         public bool OnDistrictChunkRemoved(IChunk chunk)
         {
             if (!DistrictChunks.ContainsKey(chunk.ChunkIndex))
             {
+                //Debug.Log("DistrictChunks did not contain: " + chunk.ChunkIndex);
                 return false;
             }
 
+            //Debug.Log("Removing: " + chunk.ChunkIndex + " from DistrictChunks");
             HashSet<int3> destroyedIndexes = new HashSet<int3> { chunk.ChunkIndex };
             OnChunksLost?.Invoke(destroyedIndexes);
             

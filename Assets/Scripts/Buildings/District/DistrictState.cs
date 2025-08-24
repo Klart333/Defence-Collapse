@@ -1,4 +1,5 @@
-﻿using Vector2 = UnityEngine.Vector2;
+﻿using LocalToWorld = Unity.Transforms.LocalToWorld;
+using Vector2 = UnityEngine.Vector2;
 using System.Collections.Generic;
 using Buildings.District.ECS;
 using UnityEngine.Rendering;
@@ -15,8 +16,6 @@ using UnityEngine;
 using Enemy.ECS;
 using Effects;
 using System;
-using Juice;
-using LocalToWorld = Unity.Transforms.LocalToWorld;
 
 namespace Buildings.District
 {
@@ -25,14 +24,18 @@ namespace Buildings.District
         public event Action OnStatisticsChanged;
         public event Action OnAttack;
 
-        private readonly Dictionary<int2, List<DistrictTargetMesh>> targetMeshes = new Dictionary<int2, List<DistrictTargetMesh>>();
         private readonly Dictionary<int2, List<Entity>> entityIndexes = new Dictionary<int2, List<Entity>>();
-        protected readonly HashSet<Entity> spawnedEntities = new HashSet<Entity>();
+        protected readonly HashSet<Entity> spawnedDataEntities = new HashSet<Entity>();
+        protected readonly HashSet<Entity> allSpawnedEntities = new HashSet<Entity>();
         
         protected DamageInstance lastDamageDone;
         protected EntityManager entityManager;
         protected TowerData districtData;
         protected Stats stats;
+
+        private Entity simpleTargetingEntityPrefab;
+        private Entity targetingEntityPrefab;
+        private Entity targetEntityPrefab;
         
         protected bool requireTargeting;
         
@@ -63,50 +66,58 @@ namespace Buildings.District
             Key = key;
             
             DamageCallbackHandler.DamageDoneEvent.Add(key, OnDamageDone);
+            
+            CreatePrefabEntities();
         }
-        
-        public abstract void Update();
+
+        private void CreatePrefabEntities()
+        {
+            ComponentType[] targetingComponentTypes =
+            {
+                typeof(DirectionRangeComponent),
+                typeof(DistrictDataComponent),
+                typeof(EnemyTargetComponent),
+                typeof(AttackSpeedComponent),
+                typeof(LocalTransform),
+                typeof(RangeComponent),
+                typeof(Prefab),
+            };
+            targetingEntityPrefab = entityManager.CreateEntity(targetingComponentTypes);
+            
+            ComponentType[] simpleComponentTypes =
+            {
+                typeof(DistrictDataComponent),
+                typeof(AttackSpeedComponent),
+                typeof(LocalTransform),
+                typeof(Prefab),
+            };
+            simpleTargetingEntityPrefab = entityManager.CreateEntity(simpleComponentTypes);
+
+            ComponentType[] targetComponents =
+            {
+                typeof(TargetMeshComponent),
+                typeof(LocalTransform),
+                typeof(LocalToWorld),
+                typeof(Prefab),
+            };
+            targetEntityPrefab = entityManager.CreateEntity(targetComponents);
+        }
+
+        public virtual void Update(){}
         public abstract void OnSelected(Vector3 pos);
         public abstract void OnDeselected();
 
-        public virtual void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
+        public void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
         {
-            NativeList<Entity> entitiesToDestroy = new NativeList<Entity>(destroyedIndexes.Count * 2, Allocator.Temp);
             foreach (int3 destroyedIndex in destroyedIndexes)
             {
-                if (!entityIndexes.TryGetValue(destroyedIndex.xz, out List<Entity> entities)) continue;
-
-                for (int i = 0; i < entities.Count; i++)
-                {
-                    entitiesToDestroy.Add(entities[i]);
-                    spawnedEntities.Remove(entities[i]);
-                }
-                
-                entityIndexes.Remove(destroyedIndex.xz);
-
-                if (!targetMeshes.TryGetValue(destroyedIndex.xz, out List<DistrictTargetMesh> meshes)) continue;
-                
-                for (int i = 0; i < meshes.Count; i++)
-                {
-                    meshes[i].gameObject.SetActive(false);
-                }
-                targetMeshes.Remove(destroyedIndex.xz);
+                DistrictData.DistrictChunks.Remove(destroyedIndex);
             }
-            
-            entityManager.DestroyEntity(entitiesToDestroy.AsArray());
-            
-            entitiesToDestroy.Dispose();
         }
 
-        public virtual void OnWaveStart()
-        {
-            
-        }
+        public virtual void OnWaveStart() { }
         
-        public virtual void OnWaveEnd()
-        {
-            
-        }
+        public virtual void OnWaveEnd() { }
         
         private void OnDamageDone(DamageCallbackComponent damageCallback)
         {
@@ -131,10 +142,7 @@ namespace Buildings.District
             Attack?.OnDoneDamage(this);
         }
 
-        public virtual void OnUnitKill()
-        {
-
-        }
+        public virtual void OnUnitKill() { }
 
         protected void InvokeStatisticsChanged()
         {
@@ -144,13 +152,12 @@ namespace Buildings.District
         public virtual void Dispose()
         {
             DamageCallbackHandler.DamageDoneEvent.Remove(Key);
-                
-            foreach (List<DistrictTargetMesh> meshes in targetMeshes.Values)
-            {
-                foreach (DistrictTargetMesh targetMesh in meshes) 
-                    targetMesh.gameObject.SetActive(false);
-            }
-            targetMeshes.Clear();
+            
+            entityManager.DestroyEntity(simpleTargetingEntityPrefab);
+            entityManager.DestroyEntity(targetingEntityPrefab);
+            entityManager.DestroyEntity(targetEntityPrefab);
+            
+            RemoveEntities();
         }
 
         #region Entities
@@ -164,46 +171,43 @@ namespace Buildings.District
 
         protected void SpawnEntitiesWithoutTargeting()
         {
-            List<QueryChunk> topChunks = GetEntityChunks(out List<Vector2> offsets, out List<Vector2> directions);
-            ComponentType[] componentTypes =
-            {
-                typeof(DistrictDataComponent),
-                typeof(AttackSpeedComponent),
-                typeof(LocalTransform),
-            };
+            List<QueryChunk> topChunks = GetEntityChunks(out List<Vector2> offsets, out _);
             
             int count = topChunks.Count;
             float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
             float delay = attackSpeedValue / count;
             
-            Entity srcEntity = entityManager.CreateEntity(componentTypes);
-            NativeArray<Entity> entities = entityManager.Instantiate(srcEntity, count, Allocator.Temp);
+            NativeArray<Entity> entities = entityManager.Instantiate(simpleTargetingEntityPrefab, count, Allocator.Temp);
             
             for (int i = 0; i < count; i++)
             {
-                Entity spawnedEntity = entities[i];
+                SetupSimpleTargetEntity(entities[i], i);
+            }
+            
+            entities.Dispose();
+            stats.Range.OnValueChanged += RangeChanged;
+            stats.AttackSpeed.OnValueChanged += AttackSpeedChanged;
+
+            void SetupSimpleTargetEntity(Entity spawnedEntity, int i)
+            {
                 Vector3 offset = DistrictData.DistrictGenerator.ChunkScale.MultiplyByAxis(new Vector3(0.5f + offsets[i].x, 0.5f, 0.5f + offsets[i].y));
                 Vector3 pos = topChunks[i].Position + offset;
+
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = pos });
                 entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent
                 {
                     AttackSpeed = attackSpeedValue, 
                     Timer = delay * i
                 });
-                spawnedEntities.Add(spawnedEntity);
 
                 int2 key = topChunks[i].ChunkIndex.xz;
-                AddEntityToDicts(key, spawnedEntity);
+                AddEntityToDictionary(key, spawnedEntity, true);
                 
                 entityManager.SetComponentData(spawnedEntity, new DistrictDataComponent
                 {
                     DistrictID = Key,
                 });
             }
-            
-            entities.Dispose();
-            stats.Range.OnValueChanged += RangeChanged;
-            stats.AttackSpeed.OnValueChanged += AttackSpeedChanged;
         }
         
         public virtual void SpawnEntities()
@@ -216,29 +220,30 @@ namespace Buildings.District
             
             List<QueryChunk> topChunks = GetEntityChunks(out List<Vector2> offsets, out List<Vector2> directions);
             
-            ComponentType[] componentTypes =
-            {
-                typeof(DirectionRangeComponent),
-                typeof(DistrictDataComponent),
-                typeof(EnemyTargetComponent),
-                typeof(AttackSpeedComponent),
-                typeof(LocalTransform),
-                typeof(RangeComponent),
-            };
-            
             int count = topChunks.Count;
             float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
             float delay = attackSpeedValue / count;
             
-            Entity srcEntity = entityManager.CreateEntity(componentTypes);
-            
-            entityManager.SetComponentData(srcEntity, new RangeComponent { Range = stats.Range.Value });
-            
-            NativeArray<Entity> entities = entityManager.Instantiate(srcEntity, count, Allocator.Temp);
+            NativeArray<Entity> entities = entityManager.Instantiate(targetingEntityPrefab, count, Allocator.Temp);
             
             for (int i = 0; i < count; i++)
             {
-                Entity spawnedEntity = entities[i];
+                SetupTargetEntity(entities[i], i);
+            }
+            
+            if (districtData.UseTargetMesh)
+            {
+                SpawnTargetMeshEntities(entities, count, topChunks, offsets, directions);
+            }
+            
+            entities.Dispose();
+            stats.Range.OnValueChanged += RangeChanged;
+            stats.AttackSpeed.OnValueChanged += AttackSpeedChanged;
+
+            void SetupTargetEntity(Entity spawnedEntity, int i)
+            {
+                entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = stats.Range.Value });
+
                 Vector3 offset = DistrictData.DistrictGenerator.ChunkScale.MultiplyByAxis(new Vector3(0.5f + offsets[i].x, 0.5f, 0.5f + offsets[i].y));
                 Vector3 pos = topChunks[i].Position + offset;
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = pos });
@@ -258,42 +263,30 @@ namespace Buildings.District
                     DistrictID = Key,
                 });
                 
-                spawnedEntities.Add(spawnedEntity);
+                spawnedDataEntities.Add(spawnedEntity);
 
                 int2 key = topChunks[i].ChunkIndex.xz;
-                AddEntityToDicts(key, spawnedEntity);
+                AddEntityToDictionary(key, spawnedEntity, true);
             }
-            
-            if (districtData.UseTargetMesh)
-            {
-                SpawnTargetMeshEntities(entities, count, topChunks, offsets, directions);
-            }
-            
-            entities.Dispose();
-            stats.Range.OnValueChanged += RangeChanged;
-            stats.AttackSpeed.OnValueChanged += AttackSpeedChanged;
         }
 
         private void SpawnTargetMeshEntities(NativeArray<Entity> entities, int count, List<QueryChunk> topChunks, List<Vector2> offsets, List<Vector2> directions)
         {
-            ComponentType[] targetComponents =
-            {
-                typeof(TargetMeshComponent),
-                typeof(LocalTransform),
-                typeof(LocalToWorld),
-            };
-            
-            Entity srcTargetEntity = entityManager.CreateEntity(targetComponents);
-            
             RenderMeshDescription desc = new RenderMeshDescription(shadowCastingMode: ShadowCastingMode.On, receiveShadows: true);
             RenderMeshArray renderMeshArray = new RenderMeshArray(new Material[] { districtData.MeshVariable.Material }, new Mesh[] { districtData.MeshVariable.Mesh });
-            RenderMeshUtility.AddComponents(srcTargetEntity, entityManager, desc, renderMeshArray, MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
+            RenderMeshUtility.AddComponents(targetEntityPrefab, entityManager, desc, renderMeshArray, MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
             
-            NativeArray<Entity> targetEntities = entityManager.Instantiate(srcTargetEntity, count, Allocator.Temp);
+            NativeArray<Entity> targetEntities = entityManager.Instantiate(targetEntityPrefab, count, Allocator.Temp);
 
             for (int i = 0; i < count; i++)
             {
-                Entity targetEntity = targetEntities[i];
+                SetupTargetEntity(targetEntities[i], i);
+            }
+            
+            targetEntities.Dispose();
+
+            void SetupTargetEntity(Entity targetEntity, int i)
+            {
                 Vector3 offset = DistrictData.DistrictGenerator.ChunkScale.MultiplyByAxis(new Vector3(0.5f + offsets[i].x, 0.5f, 0.5f + offsets[i].y));
                 Vector3 pos = topChunks[i].Position + offset;
                 
@@ -308,21 +301,22 @@ namespace Buildings.District
                     Rotation = quaternion.LookRotation(directions[i].ToXyZ(0), Vector3.up),
                     Scale = districtData.MeshVariable.Scale
                 });
+                
+                int2 key = topChunks[i].ChunkIndex.xz;
+                AddEntityToDictionary(key, targetEntity, false);
             }
-            
-            targetEntities.Dispose();
         }
 
-        private void AddEntityToDicts(int2 key, Entity spawnedEntity)
+        private void AddEntityToDictionary(int2 key, Entity spawnedEntity, bool isDataEntity)
         {
-            if (entityIndexes.TryGetValue(key, out List<Entity> list))
+            if (isDataEntity)
             {
-                list.Add(spawnedEntity);
+                spawnedDataEntities.Add(spawnedEntity);
             }
-            else
-            {
-                entityIndexes.Add(key, new List<Entity> { spawnedEntity });
-            }
+            
+            allSpawnedEntities.Add(spawnedEntity);
+            if (entityIndexes.TryGetValue(key, out List<Entity> list)) list.Add(spawnedEntity);
+            else entityIndexes.Add(key, new List<Entity> { spawnedEntity });
         }
 
         protected virtual void AttackSpeedChanged()
@@ -330,7 +324,7 @@ namespace Buildings.District
             float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
             float delay = attackSpeedValue / entityIndexes.Count;
             int index = 0;
-            foreach (Entity entity in spawnedEntities)
+            foreach (Entity entity in spawnedDataEntities)
             {
                 entityManager.SetComponentData(entity, new AttackSpeedComponent
                 {
@@ -342,7 +336,7 @@ namespace Buildings.District
 
         protected virtual void RangeChanged()
         {
-            foreach (Entity entity in spawnedEntities)
+            foreach (Entity entity in spawnedDataEntities)
             {
                 entityManager.SetComponentData(entity, new RangeComponent { Range = stats.Range.Value });
             }
@@ -350,9 +344,9 @@ namespace Buildings.District
         
         public virtual void RemoveEntities()
         {
-            NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(spawnedEntities.Count, Allocator.Temp);
+            NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(allSpawnedEntities.Count, Allocator.Temp);
             int index = 0;
-            foreach (Entity entity in spawnedEntities)
+            foreach (Entity entity in allSpawnedEntities)
             {
                 entitiesToDestroy[index++] = entity;
             }
@@ -360,17 +354,9 @@ namespace Buildings.District
             entityManager.DestroyEntity(entitiesToDestroy);
             
             entityIndexes.Clear();
-            spawnedEntities.Clear();
+            spawnedDataEntities.Clear();
+            allSpawnedEntities.Clear();
             entitiesToDestroy.Dispose();
-
-            foreach (List<DistrictTargetMesh> districtTargetMeshes in targetMeshes.Values)
-            {
-                foreach (DistrictTargetMesh targetMesh in districtTargetMeshes)
-                {
-                    targetMesh.gameObject.SetActive(false);
-                }
-            }
-            targetMeshes.Clear();
         }
         
         public virtual void PerformAttack(float3 targetPosition)
@@ -488,9 +474,6 @@ namespace Buildings.District
                 rangeIndicator = null;
             }
         }
-
-        public override void Update()
-        { }
     }
 
     #endregion
@@ -649,10 +632,6 @@ namespace Buildings.District
                 rangeIndicator = null;
             }
         }
-
-        public override void Update()
-        {
-        }
     }
     
     #endregion
@@ -709,10 +688,6 @@ namespace Buildings.District
             offsets = new List<Vector2> { Vector2.zero };
             directions = new List<Vector2> { Vector2.up };
             return new List<QueryChunk> { DistrictData.DistrictChunks.Values.First() };
-        }
-
-        public override void Update()
-        {
         }
 
         public override void OnSelected(Vector3 pos)
@@ -832,19 +807,14 @@ namespace Buildings.District
             rangeIndicator.SetActive(false);
             rangeIndicator = null;
         }
-
-        public override void Update()
-        {
-            
-        }
-
+        
         public override void OnWaveEnd()
         {
             base.OnWaveEnd();
 
-            foreach (Entity spawnedEntity in spawnedEntities)    
+            foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
             {
-                OriginPosition = entityManager.GetAspect<EnemyTargetAspect>(spawnedEntity).LocalTransform.ValueRO.Position;
+                OriginPosition = chunk.Position;
                 foreach (IEffect effect in districtData.EndWaveEffects)
                 {
                     effect.Perform(this);
@@ -1019,9 +989,6 @@ namespace Buildings.District
                 rangeIndicator = null;
             }
         }
- 
-        public override void Update()
-        { }
     }
      
      #endregion
@@ -1118,9 +1085,6 @@ namespace Buildings.District
                 rangeIndicator = null;
             }
         }
-
-        public override void Update()
-        { }
     }
      
      #endregion
@@ -1258,7 +1222,7 @@ namespace Buildings.District
         
         private void PerformCreateEffects()
         {
-            foreach (Entity entity in spawnedEntities)   
+            foreach (Entity entity in spawnedDataEntities)   
             {
                 float3 pos = entityManager.GetComponentData<LocalTransform>(entity).Position;
                 OriginPosition = pos;
@@ -1327,9 +1291,6 @@ namespace Buildings.District
             rangeIndicator.SetActive(false);
             rangeIndicator = null;
         }
-
-        public override void Update()
-        { }
     }
 
     #endregion
@@ -1383,10 +1344,6 @@ namespace Buildings.District
             }
 
             return chunks;
-        }
-        
-        public override void Update()
-        {
         }
         
         public override void OnSelected(Vector3 pos)

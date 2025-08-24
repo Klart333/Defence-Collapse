@@ -429,7 +429,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a5beff54e83630942b561f80a9024b14, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 48fb1fda1fff12b48b62a4eb01fa0c11, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -440,10 +440,10 @@ MonoBehaviour:
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
   spriteReference:
-    Mode: 0
+    Mode: 1
     ConstantValue: {fileID: 21300000, guid: a5beff54e83630942b561f80a9024b14, type: 3}
-    Variable: {fileID: 11400000, guid: 16830215ead314645b9dc9f68294888c, type: 2}
-    VariableValuePreview: {fileID: 21300000, guid: a066951a319336a4ca77035477ed93a5,
+    Variable: {fileID: 11400000, guid: 6aa3686e5267fda48928e2188aca468f, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 48fb1fda1fff12b48b62a4eb01fa0c11,
       type: 3}
   colorReference:
     Mode: 0
@@ -848,6 +848,7 @@ MonoBehaviour:
   titleText: {fileID: 4438561595046197129}
   iconImage: {fileID: 8024936166687089165}
   smallIconImage: {fileID: 7922681988905381828}
+  heightOffset: 10
 --- !u!114 &2038667758085654302
 MonoBehaviour:
   m_ObjectHideFlags: 0

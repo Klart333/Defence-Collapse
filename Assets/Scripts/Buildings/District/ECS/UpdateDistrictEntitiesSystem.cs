@@ -19,26 +19,30 @@ namespace Buildings.District.ECS
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            EntityCommandBuffer ecb1 = new EntityCommandBuffer(Allocator.TempJob);
+            EntityCommandBuffer ecb2 = new EntityCommandBuffer(Allocator.TempJob);
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
             float deltaTime = SystemAPI.Time.DeltaTime * gameSpeed;
 
             state.Dependency = new UpdateTargetedDistrictEntitiesJob 
             {  
-                ECB = ecb.AsParallelWriter(),
+                ECB = ecb1.AsParallelWriter(),
                 DeltaTime = deltaTime
             }.ScheduleParallel(state.Dependency);
             state.Dependency.Complete();
 
             state.Dependency = new UpdateSimpleDistrictEntitiesJob
             {
-                ECB = ecb.AsParallelWriter(),
+                ECB = ecb2.AsParallelWriter(),
                 DeltaTime = deltaTime
             }.ScheduleParallel(state.Dependency);
             state.Dependency.Complete();
             
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+            ecb1.Playback(state.EntityManager);
+            ecb1.Dispose();
+            
+            ecb2.Playback(state.EntityManager);
+            ecb2.Dispose();
         }
 
         [BurstCompile]

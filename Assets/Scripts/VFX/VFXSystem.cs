@@ -291,9 +291,9 @@ namespace VFX
         {
             if (index < 0 || index >= Datas.Length) return;
             
-            T killdata = default;
-            killdata.Kill();
-            Datas[index] = killdata;
+            T data = Datas[index];
+            data.Kill();
+            Datas[index] = data;
 
             FreeIndexes.Enqueue(index);
         }

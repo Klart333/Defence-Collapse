@@ -82,7 +82,7 @@ namespace Buildings.District
         {
             foreach (ChunkIndex chunkIndex in chunkIndexes)
             {
-                //Debug.Log("Index: " + chunkIndex);
+                Debug.Log("Index: " + chunkIndex);
             }
             districtGenerator.AddAction(async () => await districtGenerator.RemoveChunks(chunkIndexes));
         }
@@ -128,6 +128,10 @@ namespace Buildings.District
                 if (uniqueDistricts.TryGetValue(data.DistrictID, out DistrictData districtData))
                 {
                     districtData.PerformAttack(data);
+                }
+                else
+                {
+                    Debug.Log("Data ID: " + data.DistrictID + " is attacking but it does not exist");
                 }
             }
             
