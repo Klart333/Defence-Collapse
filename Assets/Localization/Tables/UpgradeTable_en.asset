@@ -25,11 +25,11 @@ MonoBehaviour:
       m_Items:
       - rid: 5367088374237626595
   - m_Id: 63471466090496
-    m_Localized: Big Money
+    m_Localized: Money Per Projectile
     m_Metadata:
       m_Items: []
   - m_Id: 59724635607040
-    m_Localized: The district gains {Color.ToTag}{PowerName}</color>
+    m_Localized: The district gains {Color.ToTag}<link={PowerName}>{PowerName}</color></link>
     m_Metadata:
       m_Items:
       - rid: 5367088374237626595
@@ -77,6 +77,41 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5367088374237626595
+  - m_Id: 1479566035030016
+    m_Localized: Money On Damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1485413851107328
+    m_Localized: All projectiles gain {Color.ToTag}{PowerName}</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1517368403595264
+    m_Localized: Attacks are charged with lightning, chaining from the enemy to up
+      to X other enemies.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1531874538196992
+    m_Localized: 'Attacks set enemies hit ablaze.
+
+      Burning enemies take X damage
+      X times per second.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1532708160311296
+    m_Localized: 'Attacks poison enemies hit.
+
+      Poisoned enemies take X damage
+      X times per second.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1533425163997184
+    m_Localized: Attacks give X gold when hitting a tagret.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1533992863043584
+    m_Localized: 'Gain X gold whenever the district deals damage. '
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

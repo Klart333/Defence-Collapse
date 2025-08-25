@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 325ce971bb8c473194576814c8c6efca, type: 3}
-  m_Name: Upgrade_Poison_Description
+  m_Name: Upgrade_GoldOnDamage_Description
   m_EditorClassIdentifier: 
   text:
     m_TableReference:
@@ -34,14 +34,14 @@ MonoBehaviour:
       type: {class: ObjectVariable, ns: UnityEngine.Localization.SmartFormat.PersistentVariables,
         asm: Unity.Localization}
       data:
-        m_Value: {fileID: 11400000, guid: 24d8318db82d3bc49b4a2ea801a9b3ce, type: 2}
+        m_Value: {fileID: 11400000, guid: 1114a80240b556b418e4775ecbd455ec, type: 2}
     - rid: 5367088378053394509
       type: {class: LocalizedString, ns: UnityEngine.Localization, asm: Unity.Localization}
       data:
         m_TableReference:
           m_TableCollectionName: GUID:43f2e9d7f5b58d14dabce85ebd58fecc
         m_TableEntryReference:
-          m_KeyId: 62646895284224
+          m_KeyId: 1479566035030016
           m_Key: 
         m_FallbackState: 0
         m_WaitForCompletion: 0

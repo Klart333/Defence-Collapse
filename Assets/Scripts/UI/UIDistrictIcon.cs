@@ -65,8 +65,7 @@ namespace UI
                 Tuple.Create(towerData.Description, 25),
             };
             
-            Vector2 position = (Vector2)rectTransform.position + Vector2.up * (rectTransform.rect.height / 2.0f - heightOffset);
-            position /= canvas.scaleFactor;
+            Vector2 position = ToolTipUtility.GetTooltipPosition(rectTransform, canvas, heightOffset);
             tooltipHandler.DisplayTooltip(districtDescription, position);
         }
 

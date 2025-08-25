@@ -72,11 +72,16 @@ namespace Gameplay.Upgrades
                     {
                         AddUpgradeEffect(upgradeInstance.AppliedCategories, effect);
                     }
-
                     break;
+                
+                case UpgradeType.OnDamageEffect:
+                    AddUpgradeEffectOnDamage(upgradeInstance.AppliedCategories, upgradeInstance.Effects);
+                    break;
+                
                 case UpgradeType.Component:
                     AddComponentEffect(upgradeInstance.AppliedCategories, upgradeInstance.ComponentType, upgradeInstance.ComponentStrength);
                     break;
+                
                 case UpgradeType.StandAloneEffect:
                     foreach (IEffect effect in upgradeInstance.Effects)
                     {
@@ -104,6 +109,27 @@ namespace Gameplay.Upgrades
                 
                 if (appliedEffects.TryGetValue(categoryType, out List<IEffect> list)) list.Add(effect);
                 else appliedEffects.Add(categoryType, new List<IEffect> { effect });
+            }
+        }
+        
+        public void AddUpgradeEffectOnDamage(CategoryType appliedDistrict, List<IEffect> effects)
+        {
+            foreach (DistrictData district in districtHandler.Districts.Values)
+            {
+                if (appliedDistrict.HasFlag(district.State.CategoryType))
+                {
+                    district.State.Attack.AddEffect(effects, EffectType.DoneDamage);
+                }
+            }
+
+            Array enumValues = Enum.GetValues(typeof(CategoryType));
+            foreach (object enumValue in enumValues)
+            {
+                CategoryType categoryType = (CategoryType)enumValue;
+                if (!appliedDistrict.HasFlag(categoryType)) continue;
+                
+                if (appliedEffects.TryGetValue(categoryType, out List<IEffect> list)) list.AddRange(effects);
+                else appliedEffects.Add(categoryType, effects);
             }
         }
         

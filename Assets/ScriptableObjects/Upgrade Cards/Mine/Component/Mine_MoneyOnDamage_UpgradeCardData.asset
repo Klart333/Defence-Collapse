@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3d805e3b3ab4891bec7b5cebf945158, type: 3}
-  m_Name: Archer_Component_Poison
+  m_Name: Mine_MoneyOnDamage_UpgradeCardData
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -26,7 +26,19 @@ MonoBehaviour:
       Data: 0|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 1|Effects.AddMoneyEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 1
+    - Name: multiplyWithAttackSpeed
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -36,22 +48,22 @@ MonoBehaviour:
   iconReference:
     Mode: 1
     ConstantValue: {fileID: 0}
-    Variable: {fileID: 11400000, guid: 089ea1addb3d38f47995c3b0e4bfc5e7, type: 2}
-    VariableValuePreview: {fileID: 21300000, guid: 1224c37b966d53d41a1a27fa1687fd24,
+    Variable: {fileID: 11400000, guid: e70dacc5b879b6b4e8f77f3d0cf508f3, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 2564da7b06561d24f8f75f21768e4086,
       type: 3}
   descriptionReference:
     Mode: 1
     ConstantValue: 
-    Variable: {fileID: 11400000, guid: bc7a3d1033f81934f9453fd83a704a3c, type: 2}
+    Variable: {fileID: 11400000, guid: 3d32c1c603758e14eb52773fef7277fc, type: 2}
     VariableValuePreview: 
   upgradeRank: 2
-  upgradeCardType: 1
-  weight: -1
-  weightStrategy: 38
+  upgradeCardType: 16
+  weight: -2
+  weightStrategy: 102
   weightChangeOnPicked: 1
-  weightChangeOnCardsPicked: 0.5
-  weightChangeOnDistrictBuilt: 0.25
-  appliedCategories: 1
-  upgradeType: 1
-  componentType: 4
-  componentStrength: 75
+  weightChangeOnCardsPicked: 1
+  weightChangeOnDistrictBuilt: 0.5
+  appliedCategories: 16
+  upgradeType: 3
+  componentType: 3
+  componentStrength: 5

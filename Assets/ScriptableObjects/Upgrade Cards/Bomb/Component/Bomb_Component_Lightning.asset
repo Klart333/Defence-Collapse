@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3d805e3b3ab4891bec7b5cebf945158, type: 3}
-  m_Name: Archer_Component_Poison
+  m_Name: Bomb_Component_Lightning
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -45,13 +45,13 @@ MonoBehaviour:
     Variable: {fileID: 11400000, guid: bc7a3d1033f81934f9453fd83a704a3c, type: 2}
     VariableValuePreview: 
   upgradeRank: 2
-  upgradeCardType: 1
-  weight: -1
-  weightStrategy: 38
+  upgradeCardType: 2
+  weight: -4
+  weightStrategy: 102
   weightChangeOnPicked: 1
-  weightChangeOnCardsPicked: 0.5
-  weightChangeOnDistrictBuilt: 0.25
-  appliedCategories: 1
+  weightChangeOnCardsPicked: 1
+  weightChangeOnDistrictBuilt: 0.5
+  appliedCategories: 2
   upgradeType: 1
-  componentType: 4
-  componentStrength: 75
+  componentType: 1
+  componentStrength: 5

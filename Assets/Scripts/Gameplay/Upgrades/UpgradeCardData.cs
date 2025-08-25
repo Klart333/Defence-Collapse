@@ -58,7 +58,7 @@ namespace Gameplay.Upgrades
         [SerializeField, ShowIf(nameof(isComponent))]
         private float componentStrength = 1;
 
-        private bool isEffectType => upgradeType is UpgradeType.Effect or UpgradeType.StandAloneEffect;
+        private bool isEffectType => upgradeType is UpgradeType.Effect or UpgradeType.StandAloneEffect or UpgradeType.OnDamageEffect;
         private bool isComponent => upgradeType == UpgradeType.Component;
         private bool isChangeOnPicked => weightStrategy.HasFlag(WeightStrategy.ChangeOnPicked);
         private bool isChangeOnCardPicked => weightStrategy.HasFlag(WeightStrategy.ChangeWithCardsPicked);
@@ -184,6 +184,7 @@ namespace Gameplay.Upgrades
         Component,
         
         StandAloneEffect,
+        OnDamageEffect,
     }
 
     public enum UpgradeComponentType

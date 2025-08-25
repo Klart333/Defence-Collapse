@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
-using Sirenix.OdinInspector;
-using TMPro;
+using UnityEngine.EventSystems;
 
 namespace UI
 {
@@ -42,7 +42,7 @@ namespace UI
 
         public void DisplayTooltip(IEnumerable<Tuple<string, int>> tooltips, Vector2 position)
         {
-            if (spawnedTooltips.Count > 0)
+            if (!isHovering && spawnedTooltips.Count > 0)
             {
                 HideTooltips();
             }
@@ -85,6 +85,26 @@ namespace UI
             }
             
             spawnedTooltips.Clear();
+        }
+    }
+
+    public static class ToolTipUtility
+    {
+        public static Vector2 GetTooltipPosition(RectTransform rectTransform, Canvas canvas, float heightOffset)
+        {
+            Vector2 screenPosition;
+            if (canvas.renderMode == RenderMode.ScreenSpaceCamera && canvas.worldCamera != null)
+            {
+                screenPosition = RectTransformUtility.WorldToScreenPoint(canvas.worldCamera, rectTransform.position);
+            }
+            else
+            {
+                screenPosition = (Vector2)rectTransform.position;
+            }
+            
+            Vector2 position = screenPosition + Vector2.up * (rectTransform.rect.height / 2.0f - heightOffset);
+            position /= canvas.scaleFactor;
+            return position;
         }
     }
 }

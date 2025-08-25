@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 6287793349395595111}
   - component: {fileID: 1518890417499705086}
   - component: {fileID: 9195058496517092639}
+  - component: {fileID: 1588282571573904970}
+  - component: {fileID: 3629915551339278582}
   m_Layer: 0
   m_Name: UITooltipText
   m_TagString: Untagged
@@ -163,3 +165,29 @@ MonoBehaviour:
     ConstantValue: {r: 0, g: 0, b: 0, a: 0}
     Variable: {fileID: 11400000, guid: aaf9388cfe535a844aed49594dd920f9, type: 2}
     VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
+--- !u!114 &1588282571573904970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5195214429464235360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0839ff14bec6464a862afbe9ddf433a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3629915551339278582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5195214429464235360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 019a731e2cbe46cc88b8a6ece3091f29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linkIdUtility: {fileID: 11400000, guid: cee962ae7c5b6354aa3ad5f62ea1c444, type: 2}
+  heightOffset: 10

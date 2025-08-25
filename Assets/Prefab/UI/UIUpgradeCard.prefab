@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 2965697129413314991}
   - component: {fileID: 477703732409711934}
   - component: {fileID: 9140296746030073778}
+  - component: {fileID: 7931669000665657126}
+  - component: {fileID: 1058361997125941891}
   m_Layer: 5
   m_Name: DescriptionText
   m_TagString: Untagged
@@ -156,6 +158,37 @@ MonoBehaviour:
     ConstantValue: {r: 0, g: 0, b: 0, a: 0}
     Variable: {fileID: 11400000, guid: aaf9388cfe535a844aed49594dd920f9, type: 2}
     VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
+--- !u!114 &7931669000665657126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630801229156022544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0839ff14bec6464a862afbe9ddf433a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  darkenTextOnHover: 1
+  hoverColor:
+    serializedVersion: 2
+    rgba: 4289243304
+--- !u!114 &1058361997125941891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630801229156022544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 019a731e2cbe46cc88b8a6ece3091f29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linkIdUtility: {fileID: 11400000, guid: cee962ae7c5b6354aa3ad5f62ea1c444, type: 2}
+  heightOffset: 10
+  useParentRectTransform: 1
 --- !u!1 &1008103805905922676
 GameObject:
   m_ObjectHideFlags: 0

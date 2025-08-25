@@ -59,6 +59,11 @@ public class InputManager : Singleton<InputManager>
     
     private void OnDisable()
     {
+        if (Instance != this)
+        {
+            return;
+        }
+        
         PanCamera.Disable();
         Cancel.Disable();
         Rotate.Disable();

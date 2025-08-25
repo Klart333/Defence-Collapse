@@ -134,6 +134,11 @@ namespace Gameplay.Upgrades
                 return "";
             }
 
+            if (upgrade.Effects == null || upgrade.Effects.Count == 0)
+            {
+                return stringVariable.LocalizedText.GetLocalizedString();
+            }
+            
             Dictionary<string, string> dict = new Dictionary<string, string>();
             for (int i = 0; i < upgrade.Effects.Count; i++)
             {

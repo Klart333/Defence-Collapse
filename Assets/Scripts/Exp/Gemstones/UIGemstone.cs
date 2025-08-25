@@ -109,9 +109,8 @@ namespace Exp.Gemstones
                 Tuple.Create($"{Gemstone.GemstoneType.ToString()} Lvl. {Gemstone.Level:N0}", 60),
                 Tuple.Create(sb.ToString(), 30),
             };
-            
-            Vector2 position = (Vector2)rectTransform.position + Vector2.up * (rectTransform.rect.height / 2.0f - heightOffset);
-            position /= canvas.scaleFactor;
+
+            Vector2 position = ToolTipUtility.GetTooltipPosition(rectTransform, canvas, heightOffset);
             tooltipHandler.DisplayTooltip(gemstoneDescription, position);
         }
 
