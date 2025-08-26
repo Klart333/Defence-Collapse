@@ -8,6 +8,7 @@ using Variables;
 using System;
 using Effects;
 using TMPro;
+using UI;
 
 namespace Gameplay.Upgrades
 {
@@ -42,10 +43,10 @@ namespace Gameplay.Upgrades
         private Transform districtIconContainer;
 
         [SerializeField]
-        private Image districtIconPrefab;
+        private UIDistrictIcon districtIconPrefab;
         
         [SerializeField]
-        private DistrictIconUtility districtIconUtility;
+        private DistrictDataUtility districtDataUtility;
         
         [Title("Animation")]
         [SerializeField]
@@ -54,8 +55,8 @@ namespace Gameplay.Upgrades
         [SerializeField]
         private Ease alphaAnimationEase = Ease.OutBack;
         
-        private Queue<Image> disabledIcons = new Queue<Image>();
-        private Stack<Image> spawnedIcons = new Stack<Image>(); 
+        private Queue<UIDistrictIcon> disabledIcons = new Queue<UIDistrictIcon>();
+        private Stack<UIDistrictIcon> spawnedIcons = new Stack<UIDistrictIcon>(); 
         
         private UpgradeCardData.UpgradeCardInstance upgradeCardInstance;
 
@@ -94,22 +95,22 @@ namespace Gameplay.Upgrades
 
             foreach (DistrictType districtType in districtTypes)
             {
-                GetIcon().sprite = districtIconUtility.GetIcon(districtType).Value;
+                GetIcon().DisplayDistrict(districtDataUtility.GetTowerData(districtType), null);
             }
         }
 
-        public Image GetIcon()
+        public UIDistrictIcon GetIcon()
         {
-            if (disabledIcons.TryDequeue(out Image image))
+            if (disabledIcons.TryDequeue(out UIDistrictIcon icon))
             {
-                image.gameObject.SetActive(true);
-                spawnedIcons.Push(image);
-                return image;
+                icon.gameObject.SetActive(true);
+                spawnedIcons.Push(icon);
+                return icon;
             }
 
-            image = Instantiate(districtIconPrefab, districtIconContainer);
-            spawnedIcons.Push(image);
-            return image;
+            icon = Instantiate(districtIconPrefab, districtIconContainer);
+            spawnedIcons.Push(icon);
+            return icon;
         }
         
         private void DisableIcons()

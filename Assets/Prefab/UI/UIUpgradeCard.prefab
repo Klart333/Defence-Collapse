@@ -171,9 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   darkenTextOnHover: 1
-  hoverColor:
-    serializedVersion: 2
-    rgba: 4289243304
+  tintingAlpha: 0.75
 --- !u!114 &1058361997125941891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1214,9 +1212,9 @@ MonoBehaviour:
   hoveredColorAlpha: 0.23529412
   appliesContainer: {fileID: 1178640087036690604}
   districtIconContainer: {fileID: 1104344208874419030}
-  districtIconPrefab: {fileID: 6189612738135852010, guid: 22f6eefbc43cf4249a92a69abadedba2,
+  districtIconPrefab: {fileID: 4215792010475547486, guid: 22f6eefbc43cf4249a92a69abadedba2,
     type: 3}
-  districtIconUtility: {fileID: 11400000, guid: 1541c85515242774dbb446c9604a93e4,
+  districtDataUtility: {fileID: 11400000, guid: baf7ccf1597b82f48aa53c42cc8f850f,
     type: 2}
   alphaAnimationDuration: 0.2
   alphaAnimationEase: 27

@@ -43,7 +43,7 @@ namespace UI
 
         private async UniTaskVoid DelayedClampToCanvas()
         {
-            await UniTask.DelayFrame(1);
+            await UniTask.Yield();
             (transform as RectTransform).ClampToParent(canvas.transform as RectTransform);
         }
 

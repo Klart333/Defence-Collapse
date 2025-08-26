@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 3586466776512753971}
   - component: {fileID: 6007186707219101712}
   - component: {fileID: 6189612738135852010}
+  - component: {fileID: 4215792010475547486}
+  - component: {fileID: 7848122652259553779}
   m_Layer: 5
   m_Name: UIDistrictImage
   m_TagString: Untagged
@@ -85,3 +87,35 @@ MonoBehaviour:
     ConstantValue: {r: 1, g: 1, b: 1, a: 1}
     Variable: {fileID: 0}
     VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
+--- !u!114 &4215792010475547486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378737125512008964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b43dc09c24734bf192791441c12e762d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  titleText: {fileID: 0}
+  iconImage: {fileID: 6189612738135852010}
+  smallIconImage: {fileID: 0}
+  heightOffset: 10
+  requiredHoverTimer: 0.3
+--- !u!114 &7848122652259553779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378737125512008964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98aaf94d0c0b4fed9cca7cc667cad365, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleMultiplier: 1.1
+  animationDuration: 0.3
+  animationEase: 4

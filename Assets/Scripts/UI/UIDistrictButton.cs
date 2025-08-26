@@ -9,13 +9,14 @@ namespace UI
 {
     public class UIDistrictButton : MonoBehaviour
     {
+        [Title("Reference")]
+        [SerializeField]
+        private UIDistrictIcon districtIcon;
+        
         [Title("Cost")]
         [SerializeField]
         private TextMeshProUGUI costText;
         
-        [SerializeField]
-        private Image iconImage;
-
         [SerializeField]
         private DistrictCostUtility costUtility;
 
@@ -38,8 +39,9 @@ namespace UI
             this.districtHandler = districtHandler;
             
             districtType = towerData.DistrictType;
-            iconImage.sprite = towerData.Icon;
-
+            
+            districtIcon.DisplayDistrict(towerData, null);
+            
             UpdateCostText();
         }
         

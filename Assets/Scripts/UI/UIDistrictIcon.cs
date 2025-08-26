@@ -24,6 +24,9 @@ namespace UI
         [Title("Tooltip")]
         [SerializeField]
         private float heightOffset = 10;
+
+        [SerializeField]
+        private float requiredHoverTimer; 
         
         private Action<TowerData> clickCallback;
         
@@ -32,6 +35,10 @@ namespace UI
         private TowerData towerData;
         private Canvas canvas;
         
+        private float hoverTimer;
+        private bool isHovering;
+        private bool isDisplaying;
+        
         private void Awake()
         {
             tooltipHandler = FindFirstObjectByType<UITooltipHandler>();
@@ -39,11 +46,36 @@ namespace UI
             canvas = transform.GetComponentInParent<Canvas>();
         }
 
+        private void Update()
+        {
+            if (isDisplaying || !isHovering)
+            {
+                return;
+            }
+            
+            hoverTimer += Time.deltaTime;
+            if (hoverTimer >= requiredHoverTimer)
+            {
+                DisplayTooltip();
+            }
+        }
+
         public void DisplayDistrict(TowerData towerData, Action<TowerData> callback)
         {
-            titleText.text = towerData.DistrictName;
-            iconImage.sprite = towerData.Icon;
-            smallIconImage.sprite = towerData.IconSmall;
+            if (titleText)
+            {
+                titleText.text = towerData.DistrictName;
+            }
+
+            if (iconImage)
+            {
+                iconImage.sprite = towerData.Icon;
+            }
+
+            if (smallIconImage)
+            {
+                smallIconImage.sprite = towerData.IconSmall;
+            }
             
             this.towerData = towerData;
             clickCallback = callback;
@@ -59,6 +91,19 @@ namespace UI
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            isHovering = true;
+            hoverTimer = 0;
+            
+            if (requiredHoverTimer <= 0)
+            {
+                DisplayTooltip();
+            }
+        }
+
+        private void DisplayTooltip()
+        {
+            isDisplaying = true;
+            
             List<Tuple<string, int>> districtDescription = new List<Tuple<string, int>>
             {
                 Tuple.Create(towerData.DistrictName, 45),
@@ -71,7 +116,14 @@ namespace UI
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            tooltipHandler.PointerExitPanel();
+            isHovering = false;
+
+            if (isDisplaying)
+            {
+                tooltipHandler.PointerExitPanel();
+            }
+            
+            isDisplaying = false;
         }
     }
 }
