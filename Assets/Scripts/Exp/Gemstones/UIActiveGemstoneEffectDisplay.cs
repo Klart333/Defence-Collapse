@@ -56,14 +56,14 @@ namespace Exp.Gemstones
                             {
                                 stats[stat.StatType] = effect.CumulativeType switch
                                 {
-                                    Modifier.ModifierType.Additive => value + effect.Value,
-                                    Modifier.ModifierType.Multiplicative => value * effect.Value,
+                                    Modifier.ModifierType.Additive => value + effect.ModifierValue,
+                                    Modifier.ModifierType.Multiplicative => value * effect.ModifierValue,
                                     _ => throw new ArgumentOutOfRangeException()
                                 };
                             }
                             else
                             {
-                                stats.Add(stat.StatType, effect.Value);
+                                stats.Add(stat.StatType, effect.ModifierValue);
                             }
                         
                             continue;
@@ -73,14 +73,14 @@ namespace Exp.Gemstones
                             {
                                 uniqueEffects[effect.GetType()] = effect.CumulativeType switch
                                 {
-                                   Modifier.ModifierType.Additive => uniqueValue + effect.Value,
-                                   Modifier.ModifierType.Multiplicative => uniqueValue * effect.Value,
+                                   Modifier.ModifierType.Additive => uniqueValue + effect.ModifierValue,
+                                   Modifier.ModifierType.Multiplicative => uniqueValue * effect.ModifierValue,
                                    _ => throw new ArgumentOutOfRangeException()
                                 };
                             }
                             else
                             {
-                                uniqueEffects.Add(effect.GetType(), effect.Value);
+                                uniqueEffects.Add(effect.GetType(), effect.ModifierValue);
                             }
                             continue;
                     }

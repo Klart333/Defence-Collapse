@@ -42,7 +42,7 @@ namespace Exp.Gemstones
             {
                 if (effectCopy.IsAdditivePercent)
                 {
-                    effectCopy.Value += 1;
+                    effectCopy.ModifierValue += 1;
                 }
                 effectCopy.PerformEffect();
             }
@@ -51,7 +51,7 @@ namespace Exp.Gemstones
             {
                 if (effectCopy.IsAdditivePercent)
                 {
-                    effectCopy.Value += 1;
+                    effectCopy.ModifierValue += 1;
                 }
                 effectCopy.PerformEffect();
             }
@@ -68,16 +68,16 @@ namespace Exp.Gemstones
                             {
                                 stats[stat.StatType] = effect.CumulativeType switch
                                 {
-                                    Modifier.ModifierType.Additive => value + effect.Value,
-                                    Modifier.ModifierType.Multiplicative => value * effect.Value,
+                                    Modifier.ModifierType.Additive => value + effect.ModifierValue,
+                                    Modifier.ModifierType.Multiplicative => value * effect.ModifierValue,
                                     _ => throw new ArgumentOutOfRangeException()
                                 };
                                 
-                                statIncreaseEffects[stat.StatType].Value = stats[stat.StatType];
+                                statIncreaseEffects[stat.StatType].ModifierValue = stats[stat.StatType];
                             }
                             else
                             {
-                                stats.Add(stat.StatType, statEffect.Value);
+                                stats.Add(stat.StatType, statEffect.ModifierValue);
                                 statIncreaseEffects.Add(stat.StatType, statEffect.Copy() as StatIncreaseEffect);
                             }
                         
@@ -86,10 +86,10 @@ namespace Exp.Gemstones
                         default:
                             if (uniqueGemEffects.TryGetValue(effect.GetType(), out IGemstoneEffect gemEffect))
                             {
-                                gemEffect.Value = effect.CumulativeType switch
+                                gemEffect.ModifierValue = effect.CumulativeType switch
                                 {
-                                    Modifier.ModifierType.Additive => effect.Value + gemEffect.Value,
-                                    Modifier.ModifierType.Multiplicative => effect.Value * gemEffect.Value,
+                                    Modifier.ModifierType.Additive => effect.ModifierValue + gemEffect.ModifierValue,
+                                    Modifier.ModifierType.Multiplicative => effect.ModifierValue * gemEffect.ModifierValue,
                                     _ => throw new ArgumentOutOfRangeException()
                                 };
                             }

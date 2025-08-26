@@ -56,7 +56,7 @@ namespace Exp.Gemstones
             {
                 IsAdditivePercent = isAdditivePercent,
                 AppliedCategory = appliedCategory,
-                Value = value,
+                ModifierValue = value,
                 EffectDescription = statNameUtility.GetDescription(increaseStatEffect.StatType, value),
                 Effect = new IncreaseStatEffect
                 {
@@ -93,7 +93,7 @@ namespace Exp.Gemstones
             float value = GetEffectValue(level, random);
             return new IncreaseGameSpeedEffect
             {
-                Value = value,
+                ModifierValue = value,
                 EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseGameSpeedEffect), value),
             };
         }
@@ -124,7 +124,7 @@ namespace Exp.Gemstones
             float value = GetEffectValue(level, random);
             return new IncreaseMoneyEffect
             {
-                Value = value,
+                ModifierValue = value,
                 EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseMoneyEffect), value),
             };
         }
@@ -155,7 +155,7 @@ namespace Exp.Gemstones
             float value = GetEffectValue(level, random);
             return new IncreaseExpEffect
             {
-                Value = value,
+                ModifierValue = value,
                 EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseExpEffect), value),
             };
         }
@@ -193,12 +193,12 @@ namespace Exp.Gemstones
             {
                 CategoryType.Projectile => new IncreaseProjectileDamageEffect
                 {
-                    Value = value,
+                    ModifierValue = value,
                     EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseProjectileDamageEffect), value),
                 },
                 CategoryType.AoE => new IncreaseSplashDamageEffect
                 {
-                    Value = value,
+                    ModifierValue = value,
                     EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseSplashDamageEffect), value),
                 },
                 _ => throw new ArgumentOutOfRangeException()
@@ -238,12 +238,12 @@ namespace Exp.Gemstones
             {
                 StatType.MaxHealth => new IncreaseWallHealthEffect()
                 {
-                    Value = value,
+                    ModifierValue = value,
                     EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseWallHealthEffect), value),
                 },
                 StatType.Healing => new IncreaseWallHealingEffect
                 {
-                    Value = value,
+                    ModifierValue = value,
                     EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseWallHealingEffect), value),
                 },
                 _ => throw new ArgumentOutOfRangeException()
@@ -283,12 +283,12 @@ namespace Exp.Gemstones
             {
                 StatType.MaxHealth => new IncreaseBarricadeHealthEffect()
                 {
-                    Value = value,
+                    ModifierValue = value,
                     EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseBarricadeHealthEffect), value),
                 },
                 StatType.Healing => new IncreaseBarricadeHealingEffect
                 {
-                    Value = value,
+                    ModifierValue = value,
                     EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseBarricadeHealingEffect), value),
                 },
                 _ => throw new ArgumentOutOfRangeException()
@@ -321,7 +321,7 @@ namespace Exp.Gemstones
             float value = GetEffectValue(level, random);
             return new EnemySpeedModifierEffect()
             {
-                Value = value,
+                ModifierValue = value,
                 EffectDescription = effectDescriptions.GetDescription(typeof(EnemySpeedModifierEffect), value),
             };
         }
@@ -352,7 +352,7 @@ namespace Exp.Gemstones
             float value = GetEffectValue(level, random);
             return new EnemyDamageModifierEffect()
             {
-                Value = value,
+                ModifierValue = value,
                 EffectDescription = effectDescriptions.GetDescription(typeof(EnemyDamageModifierEffect), value),
             };
         }

@@ -29,13 +29,21 @@ namespace Effects
     public interface IEffect
     {
         public void Perform(IAttacker attacker);
-        public void Revert(IAttacker attacker);
 
         public float ModifierValue { get; set; }
+    }
+
+    public interface IDamageEffect
+    {
         public bool IsDamageEffect { get; }
     }
 
-    public interface IEffectHolder : IEffect 
+    public interface IRevertableEffect
+    {
+        public void Revert(IAttacker attacker);
+    }
+
+    public interface IEffectHolder 
     {
         public List<IEffect> Effects { get; set; }
 
@@ -45,7 +53,7 @@ namespace Effects
     #region Increase Stat
 
     [Serializable]
-    public class IncreaseStatEffect : IEffect
+    public class IncreaseStatEffect : IEffect, IRevertableEffect
     {
         [TitleGroup("Modifier")]
         [OdinSerialize]
@@ -61,8 +69,6 @@ namespace Effects
         public bool CanIncrease = true;
 
         private Dictionary<IAttacker, Modifier> ModifierDictionary;
-
-        public bool IsDamageEffect => false;
         
         public void Perform(IAttacker unit)
         {
@@ -107,7 +113,7 @@ namespace Effects
     #region Timed Stat Increase
 
     [Serializable]
-    public class TimedStatIncreaseEffect : IEffect
+    public class TimedStatIncreaseEffect : IEffect, IRevertableEffect
     {
         [Title("Increase Amount")]
         [OdinSerialize]
@@ -121,9 +127,7 @@ namespace Effects
         public float Time = 3;
 
         private Dictionary<IAttacker, Modifier> ModifierDictionary;
-
-        public bool IsDamageEffect => false;
-
+        
         public void Perform(IAttacker unit)
         {
             PerformAsync(unit).Forget();
@@ -161,12 +165,12 @@ namespace Effects
 
         public void Revert(IAttacker unit)
         {
-            if (ModifierDictionary == null || !ModifierDictionary.ContainsKey(unit))
+            if (ModifierDictionary == null || !ModifierDictionary.TryGetValue(unit, out Modifier value))
             {
                 return;
             }
 
-            unit.Stats.RevertModifiedStat(StatType, ModifierDictionary[unit]);
+            unit.Stats.RevertModifiedStat(StatType, value);
 
             ModifierDictionary.Remove(unit);
         }
@@ -177,7 +181,7 @@ namespace Effects
     #region Temporary Increase Stat
 
     [Serializable]
-    public class TemporaryIncreaseStatEffect : IEffect
+    public class TemporaryIncreaseStatEffect : IEffect, IRevertableEffect
     {
         [TitleGroup("Modifier")]
         [OdinSerialize]
@@ -193,9 +197,7 @@ namespace Effects
         public float ChanceToTrigger = 0.2f;
 
         private HashSet<IAttacker> unitsAttacking = new HashSet<IAttacker>();
-
-        public bool IsDamageEffect => false;
-
+        
         public void Perform(IAttacker unit)
         {
             unitsAttacking ??= new HashSet<IAttacker>();
@@ -247,7 +249,7 @@ namespace Effects
     #region Damage Collider
 
     [Serializable]
-    public class DamageColliderEffect : IEffect
+    public class DamageColliderEffect : IEffect, IDamageEffect
     {
         [Title("Attack Damage")]
         [OdinSerialize]
@@ -366,11 +368,6 @@ namespace Effects
                 return spawned;
             }
         }
-        
-        public void Revert(IAttacker unit)
-        {
-            // Cant revert
-        }
     }
 
     #endregion
@@ -378,7 +375,7 @@ namespace Effects
     #region Arched Damage Collider
 
     [Serializable]
-    public class ArchedDamageColliderEffect : IEffect
+    public class ArchedDamageColliderEffect : IEffect, IDamageEffect
     {
         [FoldoutGroup("Attack Damage", order: 1)]
         [OdinSerialize]
@@ -525,12 +522,6 @@ namespace Effects
                 }
             }
         }
-
-
-        public void Revert(IAttacker unit)
-        {
-            // Cant revert
-        }
     }
 
     #endregion
@@ -546,8 +537,6 @@ namespace Effects
 
         [Title("Callbacks")]
         public bool TriggerDamageDone = true;
-
-        public bool IsDamageEffect => false;
         
         public void Perform(IAttacker unit)
         {
@@ -608,11 +597,6 @@ namespace Effects
                 return spawned;
             }
         }
-        
-        public void Revert(IAttacker unit)
-        {
-            // Cant revert
-        }
     }
 
     #endregion
@@ -620,7 +604,7 @@ namespace Effects
     #region Stacking Effect
 
     [Serializable]
-    public class StackingEffectEffect : IEffect
+    public class StackingEffectEffect : IEffect, IRevertableEffect
     {
         [TitleGroup("Stat Increase")]
         [OdinSerialize]
@@ -634,8 +618,6 @@ namespace Effects
         public IEffect EffectToStack;
 
         private Dictionary<IAttacker, float> MultiplierDictionary;
-
-        public bool IsDamageEffect => false;
 
         public void Perform(IAttacker unit)
         {
@@ -667,7 +649,7 @@ namespace Effects
 
         public void Revert(IAttacker unit)
         {
-            if (MultiplierDictionary == null || !MultiplierDictionary.ContainsKey(unit))
+            if (MultiplierDictionary == null || !MultiplierDictionary.ContainsKey(unit) || EffectToStack is not IRevertableEffect revertableEffect)
             {
                 return;
             }
@@ -675,7 +657,7 @@ namespace Effects
             float value = EffectToStack.ModifierValue;
 
             EffectToStack.ModifierValue = MultiplierDictionary[unit];
-            EffectToStack.Revert(unit);
+            revertableEffect.Revert(unit);
 
             EffectToStack.ModifierValue = value;
 
@@ -688,7 +670,7 @@ namespace Effects
     #region Damage Over Time On Damage
 
     [Serializable]
-    public class DamageOverTimeOnDamageEffect : IEffect
+    public class DamageOverTimeOnDamageEffect : IEffect, IDamageEffect
     {
         [TitleGroup("Percent Damage DOT'd")]
         [OdinSerialize]
@@ -742,11 +724,6 @@ namespace Effects
                 //unit.OnUnitDoneDamage(damageDone);
             }
         }
-
-        public void Revert(IAttacker unit)
-        {
-            // Nothing to revert
-        }
     }
 
     #endregion
@@ -754,7 +731,7 @@ namespace Effects
     #region Random Bonus
 
     [Serializable]
-    public class RandomBonusEffect : IEffect
+    public class RandomBonusEffect : IEffect, IRevertableEffect
     {
         [TitleGroup("Modifier")]
         [OdinSerialize]
@@ -770,8 +747,6 @@ namespace Effects
         public bool CanIncrease = true;
 
         private Dictionary<IAttacker, List<(StatType, Modifier)>> ModifierDictionary;
-        
-        public bool IsDamageEffect => false;
 
         public void Perform(IAttacker unit)
         {
@@ -823,7 +798,7 @@ namespace Effects
     #region Repeated Effect
 
     [Serializable]
-    public class RepeatEffect : IEffectHolder
+    public class RepeatEffect : IEffect, IEffectHolder, IRevertableEffect
     {
         [Title("Total Time")]
         [OdinSerialize]
@@ -839,8 +814,6 @@ namespace Effects
         [SerializeField]
         private float initialDelay = 0.0f;
         
-        public bool IsDamageEffect => false;
-
         public void Perform(IAttacker unit)
         {
             PerformAsync(unit, unit.AttackPosition, unit.OriginPosition).Forget();
@@ -875,7 +848,10 @@ namespace Effects
         {
             for (int i = 0; i < Effects.Count; i++)
             {
-                Effects[i].Revert(unit); // Might work
+                if (Effects[i] is IRevertableEffect revertableEffect)
+                {
+                    revertableEffect.Revert(unit); 
+                }
             }
         }
 
@@ -908,9 +884,7 @@ namespace Effects
 
         [SerializeField]
         private float delay = 0.5f;
-
-        public bool IsDamageEffect => false;
-
+        
         public void Perform(IAttacker unit)
         {
             PeformAsync(unit).Forget();
@@ -937,11 +911,6 @@ namespace Effects
                 await UniTask.Yield();
             }
         }
-
-        public void Revert(IAttacker unit)
-        {
-            // Nah
-        }
     }
 
     #endregion
@@ -949,7 +918,7 @@ namespace Effects
     #region Targeted Effect
 
     [Serializable]
-    public class OnDamageTargetedEffect : IEffectHolder
+    public class OnDamageTargetedEffect : IEffect, IEffectHolder
     {
         [Title("Nohting")]
         [OdinSerialize]
@@ -964,8 +933,6 @@ namespace Effects
 
         [ShowIf(nameof(UseDelay))]
         public float[] Delays;
-
-        public bool IsDamageEffect => false;
 
         public IEffectHolder Clone()
         {
@@ -1002,7 +969,10 @@ namespace Effects
         {
             for (int i = 0; i < Effects.Count; i++)
             {
-                Effects[i].Revert(unit); // Might work
+                if (Effects[i] is IRevertableEffect revertableEffect)
+                {
+                    revertableEffect.Revert(unit); 
+                }
             }
         }
     }
@@ -1028,8 +998,6 @@ namespace Effects
         
         [SerializeField, ShowIf(nameof(spawnAtUnitOrigin))]
         private bool orientEffectToAttackPosition;
-        
-        public bool IsDamageEffect => false;
 
         public void Perform(IAttacker unit)
         {
@@ -1042,11 +1010,6 @@ namespace Effects
                 : Quaternion.identity;
 
             AttackEffect.Spawn(targetPosition, unit.OriginPosition, unit.AttackPosition, rot, ModifierValue);
-        }
-
-        public void Revert(IAttacker unit)
-        {
-            // Cant revert
         }
     }
     

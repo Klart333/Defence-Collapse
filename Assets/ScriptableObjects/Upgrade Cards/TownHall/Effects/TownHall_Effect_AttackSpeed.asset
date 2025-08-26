@@ -51,14 +51,12 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  icon: {fileID: 21300000, guid: a1823540bcd4eb948913aeb160d7d269, type: 3}
   iconReference:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: 7900347e2a271b04c913e399a8e92e93, type: 2}
     VariableValuePreview: {fileID: 21300000, guid: f3d374d9c382df344b627716c212132a,
       type: 3}
-  description: +100% Attack Speed on the Town Hall.
   descriptionReference:
     Mode: 1
     ConstantValue: 
@@ -69,7 +67,7 @@ MonoBehaviour:
   weight: 1
   weightStrategy: 18
   weightChangeOnPicked: -0.5
-  weightChangeOnCardsPicked: 1
+  weightChangeOnCardsPicked: 0.6
   weightChangeOnDistrictBuilt: 1
   appliedCategories: 8
   upgradeType: 0

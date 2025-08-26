@@ -82,9 +82,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1485413851107328
-    m_Localized: All projectiles gain {Color.ToTag}{PowerName}</color>
+    m_Localized: All projectiles gain {Color.ToTag}<link={PowerName}>{PowerName}</color></link>
     m_Metadata:
-      m_Items: []
+      m_Items:
+      - rid: 5367088374237626595
   - m_Id: 1517368403595264
     m_Localized: Attacks are charged with lightning, chaining from the enemy to up
       to X other enemies.
@@ -126,3 +127,4 @@ MonoBehaviour:
         - id: 65733315825664
         - id: 68936249937920
         - id: 343630714802176
+        - id: 1485413851107328

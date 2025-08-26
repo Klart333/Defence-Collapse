@@ -45,7 +45,7 @@ public class Attack
             return;
         }
 
-        EffectHolders[^1].Perform(attacker);
+        (EffectHolders[^1] as IEffect)?.Perform(attacker);
     }
 
     public void OnDoneDamage(IAttacker attacker)
@@ -126,7 +126,7 @@ public class Attack
         {
             EffectHolders[i].Effects = i == 0 
                 ? Effects 
-                : new List<IEffect> { EffectHolders[i - 1] };
+                : new List<IEffect> { EffectHolders[i - 1] as IEffect };
         }
     }
 }

@@ -1237,7 +1237,10 @@ namespace Buildings.District
         {
             foreach (IEffect createdEffect in districtData.CreatedEffects)
             {
-                createdEffect.Revert(this);
+                if (createdEffect is IRevertableEffect revertableEffect)
+                {
+                    revertableEffect.Revert(this);
+                }
             }
         }
 
@@ -1363,14 +1366,12 @@ namespace Buildings.District
         {
             foreach (IEffect effect in effects)
             {
-                if (effect.IsDamageEffect)
+                switch (effect)
                 {
-                    return true;
-                }
-                
-                if (effect is IEffectHolder holder && SearchEffects(holder.Effects))
-                {
-                    return true;
+                    case IDamageEffect damageEffect:
+                        return damageEffect.IsDamageEffect;
+                    case IEffectHolder holder when SearchEffects(holder.Effects):
+                        return true;
                 }
             }
 

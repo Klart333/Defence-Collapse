@@ -16,7 +16,8 @@ MonoBehaviour:
     m_Code: tr-TR
   m_SharedData: {fileID: 11400000, guid: 43f2e9d7f5b58d14dabce85ebd58fecc, type: 2}
   m_Metadata:
-    m_Items: []
+    m_Items:
+    - rid: 5367088485705449472
   m_TableData:
   - m_Id: 3059760533504
     m_Localized: +{0} Saldiri Hizi
@@ -34,6 +35,17 @@ MonoBehaviour:
     m_Localized: Saglik Hasar Katlayicisi
     m_Metadata:
       m_Items: []
+  - m_Id: 1485413851107328
+    m_Localized: 
+    m_Metadata:
+      m_Items:
+      - rid: 5367088485705449472
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 5367088485705449472
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 
+        m_SharedEntries:
+        - id: 1485413851107328

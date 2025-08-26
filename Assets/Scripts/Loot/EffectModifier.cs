@@ -47,7 +47,7 @@ namespace Loot
             {
                 if (effect is IEffectHolder holder)
                 {
-                    Effects.Add(holder.Clone());
+                    Effects.Add(holder.Clone() as IEffect);
                 }
                 else
                 {

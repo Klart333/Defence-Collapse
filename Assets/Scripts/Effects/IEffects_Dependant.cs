@@ -7,6 +7,9 @@ using UnityEngine;
 using Gameplay;
 using System;
 using System.Collections.Generic;
+using Exp.Gemstones;
+using Gameplay.Upgrades;
+using Object = UnityEngine.Object;
 
 namespace Effects
 {
@@ -23,8 +26,6 @@ namespace Effects
         [SerializeField]
         private bool multiplyWithAttackSpeed;
         
-        public bool IsDamageEffect => false;
-        
         public void Perform(IAttacker unit)
         {
             Vector3 pos = unit.OriginPosition;
@@ -37,11 +38,6 @@ namespace Effects
             {
                 stats.GoldGained += amount;
             }
-        }
-
-        public void Revert(IAttacker unit)
-        {
-            
         }
     }
 
@@ -57,16 +53,10 @@ namespace Effects
         private IComponentData componentData;
         
         public float ModifierValue { get; set; } = 1;
-        public bool IsDamageEffect => false;
         
         public void Perform(IAttacker unit)
         {
             GameDataManager.Instance.IncreaseGameData(componentData);
-        }
-
-        public void Revert(IAttacker unit)
-        {
-            
         }
     }
 
@@ -75,7 +65,7 @@ namespace Effects
     #region Create Buff Effect
 
     [Serializable]
-    public class CreateBuffEffect : IEffect 
+    public class CreateBuffEffect : IEffect, IRevertableEffect
     {
         [Title("Modifier Multiplier")]
         [OdinSerialize]
@@ -84,8 +74,6 @@ namespace Effects
         [Title("Buff Settings")]
         [SerializeField]
         private Buff[] buffs;
-
-        public bool IsDamageEffect => false;
 
         private Dictionary<IAttacker, List<BuffEmitter>> buffEmitters;
         
@@ -130,5 +118,33 @@ namespace Effects
     }
 
     #endregion
+    
+    #region Gemstone Effect
 
+    [Serializable]
+    public class GemstoneEffect : IEffect 
+    {
+        [Title("Modifier Multiplier")]
+        [OdinSerialize]
+        public float ModifierValue { get; set; } = 1;
+
+        [Title("Gemstone")]
+        [OdinSerialize]
+        private IGemstoneEffect[] gemstoneEffects;
+        
+        public void Perform(IAttacker unit)
+        {
+            if (unit != null)
+            {
+                Debug.Log("Why are you sending a unit here?");
+            }
+
+            for (int i = 0; i < gemstoneEffects.Length; i++)
+            {
+                gemstoneEffects[i].PerformEffect();
+            }
+        }
+    }
+
+    #endregion
 }

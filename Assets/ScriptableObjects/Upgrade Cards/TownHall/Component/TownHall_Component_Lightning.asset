@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3d805e3b3ab4891bec7b5cebf945158, type: 3}
-  m_Name: Projectile_Lightning_UpgradeCardData
+  m_Name: TownHall_Component_Lightning
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -42,16 +42,16 @@ MonoBehaviour:
   descriptionReference:
     Mode: 1
     ConstantValue: 
-    Variable: {fileID: 11400000, guid: 9d8cee24063f4004883ef926f54dd418, type: 2}
+    Variable: {fileID: 11400000, guid: b633f40eb6a47744aa02cac60e355b79, type: 2}
     VariableValuePreview: 
-  upgradeRank: 3
-  upgradeCardType: 128
-  weight: 0.1
+  upgradeRank: 2
+  upgradeCardType: 8
+  weight: 1
   weightStrategy: 32
   weightChangeOnPicked: 1
   weightChangeOnCardsPicked: 1
   weightChangeOnDistrictBuilt: 1
-  appliedCategories: 128
+  appliedCategories: 8
   upgradeType: 1
   componentType: 1
-  componentStrength: 5
+  componentStrength: 10

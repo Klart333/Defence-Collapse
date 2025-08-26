@@ -73,7 +73,7 @@ namespace Gameplay.Upgrades.ECS
     public struct MultiplyDamageComponent : IComponentData
     {
         public CategoryType AppliedCategory;
-        public Health.HealthType AppliedHealthType;
+        public HealthType AppliedHealthType;
         public float DamageMultiplier;
     }
 }

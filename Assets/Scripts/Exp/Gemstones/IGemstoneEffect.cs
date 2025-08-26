@@ -1,32 +1,41 @@
+using Object = UnityEngine.Object;
 using Gameplay.Upgrades.ECS;
 using Gameplay.Upgrades;
 using Gameplay.Money;
-using UnityEngine;
 using Enemy.ECS;
 using Gameplay;
 using Effects;
 using Health;
+using System;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 
 namespace Exp.Gemstones
 {
     public interface IGemstoneEffect
     {
-        public float Value { get; set; }
         public Modifier.ModifierType CumulativeType { get; }
         public bool IsAdditivePercent { get; }
+        public float ModifierValue { get; set; }
         
         public void PerformEffect();
         public string GetDescription();
         public IGemstoneEffect Copy();
     }
     
-    public class StatIncreaseEffect : IGemstoneEffect
+    [Serializable]
+    public class StatIncreaseEffect : IEffect, IGemstoneEffect
     {
+        [OdinSerialize, Title("Effect Modifier Value")]
+        public float ModifierValue { get; set; }
+
+        [Title("Effect")]
         public CategoryType AppliedCategory;
         public IEffect Effect;
         
-        public string EffectDescription;
-        public float Value { get; set; }
+        private AppliedEffectsHandler appliedEffectsHandler;
+        
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Additive;
         public bool IsAdditivePercent { get; set; }
 
@@ -38,14 +47,20 @@ namespace Exp.Gemstones
             EffectDescription = statEffect.EffectDescription;
             AppliedCategory = statEffect.AppliedCategory;
             Effect = statEffect.Effect;
-            Value = statEffect.Value;
+            ModifierValue = statEffect.ModifierValue;
         }
 
-        public void PerformEffect() => PerformEffect(Object.FindFirstObjectByType<AppliedEffectsHandler>());
+        public void Perform(IAttacker attacker) => PerformEffect();
+        
+        public void PerformEffect()
+        {
+            appliedEffectsHandler ??= Object.FindFirstObjectByType<AppliedEffectsHandler>();
+            PerformEffect(appliedEffectsHandler);
+        }
         
         public void PerformEffect(AppliedEffectsHandler handler)
         {
-            Effect.ModifierValue = Value;
+            Effect.ModifierValue = ModifierValue;
             handler.AddUpgradeEffect(AppliedCategory, Effect);
         }
         
@@ -57,10 +72,12 @@ namespace Exp.Gemstones
         public IGemstoneEffect Copy() => new StatIncreaseEffect(this);
     }
     
-    public class IncreaseGameSpeedEffect : IGemstoneEffect
+    [Serializable]
+    public class IncreaseGameSpeedEffect : IEffect, IGemstoneEffect
     {
-        public string EffectDescription;
-        public float Value { get; set; }
+        [OdinSerialize, Title("Game Speed Multiplier")]
+        public float ModifierValue { get; set; }
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Additive;
         public bool IsAdditivePercent => true;
 
@@ -68,14 +85,16 @@ namespace Exp.Gemstones
         public IncreaseGameSpeedEffect(IncreaseGameSpeedEffect copy)
         {
             EffectDescription = copy.EffectDescription;
-            Value = copy.Value;
+            ModifierValue = copy.ModifierValue;
         }
+        
+        public void Perform(IAttacker attacker) => PerformEffect();
 
         public void PerformEffect()
         {
             GameSpeedManager.Instance.AddModifier(new Modifier
             {
-                Value = Value,
+                Value = ModifierValue,
                 Type = Modifier.ModifierType.Multiplicative
             });
         }
@@ -84,10 +103,12 @@ namespace Exp.Gemstones
         public IGemstoneEffect Copy() => new IncreaseGameSpeedEffect(this);
     }
     
-    public class IncreaseMoneyEffect : IGemstoneEffect
+    [Serializable]
+    public class IncreaseMoneyEffect : IEffect, IGemstoneEffect
     {
-        public string EffectDescription;
-        public float Value { get; set; }
+        [OdinSerialize, Title("Money Multiplier")]
+        public float ModifierValue { get; set; }
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Additive;
         public bool IsAdditivePercent => true;
 
@@ -95,14 +116,16 @@ namespace Exp.Gemstones
         public IncreaseMoneyEffect(IncreaseMoneyEffect copy)
         {
             EffectDescription = copy.EffectDescription;
-            Value = copy.Value;
+            ModifierValue = copy.ModifierValue;
         }
+
+        public void Perform(IAttacker attacker) => PerformEffect();
 
         public void PerformEffect()
         {
             MoneyManager.Instance.MoneyMultiplier.AddModifier(new Modifier
             {
-                Value = Value,
+                Value = ModifierValue,
                 Type = Modifier.ModifierType.Multiplicative
             });
         }
@@ -111,10 +134,12 @@ namespace Exp.Gemstones
         public IGemstoneEffect Copy() => new IncreaseMoneyEffect(this);
     }
     
-    public class IncreaseExpEffect : IGemstoneEffect
+    [Serializable]
+    public class IncreaseExpEffect : IEffect, IGemstoneEffect
     {
-        public string EffectDescription;
-        public float Value { get; set; }
+        [OdinSerialize, Title("Exp Multiplier")]
+        public float ModifierValue { get; set; }
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Additive;
         public bool IsAdditivePercent => true;
 
@@ -122,14 +147,16 @@ namespace Exp.Gemstones
         public IncreaseExpEffect(IncreaseExpEffect copy)
         {
             EffectDescription = copy.EffectDescription;
-            Value = copy.Value;
+            ModifierValue = copy.ModifierValue;
         }
+        
+        public void Perform(IAttacker attacker) => PerformEffect();
 
         public void PerformEffect()
         {
             ExpManager.Instance.ExpMultiplier.AddModifier(new Modifier
             {
-                Value = Value,
+                Value = ModifierValue,
                 Type = Modifier.ModifierType.Multiplicative
             });
         }
@@ -138,10 +165,12 @@ namespace Exp.Gemstones
         public IGemstoneEffect Copy() => new IncreaseExpEffect(this);
     }
     
-    public class IncreaseProjectileDamageEffect : IGemstoneEffect
+    [Serializable]
+    public class IncreaseProjectileDamageEffect : IEffect, IGemstoneEffect
     {
-        public string EffectDescription;
-        public float Value { get; set; }
+        [OdinSerialize, Title("Damage Multiplier")]
+        public float ModifierValue { get; set; }
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Additive;
         public bool IsAdditivePercent => true;
 
@@ -149,8 +178,10 @@ namespace Exp.Gemstones
         public IncreaseProjectileDamageEffect(IncreaseProjectileDamageEffect copy)
         {
             EffectDescription = copy.EffectDescription;
-            Value = copy.Value;
+            ModifierValue = copy.ModifierValue;
         }
+
+        public void Perform(IAttacker attacker) => PerformEffect();
 
         public void PerformEffect()
         {
@@ -158,7 +189,7 @@ namespace Exp.Gemstones
             {
                 AppliedCategory = CategoryType.Projectile,
                 AppliedHealthType = HealthType.Health | HealthType.Armor | HealthType.Shield,
-                DamageMultiplier = Value,
+                DamageMultiplier = ModifierValue,
             });
         }
 
@@ -166,10 +197,12 @@ namespace Exp.Gemstones
         public IGemstoneEffect Copy() => new IncreaseProjectileDamageEffect(this);
     }
     
-    public class IncreaseSplashDamageEffect : IGemstoneEffect
+    [Serializable]
+    public class IncreaseSplashDamageEffect : IEffect, IGemstoneEffect
     {
-        public string EffectDescription;
-        public float Value { get; set; }
+        [OdinSerialize, Title("Damage Multiplier")]
+        public float ModifierValue { get; set; }
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Additive;
         public bool IsAdditivePercent => true;
 
@@ -177,8 +210,10 @@ namespace Exp.Gemstones
         public IncreaseSplashDamageEffect(IncreaseSplashDamageEffect copy)
         {
             EffectDescription = copy.EffectDescription;
-            Value = copy.Value;
+            ModifierValue = copy.ModifierValue;
         }
+        
+        public void Perform(IAttacker attacker) => PerformEffect();
 
         public void PerformEffect()
         {
@@ -186,7 +221,7 @@ namespace Exp.Gemstones
             {
                 AppliedCategory = CategoryType.AoE,
                 AppliedHealthType = HealthType.Health | HealthType.Armor | HealthType.Shield,
-                DamageMultiplier = Value,
+                DamageMultiplier = ModifierValue,
             });
         }
 
@@ -196,10 +231,12 @@ namespace Exp.Gemstones
 
     #region GameData
 
-    public class IncreaseWallHealthEffect : IGemstoneEffect
+    [Serializable]
+    public class IncreaseWallHealthEffect : IEffect, IGemstoneEffect
     {
-        public string EffectDescription;
-        public float Value { get; set; }
+        [OdinSerialize, Title("Extra Wall Health")]
+        public float ModifierValue { get; set; }
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Additive;
         public bool IsAdditivePercent => true;
 
@@ -207,14 +244,16 @@ namespace Exp.Gemstones
         public IncreaseWallHealthEffect(IncreaseWallHealthEffect copy)
         {
             EffectDescription = copy.EffectDescription;
-            Value = copy.Value;
+            ModifierValue = copy.ModifierValue;
         }
+        
+        public void Perform(IAttacker attacker) => PerformEffect();
 
         public void PerformEffect()
         {
             GameData.WallHealthMultiplier.AddModifier(new Modifier
             {
-                Value = Value,
+                Value = ModifierValue,
                 Type = Modifier.ModifierType.Multiplicative
             });
         }
@@ -222,12 +261,13 @@ namespace Exp.Gemstones
         public string GetDescription() => EffectDescription;
         public IGemstoneEffect Copy() => new IncreaseWallHealthEffect(this);
     }
-
     
-    public class IncreaseWallHealingEffect : IGemstoneEffect
+    [Serializable]
+    public class IncreaseWallHealingEffect : IEffect, IGemstoneEffect
     {
-        public string EffectDescription;
-        public float Value { get; set; }
+        [OdinSerialize, Title("Extra Wall Healing")]
+        public float ModifierValue { get; set; }
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Additive;
         public bool IsAdditivePercent => false;
 
@@ -235,14 +275,16 @@ namespace Exp.Gemstones
         public IncreaseWallHealingEffect(IncreaseWallHealingEffect copy)
         {
             EffectDescription = copy.EffectDescription;
-            Value = copy.Value;
+            ModifierValue = copy.ModifierValue;
         }
+
+        public void Perform(IAttacker attacker) => PerformEffect();
 
         public void PerformEffect()
         {
             GameData.WallHealing.AddModifier(new Modifier
             {
-                Value = Value,
+                Value = ModifierValue,
                 Type = Modifier.ModifierType.Additive
             });
         }
@@ -251,10 +293,12 @@ namespace Exp.Gemstones
         public IGemstoneEffect Copy() => new IncreaseWallHealingEffect(this);
     }
     
-    public class IncreaseBarricadeHealthEffect : IGemstoneEffect
+    [Serializable]
+    public class IncreaseBarricadeHealthEffect : IEffect, IGemstoneEffect
     {
-        public string EffectDescription;
-        public float Value { get; set; }
+        [OdinSerialize, Title("Extra Barricade Health")]
+        public float ModifierValue { get; set; }
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Additive;
         public bool IsAdditivePercent => true;
 
@@ -262,14 +306,16 @@ namespace Exp.Gemstones
         public IncreaseBarricadeHealthEffect(IncreaseBarricadeHealthEffect copy)
         {
             EffectDescription = copy.EffectDescription;
-            Value = copy.Value;
+            ModifierValue = copy.ModifierValue;
         }
 
+        public void Perform(IAttacker attacker) => PerformEffect();
+        
         public void PerformEffect()
         {
             GameData.BarricadeHealthMultiplier.AddModifier(new Modifier
             {
-                Value = Value,
+                Value = ModifierValue,
                 Type = Modifier.ModifierType.Multiplicative
             });
         }
@@ -277,12 +323,13 @@ namespace Exp.Gemstones
         public string GetDescription() => EffectDescription;
         public IGemstoneEffect Copy() => new IncreaseBarricadeHealthEffect(this);
     }
-
     
-    public class IncreaseBarricadeHealingEffect : IGemstoneEffect
+    [Serializable]
+    public class IncreaseBarricadeHealingEffect : IEffect, IGemstoneEffect
     {
-        public string EffectDescription;
-        public float Value { get; set; }
+        [OdinSerialize, Title("Extra Barricade Healing")]
+        public float ModifierValue { get; set; }
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Additive;
         public bool IsAdditivePercent => false;
 
@@ -290,14 +337,16 @@ namespace Exp.Gemstones
         public IncreaseBarricadeHealingEffect(IncreaseBarricadeHealingEffect copy)
         {
             EffectDescription = copy.EffectDescription;
-            Value = copy.Value;
+            ModifierValue = copy.ModifierValue;
         }
+        
+        public void Perform(IAttacker attacker) => PerformEffect();
 
         public void PerformEffect()
         {
             GameData.BarricadeHealing.AddModifier(new Modifier
             {
-                Value = Value,
+                Value = ModifierValue,
                 Type = Modifier.ModifierType.Additive
             });
         }
@@ -308,10 +357,12 @@ namespace Exp.Gemstones
     
     #endregion
     
-    public class EnemySpeedModifierEffect : IGemstoneEffect
+    [Serializable]
+    public class EnemySpeedModifierEffect : IEffect, IGemstoneEffect
     {
-        public string EffectDescription;
-        public float Value { get; set; }
+        [OdinSerialize, Title("Enemy Speed Multiplier")]
+        public float ModifierValue { get; set; }
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Multiplicative;
         public bool IsAdditivePercent => false;
 
@@ -319,14 +370,16 @@ namespace Exp.Gemstones
         public EnemySpeedModifierEffect(EnemySpeedModifierEffect copy)
         {
             EffectDescription = copy.EffectDescription;
-            Value = copy.Value;
+            ModifierValue = copy.ModifierValue;
         }
+        
+        public void Perform(IAttacker attacker) => PerformEffect();
 
         public void PerformEffect()
         {
             GameDataManager.Instance.IncreaseGameData(new EnemySpeedModifierComponent
             {
-                SpeedMultiplier = Value
+                SpeedMultiplier = ModifierValue
             });
         }
 
@@ -334,10 +387,12 @@ namespace Exp.Gemstones
         public IGemstoneEffect Copy() => new EnemySpeedModifierEffect(this);
     }
     
-    public class EnemyDamageModifierEffect : IGemstoneEffect
+    [Serializable]
+    public class EnemyDamageModifierEffect : IEffect, IGemstoneEffect
     {
-        public string EffectDescription;
-        public float Value { get; set; }
+        [OdinSerialize, Title("Enemy Damage Multiplier")]
+        public float ModifierValue { get; set; }
+        public string EffectDescription { get; set; }
         public Modifier.ModifierType CumulativeType => Modifier.ModifierType.Multiplicative;
         public bool IsAdditivePercent => false;
 
@@ -345,14 +400,16 @@ namespace Exp.Gemstones
         public EnemyDamageModifierEffect(EnemyDamageModifierEffect copy)
         {
             EffectDescription = copy.EffectDescription;
-            Value = copy.Value;
+            ModifierValue = copy.ModifierValue;
         }
+        
+        public void Perform(IAttacker attacker) => PerformEffect();
 
         public void PerformEffect()
         {
             GameDataManager.Instance.IncreaseGameData(new EnemyDamageModifierComponent
             {
-                DamageMultiplier = Value
+                DamageMultiplier = ModifierValue
             });
         }
 
