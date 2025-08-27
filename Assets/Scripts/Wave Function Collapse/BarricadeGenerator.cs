@@ -12,6 +12,7 @@ namespace WaveFunctionCollapse
     public class BarricadeGenerator : MonoBehaviour, IQueryWaveFunction
     {
         public event Action<QueryMarchedChunk> OnLoaded;
+        public event Action<ChunkIndex> OnCellCollapsed;
 
         [Title("Wave Function")]
         [SerializeField]
@@ -149,8 +150,8 @@ namespace WaveFunctionCollapse
 
             void GetNeighbours(ChunkIndex chunkIndex, int depth)
             {
-                List<ChunkIndex> neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, gridSize.x, gridSize.z);
-                for (int j = 0; j < neighbours.Count; j++)
+                ChunkIndex[] neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, gridSize.x, gridSize.z);
+                for (int j = 0; j < neighbours.Length; j++)
                 {
                     if (cellsToUpdate.Contains(neighbours[j])
                         || !waveFunction.Chunks.TryGetValue(neighbours[j].Index, out QueryMarchedChunk neihbourChunk)

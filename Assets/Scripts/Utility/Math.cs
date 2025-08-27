@@ -1,7 +1,6 @@
-﻿using System.Collections.Specialized;
-using Chunks;
-using Unity.Mathematics;
+﻿using Unity.Mathematics;
 using UnityEngine;
+using Chunks;
 
 namespace Utility
 {
@@ -70,6 +69,13 @@ namespace Utility
                     _ => Adjacencies.None
                 }
             };
+        }
+        
+        public static Vector2 RotateVector2(Vector2 vector, float angle)
+        {
+            float x = vector.x * math.cos(angle) - vector.y * math.sin(angle);
+            float y = vector.x * math.sin(angle) + vector.y * math.cos(angle);
+            return new Vector2(x, y);
         }
     }
 }

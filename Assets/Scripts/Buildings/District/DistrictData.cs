@@ -2,17 +2,17 @@ using Object = UnityEngine.Object;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
+using Buildings.District.ECS;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
 using Unity.Collections;
+using Gameplay.Buffs;
 using UnityEngine;
 using System.Linq;
 using InputCamera;
 using Gameplay;
 using Utility;
 using System;
-using Buildings.District.ECS;
-using Gameplay.Buffs;
 
 namespace Buildings.District
 {
@@ -39,9 +39,9 @@ namespace Buildings.District
         public Stats Stats => State.Stats;
         public Vector3 Position { get; }
         
-        public IChunkWaveFunction<QueryChunk> DistrictGenerator { get; }
+        public DistrictGenerator DistrictGenerator { get; }
 
-        public DistrictData(TowerData towerData, HashSet<QueryChunk> chunks, Vector3 position, IChunkWaveFunction<QueryChunk> chunkDistrictGenerator, int key)
+        public DistrictData(TowerData towerData, HashSet<QueryChunk> chunks, Vector3 position, IChunkWaveFunction<QueryChunk> chunkDistrictGenerator, int key, PrototypeInfoData prototypeInfo)
         {
             DistrictChunks = new Dictionary<int3, QueryChunk>();
             foreach (QueryChunk chunk in chunks)
@@ -52,7 +52,7 @@ namespace Buildings.District
                 }
             }
 
-            DistrictGenerator = chunkDistrictGenerator;
+            DistrictGenerator = chunkDistrictGenerator as DistrictGenerator;
             Position = position;
             GenerateCollider();
             this.towerData = towerData;
@@ -69,7 +69,8 @@ namespace Buildings.District
                 DistrictType.Barracks => new BarracksState(this, towerData, position, key),
                 _ => throw new ArgumentOutOfRangeException(nameof(towerData.DistrictType), towerData.DistrictType, null)
             };
-
+            State.PrototypeInfo = prototypeInfo;
+            
             Events.OnWaveStarted += OnWaveStarted;
             Events.OnWaveEnded += OnWaveEnded;
             Events.OnWallsDestroyed += OnWallsDestroyed;
@@ -116,9 +117,8 @@ namespace Buildings.District
             }
             
             GenerateCollider();
-
-            State.RemoveEntities();
-            State.SpawnEntities();
+            //State.RemoveEntities();
+            //State.SpawnEntities();
         }
 
         private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
@@ -171,8 +171,8 @@ namespace Buildings.District
             
             await UniTask.WaitWhile(() => DistrictGenerator.IsGenerating);
             
-            State.RemoveEntities();
-            State.SpawnEntities();
+            //State.RemoveEntities();
+            //State.SpawnEntities();
         }
 
         /// <summary>

@@ -1,26 +1,27 @@
 using System.Collections.Generic;
 using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
+using UnityEngine.Assertions;
 using Sirenix.Serialization;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
 using Buildings.District;
 using Unity.Mathematics;
+using Sirenix.Utilities;
 using UnityEditor;
 using UnityEngine;
 using System.Linq;
+using Buildings;
 using Gameplay;
 using System;
-using Buildings;
-using Sirenix.Utilities;
-using UnityEngine.Assertions;
 
 namespace WaveFunctionCollapse
 {
     public class DistrictGenerator : SerializedMonoBehaviour, IChunkWaveFunction<QueryChunk>
     {
         public event Action<QueryChunk> OnDistrictChunkRemoved;
-        public event Action<ChunkIndex> OnDistrictCellBuilt;
+        public event Action<ChunkIndex> OnCellCollapsed;
+        public event Action OnFinishedGenerating;
         
         [Title("Wave Function")]
         [SerializeField]
@@ -355,7 +356,7 @@ namespace WaveFunctionCollapse
                 ChunkIndex? index = waveFunction.GetLowestEntropyIndex(chunksToCollapse);
                 if (!index.HasValue)
                 {
-                    //Debug.LogError("Could not find lowest entropy index");
+                    Debug.LogError("Could not find lowest entropy index");
                     IsGenerating = false;
                     return;
                 }
@@ -372,9 +373,7 @@ namespace WaveFunctionCollapse
                 }
 
                 if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
-
                 await UniTask.NextFrame();
-
                 watch.Restart();
             }
 
@@ -387,6 +386,7 @@ namespace WaveFunctionCollapse
             Place();
 
             IsGenerating = false;
+            OnFinishedGenerating?.Invoke();
         }
         
         #region Query & Place
@@ -568,7 +568,7 @@ namespace WaveFunctionCollapse
             
             if (isNew)
             {
-                OnDistrictCellBuilt?.Invoke(index);
+                OnCellCollapsed?.Invoke(index);
             }
         }
 

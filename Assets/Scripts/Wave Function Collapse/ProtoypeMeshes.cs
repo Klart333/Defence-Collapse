@@ -27,26 +27,30 @@ namespace WaveFunctionCollapse
         public void CompileData()
         {
             Meshes.Clear();
+            
             Dictionary<Mesh, int> meshesToIndex = new Dictionary<Mesh, int>();
             int index = 0;
             for (int i = 0; i < protoypeInfos.Length; i++)
             {
-                for (int j = 0; j < protoypeInfos[i].PrototypeMeshes.Count; j++)
+                PrototypeInfoData protInfo = protoypeInfos[i];
+                protInfo.PrototypeTargetIndexes.Clear();
+                
+                for (int j = 0; j < protInfo.PrototypeMeshes.Count; j++)
                 {
-                    if (!Meshes.TryAdd(index, protoypeInfos[i].PrototypeMeshes[j])) continue;
+                    if (!Meshes.TryAdd(index, protInfo.PrototypeMeshes[j])) continue;
                     
-                    meshesToIndex.Add(protoypeInfos[i].PrototypeMeshes[j], index);
+                    meshesToIndex.Add(protInfo.PrototypeMeshes[j], index);
                     index++;
                 }
 
-                for (int j = 0; j < protoypeInfos[i].Prototypes.Count; j++)
+                for (int j = 0; j < protInfo.Prototypes.Count; j++)
                 {
-                    PrototypeData prot = protoypeInfos[i].Prototypes[j];
+                    PrototypeData prot = protInfo.Prototypes[j];
                     if (prot.MeshRot.MeshIndex == -1) continue;
 
-                    if (prot.MeshRot.MeshIndex >= protoypeInfos[i].PrototypeMeshes.Count) continue;
+                    if (prot.MeshRot.MeshIndex >= protInfo.PrototypeMeshes.Count) continue;
                     
-                    int meshIndex = meshesToIndex[protoypeInfos[i].PrototypeMeshes[prot.MeshRot.MeshIndex]];
+                    int meshIndex = meshesToIndex[protInfo.PrototypeMeshes[prot.MeshRot.MeshIndex]];
                     PrototypeData prototypeData = new PrototypeData(
                         new MeshWithRotation(meshIndex, prot.MeshRot.Rot),
                         prot.PosX, prot.NegX, prot.PosY, prot.NegY, prot.PosZ, prot.NegZ,
@@ -55,19 +59,23 @@ namespace WaveFunctionCollapse
                         Name_EditorOnly = Meshes[meshIndex].name
                     };
 
-                    protoypeInfos[i].Prototypes[j] = prototypeData;
-                        
+                    protInfo.Prototypes[j] = prototypeData;
+
+                    if (protInfo.PrototypeTargetIndexesEditor.Contains(j))
+                    {
+                        protInfo.PrototypeTargetIndexes.Add(meshIndex);
+                    }
                 }
                 
-                for (int j = 0; j < protoypeInfos[i].MarchingTable.Length; j++)
+                for (int j = 0; j < protInfo.MarchingTable.Length; j++)
                 {
-                    for (int k = 0; k < protoypeInfos[i].MarchingTable[j].Count; k++)
+                    for (int k = 0; k < protInfo.MarchingTable[j].Count; k++)
                     {
-                        PrototypeData prot = protoypeInfos[i].MarchingTable[j][k];
+                        PrototypeData prot = protInfo.MarchingTable[j][k];
                         if (prot.MeshRot.MeshIndex == -1) continue;
-                        if (prot.MeshRot.MeshIndex >= protoypeInfos[i].PrototypeMeshes.Count) continue;
+                        if (prot.MeshRot.MeshIndex >= protInfo.PrototypeMeshes.Count) continue;
 
-                        int meshIndex = meshesToIndex[protoypeInfos[i].PrototypeMeshes[prot.MeshRot.MeshIndex]];
+                        int meshIndex = meshesToIndex[protInfo.PrototypeMeshes[prot.MeshRot.MeshIndex]];
                         PrototypeData prototypeData = new PrototypeData(
                             new MeshWithRotation(meshIndex, prot.MeshRot.Rot),
                             prot.PosX, prot.NegX, prot.PosY, prot.NegY, prot.PosZ, prot.NegZ,
@@ -75,11 +83,11 @@ namespace WaveFunctionCollapse
                         {
                             Name_EditorOnly = Meshes[meshIndex].name
                         };
-                        protoypeInfos[i].MarchingTable[j][k] = prototypeData;
+                        protInfo.MarchingTable[j][k] = prototypeData;
                     }
                 }
                 
-                protoypeInfos[i].NotBottomPrototypes.Clear();
+                protInfo.NotBottomPrototypes.Clear();
                 
                 UnityEditor.EditorUtility.SetDirty(protoypeInfos[i]);
             }

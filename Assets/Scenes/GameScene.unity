@@ -3007,146 +3007,17 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects:
-    - {fileID: 11400000, guid: 245db626b31676a4183321c87b450a27, type: 2}
-    - {fileID: 11400000, guid: 20071b5325a2e33418874ae5d70b303e, type: 2}
-    - {fileID: 11400000, guid: ab0696a35eef117499e0fdc29a15b776, type: 2}
-    - {fileID: 11400000, guid: d94a6d5c1a8128544a4b6388e09ea944, type: 2}
-    - {fileID: 11400000, guid: 78c9d3f9d472dc64296ab95b899cfe91, type: 2}
-    - {fileID: 11400000, guid: 9430843d50aa70c4fa143490b21bda6d, type: 2}
-    - {fileID: 11400000, guid: 130c28be23b70ae43b62a25bb84391c1, type: 2}
-    - {fileID: 11400000, guid: 23300af82b0cb0941ad306bbb43740c4, type: 2}
+    ReferencedUnityObjects: []
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes:
-    - Name: districtInfoData
-      Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[DistrictType, Core],[WaveFunctionCollapse.PrototypeInfoData,
-        Core]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[DistrictType, Core]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 8
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 10
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 10
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 10
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
-      Entry: 10
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 5
-    - Name: $v
-      Entry: 10
-      Data: 4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 6
-    - Name: $v
-      Entry: 10
-      Data: 5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 10
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 7
-    - Name: $v
-      Entry: 10
-      Data: 7
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+    SerializationNodes: []
   districtGenerator: {fileID: 1551488502}
   buildingGenerator: {fileID: 771210304}
   districtHandler: {fileID: 491554922}
   buildingPlacer: {fileID: 604477866}
+  prototypeUtility: {fileID: 11400000, guid: 219bf5d6961f4944c9987d3dcf4ebce3, type: 2}
   unableToPlacePrefab: {fileID: -7155613184035295475, guid: 37457fca56525af4bab8884b7e239b05,
     type: 3}
   costText: {fileID: 104919694}
@@ -5556,6 +5427,8 @@ MonoBehaviour:
       Data: 
   districtGenerator: {fileID: 1551488502}
   towerDataUtility: {fileID: 11400000, guid: 9c340b6d5c4971a428e173b6c297f638, type: 2}
+  prototypeInfoUtility: {fileID: 11400000, guid: 219bf5d6961f4944c9987d3dcf4ebce3,
+    type: 2}
 --- !u!114 &491554923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9663,7 +9536,7 @@ VisualEffect:
         m_Overridden: 1
       - m_Value:
           serializedVersion: 2
-          key0: {r: 0, g: 0.8660979, b: 1, a: 0}
+          key0: {r: 0, g: 1.7321959, b: 2, a: 0}
           key1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
           key2: {r: 0, g: 0, b: 0, a: 0}
           key3: {r: 0, g: 0, b: 0, a: 0}
@@ -20065,6 +19938,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2112620416}
     m_Modifications:
+    - target: {fileID: 246881616693835205, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 946916641356372004, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1080383292460972389, guid: 46298695f0056184a9aa656dd0416175,
         type: 3}
       propertyPath: serializationData.Prefab
@@ -20121,10 +20004,55 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1430324075100402537, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1488213569656293928, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1524973148181198302, guid: 46298695f0056184a9aa656dd0416175,
         type: 3}
       propertyPath: m_Name
       value: District Modules_Archer
+      objectReference: {fileID: 0}
+    - target: {fileID: 2288217007258117664, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4619131491735394420, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6154880759492164809, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7397020181972919492, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7474773258057594118, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7687606729179324924, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8732416367221588310, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

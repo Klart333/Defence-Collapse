@@ -4,6 +4,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
 using System;
+using Math = Utility.Math;
 
 namespace WaveFunctionCollapse
 {
@@ -46,6 +47,10 @@ namespace WaveFunctionCollapse
         [SerializeField, ShowIf(nameof(useBuildableCorners))]
         private BuildableCornerData buildableCornerData;
 
+        [Title("Mesh Targets")]
+        [SerializeField]
+        private Mesh[] targetMeshes;
+        
         [Title("Generated")]
         [SerializeField]
         private PrototypeInfoData prototypeData;
@@ -105,7 +110,7 @@ namespace WaveFunctionCollapse
                 List<Vector3> posZs = new List<Vector3>();
                 List<Vector3> negZs = new List<Vector3>();
                 Material[] materials = meshes[i].gameObject.GetComponent<MeshRenderer>().sharedMaterials;
-                int[] matIndexes = materials.Select((x) => materialData.Materials.IndexOf(x)).ToArray();
+                int[] matIndexes = materials.Select(x => materialData.Materials.IndexOf(x)).ToArray();
 
                 Dictionary<Direction, int[]> materialInfo = useMaterialForKeys ? meshRayService.GetMeshIndices(mesh, materials) : null;
                 
@@ -159,8 +164,13 @@ namespace WaveFunctionCollapse
                 {
                     for (int j = 1; j < prots.Count + 1; j++)
                     {
-                        prototypeData.OnlyAllowedForBottom.Add(prototypeData.Prototypes.Count - j);
+                        prototypeData.OnlyAllowedForBottom.Add(prototypeData.Prototypes.Count - j); // Don't know why the for is so weird..
                     }
+                }
+                
+                if (targetMeshes.Contains(mesh))
+                {
+                    prototypeData.PrototypeTargetIndexesEditor.Add(prototypeData.Prototypes.Count - 1);
                 }
 
                 if (prototypeData.NotAllowedForSides.Contains(i))
@@ -668,9 +678,7 @@ namespace WaveFunctionCollapse
             float angle = rot * 90 * Mathf.Deg2Rad;
             for (int i = 0; i < positions.Count; i++)
             {
-                float x = positions[i].x * Mathf.Cos(angle) - positions[i].y * Mathf.Sin(angle);
-                float y = positions[i].x * Mathf.Sin(angle) + positions[i].y * Mathf.Cos(angle);
-                rotated[i] = new Vector2(x, y);
+                rotated[i] = Math.RotateVector2(positions[i], angle);
             }
 
             return Rounded(rotated.ToList()).ToArray();

@@ -36,9 +36,9 @@ namespace Buildings.District
         [SerializeField]
         private BuildingPlacer buildingPlacer;
         
-        [OdinSerialize]
-        private Dictionary<DistrictType, PrototypeInfoData> districtInfoData = new Dictionary<DistrictType, PrototypeInfoData>();
-
+        [SerializeField]
+        private DistrictPrototypeInfoUtility prototypeUtility;
+        
         [SerializeField]
         private PooledMonoBehaviour unableToPlacePrefab;
         
@@ -175,7 +175,7 @@ namespace Buildings.District
         private bool QueryDistrict()
         {
             int height = districtType == DistrictType.TownHall ? 1 : 2;
-            Dictionary<ChunkIndex, IBuildable> districts = districtGenerator.Query(districtChunkIndexes, height, districtInfoData[districtType]);
+            Dictionary<ChunkIndex, IBuildable> districts = districtGenerator.Query(districtChunkIndexes, height, prototypeUtility.GetPrototypeInfo(districtType));
             if (districts == null)
             {
                 return false;
@@ -429,7 +429,7 @@ namespace Buildings.District
 
             moneyManager.RemoveMoney(cost);
             
-            PrototypeInfoData protInfo = districtInfoData[districtType];
+            PrototypeInfoData protInfo = prototypeUtility.GetPrototypeInfo(districtType);
             HashSet<QueryChunk> chunks = districtGenerator.QueriedChunks.Where(x => x.PrototypeInfoData == protInfo).ToHashSet();
             districtHandler.AddBuiltDistrict(chunks, districtType);
 
