@@ -85,6 +85,7 @@ namespace Gameplay.Upgrades
         {
             canvasGroup.alpha = 0;
             canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
             canvasGroup.DOFade(1, fadeInDuration).SetEase(fadeInEase);
             
             int seed = gameManager.Seed + waveCount;
@@ -114,6 +115,7 @@ namespace Gameplay.Upgrades
         {
             canvasGroup.DOKill();
             canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
             
             canvasGroup.DOFade(0, fadeOutDuration).SetEase(fadeOutEase).onComplete = () =>
             {

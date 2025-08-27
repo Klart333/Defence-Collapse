@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using TMPro;
 using UnityEngine;
 
@@ -27,4 +26,3 @@ namespace Variables
 #endif
     }
 }
-#endif

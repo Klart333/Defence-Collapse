@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,5 +26,3 @@ namespace Variables
 #endif
     }
 }
-
-#endif

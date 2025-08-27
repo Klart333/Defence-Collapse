@@ -95,8 +95,8 @@ namespace TextMeshDOTS.Authoring
             //see ReadMe for more details how
             return new FontRequest
             {
-                fontAssetPath = "Alata-Regular.ttf",
-                fontFamily = "Alata",
+                fontAssetPath = "GermaniaOne-Regular.ttf",
+                fontFamily = "GermaniaOne",
                 fontSubFamily = "Regular",
                 typographicFamily = "",
                 typographicSubfamily = "",

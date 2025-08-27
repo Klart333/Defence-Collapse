@@ -54,6 +54,7 @@ namespace Buildings.District
 
             GameSpeedManager.Instance.SetBaseGameSpeed(0, 0.5f);
             canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
             canvasGroup.DOKill();
             canvasGroup.alpha = 0;
             canvasGroup.DOFade(1.0f, fadeInDuration).SetEase(fadeInEase);
@@ -81,6 +82,7 @@ namespace Buildings.District
             Events.OnDistrictUnlocked?.Invoke(tower);
             
             canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
             canvasGroup.DOKill();
 
             GameSpeedManager.Instance.SetBaseGameSpeed(1, 0.5f);
