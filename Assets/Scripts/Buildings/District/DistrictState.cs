@@ -27,6 +27,7 @@ namespace Buildings.District
         public event Action OnAttack;
 
         private readonly Dictionary<int2, List<Entity>> entityIndexes = new Dictionary<int2, List<Entity>>();
+        protected readonly HashSet<int2> occupiedTargetMeshChunkIndex = new HashSet<int2>();
         protected readonly HashSet<Entity> spawnedDataEntities = new HashSet<Entity>();
         protected readonly HashSet<Entity> allSpawnedEntities = new HashSet<Entity>();
         protected readonly List<ChunkIndex> collapsedIndexes = new List<ChunkIndex>();
@@ -432,52 +433,54 @@ namespace Buildings.District
             foreach (ChunkIndex chunkIndex in chunkIndexes)
             {
                 ChunkIndex[] neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, width, height);
-                bool isValid = true;
-                for (int i = 0; i < neighbours.Length && isValid; i++)
-                {
-                    if (!DistrictData.DistrictChunks.TryGetValue(neighbours[i].Index, out QueryChunk chunk)
-                        || chunk.PrototypeInfoData != PrototypeInfo)
-                    {
-                        continue;
-                    } 
-                    
-                    // Check Index
-                    //isValid = false;
-                }
-                
-                if (!isValid) continue;
-
                 int rotation = DistrictData.DistrictGenerator.ChunkWaveFunction[chunkIndex].PossiblePrototypes[0].MeshRot.Rot;
                 DistrictStateUtility.MeshTargetType targetType = DistrictStateUtility.GetMeshTargetType(neighbours, DistrictData.DistrictGenerator, PrototypeInfo, rotation);
-
+                
+                Vector2 forwardDir = Math.RotateVector2(new Vector2(0, 1), -90 * (rotation + 3) * math.TORADIANS);
+                Vector2 leftDir = Math.RotateVector2(new Vector2(-1, 0), -90 * (rotation + 3) * math.TORADIANS);
+                float2 baseKey = chunkIndex.Index.xz.MultiplyByAxis(new int2(width, height)) + chunkIndex.CellIndex.xz + new float2(0.5f, 0.5f);
                 switch (targetType)
                 {
                     case DistrictStateUtility.MeshTargetType.Corner:
+                        Vector2 cornerRight = Math.RotateVector2(new Vector2(0.25f, 0f), -90 * (rotation + 3) * math.TORADIANS);
+                        Vector2 cornerBack = Math.RotateVector2(new Vector2(0f, -0.25f), -90 * (rotation + 3) * math.TORADIANS);
+                        float2 cornerRightKey = baseKey + Math.Rotate90Float2(new float2(0.5f, 0.5f), rotation + 3);
+                        float2 cornerBackKey = baseKey + Math.Rotate90Float2(new float2(-0.5f, -0.5f), rotation + 3);
+                        
+                        AddPosition(cornerRight, forwardDir, chunkIndex, new int2((int)cornerRightKey.x, (int)cornerRightKey.y));
+                        AddPosition(cornerBack, leftDir, chunkIndex, new int2((int)cornerBackKey.x, (int)cornerBackKey.y));
                         break;
                     case DistrictStateUtility.MeshTargetType.Side:
-                        Vector2 offsetRight = Math.RotateVector2(new Vector2(0.25f, 0f), -90 * (rotation + 3) * math.TORADIANS);
-                        Vector2 offsetLeft = Math.RotateVector2(new Vector2(-0.25f, 0f), -90 * (rotation + 3) * math.TORADIANS);
-                        Vector2 dir = Math.RotateVector2(new Vector2(0, 1), -90 * (rotation + 3) * math.TORADIANS);
+                        Vector2 sideRight = Math.RotateVector2(new Vector2(0.25f, 0f), -90 * (rotation + 3) * math.TORADIANS);
+                        Vector2 sideLeft = Math.RotateVector2(new Vector2(-0.25f, 0f), -90 * (rotation + 3) * math.TORADIANS);
+                        float2 sideRightKey = baseKey + Math.Rotate90Float2(new float2(0.5f, 0.5f), rotation + 3);
+                        float2 sideLeftKey = baseKey + Math.Rotate90Float2(new float2(-0.5f, 0.5f), rotation + 3);
                         
-                        AddPosition(offsetRight, dir, chunkIndex);
-                        AddPosition(offsetLeft, dir, chunkIndex);
+                        AddPosition(sideRight, forwardDir, chunkIndex, new int2((int)sideRightKey.x, (int)sideRightKey.y));
+                        AddPosition(sideLeft, forwardDir, chunkIndex, new int2((int)sideLeftKey.x, (int)sideLeftKey.y));
                         break;
                     default:
                         break;
                 }
-            }
-
+            } 
+            
             outOffsets = offsets;
             outDirections = directions;
             return indexes;
             
-            void AddPosition(Vector2 offset, Vector2 dir, ChunkIndex chunkIndex)
+            void AddPosition(Vector2 offset, Vector2 dir, ChunkIndex chunkIndex, int2 index)
             {
+                if (occupiedTargetMeshChunkIndex.Contains(index))
+                {
+                    return;
+                }
+                
                 Vector2 pivotOffset = -dir * 0.125f;
-                    
                 offsets.Add(offset + pivotOffset);
                 directions.Add(dir);
                 indexes.Add(chunkIndex);
+                
+                occupiedTargetMeshChunkIndex.Add(index);
             }
         }
 
@@ -1418,21 +1421,31 @@ namespace Buildings.District
         // Right, Forward, Left, Back 
         private static bool[] GetIfAdjacentSidesExist(ChunkIndex[] neighbours, IChunkWaveFunction<QueryChunk> waveFunction, PrototypeInfoData protInfo)
         {
-            bool right = NeighbourExists(neighbours[0], waveFunction, protInfo);
-            bool forward = NeighbourExists(neighbours[1], waveFunction, protInfo);
-            bool left = NeighbourExists(neighbours[2], waveFunction, protInfo);
-            bool back = NeighbourExists(neighbours[3], waveFunction, protInfo);
+            bool right = NeighbourExists(neighbours[0], waveFunction, protInfo, Direction.Left);
+            bool forward = NeighbourExists(neighbours[1], waveFunction, protInfo, Direction.Backward);
+            bool left = NeighbourExists(neighbours[2], waveFunction, protInfo, Direction.Right);
+            bool back = NeighbourExists(neighbours[3], waveFunction, protInfo, Direction.Forward);
             return new bool[4] { right, forward, left, back };
         }
 
-        private static bool NeighbourExists(ChunkIndex chunkIndex, IChunkWaveFunction<QueryChunk> waveFunction, PrototypeInfoData protInfo)
+        private static bool NeighbourExists(ChunkIndex chunkIndex, IChunkWaveFunction<QueryChunk> waveFunction, PrototypeInfoData protInfo, Direction oppositeDirection)
         {
             if (!waveFunction.ChunkWaveFunction.Chunks.TryGetValue(chunkIndex.Index, out QueryChunk chunk))
             {
                 return false;
             }
 
-            return chunk.PrototypeInfoData == protInfo;
+            if (chunk.PrototypeInfoData != protInfo)
+            {
+                return false;
+            }
+
+            if (chunk[chunkIndex.CellIndex].PossiblePrototypes[0].DirectionToKey(oppositeDirection) == 1)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public static MeshTargetType GetMeshTargetType(ChunkIndex[] neighbours, DistrictGenerator waveFunction, PrototypeInfoData protInfo, int rotation)

@@ -62,7 +62,7 @@ namespace Effects.ECS
             }
             
             poison.TotalDamage += sourcePoison.TotalDamage;
-            ECB.AddComponent(sortKey, entity, sourcePoison);
+            ECB.AddComponent(sortKey, entity, poison);
         }
     }
 }
