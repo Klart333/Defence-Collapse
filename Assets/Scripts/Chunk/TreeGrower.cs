@@ -177,10 +177,9 @@ namespace Chunks
             for (int y = 0; y < raycastArea.y; y++)
             {
                 Vector3 pos = transform.position + new Vector3(x, 0, y);
-                ChunkIndex? index = BuildingManager.Instance.GetIndex(pos);
-                if (index.HasValue)
+                if (BuildingManager.Instance.TryGetIndex(pos, out ChunkIndex index))
                 {
-                    chunkIndexes.Add(index.Value);
+                    chunkIndexes.Add(index);
                 }
             }
         }

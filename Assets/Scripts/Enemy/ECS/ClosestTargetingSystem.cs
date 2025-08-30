@@ -15,6 +15,7 @@ namespace Enemy.ECS
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<GameSpeedComponent>();
+            state.RequireForUpdate<FlowFieldComponent>();
             
             EntityQuery query = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAspect<EnemyTargetAspect>().Build(ref state);
             state.RequireForUpdate(query);

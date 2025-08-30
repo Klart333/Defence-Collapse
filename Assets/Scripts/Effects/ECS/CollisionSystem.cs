@@ -24,7 +24,9 @@ namespace Effects.ECS
             
             transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
             state.RequireForUpdate<WaveStateComponent>();
-            state.RequireForUpdate<SpatialHashMapSingleton>();        
+            state.RequireForUpdate<SpatialHashMapSingleton>();   
+            
+            state.RequireForUpdate<FlowFieldComponent>();
         }
 
         [BurstCompile]

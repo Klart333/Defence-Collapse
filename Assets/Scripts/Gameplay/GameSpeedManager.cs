@@ -25,6 +25,7 @@ namespace Gameplay
         private Tween slowDownTween;
         
         private Modifier speedUpModifier;
+        private Modifier speedUpModifier2;
         private Stat gameSpeedStat;
         
         public float Value => gameSpeedStat.Value;
@@ -39,6 +40,7 @@ namespace Gameplay
                 Value = speedySpeed,
                 Type = Modifier.ModifierType.Multiplicative,
             };
+            speedUpModifier2 = new Modifier(speedUpModifier);
         }
 
         private void OnEnable()
@@ -58,6 +60,8 @@ namespace Gameplay
             inputManager = await InputManager.Get();
             inputManager.Space.started += SpaceStarted;
             inputManager.Space.canceled += SpaceCanceled;
+            inputManager.Shift.started += ShiftStarted;
+            inputManager.Shift.canceled += ShiftCanceled;
         }
 
         private void OnDisable()
@@ -67,6 +71,8 @@ namespace Gameplay
             
             inputManager.Space.started -= SpaceStarted;
             inputManager.Space.canceled -= SpaceCanceled;
+            inputManager.Shift.started -= ShiftStarted;
+            inputManager.Shift.canceled -= ShiftCanceled;
         }
 
         private void SpaceStarted(InputAction.CallbackContext obj)
@@ -81,6 +87,18 @@ namespace Gameplay
             entityManager.SetComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
         }
 
+        private void ShiftStarted(InputAction.CallbackContext obj)
+        {
+            gameSpeedStat.AddModifier(speedUpModifier2);
+            entityManager.SetComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
+        }
+
+        private void ShiftCanceled(InputAction.CallbackContext obj)
+        {
+            gameSpeedStat.RemoveModifier(speedUpModifier2);
+            entityManager.SetComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
+        }
+        
         private void OnCapitolDestroyed(DistrictData destroyedDistrict)
         {
             SetBaseGameSpeed(0.001f, slowDownDuration);

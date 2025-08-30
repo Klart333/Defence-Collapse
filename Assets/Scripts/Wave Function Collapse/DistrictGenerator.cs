@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
-using UnityEngine.Assertions;
 using Sirenix.Serialization;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
@@ -20,6 +19,7 @@ namespace WaveFunctionCollapse
     public class DistrictGenerator : SerializedMonoBehaviour, IChunkWaveFunction<QueryChunk>
     {
         public event Action<QueryChunk> OnDistrictChunkRemoved;
+        public event Action<QueryChunk> OnDistrictChunkCleared;
         public event Action<ChunkIndex> OnCellCollapsed;
         public event Action OnFinishedGenerating;
         
@@ -108,7 +108,7 @@ namespace WaveFunctionCollapse
                 foreach (QueryChunk chunk in waveFunction.Chunks.Values)
                 {
                     chunk.Clear(waveFunction.GameObjectPool);
-                    ClearChunkMeshes(chunk.ChunkIndex);
+                    ClearChunkMeshes(chunk.ChunkIndex, false);
                 }
                 
                 foreach (QueryChunk chunk in waveFunction.Chunks.Values)
@@ -116,7 +116,7 @@ namespace WaveFunctionCollapse
                     waveFunction.LoadCells(chunk, chunk.PrototypeInfoData);
                 }
 
-                Run(waveFunction.Chunks.Values).Forget();
+                Run(waveFunction.Chunks.Values, true).Forget();
             }
         }
         
@@ -163,6 +163,8 @@ namespace WaveFunctionCollapse
 
         private async UniTask UpdateChunks()
         {
+            //Debug.Log("Updating Chunks", this);
+
             while (buildQueue.TryDequeue(out List<IBuildable> buildables))
             {
                 List<Vector3> positions = new List<Vector3>();
@@ -203,18 +205,21 @@ namespace WaveFunctionCollapse
                     Vector3 cornerOffset = new Vector3(WaveFunctionUtility.Corners[i].x * chunkSize.x * waveFunction.CellSize.x, 0, WaveFunctionUtility.Corners[i].y * chunkSize.z * waveFunction.CellSize.z) * 0.5f;
                     Vector3 pos = buildable.gameObject.transform.position - cornerOffset - offset;
                     int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, ChunkScale);
-                    ChunkIndex? chunkIndex = GetBuildingCell(index);
-                    Assert.IsTrue(chunkIndex.HasValue);
+                    if (!TryGetBuildingCell(index, out ChunkIndex chunkIndex))
+                    {
+                        Debug.LogError("Should never get here");
+                        return;
+                    }
                     
                     if (waveFunction.Chunks.TryGetValue(index, out QueryChunk chunk))
                     {
-                        HandleBuiltChunk(chunk, isBuildable, overrideChunks, chunkIndex.Value);
+                        HandleBuiltChunk(chunk, isBuildable, overrideChunks, chunkIndex);
                     }
                     else if (isBuildable)
                     {
                         positions.Add(pos);
-                        if (ChunkIndexToChunks.TryGetValue(chunkIndex.Value, out HashSet<int3> list)) list.Add(index);
-                        else ChunkIndexToChunks.Add(chunkIndex.Value, new HashSet<int3> { index });
+                        if (ChunkIndexToChunks.TryGetValue(chunkIndex, out HashSet<int3> list)) list.Add(index);
+                        else ChunkIndexToChunks.Add(chunkIndex, new HashSet<int3> { index });
                     }
                 }
             }
@@ -239,14 +244,14 @@ namespace WaveFunctionCollapse
                     if (isBuildable)
                     {
                         chunk.Clear(waveFunction.GameObjectPool);
-                        ClearChunkMeshes(chunk.ChunkIndex);
+                        ClearChunkMeshes(chunk.ChunkIndex, false);
                         overrideChunks.Add(chunk);
                     }
                     else
                     {
                         OnDistrictChunkRemoved?.Invoke(chunk);
                         waveFunction.RemoveChunk(chunk.ChunkIndex, out List<QueryChunk> neighbourChunks);
-                        ClearChunkMeshes(chunk.ChunkIndex);
+                        ClearChunkMeshes(chunk.ChunkIndex, false);
                         for (int i = 0; i < neighbourChunks.Count; i++)
                         {
                             ResetNeighbours(overrideChunks, neighbourChunks[i], 1);
@@ -277,7 +282,7 @@ namespace WaveFunctionCollapse
                     || neighbourChunk.AdjacentChunks[i] is not QueryChunk adjacentChunk) continue;
 
                 adjacentChunk.Clear(ChunkWaveFunction.GameObjectPool);
-                ClearChunkMeshes(adjacentChunk.ChunkIndex);
+                ClearChunkMeshes(adjacentChunk.ChunkIndex, false);
                 
                 if (depth > 0)
                 {
@@ -317,7 +322,7 @@ namespace WaveFunctionCollapse
             {
                 neighbours.Remove(waveFunction.Chunks[index]);
                 waveFunction.RemoveChunk(index);
-                ClearChunkMeshes(index);
+                ClearChunkMeshes(index, false);
             }
             
             foreach (QueryChunk neighbour in neighbours)
@@ -336,7 +341,7 @@ namespace WaveFunctionCollapse
                 return;
             }
 
-            await Run(neighbours);
+            await Run(neighbours, true);
             isRemovingChunks = false;
         }
 
@@ -464,7 +469,7 @@ namespace WaveFunctionCollapse
                     QueryChangedData.Add(index, chunkAtIndex.PrototypeInfoData);
                     chunkAtIndex.QueryLoad(prototypeInfoData, CellSize, ChunkWaveFunction.CellStack);
 
-                    ClearChunkMeshes(chunkAtIndex.ChunkIndex);   
+                    ClearChunkMeshes(chunkAtIndex.ChunkIndex, true);   
                 }
                 else
                 {
@@ -522,7 +527,7 @@ namespace WaveFunctionCollapse
                 foreach (QueryChunk chunk in frontier)
                 {
                     chunk.QueryLoad(chunk.PrototypeInfoData, ChunkWaveFunction.CellSize, ChunkWaveFunction.CellStack);
-                    ClearChunkMeshes(chunk.ChunkIndex);
+                    ClearChunkMeshes(chunk.ChunkIndex, true);
                 }
 
                 chunks.AddRange(frontier);
@@ -530,7 +535,7 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public void ClearChunkMeshes(int3 chunkIndex)
+        public void ClearChunkMeshes(int3 chunkIndex, bool isQuery)
         {
             for (int x = 0; x < chunkSize.x; x++)
             for (int y = 0; y < chunkSize.y; y++)
@@ -542,6 +547,11 @@ namespace WaveFunctionCollapse
                     buildable.gameObject.SetActive(false);
                     SpawnedMeshes.Remove(index);
                 }
+            }
+
+            if (!isQuery && ChunkWaveFunction.Chunks.TryGetValue(chunkIndex, out QueryChunk chunk))
+            {
+                OnDistrictChunkCleared?.Invoke(chunk);
             }
         }
 
@@ -640,10 +650,10 @@ namespace WaveFunctionCollapse
 #endif
         #endregion
 
-        public ChunkIndex? GetBuildingCell(int3 districtChunkIndex)
+        public bool TryGetBuildingCell(int3 districtChunkIndex, out ChunkIndex index)
         {
             Vector3 pos = ChunkWaveUtility.GetPosition(districtChunkIndex, ChunkScale);
-            return BuildingManager.Instance.GetIndex(pos + BuildingManager.Instance.CellSize.XyZ(0) / 2.0f);
+            return BuildingManager.Instance.TryGetIndex(pos + BuildingManager.Instance.CellSize.XyZ(0) / 2.0f, out index);
         }
     }
 }

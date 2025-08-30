@@ -74,8 +74,7 @@ namespace WaveFunctionCollapse
             for (int i = 0; i < 4; i++)
             {
                 Vector3 marchPos = pos + new Vector3(WaveFunctionUtility.MarchDirections[i].x * CellSize.x, 0, WaveFunctionUtility.MarchDirections[i].y * CellSize.z);
-                ChunkIndex? chunk = GetIndex(marchPos);
-                if (chunk.HasValue && ChunkWaveFunction.Chunks[chunk.Value.Index].BuiltCells[chunk.Value.CellIndex.x, chunk.Value.CellIndex.y, chunk.Value.CellIndex.z])
+                if (TryGetIndex(marchPos, out ChunkIndex chunk) && ChunkWaveFunction.Chunks[chunk.Index].BuiltCells[chunk.CellIndex.x, chunk.CellIndex.y, chunk.CellIndex.z])
                 {
                     marchedIndex += (int)Mathf.Pow(2, i);
                 }
@@ -84,39 +83,41 @@ namespace WaveFunctionCollapse
             return marchedIndex;
         }
         
-        public ChunkIndex? GetIndex(Vector3 pos)
+        public bool TryGetIndex(Vector3 pos, out ChunkIndex chunkIndex)
         {
+            chunkIndex = default;
+
             foreach (QueryMarchedChunk chunk in ChunkWaveFunction.Chunks.Values)
             {
                 if (!chunk.ContainsPoint(pos, CellSize)) continue;
                 
-                int3? cellIndex = GetIndex(pos, chunk);
-                if (cellIndex.HasValue)
+                if (TryGetIndex(pos, chunk, out var cellIndex))
                 {
-                    return new ChunkIndex(chunk.ChunkIndex, cellIndex.Value);
+                    chunkIndex = new ChunkIndex(chunk.ChunkIndex, cellIndex);
+                    return true;
                 }
                 
-                return null;
+                return false;
             }
 
-            return null;
+            return false;
         }
         
-        public int3? GetIndex(Vector3 pos, IChunk chunk)
+        public bool TryGetIndex(Vector3 pos, IChunk chunk, out int3 index)
         {
             pos -= chunk.Position;
-            int3 index = new int3(Utility.Math.GetMultiple(pos.x, CellSize.x), 0, Utility.Math.GetMultiple(pos.z, CellSize.z));
+            index = new int3(Utility.Math.GetMultiple(pos.x, CellSize.x), 0, Utility.Math.GetMultiple(pos.z, CellSize.z));
             if (chunk.Cells.IsInBounds(index))
             {
-                return index;
+                return true;
             }
 
-            return null;
+            return false;
         }
         
-        public int3? GetIndex(Vector3 pos, int3 chunkIndex)
+        public bool TryGetIndex(Vector3 pos, int3 chunkIndex, out int3 index)
         {
-            return GetIndex(pos, ChunkWaveFunction.Chunks[chunkIndex]);
+            return TryGetIndex(pos, ChunkWaveFunction.Chunks[chunkIndex], out index);
         }
         
         public Vector3 GetPos(ChunkIndex index)
@@ -136,10 +137,9 @@ namespace WaveFunctionCollapse
             for (int z = -1; z <= 1; z+=2)
             {
                 Vector3 pos = queryPosition + new Vector3(x, 0, z).MultiplyByAxis(ChunkWaveFunction.CellSize);
-                ChunkIndex? index = GetIndex(pos);
-                if (index.HasValue) 
+                if (TryGetIndex(pos, out ChunkIndex index)) 
                 {
-                    surrounding.Add(index.Value);
+                    surrounding.Add(index);
                 }
             }
 
@@ -150,14 +150,14 @@ namespace WaveFunctionCollapse
         {
             List<ChunkIndex> builtIndexes = new List<ChunkIndex>(4) { queryIndex };
             Vector3 queryPos = ChunkWaveFunction[queryIndex].Position;
-            ChunkIndex? westCell = GetIndex(queryPos + new Vector3(-1, 0, 0).MultiplyByAxis(ChunkWaveFunction.CellSize));
-            if (westCell.HasValue) builtIndexes.Add(westCell.Value);
+            if (TryGetIndex(queryPos + new Vector3(-1, 0, 0).MultiplyByAxis(ChunkWaveFunction.CellSize), out ChunkIndex westCell)) 
+                builtIndexes.Add(westCell);
             
-            ChunkIndex? southCell = GetIndex(queryPos + new Vector3(0, 0, -1).MultiplyByAxis(ChunkWaveFunction.CellSize));
-            if (southCell.HasValue) builtIndexes.Add(southCell.Value);
+            if (TryGetIndex(queryPos + new Vector3(0, 0, -1).MultiplyByAxis(ChunkWaveFunction.CellSize), out ChunkIndex southCell)) 
+                builtIndexes.Add(southCell);
 
-            ChunkIndex? southWestCell = GetIndex(queryPos + new Vector3(-1, 0, -1).MultiplyByAxis(ChunkWaveFunction.CellSize));
-            if (southWestCell.HasValue) builtIndexes.Add(southWestCell.Value);
+            if (TryGetIndex(queryPos + new Vector3(-1, 0, -1).MultiplyByAxis(ChunkWaveFunction.CellSize), out ChunkIndex southWestCell)) 
+                builtIndexes.Add(southWestCell);
             
             for (int i = builtIndexes.Count - 1; i >= 0; i--)
             {
@@ -179,10 +179,9 @@ namespace WaveFunctionCollapse
             for (int i = 0; i < 4; i++)
             {
                 Vector3 marchPos = pos - new Vector3(WaveFunctionUtility.MarchDirections[i].x * CellSize.x, 0, WaveFunctionUtility.MarchDirections[i].y * CellSize.z);
-                ChunkIndex? chunk = this.GetIndex(marchPos);
-                if (chunk.HasValue)
+                if (TryGetIndex(marchPos, out ChunkIndex chunk))
                 {
-                    result.Add(chunk.Value);
+                    result.Add(chunk);
                 }
             }
             
@@ -207,19 +206,19 @@ namespace WaveFunctionCollapse
             queryWaveFunction.MakeBuildable(cellsToCollapse, protInfo);
         }
         
-        public static ChunkIndex? GetIndex<T>(this T queryWaveFunction, Vector3 pos) where T : IQueryWaveFunction
+        public static bool TryGetIndex<T>(this T queryWaveFunction, Vector3 pos, out ChunkIndex index) where T : IQueryWaveFunction
         {
-            return queryWaveFunction.GetIndex(pos);
+            return queryWaveFunction.TryGetIndex(pos, out index);
         }
         
-        public static int3? GetIndex<T>(this T queryWaveFunction, Vector3 pos, IChunk chunk) where T : IQueryWaveFunction
+        public static bool TryGetIndex<T>(this T queryWaveFunction, Vector3 pos, IChunk chunk, int3 index) where T : IQueryWaveFunction
         {
-            return queryWaveFunction.GetIndex(pos, chunk);
+            return queryWaveFunction.TryGetIndex(pos, chunk, out index);
         }
         
-        public static int3? GetIndex<T>(this T queryWaveFunction, Vector3 pos, int3 chunkIndex) where T : IQueryWaveFunction
+        public static bool TryGetIndex<T>(this T queryWaveFunction, Vector3 pos, int3 chunkIndex, out int3 index) where T : IQueryWaveFunction
         {
-            return queryWaveFunction.GetIndex(pos, chunkIndex);
+            return queryWaveFunction.TryGetIndex(pos, chunkIndex, out index);
         }
         
         public static Vector3 GetPos<T>(this T queryWaveFunction, ChunkIndex index) where T : IQueryWaveFunction

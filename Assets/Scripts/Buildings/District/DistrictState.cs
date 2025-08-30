@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Buildings.District.ECS;
 using UnityEngine.Rendering;
 using WaveFunctionCollapse;
+using Math = Utility.Math;
 using Unity.Collections;
 using Unity.Mathematics;
 using Gameplay.Upgrades;
@@ -17,7 +18,6 @@ using Enemy.ECS;
 using Effects;
 using System;
 using Utility;
-using Math = Utility.Math;
 
 namespace Buildings.District
 {
@@ -27,9 +27,10 @@ namespace Buildings.District
         public event Action OnAttack;
 
         private readonly Dictionary<int2, List<Entity>> entityIndexes = new Dictionary<int2, List<Entity>>();
-        protected readonly HashSet<int2> occupiedTargetMeshChunkIndex = new HashSet<int2>();
+        protected readonly HashSet<int3> occupiedTargetMeshChunkIndex = new HashSet<int3>();
         protected readonly HashSet<Entity> spawnedDataEntities = new HashSet<Entity>();
         protected readonly HashSet<Entity> allSpawnedEntities = new HashSet<Entity>();
+        
         protected readonly List<ChunkIndex> collapsedIndexes = new List<ChunkIndex>();
         
         protected DamageInstance lastDamageDone;
@@ -55,6 +56,7 @@ namespace Buildings.District
         public float DamageDone { get; set; }
         public float GoldGained { get; set; }
         public int Level { get; set; } = 1;
+        public bool IsDebug { get; set; }
         public int Key { get; set; }
         
         public CategoryType CategoryType => districtData.CategoryType;
@@ -74,8 +76,9 @@ namespace Buildings.District
             
             CreatePrefabEntities();
             
-            DistrictData.DistrictGenerator.OnCellCollapsed += OnCellCollapsed;
+            DistrictData.DistrictGenerator.OnDistrictChunkCleared += OnDistrictChunkCleared;
             DistrictData.DistrictGenerator.OnFinishedGenerating += OnFinishedGenerating;
+            DistrictData.DistrictGenerator.OnCellCollapsed += OnCellCollapsed;
         }
 
         protected void SubscribeToStats()
@@ -109,6 +112,16 @@ namespace Buildings.District
                 collapsedIndexes.Add(chunkIndex);
             }
         }
+        
+        private void OnDistrictChunkCleared(QueryChunk chunk)
+        {
+            if (!DistrictData.DistrictChunks.ContainsKey(chunk.ChunkIndex))
+            {
+                return;
+            }
+
+            RemoveEntities(new HashSet<int3> { chunk.ChunkIndex });
+        }
 
         private void CreatePrefabEntities()
         {
@@ -137,13 +150,16 @@ namespace Buildings.District
             {
                 ComponentType[] targetComponents =
                 {
+                    typeof(ArchedMovementComponent),
                     typeof(TargetMeshComponent),
                     typeof(LocalTransform),
+                    typeof(SpeedComponent),
                     typeof(LocalToWorld),
                     typeof(Prefab),
                 };
                 targetEntityPrefab = entityManager.CreateEntity(targetComponents);
-            
+                entityManager.SetComponentData(targetEntityPrefab, new SpeedComponent { Speed = 1});
+                    
                 RenderMeshDescription desc = new RenderMeshDescription(shadowCastingMode: ShadowCastingMode.On, receiveShadows: true);
                 RenderMeshArray renderMeshArray = new RenderMeshArray(new Material[] { districtData.MeshVariable.Material }, new Mesh[] { districtData.MeshVariable.Mesh });
                 RenderMeshUtility.AddComponents(targetEntityPrefab, entityManager, desc, renderMeshArray, MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
@@ -153,17 +169,7 @@ namespace Buildings.District
         public virtual void Update(){}
         public abstract void OnSelected(Vector3 pos);
         public abstract void OnDeselected();
-
-        public void OnIndexesDestroyed(HashSet<int3> destroyedIndexes)
-        {
-            foreach (int3 destroyedIndex in destroyedIndexes)
-            {
-                DistrictData.DistrictChunks.Remove(destroyedIndex);
-            }
-        }
-
         public virtual void OnWaveStart() { }
-        
         public virtual void OnWaveEnd() { }
         
         private void OnDamageDone(DamageCallbackComponent damageCallback)
@@ -198,8 +204,9 @@ namespace Buildings.District
         
         public virtual void Dispose()
         {
-            DistrictData.DistrictGenerator.OnCellCollapsed -= OnCellCollapsed;
+            DistrictData.DistrictGenerator.OnDistrictChunkCleared -= OnDistrictChunkCleared;
             DistrictData.DistrictGenerator.OnFinishedGenerating -= OnFinishedGenerating;
+            DistrictData.DistrictGenerator.OnCellCollapsed -= OnCellCollapsed;
 
             DamageCallbackHandler.DamageDoneEvent.Remove(Key);
             
@@ -207,7 +214,7 @@ namespace Buildings.District
             entityManager.DestroyEntity(targetingEntityPrefab);
             entityManager.DestroyEntity(targetEntityPrefab);
             
-            RemoveEntities();
+            RemoveAllEntities();
         }
 
         #region Entities
@@ -219,12 +226,16 @@ namespace Buildings.District
             return chunkIndexes;
         }
         
-        public virtual void SpawnEntities(List<ChunkIndex> chunkIndexes)
+        protected virtual void SpawnEntities(List<ChunkIndex> chunkIndexes)
         {
-            Debug.Log("Total Entities: " + chunkIndexes.Count);
             List<ChunkIndex> topIndexes = GetEntityChunks(chunkIndexes, out List<Vector2> offsets, out List<Vector2> directions);
-            Debug.Log("Spawning Entities: " + topIndexes.Count);
-            
+#if UNITY_EDITOR
+            if (IsDebug)
+            {
+                Debug.Log($"Spawning {topIndexes.Count} entities, Total: {spawnedDataEntities.Count + topIndexes.Count}");
+            }
+#endif
+
             int count = topIndexes.Count;
             float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
             float delay = attackSpeedValue / count;
@@ -238,7 +249,7 @@ namespace Buildings.District
                 if (requireTargeting) SetupShooterEntity(entities[i], i, pos);
                 else SetupSimpleShooterEntity(entities[i], i, pos);
                 
-                int2 key = topIndexes[i].Index.xz;
+                int2 key = topIndexes[i].Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + topIndexes[i].CellIndex.xz;
                 AddEntityToDictionary(key, entities[i], true);
             }
             
@@ -280,19 +291,27 @@ namespace Buildings.District
 
                 SetupTargetEntity(targetEntities[i], entities[i], pos, directions[i]);
 
-                int2 key = topIndexes[i].Index.xz;
+                int2 key = topIndexes[i].Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + topIndexes[i].CellIndex.xz;
                 AddEntityToDictionary(key, targetEntities[i], false);
             }
             
 
             void SetupTargetEntity(Entity spawnedEntity, Entity shooterEntity, Vector3 pos, Vector2 direction)
             {
+                Vector3 upPosition = pos + new Vector3(0, 1.5f, 0);
                 entityManager.SetComponentData(spawnedEntity, new TargetMeshComponent { Target = shooterEntity });
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform
                 {
-                    Position = pos,
+                    Position = upPosition,
                     Rotation = quaternion.LookRotation(direction.ToXyZ(0), Vector3.up),
                     Scale = districtData.MeshVariable.Scale
+                });
+                
+                entityManager.SetComponentData(spawnedEntity, new ArchedMovementComponent
+                {
+                    EndPosition = pos,
+                    StartPosition = upPosition,
+                    Pivot = (pos + upPosition) / 2.0f
                 });
             }
         }
@@ -340,8 +359,75 @@ namespace Buildings.District
                 entityManager.SetComponentData(entity, new RangeComponent { Range = stats.Range.Value });
             }
         }
+
+        public void RemoveEntities(ChunkIndex chunkIndex)
+        {
+            int2 index = chunkIndex.Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + chunkIndex.CellIndex.xz;
+            Debug.Log($"Removing entities from index: {index}");
+            if (!entityIndexes.TryGetValue(index, out List<Entity> entities)) return;
+                
+            for (int i = 0; i < entities.Count; i++)
+            {
+                Entity entity = entities[i];
+                
+                DistrictStateUtility.RemoveChunkIndexFromOccupied(index, occupiedTargetMeshChunkIndex);
+                spawnedDataEntities.Remove(entity);
+                allSpawnedEntities.Remove(entity);
+                entityManager.DestroyEntity(entity);
+            }
+            
+            entityIndexes.Remove(index);
+        }
         
-        public virtual void RemoveEntities()
+        public void RemoveEntities(HashSet<int3> destroyedIndexes)
+        {
+            List<Entity> toRemove = new List<Entity>();
+            foreach (int3 destroyedIndex in destroyedIndexes)
+            {
+                for (int x = 0; x < DistrictStateUtility.Width; x++)
+                for (int y = 0; y < DistrictStateUtility.Height; y++)
+                {
+                    int2 longIndex = destroyedIndex.xz.MultiplyByAxis(DistrictStateUtility.Size) + new int2(x, y);
+
+                    #if UNITY_EDITOR
+                    if (IsDebug)
+                    {
+                        Debug.Log($"Removing entities from index: {longIndex}");
+                    }
+                    #endif
+                    
+                    if (!entityIndexes.TryGetValue(longIndex, out List<Entity> entities)) continue;
+                
+                    for (int i = 0; i < entities.Count; i++)
+                    {
+                        Entity entity = entities[i];
+                        toRemove.Add(entity);
+                        
+                        spawnedDataEntities.Remove(entity);
+                        allSpawnedEntities.Remove(entity);
+                        DistrictStateUtility.RemoveChunkIndexFromOccupied(longIndex, occupiedTargetMeshChunkIndex);
+                    }
+                    
+                    entityIndexes.Remove(longIndex);
+                }
+            }
+
+            if (toRemove.Count <= 1)
+            {
+                for (int i = 0; i < toRemove.Count; i++)
+                {
+                    entityManager.DestroyEntity(toRemove[i]);
+                }
+
+                return;
+            }
+            
+            NativeArray<Entity> remove = toRemove.ToNativeArray(Allocator.Temp);
+            entityManager.DestroyEntity(remove);
+            remove.Dispose();
+        }
+        
+        protected virtual void RemoveAllEntities()
         {
             NativeArray<Entity> entitiesToDestroy = new NativeArray<Entity>(allSpawnedEntities.Count, Allocator.Temp);
             int index = 0;
@@ -429,16 +515,15 @@ namespace Buildings.District
             List<ChunkIndex> indexes = new List<ChunkIndex>();
             List<Vector2> directions = new List<Vector2>();
             List<Vector2> offsets = new List<Vector2>();
-            const int width = 2; const int height = 2;
             foreach (ChunkIndex chunkIndex in chunkIndexes)
             {
-                ChunkIndex[] neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, width, height);
+                ChunkIndex[] neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, DistrictStateUtility.Width,  DistrictStateUtility.Height);
                 int rotation = DistrictData.DistrictGenerator.ChunkWaveFunction[chunkIndex].PossiblePrototypes[0].MeshRot.Rot;
                 DistrictStateUtility.MeshTargetType targetType = DistrictStateUtility.GetMeshTargetType(neighbours, DistrictData.DistrictGenerator, PrototypeInfo, rotation);
                 
                 Vector2 forwardDir = Math.RotateVector2(new Vector2(0, 1), -90 * (rotation + 3) * math.TORADIANS);
                 Vector2 leftDir = Math.RotateVector2(new Vector2(-1, 0), -90 * (rotation + 3) * math.TORADIANS);
-                float2 baseKey = chunkIndex.Index.xz.MultiplyByAxis(new int2(width, height)) + chunkIndex.CellIndex.xz + new float2(0.5f, 0.5f);
+                float2 baseKey = chunkIndex.Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + chunkIndex.CellIndex.xz + new float2(0.5f, 0.5f);
                 switch (targetType)
                 {
                     case DistrictStateUtility.MeshTargetType.Corner:
@@ -447,8 +532,8 @@ namespace Buildings.District
                         float2 cornerRightKey = baseKey + Math.Rotate90Float2(new float2(0.5f, 0.5f), rotation + 3);
                         float2 cornerBackKey = baseKey + Math.Rotate90Float2(new float2(-0.5f, -0.5f), rotation + 3);
                         
-                        AddPosition(cornerRight, forwardDir, chunkIndex, new int2((int)cornerRightKey.x, (int)cornerRightKey.y));
-                        AddPosition(cornerBack, leftDir, chunkIndex, new int2((int)cornerBackKey.x, (int)cornerBackKey.y));
+                        AddPosition(cornerRight, forwardDir, chunkIndex, new int3((int)cornerRightKey.x, (int)cornerRightKey.y, rotation));
+                        AddPosition(cornerBack, leftDir, chunkIndex, new int3((int)cornerBackKey.x, (int)cornerBackKey.y, (rotation + 3) % 4));
                         break;
                     case DistrictStateUtility.MeshTargetType.Side:
                         Vector2 sideRight = Math.RotateVector2(new Vector2(0.25f, 0f), -90 * (rotation + 3) * math.TORADIANS);
@@ -456,8 +541,8 @@ namespace Buildings.District
                         float2 sideRightKey = baseKey + Math.Rotate90Float2(new float2(0.5f, 0.5f), rotation + 3);
                         float2 sideLeftKey = baseKey + Math.Rotate90Float2(new float2(-0.5f, 0.5f), rotation + 3);
                         
-                        AddPosition(sideRight, forwardDir, chunkIndex, new int2((int)sideRightKey.x, (int)sideRightKey.y));
-                        AddPosition(sideLeft, forwardDir, chunkIndex, new int2((int)sideLeftKey.x, (int)sideLeftKey.y));
+                        AddPosition(sideRight, forwardDir, chunkIndex, new int3((int)sideRightKey.x, (int)sideRightKey.y, rotation));
+                        AddPosition(sideLeft, forwardDir, chunkIndex, new int3((int)sideLeftKey.x, (int)sideLeftKey.y, rotation));
                         break;
                     default:
                         break;
@@ -468,7 +553,7 @@ namespace Buildings.District
             outDirections = directions;
             return indexes;
             
-            void AddPosition(Vector2 offset, Vector2 dir, ChunkIndex chunkIndex, int2 index)
+            void AddPosition(Vector2 offset, Vector2 dir, ChunkIndex chunkIndex, int3 index)
             {
                 if (occupiedTargetMeshChunkIndex.Contains(index))
                 {
@@ -1242,16 +1327,16 @@ namespace Buildings.District
             }
         }*/
         
-        public override void SpawnEntities(List<ChunkIndex> chunkIndexes)
+        protected override void SpawnEntities(List<ChunkIndex> chunkIndexes)
         {
             base.SpawnEntities(chunkIndexes);
 
             PerformCreateEffects();
         }
 
-        public override void RemoveEntities()
+        protected override void RemoveAllEntities()
         {
-            base.RemoveEntities();
+            base.RemoveAllEntities();
 
             RevertCreateEffects();
         }
@@ -1401,6 +1486,10 @@ namespace Buildings.District
 
     public static class DistrictStateUtility
     {
+        public const int Width = 2;
+        public const int Height = 2;
+        public static int2 Size => new int2(Width, Height);
+        
         public static bool SearchEffects(List<IEffect> effects)
         {
             foreach (IEffect effect in effects)
@@ -1461,6 +1550,19 @@ namespace Buildings.District
                 (true, true, true, true) => MeshTargetType.Full,
                 _ => MeshTargetType.None
             };
+        }
+
+        public static void RemoveChunkIndexFromOccupied(int2 longIndex, HashSet<int3> occupiedChunks)
+        {
+            for (int x = 0; x < 2; x++)
+            for (int y = 0; y < 2; y++)
+            {
+                int2 index = longIndex + new int2(x, y);
+                for (int i = 0; i < 4; i++)
+                {
+                    occupiedChunks.Remove(new int3(index.x, index.y, i));
+                }
+            }
         }
 
         public enum MeshTargetType

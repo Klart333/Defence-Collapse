@@ -261,17 +261,16 @@ namespace Buildings.District
                     return false;
                 }
 
-                ChunkIndex? buildIndex = buildingGenerator.GetIndex(districtPos);// + buildingGenerator.CellSize.XyZ(0) / 2.0f);
-                if (!buildIndex.HasValue)
+                if (!buildingGenerator.TryGetIndex(districtPos, out ChunkIndex buildIndex)) // + buildingGenerator.CellSize.XyZ(0) / 2.0f)
                 {
                     if (verbose) Debug.Log("Invalid, Can't find build index");
                     return false;
                 }
 
-                buildingIndexes.Add(buildIndex.Value);
-                Vector3 buildingCellPosition = buildingGenerator.GetPos(buildIndex.Value);
+                buildingIndexes.Add(buildIndex);
+                Vector3 buildingCellPosition = buildingGenerator.GetPos(buildIndex);
                 
-                if (TryGetBuiltIndex(buildingCellPosition, buildIndex.Value, districtPos, out ChunkIndex builtIndex))
+                if (TryGetBuiltIndex(buildingCellPosition, buildIndex, districtPos, out ChunkIndex builtIndex))
                 {
                     if (!buildingGenerator.IsBuildable(builtIndex))
                     {
@@ -310,22 +309,22 @@ namespace Buildings.District
             bool TryGetBuiltIndex(Vector3 buildingCellPosition, ChunkIndex buildIndex, Vector3 districtPos, out ChunkIndex builtIndex)
             {
                 Vector2 dir = (buildingCellPosition.XZ() - districtPos.XZ()).normalized;
-                ChunkIndex? builtIndexNullable = (dir.x, dir.y) switch
+                builtIndex = buildIndex;
+                bool isValid = (dir.x, dir.y) switch
                 {
-                    (x: < 0.1f, y: < 0.1f) => buildIndex,
-                    (x: < 0.1f, y: > 0) => buildingGenerator.GetIndex(buildingCellPosition - Vector3.forward * buildingGenerator.CellSize.z / 2.0f),
-                    (x: > 0, y: < 0.1f) => buildingGenerator.GetIndex(buildingCellPosition - Vector3.right * buildingGenerator.CellSize.z / 2.0f),
-                    (x: > 0, y: > 0) => buildingGenerator.GetIndex(buildingCellPosition - buildingGenerator.CellSize / 2.0f),
+                    (x: < 0.1f, y: < 0.1f) => true,
+                    (x: < 0.1f, y: > 0) => buildingGenerator.TryGetIndex(buildingCellPosition - Vector3.forward * buildingGenerator.CellSize.z / 2.0f, out builtIndex),
+                    (x: > 0, y: < 0.1f) => buildingGenerator.TryGetIndex(buildingCellPosition - Vector3.right * buildingGenerator.CellSize.z / 2.0f, out builtIndex),
+                    (x: > 0, y: > 0) => buildingGenerator.TryGetIndex(buildingCellPosition - buildingGenerator.CellSize / 2.0f, out builtIndex),
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
-                if (!builtIndexNullable.HasValue)
+                if (!isValid)
                 {
                     builtIndex = default;
                     return false;
                 }
                 
-                builtIndex = builtIndexNullable.Value;
                 if (buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z] 
                     && !buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].QueryBuiltCells.Contains(builtIndex.CellIndex))
                 {
@@ -348,14 +347,13 @@ namespace Buildings.District
                 }
                 
                 districtPos = ChunkWaveUtility.GetPosition(districtChunkIndexes[x, z].XyZ(0), districtGenerator.ChunkScale);
-                ChunkIndex? buildingIndex = buildingGenerator.GetIndex(districtPos + buildingGenerator.CellSize / 2.0f);
-                if (!buildingIndex.HasValue)
+                if (!buildingGenerator.TryGetIndex(districtPos + buildingGenerator.CellSize / 2.0f, out ChunkIndex buildingIndex))
                 {
                     if (verbose) Debug.Log("Invalid, District index is out of bounds");
                     return false;
                 }
                 
-                GroundType groundType = buildingGenerator.ChunkWaveFunction.Chunks[buildingIndex.Value.Index].GroundTypes[buildingIndex.Value.CellIndex.x, buildingIndex.Value.CellIndex.y, buildingIndex.Value.CellIndex.z];
+                GroundType groundType = buildingGenerator.ChunkWaveFunction.Chunks[buildingIndex.Index].GroundTypes[buildingIndex.CellIndex.x, buildingIndex.CellIndex.y, buildingIndex.CellIndex.z];
                 if (!IsBuildable(groundType))
                 {
                     if (verbose) Debug.Log($"Invalid, The groundType: {groundType} does not match the district's restrictions");

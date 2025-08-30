@@ -17,6 +17,8 @@ namespace Enemy.ECS
         {
             var entity = state.EntityManager.CreateEntity();
             state.EntityManager.AddComponentData(entity, new SpatialHashMapSingleton());
+            
+            state.RequireForUpdate<FlowFieldComponent>(); // Require enemy (or little dude)
         }
         
         [BurstCompile]
@@ -24,7 +26,7 @@ namespace Enemy.ECS
         {
             int enemyCount = SystemAPI.GetSingletonRW<WaveStateComponent>().ValueRO.EnemyCount;
             RefRW<SpatialHashMapSingleton> mapSingleton = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>();
-            mapSingleton.ValueRW.Value = new NativeParallelMultiHashMap<int2, Entity>(enemyCount * 2 + 10, state.WorldUpdateAllocator); // Double for loadfactor stuff
+            mapSingleton.ValueRW.Value = new NativeParallelMultiHashMap<int2, Entity>((int)(enemyCount * 2.5f) + 20, state.WorldUpdateAllocator); // Double for loadfactor stuff
             if (enemyCount == 0)
             {
                 return;
@@ -33,7 +35,7 @@ namespace Enemy.ECS
             state.Dependency = new BuildEnemyHashGridJob
             {
                 SpatialGrid = mapSingleton.ValueRW.Value.AsParallelWriter(),
-                CellSize = 1,
+                //CellSize = 1,
             }.ScheduleParallel(state.Dependency);
             
             //state.Dependency.Complete();
@@ -48,17 +50,15 @@ namespace Enemy.ECS
     
     [BurstCompile]
     [WithAll(typeof(FlowFieldComponent)), WithNone(typeof(LittleDudeComponent))]
-    public partial struct BuildEnemyHashGridJob : IJobEntity
+    public partial struct BuildEnemyHashGridJob : IJobEntity // CELL SIZE 1!!
     {
         [WriteOnly]
         public NativeParallelMultiHashMap<int2, Entity>.ParallelWriter SpatialGrid;
 
-        public float CellSize;
-
         [BurstCompile]
         public void Execute(in LocalTransform enemyTransform, in Entity entity)
         {
-            int2 cell = HashGridUtility.GetCell(enemyTransform.Position, CellSize);
+            int2 cell = HashGridUtility.GetCellForCellSize1(enemyTransform.Position);
             SpatialGrid.Add(cell, entity);
         }
     }
@@ -86,6 +86,13 @@ namespace Enemy.ECS
         {
             int cellX = (int)(position.x / cellSize);
             int cellY = (int)(position.z / cellSize);
+            return new int2(cellX, cellY);
+        }
+        
+        public static int2 GetCellForCellSize1(float3 position)
+        {
+            int cellX = (int)position.x;
+            int cellY = (int)position.z;
             return new int2(cellX, cellY);
         }
     }

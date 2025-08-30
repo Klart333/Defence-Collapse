@@ -95,14 +95,13 @@ namespace Buildings
             }
 
             Vector3 mousePoint = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
-            ChunkIndex? chunkIndex = buildingManager.GetIndex(mousePoint);
-            if (!chunkIndex.HasValue)
+            if (!buildingManager.TryGetIndex(mousePoint, out ChunkIndex chunkIndex))
             {
                 SquareIndex = null;
                 return;
             }
 
-            if (!spawnedSpawnPlaces.TryGetValue(chunkIndex.Value, out PlaceSquare placeSquare))
+            if (!spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare placeSquare))
             {
                 hoveredSquare?.OnHoverExit();
                 hoveredSquare = null;

@@ -70,8 +70,13 @@ namespace Buildings.District
             districtGenerator.OnDistrictChunkRemoved -= OnDistrictChunkRemoved;
         }
 
+        /// <summary>
+        /// District Generator Rebuilding/Removing Chunk
+        /// </summary>
+        /// <param name="chunk"></param>
         private void OnDistrictChunkRemoved(IChunk chunk)
         {
+            Debug.Log("OnDistrictChunkRemoved");
             foreach (DistrictData districtData in uniqueDistricts.Values)
             {
                 if (districtData.OnDistrictChunkRemoved(chunk))
@@ -83,9 +88,11 @@ namespace Buildings.District
 
         private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
         {
+            Debug.Log("OnWallsDestroyed");
+
             foreach (ChunkIndex chunkIndex in chunkIndexes)
             {
-                Debug.Log("Index: " + chunkIndex);
+                //Debug.Log("Index: " + chunkIndex);
             }
             districtGenerator.AddAction(async () => await districtGenerator.RemoveChunks(chunkIndexes));
         }
@@ -169,10 +176,14 @@ namespace Buildings.District
 
             foreach (QueryChunk chunk in chunks)
             {
-                ChunkIndex? chunkIndex = districtGenerator.GetBuildingCell(chunk.ChunkIndex);
-                Debug.Assert(chunkIndex != null, nameof(chunkIndex) + " != null");
-                if (districtGenerator.ChunkIndexToChunks.TryGetValue(chunkIndex.Value, out HashSet<int3> list)) list.Add(chunk.ChunkIndex);
-                else districtGenerator.ChunkIndexToChunks.Add(chunkIndex.Value, new HashSet<int3> { chunk.ChunkIndex });
+                if (!districtGenerator.TryGetBuildingCell(chunk.ChunkIndex, out ChunkIndex chunkIndex))
+                {
+                    Debug.LogError("Should not happen");
+                    return;
+                }
+                
+                if (districtGenerator.ChunkIndexToChunks.TryGetValue(chunkIndex, out HashSet<int3> list)) list.Add(chunk.ChunkIndex);
+                else districtGenerator.ChunkIndexToChunks.Add(chunkIndex, new HashSet<int3> { chunk.ChunkIndex });
             }
             
             Events.OnDistrictBuilt?.Invoke(districtType);
@@ -309,7 +320,7 @@ namespace Buildings.District
                 foreach (QueryChunk queryChunk in districtData.DistrictChunks.Values)
                 {
                     queryChunk.Clear(districtGenerator.ChunkWaveFunction.GameObjectPool);
-                    districtGenerator.ClearChunkMeshes(queryChunk.ChunkIndex);
+                    districtGenerator.ClearChunkMeshes(queryChunk.ChunkIndex, false);
                     districtGenerator.ChunkWaveFunction.LoadCells(queryChunk, queryChunk.PrototypeInfoData);
                     addedChunks.Add(queryChunk);
 
@@ -318,9 +329,6 @@ namespace Buildings.District
                         continue;
                     }
 
-                    ChunkIndex? buildingChunkIndex = districtGenerator.GetBuildingCell(queryChunk.ChunkIndex);
-                    Assert.IsTrue(buildingChunkIndex.HasValue);
-                    
                     int heightLevel = queryChunk.ChunkIndex.y + 1;
                     Vector3 pos = queryChunk.Position.XyZ(0) + Vector3.up * (districtGenerator.ChunkScale.y * heightLevel);
                     int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, districtGenerator.ChunkScale);
@@ -333,7 +341,13 @@ namespace Buildings.District
                     QueryChunk addChunk = districtGenerator.ChunkWaveFunction.LoadChunk(pos, districtGenerator.ChunkSize, queryChunk.PrototypeInfoData);
                     addedChunks.Add(addChunk);
 
-                    districtGenerator.ChunkIndexToChunks[buildingChunkIndex.Value].Add(addChunk.ChunkIndex);
+                    if (!districtGenerator.TryGetBuildingCell(queryChunk.ChunkIndex, out ChunkIndex buildingChunkIndex))
+                    {
+                        Debug.LogError("Should never get here");
+                        return;
+                    }
+                    
+                    districtGenerator.ChunkIndexToChunks[buildingChunkIndex].Add(addChunk.ChunkIndex);
                 }
                     
                 districtData.ExpandDistrict(addedChunks);
@@ -341,7 +355,7 @@ namespace Buildings.District
             }
             
             districtGenerator.ChunkWaveFunction.Propagate();
-            await districtGenerator.Run(addedChunks);
+            await districtGenerator.Run(addedChunks, true);
         }
 
         public void SetHoverOnObjects(ICollection<QueryChunk> chunks, bool isHover)

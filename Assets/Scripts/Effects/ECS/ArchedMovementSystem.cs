@@ -1,7 +1,9 @@
 using Enemy.ECS;
 using Gameplay;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 
 namespace Effects.ECS
@@ -18,11 +20,17 @@ namespace Effects.ECS
         public void OnUpdate(ref SystemState state)
         {
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
-        
-            new ArchedMovementJob
+            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            
+            state.Dependency = new ArchedMovementJob
             {
                 DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
-            }.ScheduleParallel();
+                ECB = ecb.AsParallelWriter(),
+            }.ScheduleParallel(state.Dependency);
+            
+            state.Dependency.Complete();
+            ecb.Playback(state.EntityManager);
+            ecb.Dispose();
         }
 
         [BurstCompile]
@@ -35,14 +43,21 @@ namespace Effects.ECS
     [BurstCompile]
     public partial struct ArchedMovementJob : IJobEntity
     {
+        public EntityCommandBuffer.ParallelWriter ECB;
+        
         public float DeltaTime;
         
         [BurstCompile]
-        public void Execute(ref LocalTransform transform, ref ArchedMovementComponent arch, in SpeedComponent speed)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ref LocalTransform transform, ref ArchedMovementComponent arch, in SpeedComponent speed)
         {
-            arch.Value += speed.Speed * DeltaTime;
+            arch.Value = math.min(1.0f, arch.Value + speed.Speed * DeltaTime);
             
             transform.Position = Utility.Math.CubicLerp(arch.StartPosition, arch.EndPosition, arch.Pivot, arch.Value);
+
+            if (arch.Value >= 1.0f)
+            {
+                ECB.RemoveComponent<ArchedMovementComponent>(sortKey, entity);
+            }
         }
     }
 }
