@@ -32,17 +32,25 @@ namespace WaveFunctionCollapse
         public List<PrototypeData>[] MarchingTable { get; set; }
         
         [OdinSerialize]
-        public List<Mesh> PrototypeMeshes { get; set; } = new List<Mesh>();
-
+        public List<Mesh> PrototypeMeshes { get; set; } = new();
+        
+        [OdinSerialize]
+        public List<int> PrototypeTargetIndexes { get; set; } = new();
+        
 #if UNITY_EDITOR
+        [OdinSerialize, ReadOnly]
+        public List<int> PrototypeTargetIndexesEditor { get; set; } = new();
+
         public void Clear()
         {
             Prototypes.Clear();
             SocketList.Clear();
             VerticalSocketList.Clear();
+            NotAllowedForSides.Clear();
             NotAllowedForBottom.Clear();
             OnlyAllowedForBottom.Clear();
-            NotAllowedForSides.Clear();
+            PrototypeTargetIndexes.Clear();
+            PrototypeTargetIndexesEditor.Clear();
             MarchingTable = Array.Empty<List<PrototypeData>>();
             
             notBottomPrototypes = null;

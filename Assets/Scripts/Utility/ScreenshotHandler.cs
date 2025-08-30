@@ -1,8 +1,5 @@
 // 8/26/2025 AI-Tag
 // This was created with the help of Assistant, a Unity Artificial Intelligence product.
-
-using System;
-using UnityEditor;
 using UnityEngine;
 using System.IO;
 
@@ -20,7 +17,7 @@ public class ScreenshotHandler : MonoBehaviour
     private void TakeScreenshot()
     {
         // Define the path to save the screenshot
-        string folderPath = Path.Combine(Application.dataPath, "Screenshots");
+        string folderPath = Path.Combine(Application.dataPath, "Art/Screenshots");
         if (!Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);

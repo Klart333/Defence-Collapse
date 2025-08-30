@@ -877,9 +877,9 @@ namespace WaveFunctionCollapse
             return handlerChunkScale.MultiplyByAxis(index);
         }
         
-        public static List<ChunkIndex> GetNeighbouringChunkIndexes(ChunkIndex chunkIndex, int gridWidth, int gridHeight)
+        public static ChunkIndex[] GetNeighbouringChunkIndexes(ChunkIndex chunkIndex, int gridWidth, int gridHeight)
         {
-            List<ChunkIndex> neighbours = new List<ChunkIndex>();
+            ChunkIndex[] neighbours = new ChunkIndex[4];
             for (int i = 0; i < WaveFunctionUtility.NeighbourDirections.Length; i++)
             {
                 ChunkIndex neighbour = new ChunkIndex(chunkIndex.Index, chunkIndex.CellIndex + WaveFunctionUtility.NeighbourDirections[i].XyZ(0));
@@ -904,7 +904,7 @@ namespace WaveFunctionCollapse
                     neighbour.Index.z += 1;
                     neighbour.CellIndex.z = 0;
                 }
-                neighbours.Add(neighbour);
+                neighbours[i] = neighbour;
             }
             return neighbours;
         }

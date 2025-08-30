@@ -6,8 +6,8 @@ using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
 using UnityEditor;
-using System;
 using Buildings;
+using System;
 
 public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 {
@@ -176,8 +176,8 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
         void GetNeighbours(ChunkIndex chunkIndex, int depth)
         {
-            List<ChunkIndex> neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, gridSize.x, gridSize.z);
-            for (int i = 0; i < neighbours.Count; i++)
+            ChunkIndex[] neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, gridSize.x, gridSize.z);
+            for (int i = 0; i < neighbours.Length; i++)
             {
                 if (cellsToUpdate.Contains(neighbours[i])
                     || !waveFunction.Chunks.TryGetValue(neighbours[i].Index, out QueryMarchedChunk neihbourChunk)

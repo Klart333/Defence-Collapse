@@ -3007,146 +3007,17 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects:
-    - {fileID: 11400000, guid: 245db626b31676a4183321c87b450a27, type: 2}
-    - {fileID: 11400000, guid: 20071b5325a2e33418874ae5d70b303e, type: 2}
-    - {fileID: 11400000, guid: ab0696a35eef117499e0fdc29a15b776, type: 2}
-    - {fileID: 11400000, guid: d94a6d5c1a8128544a4b6388e09ea944, type: 2}
-    - {fileID: 11400000, guid: 78c9d3f9d472dc64296ab95b899cfe91, type: 2}
-    - {fileID: 11400000, guid: 9430843d50aa70c4fa143490b21bda6d, type: 2}
-    - {fileID: 11400000, guid: 130c28be23b70ae43b62a25bb84391c1, type: 2}
-    - {fileID: 11400000, guid: 23300af82b0cb0941ad306bbb43740c4, type: 2}
+    ReferencedUnityObjects: []
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes:
-    - Name: districtInfoData
-      Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[DistrictType, Core],[WaveFunctionCollapse.PrototypeInfoData,
-        Core]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[DistrictType, Core]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 8
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 10
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 10
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 10
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
-      Entry: 10
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 5
-    - Name: $v
-      Entry: 10
-      Data: 4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 6
-    - Name: $v
-      Entry: 10
-      Data: 5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 10
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 7
-    - Name: $v
-      Entry: 10
-      Data: 7
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+    SerializationNodes: []
   districtGenerator: {fileID: 1551488502}
   buildingGenerator: {fileID: 771210304}
   districtHandler: {fileID: 491554922}
   buildingPlacer: {fileID: 604477866}
+  prototypeUtility: {fileID: 11400000, guid: 219bf5d6961f4944c9987d3dcf4ebce3, type: 2}
   unableToPlacePrefab: {fileID: -7155613184035295475, guid: 37457fca56525af4bab8884b7e239b05,
     type: 3}
   costText: {fileID: 104919694}
@@ -5556,6 +5427,8 @@ MonoBehaviour:
       Data: 
   districtGenerator: {fileID: 1551488502}
   towerDataUtility: {fileID: 11400000, guid: 9c340b6d5c4971a428e173b6c297f638, type: 2}
+  prototypeInfoUtility: {fileID: 11400000, guid: 219bf5d6961f4944c9987d3dcf4ebce3,
+    type: 2}
 --- !u!114 &491554923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9663,7 +9536,7 @@ VisualEffect:
         m_Overridden: 1
       - m_Value:
           serializedVersion: 2
-          key0: {r: 0, g: 0.8660979, b: 1, a: 0}
+          key0: {r: 0, g: 1.7321959, b: 2, a: 0}
           key1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
           key2: {r: 0, g: 0, b: 0, a: 0}
           key3: {r: 0, g: 0, b: 0, a: 0}
@@ -13607,9 +13480,9 @@ MonoBehaviour:
   m_fontSize: 30
   m_fontSizeBase: 30
   m_fontWeight: 400
-  m_enableAutoSizing: 1
-  m_fontSizeMin: 10
-  m_fontSizeMax: 30
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -13620,7 +13493,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -13956,7 +13829,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1648313071
 Transform:
   m_ObjectHideFlags: 0
@@ -16127,7 +16000,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 10
+  m_text: '10
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3a1b3067318700840878d31e47678c1e, type: 2}
   m_sharedMaterial: {fileID: -2475147182593723023, guid: 3a1b3067318700840878d31e47678c1e,
@@ -16158,9 +16033,9 @@ MonoBehaviour:
   m_fontSize: 30
   m_fontSizeBase: 30
   m_fontWeight: 400
-  m_enableAutoSizing: 1
-  m_fontSizeMin: 10
-  m_fontSizeMax: 30
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -16171,7 +16046,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -17302,11 +17177,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Path Modules
       objectReference: {fileID: 0}
-    - target: {fileID: 8077899792225836242, guid: 96e777949a7496843a4bf1fb6c0a704f,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -17634,11 +17504,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: District Modules_Barracks
-      objectReference: {fileID: 0}
-    - target: {fileID: 7727920362755043617, guid: 810307ae63a68d14e951b35d1d88d0d3,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8111884862701064820, guid: 810307ae63a68d14e951b35d1d88d0d3,
         type: 3}
@@ -18056,11 +17921,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 4138898387883981654, guid: f8d6d4cb9e7edcc48afdf101345acab7,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4405427333691153625, guid: f8d6d4cb9e7edcc48afdf101345acab7,
         type: 3}
@@ -18594,11 +18454,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: District Modules_Flame
       objectReference: {fileID: 0}
-    - target: {fileID: 8983085981725885891, guid: ab9b312939049ed41aee53f734e6d55d,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 9026706858929617183, guid: ab9b312939049ed41aee53f734e6d55d,
         type: 3}
       propertyPath: m_LocalRotation.w
@@ -18788,11 +18643,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: District Modules_TownHall
       objectReference: {fileID: 0}
-    - target: {fileID: 6085824506347938713, guid: bf94ec1282f71a743a6e3bba34ff9eac,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6128712432124699155, guid: bf94ec1282f71a743a6e3bba34ff9eac,
         type: 3}
       propertyPath: m_Enabled
@@ -18876,11 +18726,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: District Modules_Bomb
-      objectReference: {fileID: 0}
-    - target: {fileID: 2139264216553386385, guid: 22baaf61f7f6e634fb781e4f42f0b782,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3080246409909065883, guid: 22baaf61f7f6e634fb781e4f42f0b782,
         type: 3}
@@ -19051,11 +18896,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: District Modules
       objectReference: {fileID: 0}
-    - target: {fileID: 7557381435258666559, guid: 2be1bd8da712d78428179d99d243eb9b,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7717291758599079780, guid: 2be1bd8da712d78428179d99d243eb9b,
         type: 3}
       propertyPath: m_Enabled
@@ -19151,11 +18991,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: District Modules_Mine
-      objectReference: {fileID: 0}
-    - target: {fileID: 670403522272675298, guid: e0e11c4442e1463419be67ea519f48ca,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1212358105342358049, guid: e0e11c4442e1463419be67ea519f48ca,
         type: 3}
@@ -20103,6 +19938,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2112620416}
     m_Modifications:
+    - target: {fileID: 246881616693835205, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 946916641356372004, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1080383292460972389, guid: 46298695f0056184a9aa656dd0416175,
         type: 3}
       propertyPath: serializationData.Prefab
@@ -20159,14 +20004,54 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1430324075100402537, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1488213569656293928, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1524973148181198302, guid: 46298695f0056184a9aa656dd0416175,
         type: 3}
       propertyPath: m_Name
       value: District Modules_Archer
       objectReference: {fileID: 0}
-    - target: {fileID: 1524973148181198302, guid: 46298695f0056184a9aa656dd0416175,
+    - target: {fileID: 2288217007258117664, guid: 46298695f0056184a9aa656dd0416175,
         type: 3}
-      propertyPath: m_IsActive
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4619131491735394420, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6154880759492164809, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7397020181972919492, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7474773258057594118, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7687606729179324924, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8732416367221588310, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -20262,11 +20147,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: District Modules_Church
-      objectReference: {fileID: 0}
-    - target: {fileID: 6377921852022467913, guid: fccc7a90662d0924789e9b9413bcd6e7,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7132022617744640011, guid: fccc7a90662d0924789e9b9413bcd6e7,
         type: 3}
@@ -21152,11 +21032,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Town Modules
       objectReference: {fileID: 0}
-    - target: {fileID: 8139223857813074696, guid: 60d7cc98291bff04888e38dc154f3f59,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8937457377877375731, guid: 60d7cc98291bff04888e38dc154f3f59,
         type: 3}
       propertyPath: m_LocalRotation.w
@@ -21282,11 +21157,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: District Modules_Lightning
-      objectReference: {fileID: 0}
-    - target: {fileID: 8654126926665224046, guid: dd3c557d2b05d3f49977f67822eddf7a,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

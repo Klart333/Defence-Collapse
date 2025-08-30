@@ -28,6 +28,9 @@ namespace Buildings.District
         [SerializeField]
         private TowerDataUtility towerDataUtility;
         
+        [SerializeField]
+        private DistrictPrototypeInfoUtility prototypeInfoUtility;
+        
         [Title("Debug")]
         [OdinSerialize, Sirenix.OdinInspector.ReadOnly]
         private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
@@ -206,10 +209,11 @@ namespace Buildings.District
 
         private DistrictData CreateDistrictData(DistrictType districtType, HashSet<QueryChunk> chunks)
         {
-            Vector3 position = GetAveragePosition(chunks);
+            PrototypeInfoData prototypeInfo = prototypeInfoUtility.GetPrototypeInfo(districtType);
             TowerData towerData = towerDataUtility.GetTowerData(districtType);
+            Vector3 position = GetAveragePosition(chunks);
             int key = districtKey++;
-            DistrictData districtData = new DistrictData(towerData, chunks, position, districtGenerator, key)
+            DistrictData districtData = new DistrictData(towerData, chunks, position, districtGenerator, key, prototypeInfo)
             {
                 GameSpeed = GameSpeedManager.Instance,
                 DistrictHandler = this

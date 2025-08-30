@@ -35,12 +35,12 @@ namespace WaveFunctionCollapse
         
         private void OnEnable()
         {
-            districtGenerator.OnDistrictCellBuilt += OnCellCollapsed;
+            districtGenerator.OnCellCollapsed += OnCellCollapsed;
         }
 
         private void OnDisable()
         {
-            districtGenerator.OnDistrictCellBuilt -= OnCellCollapsed;
+            districtGenerator.OnCellCollapsed -= OnCellCollapsed;
         }
 
         private void Update()
