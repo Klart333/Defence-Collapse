@@ -29,11 +29,10 @@ namespace WaveFunctionCollapse
             Meshes.Clear();
             
             Dictionary<Mesh, int> meshesToIndex = new Dictionary<Mesh, int>();
-            int index = 0;
+            int index = protoypeInfos[0].PrototypeMeshes.Count;
             for (int i = 0; i < protoypeInfos.Length; i++)
             {
                 PrototypeInfoData protInfo = protoypeInfos[i];
-                protInfo.PrototypeTargetIndexes.Clear();
                 
                 for (int j = 0; j < protInfo.PrototypeMeshes.Count; j++)
                 {
@@ -47,7 +46,6 @@ namespace WaveFunctionCollapse
                 {
                     PrototypeData prot = protInfo.Prototypes[j];
                     if (prot.MeshRot.MeshIndex == -1) continue;
-
                     if (prot.MeshRot.MeshIndex >= protInfo.PrototypeMeshes.Count) continue;
                     
                     int meshIndex = meshesToIndex[protInfo.PrototypeMeshes[prot.MeshRot.MeshIndex]];
@@ -60,7 +58,6 @@ namespace WaveFunctionCollapse
                     };
 
                     protInfo.Prototypes[j] = prototypeData;
-
                     if (protInfo.PrototypeTargetIndexesEditor.Contains(j))
                     {
                         protInfo.PrototypeTargetIndexes.Add(meshIndex);

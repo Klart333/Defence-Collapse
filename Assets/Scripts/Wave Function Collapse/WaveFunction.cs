@@ -1,17 +1,16 @@
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 using JetBrains.Annotations;
 using Sirenix.OdinInspector;
 using Unity.Collections;
+using Unity.Mathematics;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
 using System.Linq;
 using System;
-using System.Collections.Specialized;
-using Unity.Mathematics;
-using UnityEngine.Serialization;
 
 namespace WaveFunctionCollapse
 {

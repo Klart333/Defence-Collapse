@@ -44,6 +44,7 @@ namespace Buildings.District
         
         protected bool requireTargeting;
         
+        public CategoryType CategoryType => districtData.CategoryType;
         public DamageInstance LastDamageDone => lastDamageDone;
         public Stats Stats => stats;
 
@@ -59,8 +60,6 @@ namespace Buildings.District
         public bool IsDebug { get; set; }
         public int Key { get; set; }
         
-        public CategoryType CategoryType => districtData.CategoryType;
-
         protected DistrictState(DistrictData districtData, Vector3 position, int key, TowerData towerData)
         {
             this.districtData = towerData;
@@ -171,6 +170,7 @@ namespace Buildings.District
         public abstract void OnDeselected();
         public virtual void OnWaveStart() { }
         public virtual void OnWaveEnd() { }
+        public virtual void OnUnitKill() { }
         
         private void OnDamageDone(DamageCallbackComponent damageCallback)
         {
@@ -194,9 +194,7 @@ namespace Buildings.District
 
             Attack?.OnDoneDamage(this);
         }
-
-        public virtual void OnUnitKill() { }
-
+        
         protected void InvokeStatisticsChanged()
         {
             OnStatisticsChanged?.Invoke();
@@ -222,7 +220,11 @@ namespace Buildings.District
         protected virtual List<ChunkIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes, out List<Vector2> offsets, out List<Vector2> directions)
         {
             offsets = new Vector2[chunkIndexes.Count].ToList();
-            directions = new Vector2[chunkIndexes.Count].ToList();
+            directions = new List<Vector2>();
+            for (int i = 0; i < chunkIndexes.Count; i++)
+            {
+                directions.Add(Vector2.up);
+            }
             return chunkIndexes;
         }
         
@@ -363,7 +365,12 @@ namespace Buildings.District
         public void RemoveEntities(ChunkIndex chunkIndex)
         {
             int2 index = chunkIndex.Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + chunkIndex.CellIndex.xz;
-            Debug.Log($"Removing entities from index: {index}");
+#if UNITY_EDITOR
+            if (IsDebug)
+            {
+                Debug.Log($"Removing entities from index: {index}");
+            }
+#endif
             if (!entityIndexes.TryGetValue(index, out List<Entity> entities)) return;
                 
             for (int i = 0; i < entities.Count; i++)
@@ -599,15 +606,7 @@ namespace Buildings.District
     {
         private GameObject rangeIndicator;
         private bool selected;
-        
-        private readonly int2[] corners = // Top left, Top right, bottom left, bottom right 
-        {
-            new int2(-1, 1),
-            new int2(1, 1),
-            new int2(-1, -1),
-            new int2(1, -1),
-        };
-        
+
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
         
@@ -618,77 +617,6 @@ namespace Buildings.District
             Attack = new Attack(this.districtData.BaseAttack);
         }
         
-        /*
-        protected override List<QueryChunk> GetEntityChunks(out List<Vector2> offsets, out List<Vector2> directions)
-        {
-            List<QueryChunk> chunks = new List<QueryChunk>();
-            HashSet<Tuple<int3, int2>> addedCorners = new HashSet<Tuple<int3, int2>>();
-            offsets = new List<Vector2>();
-            directions = new List<Vector2>();
-
-            foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
-            {
-                for (int corner = 0; corner < 4; corner++)
-                {
-                    int3 chunkIndex = chunk.ChunkIndex;
-                    int2 cornerDir = corners[corner]; 
-                    if (addedCorners.Contains(Tuple.Create(chunkIndex, cornerDir)))
-                    {
-                        continue;
-                    }
-                    
-                    bool isCornerValid = IsCornerValid(chunkIndex, cornerDir, chunk.PrototypeInfoData);
-
-                    if (!isCornerValid) continue;
-                    
-                    chunks.Add(chunk);
-                    offsets.Add(new Vector2(cornerDir.x, cornerDir.y) * 0.5f);
-                    directions.Add(offsets[^1].normalized);
-                    AddCornerToHashSet(cornerDir, chunkIndex);
-                }
-            }
-
-            return chunks;
-            
-            bool IsCornerValid(int3 chunkIndex, int2 cornerDir, PrototypeInfoData chunkData)
-            {
-                bool isCornerValid = true;
-
-                for (int x = 0; x < 2 && isCornerValid; x++)
-                for (int z = 0; z < 2 && isCornerValid; z++)
-                {
-                    if (x == 0 && z == 0)
-                    {
-                        continue;
-                    }
-                        
-                    int3 index = chunkIndex + new int3(x * cornerDir.x, 0, z * cornerDir.y);
-                    if (!DistrictData.DistrictChunks.TryGetValue(index, out var chunk) || chunk.PrototypeInfoData != chunkData)
-                    {
-                        isCornerValid = false;
-                    }
-                }
-
-                return isCornerValid;
-            }
-            
-            void AddCornerToHashSet(int2 cornerDir, int3 chunkIndex)
-            {
-                for (int x = 0; x < 2; x++)
-                for (int z = 0; z < 2; z++)
-                {
-                    if (x == 0 && z == 0)
-                    {
-                        continue;
-                    }
-                        
-                    int3 index = chunkIndex + new int3(x * cornerDir.x, 0, z * cornerDir.y);
-                    int2 corner = new int2(cornerDir.x * (x == 1 ? -1 : 1), cornerDir.y * (z == 1 ? -1 : 1));
-                    addedCorners.Add(Tuple.Create(index, corner));
-                }
-            }
-        }*/
-
         protected override void RangeChanged()
         {
             base.RangeChanged();

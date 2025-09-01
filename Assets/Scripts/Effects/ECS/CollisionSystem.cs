@@ -96,6 +96,11 @@ namespace Effects.ECS
             }
 
             float3 pos = transform.Position;
+            if (pos.y > 1.0f)
+            {
+                return;
+            }          
+            
             float radius = colliderComponent.Radius;
             float radiusSq = radius * radius;
 

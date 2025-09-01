@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Serialization;
+using System;
 
 namespace WaveFunctionCollapse
 {

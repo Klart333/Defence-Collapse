@@ -18,9 +18,8 @@ namespace Buildings.District
     [Serializable]
     public class DistrictData : IDisposable, IBuffable
     {
-        public event Action<DistrictData> OnClicked;
         public event Action<HashSet<int3>> OnChunksLost;
-        
+        public event Action<DistrictData> OnClicked;
         public event Action OnDisposed;
         public event Action OnLevelup;
 
@@ -119,8 +118,6 @@ namespace Buildings.District
             }
             
             GenerateCollider();
-            //State.RemoveEntities();
-            //State.SpawnEntities();
         }
 
         /// <summary>
@@ -170,18 +167,6 @@ namespace Buildings.District
                 Dispose();
             }
         }
-/*
-        private async UniTaskVoid DelayedUpdateEntities()
-        {
-            if (!DistrictGenerator.IsGenerating)
-            {
-                await UniTask.Yield();
-            }
-
-            await UniTask.WaitWhile(() => DistrictGenerator.IsGenerating);
-
-            State.SpawnEntities();
-        }*/
 
         /// <summary>
         /// This is from the district generator rebuilding the district based on the shape of the walls
@@ -192,11 +177,21 @@ namespace Buildings.District
         {
             if (!DistrictChunks.ContainsKey(chunk.ChunkIndex))
             {
-                //Debug.Log($"({this.towerData.DistrictType}) DistrictChunks did not contain: {chunk.ChunkIndex}");
+#if UNITY_EDITOR
+                if (State.IsDebug)
+                {
+                    Debug.Log($"({this.towerData.DistrictType}) DistrictChunks did not contain: {chunk.ChunkIndex}");
+                }
+#endif
                 return false;
             }
-
-            Debug.Log($"({towerData.DistrictType})Removing: " + chunk.ChunkIndex + " from DistrictChunks");
+            
+#if UNITY_EDITOR
+            if (State.IsDebug)
+            {
+                Debug.Log($"({towerData.DistrictType})Removing: " + chunk.ChunkIndex + " from DistrictChunks");
+            }
+#endif
             HashSet<int3> destroyedIndexes = new HashSet<int3> { chunk.ChunkIndex };
             State.RemoveEntities(destroyedIndexes); 
             OnChunksLost?.Invoke(destroyedIndexes);
@@ -204,7 +199,6 @@ namespace Buildings.District
             DistrictChunks.Remove(chunk.ChunkIndex);
             GenerateCollider();
             
-            //DelayedUpdateEntities().Forget();
             return true;
         }
 
