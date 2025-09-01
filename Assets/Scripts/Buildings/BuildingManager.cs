@@ -144,7 +144,8 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
         int tries = 1000;
         IsGenerating = true;
-        while (cellsToUpdate.Any(x => !waveFunction[x].Collapsed) && tries-- > 0)
+        
+        while (!IsAllCollapsed(cellsToUpdate) && tries-- > 0)
         {
             ChunkIndex index = waveFunction.GetLowestEntropyIndex(cellsToUpdate);
             PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index]);
@@ -190,6 +191,19 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
                 GetNeighbours(neighbours[i], depth - 1);
             }
         }
+    }
+    
+    private bool IsAllCollapsed(IEnumerable<ChunkIndex> cellsToUpdate)
+    {
+        foreach (ChunkIndex x in cellsToUpdate)
+        {
+            if (!waveFunction[x].Collapsed)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     #region Query & Place
@@ -272,7 +286,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
         IsGenerating = true;
         int tries = 1000;
-        while (cellsToCollapse.Any(x => !waveFunction[x].Collapsed) && tries-- > 0)
+        while (!IsAllCollapsed(cellsToCollapse) && tries-- > 0)
         {
             ChunkIndex index = waveFunction.GetLowestEntropyIndex(cellsToCollapse);
             PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index]);

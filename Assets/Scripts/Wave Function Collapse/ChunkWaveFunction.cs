@@ -69,9 +69,9 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public bool Load(IChunkWaveFunction<TChunk> handler)
+        public bool Load(IChunkWaveFunction<TChunk> waveFunctionHandler)
         {
-            this.handler = handler;
+            handler = waveFunctionHandler;
             Clear();
 
             return true;
@@ -189,33 +189,20 @@ namespace WaveFunctionCollapse
             Chunks.Remove(chunkIndex);
         }
 
-        public Cell Iterate()
+        public ChunkIndex Iterate(bool spawnMesh = true)
         {
             ChunkIndex index = GetLowestEntropyIndex();
 
             PrototypeData chosenPrototype = Collapse(this[index]);
-            //Debug.Log("Collapsing: " + index + "\n ChosenPrototype: " + chosenPrototype);
-            SetCell(index, chosenPrototype);
-
-            Propagate();
-            return this[index];
-        }
-        
-        public ChunkIndex Iterate(TChunk chunk)
-        {
-            ChunkIndex index = GetLowestEntropyIndex(chunk);
-
-            PrototypeData chosenPrototype = Collapse(this[index]);
-            //Debug.Log("Collapsing: " + index.CellIndex + "\n ChosenPrototype: " + chosenPrototype);
-            SetCell(index, chosenPrototype);
+            SetCell(index, chosenPrototype, spawnMesh);
 
             Propagate();
             return index;
         }
         
-        public ChunkIndex Iterate(List<ChunkIndex> cells)
+        public ChunkIndex Iterate(TChunk chunk)
         {
-            ChunkIndex index = GetLowestEntropyIndex(cells);
+            ChunkIndex index = GetLowestEntropyIndex(chunk);
 
             PrototypeData chosenPrototype = Collapse(this[index]);
             //Debug.Log("Collapsing: " + index.CellIndex + "\n ChosenPrototype: " + chosenPrototype);
@@ -298,10 +285,7 @@ namespace WaveFunctionCollapse
                 for (int z = 0; z < chunk.Cells.GetLength(2); z++)
                 {
                     Cell cell = chunk.Cells[x, y, z];
-                    if (cell.Collapsed)
-                    {
-                        continue;
-                    }
+                    if (cell.Collapsed) continue;
 
                     float cellEntropy = cell.Position.y * 10;
                     if (cellEntropy > lowestEntropy) continue;
@@ -373,11 +357,13 @@ namespace WaveFunctionCollapse
             return cell.PossiblePrototypes[index];
         }
 
-        public void SetCell(ChunkIndex index, PrototypeData chosenPrototype)
+        public void SetCell(ChunkIndex index, PrototypeData chosenPrototype, bool spawnMesh = true)
         {
             Vector3 position = this[index].Position;
             this[index] = new Cell(true, position, new List<PrototypeData> { chosenPrototype });
             CellStack.Push(index);
+
+            if (!spawnMesh) return;
 
             if (!ChunkParents.TryGetValue(index.Index, out Transform parent))
             {
@@ -385,6 +371,7 @@ namespace WaveFunctionCollapse
                 if (ParentTransform != null) parent.SetParent(ParentTransform); 
                 ChunkParents.Add(index.Index, parent);
             }
+            
             GameObject spawned = GenerateMesh(position, chosenPrototype, parent);
             if (spawned is not null)
             {

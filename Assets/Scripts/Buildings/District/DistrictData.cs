@@ -23,30 +23,27 @@ namespace Buildings.District
         public event Action OnDisposed;
         public event Action OnLevelup;
 
-        protected readonly Dictionary<ChunkIndex, List<int3>> cachedChunkIndexes = new Dictionary<ChunkIndex, List<int3>>();
+        protected Dictionary<ChunkIndex, List<int3>> cachedBuildingChunkIndexes = new Dictionary<ChunkIndex, List<int3>>();
 
         private MeshCollider meshCollider;
         protected TowerData towerData;
 
-        public List<IUpgradeStat> UpgradeStats => State.UpgradeStats;
         public Dictionary<int3, QueryChunk> DistrictChunks { get; } 
         public DistrictHandler DistrictHandler { get; set; }
+        public DistrictGenerator DistrictGenerator { get; }
         public IGameSpeed GameSpeed { get; set; }
         public DistrictState State { get; }
-        public Stats Stats => State.Stats;
         public Vector3 Position { get; }
         
-        public DistrictGenerator DistrictGenerator { get; }
+        public List<IUpgradeStat> UpgradeStats => State.UpgradeStats;
+        public Stats Stats => State.Stats;
 
         public DistrictData(TowerData towerData, HashSet<QueryChunk> chunks, Vector3 position, IChunkWaveFunction<QueryChunk> chunkDistrictGenerator, int key, PrototypeInfoData prototypeInfo)
         {
             DistrictChunks = new Dictionary<int3, QueryChunk>();
             foreach (QueryChunk chunk in chunks)
             {
-                if (chunk.IsTop) // Remove if a state uses the below chunks in future
-                {
-                    DistrictChunks.Add(chunk.ChunkIndex, chunk);
-                }
+                DistrictChunks.Add(chunk.ChunkIndex, chunk);
             }
 
             DistrictGenerator = chunkDistrictGenerator as DistrictGenerator;
@@ -87,23 +84,18 @@ namespace Buildings.District
 
         private void CreateChunkIndexCache()
         {
-            cachedChunkIndexes.Clear();
+            cachedBuildingChunkIndexes.Clear();
             foreach (QueryChunk chunk in DistrictChunks.Values)
             {
-                if (!BuildingManager.Instance.TryGetIndex(chunk.Position, out ChunkIndex index))
+                Vector3 pos = chunk.Position + BuildingManager.Instance.CellSize.XyZ(0) / 2.0f;
+                if (!BuildingManager.Instance.TryGetIndex(pos, out ChunkIndex index))
                 {
                     Debug.LogError("Chunk index could not be found, VERY WERID");
                     return;
                 }
                 
-                if (!cachedChunkIndexes.TryGetValue(index, out List<int3> chunkIndex))
-                {
-                    cachedChunkIndexes.Add(index, new List<int3> { chunk.ChunkIndex });
-                }
-                else
-                {
-                    chunkIndex.Add(chunk.ChunkIndex);
-                }
+                if (!cachedBuildingChunkIndexes.TryGetValue(index, out List<int3> chunkIndex)) cachedBuildingChunkIndexes.Add(index, new List<int3> { chunk.ChunkIndex });
+                else chunkIndex.Add(chunk.ChunkIndex);
             }
         }
 
@@ -111,10 +103,7 @@ namespace Buildings.District
         {
             foreach (QueryChunk chunk in chunks)
             {
-                if (chunk.IsTop)
-                {
-                    DistrictChunks.TryAdd(chunk.ChunkIndex, chunk);
-                }
+                DistrictChunks.TryAdd(chunk.ChunkIndex, chunk);
             }
             
             GenerateCollider();
@@ -126,12 +115,10 @@ namespace Buildings.District
         /// <param name="chunkIndexes"></param>
         private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
         {
-            Debug.Log("OnWallsDestroyed");
-
             HashSet<int3> destroyedIndexes = new HashSet<int3>();
             for (int i = 0; i < chunkIndexes.Count; i++)
             {
-                if (!cachedChunkIndexes.TryGetValue(chunkIndexes[i], out List<int3> indexes)) continue;
+                if (!cachedBuildingChunkIndexes.TryGetValue(chunkIndexes[i], out List<int3> indexes)) continue;
             
                 for (int j = indexes.Count - 1; j >= 0; j--)
                 {
@@ -144,11 +131,16 @@ namespace Buildings.District
 
                 if (indexes.Count == 0)
                 {
-                    cachedChunkIndexes.Remove(chunkIndexes[i]);
+                    cachedBuildingChunkIndexes.Remove(chunkIndexes[i]);
                 }
             }
 
-            Debug.Log($"OnWallsDestroyed, Destroyed Indexes: {destroyedIndexes.Count}");
+#if UNITY_EDITOR
+            if (DistrictHandler.IsDebug)
+            {
+                Debug.Log($"OnWallsDestroyed, Destroyed Indexes: {destroyedIndexes.Count}");
+            }
+#endif
             bool isDead = DistrictChunks.Count <= 0;
             if (destroyedIndexes.Count > 0)
             {
@@ -158,7 +150,6 @@ namespace Buildings.District
                 {
                     GenerateCollider();
                     State.RemoveEntities(destroyedIndexes);
-                    //DelayedUpdateEntities().Forget();
                 }
             }
 
@@ -178,7 +169,7 @@ namespace Buildings.District
             if (!DistrictChunks.ContainsKey(chunk.ChunkIndex))
             {
 #if UNITY_EDITOR
-                if (State.IsDebug)
+                if (DistrictHandler.IsDebug)
                 {
                     Debug.Log($"({this.towerData.DistrictType}) DistrictChunks did not contain: {chunk.ChunkIndex}");
                 }
@@ -187,7 +178,7 @@ namespace Buildings.District
             }
             
 #if UNITY_EDITOR
-            if (State.IsDebug)
+            if (DistrictHandler.IsDebug)
             {
                 Debug.Log($"({towerData.DistrictType})Removing: " + chunk.ChunkIndex + " from DistrictChunks");
             }
@@ -304,13 +295,13 @@ namespace Buildings.District
             
             foreach (IChunk chunk in chunks)
             {
-                if (chunk.AdjacentChunks.All(x => x != null && x.PrototypeInfoData == chunk.PrototypeInfoData))
+                if (IsInvalid(chunk))
                 {
                     continue;
                 }
                 
                 // Assuming each chunk has a position and contains 2x2x2 cells
-                Vector3 chunkPosition = chunk.Position - pos - CellSize / 2.0f; 
+                Vector3 chunkPosition = chunk.Position - pos; 
 
                 // Define the 8 corners of the 3D cell
                 Vector3 bottomLeftFront = new Vector3(chunkPosition.x, chunkPosition.y, chunkPosition.z);
@@ -395,6 +386,19 @@ namespace Buildings.District
                 triangles.Add(c);
                 triangles.Add(b);
                 triangles.Add(d);
+            }
+
+            bool IsInvalid(IChunk chunk)
+            {
+                foreach (IChunk x in chunk.AdjacentChunks)
+                {
+                    if (x == null || x.PrototypeInfoData != chunk.PrototypeInfoData)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
             }
         }
     }

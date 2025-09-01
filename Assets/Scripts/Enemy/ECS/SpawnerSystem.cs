@@ -93,38 +93,38 @@ namespace Enemy.ECS
         [BurstCompile]
         public void Execute([EntityIndexInChunk] int index, Entity entity, SpawnPointAspect spawnPointAspect)
         {
-            if (spawnPointAspect.SpawnPointComponent.ValueRO.Timer > 0)
+            spawnPointAspect.SpawnPointComponent.ValueRW.Timer -= DeltaTime;
+            
+            while (spawnPointAspect.SpawnPointComponent.ValueRO.Timer < 0)
             {
-                spawnPointAspect.SpawnPointComponent.ValueRW.Timer -= DeltaTime;
-                return;
-            }
+                int enemyIndex = spawnPointAspect.SpawnPointComponent.ValueRO.EnemyIndex;
+                Entity prefabEntity = enemyIndex >= 100 ? BossBuffer[enemyIndex - 100].EnemyEntity : EnemyBuffer[enemyIndex].EnemyEntity;
+                Entity spawnedEntity = ECB.Instantiate(index, prefabEntity);
             
-            spawnPointAspect.SpawnPointComponent.ValueRW.Timer = spawnPointAspect.SpawnPointComponent.ValueRO.SpawnRate;
-            spawnPointAspect.SpawnPointComponent.ValueRW.Amount--;
+                LocalTransform prefabTransform = TransformLookup[prefabEntity];
 
-            int enemyIndex = spawnPointAspect.SpawnPointComponent.ValueRO.EnemyIndex;
-            Entity prefabEntity = enemyIndex >= 100 ? BossBuffer[enemyIndex - 100].EnemyEntity : EnemyBuffer[enemyIndex].EnemyEntity;
-            Entity spawnedEntity = ECB.Instantiate(index, prefabEntity);
+                Random random = Random.CreateFromIndex((uint)(Seed + index));
             
-            LocalTransform prefabTransform = TransformLookup[prefabEntity];
+                float3 spawnPosition = spawnPointAspect.Transform.ValueRO.Position + random.NextFloat3(MinRandomPosition, MaxRandomPosition);
+                quaternion spawnRotation = math.mul(prefabTransform.Rotation, quaternion.AxisAngle(new float3(0, 1, 0), random.NextFloat(360)));
 
-            Random random = Random.CreateFromIndex((uint)(Seed + index));
-            
-            float3 spawnPosition = spawnPointAspect.Transform.ValueRO.Position + random.NextFloat3(MinRandomPosition, MaxRandomPosition);
-            quaternion spawnRotation = math.mul(prefabTransform.Rotation, quaternion.AxisAngle(new float3(0, 1, 0), random.NextFloat(360)));
-
-            LocalTransform newTransform = LocalTransform.FromPositionRotationScale(
-                spawnPosition,       
-                spawnRotation, 
-                prefabTransform.Scale     
-            );
-            ECB.SetComponent(index, spawnedEntity, new RandomComponent { Random = random });
-            ECB.SetComponent(index, spawnedEntity, newTransform);
-
-            if (spawnPointAspect.SpawnPointComponent.ValueRO.Amount <= 0)
-            {
-                ECB.RemoveComponent<SpawningTag>(index, entity);
-            }
+                LocalTransform newTransform = LocalTransform.FromPositionRotationScale(
+                    spawnPosition,       
+                    spawnRotation, 
+                    prefabTransform.Scale     
+                );
+                ECB.SetComponent(index, spawnedEntity, new RandomComponent { Random = random });
+                ECB.SetComponent(index, spawnedEntity, newTransform);
+                
+                spawnPointAspect.SpawnPointComponent.ValueRW.Timer += spawnPointAspect.SpawnPointComponent.ValueRO.SpawnRate;
+                spawnPointAspect.SpawnPointComponent.ValueRW.Amount--;
+                
+                if (spawnPointAspect.SpawnPointComponent.ValueRO.Amount <= 0)
+                {
+                    ECB.RemoveComponent<SpawningTag>(index, entity);
+                    break;
+                }
+            } 
         }
     }
 }

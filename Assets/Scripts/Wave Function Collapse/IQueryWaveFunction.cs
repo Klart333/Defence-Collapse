@@ -91,7 +91,7 @@ namespace WaveFunctionCollapse
             {
                 if (!chunk.ContainsPoint(pos, CellSize)) continue;
                 
-                if (TryGetIndex(pos, chunk, out var cellIndex))
+                if (TryGetIndex(pos, chunk, out int3 cellIndex))
                 {
                     chunkIndex = new ChunkIndex(chunk.ChunkIndex, cellIndex);
                     return true;

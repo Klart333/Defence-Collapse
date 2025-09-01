@@ -57,7 +57,6 @@ namespace Buildings.District
         public float DamageDone { get; set; }
         public float GoldGained { get; set; }
         public int Level { get; set; } = 1;
-        public bool IsDebug { get; set; }
         public int Key { get; set; }
         
         protected DistrictState(DistrictData districtData, Vector3 position, int key, TowerData towerData)
@@ -105,6 +104,12 @@ namespace Buildings.District
                 return;
             }
 
+            if (!districtData.UseMeshBasedPlacement)
+            {
+                collapsedIndexes.Add(chunkIndex);
+                return;
+            }
+            
             int index = DistrictData.DistrictGenerator.ChunkWaveFunction[chunkIndex].PossiblePrototypes[0].MeshRot.MeshIndex;
             if (PrototypeInfo.PrototypeTargetIndexes.Contains(index))
             {
@@ -217,28 +222,30 @@ namespace Buildings.District
 
         #region Entities
 
-        protected virtual List<ChunkIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes, out List<Vector2> offsets, out List<Vector2> directions)
+        protected virtual List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
-            offsets = new Vector2[chunkIndexes.Count].ToList();
-            directions = new List<Vector2>();
+            List<TargetEntityIndex> indexes = new List<TargetEntityIndex>();
             for (int i = 0; i < chunkIndexes.Count; i++)
             {
-                directions.Add(Vector2.up);
+                indexes.Add(new TargetEntityIndex
+                {
+                    ChunkIndex = chunkIndexes[i],
+                    Direction = Vector2.up,
+                });
             }
-            return chunkIndexes;
+            return indexes;
         }
         
         protected virtual void SpawnEntities(List<ChunkIndex> chunkIndexes)
         {
-            List<ChunkIndex> topIndexes = GetEntityChunks(chunkIndexes, out List<Vector2> offsets, out List<Vector2> directions);
+            List<TargetEntityIndex> targetIndexes = GetEntityChunks(chunkIndexes);
 #if UNITY_EDITOR
-            if (IsDebug)
+            if (DistrictData.DistrictHandler.IsDebug)
             {
-                Debug.Log($"Spawning {topIndexes.Count} entities, Total: {spawnedDataEntities.Count + topIndexes.Count}");
+                Debug.Log($"Spawning {targetIndexes.Count} entities, Total: {spawnedDataEntities.Count + targetIndexes.Count}");
             }
 #endif
-
-            int count = topIndexes.Count;
+            int count = targetIndexes.Count;
             float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
             float delay = attackSpeedValue / count;
             
@@ -246,18 +253,19 @@ namespace Buildings.District
             
             for (int i = 0; i < count; i++)
             {
-                Vector3 pos = GetPosition(topIndexes[i], offsets[i]);
+                TargetEntityIndex index = targetIndexes[i];
+                Vector3 pos = GetPosition(index.ChunkIndex, index.Offset);
 
                 if (requireTargeting) SetupShooterEntity(entities[i], i, pos);
                 else SetupSimpleShooterEntity(entities[i], i, pos);
                 
-                int2 key = topIndexes[i].Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + topIndexes[i].CellIndex.xz;
+                int2 key = index.ChunkIndex.Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + index.ChunkIndex.CellIndex.xz;
                 AddEntityToDictionary(key, entities[i], true);
             }
             
             if (districtData.UseTargetMesh)
             {
-                SpawnTargetEntities(entities, topIndexes, offsets, directions);
+                SpawnTargetEntities(entities, targetIndexes);
             }
             
             entities.Dispose();
@@ -270,7 +278,7 @@ namespace Buildings.District
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = pos });
                 entityManager.SetComponentData(spawnedEntity, new DirectionRangeComponent
                 {
-                    Direction = directions[i],
+                    Direction = targetIndexes[i].Direction,
                     Angle = districtData.AttackAngle,
                 });
             }
@@ -283,17 +291,18 @@ namespace Buildings.District
             }
         }
         
-        private void SpawnTargetEntities(NativeArray<Entity> entities, List<ChunkIndex> topIndexes, List<Vector2> offsets, List<Vector2> directions)
+        private void SpawnTargetEntities(NativeArray<Entity> entities, List<TargetEntityIndex> targetIndexes)
         {
             NativeArray<Entity> targetEntities = entityManager.Instantiate(targetEntityPrefab, entities.Length, Allocator.Temp);
 
             for (int i = 0; i < targetEntities.Length; i++)
             {
-                Vector3 pos = GetPosition(topIndexes[i], offsets[i]);
+                TargetEntityIndex index = targetIndexes[i];
+                Vector3 pos = GetPosition(index.ChunkIndex, index.Offset);
+                
+                SetupTargetEntity(targetEntities[i], entities[i], pos, index.Direction);
 
-                SetupTargetEntity(targetEntities[i], entities[i], pos, directions[i]);
-
-                int2 key = topIndexes[i].Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + topIndexes[i].CellIndex.xz;
+                int2 key = index.ChunkIndex.Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + index.ChunkIndex.CellIndex.xz;
                 AddEntityToDictionary(key, targetEntities[i], false);
             }
             
@@ -318,10 +327,10 @@ namespace Buildings.District
             }
         }
         
-        private Vector3 GetPosition(ChunkIndex chunkIndex, Vector2 offset)
+        private Vector3 GetPosition(ChunkIndex chunkIndex, Vector3 offset)
         {
             QueryChunk chunk = DistrictData.DistrictChunks[chunkIndex.Index];
-            Vector3 scaledOffset = DistrictData.DistrictGenerator.ChunkScale.MultiplyByAxis(offset.ToXyZ(0));
+            Vector3 scaledOffset = DistrictData.DistrictGenerator.ChunkScale.MultiplyByAxis(offset);
             Vector3 cellOffset = DistrictData.DistrictGenerator.CellSize.MultiplyByAxis(new Vector3(0.5f + chunkIndex.CellIndex.x, chunkIndex.CellIndex.y, 0.5f + chunkIndex.CellIndex.z));
             Vector3 pos = chunk.Position + scaledOffset + cellOffset;
             return pos;
@@ -366,7 +375,7 @@ namespace Buildings.District
         {
             int2 index = chunkIndex.Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + chunkIndex.CellIndex.xz;
 #if UNITY_EDITOR
-            if (IsDebug)
+            if (DistrictData.DistrictHandler.IsDebug)
             {
                 Debug.Log($"Removing entities from index: {index}");
             }
@@ -397,9 +406,9 @@ namespace Buildings.District
                     int2 longIndex = destroyedIndex.xz.MultiplyByAxis(DistrictStateUtility.Size) + new int2(x, y);
 
                     #if UNITY_EDITOR
-                    if (IsDebug)
+                    if (DistrictData.DistrictHandler.IsDebug)
                     {
-                        Debug.Log($"Removing entities from index: {longIndex}");
+                        //Debug.Log($"Removing entities from index: {longIndex}");
                     }
                     #endif
                     
@@ -517,63 +526,9 @@ namespace Buildings.District
             SubscribeToStats();
         }
 
-        protected override List<ChunkIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes, out List<Vector2> outOffsets, out List<Vector2> outDirections)
+        protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
-            List<ChunkIndex> indexes = new List<ChunkIndex>();
-            List<Vector2> directions = new List<Vector2>();
-            List<Vector2> offsets = new List<Vector2>();
-            foreach (ChunkIndex chunkIndex in chunkIndexes)
-            {
-                ChunkIndex[] neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, DistrictStateUtility.Width,  DistrictStateUtility.Height);
-                int rotation = DistrictData.DistrictGenerator.ChunkWaveFunction[chunkIndex].PossiblePrototypes[0].MeshRot.Rot;
-                DistrictStateUtility.MeshTargetType targetType = DistrictStateUtility.GetMeshTargetType(neighbours, DistrictData.DistrictGenerator, PrototypeInfo, rotation);
-                
-                Vector2 forwardDir = Math.RotateVector2(new Vector2(0, 1), -90 * (rotation + 3) * math.TORADIANS);
-                Vector2 leftDir = Math.RotateVector2(new Vector2(-1, 0), -90 * (rotation + 3) * math.TORADIANS);
-                float2 baseKey = chunkIndex.Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + chunkIndex.CellIndex.xz + new float2(0.5f, 0.5f);
-                switch (targetType)
-                {
-                    case DistrictStateUtility.MeshTargetType.Corner:
-                        Vector2 cornerRight = Math.RotateVector2(new Vector2(0.25f, 0f), -90 * (rotation + 3) * math.TORADIANS);
-                        Vector2 cornerBack = Math.RotateVector2(new Vector2(0f, -0.25f), -90 * (rotation + 3) * math.TORADIANS);
-                        float2 cornerRightKey = baseKey + Math.Rotate90Float2(new float2(0.5f, 0.5f), rotation + 3);
-                        float2 cornerBackKey = baseKey + Math.Rotate90Float2(new float2(-0.5f, -0.5f), rotation + 3);
-                        
-                        AddPosition(cornerRight, forwardDir, chunkIndex, new int3((int)cornerRightKey.x, (int)cornerRightKey.y, rotation));
-                        AddPosition(cornerBack, leftDir, chunkIndex, new int3((int)cornerBackKey.x, (int)cornerBackKey.y, (rotation + 3) % 4));
-                        break;
-                    case DistrictStateUtility.MeshTargetType.Side:
-                        Vector2 sideRight = Math.RotateVector2(new Vector2(0.25f, 0f), -90 * (rotation + 3) * math.TORADIANS);
-                        Vector2 sideLeft = Math.RotateVector2(new Vector2(-0.25f, 0f), -90 * (rotation + 3) * math.TORADIANS);
-                        float2 sideRightKey = baseKey + Math.Rotate90Float2(new float2(0.5f, 0.5f), rotation + 3);
-                        float2 sideLeftKey = baseKey + Math.Rotate90Float2(new float2(-0.5f, 0.5f), rotation + 3);
-                        
-                        AddPosition(sideRight, forwardDir, chunkIndex, new int3((int)sideRightKey.x, (int)sideRightKey.y, rotation));
-                        AddPosition(sideLeft, forwardDir, chunkIndex, new int3((int)sideLeftKey.x, (int)sideLeftKey.y, rotation));
-                        break;
-                    default:
-                        break;
-                }
-            } 
-            
-            outOffsets = offsets;
-            outDirections = directions;
-            return indexes;
-            
-            void AddPosition(Vector2 offset, Vector2 dir, ChunkIndex chunkIndex, int3 index)
-            {
-                if (occupiedTargetMeshChunkIndex.Contains(index))
-                {
-                    return;
-                }
-                
-                Vector2 pivotOffset = -dir * 0.125f;
-                offsets.Add(offset + pivotOffset);
-                directions.Add(dir);
-                indexes.Add(chunkIndex);
-                
-                occupiedTargetMeshChunkIndex.Add(index);
-            }
+            return DistrictStateUtility.GetPerimeterEntityChunks(chunkIndexes, occupiedTargetMeshChunkIndex, DistrictData.DistrictGenerator, PrototypeInfo, 3);
         }
 
         public override void OnSelected(Vector3 pos)
@@ -729,11 +684,16 @@ namespace Buildings.District
             
         }
 
-        protected override List<ChunkIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes, out List<Vector2> offsets, out List<Vector2> directions)
+        protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
-            offsets = new List<Vector2> { Vector2.zero };
-            directions = new List<Vector2> { Vector2.up };
-            return new List<ChunkIndex> { chunkIndexes.First() };
+            return new List<TargetEntityIndex>
+            {
+                new TargetEntityIndex
+                {
+                    ChunkIndex = chunkIndexes[0],
+                    Direction = Vector2.up
+                }
+            };
         }
 
         public override void OnSelected(Vector3 pos)
@@ -808,8 +768,6 @@ namespace Buildings.District
             
             Attack.OnEffectsAdded -= AttackEffectsAdded;
             requireTargeting = true;
-            
-            //RemoveEntities();
         }
 
         private void CreateStats()
@@ -878,15 +836,7 @@ namespace Buildings.District
     { 
         private GameObject rangeIndicator;
         private bool selected;
-        
-        private readonly int2[] corners =
-        {
-            new int2(-1, 1),
-            new int2(1, 1),
-            new int2(-1, -1),
-            new int2(1, -1),
-        };
-        
+
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
         
@@ -897,85 +847,11 @@ namespace Buildings.District
             Attack = new Attack(flameData.BaseAttack);
         }
         
-        /*protected override List<ChunkIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes, out List<Vector2> offsets, out List<Vector2> directions)
+        protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
-            List<ChunkIndex> indexes = new List<ChunkIndex>();
-            HashSet<Tuple<int3, int2>> addedCorners = new HashSet<Tuple<int3, int2>>();
-            offsets = new List<Vector2>();
-            directions = new List<Vector2>();
- 
-            foreach (ChunkIndex index in chunkIndexes)
-            {
-                for (int corner = 0; corner < 4; corner++)
-                {
-                    int3 chunkIndex = index.Index;
-                    int2 cornerDir = corners[corner]; 
-                    if (addedCorners.Contains(Tuple.Create(chunkIndex, cornerDir)))
-                    {
-                        continue;
-                    }
-                    
-                    bool isCornerValid = IsCornerValid(chunkIndex, cornerDir, PrototypeInfo, out Vector2 direction);
- 
-                    if (!isCornerValid) continue;
-                    
-                    indexes.Add(chunk);
-                    offsets.Add(new Vector2(cornerDir.x, cornerDir.y) * 0.5f);
-                    directions.Add(direction);
-                    AddCornerToHashSet(cornerDir, chunkIndex);
-                }
-            }
- 
-            return chunks;
-            
-            bool IsCornerValid(int3 chunkIndex, int2 cornerDir, PrototypeInfoData chunkData, out Vector2 direction)
-            {
-                direction = default;
- 
-                int3 diagonal = chunkIndex + cornerDir.XyZ(0);
-                if (DistrictData.DistrictChunks.TryGetValue(diagonal, out var chunk)
-                    && chunk.PrototypeInfoData == chunkData)
-                {
-                    return false; // The opposite corner should not be built
-                }
- 
-                int3 horizontal = chunkIndex + new int3(cornerDir.x, 0, 0);
-                bool horizontalIsValid = DistrictData.DistrictChunks.TryGetValue(horizontal, out var horizontalChunk)
-                                         && horizontalChunk.PrototypeInfoData == chunkData;
-                
-                int3 vertical = chunkIndex + new int3(0, 0, cornerDir.y);
-                bool verticalIsValid = DistrictData.DistrictChunks.TryGetValue(vertical, out var verticalChunk)
-                                       && verticalChunk.PrototypeInfoData == chunkData;
- 
-                if (horizontalIsValid == verticalIsValid) // XOR
-                {
-                    return false;
-                }
- 
-                direction = horizontalIsValid
-                    ? new Vector2(0, cornerDir.y)
-                    : new Vector2(cornerDir.x, 0);   
-                
-                return true;
-            }
-            
-            void AddCornerToHashSet(int2 cornerDir, int3 chunkIndex)
-            {
-                for (int x = 0; x < 2; x++)
-                for (int z = 0; z < 2; z++)
-                {
-                    if (x == 0 && z == 0)
-                    {
-                        continue;
-                    }
-                        
-                    int3 index = chunkIndex + new int3(x * cornerDir.x, 0, z * cornerDir.y);
-                    int2 corner = new int2(cornerDir.x * (x == 1 ? -1 : 1), cornerDir.y * (z == 1 ? -1 : 1));
-                    addedCorners.Add(Tuple.Create(index, corner));
-                }
-            }
-        }*/
-        
+            return DistrictStateUtility.GetPerimeterEntityChunks(chunkIndexes, occupiedTargetMeshChunkIndex, DistrictData.DistrictGenerator, PrototypeInfo, 2);
+        }
+
         protected override void RangeChanged()
         {
             base.RangeChanged();
@@ -1056,24 +932,11 @@ namespace Buildings.District
 
             Attack = new Attack(flameData.BaseAttack);
         }
-        
-        /*
-        protected override List<QueryChunk> GetEntityChunks(out List<Vector2> offsets, out List<Vector2> directions)
+
+        protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
-            List<QueryChunk> chunks = new List<QueryChunk>();
-            offsets = new List<Vector2>();
-            directions = new List<Vector2>();
-
-            foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
-            {
-                chunks.Add(chunk);
-                offsets.Add(DistrictData.DistrictGenerator.ChunkScale / 2.0f);
-                directions.Add(Vector2.zero);
-            }
-
-            return chunks;
+            return DistrictStateUtility.GetFullChunkEntityIndexes(chunkIndexes, DistrictData.DistrictGenerator.ChunkScale);
         }
-        */
 
         protected override void RangeChanged()
         {
@@ -1147,14 +1010,6 @@ namespace Buildings.District
 
         private bool selected;
         
-        private readonly int2[] corners = // Top left, Top right, bottom left, bottom right 
-        {
-            new int2(-1, 1),
-            new int2(1, 1),
-            new int2(-1, -1),
-            new int2(1, -1),
-        };
-        
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
 
@@ -1185,76 +1040,11 @@ namespace Buildings.District
             }
         }
 
-        /*protected override List<QueryChunk> GetEntityChunks(out List<Vector2> offsets, out List<Vector2> directions)
+        protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
-            List<QueryChunk> chunks = new List<QueryChunk>();
-            HashSet<Tuple<int3, int2>> addedCorners = new HashSet<Tuple<int3, int2>>();
-            offsets = new List<Vector2>();
-            directions = new List<Vector2>();
+            return DistrictStateUtility.GetFullChunkEntityIndexes(chunkIndexes, DistrictData.DistrictGenerator.ChunkScale, Vector3.up);
+        }
 
-            foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
-            {
-                for (int corner = 0; corner < 4; corner++)
-                {
-                    int3 chunkIndex = chunk.ChunkIndex;
-                    int2 cornerDir = corners[corner]; 
-                    if (addedCorners.Contains(Tuple.Create(chunkIndex, cornerDir)))
-                    {
-                        continue;
-                    }
-                    
-                    bool isCornerValid = IsCornerValid(chunkIndex, cornerDir, chunk.PrototypeInfoData);
-
-                    if (!isCornerValid) continue;
-                    
-                    chunks.Add(chunk);
-                    offsets.Add(new Vector2(cornerDir.x, cornerDir.y) * 0.5f);
-                    directions.Add(offsets[^1].normalized);
-                    AddCornerToHashSet(cornerDir, chunkIndex);
-                }
-            }
-
-            return chunks;
-            
-            bool IsCornerValid(int3 chunkIndex, int2 cornerDir, PrototypeInfoData chunkData)
-            {
-                bool isCornerValid = true;
-
-                for (int x = 0; x < 2 && isCornerValid; x++)
-                for (int z = 0; z < 2 && isCornerValid; z++)
-                {
-                    if (x == 0 && z == 0)
-                    {
-                        continue;
-                    }
-                        
-                    int3 index = chunkIndex + new int3(x * cornerDir.x, 0, z * cornerDir.y);
-                    if (!DistrictData.DistrictChunks.TryGetValue(index, out var chunk) || chunk.PrototypeInfoData != chunkData)
-                    {
-                        isCornerValid = false;
-                    }
-                }
-
-                return isCornerValid;
-            }
-            
-            void AddCornerToHashSet(int2 cornerDir, int3 chunkIndex)
-            {
-                for (int x = 0; x < 2; x++)
-                for (int z = 0; z < 2; z++)
-                {
-                    if (x == 0 && z == 0)
-                    {
-                        continue;
-                    }
-                        
-                    int3 index = chunkIndex + new int3(x * cornerDir.x, 0, z * cornerDir.y);
-                    int2 corner = new int2(cornerDir.x * (x == 1 ? -1 : 1), cornerDir.y * (z == 1 ? -1 : 1));
-                    addedCorners.Add(Tuple.Create(index, corner));
-                }
-            }
-        }*/
-        
         protected override void SpawnEntities(List<ChunkIndex> chunkIndexes)
         {
             base.SpawnEntities(chunkIndexes);
@@ -1305,8 +1095,6 @@ namespace Buildings.District
             
             Attack.OnEffectsAdded -= AttackEffectsAdded;
             requireTargeting = true;
-            
-            //RemoveEntities();
         }
 
         private void CreateStats()
@@ -1369,37 +1157,11 @@ namespace Buildings.District
             stats = new Stats(districtData.Stats);
             SubscribeToStats();
         }
-
-        /*
-        protected override List<QueryChunk> GetEntityChunks(out List<Vector2> offsets, out List<Vector2> directions)
+        
+        protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
-            List<QueryChunk> chunks = new List<QueryChunk>();
-            offsets = new List<Vector2>();
-            directions = new List<Vector2>();
-
-            foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
-            {
-                for (int i = 0; i < chunk.AdjacentChunks.Length; i++)
-                {
-                    if (i is 2 or 3 || (chunk.AdjacentChunks[i] != null && chunk.AdjacentChunks[i].PrototypeInfoData == chunk.PrototypeInfoData)) continue;
-                    
-                    chunks.Add(chunk);
-                    Vector2 offset = i switch
-                    {
-                        0 => new Vector2(0.25f, 0),
-                        1 => new Vector2(-0.25f, 0),
-                        4 => new Vector2(0, 0.25f),
-                        5 => new Vector2(0, -0.25f),
-                        _ => throw new ArgumentOutOfRangeException()
-                    };
-                    offsets.Add(offset);
-                    directions.Add(offset.normalized);
-                }
-            }
-
-            return chunks;
+            return DistrictStateUtility.GetFullChunkEntityIndexes(chunkIndexes, DistrictData.DistrictGenerator.ChunkScale);
         }
-        */
         
         public override void OnSelected(Vector3 pos)
         {
@@ -1468,7 +1230,7 @@ namespace Buildings.District
         public static MeshTargetType GetMeshTargetType(ChunkIndex[] neighbours, DistrictGenerator waveFunction, PrototypeInfoData protInfo, int rotation)
         {
             bool[] sides = GetIfAdjacentSidesExist(neighbours, waveFunction, protInfo);
-            ListRotator.RotateInPlace(sides, rotation + 3);
+            ListRotator.RotateInPlace(sides, rotation);
             
             // Right, Forward, Left, Back
             return (sides[0], sides[1], sides[2], sides[3]) switch
@@ -1500,5 +1262,100 @@ namespace Buildings.District
             Side,
             Full,
         }
+        
+        
+        public static List<TargetEntityIndex> GetPerimeterEntityChunks(List<ChunkIndex> chunkIndexes, HashSet<int3> occupiedTargetMeshChunkIndex, DistrictGenerator districtGenerator, PrototypeInfoData protInfo, int rotationOffset)
+        {
+            List<TargetEntityIndex> entityIndexes = new List<TargetEntityIndex>();
+            foreach (ChunkIndex chunkIndex in chunkIndexes)
+            {
+                ChunkIndex[] neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, Width,  Height);
+                int rotation = districtGenerator.ChunkWaveFunction[chunkIndex].PossiblePrototypes[0].MeshRot.Rot + rotationOffset;
+                MeshTargetType targetType = GetMeshTargetType(neighbours, districtGenerator, protInfo, rotation);
+                
+                Vector2 forwardDir = Math.RotateVector2(new Vector2(0, 1), -90 * rotation * math.TORADIANS);
+                Vector2 leftDir = Math.RotateVector2(new Vector2(-1, 0), -90 * rotation * math.TORADIANS);
+                float2 baseKey = chunkIndex.Index.xz.MultiplyByAxis(Size) + chunkIndex.CellIndex.xz + new float2(0.5f, 0.5f);
+                switch (targetType)
+                {
+                    case MeshTargetType.Corner:
+                        Vector2 cornerRight = Math.RotateVector2(new Vector2(0.25f, 0f), -90 * rotation * math.TORADIANS);
+                        Vector2 cornerBack = Math.RotateVector2(new Vector2(0f, -0.25f), -90 * rotation * math.TORADIANS);
+                        float2 cornerRightKey = baseKey + Math.Rotate90Float2(new float2(0.5f, 0.5f), rotation);
+                        float2 cornerBackKey = baseKey + Math.Rotate90Float2(new float2(-0.5f, -0.5f), rotation);
+                        
+                        AddPosition(cornerRight, forwardDir, chunkIndex, new int3((int)cornerRightKey.x, (int)cornerRightKey.y, (rotation - rotationOffset) % 4));
+                        AddPosition(cornerBack, leftDir, chunkIndex, new int3((int)cornerBackKey.x, (int)cornerBackKey.y, (rotation - rotationOffset + 3) % 4));
+                        break;
+                    case MeshTargetType.Side:
+                        Vector2 sideRight = Math.RotateVector2(new Vector2(0.25f, 0f), -90 * rotation * math.TORADIANS);
+                        Vector2 sideLeft = Math.RotateVector2(new Vector2(-0.25f, 0f), -90 * rotation * math.TORADIANS);
+                        float2 sideRightKey = baseKey + Math.Rotate90Float2(new float2(0.5f, 0.5f), rotation);
+                        float2 sideLeftKey = baseKey + Math.Rotate90Float2(new float2(-0.5f, 0.5f), rotation);
+                        
+                        AddPosition(sideRight, forwardDir, chunkIndex, new int3((int)sideRightKey.x, (int)sideRightKey.y, (rotation - rotationOffset) % 4));
+                        AddPosition(sideLeft, forwardDir, chunkIndex, new int3((int)sideLeftKey.x, (int)sideLeftKey.y, (rotation - rotationOffset) % 4));
+                        break;
+                }
+            } 
+            
+            return entityIndexes;
+            
+            void AddPosition(Vector2 offset, Vector2 dir, ChunkIndex chunkIndex, int3 index)
+            {
+                if (occupiedTargetMeshChunkIndex.Contains(index))
+                {
+                    return;
+                }
+                
+                Vector2 pivotOffset = -dir * 0.125f;
+                entityIndexes.Add(new TargetEntityIndex
+                {
+                    ChunkIndex = chunkIndex,
+                    Offset = (offset + pivotOffset).ToXyZ(0),
+                    Direction = dir
+                });
+                
+                occupiedTargetMeshChunkIndex.Add(index);
+            }
+        }
+        
+        public static List<TargetEntityIndex> GetFullChunkEntityIndexes(List<ChunkIndex> chunkIndexes, Vector3 chunkScale, Vector3 offset = default)
+        {
+            Dictionary<int3, List<ChunkIndex>> chunkIndexLookup = new Dictionary<int3, List<ChunkIndex>>();
+            List<TargetEntityIndex> entityIndexes = new List<TargetEntityIndex>();
+            foreach (ChunkIndex chunkIndex in chunkIndexes)
+            {
+                if (chunkIndexLookup.TryGetValue(chunkIndex.Index, out List<ChunkIndex> list))
+                {
+                    if (list.Count < 3)
+                    {
+                        list.Add(chunkIndex);
+                        continue;
+                    }
+
+                    chunkIndexLookup.Remove(chunkIndex.Index);
+                    entityIndexes.Add(new TargetEntityIndex
+                    {
+                        ChunkIndex = new ChunkIndex(chunkIndex.Index, new int3()),
+                        Offset = offset + chunkScale.XyZ(0) / 2.0f,
+                        Direction = Vector2.up
+                    });
+                }
+                else
+                {
+                    chunkIndexLookup.Add(chunkIndex.Index, new List<ChunkIndex>(4) { chunkIndex });
+                }
+            }
+            
+            return entityIndexes;
+        }
+    }
+
+    public struct TargetEntityIndex
+    {
+        public ChunkIndex ChunkIndex;
+        public Vector3 Offset;
+        public Vector2 Direction;
     }
 }

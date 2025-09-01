@@ -355,7 +355,8 @@ namespace WaveFunctionCollapse
             IsGenerating = true;
             Stopwatch watch = Stopwatch.StartNew();
             int frameCount = 0;
-            while (chunksToCollapse.Any(x => !x.AllCollapsed))
+
+            while (!IsAllCollapsed())
             {
                 watch.Start();
                 ChunkIndex? index = waveFunction.GetLowestEntropyIndex(chunksToCollapse);
@@ -392,6 +393,19 @@ namespace WaveFunctionCollapse
 
             IsGenerating = false;
             OnFinishedGenerating?.Invoke();
+
+            bool IsAllCollapsed()
+            {
+                foreach (QueryChunk x in chunksToCollapse)
+                {
+                    if (!x.AllCollapsed && !x.IsClear)
+                    {
+                        return false;
+                    }
+                }
+                
+                return true;
+            } 
         }
         
         #region Query & Place

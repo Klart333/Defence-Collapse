@@ -55,6 +55,9 @@ namespace Buildings.District
         private float attackAngle = 360;
         
         [SerializeField, ShowIf(nameof(requireTargeting))]
+        private bool useMeshBasedPlacement = true;
+        
+        [SerializeField, ShowIf(nameof(requireTargeting))]
         private bool useTargetMesh;
 
         [SerializeField, ShowIf(nameof(useTargetMesh))]
@@ -75,6 +78,7 @@ namespace Buildings.District
         [OdinSerialize]
         private List<IEffect> endWaveEffects = new List<IEffect>();
 
+        public bool UseMeshBasedPlacement => useMeshBasedPlacement;
         public string DistrictName => districtNameReference.Value;
         public string Description => descriptionReference.Value;
         public List<IEffect> EndWaveEffects => endWaveEffects;

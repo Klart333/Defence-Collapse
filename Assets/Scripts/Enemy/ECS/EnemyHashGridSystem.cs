@@ -1,3 +1,4 @@
+using Effects.LittleDudes;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -5,11 +6,11 @@ using Unity.Entities;
 using Unity.Burst;
 using Effects.ECS;
 using System;
-using Effects.LittleDudes;
 
 namespace Enemy.ECS
 {
-    [BurstCompile, UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(DeathSystem))]
+    [BurstCompile, UpdateInGroup(typeof(SimulationSystemGroup)), 
+     UpdateAfter(typeof(SpawnerSystem)), UpdateAfter(typeof(DeathSystem))]
     public partial struct EnemyHashGridSystem : ISystem
     {
         [BurstCompile]
@@ -26,7 +27,7 @@ namespace Enemy.ECS
         {
             int enemyCount = SystemAPI.GetSingletonRW<WaveStateComponent>().ValueRO.EnemyCount;
             RefRW<SpatialHashMapSingleton> mapSingleton = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>();
-            mapSingleton.ValueRW.Value = new NativeParallelMultiHashMap<int2, Entity>((int)(enemyCount * 2.5f) + 20, state.WorldUpdateAllocator); // Double for loadfactor stuff
+            mapSingleton.ValueRW.Value = new NativeParallelMultiHashMap<int2, Entity>((int)(enemyCount * 2.5f) + 100, state.WorldUpdateAllocator); // Double for loadfactor stuff
             if (enemyCount == 0)
             {
                 return;
@@ -35,10 +36,9 @@ namespace Enemy.ECS
             state.Dependency = new BuildEnemyHashGridJob
             {
                 SpatialGrid = mapSingleton.ValueRW.Value.AsParallelWriter(),
-                //CellSize = 1,
             }.ScheduleParallel(state.Dependency);
             
-            //state.Dependency.Complete();
+            state.Dependency.Complete();
         }
 
         [BurstCompile]

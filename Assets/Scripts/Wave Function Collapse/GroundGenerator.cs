@@ -1,20 +1,11 @@
-using MeshCollider = Unity.Physics.MeshCollider;
-using Material = Unity.Physics.Material;
-using Collider = Unity.Physics.Collider;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
-using UnityEngine.Assertions;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
 using Unity.Mathematics;
-using Unity.Collections;
-using Unity.Transforms;
-using Unity.Entities;
-using Unity.Physics;
 using UnityEngine;
 using System;
-using Chunks;
 using Enemy;
 
 namespace WaveFunctionCollapse
@@ -33,6 +24,9 @@ namespace WaveFunctionCollapse
         
         [SerializeField]
         private PrototypeInfoData defaultPrototypeInfoData;
+
+        [SerializeField]
+        private int maximumSize = 1;
         
         [Title("Settings")]
         [SerializeField]
@@ -46,10 +40,6 @@ namespace WaveFunctionCollapse
 
         [SerializeField]
         private bool shouldCombine = true;
-
-        [Title("References")]
-        [SerializeField]
-        private ChunkMaskHandler chunkMaskHandler;
 
         [Title("Enemy Spawning")]
         [SerializeField]
@@ -73,18 +63,16 @@ namespace WaveFunctionCollapse
         private bool compilePrototypeMeshes = true;
         
         private readonly Dictionary<int3, GameObject> spawnedChunks = new Dictionary<int3, GameObject>();
-        private readonly Dictionary<int3, Entity> spawnedChunkColliders = new Dictionary<int3, Entity>();
         private readonly HashSet<int3> generatedChunks = new HashSet<int3>();
-
-        private NativeList<BlobAssetReference<Collider>> spawnedColliders;
         
-        private EntityManager entityManager;
+        private MeshCombiner meshCombiner;
 
         public bool IsGenerating { get; private set; }
-        public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
-        public PrototypeInfoData DefaultPrototypeInfoData => defaultPrototypeInfoData;
+        
         public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.CellSize.x, chunkSize.y * ChunkWaveFunction.CellSize.y, chunkSize.z * ChunkWaveFunction.CellSize.z);
+        public PrototypeInfoData DefaultPrototypeInfoData => defaultPrototypeInfoData;
         public int3 ChunkSize => new int3(chunkSize.x, chunkSize.y, chunkSize.z);
+        public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
         
 #if UNITY_EDITOR
         private async UniTaskVoid Start()
@@ -100,48 +88,45 @@ namespace WaveFunctionCollapse
         private void Start()
         {
 #endif
-            spawnedColliders = new NativeList<BlobAssetReference<Collider>>(Allocator.Persistent);
-            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            meshCombiner = GetComponent<MeshCombiner>();
 
-            if (!waveFunction.Load(this))
-            {
-                return;
-            }
+            if (!waveFunction.Load(this)) return;
             waveFunction.ParentTransform = transform;
-            
-            Chunk chunk = waveFunction.LoadChunk(transform.position, chunkSize, defaultPrototypeInfoData, false);
-            //SetCrystalInCenter(chunk);
-            
-            if (shouldRun)
-                LoadChunk(chunk).Forget();
+
+            if (shouldRun) SetupGround().Forget();
         }
 
-        private void OnDisable()
+        private async UniTaskVoid SetupGround()
         {
-            if (spawnedColliders.IsCreated)
-            {
-                foreach (BlobAssetReference<Collider> spawnedCollider in spawnedColliders)
-                {
-                    if (spawnedCollider.IsCreated)
-                    {
-                        spawnedCollider.Dispose();
-                    }
-                }
+            await PreGenerate();
             
-                spawnedColliders.Dispose();
+            LoadChunk(waveFunction.Chunks[new int3(0, 0, 0)]).Forget();
+        }
+
+        public async UniTask PreGenerate()
+        {
+            for (int x = -maximumSize; x <= maximumSize; x++)
+            for (int z = -maximumSize; z <= maximumSize; z++)
+            {
+                int3 chunkIndex = new int3(x, 0, z);
+                if (waveFunction.Chunks.ContainsKey(chunkIndex)) continue;
+                
+                waveFunction.LoadChunk(chunkIndex, chunkSize, defaultPrototypeInfoData, false);
             }
-           
+            
+            waveFunction.Propagate();
+            
+            await Run(waveFunction.AllCollapsed, () => waveFunction.Iterate(false));
         }
 
         public async UniTaskVoid LoadChunk(Chunk chunk)
         {
             IsGenerating = true;
-            if (chunkMaskHandler.isActiveAndEnabled) chunkMaskHandler.RemoveMask(chunk);
             
-            await LoadAdjacentChunks(chunk);
+            await DisplayAdjacentChunks(chunk);
 
             waveFunction.Propagate();
-            await Run(chunk);
+            await Run(() => chunk.AllCollapsed, () => Iterate(chunk, false));
 
             if (shouldCombine)
             {
@@ -200,24 +185,17 @@ namespace WaveFunctionCollapse
                 
                 spawnedChunks[chunk.ChunkIndex].SetActive(false);
                 spawnedChunks.Remove(chunk.ChunkIndex);
-
-                if (spawnedChunkColliders.ContainsKey(chunk.ChunkIndex))
-                {
-                    entityManager.DestroyEntity(spawnedChunkColliders[chunk.ChunkIndex]);
-                    spawnedChunkColliders.Remove(chunk.ChunkIndex);   
-                }
             }
         }
 
-        private async Task Run(Chunk chunk)
+        private async Task Run(Func<bool> AllCollapsed, Action Iterate)
         {
             Stopwatch watch = Stopwatch.StartNew();
             int frameCount = 0;
-            while (!chunk.AllCollapsed)
+            while (!AllCollapsed())
             {
                 watch.Start();
-                ChunkIndex index = waveFunction.Iterate(chunk);
-                OnCellCollapsed?.Invoke(index);
+                Iterate.Invoke();
                 watch.Stop();
                 
                 if (awaitEveryFrame > 0 && ++frameCount % awaitEveryFrame == 0)
@@ -234,63 +212,51 @@ namespace WaveFunctionCollapse
             }
         }
         
-        private async Task Run(List<ChunkIndex> cells)
+        public ChunkIndex Iterate(Chunk chunk, bool shouldSpawn)
         {
-            Stopwatch watch = Stopwatch.StartNew();
-            int frameCount = 0;
-            while (!cells.TrueForAll((x) => ChunkWaveFunction[x].Collapsed))
-            {
-                watch.Start();
-                ChunkIndex index = waveFunction.Iterate(cells);
-                OnCellCollapsed?.Invoke(index);
-                watch.Stop();
-                
-                if (awaitEveryFrame > 0 && ++frameCount % awaitEveryFrame == 0)
-                {
-                    frameCount = 0;
-                    await UniTask.Delay(awaitTimeMs);
-                }
-                
-                if (watch.ElapsedMilliseconds < maxMillisecondsPerFrame) continue;
+            ChunkIndex index = waveFunction.GetLowestEntropyIndex(chunk);
+            PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index]);
+            waveFunction.SetCell(index, chosenPrototype, shouldSpawn);
 
-                await UniTask.NextFrame();
-
-                watch.Restart();
-            }
+            waveFunction.Propagate();
+            return index;
         }
+        
+        public ChunkIndex Iterate(List<ChunkIndex> cells, bool shouldSpawn)
+        {
+            ChunkIndex index = waveFunction.GetLowestEntropyIndex(cells);
+            PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index]);
+            waveFunction.SetCell(index, chosenPrototype, shouldSpawn);
 
-        private async UniTask LoadAdjacentChunks(Chunk chunk)
+            waveFunction.Propagate();
+            return index;
+        }
+        
+        private async UniTask DisplayAdjacentChunks(Chunk chunk)
         {
             List<Chunk> adjacentChunks = new List<Chunk>();
             List<Direction> directions = new List<Direction>();
             for (int x = -1; x <= 1; x++)
             for (int z = -1; z <= 1; z++)
             {
-                if (x == 0 && z == 0 || x != 0 && z != 0)
-                {
-                    continue;
-                }
+                if (x == 0 && z == 0 || x != 0 && z != 0) continue;
                 
                 int3 chunkIndex = new int3(chunk.ChunkIndex.x + x, 0, chunk.ChunkIndex.z + z);
-                if (waveFunction.Chunks.ContainsKey(chunkIndex))
-                {
-                    continue;
-                }
+                if (waveFunction.Chunks.ContainsKey(chunkIndex)) continue;
                 
                 Chunk adjacent = waveFunction.LoadChunk(chunkIndex, chunkSize, defaultPrototypeInfoData, false);
-                if (chunkMaskHandler.isActiveAndEnabled) chunkMaskHandler.CreateMask(adjacent, Utility.Math.IntToAdjacency(new int2(-x, -z)));
+                Direction dir = DirectionUtility.Int2ToDirection(new int2(-x, -z));
                 adjacentChunks.Add(adjacent);
-                directions.Add(DirectionUtility.Int2ToDirection(new int2(-x, -z)));
+                directions.Add(dir);
             }
 
             SetSpawnPoints();
 
-            waveFunction.Propagate();
             for (int i = 0; i < adjacentChunks.Count; i++)
             {
                 List<ChunkIndex> cells = GetSideIndexes(adjacentChunks[i], directions[i]);
                 
-                await Run(cells);
+                await Run(() => adjacentChunks[i].AllCollapsed, () => Iterate(adjacentChunks[i], true));
                 Events.OnGroundChunkGenerated?.Invoke(adjacentChunks[i]);
                 if (shouldCombine)
                 {
@@ -301,12 +267,14 @@ namespace WaveFunctionCollapse
             void SetSpawnPoints()
             {
                 int spawned = 0;
-                int chunkCount = adjacentChunks.Count;
-                for (int i = 0; i < chunkCount; i++)
+                int count = adjacentChunks.Count;
+                for (int i = 0; i < count; i++)
                 {
+                    if (directions[i] == Direction.None) continue;
+
                     int3 chunkIndex = adjacentChunks[i].ChunkIndex;
                     if (!enemySpawnHandler.ShouldSetSpawnPoint(chunkIndex, out int difficulty)
-                        && !enemySpawnHandler.ShouldForceSpawnPoint(i, chunkCount - 1, spawned, difficulty)) continue;
+                        && !enemySpawnHandler.ShouldForceSpawnPoint(i, count - 1, spawned, difficulty)) continue;
                 
                     if (enemySpawnHandler.GetMaxSpawns(difficulty) <= spawned) break;
                     
@@ -318,26 +286,26 @@ namespace WaveFunctionCollapse
 
         private List<ChunkIndex> GetSideIndexes(Chunk chunk, Direction direction)
         {
+            if (direction == Direction.None) return new List<ChunkIndex>();
+            
             List<ChunkIndex> cells = new();
             int length = chunk.Width;
 
             for (int i = 0; i < length; i++)
             {
-                (int3 a, int3 b) = direction switch
+                int3 adjacent = direction switch
                 {
-                    Direction.Right    => (new int3(length - 1, 0, i),          new int3(length - 2, 0, i)),
-                    Direction.Left     => (new int3(0,          0, i),          new int3(1,          0, i)),
-                    Direction.Forward  => (new int3(i,          0, length - 1), new int3(i,          0, length - 2)),
-                    Direction.Backward => (new int3(i,          0, 0),          new int3(i,          0, 1)),
+                    Direction.Right    => new int3(length - 1, 0, i         ),          
+                    Direction.Left     => new int3(0,          0, i         ),          
+                    Direction.Forward  => new int3(i,          0, length - 1),
+                    Direction.Backward => new int3(i,          0, 0         ),          
                     _ => default
                 };
                 
-                cells.Add(new ChunkIndex(chunk.ChunkIndex, a));
-                //cells.Add(new ChunkIndex(chunk.ChunkIndex, b));
+                cells.Add(new ChunkIndex(chunk.ChunkIndex, adjacent));
             }
 
             return cells;
-
         }
 
         private void SetEnemySpawn(Chunk chunk, Direction direction, int difficulty)
@@ -373,71 +341,11 @@ namespace WaveFunctionCollapse
                 : (chunk.Cells[Mathf.FloorToInt(middle), 0, edge].Position + chunk.Cells[Mathf.CeilToInt(middle), 0, edge].Position) / 2.0f;
             enemySpawnHandler.SetEnemySpawn(pos - (Vector3)DirectionUtility.DirectionToInt2(direction).XyZ(0.0f), chunk.ChunkIndex, difficulty);
         }
-
-        private void SetCrystalInCenter(Chunk chunk)
-        {
-            float middle = (chunk.Depth - 1) / 2.0f;
-            int start = Mathf.FloorToInt(middle);
-            int end = Mathf.CeilToInt(middle);
-            Assert.AreNotEqual(start, end);
-
-            int index = 0;
-            for (int x = start; x <= end; x++)
-            {
-                for (int z = start; z <= end; z++)
-                {
-                    List<PrototypeData> prots = new List<PrototypeData>
-                    {
-                        defaultPrototypeInfoData.Prototypes[crystalCornerIndexes[index++]]
-                    };
-                    
-                    chunk.Cells[x, 0, z] = new Cell(false, chunk.Cells[x, 0, z].Position, prots);
-                    ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
-                    waveFunction.CellStack.Push(chunkIndex);
-                }
-            }    
-        }
         
         private void CombineMeshes(int3 chunkIndex, Transform chunkParent)
         {
-            Mesh mesh = GetComponent<MeshCombiner>().CombineMeshes(chunkParent, out GameObject spawnedMesh);
+            meshCombiner.CombineMeshes(chunkParent, out GameObject spawnedMesh);
             spawnedChunks.Add(chunkIndex, spawnedMesh);
-            return;
-            
-            BlobAssetReference<Collider> blobCollider = MeshCollider.Create(mesh, new CollisionFilter
-            {
-                BelongsTo = 6,
-                CollidesWith = 6,
-                GroupIndex = 0,
-            }, Material.Default);
-
-            ComponentType[] componentTypes = new ComponentType[4]
-            {
-                typeof(LocalTransform),
-                typeof(LocalToWorld),
-                typeof(PhysicsCollider),
-                typeof(PhysicsWorldIndex),
-            };
-
-            Entity entity = entityManager.CreateEntity(componentTypes);
-            entityManager.SetComponentData(entity, new LocalToWorld
-            {
-                Value = gameObject.transform.localToWorldMatrix,
-            });
-            entityManager.SetComponentData(entity, new LocalTransform()
-            {
-                Position = transform.localPosition,
-                Rotation = transform.localRotation,
-                Scale = transform.localScale.x,
-            });
-            entityManager.SetComponentData(entity, new PhysicsCollider
-            {
-                Value = blobCollider,
-            });
-            
-            spawnedChunkColliders.Add(chunkIndex, entity);
-            
-            spawnedColliders.Add(blobCollider);
         }
     }
 }

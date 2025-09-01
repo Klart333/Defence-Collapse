@@ -293,8 +293,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: fe1ed4a815104294f8efe94d0e694862, type: 3}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
-  requireTargeting: 0
+  requireTargeting: 1
   attackAngle: 360
-  useTargetMesh: 0
-  meshVariable: {fileID: 0}
+  useMeshBasedPlacement: 0
+  useTargetMesh: 1
+  meshVariable: {fileID: 11400000, guid: 7784ece2c0472d04f827b479b3a0d191, type: 2}
   categoryType: 4

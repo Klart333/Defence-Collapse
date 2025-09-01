@@ -5429,6 +5429,7 @@ MonoBehaviour:
   towerDataUtility: {fileID: 11400000, guid: 9c340b6d5c4971a428e173b6c297f638, type: 2}
   prototypeInfoUtility: {fileID: 11400000, guid: 219bf5d6961f4944c9987d3dcf4ebce3,
     type: 2}
+  IsDebug: 0
 --- !u!114 &491554923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9120,11 +9121,10 @@ MonoBehaviour:
   chunkSize: {x: 4, y: 1, z: 4}
   defaultPrototypeInfoData: {fileID: 11400000, guid: 58fb6f893a0db174cacd0d23f7e4cac6,
     type: 2}
-  awaitEveryFrame: 1
-  awaitTimeMs: 40
-  maxMillisecondsPerFrame: 0.5
+  awaitEveryFrame: 0
+  awaitTimeMs: 4
+  maxMillisecondsPerFrame: 3
   shouldCombine: 1
-  chunkMaskHandler: {fileID: 629965934}
   enemySpawnHandler: {fileID: 342113231}
   fullTreeIndex: 0
   enemyGateIndex: 1
@@ -18509,6 +18509,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 875902803780718147, guid: bf94ec1282f71a743a6e3bba34ff9eac,
         type: 3}
+      propertyPath: targetMeshes.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 875902803780718147, guid: bf94ec1282f71a743a6e3bba34ff9eac,
+        type: 3}
       propertyPath: serializationData.Prefab
       value: 
       objectReference: {fileID: 875902803780718147, guid: bf94ec1282f71a743a6e3bba34ff9eac,
@@ -18997,12 +19002,27 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2693905704635055206, guid: e0e11c4442e1463419be67ea519f48ca,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3685098767456390814, guid: e0e11c4442e1463419be67ea519f48ca,
         type: 3}
       propertyPath: serializationData.Prefab
       value: 
       objectReference: {fileID: 3685098767456390814, guid: e0e11c4442e1463419be67ea519f48ca,
         type: 3}
+    - target: {fileID: 5670838541089689450, guid: e0e11c4442e1463419be67ea519f48ca,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015518585925078289, guid: e0e11c4442e1463419be67ea519f48ca,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7593706095047939431, guid: e0e11c4442e1463419be67ea519f48ca,
         type: 3}
       propertyPath: m_LocalPosition.x

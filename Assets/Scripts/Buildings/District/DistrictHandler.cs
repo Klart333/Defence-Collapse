@@ -35,6 +35,8 @@ namespace Buildings.District
         [OdinSerialize, Sirenix.OdinInspector.ReadOnly]
         private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
 
+        public bool IsDebug;
+        
         private readonly Dictionary<int2, HashSet<District>> districtObjects = new Dictionary<int2, HashSet<District>>();
         private readonly Dictionary<int, DistrictData> uniqueDistricts = new Dictionary<int, DistrictData>();
         private readonly Dictionary<DistrictType, int> districtAmounts = new Dictionary<DistrictType, int>();
@@ -76,7 +78,7 @@ namespace Buildings.District
         /// <param name="chunk"></param>
         private void OnDistrictChunkRemoved(IChunk chunk)
         {
-            Debug.Log("OnDistrictChunkRemoved");
+            //Debug.Log("OnDistrictChunkRemoved");
             foreach (DistrictData districtData in uniqueDistricts.Values)
             {
                 if (districtData.OnDistrictChunkRemoved(chunk))
@@ -88,12 +90,11 @@ namespace Buildings.District
 
         private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
         {
-            Debug.Log("OnWallsDestroyed");
-
-            foreach (ChunkIndex chunkIndex in chunkIndexes)
-            {
-                //Debug.Log("Index: " + chunkIndex);
-            }
+            //Debug.Log("OnWallsDestroyed");
+            //foreach (ChunkIndex chunkIndex in chunkIndexes)
+            //{
+            //    Debug.Log("Index: " + chunkIndex);
+            //}
             districtGenerator.AddAction(async () => await districtGenerator.RemoveChunks(chunkIndexes));
         }
 

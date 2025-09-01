@@ -10,7 +10,8 @@ namespace WaveFunctionCollapse
         Up = 2,
         Down = 3,
         Forward = 4,
-        Backward = 5
+        Backward = 5,
+        None = 6
     }
 
     public static class DirectionUtility
@@ -31,7 +32,7 @@ namespace WaveFunctionCollapse
                 {x: -1, y: 0} => Direction.Left,
                 {x: 0, y: 1} => Direction.Forward,
                 {x: 0, y: -1} => Direction.Backward,
-                _ => throw new ArgumentOutOfRangeException(nameof(dir), dir, null)
+                _ => Direction.None
             };
         }
         
