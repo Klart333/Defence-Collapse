@@ -322,11 +322,6 @@ namespace Buildings
                 ToggleSpawnPlaces(false);
                 DisablePlaces();
                 buildingManager.RevertQuery();
-
-                if (!manualCancel)
-                {
-                    Events.OnBuildingCanceled?.Invoke();
-                }
             }
         }
 

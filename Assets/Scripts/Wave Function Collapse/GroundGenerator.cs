@@ -243,8 +243,6 @@ namespace WaveFunctionCollapse
         
         private void OnGroundAnimatorFinished()
         {
-            Debug.Log("OnGroundAnimatorFinished");
-
             groundAnimator.OnAnimationFinished -= OnGroundAnimatorFinished;
 
             if (shouldCombine)

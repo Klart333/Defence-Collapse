@@ -90,34 +90,23 @@ namespace WaveFunctionCollapse
             cellTransform.transform.localScale = Vector3.zero;
             
             builtQueue.Enqueue(Tuple.Create(cellTransform, targetScale));
-            /*cellTransform.OnReturnToPool += CellTransformOnReturnToPool;
-
-            void CellTransformOnReturnToPool(PooledMonoBehaviour obj)
-            {
-                cellTransform.transform.DOKill();
-                cellTransform.OnReturnToPool -= CellTransformOnReturnToPool;
-                builtQueue.Delete(handle);
-            }*/
         }
 
         private void AnimateGroundCell(Transform cellTransform, Vector3 targetScale)
         {
             cellTransform.transform.DOScale(targetScale, fallDuration/4.0f).SetEase(fallEase);
             
-            Vector3 position = cellTransform.transform.position;
+            Vector3 position = cellTransform.transform.position + Vector3.down * 0.1f;
             cellTransform.transform.position += Vector3.up * height;
             cellTransform.transform.DOMove(position, fallDuration).SetEase(fallEase);
         }
 
         private async UniTaskVoid DelayedComplete()
         {
-            Debug.Log("DelayedComplete");
-
             await UniTask.Delay(TimeSpan.FromSeconds(fallDuration));
 
             if (builtQueue.Count > 0)
             {
-                Debug.Log("Nvm");
                 return;
             }
             OnAnimationFinished?.Invoke();

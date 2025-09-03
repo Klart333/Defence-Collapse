@@ -13,10 +13,12 @@ public static class Events
     public static UnityAction<IEnumerable<ChunkIndex>> OnBuiltIndexBuilt;
     public static UnityAction<ICollection<IBuildable>> OnBuildingBuilt;
     public static UnityAction<BuildingType> OnBuildingClicked;
-    public static UnityAction OnBuildingCanceled; 
 
     public static UnityAction OnWaveStarted;
     public static UnityAction OnWaveEnded;
+    
+    public static UnityAction<int> OnTurnIncreased;
+    public static UnityAction OnTurnComplete;
 
     public static UnityAction<List<ChunkIndex>> OnWallsDestroyed;
     public static UnityAction<ChunkIndex> OnBuiltIndexDestroyed;
@@ -33,7 +35,7 @@ public static class Events
 
 public static class ECSEvents
 {
-    public static UnityAction<float3> OnLootSpawn; 
+    public static UnityAction<float3> OnLootSpawn; // TODO: Remove
 }
 
 public static class UIEvents

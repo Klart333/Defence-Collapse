@@ -1,3 +1,4 @@
+using System.Collections;
 using Random = UnityEngine.Random;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
@@ -34,6 +35,8 @@ namespace Chunks
         
         private Dictionary<int2, int> builtIndexesMap = new Dictionary<int2, int>();
 
+        private Coroutine growingTrees;
+
         private int2[] neighbours = new int2[4]
         {
             new int2(1, 0),
@@ -58,6 +61,11 @@ namespace Chunks
         {
             Cell cell = groundGenerator.ChunkWaveFunction[chunkIndex];
             if (!cell.PossiblePrototypes[0].MaterialIndexes.Contains(treeMaterialIndex)) return;
+
+            if (growingTrees != null)
+            {
+                StopCoroutine(growingTrees);
+            }
             
             TreeGrower spawned = treeGrowerPrefab.GetAtPosAndRot<TreeGrower>(cell.Position, Quaternion.identity);
             spawned.ChunkIndex = chunkIndex;
@@ -95,10 +103,10 @@ namespace Chunks
 
         private void OnGenerationFinished()
         {
-            GrowTrees().Forget();
+            growingTrees = StartCoroutine(GrowTrees());
         }
 
-        private async UniTaskVoid GrowTrees()
+        private IEnumerator GrowTrees()
         {
             List<int3> chunksGrown = new List<int3>();
             foreach (KeyValuePair<int3, List<TreeGrower>> kvp in treeGrowersByChunk)
@@ -121,11 +129,12 @@ namespace Chunks
                     
                     grower.GrowTrees(groupIndex).Forget();
                     grower.HasGrown = true;
-                    await UniTask.Yield();
+                    yield return null;
                 }
                 
             }
 
+            growingTrees = null;
             //DeallocateGrownChunks(chunksGrown);
         }
 
