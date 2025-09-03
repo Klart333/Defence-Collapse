@@ -2515,7 +2515,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c859f7da92220d47b203fcc22edf79f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkMaskHandler: {fileID: 629965934}
   groundGenerator: {fileID: 1024001993}
   treeGrowerPrefab: {fileID: 8308232050752938920, guid: f5248643b05c52c46bf24e412cec980a,
     type: 3}
@@ -6185,56 +6184,6 @@ MonoBehaviour:
   moneyAmount: {fileID: 2003639409}
   tweenDuration: 0.5
   easeType: 22
---- !u!1 &629965932
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 629965933}
-  - component: {fileID: 629965934}
-  m_Layer: 0
-  m_Name: ChunkMaskHandler
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &629965933
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 629965932}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1411626119}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &629965934
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 629965932}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 514cfb20c4544a43815e58d6220f29bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  groundGenerator: {fileID: 1024001993}
-  maskPrefab: {fileID: 1989031652695953518, guid: 1d6f09057ca45af49b970e6981333224,
-    type: 3}
-  fadeIn: 0.5
-  fadeOut: 0.5
-  distanceThreshold: 1.01
 --- !u!1 &635823759
 GameObject:
   m_ObjectHideFlags: 0
@@ -9121,14 +9070,12 @@ MonoBehaviour:
   chunkSize: {x: 4, y: 1, z: 4}
   defaultPrototypeInfoData: {fileID: 11400000, guid: 58fb6f893a0db174cacd0d23f7e4cac6,
     type: 2}
+  maximumSize: 3
   awaitEveryFrame: 0
-  awaitTimeMs: 4
-  maxMillisecondsPerFrame: 3
+  awaitTimeMs: 1
+  maxMillisecondsPerFrame: 12
   shouldCombine: 1
   enemySpawnHandler: {fileID: 342113231}
-  fullTreeIndex: 0
-  enemyGateIndex: 1
-  crystalCornerIndexes: 05000000060000000800000007000000
   shouldRun: 1
   compilePrototypeMeshes: 1
 --- !u!114 &1024001994
@@ -9144,8 +9091,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundGenerator: {fileID: 1024001993}
-  fallDuration: 1
-  fallEase: 7
+  defaultDelayMs: 0.016666668
+  queueSpeedCapacity: 20
+  height: 5
+  fallDuration: 0.9
+  fallEase: 4
 --- !u!1 &1033414324
 GameObject:
   m_ObjectHideFlags: 0
@@ -9298,7 +9248,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c859f7da92220d47b203fcc22edf79f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkMaskHandler: {fileID: 629965934}
   groundGenerator: {fileID: 1024001993}
   treeGrowerPrefab: {fileID: 8308232050752938920, guid: 5be1d375224d84e4f9bbd6cbbcf62b6e,
     type: 3}
@@ -10938,56 +10887,6 @@ MonoBehaviour:
     ConstantValue: {r: 0, g: 0, b: 0, a: 0}
     Variable: {fileID: 11400000, guid: 29a79831a54fdaf4bb6cc16234e853f0, type: 2}
     VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
---- !u!1 &1258049194
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1258049195}
-  - component: {fileID: 1258049196}
-  m_Layer: 0
-  m_Name: GrassHandler
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1258049195
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1258049194}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1411626119}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1258049196
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1258049194}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee9f77cab4ac4a4a95c583967adb4cbc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chunkMaskHandler: {fileID: 0}
-  groundGenerator: {fileID: 1024001993}
-  protoypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
-  grassGrowerPrefab: {fileID: 8098911415990273181, guid: ef0ce391c4f1a3844ac1409370dff2c5,
-    type: 3}
-  grassMaterialIndex: 0
 --- !u!1 &1262601025
 GameObject:
   m_ObjectHideFlags: 0
@@ -12253,7 +12152,6 @@ Transform:
   - {fileID: 191278484}
   - {fileID: 1079521738}
   - {fileID: 1115667078}
-  - {fileID: 629965933}
   - {fileID: 342113230}
   - {fileID: 1786098203}
   - {fileID: 266661675}
@@ -12263,7 +12161,6 @@ Transform:
   - {fileID: 1721988427}
   - {fileID: 1149199777}
   - {fileID: 1306756418}
-  - {fileID: 1258049195}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1416224650

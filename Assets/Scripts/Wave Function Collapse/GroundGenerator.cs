@@ -7,6 +7,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using System;
 using Enemy;
+using Debug = UnityEngine.Debug;
 
 namespace WaveFunctionCollapse
 {
@@ -14,11 +15,12 @@ namespace WaveFunctionCollapse
     {
         public event Action<Chunk> OnChunkGenerated;
         public event Action<ChunkIndex> OnCellCollapsed;
+        public event Action OnGenerationFinished;
 
         [Title("Wave Function")]
         [SerializeField]
         private ChunkWaveFunction<Chunk> waveFunction;
-
+        
         [SerializeField]
         private Vector3Int chunkSize;
         
@@ -45,16 +47,6 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private EnemySpawnHandler enemySpawnHandler; 
         
-        [SerializeField]
-        private int fullTreeIndex = 1;
-        
-        [SerializeField]
-        private int enemyGateIndex = 1;
-
-        [Title("Crystal")]
-        [SerializeField]
-        private int[] crystalCornerIndexes;
-        
         [Title("Debug")]
         [SerializeField]
         private bool shouldRun = true;
@@ -66,11 +58,11 @@ namespace WaveFunctionCollapse
         private readonly HashSet<int3> generatedChunks = new HashSet<int3>();
         
         private MeshCombiner meshCombiner;
+        private GroundAnimator groundAnimator;
 
         public bool IsGenerating { get; private set; }
         
         public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.CellSize.x, chunkSize.y * ChunkWaveFunction.CellSize.y, chunkSize.z * ChunkWaveFunction.CellSize.z);
-        public PrototypeInfoData DefaultPrototypeInfoData => defaultPrototypeInfoData;
         public int3 ChunkSize => new int3(chunkSize.x, chunkSize.y, chunkSize.z);
         public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
         
@@ -89,7 +81,8 @@ namespace WaveFunctionCollapse
         {
 #endif
             meshCombiner = GetComponent<MeshCombiner>();
-
+            groundAnimator = GetComponent<GroundAnimator>();
+            
             if (!waveFunction.Load(this)) return;
             waveFunction.ParentTransform = transform;
 
@@ -98,13 +91,18 @@ namespace WaveFunctionCollapse
 
         private async UniTaskVoid SetupGround()
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             await PreGenerate();
+            stopwatch.Stop();
+            Debug.Log("Generated In: " + stopwatch.Elapsed.TotalMilliseconds + "ms");
             
-            LoadChunk(waveFunction.Chunks[new int3(0, 0, 0)]).Forget();
+            LoadChunk(new int3(0, 0, 0));
         }
 
-        public async UniTask PreGenerate()
+        private async UniTask PreGenerate()
         {
+            IsGenerating = true;
+            
             for (int x = -maximumSize; x <= maximumSize; x++)
             for (int z = -maximumSize; z <= maximumSize; z++)
             {
@@ -115,88 +113,28 @@ namespace WaveFunctionCollapse
             }
             
             waveFunction.Propagate();
-            
-            await Run(waveFunction.AllCollapsed, () => waveFunction.Iterate(false));
-        }
 
-        public async UniTaskVoid LoadChunk(Chunk chunk)
-        {
-            IsGenerating = true;
-            
-            await DisplayAdjacentChunks(chunk);
-
-            waveFunction.Propagate();
-            await Run(() => chunk.AllCollapsed, () => Iterate(chunk, false));
-
-            if (shouldCombine)
+            int cellCount = 0;
+            foreach (Chunk chunk in waveFunction.Chunks.Values)
             {
-                CombineChunk(chunk, false).Forget();
+                cellCount += chunk.Width * chunk.Height * chunk.Depth;
             }
-
-            OnChunkGenerated?.Invoke(chunk);
-            generatedChunks.Add(chunk.ChunkIndex);
-            RemoveUnreferencedChunks();
+            await Run(cellCount, () => waveFunction.Iterate(false));
 
             IsGenerating = false;
         }
-
-        private void RemoveUnreferencedChunks()
-        {
-            List<int3> unreferencedChunks = new List<int3>();
-            foreach (KeyValuePair<int3, Chunk> kvp in ChunkWaveFunction.Chunks)
-            {
-                if (!generatedChunks.Contains(kvp.Key)) continue;
-                bool valid = true;
-                for (int i = 0; valid && i < WaveFunctionUtility.NeighbourDirections.Length; i++)
-                {
-                    int3 index = new int3(kvp.Key.x + WaveFunctionUtility.NeighbourDirections[i].x, 0, kvp.Key.z + WaveFunctionUtility.NeighbourDirections[i].y);
-                    if (!generatedChunks.Contains(index))
-                    {
-                        valid = false;
-                    }
-                }
-
-                if (valid)
-                {
-                    unreferencedChunks.Add(kvp.Key);
-                }
-            }
-
-            for (int i = 0; i < unreferencedChunks.Count; i++)
-            {
-                ChunkWaveFunction.RemoveChunk(unreferencedChunks[i], out _);
-            }
-        }
-
-        private async UniTaskVoid CombineChunk(Chunk chunk, bool subToEvent = true)
-        {
-            await UniTask.Delay(1000);
-            CombineMeshes(chunk.ChunkIndex, ChunkWaveFunction.ChunkParents[chunk.ChunkIndex]);
-            chunk.ClearSpawnedMeshes(waveFunction.GameObjectPool);
-
-            if (subToEvent)
-            {
-                chunk.OnCleared += ChunkOnOnCleared;
-            }
-
-            void ChunkOnOnCleared()
-            {
-                chunk.OnCleared -= ChunkOnOnCleared;
-                
-                spawnedChunks[chunk.ChunkIndex].SetActive(false);
-                spawnedChunks.Remove(chunk.ChunkIndex);
-            }
-        }
-
-        private async Task Run(Func<bool> AllCollapsed, Action Iterate)
+        
+        private async Task Run(int cellCountToCollapse, Action Iterate)
         {
             Stopwatch watch = Stopwatch.StartNew();
             int frameCount = 0;
-            while (!AllCollapsed())
+            int collapseCount = 0;
+            while (collapseCount < cellCountToCollapse)
             {
                 watch.Start();
                 Iterate.Invoke();
                 watch.Stop();
+                collapseCount++;
                 
                 if (awaitEveryFrame > 0 && ++frameCount % awaitEveryFrame == 0)
                 {
@@ -211,28 +149,50 @@ namespace WaveFunctionCollapse
                 watch.Restart();
             }
         }
-        
-        public ChunkIndex Iterate(Chunk chunk, bool shouldSpawn)
-        {
-            ChunkIndex index = waveFunction.GetLowestEntropyIndex(chunk);
-            PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index]);
-            waveFunction.SetCell(index, chosenPrototype, shouldSpawn);
 
-            waveFunction.Propagate();
-            return index;
+        public void LoadChunk(int3 chunkIndex)
+        {
+            IsGenerating = true;
+            Chunk chunk = waveFunction.Chunks[chunkIndex];
+
+            if (spawnedChunks.ContainsKey(chunkIndex))
+            {
+                chunk.InvokeOnCleared();
+            }
+            
+            DisplayAdjacentChunks(chunk);
+            DisplayChunk(chunk);
+
+            groundAnimator.OnAnimationFinished += OnGroundAnimatorFinished;
+
+            OnChunkGenerated?.Invoke(chunk);
+            generatedChunks.Add(chunk.ChunkIndex);
+            //RemoveUnreferencedChunks();
+        }
+
+        private void DisplayChunk(Chunk chunk)
+        {
+            List<ChunkIndex> cells = new List<ChunkIndex>();
+            for (int x = 0; x < chunk.Width; x++)
+            for (int y = 0; y < chunk.Height; y++)
+            for (int z = 0; z < chunk.Depth; z++)
+            {
+                cells.Add(new ChunkIndex(chunk.ChunkIndex, new int3(x, y, z)));
+            }
+            
+            DisplayCells(cells);
         }
         
-        public ChunkIndex Iterate(List<ChunkIndex> cells, bool shouldSpawn)
+        private void DisplayCells(IEnumerable<ChunkIndex> cells)
         {
-            ChunkIndex index = waveFunction.GetLowestEntropyIndex(cells);
-            PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index]);
-            waveFunction.SetCell(index, chosenPrototype, shouldSpawn);
-
-            waveFunction.Propagate();
-            return index;
+            foreach (ChunkIndex chunkIndex in cells)
+            {
+                waveFunction.SetCell(chunkIndex, waveFunction[chunkIndex].PossiblePrototypes[0]);
+                OnCellCollapsed?.Invoke(chunkIndex);
+            }
         }
         
-        private async UniTask DisplayAdjacentChunks(Chunk chunk)
+        private void DisplayAdjacentChunks(Chunk chunk)
         {
             List<Chunk> adjacentChunks = new List<Chunk>();
             List<Direction> directions = new List<Direction>();
@@ -242,52 +202,25 @@ namespace WaveFunctionCollapse
                 if (x == 0 && z == 0 || x != 0 && z != 0) continue;
                 
                 int3 chunkIndex = new int3(chunk.ChunkIndex.x + x, 0, chunk.ChunkIndex.z + z);
-                if (waveFunction.Chunks.ContainsKey(chunkIndex)) continue;
-                
-                Chunk adjacent = waveFunction.LoadChunk(chunkIndex, chunkSize, defaultPrototypeInfoData, false);
+                if (spawnedChunks.ContainsKey(chunkIndex) || !waveFunction.Chunks.TryGetValue(chunkIndex, out Chunk adjacent)) continue;
+                // If spawnedChunks contains could add a new enemy direction
                 Direction dir = DirectionUtility.Int2ToDirection(new int2(-x, -z));
                 adjacentChunks.Add(adjacent);
                 directions.Add(dir);
             }
-
-            SetSpawnPoints();
-
+            
             for (int i = 0; i < adjacentChunks.Count; i++)
             {
                 List<ChunkIndex> cells = GetSideIndexes(adjacentChunks[i], directions[i]);
                 
-                await Run(() => adjacentChunks[i].AllCollapsed, () => Iterate(adjacentChunks[i], true));
+                DisplayCells(cells);
+                generatedChunks.Add(adjacentChunks[i].ChunkIndex);
                 Events.OnGroundChunkGenerated?.Invoke(adjacentChunks[i]);
-                if (shouldCombine)
-                {
-                    CombineChunk(adjacentChunks[i]).Forget();
-                }
-            }
-
-            void SetSpawnPoints()
-            {
-                int spawned = 0;
-                int count = adjacentChunks.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    if (directions[i] == Direction.None) continue;
-
-                    int3 chunkIndex = adjacentChunks[i].ChunkIndex;
-                    if (!enemySpawnHandler.ShouldSetSpawnPoint(chunkIndex, out int difficulty)
-                        && !enemySpawnHandler.ShouldForceSpawnPoint(i, count - 1, spawned, difficulty)) continue;
-                
-                    if (enemySpawnHandler.GetMaxSpawns(difficulty) <= spawned) break;
-                    
-                    spawned++;  
-                    SetEnemySpawn(adjacentChunks[i], directions[i], difficulty);
-                }
             }
         }
 
         private List<ChunkIndex> GetSideIndexes(Chunk chunk, Direction direction)
         {
-            if (direction == Direction.None) return new List<ChunkIndex>();
-            
             List<ChunkIndex> cells = new();
             int length = chunk.Width;
 
@@ -307,39 +240,43 @@ namespace WaveFunctionCollapse
 
             return cells;
         }
-
-        private void SetEnemySpawn(Chunk chunk, Direction direction, int difficulty)
+        
+        private void OnGroundAnimatorFinished()
         {
-            float middle = (chunk.Depth - 1) / 2.0f;
+            Debug.Log("OnGroundAnimatorFinished");
 
-            bool isHorizontal = direction is Direction.Right or Direction.Left;
-            int edge = isHorizontal 
-                ? direction == Direction.Right ? chunk.Width - 1 : 0
-                : direction == Direction.Forward ? chunk.Depth - 1 : 0;
+            groundAnimator.OnAnimationFinished -= OnGroundAnimatorFinished;
 
-            int end = isHorizontal ? chunk.Depth : chunk.Width;
-            for (int i = 1; i < end - 1; i++)
+            if (shouldCombine)
             {
-                int x = isHorizontal ? edge : i;
-                int z = isHorizontal ? i : edge;
-
-                List<PrototypeData> prots = new List<PrototypeData>
+                foreach (int3 chunkIndex in generatedChunks)
                 {
-                    defaultPrototypeInfoData.Prototypes[isHorizontal 
-                        ? enemyGateIndex + 1 + (i - 1) * 2
-                        : enemyGateIndex + 2 - (i - 1) * 2
-                    ]
-                };
-
-                chunk.Cells[x, 0, z] = new Cell(false, chunk.Cells[x, 0, z].Position, prots);
-                ChunkIndex index = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
-                waveFunction.CellStack.Push(index);
+                    if (spawnedChunks.ContainsKey(chunkIndex))
+                    {
+                        continue;
+                    }
+                    
+                    CombineChunk(waveFunction.Chunks[chunkIndex]);
+                }
             }
-
-            Vector3 pos = isHorizontal
-                ? (chunk.Cells[edge, 0, Mathf.FloorToInt(middle)].Position + chunk.Cells[edge, 0, Mathf.CeilToInt(middle)].Position) / 2.0f
-                : (chunk.Cells[Mathf.FloorToInt(middle), 0, edge].Position + chunk.Cells[Mathf.CeilToInt(middle), 0, edge].Position) / 2.0f;
-            enemySpawnHandler.SetEnemySpawn(pos - (Vector3)DirectionUtility.DirectionToInt2(direction).XyZ(0.0f), chunk.ChunkIndex, difficulty);
+            
+            IsGenerating = false;
+            OnGenerationFinished?.Invoke();
+        }
+        
+        private void CombineChunk(Chunk chunk)
+        {
+            CombineMeshes(chunk.ChunkIndex, ChunkWaveFunction.ChunkParents[chunk.ChunkIndex]);
+            chunk.ClearSpawnedMeshes(waveFunction.GameObjectPool);
+            chunk.OnCleared += ChunkOnOnCleared;
+            
+            void ChunkOnOnCleared()
+            {
+                chunk.OnCleared -= ChunkOnOnCleared;
+                
+                spawnedChunks[chunk.ChunkIndex].SetActive(false);
+                spawnedChunks.Remove(chunk.ChunkIndex);
+            }
         }
         
         private void CombineMeshes(int3 chunkIndex, Transform chunkParent)

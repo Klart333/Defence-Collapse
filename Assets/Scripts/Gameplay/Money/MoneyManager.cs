@@ -141,7 +141,7 @@ namespace Gameplay.Money
         #region Debug
 
         [Button]
-        private void AddMoneyDebug(float money = 1000)
+        private void AddMoneyDebug(float money = 100000)
         {
             AddMoney(money);
         }

@@ -92,9 +92,7 @@ namespace Chunks
 
         public void UnlockChunk(Chunk chunk)
         {
-            groundGenerator.ChunkWaveFunction.RemoveChunk(chunk.ChunkIndex, out _);
-            Chunk newChunk = groundGenerator.ChunkWaveFunction.LoadChunk(chunk.ChunkIndex, chunk.ChunkSize, groundGenerator.DefaultPrototypeInfoData, false);
-            groundGenerator.LoadChunk(newChunk).Forget();
+            groundGenerator.LoadChunk(chunk.ChunkIndex);
             Cost *= chunkCostIncrease;
 
             foreach (ChunkUnlocker unlocker in unlockers.Values)

@@ -55,21 +55,6 @@ namespace Utility
 
             return Vector3.zero;
         }
-
-        public static Adjacencies IntToAdjacency(int2 value)
-        {
-            return value.x switch
-            {
-                1 => Adjacencies.East,
-                -1 => Adjacencies.West,
-                _ => value.y switch
-                {
-                    1 => Adjacencies.North,
-                    -1 => Adjacencies.South,
-                    _ => Adjacencies.None
-                }
-            };
-        }
         
         public static Vector2 RotateVector2(Vector2 vector, float angle)
         {

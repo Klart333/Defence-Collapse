@@ -710,6 +710,11 @@ namespace WaveFunctionCollapse
             }
         }
 
+        public void InvokeOnCleared()
+        {
+            OnCleared?.Invoke();
+        }
+
         /// <remarks>Does not use height</remarks>>
         public bool ContainsPoint(Vector3 point, Vector3 scale)
         {

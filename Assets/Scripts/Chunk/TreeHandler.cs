@@ -1,3 +1,4 @@
+using Random = UnityEngine.Random;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
@@ -6,16 +7,12 @@ using Unity.Mathematics;
 using Unity.Collections;
 using System.Linq;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Chunks
 {
     public class TreeHandler : MonoBehaviour
     {
         [Title("References")]
-        [SerializeField]
-        private ChunkMaskHandler chunkMaskHandler;
-        
         [SerializeField]
         private GroundGenerator groundGenerator;
         
@@ -33,11 +30,11 @@ namespace Chunks
         [SerializeField, Range(0.0f, 1.0f)]
         private float groupingFactor = 0.4f;
 
-        private readonly Dictionary<int3, List<TreeGrower>> treeGrowersByChunk = new Dictionary<int3, List<TreeGrower>>();
+        private Dictionary<int3, List<TreeGrower>> treeGrowersByChunk = new Dictionary<int3, List<TreeGrower>>();
         
-        private readonly Dictionary<int2, int> builtIndexesMap = new Dictionary<int2, int>();
+        private Dictionary<int2, int> builtIndexesMap = new Dictionary<int2, int>();
 
-        private readonly int2[] neighbours = new int2[4]
+        private int2[] neighbours = new int2[4]
         {
             new int2(1, 0),
             new int2(-1, 0),
@@ -47,13 +44,13 @@ namespace Chunks
 
         private void OnEnable()
         {
-            groundGenerator.OnChunkGenerated += OnChunkGenerated;
+            groundGenerator.OnGenerationFinished += OnGenerationFinished;
             groundGenerator.OnCellCollapsed += OnCellCollapsed;
         }
 
         private void OnDisable()
         {
-            groundGenerator.OnChunkGenerated -= OnChunkGenerated;
+            groundGenerator.OnGenerationFinished -= OnGenerationFinished;
             groundGenerator.OnCellCollapsed -= OnCellCollapsed;
         }
 
@@ -96,25 +93,24 @@ namespace Chunks
             }
         }
 
-        private void OnChunkGenerated(Chunk chunk)
+        private void OnGenerationFinished()
         {
-            GrowTrees(chunk.ChunkIndex).Forget();
+            GrowTrees().Forget();
         }
 
-        private async UniTaskVoid GrowTrees(int3 chunkIndex)
+        private async UniTaskVoid GrowTrees()
         {
-            await UniTask.Delay(1016);
+            List<int3> chunksGrown = new List<int3>();
             foreach (KeyValuePair<int3, List<TreeGrower>> kvp in treeGrowersByChunk)
             {
                 for (int i = 0; i < kvp.Value.Count; i++)
                 {
                     TreeGrower grower = kvp.Value[i];
-                    if (grower.HasGrown 
-                        || chunkMaskHandler.isActiveAndEnabled && chunkMaskHandler.IsMasked(kvp.Key, grower.Cell))
+                    if (grower.HasGrown)
                     {
                         continue;
                     }
-                    
+                    chunksGrown.Add(kvp.Key);
                     int groupIndex = 0;
                     if (groupCount > 1)
                     {
@@ -129,9 +125,16 @@ namespace Chunks
                 }
                 
             }
-            
-            if (treeGrowersByChunk.TryGetValue(chunkIndex, out List<TreeGrower> value))
+
+            //DeallocateGrownChunks(chunksGrown);
+        }
+
+        private void DeallocateGrownChunks(List<int3> chunksGrown)
+        {
+            foreach (int3 chunks in chunksGrown)
             {
+                if (!treeGrowersByChunk.TryGetValue(chunks, out List<TreeGrower> value)) continue;
+                
                 bool removeChunk = true;
                 foreach (TreeGrower grower in value)
                 {
@@ -148,7 +151,7 @@ namespace Chunks
 
                 if (removeChunk)
                 {
-                    treeGrowersByChunk.Remove(chunkIndex);
+                    treeGrowersByChunk.Remove(chunks);
                 }
             }
         }
