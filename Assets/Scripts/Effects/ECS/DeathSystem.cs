@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
+using Enemy.ECS;
 using System;
 
 namespace Effects.ECS
 {
-    [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
+    [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(ClusterCleanupSystem))]
     public partial class DeathSystem : SystemBase
     {
         public static readonly Dictionary<int, Action> DeathCallbacks = new Dictionary<int, Action>();

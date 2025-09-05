@@ -54,14 +54,12 @@ namespace Buildings
         private BuildingManager buildingManager;
         private IGameSpeed gameSpeed;
 
-        private bool inWave;
         private int selectedGroupIndex = -1;
         private int groupIndexCounter;
 
         private void OnEnable()
         {
-            Events.OnWaveStarted += OnWaveStarted;
-            Events.OnWaveEnded += OnWaveEnded;
+            Events.OnTurnIncreased += OnTurnIncreased;
             
             GetBuildingManager().Forget();
             GetGameSpeed().Forget();
@@ -69,18 +67,7 @@ namespace Buildings
 
         private void OnDisable()
         {
-            Events.OnWaveStarted -= OnWaveStarted;
-            Events.OnWaveEnded -= OnWaveEnded;
-        }
-
-        private void OnWaveStarted()
-        {
-            inWave = true;
-        }
-
-        private void OnWaveEnded()
-        {
-            inWave = false;
+            Events.OnTurnIncreased -= OnTurnIncreased;
         }
 
         private async UniTaskVoid GetBuildingManager()
@@ -93,16 +80,11 @@ namespace Buildings
             gameSpeed = await GameSpeedManager.Get();
         }
         
-        private void Update()
+        private void OnTurnIncreased(int increase, int total)
         {
-            if (!inWave)
-            {
-                return;
-            }
-            
             foreach (WallState wallState in WallStates.Values)
             {
-                wallState.Update(Time.deltaTime * gameSpeed.Value);
+                wallState.OnTurnsIncrease(increase);
             }
         }
 

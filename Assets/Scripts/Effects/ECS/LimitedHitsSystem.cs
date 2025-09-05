@@ -4,6 +4,7 @@ using Unity.Entities;
 
 namespace Effects.ECS
 {
+    [BurstCompile, UpdateAfter(typeof(DeathSystem))]
     public partial struct LimitedHitsSystem : ISystem
     {
         [BurstCompile]

@@ -23,7 +23,7 @@ namespace Pathfinding
         [SerializeField]
         private float updateInterval = 0.5f;
         
-        private readonly List<LineVisualizer> spawnedLines = new List<LineVisualizer>();
+        /*private readonly List<LineVisualizer> spawnedLines = new List<LineVisualizer>();
         
         private PathManager pathManager;
         private InputManager inputManager;
@@ -144,6 +144,6 @@ namespace Pathfinding
             }
 
             return path.ToList();
-        }
+        }*/
     }
 }

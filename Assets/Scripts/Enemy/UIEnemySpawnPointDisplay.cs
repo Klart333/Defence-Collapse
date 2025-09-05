@@ -6,9 +6,9 @@ using TMPro;
 
 namespace Enemy
 {
-    public class UIEnemySpawnPointDisplay : PooledMonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public class UIEnemySpawnPointDisplay : PooledMonoBehaviour//, IPointerEnterHandler, IPointerExitHandler
     {
-        [Title("References")]
+        /*[Title("References")]
         [SerializeField]
         private Image selectedImage;
 
@@ -59,13 +59,13 @@ namespace Enemy
             selectedImage.gameObject.SetActive(true);
             levelText.gameObject.SetActive(true);
 
-            levelText.text = $"Level {enemySpawnPoint.SpawnLevel:N0}";
+            //levelText.text = $"Level {enemySpawnPoint.SpawnLevel:N0}";
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             selectedImage.gameObject.SetActive(false);
             levelText.gameObject.SetActive(false);
-        }
+        }*/
     }
 }

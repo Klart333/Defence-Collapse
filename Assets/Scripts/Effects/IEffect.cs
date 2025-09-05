@@ -17,6 +17,7 @@ using Gameplay;
 using VFX.ECS;
 using System;
 using Effects.LittleDudes;
+using Variables;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable ConvertToConstant.Global
@@ -403,11 +404,7 @@ namespace Effects
         public List<IEffect> Effects;
         
         [FoldoutGroup("Visual")]
-        public Mesh Mesh;
-        [FoldoutGroup("Visual")]
-        public Material Material;
-        [FoldoutGroup("Visual")]
-        public float Scale = 1;
+        public MeshVariable Mesh;
         [FoldoutGroup("Visual")]
         public float TrailScaleFactor = 1;
 
@@ -429,23 +426,9 @@ namespace Effects
                 DeathSystem.DeathCallbacks.Add(DeathSystem.Key++, OnColliderDestroyed);
             }
             
-            Entity CreateEntity(float3 pos) // COULD MAYBE BAKE INTO A PREFAB
+            Entity CreateEntity(float3 pos) // USE IBUFFERELEMENT AND A SPAWNING SYSTEM
             {
-                ComponentType[] componentTypes = {
-                    typeof(RotateTowardsVelocityComponent),
-                    typeof(AddComponentInitComponent),
-                    typeof(ArchedMovementComponent),
-                    typeof(InitTrailComponent),
-                    typeof(ColliderComponent),
-                    typeof(LifetimeComponent),
-                    typeof(DamageComponent),
-                    typeof(RandomComponent),
-                    typeof(SpeedComponent),
-                    typeof(LocalTransform),
-                    typeof(CritComponent),
-                };
-
-                Entity spawned = entityManager.CreateEntity(componentTypes);
+                Entity spawned = EffectEntityPrefabs.GetArchedDamageColliderEntity(entityManager, Mesh);
                 entityManager.SetComponentData(spawned, new SpeedComponent { Speed = 1.0f / lifetime });
                 entityManager.SetComponentData(spawned, new LifetimeComponent { Lifetime = lifetime + 0.1f });
                 entityManager.SetComponentData(spawned, new ColliderComponent { Radius = Radius });
@@ -470,7 +453,7 @@ namespace Effects
                 {
                     Position = pos,
                     Rotation = quaternion.LookRotation(direction, Vector3.up),
-                    Scale = Scale
+                    Scale = Mesh.Scale
                 });
                 
                 entityManager.SetComponentData(spawned, new RotateTowardsVelocityComponent
@@ -496,18 +479,6 @@ namespace Effects
                     Pivot = Vector3.Lerp(unit.OriginPosition, targetPosition, 0.5f) + Vector3.up * Height,
                 });
                 
-                RenderMeshDescription desc = new RenderMeshDescription(
-                    shadowCastingMode: ShadowCastingMode.Off,
-                    receiveShadows: false);
-
-                RenderMeshArray renderMeshArray = new RenderMeshArray(new Material[] { Material }, new Mesh[] { Mesh });
-
-                RenderMeshUtility.AddComponents(
-                    spawned,
-                    entityManager,
-                    desc,
-                    renderMeshArray,
-                    MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
                 
                 return spawned;
             }
@@ -1020,5 +991,55 @@ namespace Effects
         Effect,
         Holder,
         DoneDamage
+    }
+
+    public static class EffectEntityPrefabs
+    {
+        private static Dictionary<Mesh, Entity> archedDamagePrefabs = new Dictionary<Mesh, Entity>();
+        private static Entity GetArchedDamagePrefab(EntityManager entityManager, MeshVariable meshVariable)
+        {
+            if (archedDamagePrefabs.TryGetValue(meshVariable.Mesh, out Entity entity))
+            {
+                return entity;
+            }
+            
+            ComponentType[] componentTypes = {
+                typeof(RotateTowardsVelocityComponent),
+                typeof(AddComponentInitComponent),
+                typeof(ArchedMovementComponent),
+                typeof(InitTrailComponent),
+                typeof(ColliderComponent),
+                typeof(LifetimeComponent),
+                typeof(DamageComponent),
+                typeof(RandomComponent),
+                typeof(SpeedComponent),
+                typeof(LocalTransform),
+                typeof(CritComponent),
+                typeof(Prefab),
+            };
+            Entity spawned = entityManager.CreateEntity(componentTypes);
+            
+            RenderMeshDescription desc = new RenderMeshDescription(
+                shadowCastingMode: ShadowCastingMode.Off,
+                receiveShadows: false);
+
+            RenderMeshArray renderMeshArray = new RenderMeshArray(new Material[] { meshVariable.Material }, new Mesh[] { meshVariable.Mesh });
+
+            RenderMeshUtility.AddComponents(
+                spawned,
+                entityManager,
+                desc,
+                renderMeshArray,
+                MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
+            
+            archedDamagePrefabs.Add(meshVariable.Mesh, spawned);
+            return spawned;
+        }
+        
+        public static Entity GetArchedDamageColliderEntity(EntityManager entityManager, MeshVariable meshVariable)
+        {
+            Entity prefab = GetArchedDamagePrefab(entityManager, meshVariable);
+            return entityManager.Instantiate(prefab);
+        }
     }
 }

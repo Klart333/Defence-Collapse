@@ -1,23 +1,23 @@
 ﻿using LocalToWorld = Unity.Transforms.LocalToWorld;
 using Vector2 = UnityEngine.Vector2;
+using Math = Utility.Math;
+
 using System.Collections.Generic;
 using Buildings.District.ECS;
 using UnityEngine.Rendering;
 using WaveFunctionCollapse;
-using Math = Utility.Math;
 using Unity.Collections;
 using Unity.Mathematics;
 using Gameplay.Upgrades;
 using Unity.Transforms;
 using Unity.Rendering;
 using Unity.Entities;
-using System.Linq;
 using Effects.ECS;
 using UnityEngine;
 using Enemy.ECS;
 using Effects;
-using System;
 using Utility;
+using System;
 
 namespace Buildings.District
 {
@@ -170,11 +170,8 @@ namespace Buildings.District
             }
         }
 
-        public virtual void Update(){}
         public abstract void OnSelected(Vector3 pos);
         public abstract void OnDeselected();
-        public virtual void OnWaveStart() { }
-        public virtual void OnWaveEnd() { }
         public virtual void OnUnitKill() { }
         
         private void OnDamageDone(DamageCallbackComponent damageCallback)
@@ -651,7 +648,6 @@ namespace Buildings.District
             CreateStats();
             
             Attack = new Attack(townhallData.BaseAttack);
-            Events.OnWaveEnded += OnWaveEnded;
         }
 
         protected override void RangeChanged()
@@ -677,11 +673,6 @@ namespace Buildings.District
             UpgradeStats.Add(townHall);
             
             SubscribeToStats();
-        }
-        
-        private void OnWaveEnded()
-        {
-            
         }
 
         protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
@@ -716,18 +707,13 @@ namespace Buildings.District
                 rangeIndicator = null;
             }
         }
-
-        public override void Dispose()
-        {
-            Events.OnWaveEnded -= OnWaveEnded;
-        }
     }
 
     #endregion
     
     #region Mine
 
-    public sealed class MineState : DistrictState
+    public sealed class MineState : DistrictState, ITurnIncreaseSubscriber
     {
         private GameObject rangeIndicator;
         
@@ -811,11 +797,9 @@ namespace Buildings.District
             rangeIndicator.SetActive(false);
             rangeIndicator = null;
         }
-        
-        public override void OnWaveEnd()
-        {
-            base.OnWaveEnd();
 
+        public void TurnsIncreased(int increase, int total)
+        {
             foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
             {
                 OriginPosition = chunk.Position;
@@ -1357,5 +1341,10 @@ namespace Buildings.District
         public ChunkIndex ChunkIndex;
         public Vector3 Offset;
         public Vector2 Direction;
+    }
+
+    public interface ITurnIncreaseSubscriber
+    {
+        public void TurnsIncreased(int increase, int total);
     }
 }

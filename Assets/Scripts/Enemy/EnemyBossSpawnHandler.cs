@@ -12,59 +12,61 @@ namespace Enemy
 {
     public class EnemyBossSpawnHandler : MonoBehaviour
     {
-        [Title("References")]
-        [SerializeField]
-        private EnemySpawnHandler spawnHandler;
-        
-        [SerializeField]
-        private EnemyBossData bossData;
-        
-        [SerializeField]
-        private SpawnDataUtility spawnDataUtility;
-        
-        private List<Entity> spawnedBossPoints = new List<Entity>();
-        
-        private EntityManager entityManager;
-        private GameManager gameManager;
+        /*
+       [Title("References")]
+       [SerializeField]
+       private EnemySpawnHandler spawnHandler;
 
-        private float spawnFrequency;
-        private float spawnTimer;
-        private int waveCount;
+       [SerializeField]
+       private EnemyBossData bossData;
 
-        private void OnEnable()
-        {
-            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            spawnFrequency = bossData.BossSpawnFrequency;
-            
-            Events.OnWaveStarted += OnWaveStarted;
-            
-            GetGameManager().Forget();
-        }
+       [SerializeField]
+       private SpawnDataUtility spawnDataUtility;
 
-        private async UniTaskVoid GetGameManager()
-        {
-            gameManager = await GameManager.Get();
-        }
+       private List<Entity> spawnedBossPoints = new List<Entity>();
 
-        private void OnDisable()
-        {
-            Events.OnWaveStarted -= OnWaveStarted;
-        }
+       private EntityManager entityManager;
+       private GameManager gameManager;
 
-        private void OnWaveStarted()
-        {
-            waveCount++;
-            spawnTimer++;
+       private float spawnFrequency;
+       private float spawnTimer;
+       private int waveCount;
 
-            if (spawnTimer >= spawnFrequency)
-            {
-                spawnTimer -= spawnFrequency;
-                spawnFrequency = Mathf.Max(spawnFrequency - bossData.FrequencyDecrease, 1);
-                SpawnBosses();
-            }
-        }
+       private void OnEnable()
+       {
+           entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+           spawnFrequency = bossData.BossSpawnFrequency;
 
-        private void SpawnBosses()
+           Events.OnWaveStarted += OnWaveStarted;
+
+           GetGameManager().Forget();
+       }
+
+       private async UniTaskVoid GetGameManager()
+       {
+           gameManager = await GameManager.Get();
+       }
+
+       private void OnDisable()
+       {
+           Events.OnWaveStarted -= OnWaveStarted;
+       }
+
+
+       private void OnWaveStarted()
+       {
+           waveCount++;
+           spawnTimer++;
+
+           if (spawnTimer >= spawnFrequency)
+           {
+               spawnTimer -= spawnFrequency;
+               spawnFrequency = Mathf.Max(spawnFrequency - bossData.FrequencyDecrease, 1);
+               SpawnBosses();
+           }
+       }*/
+
+        /*private void SpawnBosses()
         {
             List<Vector3> points = new List<Vector3>();
             int totalLevels = 0;
@@ -109,6 +111,6 @@ namespace Enemy
                 entityManager.SetComponentData(spawnPoint, LocalTransform.FromPosition(info.Position));
                 entityManager.AddComponent<SpawningTag>(spawnPoint);
             }
-        }
+        }*/
     }
 }

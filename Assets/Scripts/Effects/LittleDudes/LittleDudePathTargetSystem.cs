@@ -81,7 +81,7 @@ namespace Effects.LittleDudes
         {
             ref LittleDudePathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
             ref BlobArray<int> targets = ref valuePathChunk.TargetIndexes;
-            targets[flowField.PathIndex.GridIndex] += flowField.Importance;
+            targets[flowField.PathIndex.GridIndex] += 100;
         }
     }
 }

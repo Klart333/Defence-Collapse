@@ -17,7 +17,7 @@ namespace Enemy.ECS
             state.RequireForUpdate<GameSpeedComponent>();
             state.RequireForUpdate<FlowFieldComponent>();
             
-            EntityQuery query = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAspect<EnemyTargetAspect>().Build(ref state);
+            EntityQuery query = SystemAPI.QueryBuilder().WithAspect<EnemyTargetAspect>().Build();
             state.RequireForUpdate(query);
         }
 
@@ -26,7 +26,6 @@ namespace Enemy.ECS
         {
             NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
 
-            // Create and schedule the job
             new ClosestTargetingJob
             {
                 TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),

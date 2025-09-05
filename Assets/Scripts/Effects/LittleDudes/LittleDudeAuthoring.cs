@@ -43,12 +43,6 @@ namespace Effects.LittleDudes
                 
                 AddComponent(prefab, new FlowFieldComponent
                 {
-                    Up = new float3(0, 1, 0),
-                    TargetUp = new float3(0, 1, 0),
-                    Forward = new float3(0, 0, 1),
-                    TurnSpeed = 5,
-                    
-                    Importance = 1,
                 });
                 
             }

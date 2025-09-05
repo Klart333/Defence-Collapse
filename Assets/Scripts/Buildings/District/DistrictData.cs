@@ -7,7 +7,6 @@ using Unity.Mathematics;
 using Unity.Collections;
 using Gameplay.Buffs;
 using UnityEngine;
-using System.Linq;
 using InputCamera;
 using Gameplay;
 using Utility;
@@ -49,25 +48,32 @@ namespace Buildings.District
             DistrictGenerator = chunkDistrictGenerator as DistrictGenerator;
             Position = position;
             GenerateCollider();
-            this.towerData = towerData;
             
+            this.towerData = towerData;
             State = towerData.DistrictType switch
             {
-                DistrictType.TownHall => new TownHallState(this, towerData, position, key),
-                DistrictType.Archer => new ArcherState(this, towerData, position, key),
-                DistrictType.Bomb => new BombState(this, towerData, position, key),
-                DistrictType.Mine => new MineState(this, towerData, position, key),
-                DistrictType.Flame => new FlameState(this, towerData, position, key),
                 DistrictType.Lightning => new LightningState(this, towerData, position, key),
-                DistrictType.Church => new ChurchState(this, towerData, position, key),
+                DistrictType.TownHall => new TownHallState(this, towerData, position, key),
                 DistrictType.Barracks => new BarracksState(this, towerData, position, key),
+                DistrictType.Church => new ChurchState(this, towerData, position, key),
+                DistrictType.Archer => new ArcherState(this, towerData, position, key),
+                DistrictType.Flame => new FlameState(this, towerData, position, key),
+                DistrictType.Mine => new MineState(this, towerData, position, key),
+                DistrictType.Bomb => new BombState(this, towerData, position, key),
                 _ => throw new ArgumentOutOfRangeException(nameof(towerData.DistrictType), towerData.DistrictType, null)
             };
             State.PrototypeInfo = prototypeInfo;
             
-            Events.OnWaveStarted += OnWaveStarted;
-            Events.OnWaveEnded += OnWaveEnded;
+            Events.OnTurnIncreased += OnTurnIncreased;
             Events.OnWallsDestroyed += OnWallsDestroyed;
+        }
+
+        private void OnTurnIncreased(int increase, int total)
+        {
+            if (State is ITurnIncreaseSubscriber turnIncreaseSubscriber)
+            {
+                turnIncreaseSubscriber.TurnsIncreased(increase, total);
+            }
         }
 
         private void GenerateCollider()
@@ -236,24 +242,9 @@ namespace Buildings.District
             State.OnDeselected();
         }
 
-        private void OnWaveStarted()
-        {
-            State.OnWaveStart();
-        }
-
-        private void OnWaveEnded()
-        {
-            State.OnWaveEnd();
-        }
-        
         public void LevelUp()
         {
             OnLevelup?.Invoke();
-        }
-
-        public void Update()
-        {
-            State.Update();
         }
 
         public void Dispose()
@@ -263,8 +254,7 @@ namespace Buildings.District
             InputManager.Instance.Cancel.performed -= OnDeselected;
             Events.OnWallsDestroyed -= OnWallsDestroyed;
             UIEvents.OnFocusChanged -= Deselect;
-            Events.OnWaveStarted -= OnWaveStarted;
-            Events.OnWaveEnded -= OnWaveEnded;
+            Events.OnTurnIncreased -= OnTurnIncreased;
             
             if (meshCollider)
             {

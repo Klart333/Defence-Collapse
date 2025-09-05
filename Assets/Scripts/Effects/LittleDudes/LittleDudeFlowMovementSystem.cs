@@ -11,7 +11,7 @@ using Gameplay;
 
 namespace Effects.LittleDudes
 {
-    [UpdateInGroup(typeof(TransformSystemGroup)), UpdateAfter(typeof(GroundSystem))] 
+    [UpdateInGroup(typeof(TransformSystemGroup))] 
     public partial struct LittleDudeFlowMovementSystem : ISystem
     {
         [BurstCompile]
@@ -63,14 +63,10 @@ namespace Effects.LittleDudes
         private void Execute(in SpeedComponent speed, ref FlowFieldComponent flowField, ref LocalTransform transform)
         {
             ref LittleDudePathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
-            float3 direction = PathUtility.ByteToDirectionFloat3(valuePathChunk.Directions[flowField.PathIndex.GridIndex], flowField.Forward.y);
-            
-            flowField.Forward = math.normalize(flowField.Forward + direction * (flowField.TurnSpeed * DeltaTime));
-            flowField.Up = math.normalize(flowField.Up + flowField.TargetUp * flowField.TurnSpeed * DeltaTime * 5);
-            transform.Rotation = quaternion.LookRotation(flowField.Forward, flowField.Up);
+            float3 direction = PathUtility.ByteToDirectionFloat3(valuePathChunk.Directions[flowField.PathIndex.GridIndex]);
 
-            float3 movement = transform.Forward() * speed.Speed * DeltaTime;
-            PathIndex movedPathIndex = PathUtility.GetIndex(transform.Position.x, transform.Position.z);
+            float3 movement = direction * speed.Speed * DeltaTime;
+            PathIndex movedPathIndex = PathUtility.GetIndex(transform.Position.x + movement.x, transform.Position.z + movement.z);
             if (!ChunkIndexToListIndex.ContainsKey(movedPathIndex.ChunkIndex))
             {
                 return;

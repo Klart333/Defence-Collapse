@@ -32,9 +32,9 @@ namespace Buildings
             Index = index;
         }
 
-        public void Update(float dt)
+        public void OnTurnsIncrease(int turnIncrease)
         {
-            Health.Update(dt);
+            Health.UpdateHealing(turnIncrease);
         }
 
         public void TakeDamage(DamageInstance damage, out DamageInstance damageDone)

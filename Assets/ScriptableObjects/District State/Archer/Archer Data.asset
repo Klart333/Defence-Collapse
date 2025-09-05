@@ -16,8 +16,7 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: -7929139438592967118, guid: b81e4778696bab64387c2007f044d4c1, type: 3}
-    - {fileID: 2100000, guid: af2e22e44379fcb4d823d8e8068359c0, type: 2}
+    - {fileID: 11400000, guid: 061d5ea0a9eab7c40a9b46aa7f91b4dd, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -194,12 +193,6 @@ MonoBehaviour:
     - Name: Mesh
       Entry: 10
       Data: 0
-    - Name: Material
-      Entry: 10
-      Data: 1
-    - Name: Scale
-      Entry: 4
-      Data: 0.5
     - Name: TrailScaleFactor
       Entry: 4
       Data: 0.8
@@ -294,6 +287,7 @@ MonoBehaviour:
     type: 3}
   requireTargeting: 1
   attackAngle: 75
+  useMeshBasedPlacement: 1
   useTargetMesh: 1
   meshVariable: {fileID: 11400000, guid: d4d5b9c8ee9a39c4bbce276cb6044a6c, type: 2}
   categoryType: 1

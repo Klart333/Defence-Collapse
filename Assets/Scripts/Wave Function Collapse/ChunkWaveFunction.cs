@@ -869,6 +869,11 @@ namespace WaveFunctionCollapse
             return handlerChunkScale.MultiplyByAxis(index);
         }
         
+        public static Vector3 GetPosition(ChunkIndex chunkIndex, Vector3 chunkScale, Vector3 cellScale)
+        {
+            return chunkScale.MultiplyByAxis(chunkIndex.Index) + cellScale.MultiplyByAxis(chunkIndex.CellIndex);
+        }
+        
         public static ChunkIndex[] GetNeighbouringChunkIndexes(ChunkIndex chunkIndex, int gridWidth, int gridHeight)
         {
             ChunkIndex[] neighbours = new ChunkIndex[4];

@@ -1,20 +1,19 @@
 using System.Collections.Generic;
+using Enemy.ECS;
 using Sirenix.OdinInspector;
+using Unity.Collections;
 using UnityEngine;
 
 namespace Enemy
 {
     [CreateAssetMenu(fileName = "SpawnDataUtility", menuName = "Enemy/Spawn Data Utility"), InlineEditor] 
-    class SpawnDataUtility : ScriptableObject
+    public class SpawnDataUtility : ScriptableObject
     {
         [Title("Data")]
         [SerializeField]
         private EnemyUtility enemyUtility;
 
         [Title("Settings")]
-        [SerializeField]
-        private AnimationCurve targetWaveDuration;
-
         [SerializeField]
         private float startCredits = 5;
 
@@ -24,15 +23,16 @@ namespace Enemy
         [SerializeField]
         private float creditExponent = 1.5f;
         
-        public AnimationCurve TargetWaveDuration => targetWaveDuration;
-        
-        public SpawnPointComponent GetSpawnPointData(int spawnPointLevel, int waveLevel)
+        /// <summary>
+        /// </summary>
+        /// <param name="turns"></param>
+        /// <returns>Returns a TempJob allocated array</returns>
+        public NativeArray<SpawningComponent> GetSpawnPointData(int turns)
         {
-            float combinedWaveLevel = (spawnPointLevel + waveLevel) * creditBaseMultiplier;
-            float credits = startCredits + Mathf.Pow(combinedWaveLevel, creditExponent) * Random.Range(0.9f, 1.1f);
+            float baseCredits = turns * creditBaseMultiplier;
+            float credits = startCredits + Mathf.Pow(baseCredits, creditExponent) * Random.Range(0.9f, 1.1f);
             List<int> possibleEnemies = new List<int>();
 
-            //Debug.Log("Total Credits: " + credits);
             for (int i = 0; i < enemyUtility.Enemies.Count; i++)
             {
                 if (credits > enemyUtility.Enemies[i].EnemyData.UnlockedThreshold)
@@ -40,18 +40,20 @@ namespace Enemy
                     possibleEnemies.Add(i);
                 }
             }
-            
-            int enemyIndex = Random.Range(0, possibleEnemies.Count);
-            int amount = Mathf.FloorToInt(credits / enemyUtility.Enemies[enemyIndex].EnemyData.CreditCost);
-            float spawnRate = (targetWaveDuration.Evaluate(combinedWaveLevel) / amount) * Random.Range(0.75f, 1.5f);
-            
-            return new SpawnPointComponent
+
+            NativeArray<SpawningComponent> possibleSpawns = new NativeArray<SpawningComponent>(possibleEnemies.Count, Allocator.TempJob);
+
+            for (int i = 0; i < possibleEnemies.Count; i++)
             {
-                EnemyIndex = enemyIndex,
-                SpawnRate = spawnRate,
-                Amount = amount,
-                Timer = 1,
-            };
+                possibleSpawns[i] = new SpawningComponent
+                {
+                    EnemyIndex = possibleEnemies[i],
+                    Amount = Mathf.FloorToInt(credits / enemyUtility.Enemies[possibleEnemies[i]].EnemyData.CreditCost),
+                    Turns = 3,
+                };
+            }
+
+            return possibleSpawns; 
         }
     }
 }

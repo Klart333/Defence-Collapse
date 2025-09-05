@@ -108,7 +108,6 @@ namespace Chunks
 
         private IEnumerator GrowTrees()
         {
-            List<int3> chunksGrown = new List<int3>();
             foreach (KeyValuePair<int3, List<TreeGrower>> kvp in treeGrowersByChunk)
             {
                 for (int i = 0; i < kvp.Value.Count; i++)
@@ -118,7 +117,6 @@ namespace Chunks
                     {
                         continue;
                     }
-                    chunksGrown.Add(kvp.Key);
                     int groupIndex = 0;
                     if (groupCount > 1)
                     {

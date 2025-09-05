@@ -13,12 +13,7 @@ namespace Enemy.ECS
     public struct FlowFieldComponent : IComponentData
     {
         public PathIndex PathIndex;
-        public float TurnSpeed;
-        public float3 TargetUp;
-        public float3 Forward;
-        public float3 Up;
-
-        public int Importance;
+        public int MoveTimer;
     }
 
     public struct AttackSpeedComponent : IComponentData

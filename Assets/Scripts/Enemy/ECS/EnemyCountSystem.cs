@@ -1,50 +1,34 @@
-using Effects.ECS;
 using Effects.LittleDudes;
 using Unity.Entities;
-using UnityEngine;
+using Effects.ECS;
+using Unity.Burst;
 
 namespace Enemy.ECS
 {
     [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(SpawnerSystem)), 
      UpdateBefore(typeof(CollisionSystem)), UpdateBefore(typeof(EnemyHashGridSystem))]
-    public partial class EnemyCountSystem : SystemBase
+    [BurstCompile]
+    public partial struct EnemyCountSystem : ISystem // TODO: Remove this basically
     {
         private EntityQuery enemyQuery;
-        private EntityQuery spawnerQuery;
         
-        private bool inWave;
-    
-        protected override void OnCreate()
+        public void OnCreate(ref SystemState state)
         {
-            enemyQuery = SystemAPI.QueryBuilder().WithAll<FlowFieldComponent>().WithNone<LittleDudeComponent>().Build();
-            spawnerQuery = SystemAPI.QueryBuilder().WithAspect<SpawnPointAspect>().Build();
+            enemyQuery = SystemAPI.QueryBuilder().WithAll<ManagedClusterComponent>().Build();
             
-            Events.OnWaveStarted += OnWaveStarted;
-
-            EntityManager.CreateEntity(typeof(WaveStateComponent));
+           state.EntityManager.CreateEntity(typeof(WaveStateComponent));
         }
 
-        private void OnWaveStarted()
+        [BurstCompile]
+        public void OnUpdate(ref SystemState state)
         {
-            inWave = true;
-        }
-
-        protected override void OnUpdate()
-        {
-            if (!inWave) return;
-            
             SystemAPI.GetSingletonRW<WaveStateComponent>().ValueRW.EnemyCount = enemyQuery.CalculateEntityCount();
-            
-            if (enemyQuery.IsEmpty && spawnerQuery.IsEmpty)
-            {
-                inWave = false;
-                Events.OnWaveEnded.Invoke();
-            }
         }
 
-        protected override void OnDestroy()
+        [BurstCompile]
+        public void OnDestroy(ref SystemState state)
         {
-            Events.OnWaveStarted -= OnWaveStarted;
+
         }
     }
 

@@ -1,40 +1,42 @@
+using Gameplay.Turns.ECS;
 using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
+using Effects.ECS;
 using Unity.Burst;
 using Enemy.ECS;
-using Gameplay;
 
 namespace Buildings.District.ECS
 {
+    [UpdateAfter(typeof(DeathSystem))]
     public partial struct UpdateDistrictEntitiesSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<GameSpeedComponent>();
+            state.RequireForUpdate<TurnIncreaseComponent>();
             state.RequireForUpdate<FlowFieldComponent>(); // Require Enemy
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            TurnIncreaseComponent turnIncrease = SystemAPI.GetSingleton<TurnIncreaseComponent>();
+            
             EntityCommandBuffer ecb1 = new EntityCommandBuffer(Allocator.TempJob);
             EntityCommandBuffer ecb2 = new EntityCommandBuffer(Allocator.TempJob);
-            float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
-            float deltaTime = SystemAPI.Time.DeltaTime * gameSpeed;
 
             state.Dependency = new UpdateTargetedDistrictEntitiesJob 
             {  
                 ECB = ecb1.AsParallelWriter(),
-                DeltaTime = deltaTime
+                TurnIncrease = turnIncrease.TurnIncrease,
             }.ScheduleParallel(state.Dependency);
             state.Dependency.Complete();
 
             state.Dependency = new UpdateSimpleDistrictEntitiesJob
             {
                 ECB = ecb2.AsParallelWriter(),
-                DeltaTime = deltaTime
+                TurnIncrease = turnIncrease.TurnIncrease,
             }.ScheduleParallel(state.Dependency);
             state.Dependency.Complete();
             
@@ -56,15 +58,18 @@ namespace Buildings.District.ECS
     public partial struct UpdateTargetedDistrictEntitiesJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter ECB;
-        public float DeltaTime;
+        public int TurnIncrease;
         
         public void Execute([ChunkIndexInQuery]int sortKey, ref AttackSpeedComponent attackSpeedComponent, ref EnemyTargetComponent targetComponent, in LocalTransform transform, in DistrictDataComponent districtData)
         {
-            attackSpeedComponent.Timer += DeltaTime;
+            attackSpeedComponent.Timer += TurnIncrease;
             if (attackSpeedComponent.Timer < attackSpeedComponent.AttackSpeed
-                || !targetComponent.HasTarget) return;
+                || !targetComponent.HasTarget)
+            {
+                return;
+            }
 
-            attackSpeedComponent.Timer = 0;
+            attackSpeedComponent.Timer -= attackSpeedComponent.AttackSpeed;
             targetComponent.HasTarget = false;
 
             Entity entity = ECB.CreateEntity(sortKey);
@@ -81,14 +86,14 @@ namespace Buildings.District.ECS
     public partial struct UpdateSimpleDistrictEntitiesJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter ECB;
-        public float DeltaTime;
+        public int TurnIncrease;
 
         public void Execute([ChunkIndexInQuery]int sortKey, ref AttackSpeedComponent attackSpeedComponent, in LocalTransform transform, in DistrictDataComponent districtData)
         {
-            attackSpeedComponent.Timer += DeltaTime;
+            attackSpeedComponent.Timer += TurnIncrease;
             if (attackSpeedComponent.Timer < attackSpeedComponent.AttackSpeed) return;
 
-            attackSpeedComponent.Timer = 0;
+            attackSpeedComponent.Timer -= attackSpeedComponent.AttackSpeed;
             
             Entity entity = ECB.CreateEntity(sortKey);
             ECB.AddComponent(sortKey, entity, new DistrictEntityData

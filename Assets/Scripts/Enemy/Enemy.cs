@@ -43,6 +43,7 @@ namespace Enemy
                 Entity enemyEntity = GetEntity(TransformUsageFlags.Dynamic);
                 
                 AddComponent<EnemySpawnedTag>(enemyEntity);
+                AddComponent<ManagedClusterComponent>(enemyEntity);
                 
                 AddComponent(enemyEntity, new RandomComponent { Random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 1000000)) });
                 AddComponent(enemyEntity, new AttackSpeedComponent { AttackSpeed = 1.0f / stats.AttackSpeed.Value });
@@ -50,17 +51,6 @@ namespace Enemy
                 AddComponent(enemyEntity, new SimpleDamageComponent { Damage = stats.HealthDamage.Value, });
                 AddComponent(enemyEntity, new SpeedComponent { Speed = stats.MovementSpeed.Value });
                 AddComponent(enemyEntity, new FresnelComponent { Value = 5f });
-
-                AddComponent(enemyEntity, new FlowFieldComponent
-                {
-                    Up = new float3(0, 1, 0),
-                    TargetUp = new float3(0, 1, 0),
-                    Forward = new float3(0, 0, 1),
-                    TurnSpeed = authoring.turnSpeed,
-                    
-                    Importance = authoring.enemyData.Importance,
-                    //LayerMask = authoring.groundMask,
-                });
                 
                 AddComponent(enemyEntity, new HealthComponent
                 {
@@ -108,6 +98,11 @@ namespace Enemy
     public struct EnemySpawnedTag : IComponentData
     {
         
+    }
+
+    public struct ManagedClusterComponent : IComponentData
+    {
+        public Entity ClusterParent;
     }
 
     public struct EnemyBossComponent : IComponentData

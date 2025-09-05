@@ -24,7 +24,7 @@ namespace Enemy.ECS
             Entity pathBlobberEntity = SystemAPI.GetSingletonEntity<PathBlobber>();
             PathBlobber pathBlobber = SystemAPI.GetComponent<PathBlobber>(pathBlobberEntity);
             
-            var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
 
             new CheckAttackingJob
             {

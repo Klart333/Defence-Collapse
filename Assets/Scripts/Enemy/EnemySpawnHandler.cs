@@ -8,118 +8,107 @@ using Effects.ECS;
 using UnityEngine;
 using Gameplay;
 using System;
+using Enemy.ECS;
+using Unity.Collections;
 
 namespace Enemy
 {
     public class EnemySpawnHandler : MonoBehaviour
     {
+        public static SpawnDataUtility SpawnDataUtility;
+        
         [Title("References")]
         [SerializeField]
         private GroundGenerator groundGenerator;
         
-        [Title("Spawn Point")]
         [SerializeField]
-        private EnemySpawnPoint spawnPointPrefab;
+        private SpawnDataUtility spawnDataUtility;
 
-        [SerializeField]
-        private AnimationCurve shouldSpawnCurve;
-
-        [SerializeField]
-        private AnimationCurve minimumSpawnsCurve;
-        
-        [SerializeField]
-        private AnimationCurve maximumSpawnsCurve;
-
-        [Title("UI Display")]
-        [SerializeField]
-        private UIEnemySpawnPointDisplay displayPrefab;
-        
-        private readonly Dictionary<int3, List<EnemySpawnPoint>>  spawnPoints = new Dictionary<int3, List<EnemySpawnPoint>>();
-        private readonly Dictionary<int3, List<UIEnemySpawnPointDisplay>> displays = new Dictionary<int3, List<UIEnemySpawnPointDisplay>>();
-        private Random random;
+        private Dictionary<ChunkIndex, Entity> spawnedEntities = new Dictionary<ChunkIndex, Entity>();
         
         private EntityManager entityManager;
-        private Entity waveCountEntity;
+        private Entity spawnPrefab;
+        private Random random;
         
-        public Dictionary<int3, List<EnemySpawnPoint>> SpawnPoints => spawnPoints;
-        
-        public int WaveCount { get; private set; }
+        private int spawnIndex;
+
+        private void Awake()
+        {
+            SpawnDataUtility = spawnDataUtility;
+        }
 
         private void OnEnable()
         {
             groundGenerator.OnChunkGenerated += OnChunkUnlocked;
-            Events.OnWaveStarted += OnWaveStarted;
             
             random = new Random(GameManager.Instance?.Seed ?? -1);
             
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            waveCountEntity = entityManager.CreateEntity();
-            entityManager.AddComponent<WaveCountComponent>(waveCountEntity);
+            spawnPrefab = entityManager.CreateEntity(typeof(SpawnPointComponent), typeof(Prefab));
         }
 
         private void OnDisable()
         {
             groundGenerator.OnChunkGenerated -= OnChunkUnlocked;
-            Events.OnWaveStarted -= OnWaveStarted;
-        }
-
-        private void OnWaveStarted()
-        {
-            WaveCount++;
-            entityManager.SetComponentData(waveCountEntity, new WaveCountComponent { Value = WaveCount });
         }
 
         private void OnChunkUnlocked(Chunk chunk)
         {
-            if (spawnPoints.TryGetValue(chunk.ChunkIndex, out List<EnemySpawnPoint> spawnPointToRemove))
+            List<ChunkIndex> toRemove = new List<ChunkIndex>();
+            foreach (ChunkIndex index in spawnedEntities.Keys)
             {
-                foreach (EnemySpawnPoint point in spawnPointToRemove)
+                if (math.all(index.Index == chunk.ChunkIndex))
                 {
-                    point.gameObject.SetActive(false);
+                    toRemove.Add(index);
                 }
-                spawnPoints.Remove(chunk.ChunkIndex);
+            }
+
+            NativeArray<Entity> entitiesToRemove = new NativeArray<Entity>(toRemove.Count, Allocator.Temp);
+            for (int i = 0; i < toRemove.Count; i++)
+            {
+                entitiesToRemove[i] = spawnedEntities[toRemove[i]];
+                spawnedEntities.Remove(toRemove[i]);
             }
             
-            if (displays.TryGetValue(chunk.ChunkIndex, out List<UIEnemySpawnPointDisplay> displaysToRemove))
+            entityManager.DestroyEntity(entitiesToRemove);
+            entitiesToRemove.Dispose();
+
+            spawnIndex = 0;
+            foreach (var kvp in spawnedEntities)
             {
-                foreach (UIEnemySpawnPointDisplay display in displaysToRemove)
+                float3 position = ChunkWaveUtility.GetPosition(kvp.Key, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize);
+                entityManager.SetComponentData(kvp.Value, new SpawnPointComponent
                 {
-                    display.gameObject.SetActive(false);
-                }
-                displays.Remove(chunk.ChunkIndex);
+                    Position = position,
+                    Index = spawnIndex++,
+                    Random = Unity.Mathematics.Random.CreateFromIndex((uint)random.Next(1, 20000000))
+                });
             }
         }
 
-        public void SetEnemySpawn(Vector3 pos, int3 chunkIndex, int difficulty)
+        public void AddSpawnPoints(List<ChunkIndex> cells)
         {
-            EnemySpawnPoint spawned = spawnPointPrefab.GetAtPosAndRot<EnemySpawnPoint>(pos, Quaternion.identity);
-            spawned.BaseDifficulty = difficulty;
-            spawned.EnemySpawnHandler = this;
-            if (spawnPoints.TryGetValue(chunkIndex, out List<EnemySpawnPoint> list)) list.Add(spawned);
-            else spawnPoints.Add(chunkIndex, new List<EnemySpawnPoint> { spawned });
-
-            UIEnemySpawnPointDisplay display = displayPrefab.GetAtPosAndRot<UIEnemySpawnPointDisplay>(pos, Quaternion.identity);
-            display.DisplayPoint(pos, spawned);
-            if (displays.TryGetValue(chunkIndex, out List<UIEnemySpawnPointDisplay> list2)) list2.Add(display);
-            else displays.Add(chunkIndex, new List<UIEnemySpawnPointDisplay> { display });
-
-        }
-        
-        public int GetMaxSpawns(int difficulty) => (int)Math.Round(maximumSpawnsCurve.Evaluate(difficulty), MidpointRounding.AwayFromZero);
-
-        public bool ShouldSetSpawnPoint(int3 chunkIndex, out int difficulty)
-        {
-            int distance = Mathf.Abs(chunkIndex.x) + Mathf.Abs(chunkIndex.z);
-            difficulty = distance;
-
-            return random.NextDouble() <= shouldSpawnCurve.Evaluate(difficulty);
+            foreach (ChunkIndex chunkIndex in cells)
+            {
+                if (spawnedEntities.ContainsKey(chunkIndex)) continue;
+                
+                CreateEntity(chunkIndex);
+            }
         }
 
-        public bool ShouldForceSpawnPoint(int index, int max, int amountSpawned, int difficulty)
+        private void CreateEntity(ChunkIndex chunkIndex)
         {
-            int minimum = (int)System.Math.Round(minimumSpawnsCurve.Evaluate(difficulty), MidpointRounding.AwayFromZero);
-            int pointsLeft = max - index;
-            return pointsLeft + amountSpawned < minimum;
+            float3 position = ChunkWaveUtility.GetPosition(chunkIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize);
+
+            Entity entity = entityManager.Instantiate(spawnPrefab);
+            entityManager.SetComponentData(entity, new SpawnPointComponent
+            {
+                Position = position,
+                Index = spawnIndex++,
+                Random = Unity.Mathematics.Random.CreateFromIndex((uint)random.Next(1, 20000000))
+            });
+            
+            spawnedEntities.Add(chunkIndex, entity);
         }
     }
 }

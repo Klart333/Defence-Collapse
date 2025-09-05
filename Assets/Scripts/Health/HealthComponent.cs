@@ -13,19 +13,14 @@ namespace Health
 
         public float CurrentHealth;
         public float MaxHealth;
-
-        private float healingTimer;
-        private const float healingFrequency = 2f; 
-
+        
         public bool Alive => CurrentHealth > 0;
         public float HealthPercentage => CurrentHealth / Stats.MaxHealth.Value;
 
         public List<StatusEffect> StatusEffects { get; set; } = new List<StatusEffect>();
         public DamageInstance LastDamageTaken { get; private set; }
         public Stats Stats { get; private set; }
-
-        public HealthComponent Health => this;
-
+        
         public HealthComponent(Stats stats)
         {
             Stats = stats;
@@ -34,20 +29,17 @@ namespace Health
             UpdateMaxHealth();
         }
 
-        public void Update(float deltaTime)
+        public void UpdateHealing(int turnIncrease)
         {
             if (CurrentHealth >= MaxHealth) return;
-            
-            healingTimer += deltaTime;
 
-            if (healingTimer > healingFrequency)
+            for (int i = 0; i < turnIncrease; i++)
             {
-                float heal = Stats.Healing.Value * healingTimer;
+                float heal = Stats.Healing.Value;
                 CurrentHealth = Mathf.Min(CurrentHealth + heal, MaxHealth);
-                
-                OnHealthChanged?.Invoke();
-                healingTimer = 0;
             }
+            
+            OnHealthChanged?.Invoke();
         }
 
         private void UpdateMaxHealth()

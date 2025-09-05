@@ -1,13 +1,14 @@
 using System.Collections.Generic;
+using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
 using Unity.Mathematics;
+using Unity.Entities;
 using UnityEngine;
 using System;
 using Enemy;
-using Debug = UnityEngine.Debug;
 
 namespace WaveFunctionCollapse
 {
@@ -54,11 +55,13 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private bool compilePrototypeMeshes = true;
         
-        private readonly Dictionary<int3, GameObject> spawnedChunks = new Dictionary<int3, GameObject>();
-        private readonly HashSet<int3> generatedChunks = new HashSet<int3>();
+        private Dictionary<int3, GameObject> spawnedChunks = new Dictionary<int3, GameObject>();
+        private Dictionary<int2, Entity> SpawnedEntities = new Dictionary<int2, Entity>(); 
+        private HashSet<int3> generatedChunks = new HashSet<int3>();
         
-        private MeshCombiner meshCombiner;
         private GroundAnimator groundAnimator;
+        private EntityManager entityManager;
+        private MeshCombiner meshCombiner;
 
         public bool IsGenerating { get; private set; }
         
@@ -80,8 +83,9 @@ namespace WaveFunctionCollapse
         private void Start()
         {
 #endif
-            meshCombiner = GetComponent<MeshCombiner>();
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             groundAnimator = GetComponent<GroundAnimator>();
+            meshCombiner = GetComponent<MeshCombiner>();
             
             if (!waveFunction.Load(this)) return;
             waveFunction.ParentTransform = transform;
@@ -203,7 +207,7 @@ namespace WaveFunctionCollapse
                 
                 int3 chunkIndex = new int3(chunk.ChunkIndex.x + x, 0, chunk.ChunkIndex.z + z);
                 if (spawnedChunks.ContainsKey(chunkIndex) || !waveFunction.Chunks.TryGetValue(chunkIndex, out Chunk adjacent)) continue;
-                // If spawnedChunks contains could add a new enemy direction
+
                 Direction dir = DirectionUtility.Int2ToDirection(new int2(-x, -z));
                 adjacentChunks.Add(adjacent);
                 directions.Add(dir);
@@ -216,6 +220,8 @@ namespace WaveFunctionCollapse
                 DisplayCells(cells);
                 generatedChunks.Add(adjacentChunks[i].ChunkIndex);
                 Events.OnGroundChunkGenerated?.Invoke(adjacentChunks[i]);
+                
+                enemySpawnHandler.AddSpawnPoints(cells);
             }
         }
 

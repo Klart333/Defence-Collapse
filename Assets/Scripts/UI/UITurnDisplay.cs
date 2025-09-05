@@ -18,9 +18,9 @@ namespace UI
             Events.OnTurnIncreased -= OnTurnIncreased;
         }
 
-        private void OnTurnIncreased(int turn)
+        private void OnTurnIncreased(int increase, int total)
         {
-            turnCountText.text = turn.ToString("N0");
+            turnCountText.text = total.ToString("N0");
         }
     }
 }

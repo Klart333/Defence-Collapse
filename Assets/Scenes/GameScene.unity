@@ -2215,6 +2215,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da655e40d87243baa0fc32dc5a2a7bb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  turnInterval: 20
   upgradeCardParent: {fileID: 1816681069}
   upgradeCards:
   - {fileID: 575319406}
@@ -4263,91 +4264,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundGenerator: {fileID: 1024001993}
-  spawnPointPrefab: {fileID: 4454381110423590850, guid: c53a219438839dd45a1e2dd1a32dab2c,
-    type: 3}
-  shouldSpawnCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0.9990921
-      value: 0.30195922
-      inSlope: 0.08763102
-      outSlope: 0.08763102
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.036764704
-    - serializedVersion: 3
-      time: 19.981628
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  minimumSpawnsCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0.89411163
-      value: 1.0379944
-      inSlope: 1.1418351
-      outSlope: 1.1418351
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1.793006
-      value: 2.0643835
-      inSlope: Infinity
-      outSlope: Infinity
-      tangentMode: 103
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 9.926453
-      value: 3.0150795
-      inSlope: Infinity
-      outSlope: Infinity
-      tangentMode: 103
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  maximumSpawnsCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0.9836553
-      value: 2.0553377
-      inSlope: Infinity
-      outSlope: Infinity
-      tangentMode: 103
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1.9292119
-      value: 3.1146867
-      inSlope: Infinity
-      outSlope: Infinity
-      tangentMode: 103
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  displayPrefab: {fileID: 4713737178620374483, guid: 417e811b0c4e9ee4b8299fbb35e0048d,
-    type: 3}
+  spawnDataUtility: {fileID: 11400000, guid: 14e0cdc191631d54d99384f21e9b5d6f, type: 2}
 --- !u!1 &343935060
 GameObject:
   m_ObjectHideFlags: 0
@@ -4606,7 +4523,7 @@ GameObject:
   - component: {fileID: 370144371}
   - component: {fileID: 370144372}
   m_Layer: 5
-  m_Name: Start Wave
+  m_Name: Next Turn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13159,7 +13076,7 @@ GameObject:
   - component: {fileID: 1611296566}
   - component: {fileID: 1611296568}
   m_Layer: 5
-  m_Name: StartButton
+  m_Name: TurnButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14218,9 +14135,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28ed967c15764d1ba3f04855aec4c3b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnHandler: {fileID: 342113231}
-  bossData: {fileID: 11400000, guid: 044c8039edcb2c0448e78cb816ba2851, type: 2}
-  spawnDataUtility: {fileID: 11400000, guid: 14e0cdc191631d54d99384f21e9b5d6f, type: 2}
 --- !u!1 &1816681069
 GameObject:
   m_ObjectHideFlags: 0

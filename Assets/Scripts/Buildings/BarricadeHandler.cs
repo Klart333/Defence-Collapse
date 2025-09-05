@@ -42,17 +42,27 @@ namespace Buildings
             GetGameSpeed().Forget();
         }
 
+        private void OnEnable()
+        {
+            Events.OnTurnIncreased += OnTurnIncreased;
+        }
+
+        private void OnDisable()
+        {
+            Events.OnTurnIncreased -= OnTurnIncreased;
+        }
+
         private async UniTaskVoid GetGameSpeed()
         {
             gameSpeed = await GameSpeedManager.Get();
         }
         
-        private void Update()
+        private void OnTurnIncreased(int increase, int total)
         {
             foreach (BarricadeState barricadeState in BarricadeStates.Values)
             {
-                barricadeState.Update(Time.deltaTime * gameSpeed.Value);
-            }
+                barricadeState.OnTurnsIncreased(increase);
+            }        
         }
         
         public void AddBarricade(Barricade barricade)

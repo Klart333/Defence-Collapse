@@ -8,6 +8,10 @@ namespace Gameplay.Upgrades
 {
     public class UpgradeCardHandler : MonoBehaviour
     {
+        [Title("Settings")]
+        [SerializeField]
+        private int turnInterval = 10;
+        
         [Title("References")]
         [SerializeField]
         private GameObject upgradeCardParent;
@@ -34,8 +38,8 @@ namespace Gameplay.Upgrades
         private GameManager gameManager;
         private CanvasGroup canvasGroup;
         
-        private int waveCount = 0; 
-        private int rerollCount = 0;
+        private int rerollCount;
+        private int lastCardTurn;
 
         private void Awake()
         {
@@ -53,42 +57,44 @@ namespace Gameplay.Upgrades
             upgradeDataUtility.StartObserving();
 
             Events.OnUpgradeCardPicked += OnUpgradePicked;
-            Events.OnWaveEnded += OnWaveEnded;
+            Events.OnTurnIncreased += OnTurnIncreased;
             
             canvasGroup = upgradeCardParent.GetComponentInChildren<CanvasGroup>();
         }
-        
+
         private void OnDisable()
         {
             upgradeDataUtility.StopObserving();
             
             Events.OnUpgradeCardPicked -= OnUpgradePicked;
-            Events.OnWaveEnded -= OnWaveEnded;
+            Events.OnTurnIncreased -= OnTurnIncreased;
+        }
+
+        private void OnTurnIncreased(int increase, int total)
+        {
+            int diff = total - lastCardTurn;
+            if (diff % turnInterval != 0) return;
+            
+            lastCardTurn = total;
+            DisplayUpgradeCards();
         }
 
         private void OnUpgradePicked(UpgradeCardData.UpgradeCardInstance _)
         {
             HideCards();
         }
-
-        private void OnWaveEnded()
-        {
-            UIEvents.OnFocusChanged?.Invoke();
-
-            waveCount++;
-            rerollCount = 0;
-
-            DisplayUpgradeCards();
-        }
         
         public void DisplayUpgradeCards()
         {
+            UIEvents.OnFocusChanged?.Invoke();
+            rerollCount = 0;
+
             canvasGroup.alpha = 0;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
             canvasGroup.DOFade(1, fadeInDuration).SetEase(fadeInEase);
             
-            int seed = gameManager.Seed + waveCount;
+            int seed = gameManager.Seed + lastCardTurn;
             List<UpgradeCardData.UpgradeCardInstance> datas = upgradeDataUtility.GetRandomData(seed, upgradeCards.Length);
 
             for (int i = 0; i < upgradeCards.Length; i++)
@@ -102,7 +108,7 @@ namespace Gameplay.Upgrades
         public void RerollUpgradeCards()
         {
             rerollCount++;
-            int seed = gameManager.Seed + waveCount + rerollCount;
+            int seed = gameManager.Seed + lastCardTurn + rerollCount;
             List<UpgradeCardData.UpgradeCardInstance> datas = upgradeDataUtility.GetRandomData(seed, upgradeCards.Length);
 
             for (int i = 0; i < upgradeCards.Length; i++)

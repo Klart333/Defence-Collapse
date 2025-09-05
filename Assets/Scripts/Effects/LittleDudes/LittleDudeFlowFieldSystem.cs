@@ -9,10 +9,12 @@ using Pathfinding;
 using Unity.Burst;
 using Unity.Jobs;
 using System;
+using Effects.ECS;
 
 namespace Effects.LittleDudes
 {
-    public partial class LittleDudeFlowFieldSystem : SystemBase
+    [UpdateAfter(typeof(DeathSystem))]
+    public partial class LittleDudeFlowFieldSystem : SystemBase // TODO: Make little dudes last an amount of turns
     {
         private BlobAssetReference<LittleDudePathChunkArray> pathChunks;
         private NativeHashMap<int2, int> chunkIndexToListIndex;
@@ -28,7 +30,6 @@ namespace Effects.LittleDudes
             base.OnCreate();
             
             Events.OnGroundChunkGenerated += OnGroundChunkGenerated;
-            Events.OnWaveEnded += OnWaveEnded;
             InitializeFlowField();
 
             littleDudeQuery = SystemAPI.QueryBuilder().WithAll<LittleDudeComponent>().Build();
@@ -99,19 +100,11 @@ namespace Effects.LittleDudes
             }
         }
         
-        private void OnWaveEnded()
-        {
-            NativeArray<Entity> dudes = littleDudeQuery.ToEntityArray(Allocator.Temp);
-            EntityManager.DestroyEntity(dudes);
-            dudes.Dispose();
-        }
-
         protected override void OnDestroy()
         {
             base.OnDestroy();
             
             Events.OnGroundChunkGenerated -= OnGroundChunkGenerated;
-            Events.OnWaveEnded -= OnWaveEnded;
 
             chunkIndexToListIndex.Dispose();
             pathChunks.Dispose();

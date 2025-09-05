@@ -35,10 +35,10 @@ namespace Gameplay.Turns
 
         public void IncreaseTurn()
         {
-            Events.OnTurnIncreased?.Invoke(turnHandler.Turn + 1);
+            Events.OnTurnIncreased?.Invoke(1, turnHandler.Turn + 1);
             
             isProcessingTurn = true;
-            increaseTurnButton.interactable = !isProcessingTurn;
+            //increaseTurnButton.interactable = !isProcessingTurn;
         }
     }
 }

@@ -7,6 +7,7 @@ using Unity.Burst;
 
 namespace Effects.LittleDudes
 {
+    [BurstCompile, UpdateAfter(typeof(DeathSystem))]
     public partial struct LittleDudeSpawner : ISystem
     {
         private ComponentLookup<LocalTransform> transformLookup;

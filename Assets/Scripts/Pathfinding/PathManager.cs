@@ -222,7 +222,7 @@ namespace Pathfinding
         public static float3 ByteToDirectionFloat3(byte directionByte, float y = 0)
         {
             float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees
-            return new float3(math.cos(angleRad), y, math.sin(angleRad));
+            return math.normalize(new float3(math.cos(angleRad), y, math.sin(angleRad)));
         }
         
         public static float3 ChunkIndexToWorld(int2 chunkIndex)

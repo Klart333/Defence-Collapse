@@ -19,7 +19,7 @@ namespace Enemy.ECS
             var entity = state.EntityManager.CreateEntity();
             state.EntityManager.AddComponentData(entity, new SpatialHashMapSingleton());
             
-            state.RequireForUpdate<FlowFieldComponent>(); // Require enemy (or little dude)
+            state.RequireForUpdate<ManagedClusterComponent>(); // Require enemy (or little dude)
         }
         
         [BurstCompile]
@@ -49,7 +49,7 @@ namespace Enemy.ECS
     }
     
     [BurstCompile]
-    [WithAll(typeof(FlowFieldComponent)), WithNone(typeof(LittleDudeComponent))]
+    [WithAll(typeof(ManagedClusterComponent))]
     public partial struct BuildEnemyHashGridJob : IJobEntity // CELL SIZE 1!!
     {
         [WriteOnly]

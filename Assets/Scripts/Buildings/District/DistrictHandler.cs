@@ -45,7 +45,6 @@ namespace Buildings.District
         private EntityQuery districtEntityQuery;
         
         private int districtKey;
-        private bool inWave;
         
         public Dictionary<int, DistrictData> Districts => uniqueDistricts;
 
@@ -53,32 +52,28 @@ namespace Buildings.District
         {
             Events.OnWallsDestroyed += OnWallsDestroyed;
             Events.OnDistrictBuilt += OnDistrictBuilt;
-            Events.OnWaveStarted += OnWaveStarted;
-            Events.OnWaveEnded += OnWaveEnded;
-            
+            Events.OnTurnIncreased += OnTurnIncreased;
             districtGenerator.OnDistrictChunkRemoved += OnDistrictChunkRemoved;
             
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             districtEntityQuery = entityManager.CreateEntityQuery(typeof(DistrictEntityData));
         }
-
+        
         private void OnDisable()
         {
             Events.OnWallsDestroyed -= OnWallsDestroyed;
             Events.OnDistrictBuilt -= OnDistrictBuilt;
-            Events.OnWaveStarted -= OnWaveStarted;
-            Events.OnWaveEnded -= OnWaveEnded;
+            Events.OnTurnIncreased -= OnTurnIncreased;
             
             districtGenerator.OnDistrictChunkRemoved -= OnDistrictChunkRemoved;
         }
-
+        
         /// <summary>
         /// District Generator Rebuilding/Removing Chunk
         /// </summary>
         /// <param name="chunk"></param>
         private void OnDistrictChunkRemoved(IChunk chunk)
         {
-            //Debug.Log("OnDistrictChunkRemoved");
             foreach (DistrictData districtData in uniqueDistricts.Values)
             {
                 if (districtData.OnDistrictChunkRemoved(chunk))
@@ -90,38 +85,19 @@ namespace Buildings.District
 
         private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
         {
-            //Debug.Log("OnWallsDestroyed");
-            //foreach (ChunkIndex chunkIndex in chunkIndexes)
-            //{
-            //    Debug.Log("Index: " + chunkIndex);
-            //}
             districtGenerator.AddAction(async () => await districtGenerator.RemoveChunks(chunkIndexes));
         }
 
-        private void OnWaveEnded()
+        
+        private void OnTurnIncreased(int increase, int total)
         {
-            inWave = false;
-        }
-
-        private void OnWaveStarted()
-        {
-            inWave = true;
-        }
-
-        private void Update()
-        {
-            if (!inWave || GameManager.Instance.IsGameOver) return;
-
-            foreach (DistrictData districtData in uniqueDistricts.Values)
-            {
-                districtData.Update();
-            }
-
             UpdateDistrictEntities().Forget();
         }
 
         private async UniTaskVoid UpdateDistrictEntities()
         {
+            await UniTask.NextFrame();
+            
             NativeList<DistrictEntityData> array = districtEntityQuery.ToComponentDataListAsync<DistrictEntityData>(Allocator.TempJob, out var awaitJobHandle);
             awaitJobHandle.Complete();
             while (!awaitJobHandle.IsCompleted)
@@ -129,8 +105,11 @@ namespace Buildings.District
                 await UniTask.Yield();
             }
 
-            if (!array.IsCreated)
+            if (!array.IsCreated) return;
+
+            if (array.Length == 0)
             {
+                array.Dispose();
                 return;
             }
             
@@ -148,6 +127,8 @@ namespace Buildings.District
             
             array.Dispose();
             entityManager.DestroyEntity(districtEntityQuery);
+            
+            UpdateDistrictEntities().Forget();
         }
 
         public void AddBuiltDistrict(HashSet<QueryChunk> chunks, DistrictType districtType)
