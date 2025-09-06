@@ -1,14 +1,13 @@
+using HealthComponent = Effects.ECS.HealthComponent;
 using Random = Unity.Mathematics.Random;
 using Sirenix.OdinInspector;
-using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Entities;
 using Effects.ECS;
 using UnityEngine;
 using Enemy.ECS;
-using Health;
 using VFX.ECS;
-using HealthComponent = Effects.ECS.HealthComponent;
+using Health;
 
 namespace Enemy
 {
@@ -86,7 +85,7 @@ namespace Enemy
                 {
                     AddComponent(enemyEntity, new EnemyBossComponent
                     {
-                        Name = authoring.enemyData.BossName,
+                        Name = authoring.enemyData.Name,
                         Offset = authoring.enemyData.VerticalNameOffset,
                     });
 

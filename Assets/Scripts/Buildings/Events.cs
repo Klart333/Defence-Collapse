@@ -25,6 +25,7 @@ public static class Events
     public static UnityAction<DistrictType> OnDistrictBuilt;
     public static UnityAction<TowerData> OnDistrictUnlocked;
     
+    public static UnityAction OnUpgradeCardsDisplayed;
     public static UnityAction<UpgradeCardData.UpgradeCardInstance> OnUpgradeCardPicked;
     
     public static UnityAction OnGameReset;

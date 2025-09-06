@@ -57,6 +57,11 @@ public class AttackVisualEffect : PooledMonoBehaviour
 
     private void Update()
     {
+        if (gameSpeed == null)
+        {
+            return;
+        }
+        
         if (setVisualEffectToGameSpeed && !Mathf.Approximately(visualEffect.playRate, gameSpeed.Value))
         {
             visualEffect.playRate = gameSpeed.Value;

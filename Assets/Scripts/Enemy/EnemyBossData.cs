@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Random = System.Random;
 using Sirenix.OdinInspector;
-using Unity.Entities;
 using UnityEngine;
 
 namespace Enemy

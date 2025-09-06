@@ -3,6 +3,7 @@ using Sirenix.Serialization;
 using UnityEngine;
 using Effects;
 using System;
+using Variables;
 
 namespace Enemy
 {
@@ -10,6 +11,16 @@ namespace Enemy
     [InlineEditor, CreateAssetMenu(fileName = "New Enemy Data", menuName = "Enemy/Enemy Data")]
     public class EnemyData : SerializedScriptableObject
     {
+        [Title("Display")]
+        [SerializeField]
+        private StringReference displayName;
+        
+        [SerializeField]
+        private StringReference description;
+        
+        [SerializeField]
+        private SpriteReference icon; 
+        
         [TitleGroup("Stats")]
         [OdinSerialize, NonSerialized]
         public Stats Stats;
@@ -25,9 +36,6 @@ namespace Enemy
         [Title("Spawning")]
         [SerializeField]
         private bool isBoss = false;
-
-        [SerializeField, ShowIf(nameof(isBoss))]
-        private string bossName;
 
         [SerializeField, ShowIf(nameof(isBoss))]
         private float verticalNameOffset;
@@ -64,13 +72,15 @@ namespace Enemy
 
         public float HealthScalingMultiplier => healthScalingMultiplier;
         public float VerticalNameOffset => verticalNameOffset;
+        public string Description => description.Value;
         public float DropLootChance => dropLootChance;
         public int Importance => flowFieldImportance;
         public bool ExplodeOnDeath => explodeOnDeath;
         public float ExplosionSize => explosionSize;
         public float MoneyOnDeath => moneyOnDeath;
+        public string Name => displayName.Value;
         public bool CanDropLoot => canDropLoot;
-        public string BossName => bossName;
+        public Sprite Icon => icon.Value;
         public bool IsBoss => isBoss;
 
         [TitleGroup("Stats")]

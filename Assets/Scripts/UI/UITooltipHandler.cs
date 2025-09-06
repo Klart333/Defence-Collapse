@@ -79,7 +79,7 @@ namespace UI
             
             foreach (UITooltipDisplay tooltip in spawnedTooltips)
             {
-                tooltip.HideTooltip();
+                tooltip.HideTooltip().Forget();
                 tooltip.OnPointerEnter -= PointerEnterPanel;
                 tooltip.OnPointerExit -= PointerExitPanel;
             }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
@@ -87,6 +88,7 @@ namespace Gameplay.Upgrades
         public void DisplayUpgradeCards()
         {
             UIEvents.OnFocusChanged?.Invoke();
+            Events.OnUpgradeCardsDisplayed?.Invoke();
             rerollCount = 0;
 
             canvasGroup.alpha = 0;

@@ -105,6 +105,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9219457892140205176}
+  - component: {fileID: 6129324741205504309}
   - component: {fileID: 7188492982815616304}
   - component: {fileID: 5830034467504996574}
   - component: {fileID: 6301747978653250796}
@@ -137,6 +138,18 @@ RectTransform:
   m_AnchoredPosition: {x: 15, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0}
+--- !u!225 &6129324741205504309
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4956670823824996570}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &7188492982815616304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,6 +206,9 @@ MonoBehaviour:
   contentParent: {fileID: 9219457892140205176}
   tooltipTextPrefab: {fileID: 9195058496517092639, guid: 8254f39f45dc0f0459999f7a1d68489c,
     type: 3}
+  fadeInDuration: 0.2
+  fadeOutDuration: 0.2
+  ease: 22
 --- !u!1 &6334299118302923746
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,5 +8,10 @@ namespace Enemy
     public class EnemyUtility : ScriptableObject
     {
         public List<Enemy> Enemies;
+
+        public EnemyData GetEnemy(int index)
+        {
+            return Enemies[index].EnemyData;
+        }
     }
 }
