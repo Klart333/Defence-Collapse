@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
+using InputCamera;
 using UnityEngine.EventSystems;
 
 namespace UI

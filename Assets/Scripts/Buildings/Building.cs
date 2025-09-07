@@ -7,6 +7,8 @@ using UnityEngine.Events;
 using Pathfinding;
 using UnityEngine;
 using Enemy.ECS;
+using Gameplay.Event;
+using InputCamera;
 
 namespace Buildings
 {

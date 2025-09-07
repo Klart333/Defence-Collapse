@@ -7,6 +7,7 @@ using System.Linq;
 using UnityEngine;
 using Effects.ECS;
 using Effects;
+using Gameplay.Event;
 using Unity.Collections;
 
 namespace Gameplay.Upgrades

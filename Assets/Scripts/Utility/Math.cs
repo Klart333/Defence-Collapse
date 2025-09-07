@@ -8,8 +8,8 @@ namespace Utility
     {
         public static float Round(float x, float multiple)
         {
-            float below = multiple * Mathf.FloorToInt(x / multiple);
-            float above = multiple * Mathf.CeilToInt(x / multiple);
+            float below = multiple * math.floor(x / multiple);
+            float above = multiple * math.ceil(x / multiple);
             if (x - below < above - x)
             {
                 return below;
@@ -20,12 +20,12 @@ namespace Utility
 
         public static int GetMultiple(float x, float multiple)
         {
-            return Mathf.FloorToInt(x / multiple + 0.5f);
+            return (int)math.floor(x / multiple + 0.5f);
         }
 
         public static int GetMultipleFloored(float x, float multiple)
         {
-            return Mathf.FloorToInt(x / multiple);
+            return (int)math.floor(x / multiple);
         }
 
         public static float3 CubicLerp(float3 a, float3 b, float3 c, float t)

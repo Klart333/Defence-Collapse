@@ -8,6 +8,7 @@ using Unity.Mathematics;
 using Gameplay.Money;
 using System.Linq;
 using DG.Tweening;
+using Gameplay.Event;
 using InputCamera;
 using UnityEngine;
 

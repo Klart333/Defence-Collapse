@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Gameplay;
+using Gameplay.Event;
+using InputCamera;
 using UnityEngine.InputSystem;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;

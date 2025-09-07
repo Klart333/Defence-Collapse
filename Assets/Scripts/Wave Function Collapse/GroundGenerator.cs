@@ -9,6 +9,7 @@ using Unity.Entities;
 using UnityEngine;
 using System;
 using Enemy;
+using Gameplay.Event;
 
 namespace WaveFunctionCollapse
 {
@@ -56,11 +57,9 @@ namespace WaveFunctionCollapse
         private bool compilePrototypeMeshes = true;
         
         private Dictionary<int3, GameObject> spawnedChunks = new Dictionary<int3, GameObject>();
-        private Dictionary<int2, Entity> SpawnedEntities = new Dictionary<int2, Entity>(); 
         private HashSet<int3> generatedChunks = new HashSet<int3>();
         
         private GroundAnimator groundAnimator;
-        private EntityManager entityManager;
         private MeshCombiner meshCombiner;
 
         public bool IsGenerating { get; private set; }
@@ -83,7 +82,6 @@ namespace WaveFunctionCollapse
         private void Start()
         {
 #endif
-            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             groundAnimator = GetComponent<GroundAnimator>();
             meshCombiner = GetComponent<MeshCombiner>();
             

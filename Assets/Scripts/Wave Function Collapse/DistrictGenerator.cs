@@ -13,6 +13,7 @@ using System.Linq;
 using Buildings;
 using Gameplay;
 using System;
+using Gameplay.Event;
 
 namespace WaveFunctionCollapse
 {

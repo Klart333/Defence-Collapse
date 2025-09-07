@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Gameplay;
+using InputCamera;
 using Sirenix.OdinInspector;
 using UnityEngine.InputSystem;
 using UnityEngine;
@@ -56,14 +57,8 @@ namespace UI
         {
             isPaused = !isPaused;
 
-            if (isPaused)
-            {
-                OpenPauseMenu();  
-            }
-            else
-            {
-                ClosePauseMenu();
-            }
+            if (isPaused) OpenPauseMenu();  
+            else ClosePauseMenu();
         }
 
         public void OpenPauseMenu()

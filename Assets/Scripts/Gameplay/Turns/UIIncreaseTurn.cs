@@ -1,3 +1,4 @@
+using Gameplay.Event;
 using UnityEngine.UI;
 using UnityEngine;
 

@@ -7,6 +7,7 @@ using DG.Tweening;
 using Variables;
 using System;
 using Effects;
+using Gameplay.Event;
 using TMPro;
 using UI;
 

@@ -5,6 +5,7 @@ using UnityEngine;
 using Saving;
 using System;
 using Effects;
+using Gameplay.Event;
 
 namespace Exp
 {

@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
+using Gameplay.Event;
 using TMPro;
 using Loot;
 

@@ -9,6 +9,7 @@ using UnityEngine;
 using Gameplay;
 using System;
 using Enemy.ECS;
+using Pathfinding;
 using Unity.Collections;
 
 namespace Enemy
@@ -99,7 +100,6 @@ namespace Enemy
         private void CreateEntity(ChunkIndex chunkIndex)
         {
             float3 position = ChunkWaveUtility.GetPosition(chunkIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize);
-
             Entity entity = entityManager.Instantiate(spawnPrefab);
             entityManager.SetComponentData(entity, new SpawnPointComponent
             {

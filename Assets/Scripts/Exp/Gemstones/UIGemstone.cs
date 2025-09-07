@@ -8,6 +8,7 @@ using DG.Tweening;
 using Gameplay;
 using System;
 using Cysharp.Threading.Tasks;
+using Gameplay.Event;
 using UI;
 
 namespace Exp.Gemstones

@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine.EventSystems;
 using Cysharp.Threading.Tasks;
+using Gameplay.Event;
 using Sirenix.OdinInspector;
 using UnityEngine.UI;
 using UnityEngine;

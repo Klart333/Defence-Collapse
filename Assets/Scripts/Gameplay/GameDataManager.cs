@@ -9,6 +9,7 @@ using Enemy.ECS;
 using Effects;
 using Health;
 using System;
+using Gameplay.Event;
 
 namespace Gameplay
 {

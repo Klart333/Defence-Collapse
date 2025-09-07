@@ -10,6 +10,7 @@
 
 using System;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 [assembly: RegisterAssetReferenceAttributeForwardToChild(typeof(InlineEditorAttribute))]
 [assembly: RegisterAssetReferenceAttributeForwardToChild(typeof(PreviewFieldAttribute))]

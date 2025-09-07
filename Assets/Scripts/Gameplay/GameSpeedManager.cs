@@ -6,6 +6,8 @@ using Unity.Entities;
 using DG.Tweening;
 using UnityEngine;
 using Effects;
+using Gameplay.Event;
+using InputCamera;
 
 namespace Gameplay
 {

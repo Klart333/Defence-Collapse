@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using DG.Tweening;
 using Gameplay;
+using Gameplay.Event;
 
 namespace UI
 {

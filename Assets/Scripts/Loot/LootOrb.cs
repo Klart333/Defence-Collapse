@@ -1,5 +1,6 @@
 using DG.Tweening;
 using System;
+using InputCamera;
 using UnityEngine;
 
 namespace Loot

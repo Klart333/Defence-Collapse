@@ -6,6 +6,7 @@ using Pathfinding.ECS;
 using Unity.Entities;
 using Unity.Burst;
 using Pathfinding;
+using Utility;
 
 namespace Enemy.ECS
 {
@@ -22,8 +23,7 @@ namespace Enemy.ECS
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            Entity pathBlobberEntity = SystemAPI.GetSingletonEntity<PathBlobber>();
-            PathBlobber pathBlobber = SystemAPI.GetComponent<PathBlobber>(pathBlobberEntity);
+            PathBlobber pathBlobber = SystemAPI.GetSingleton<PathBlobber>();
             TurnIncreaseComponent turnIncrease = SystemAPI.GetSingleton<TurnIncreaseComponent>();
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
             
@@ -68,14 +68,18 @@ namespace Enemy.ECS
             flowField.MoveTimer = (int)math.round(1.0f / speed.Speed);
             
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
-            float3 direction = PathUtility.ByteToDirectionFloat3(valuePathChunk.Directions[flowField.PathIndex.GridIndex], 0);
+            float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[flowField.PathIndex.GridIndex]);
             
-            float3 movement = direction * speed.Speed;
-            PathIndex movedPathIndex = PathUtility.GetIndex(cluster.Position.x + movement.x, cluster.Position.z + movement.z);
+            float3 movedPosition = cluster.Position + new float3(Math.GetMultiple(direction.x, PathUtility.CELL_SCALE), 0, Math.GetMultiple(direction.y, PathUtility.CELL_SCALE)) * 2;
+            PathIndex movedPathIndex = PathUtility.GetIndex(movedPosition.xz);
             if (!ChunkIndexToListIndex.ContainsKey(movedPathIndex.ChunkIndex)) return;
             
             flowField.PathIndex = movedPathIndex;
-            cluster.Position += movement;
+            cluster.Position = movedPosition;
+            
+            ref PathChunk movedPathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[movedPathIndex.ChunkIndex]];
+            float2 newDirection = PathUtility.ByteToDirection(movedPathChunk.Directions[movedPathIndex.GridIndex]);
+            cluster.Facing = newDirection;
             
             ECB.AddComponent<UpdatePositioningTag>(sortKey, entity);
         }

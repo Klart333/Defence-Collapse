@@ -57,15 +57,16 @@ namespace Enemy.ECS
 
         public EntityCommandBuffer.ParallelWriter ECB;
         
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in EnemyClusterComponent clusterComponent)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in EnemyClusterComponent cluster)
         {
             DynamicBuffer<ManagedEntityBuffer> buffer = BufferLookup[entity];
-            
-            float size = clusterComponent.EnemySize;
             
             int bufferLength = buffer.Length;
             int rows = (int)math.floor(math.sqrt(bufferLength));
             int enemiesPerRow = (int)math.ceil((float)bufferLength / rows);
+            const float tileSize = 1.75f; // 2 - some padding
+            float size = math.min(cluster.EnemySize, tileSize / rows); 
+            quaternion rotation = quaternion.LookRotation(new float3(cluster.Facing.x, 0, cluster.Facing.y), new float3(0, 1, 0));
             
             int bufferIndex = 0;
             for (int i = 0; i < rows; i++)
@@ -76,10 +77,11 @@ namespace Enemy.ECS
                     RefRW<LocalTransform> transform = TransformLookup.GetRefRW(buffer[bufferIndex++].Entity);
                     float rowOffset = rows / 2.0f * size - i * size;
                     float columnOffset = enemiesInRow / 2.0f * size - j * size;
-                    transform.ValueRW.Position = clusterComponent.Position + new float3(columnOffset, 0, rowOffset);
+                    transform.ValueRW.Position = cluster.Position + math.mul(rotation, new float3(columnOffset, 0, rowOffset));
+                    transform.ValueRW.Rotation = rotation;
                 }
             }
-            
+
             ECB.RemoveComponent<UpdatePositioningTag>(sortKey, entity);
         }
     }

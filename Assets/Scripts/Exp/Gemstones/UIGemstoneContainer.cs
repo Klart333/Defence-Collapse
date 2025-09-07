@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
+using Gameplay.Event;
 
 namespace Exp.Gemstones
 {

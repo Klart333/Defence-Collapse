@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Linq;
 using Buildings;
 using System;
+using Gameplay.Event;
 using UnityEngine.Serialization;
 
 namespace WaveFunctionCollapse

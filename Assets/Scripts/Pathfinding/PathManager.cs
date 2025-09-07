@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Runtime.CompilerServices;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Effects.LittleDudes;
@@ -9,7 +9,7 @@ using Unity.Entities;
 using UnityEngine;
 using Unity.Jobs;
 using System;
-using System.Runtime.CompilerServices;
+using Gameplay.Event;
 
 namespace Pathfinding
 {
@@ -31,12 +31,9 @@ namespace Pathfinding
         private EntityManager entityManager;
         private Entity blobEntity;
 
-        private int arrayLength;
         private int chunkAmount;
         private int jobStartIndex;
 
-        public NativeHashMap<int2, int> ChunkIndexToListIndex => chunkIndexToListIndex;
-        public BlobAssetReference<PathChunkArray> PathChunks => pathChunks;
         public float CellScale => cellScale;
 
         public BuildingTargetPathSet TargetTargetPathSet { get; private set; }
@@ -50,7 +47,6 @@ namespace Pathfinding
             
             chunkAmount = 0;
             chunkIndexToListIndex.Add(int2.zero, chunkAmount);    
-            //listIndexToChunkIndex.Add(chunkAmount, int2.zero);
             pathChunks = PathUtility.CreatePathChunks(++chunkAmount, int2.zero, (BlobAssetReference<PathChunkArray>)default);
             
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -97,7 +93,6 @@ namespace Pathfinding
         private void OnChunkGenerated(Chunk chunk)
         {
             chunkIndexToListIndex.Add(chunk.ChunkIndex.xz, chunkAmount);
-            //listIndexToChunkIndex.Add(chunkAmount, chunk.ChunkIndex.xz);
             pathChunks = PathUtility.CreatePathChunks(++chunkAmount, chunk.ChunkIndex.xz, pathChunks);
             
             entityManager.AddComponentData(blobEntity, new PathBlobber
@@ -151,7 +146,7 @@ namespace Pathfinding
             for (int i = 0; i < chunkAmount; i++)
             {
                 ref PathChunk pathChunk = ref pathChunks.Value.PathChunks[i];
-                for (int j = 0; j < arrayLength; j++)
+                for (int j = 0; j < pathChunk.ExtraDistance.Length; j++)
                 {
                     PathIndex index = new PathIndex(pathChunk.ChunkIndex, j);
                     Vector3 pos = (Vector3)PathUtility.GetPos(index) + Vector3.up * 0.1f;
@@ -175,8 +170,8 @@ namespace Pathfinding
                     float arrowHeadAngle = 30f; // degrees
             
                     // Calculate perpendicular directions for arrowhead
-                    Quaternion leftRot = Quaternion.Euler(0, arrowHeadAngle, 0);
-                    Quaternion rightRot = Quaternion.Euler(0, -arrowHeadAngle, 0);
+                    Quaternion leftRot = Quaternion.Euler(0, -arrowHeadAngle, 0);
+                    Quaternion rightRot = Quaternion.Euler(0, arrowHeadAngle, 0);
             
                     Vector3 arrowLeft = leftRot * direction * arrowHeadLength;
                     Vector3 arrowRight = rightRot * direction * arrowHeadLength;
@@ -191,7 +186,7 @@ namespace Pathfinding
 
         #endregion
 
-        }
+    }
 
     public static class PathUtility
     {
@@ -209,10 +204,11 @@ namespace Pathfinding
         
         public const float HALF_BUILDING_CELL = 0.25f;
         public const float FULL_BUILDING_CELL = 0.5f;
-        public const float CELL_SCALE = 0.5f;
+        public const float CELL_SCALE = 1.0f;
         public const float CHUNK_SIZE = 8;
-        public const int GRID_WIDTH = 16; // Also change GetNeighbours inside PathJob
-        public const int GRID_LENGTH = 256; // Width * Width
+        public const int GRID_WIDTH = 8; 
+        public const int GRID_LENGTH = GRID_WIDTH * GRID_WIDTH;
+        
         public static float2 ByteToDirection(byte directionByte)
         {
             float angleRad = (directionByte / 255f) * math.PI2; // Map byte to [0, 360) degrees
@@ -259,6 +255,27 @@ namespace Pathfinding
             int targetIndex = gridZ * GRID_WIDTH + gridX;
         
             return new PathIndex(chunkIndex, targetIndex);
+        }
+        
+        public static PathIndex AddToPathIndex(PathIndex index, int2 add)
+        {
+            int2 chunkIndexAdd = int2.zero;
+            chunkIndexAdd.x = (index.GridIndex + add.x) switch
+            {
+                >= GRID_LENGTH => 1,
+                < 0 => -1,
+                _ => 0
+            };
+            
+            chunkIndexAdd.y = (index.GridIndex + add.y * GRID_WIDTH) switch
+            {
+                >= GRID_LENGTH => 1,
+                < 0 => -1,
+                _ => 0
+            };
+
+            int flatAdd = add.x - chunkIndexAdd.x * GRID_WIDTH + add.y * GRID_WIDTH - chunkIndexAdd.y * GRID_LENGTH;
+            return new PathIndex(index.ChunkIndex + chunkIndexAdd, index.GridIndex + flatAdd);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

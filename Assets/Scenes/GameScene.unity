@@ -3512,7 +3512,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shouldDestroyOnLoad: 1
-  cellScale: 0.5
+  cellScale: 1
   debugGradient:
     serializedVersion: 2
     key0: {r: 1, g: 0, b: 0, a: 1}
@@ -11981,6 +11981,7 @@ Transform:
   - {fileID: 1306756418}
   - {fileID: 827279925}
   - {fileID: 1967713493}
+  - {fileID: 1843548455}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1416224650
@@ -14428,6 +14429,50 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 20
   m_TargetDisplay: 0
+--- !u!1 &1843548454
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1843548455}
+  - component: {fileID: 1843548456}
+  m_Layer: 0
+  m_Name: InputEntityWriter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1843548455
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1843548454}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1411626119}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1843548456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1843548454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f73d3c15ee04ddb8902e8f2ef36c9d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::InputCamera.InputEntityWriter
 --- !u!1 &1844829325
 GameObject:
   m_ObjectHideFlags: 0
@@ -15809,6 +15854,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Core::Juice.SelectedTileHandler
   selectedTile: {fileID: 1478024033}
+  offset: {x: 0, y: -0.1, z: 0}
   groundGenerator: {fileID: 1024001993}
 --- !u!1 &1978976918
 GameObject:

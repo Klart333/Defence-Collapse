@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
+using Gameplay.Event;
+using InputCamera;
 using Loot;
 
 namespace Buildings.District

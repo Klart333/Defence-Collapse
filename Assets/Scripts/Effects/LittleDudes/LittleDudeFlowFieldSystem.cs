@@ -10,6 +10,7 @@ using Unity.Burst;
 using Unity.Jobs;
 using System;
 using Effects.ECS;
+using Gameplay.Event;
 
 namespace Effects.LittleDudes
 {

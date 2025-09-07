@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
 using Gameplay;
+using Gameplay.Event;
 using InputCamera.ECS;
 using Sirenix.OdinInspector;
 using Unity.Entities;

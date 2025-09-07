@@ -11,6 +11,7 @@ using DG.Tweening;
 using InputCamera;
 using System;
 using Effects;
+using Gameplay.Event;
 using TMPro;
 using Loot;
 

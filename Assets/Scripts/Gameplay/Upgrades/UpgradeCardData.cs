@@ -4,6 +4,7 @@ using UnityEngine;
 using Variables;
 using Effects;
 using System;
+using Gameplay.Event;
 
 namespace Gameplay.Upgrades
 {

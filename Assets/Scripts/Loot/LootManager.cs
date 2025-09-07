@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Gameplay.Event;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
