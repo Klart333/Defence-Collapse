@@ -77,6 +77,7 @@ public class MeshCombiner : MonoBehaviour
         finalMesh.CombineMeshes(finalCombiners.ToArray(), false);
         
         spawned = meshPrefab.GetAtPosAndRot<PooledMonoBehaviour>(Vector3.zero, Quaternion.identity).gameObject;
+        spawned.transform.SetParent(parent);
         spawned.GetComponent<MeshFilter>().sharedMesh = finalMesh;
         spawned.GetComponent<MeshCollider>().sharedMesh = finalMesh;
         spawned.GetComponent<MeshRenderer>().sharedMaterials = materials.ToArray();

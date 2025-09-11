@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
 using Sirenix.OdinInspector;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -28,15 +28,16 @@ namespace WaveFunctionCollapse
             Direction.Backward,
         };
         
+        /// <summary>
+        /// Returns an array of material indexes in the order of directions above
+        /// </summary>
         public Dictionary<Direction, int[]> GetMeshIndices(Mesh mesh, Material[] mats)
         {
             MeshRaycastDummy dummy = meshRaycastDummy.SpawnMesh(mesh, mats);
 
             Dictionary<Direction, int[]> result = new Dictionary<Direction, int[]>();
 
-            // Since mesh bounds are always 2 units centered at origin
-            const float halfSize = 1f; // half of 2 units
-            
+            const float halfSize = 1f;
             foreach (Direction direction in directions)
             {
                 HashSet<int> submeshIndices = new HashSet<int>();
@@ -77,7 +78,7 @@ namespace WaveFunctionCollapse
 
                     for (int submesh = 0; submesh < mesh.subMeshCount; submesh++)
                     {
-                        var desc = mesh.GetSubMesh(submesh);
+                        SubMeshDescriptor desc = mesh.GetSubMesh(submesh);
                         if (triangleStart < desc.indexStart || triangleStart >= desc.indexStart + desc.indexCount) continue;
                         submeshIndices.Add(submesh);
                         break;

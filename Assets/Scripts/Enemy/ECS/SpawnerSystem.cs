@@ -195,7 +195,7 @@ namespace Enemy.ECS
             float3 spawnPosition = spawningComponent.Position;
             
             Entity clusterEntity = ECB.CreateEntity(sortKey);
-            DynamicBuffer<ManagedEntityBuffer> buffer = SpawnCluster(sortKey, clusterEntity, spawnPosition);
+            DynamicBuffer<ManagedEntityBuffer> buffer = SpawnCluster(sortKey, clusterEntity, spawnPosition, enemyIndex);
 
             for (int i = 0; i < spawningComponent.Amount; i++)
             {
@@ -218,7 +218,7 @@ namespace Enemy.ECS
             ECB.AddComponent<DeathTag>(sortKey, entity);
         }
 
-        private DynamicBuffer<ManagedEntityBuffer> SpawnCluster(int sortKey, Entity clusterEntity, float3 spawnPosition)
+        private DynamicBuffer<ManagedEntityBuffer> SpawnCluster(int sortKey, Entity clusterEntity, float3 spawnPosition, int enemyIndex)
         {
             ECB.AddComponent<UpdatePositioningTag>(sortKey, clusterEntity);
             ECB.AddComponent(sortKey, clusterEntity, new FlowFieldComponent { MoveTimer = StartMoveDelay, PathIndex = PathUtility.GetIndex(spawnPosition.xz) });
@@ -231,7 +231,8 @@ namespace Enemy.ECS
             {
                 Position = spawnPosition, 
                 EnemySize = 0.25f,
-                Facing = direction
+                Facing = direction,
+                EnemyType = enemyIndex,
             });
             
             DynamicBuffer<ManagedEntityBuffer> buffer = ECB.AddBuffer<ManagedEntityBuffer>(sortKey, clusterEntity);

@@ -1,9 +1,9 @@
 ﻿using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
+using Variables;
 using Effects;
 using System;
-using Variables;
 
 namespace Enemy
 {

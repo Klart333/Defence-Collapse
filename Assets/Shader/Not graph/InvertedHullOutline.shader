@@ -11,6 +11,8 @@
         [Toggle(CUSTOM_NORMALS)]
         _CustomNormals ("Custom Normals (UV2)", Float) = 0
 
+        [Toggle(USE_DITHER)]
+        _UseDither ("Use Dither", Float) = 1
         _DitherThreshold ("Dither Threshold", Float) = 2.5
     }
     SubShader
@@ -24,6 +26,7 @@
             #pragma vertex vert
             #pragma fragment frag
 
+            #pragma shader_feature_fragment USE_DITHER
             #pragma shader_feature_vertex CLIP_SPACE
             #pragma shader_feature_vertex CUSTOM_NORMALS
             #pragma shader_feature_vertex FALLBACK_TO_DEFAULT_NORMALS
@@ -77,7 +80,8 @@
             }
 
             float4 frag(const v2f input) : SV_Target
-            { 
+            {
+#ifdef USE_DITHER
                 float dist = distance(_MousePos.xy, input.position_ws.xz);
                 float2 uv = input.position_cs.xy * _ScreenParams.xy;
                 const float DITHER_THRESHOLDS[16] =
@@ -89,10 +93,11 @@
                 };
                 uint index = (uint(uv.x) % 4) * 4 + uint(uv.y) % 4;
                 float threshold = (dist - _DitherThreshold) - DITHER_THRESHOLDS[index];
-
+                
                 // Clip based on dithering threshold
                 if (threshold <= 0)
                     discard;
+#endif
 
                 float4 output = _Color;
                 output.rgb = MixFog(output.rgb, input.fog_factor);

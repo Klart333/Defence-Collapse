@@ -67,6 +67,7 @@ namespace Gameplay
             AttackingSystem.DamageEvent.Clear();
             StopAttackingSystem.KilledIndexes.Clear();
             DamageCallbackHandler.DamageDoneEvent.Clear();
+            EffectEntityPrefabs.Clear();
             
             World defaultWorld = World.DefaultGameObjectInjectionWorld;
             if (defaultWorld != null)

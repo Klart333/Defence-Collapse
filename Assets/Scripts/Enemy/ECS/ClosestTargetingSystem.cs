@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Burst;
 using UnityEngine;
 using Gameplay;
+using Gameplay.Turns.ECS;
 
 namespace Enemy.ECS
 {
@@ -14,8 +15,8 @@ namespace Enemy.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<GameSpeedComponent>();
-            state.RequireForUpdate<FlowFieldComponent>();
+            state.RequireForUpdate<TurnIncreaseComponent>();
+            state.RequireForUpdate<EnemyClusterComponent>();
             
             EntityQuery query = SystemAPI.QueryBuilder().WithAspect<EnemyTargetAspect>().Build();
             state.RequireForUpdate(query);
@@ -42,7 +43,7 @@ namespace Enemy.ECS
     }
     
     [BurstCompile]
-    public partial struct ClosestTargetingJob : IJobEntity
+    public partial struct ClosestTargetingJob : IJobEntity // TODO: Don't execute every frame dumbass
     {
         [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
@@ -55,11 +56,6 @@ namespace Enemy.ECS
         [BurstCompile]
         public void Execute(EnemyTargetAspect enemyTargetAspect)
         {
-            if (!enemyTargetAspect.ShouldFindTarget())
-            {
-                return;
-            }
-            
             float2 towerPosition = enemyTargetAspect.LocalTransform.ValueRO.Position.xz;
             int2 towerCell = HashGridUtility.GetCell(towerPosition, CellSize);
             float range = enemyTargetAspect.RangeComponent.ValueRO.Range;

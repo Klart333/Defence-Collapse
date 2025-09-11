@@ -28,7 +28,7 @@ namespace WaveFunctionCollapse
         public IQueryWaveFunction Handler { get; set; }
         public Cell[,,] Cells { get; private set; }
         public bool[,,] BuiltCells { get; private set; }
-        public GroundType[,,] GroundTypes { get; private set; }
+        public GroundType[,,,] GroundTypes { get; private set; }
         public List<GameObject> SpawnedMeshes { get; } = new List<GameObject>();
         public Vector3 Position { get; private set;}
         public int Width { get; private set;}
@@ -126,7 +126,7 @@ namespace WaveFunctionCollapse
                 Cells[x, y, z] = new Cell(false, Position + pos, new List<PrototypeData> { PrototypeData.Empty });
             }
             
-            GroundTypes = new GroundType[Width, Height, Depth];
+            GroundTypes = new GroundType[Width, Height, Depth, 4];
             for (int z = 0; z < Depth; z++)
             for (int y = 0; y < Height; y++)
             for (int x = 0; x < Width; x++)
@@ -147,11 +147,14 @@ namespace WaveFunctionCollapse
                     return;
                 }
                 Cell groundCell = groundChunk.Cells[groundIndex.x, 0, groundIndex.z];
-                int2 corner = new int2((int)Mathf.Sign(groundCell.Position.x - cellPosition.x), (int)Mathf.Sign(groundCell.Position.z - cellPosition.z));
 
-                if (cellBuildableCornerData.IsCornerBuildable(groundCell.PossiblePrototypes[0].MeshRot, -corner, out GroundType type))
+                for (int i = 0; i < WaveFunctionUtility.Corners.Length; i++)
                 {
-                    GroundTypes[cellIndex.x, cellIndex.y, cellIndex.z] = type;
+                    int2 corner = WaveFunctionUtility.Corners[i];
+                    if (cellBuildableCornerData.IsCornerBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner, out GroundType type))
+                    {
+                        GroundTypes[cellIndex.x, cellIndex.y, cellIndex.z, i] = type;
+                    }   
                 }
             }
         }

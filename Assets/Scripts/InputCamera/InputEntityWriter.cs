@@ -1,8 +1,10 @@
 using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using Math = Utility.Math;
 using Unity.Mathematics;
 using Unity.Entities;
 using UnityEngine;
+using DG.Tweening;
 
 namespace InputCamera
 {
@@ -10,10 +12,21 @@ namespace InputCamera
     {
         private static readonly int MousePos = Shader.PropertyToID("_MousePos");
         
+        [Title("Animation")]
+        [SerializeField]
+        private float blendDuration = 0.3f;
+        
+        [SerializeField]
+        private Ease blendEase = Ease.InOutSine;
+        
+        private Vector3 overrideMousePosition;
         private EntityManager entityManager;
         private Entity mousePositionEntity;
         private InputManager inputManager;
         private Camera cam;
+
+        private bool isOverridingMousePosition;
+        
 
         private void OnEnable()
         {
@@ -33,15 +46,36 @@ namespace InputCamera
         {
             if (!inputManager) return;
 
-            float2 screenPos = inputManager.Mouse.ReadValue<Vector2>();
-            float3 worldPos = Math.GetGroundIntersectionPoint(cam, screenPos);
             entityManager.SetComponentData(mousePositionEntity, new MousePositionComponent
             {
-                ScreenPosition = screenPos,
-                WorldPosition = worldPos,
+                ScreenPosition = inputManager.CurrentMouseScreenPosition,
+                WorldPosition = inputManager.CurrentMouseWorldPosition,
             });
-            
-            Shader.SetGlobalVector(MousePos, new Vector4(worldPos.x, worldPos.z, 0, 0));
+
+            Vector4 pos = isOverridingMousePosition ? new Vector4(overrideMousePosition.x, overrideMousePosition.z, 0, 0) : new Vector4(inputManager.CurrentMouseWorldPosition.x, inputManager.CurrentMouseWorldPosition.z, 0, 0);
+            Shader.SetGlobalVector(MousePos, pos);
+        }
+
+        public void OverrideShaderMousePosition(Vector3 mousePosition, bool blend = true)
+        {
+            isOverridingMousePosition = true;
+
+            if (blend)
+            {
+                DOTween.Kill(0);
+                
+                overrideMousePosition = inputManager.CurrentMouseWorldPosition;
+                DOTween.To(() => overrideMousePosition, x => overrideMousePosition = x, mousePosition, blendDuration).SetEase(blendEase).SetId(0);
+            }
+            else
+            {
+                overrideMousePosition = mousePosition;
+            }
+        }
+
+        public void DisableOverride()
+        {
+            isOverridingMousePosition = false;
         }
     }
 

@@ -89,12 +89,13 @@ namespace WaveFunctionCollapse
             return chunk;
         }
         
-        public TChunk LoadChunk(int3 index, Vector3Int size, PrototypeInfoData prototypeInfo, bool useSideConstraints = true)
+        public TChunk LoadChunk(int3 index, Vector3Int size, PrototypeInfoData prototypeInfo, bool useSideConstraints = true, Vector3 offset = default)
         {
             Vector3 position = ChunkWaveUtility.GetPosition(index, handler.ChunkScale);
             TChunk[] adjacentChunks = GetAdjacentChunks(index);
             TChunk chunk = new TChunk();
-            chunk.Construct(size.x, size.y, size.z, index, position, adjacentChunks.Cast<IChunk>().ToArray(), useSideConstraints);            Chunks.Add(index, chunk);
+            chunk.Construct(size.x, size.y, size.z, index, position, adjacentChunks.Cast<IChunk>().ToArray(), useSideConstraints);            
+            Chunks.Add(index, chunk);
             LoadCells(chunk, prototypeInfo);
             return chunk;
         }
@@ -862,6 +863,13 @@ namespace WaveFunctionCollapse
             int y = Utility.Math.GetMultipleFloored(position.y, chunkScale.y);
             int z = Utility.Math.GetMultipleFloored(position.z, chunkScale.z);
             return new int3(x, y, z);
+        }
+
+        public static ChunkIndex GetChunkIndex(Vector3 position, Vector3 chunkScale, Vector3 cellSize)
+        {
+            int3 chunkIndex = GetDistrictIndex3(position, chunkScale);
+            int3 cellIndex = GetDistrictIndex3(position - chunkScale.MultiplyByAxis(chunkIndex), cellSize);
+            return new ChunkIndex(chunkIndex, cellIndex);
         }
 
         public static Vector3 GetPosition(int3 index, Vector3 handlerChunkScale)

@@ -29,10 +29,10 @@ namespace Enemy.ECS
             
             state.Dependency = new FlowMovementJob
             {
-                ECB = ecb.AsParallelWriter(),
-                PathChunks = pathBlobber.PathBlob,
                 ChunkIndexToListIndex = pathBlobber.ChunkIndexToListIndex,
                 TurnIncrease = turnIncrease.TurnIncrease,
+                PathChunks = pathBlobber.PathBlob,
+                ECB = ecb.AsParallelWriter(),
             }.ScheduleParallel(state.Dependency);
             
             state.Dependency.Complete();
@@ -47,7 +47,7 @@ namespace Enemy.ECS
         }
     }
 
-    [BurstCompile]
+    [BurstCompile, WithNone(typeof(AttackingComponent))]
     public partial struct FlowMovementJob : IJobEntity
     {
         [ReadOnly]
@@ -65,12 +65,12 @@ namespace Enemy.ECS
         {
             flowField.MoveTimer -= TurnIncrease;
             if (flowField.MoveTimer > 0) return;
-            flowField.MoveTimer = (int)math.round(1.0f / speed.Speed);
+            flowField.MoveTimer += (int)math.round(1.0f / speed.Speed);
             
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
             float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[flowField.PathIndex.GridIndex]);
             
-            float3 movedPosition = cluster.Position + new float3(Math.GetMultiple(direction.x, PathUtility.CELL_SCALE), 0, Math.GetMultiple(direction.y, PathUtility.CELL_SCALE)) * 2;
+            float3 movedPosition = cluster.Position + (math.round(direction) * PathUtility.CELL_SCALE).XyZ();
             PathIndex movedPathIndex = PathUtility.GetIndex(movedPosition.xz);
             if (!ChunkIndexToListIndex.ContainsKey(movedPathIndex.ChunkIndex)) return;
             

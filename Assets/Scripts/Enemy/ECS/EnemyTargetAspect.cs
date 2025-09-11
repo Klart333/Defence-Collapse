@@ -9,14 +9,5 @@ namespace Enemy.ECS
         public readonly RefRW<EnemyTargetComponent> EnemyTargetComponent;
         public readonly RefRO<RangeComponent> RangeComponent;
         public readonly RefRO<LocalTransform> LocalTransform;
-        
-        private readonly RefRW<AttackSpeedComponent> AttackSpeedComponent;
-        
-        public bool ShouldFindTarget()
-        {
-            float delta = AttackSpeedComponent.ValueRO.AttackSpeed - AttackSpeedComponent.ValueRO.Timer;
-
-            return delta < 0.2f;
-        }
     }
 }

@@ -1041,5 +1041,10 @@ namespace Effects
             Entity prefab = GetArchedDamagePrefab(entityManager, meshVariable);
             return entityManager.Instantiate(prefab);
         }
+
+        public static void Clear()
+        {
+            archedDamagePrefabs.Clear();
+        }
     }
 }

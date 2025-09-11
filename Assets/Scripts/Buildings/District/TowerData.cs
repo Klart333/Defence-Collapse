@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Effects;
+using Gameplay;
+using Gameplay.Upgrades;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
-using Gameplay.Upgrades;
 using UnityEngine;
 using Variables;
-using Gameplay;
-using Effects;
-using System;
 
 namespace Buildings.District
 {

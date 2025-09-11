@@ -1,5 +1,4 @@
 using Unity.Collections.LowLevel.Unsafe;
-using Effects.LittleDudes;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -10,12 +9,14 @@ using Pathfinding;
 
 namespace Enemy.ECS
 {
+    [UpdateAfter(typeof(FlowMovementSystem))]
     public partial struct CheckAttackingSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<PathBlobber>();
+            state.RequireForUpdate<EnemyClusterComponent>();
         }
 
         [BurstCompile]
@@ -45,7 +46,7 @@ namespace Enemy.ECS
         }
     }
 
-    [BurstCompile, WithNone(typeof(AttackingComponent), typeof(LittleDudeComponent))]
+    [BurstCompile, WithAll(typeof(EnemyClusterComponent), typeof(UpdatePositioningTag)), WithNone(typeof(AttackingComponent))]
     public partial struct CheckAttackingJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter ECB;
@@ -56,7 +57,7 @@ namespace Enemy.ECS
         public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
         
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in FlowFieldComponent flowField, in LocalTransform transform)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in FlowFieldComponent flowField)
         {
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
             if (valuePathChunk.Directions[flowField.PathIndex.GridIndex] == byte.MaxValue)

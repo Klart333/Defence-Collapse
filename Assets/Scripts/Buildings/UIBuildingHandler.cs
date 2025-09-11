@@ -1,10 +1,10 @@
-using System.Collections.Generic;
-using Buildings.District;
-using UnityEngine;
-using Buildings;
 using System;
+using System.Collections.Generic;
+using Buildings;
+using Buildings.District;
 using Gameplay.Event;
 using UI;
+using UnityEngine;
 
 public class UIBuildingHandler : MonoBehaviour
 {
@@ -56,13 +56,6 @@ public class UIBuildingHandler : MonoBehaviour
 
     public void ClickDistrict(DistrictType district)
     {
-        Events.OnDistrictClicked?.Invoke(district, district switch
-        {
-            DistrictType.Bomb => 3,
-            DistrictType.Church => 3,
-            DistrictType.Lightning => 1,
-            DistrictType.Mine => 1,
-            _ => 2, 
-        });
+        Events.OnDistrictClicked?.Invoke(district);
     }
 }

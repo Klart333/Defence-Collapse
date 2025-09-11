@@ -23,7 +23,7 @@ namespace Gameplay.Event
         public static UnityAction<ChunkIndex> OnBuiltIndexDestroyed;
         public static UnityAction<DistrictData> OnCapitolDestroyed;
 
-        public static UnityAction<DistrictType, int> OnDistrictClicked;
+        public static UnityAction<DistrictType> OnDistrictClicked;
         public static UnityAction<DistrictType> OnDistrictBuilt;
         public static UnityAction<TowerData> OnDistrictUnlocked;
 

@@ -1,6 +1,6 @@
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using System;
 
 [CreateAssetMenu(menuName = "Ground Object Data")]
 public class GroundObjectData : ScriptableObject

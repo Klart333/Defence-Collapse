@@ -41,27 +41,27 @@ namespace WaveFunctionCollapse
             return chunks;
         }
         
-        public void MakeBuildable(IEnumerable<ChunkIndex> cellsToCollapse, PrototypeInfoData prototypeInfo) 
+        public void MakeBuildable(ChunkIndex index, PrototypeInfoData prototypeInfo) 
         {
-            foreach (ChunkIndex index in cellsToCollapse)
-            {
-                QueryMarchedChunk chunk = ChunkWaveFunction.Chunks[index.Index];
-                if (!IsBuildable(index)) continue;
+            QueryMarchedChunk chunk = ChunkWaveFunction.Chunks[index.Index];
+            //if (!IsBuildable(index)) return;
 
-                int marchedIndex = GetMarchIndex(index);
-                chunk.QueryChangedCells.Add((index.CellIndex, chunk[index.CellIndex]));
+            int marchedIndex = GetMarchIndex(index);
+            chunk.QueryChangedCells.Add((index.CellIndex, chunk[index.CellIndex]));
                 
-                chunk[index.CellIndex] = new Cell(false, 
-                    chunk[index.CellIndex].Position, 
-                    new List<PrototypeData>(prototypeInfo.MarchingTable[marchedIndex]));
+            chunk[index.CellIndex] = new Cell(false, 
+                chunk[index.CellIndex].Position, 
+                new List<PrototypeData>(prototypeInfo.MarchingTable[marchedIndex]));
 
-                chunk.GetAdjacentCells(index.CellIndex, out _).ForEach(x => ChunkWaveFunction.CellStack.Push(x));
-
-                if (SpawnedMeshes.TryGetValue(index, out IBuildable buildable))
-                {
-                    buildable.gameObject.SetActive(false);
-                    SpawnedMeshes.Remove(index);
-                }
+            foreach (ChunkIndex x in chunk.GetAdjacentCells(index.CellIndex, out _))
+            {
+                ChunkWaveFunction.CellStack.Push(x);
+            }
+  
+            if (SpawnedMeshes.TryGetValue(index, out IBuildable buildable))
+            {
+                buildable.gameObject.SetActive(false);
+                SpawnedMeshes.Remove(index);
             }
         }
 
@@ -73,7 +73,7 @@ namespace WaveFunctionCollapse
             Vector3 pos = ChunkWaveFunction[index].Position + CellSize / 2.0f;
             for (int i = 0; i < 4; i++)
             {
-                Vector3 marchPos = pos + new Vector3(WaveFunctionUtility.MarchDirections[i].x * CellSize.x, 0, WaveFunctionUtility.MarchDirections[i].y * CellSize.z);
+                Vector3 marchPos = pos + new Vector3(WaveFunctionUtility.MarchDirections[i].x * CellSize.x, 0, WaveFunctionUtility.MarchDirections[i].y * CellSize.z) ;
                 if (TryGetIndex(marchPos, out ChunkIndex chunk) && ChunkWaveFunction.Chunks[chunk.Index].BuiltCells[chunk.CellIndex.x, chunk.CellIndex.y, chunk.CellIndex.z])
                 {
                     marchedIndex += (int)Mathf.Pow(2, i);
@@ -127,7 +127,7 @@ namespace WaveFunctionCollapse
         
         public List<ChunkIndex> GetCellsToCollapse(ChunkIndex queryIndex)
         {
-            return GetSurroundingCells(ChunkWaveFunction[queryIndex].Position + new Vector3(CellSize.x + 0.1f, 0, CellSize.z + 0.1f));
+            return GetSurroundingCells(ChunkWaveFunction[queryIndex].Position + new Vector3(CellSize.x + 0.1f, 0, CellSize.z + 0.1f) / 2.0f);
         }
 
         private List<ChunkIndex> GetSurroundingCells(Vector3 queryPosition)
@@ -201,9 +201,9 @@ namespace WaveFunctionCollapse
             return queryWaveFunction.GetChunks(cellsToCollapse);
         }
         
-        public static void MakeBuildable<T>(this T queryWaveFunction, IEnumerable<ChunkIndex> cellsToCollapse, PrototypeInfoData protInfo) where T : IQueryWaveFunction
+        public static void MakeBuildable<T>(this T queryWaveFunction, ChunkIndex index, PrototypeInfoData protInfo) where T : IQueryWaveFunction
         {
-            queryWaveFunction.MakeBuildable(cellsToCollapse, protInfo);
+            queryWaveFunction.MakeBuildable(index, protInfo);
         }
         
         public static bool TryGetIndex<T>(this T queryWaveFunction, Vector3 pos, out ChunkIndex index) where T : IQueryWaveFunction

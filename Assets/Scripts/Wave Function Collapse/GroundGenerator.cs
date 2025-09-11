@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using System.Diagnostics;
 using Unity.Mathematics;
-using Unity.Entities;
+using Gameplay.Event;
 using UnityEngine;
 using System;
 using Enemy;
-using Gameplay.Event;
 
 namespace WaveFunctionCollapse
 {
@@ -56,8 +55,10 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private bool compilePrototypeMeshes = true;
         
-        private Dictionary<int3, GameObject> spawnedChunks = new Dictionary<int3, GameObject>();
+        private Dictionary<int3, HashSet<int3>> generatedChunkIndexes = new Dictionary<int3, HashSet<int3>>();
         private HashSet<int3> generatedChunks = new HashSet<int3>();
+        private HashSet<int3> spawnedChunks = new HashSet<int3>();
+        private List<int3> chunksToCombine = new List<int3>();
         
         private GroundAnimator groundAnimator;
         private MeshCombiner meshCombiner;
@@ -67,6 +68,7 @@ namespace WaveFunctionCollapse
         public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.CellSize.x, chunkSize.y * ChunkWaveFunction.CellSize.y, chunkSize.z * ChunkWaveFunction.CellSize.z);
         public int3 ChunkSize => new int3(chunkSize.x, chunkSize.y, chunkSize.z);
         public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
+        public HashSet<int3> GeneratedChunks => generatedChunks;
         
 #if UNITY_EDITOR
         private async UniTaskVoid Start()
@@ -156,11 +158,6 @@ namespace WaveFunctionCollapse
         {
             IsGenerating = true;
             Chunk chunk = waveFunction.Chunks[chunkIndex];
-
-            if (spawnedChunks.ContainsKey(chunkIndex))
-            {
-                chunk.InvokeOnCleared();
-            }
             
             DisplayAdjacentChunks(chunk);
             DisplayChunk(chunk);
@@ -168,18 +165,22 @@ namespace WaveFunctionCollapse
             groundAnimator.OnAnimationFinished += OnGroundAnimatorFinished;
 
             OnChunkGenerated?.Invoke(chunk);
-            generatedChunks.Add(chunk.ChunkIndex);
-            //RemoveUnreferencedChunks();
+            chunksToCombine.Add(chunkIndex);
+            generatedChunks.Add(chunkIndex);
         }
 
         private void DisplayChunk(Chunk chunk)
         {
+            HashSet<int3> builtCells = generatedChunkIndexes.GetValueOrDefault(chunk.ChunkIndex, new HashSet<int3>());
             List<ChunkIndex> cells = new List<ChunkIndex>();
             for (int x = 0; x < chunk.Width; x++)
             for (int y = 0; y < chunk.Height; y++)
             for (int z = 0; z < chunk.Depth; z++)
             {
-                cells.Add(new ChunkIndex(chunk.ChunkIndex, new int3(x, y, z)));
+                int3 cellIndex = new int3(x, y, z);
+                if (builtCells.Contains(cellIndex)) continue;
+
+                cells.Add(new ChunkIndex(chunk.ChunkIndex, cellIndex));
             }
             
             DisplayCells(cells);
@@ -191,22 +192,25 @@ namespace WaveFunctionCollapse
             {
                 waveFunction.SetCell(chunkIndex, waveFunction[chunkIndex].PossiblePrototypes[0]);
                 OnCellCollapsed?.Invoke(chunkIndex);
+                
+                if (generatedChunkIndexes.TryGetValue(chunkIndex.Index, out HashSet<int3> list)) list.Add(chunkIndex.CellIndex);
+                else generatedChunkIndexes.Add(chunkIndex.Index, new HashSet<int3> { chunkIndex.CellIndex });
             }
         }
         
         private void DisplayAdjacentChunks(Chunk chunk)
         {
             List<Chunk> adjacentChunks = new List<Chunk>();
-            List<Direction> directions = new List<Direction>();
+            List<MultiDirection> directions = new List<MultiDirection>();
             for (int x = -1; x <= 1; x++)
             for (int z = -1; z <= 1; z++)
             {
-                if (x == 0 && z == 0 || x != 0 && z != 0) continue;
+                if (x == 0 && z == 0) continue;
                 
                 int3 chunkIndex = new int3(chunk.ChunkIndex.x + x, 0, chunk.ChunkIndex.z + z);
-                if (spawnedChunks.ContainsKey(chunkIndex) || !waveFunction.Chunks.TryGetValue(chunkIndex, out Chunk adjacent)) continue;
+                if (!waveFunction.Chunks.TryGetValue(chunkIndex, out Chunk adjacent)) continue;
 
-                Direction dir = DirectionUtility.Int2ToDirection(new int2(-x, -z));
+                MultiDirection dir = DirectionUtility.Int2ToMultiDirection(new int2(-x, -z));
                 adjacentChunks.Add(adjacent);
                 directions.Add(dir);
             }
@@ -214,32 +218,67 @@ namespace WaveFunctionCollapse
             for (int i = 0; i < adjacentChunks.Count; i++)
             {
                 List<ChunkIndex> cells = GetSideIndexes(adjacentChunks[i], directions[i]);
+                if (cells.Count == 0) continue;
                 
                 DisplayCells(cells);
+                enemySpawnHandler.AddSpawnPoints(cells);
+                chunksToCombine.Add(adjacentChunks[i].ChunkIndex);
+
+                if (spawnedChunks.Contains(adjacentChunks[i].ChunkIndex))
+                {
+                    continue;
+                }
+
                 generatedChunks.Add(adjacentChunks[i].ChunkIndex);
                 Events.OnGroundChunkGenerated?.Invoke(adjacentChunks[i]);
-                
-                enemySpawnHandler.AddSpawnPoints(cells);
             }
         }
 
-        private List<ChunkIndex> GetSideIndexes(Chunk chunk, Direction direction)
+        private List<ChunkIndex> GetSideIndexes(Chunk chunk, MultiDirection direction)
         {
-            List<ChunkIndex> cells = new();
+            HashSet<int3> builtCells = generatedChunkIndexes.GetValueOrDefault(chunk.ChunkIndex, new HashSet<int3>());
+            List<ChunkIndex> cells = new List<ChunkIndex>();
             int length = chunk.Width;
 
+            // Extract all active flags
+            List<MultiDirection> activeDirections = new List<MultiDirection>();
+            foreach (MultiDirection dir in Enum.GetValues(typeof(MultiDirection)))
+            {
+                if (direction.HasFlag(dir))
+                {
+                    activeDirections.Add(dir);
+                }   
+            }
+
+            // Case 1: Corner (2+ flags) -> single overlap index
+            if (activeDirections.Count == 2)
+            {
+                int x = direction.HasFlag(MultiDirection.Right)   ? length - 1 : 0;
+                int z = direction.HasFlag(MultiDirection.Forward) ? length - 1 : 0;
+
+                int3 index = new(x, 0, z);
+                if (!builtCells.Contains(index))
+                {
+                    cells.Add(new ChunkIndex(chunk.ChunkIndex, index));
+                }
+                return cells;
+            }
+
+            // Case 2: Single side -> add the whole edge
             for (int i = 0; i < length; i++)
             {
-                int3 adjacent = direction switch
+                int3 targetIndex = direction switch
                 {
-                    Direction.Right    => new int3(length - 1, 0, i         ),          
-                    Direction.Left     => new int3(0,          0, i         ),          
-                    Direction.Forward  => new int3(i,          0, length - 1),
-                    Direction.Backward => new int3(i,          0, 0         ),          
-                    _ => default
+                    MultiDirection.Right => new int3(length - 1, 0, i),
+                    MultiDirection.Left => new int3(0, 0, i),
+                    MultiDirection.Forward => new int3(i, 0, length - 1),
+                    MultiDirection.Backward => new int3(i, 0, 0),
+                    _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
                 };
+
+                if (builtCells.Contains(targetIndex)) continue;
                 
-                cells.Add(new ChunkIndex(chunk.ChunkIndex, adjacent));
+                cells.Add(new ChunkIndex(chunk.ChunkIndex, targetIndex));
             }
 
             return cells;
@@ -251,15 +290,12 @@ namespace WaveFunctionCollapse
 
             if (shouldCombine)
             {
-                foreach (int3 chunkIndex in generatedChunks)
+                foreach (int3 chunkIndex in chunksToCombine)
                 {
-                    if (spawnedChunks.ContainsKey(chunkIndex))
-                    {
-                        continue;
-                    }
-                    
                     CombineChunk(waveFunction.Chunks[chunkIndex]);
                 }
+                
+                chunksToCombine.Clear();
             }
             
             IsGenerating = false;
@@ -270,21 +306,12 @@ namespace WaveFunctionCollapse
         {
             CombineMeshes(chunk.ChunkIndex, ChunkWaveFunction.ChunkParents[chunk.ChunkIndex]);
             chunk.ClearSpawnedMeshes(waveFunction.GameObjectPool);
-            chunk.OnCleared += ChunkOnOnCleared;
-            
-            void ChunkOnOnCleared()
-            {
-                chunk.OnCleared -= ChunkOnOnCleared;
-                
-                spawnedChunks[chunk.ChunkIndex].SetActive(false);
-                spawnedChunks.Remove(chunk.ChunkIndex);
-            }
         }
         
         private void CombineMeshes(int3 chunkIndex, Transform chunkParent)
         {
             meshCombiner.CombineMeshes(chunkParent, out GameObject spawnedMesh);
-            spawnedChunks.Add(chunkIndex, spawnedMesh);
+            spawnedChunks.Add(chunkIndex);
         }
     }
 }

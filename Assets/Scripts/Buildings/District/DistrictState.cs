@@ -1,23 +1,22 @@
-﻿using LocalToWorld = Unity.Transforms.LocalToWorld;
-using Vector2 = UnityEngine.Vector2;
-using Math = Utility.Math;
-
+﻿using System;
 using System.Collections.Generic;
 using Buildings.District.ECS;
-using UnityEngine.Rendering;
-using WaveFunctionCollapse;
-using Unity.Collections;
-using Unity.Mathematics;
-using Gameplay.Upgrades;
-using Unity.Transforms;
-using Unity.Rendering;
-using Unity.Entities;
-using Effects.ECS;
-using UnityEngine;
-using Enemy.ECS;
 using Effects;
+using Effects.ECS;
+using Enemy.ECS;
+using Gameplay.Upgrades;
+using Unity.Collections;
+using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Rendering;
+using Unity.Transforms;
+using UnityEngine;
+using UnityEngine.Rendering;
 using Utility;
-using System;
+using WaveFunctionCollapse;
+using LocalToWorld = Unity.Transforms.LocalToWorld;
+using Math = Utility.Math;
+using Vector2 = UnityEngine.Vector2;
 
 namespace Buildings.District
 {
@@ -269,7 +268,7 @@ namespace Buildings.District
 
             void SetupShooterEntity(Entity spawnedEntity, int i, Vector3 pos)
             {
-                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent { AttackSpeed = attackSpeedValue, Timer = delay * i });
+                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent { AttackSpeed = attackSpeedValue});
                 entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = stats.Range.Value });
                 entityManager.SetComponentData(spawnedEntity, new DistrictDataComponent { DistrictID = Key, });
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = pos });
@@ -282,7 +281,7 @@ namespace Buildings.District
             
             void SetupSimpleShooterEntity(Entity spawnedEntity, int i, Vector3 pos)
             {
-                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent { AttackSpeed = attackSpeedValue, Timer = delay * i });
+                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent { AttackSpeed = attackSpeedValue});
                 entityManager.SetComponentData(spawnedEntity, new DistrictDataComponent { DistrictID = Key, });
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = pos });
             }
@@ -348,14 +347,11 @@ namespace Buildings.District
         protected virtual void AttackSpeedChanged()
         {
             float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
-            float delay = attackSpeedValue / entityIndexes.Count;
-            int index = 0;
             foreach (Entity entity in spawnedDataEntities)
             {
                 entityManager.SetComponentData(entity, new AttackSpeedComponent
                 {
                     AttackSpeed = attackSpeedValue, 
-                    Timer = index++ * delay,
                 });
             }
         }

@@ -1,7 +1,7 @@
-using Unity.Mathematics;
 using System;
 using InputCamera;
 using Sirenix.OdinInspector;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;

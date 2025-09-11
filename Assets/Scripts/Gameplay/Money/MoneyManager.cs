@@ -87,10 +87,9 @@ namespace Gameplay.Money
         }
 
 
-        public bool CanPurchase(DistrictType districtType, int districtAmount, int extraBuildingAmount, out float cost)
+        public bool CanPurchase(DistrictType districtType, int districtAmount, out float cost)
         {
             cost = districtCostUtility.GetCost(districtType, districtAmount);
-            cost += extraBuildingAmount * BuildingCost;
             if (Money >= cost)
             {
                 return true;

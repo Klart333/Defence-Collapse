@@ -1,9 +1,9 @@
-﻿using WaveFunctionCollapse;
-using System;
+﻿using System;
 using Effects;
 using Gameplay.Buffs;
 using Health;
 using UnityEngine;
+using WaveFunctionCollapse;
 
 namespace Buildings
 {

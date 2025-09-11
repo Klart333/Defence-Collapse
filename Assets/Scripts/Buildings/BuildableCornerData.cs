@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
+using System;
 
 namespace WaveFunctionCollapse
 {
@@ -136,6 +136,7 @@ namespace WaveFunctionCollapse
     {
         Grass = 1 << 0, 
         Crystal = 1 << 1,
+        Buildable = Grass | Crystal,
     }
 
     public enum Corner

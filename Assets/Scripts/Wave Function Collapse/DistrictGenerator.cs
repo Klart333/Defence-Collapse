@@ -87,7 +87,7 @@ namespace WaveFunctionCollapse
 
         private void OnEnable()
         {
-            offset = new Vector3(waveFunction.CellSize.x, 0, waveFunction.CellSize.z) / 2.0f;
+            offset = waveFunction.CellSize.XyZ(0) / 2.0f;
             buildingAnimator = FindAnyObjectByType<BuildingAnimator>();
 
             waveFunction.Load(this);
@@ -200,11 +200,12 @@ namespace WaveFunctionCollapse
             {
                 for (int i = 0; i < WaveFunctionUtility.Corners.Length; i++)
                 {
-                    bool isBuildable = buildableCornerData.IsCornerBuildable(buildable.MeshRot, -WaveFunctionUtility.Corners[i], out bool meshIsBuildable);
+                    int2 corner = WaveFunctionUtility.Corners[i];
+                    bool isBuildable = buildableCornerData.IsCornerBuildable(buildable.MeshRot, corner, out bool meshIsBuildable);
                     if (!isBuildable && !meshIsBuildable) continue; 
 
-                    Vector3 cornerOffset = new Vector3(WaveFunctionUtility.Corners[i].x * chunkSize.x * waveFunction.CellSize.x, 0, WaveFunctionUtility.Corners[i].y * chunkSize.z * waveFunction.CellSize.z) * 0.5f;
-                    Vector3 pos = buildable.gameObject.transform.position - cornerOffset - offset;
+                    Vector3 cornerOffset = new Vector3(corner.x * chunkSize.x * waveFunction.CellSize.x, 0, corner.y * chunkSize.z * waveFunction.CellSize.z) * 0.5f;
+                    Vector3 pos = buildable.gameObject.transform.position + cornerOffset - offset;
                     int3 index = ChunkWaveUtility.GetDistrictIndex3(pos, ChunkScale);
                     if (!TryGetBuildingCell(index, out ChunkIndex chunkIndex))
                     {
@@ -461,7 +462,7 @@ namespace WaveFunctionCollapse
             QueriedChunks.Clear();
         }
         
-        public Dictionary<ChunkIndex, IBuildable> Query(int2[,] cellsToCollapse, int height, PrototypeInfoData prototypeInfoData)
+        public Dictionary<ChunkIndex, IBuildable> Query(Vector3 position, int height, PrototypeInfoData prototypeInfoData)
         {
             if (IsGenerating || isRemovingChunks || isUpdatingChunks)
             {
@@ -470,13 +471,21 @@ namespace WaveFunctionCollapse
             
             RevertQuery();
 
-            if (cellsToCollapse.Length <= 0) return QuerySpawnedBuildings;
+            int2[,] chunksToCollapse = new int2[2, 2];
+            for (int i = 0; i < WaveFunctionUtility.Corners.Length; i++)
+            {
+                int2 corner = WaveFunctionUtility.Corners[i];
+                Vector3 cornerOffset = new Vector3(corner.x * chunkSize.x * waveFunction.CellSize.x, 0, corner.y * chunkSize.z * waveFunction.CellSize.z) * 0.5f;
+                Vector3 pos = position + cornerOffset;
+                int2 index = ChunkWaveUtility.GetDistrictIndex2(pos, ChunkScale);
+                chunksToCollapse[corner.x == -1 ? 0 : 1, corner.y == -1 ? 0 : 1] = index;
+            }
             
-            for (int x = 0; x < cellsToCollapse.GetLength(0); x++)
-            for (int z = 0; z < cellsToCollapse.GetLength(1); z++)
+            for (int x = 0; x < chunksToCollapse.GetLength(0); x++)
+            for (int z = 0; z < chunksToCollapse.GetLength(1); z++)
             for (int y = 0; y < height; y++)
             {
-                int3 index = cellsToCollapse[x, z].XyZ(y);
+                int3 index = chunksToCollapse[x, z].XyZ(y);
                 if (ChunkWaveFunction.Chunks.TryGetValue(index, out QueryChunk chunkAtIndex))
                 {
                     // It's not a district because then it's not valid to query (from the DistrictPlacer)
@@ -499,7 +508,8 @@ namespace WaveFunctionCollapse
 
             IsGenerating = true;
             int tries = 1000;
-            while (QueriedChunks.Any(x => !x.IsClear && !x.AllCollapsed) && tries-- > 0)
+
+            while (!AllCollapsed() && tries-- > 0)
             {
                 ChunkIndex? index = waveFunction.GetLowestEntropyIndex(QueriedChunks);
                 if (!index.HasValue)
@@ -520,6 +530,19 @@ namespace WaveFunctionCollapse
             }
 
             return QuerySpawnedBuildings;
+        }
+
+        private bool AllCollapsed()
+        {
+            foreach (QueryChunk x in QueriedChunks)
+            {
+                if (!x.IsClear && !x.AllCollapsed)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void QueryResetNeighbours(HashSet<QueryChunk> chunks, int depth)

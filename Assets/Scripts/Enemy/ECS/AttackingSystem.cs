@@ -1,13 +1,16 @@
 using System.Collections.Generic;
+using Gameplay.Turns.ECS;
 using Unity.Collections;
+using Unity.Mathematics;
 using Unity.Entities;
 using Unity.Burst;
+using Effects.ECS;
 using Pathfinding;
-using Gameplay;
 using System;
 
 namespace Enemy.ECS
 {
+    [UpdateAfter(typeof(CheckAttackingSystem))]
     public partial class AttackingSystem : SystemBase 
     {
         public static readonly Dictionary<PathIndex, Action<float>> DamageEvent = new Dictionary<PathIndex, Action<float>>();
@@ -17,17 +20,18 @@ namespace Enemy.ECS
         protected override void OnCreate()
         {
             damageQueue = new NativeQueue<DamageIndex>(Allocator.Persistent);
-            RequireForUpdate<GameSpeedComponent>();
+            
+            RequireForUpdate<TurnIncreaseComponent>();
         }
 
         protected override void OnUpdate()
         {
-            float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
+            TurnIncreaseComponent turnIncrease = SystemAPI.GetSingleton<TurnIncreaseComponent>();
 
             new AttackingJob
             {
                 DamageQueue = damageQueue.AsParallelWriter(),
-                DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
+                TurnIncrease = turnIncrease.TurnIncrease,
             }.ScheduleParallel();
 
             Dependency.Complete();
@@ -57,24 +61,25 @@ namespace Enemy.ECS
         }
     }
     
-    [BurstCompile]
+    [BurstCompile, WithAll(typeof(EnemyClusterComponent))]
     public partial struct AttackingJob : IJobEntity
     {
+        public BufferLookup<ManagedEntityBuffer> BufferLookup;
+        
         public NativeQueue<DamageIndex>.ParallelWriter DamageQueue;
         
-        public float DeltaTime;
+        public int TurnIncrease;
         
         [BurstCompile]
-        public void Execute(AttackingAspect attackingAspect)
+        public void Execute(Entity entity, in AttackingComponent attackingComponent, ref AttackSpeedComponent attackSpeedComponent, in SimpleDamageComponent damageComponent)
         {
-            if (!attackingAspect.CanAttack(DeltaTime))
-            {
-                return;    
-            }
-            attackingAspect.AttackSpeedComponent.ValueRW.Timer = 0;
+            attackSpeedComponent.AttackTimer -= TurnIncrease;
+            if (attackSpeedComponent.AttackTimer > 0) return;
+            attackSpeedComponent.AttackTimer = (int)math.round(1.0f / attackSpeedComponent.AttackSpeed);
 
-            float damage = attackingAspect.DamageComponent.ValueRO.Damage;
-            DamageQueue.Enqueue(new DamageIndex { Damage = damage, Index = attackingAspect.AttackingComponent.ValueRO.Target });
+            int enemyCount = BufferLookup[entity].Length;
+            float damage = damageComponent.Damage * enemyCount;
+            DamageQueue.Enqueue(new DamageIndex { Damage = damage, Index = attackingComponent.Target });
         }
     }
     

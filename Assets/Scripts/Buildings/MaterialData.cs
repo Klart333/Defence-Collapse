@@ -1,5 +1,5 @@
-﻿using Sirenix.OdinInspector;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 [InlineEditor, CreateAssetMenu(fileName = "Material Data", menuName = "Building/Material Data")]

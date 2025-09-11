@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Sirenix.OdinInspector;
-using WaveFunctionCollapse;
-using Pathfinding;
-using UnityEngine;
 using Enemy.ECS;
 using Gameplay;
 using Gameplay.Event;
+using Pathfinding;
+using Sirenix.OdinInspector;
 using UI;
+using UnityEngine;
+using WaveFunctionCollapse;
 
 namespace Buildings
 {

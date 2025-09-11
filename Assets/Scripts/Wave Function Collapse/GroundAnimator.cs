@@ -83,6 +83,11 @@ namespace WaveFunctionCollapse
 
         private void OnCellCollapsed(ChunkIndex index)
         {
+            if (groundGenerator.ChunkWaveFunction.Chunks[index.Index].SpawnedMeshes.Count == 0)
+            {
+                return;
+            }
+            
             queueIsEmpty = false;
             
             Transform cellTransform = groundGenerator.ChunkWaveFunction.Chunks[index.Index].SpawnedMeshes[^1].transform;

@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
-using WaveFunctionCollapse;
 using UnityEngine;
+using WaveFunctionCollapse;
 
 namespace Buildings.District
 {

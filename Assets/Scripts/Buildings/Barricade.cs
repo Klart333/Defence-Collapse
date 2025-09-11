@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Sirenix.OdinInspector;
-using WaveFunctionCollapse;
-using UnityEngine.Events;
-using Pathfinding;
-using UnityEngine;
 using Enemy.ECS;
+using Pathfinding;
+using Sirenix.OdinInspector;
+using UnityEngine;
+using UnityEngine.Events;
+using WaveFunctionCollapse;
 
 namespace Buildings
 {

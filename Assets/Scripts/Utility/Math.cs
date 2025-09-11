@@ -27,6 +27,11 @@ namespace Utility
         {
             return (int)math.floor(x / multiple);
         }
+        
+        public static int GetMultipleCeil(float x, float multiple)
+        {
+            return (int)math.ceil(x / multiple);
+        }
 
         public static float3 CubicLerp(float3 a, float3 b, float3 c, float t)
         {

@@ -1,10 +1,11 @@
-using Gameplay.Turns.ECS;
-using Unity.Collections;
-using Unity.Transforms;
-using Unity.Entities;
 using Effects.ECS;
-using Unity.Burst;
 using Enemy.ECS;
+using Gameplay.Turns.ECS;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 
 namespace Buildings.District.ECS
 {
@@ -58,18 +59,21 @@ namespace Buildings.District.ECS
     public partial struct UpdateTargetedDistrictEntitiesJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter ECB;
+        
         public int TurnIncrease;
         
         public void Execute([ChunkIndexInQuery]int sortKey, ref AttackSpeedComponent attackSpeedComponent, ref EnemyTargetComponent targetComponent, in LocalTransform transform, in DistrictDataComponent districtData)
         {
-            attackSpeedComponent.Timer += TurnIncrease;
-            if (attackSpeedComponent.Timer < attackSpeedComponent.AttackSpeed
-                || !targetComponent.HasTarget)
+            if (!targetComponent.HasTarget)
             {
+                attackSpeedComponent.AttackTimer = math.max(attackSpeedComponent.AttackTimer - TurnIncrease, 0);
                 return;
             }
-
-            attackSpeedComponent.Timer -= attackSpeedComponent.AttackSpeed;
+            
+            attackSpeedComponent.AttackTimer -= TurnIncrease;
+            if (attackSpeedComponent.AttackTimer > 0) return;
+            
+            attackSpeedComponent.AttackTimer += (int)math.round(1.0f / attackSpeedComponent.AttackSpeed);
             targetComponent.HasTarget = false;
 
             Entity entity = ECB.CreateEntity(sortKey);
@@ -90,10 +94,10 @@ namespace Buildings.District.ECS
 
         public void Execute([ChunkIndexInQuery]int sortKey, ref AttackSpeedComponent attackSpeedComponent, in LocalTransform transform, in DistrictDataComponent districtData)
         {
-            attackSpeedComponent.Timer += TurnIncrease;
-            if (attackSpeedComponent.Timer < attackSpeedComponent.AttackSpeed) return;
-
-            attackSpeedComponent.Timer -= attackSpeedComponent.AttackSpeed;
+            attackSpeedComponent.AttackTimer -= TurnIncrease;
+            if (attackSpeedComponent.AttackTimer > 0) return;
+            
+            attackSpeedComponent.AttackTimer += (int)math.round(1.0f / attackSpeedComponent.AttackSpeed);
             
             Entity entity = ECB.CreateEntity(sortKey);
             ECB.AddComponent(sortKey, entity, new DistrictEntityData

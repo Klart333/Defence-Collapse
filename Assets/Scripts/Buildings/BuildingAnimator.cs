@@ -1,10 +1,10 @@
 ﻿using System;
-using DG.Tweening;
-using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using Buildings;
 using Buildings.District;
+using DG.Tweening;
 using Gameplay.Event;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class BuildingAnimator : MonoBehaviour

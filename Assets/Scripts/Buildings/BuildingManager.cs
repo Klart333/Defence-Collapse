@@ -3,12 +3,12 @@ using Debug = UnityEngine.Debug;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
+using Gameplay.Event;
 using UnityEngine;
-using System.Linq;
 using UnityEditor;
+using System.Linq;
 using Buildings;
 using System;
-using Gameplay.Event;
 
 public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 {
@@ -67,13 +67,16 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         groundGenerator = FindFirstObjectByType<GroundGenerator>();
         buildingAnimator = GetComponent<BuildingAnimator>();
 
-        groundGenerator.OnChunkGenerated += LoadCells;
+        groundGenerator.OnChunkGenerated += OnFirstChunkGenerated;
+        Events.OnGroundChunkGenerated += LoadCells;
         Events.OnBuiltIndexDestroyed += RemoveBuiltIndex;
     }
-    
+
     private void OnDisable()
     {
-        groundGenerator.OnChunkGenerated -= LoadCells;
+        groundGenerator.OnChunkGenerated -= OnFirstChunkGenerated;
+
+        Events.OnGroundChunkGenerated -= LoadCells;
         Events.OnBuiltIndexDestroyed -= RemoveBuiltIndex;
     }
     
@@ -98,6 +101,12 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
             Debug.Log($"QueryChanged Count: {queryChangedCount}");
         }
     }
+    
+    private void OnFirstChunkGenerated(Chunk chunk)
+    {
+        groundGenerator.OnChunkGenerated -= OnFirstChunkGenerated;
+        LoadCells(chunk);
+    }
 
     private void LoadCells(Chunk chunk)
     {
@@ -112,7 +121,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
             false) as QueryMarchedChunk;
         
         queryChunk.Handler = this;
-        Vector3 offset = new Vector3(CellSize.x / 2.0f, 0, CellSize.z / 2.0f);
+        Vector3 offset = groundGenerator.ChunkWaveFunction.CellSize.XyZ(0) / 2.0f;
         queryChunk.LoadCells(townPrototypeInfo, CellSize, chunk, offset, cellBuildableCornerData);
         waveFunction.LoadChunk(index, queryChunk);
         
@@ -139,7 +148,10 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         }
         
         queriedChunks = this.GetChunks(cellsToUpdate);
-        this.MakeBuildable(cellsToUpdate, PrototypeInfo);
+        foreach (ChunkIndex index in cellsToUpdate)
+        {
+            this.MakeBuildable(index, PrototypeInfo);
+        }
         
         waveFunction.Propagate();
 
@@ -280,8 +292,11 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         {
             waveFunction.Chunks[builtIndex.Index].SetBuiltCells(builtIndex.CellIndex);
         }
-        
-        this.MakeBuildable(cellsToCollapse, PrototypeInfo);
+
+        foreach (ChunkIndex index in cellsToCollapse)
+        {
+            this.MakeBuildable(index, PrototypeInfo);
+        }
 
         waveFunction.Propagate();
 
@@ -307,7 +322,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
     public IBuildable GenerateMesh(Vector3 position, ChunkIndex index, PrototypeData prototypeData, bool animate = false)
     {
-        Building building = buildingPrefab.GetAtPosAndRot<Building>(position, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0)); 
+        Building building = buildingPrefab.GetAtPosAndRot<Building>(position + CellSize.XyZ() / 2.0f, Quaternion.Euler(0, 90 * prototypeData.MeshRot.Rot, 0)); 
 
         building.Setup(prototypeData, index, waveFunction.CellSize);
 
@@ -325,9 +340,10 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         return IsBuildable(waveFunction.Chunks[chunkIndex.Index], chunkIndex.CellIndex);
     }
     
-    public bool IsBuildable(QueryMarchedChunk chunk, int3 index)
+    public static bool IsBuildable(QueryMarchedChunk chunk, int3 index)
     {
-        return (chunk.GroundTypes[index.x, index.y, index.z] & (GroundType.Grass | GroundType.Crystal)) != 0;
+        // Technically only need to check one of them, 1 = Top Right
+        return (chunk.GroundTypes[index.x, index.y, index.z, 1] & GroundType.Buildable) > 0;
     }
     
     #endregion
@@ -348,17 +364,16 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         foreach (QueryMarchedChunk chunk in waveFunction.Chunks.Values)
         {
             for (int y = 0; y < chunk.Cells.GetLength(2); y++)
+            for (int x = 0; x < chunk.Cells.GetLength(0); x++)
             {
-                for (int x = 0; x < chunk.Cells.GetLength(0); x++)
-                {
-                    Vector3 pos = chunk.Cells[x, 0, y].Position;
-                    Gizmos.color = chunk.BuiltCells[x, 0, y] 
-                        ? Color.magenta 
-                        : chunk.Cells[x, 0, y].Collapsed 
-                            ? Color.blue 
-                            : Color.white;
-                    Gizmos.DrawWireCube(pos, CellSize * 0.9f);
-                }
+                Vector3 pos = chunk.Cells[x, 0, y].Position;
+                Gizmos.color = chunk.BuiltCells[x, 0, y] 
+                    ? Color.magenta 
+                    : chunk.Cells[x, 0, y].Collapsed 
+                        ? Color.blue 
+                        : Color.white;
+                Vector3 center = pos + CellSize * 0.5f;
+                Gizmos.DrawWireCube(center, CellSize * 0.9f);
             }
         }
         

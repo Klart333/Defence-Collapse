@@ -61,7 +61,6 @@ public class GroundObjectPlacer : MonoBehaviour
         int3 chunkIndex = keys[UnityEngine.Random.Range(0, keys.Length)];
         QueryMarchedChunk chunk = BuildingManager.Instance.ChunkWaveFunction.Chunks[chunkIndex];
         
-        const int y = 0;
         int cellsWidth = chunk.Width;
         int cellsDepth = chunk.Depth;
         int startX = UnityEngine.Random.Range(0, cellsWidth);

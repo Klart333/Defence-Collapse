@@ -1,8 +1,8 @@
 using Effects;
 using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
 using Utility;
-using TMPro;
 
 namespace Buildings.District
 {

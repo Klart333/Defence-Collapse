@@ -3,14 +3,12 @@ using Random = System.Random;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
-using Unity.Entities;
-using Effects.ECS;
-using UnityEngine;
-using Gameplay;
-using System;
-using Enemy.ECS;
-using Pathfinding;
 using Unity.Collections;
+using Unity.Entities;
+using UnityEngine;
+using Pathfinding;
+using Enemy.ECS;
+using Gameplay;
 
 namespace Enemy
 {
@@ -78,9 +76,10 @@ namespace Enemy
             foreach (var kvp in spawnedEntities)
             {
                 float3 position = ChunkWaveUtility.GetPosition(kvp.Key, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize);
+                float3 pathPosition = PathUtility.GetPos(PathUtility.GetIndex(position.xz));
                 entityManager.SetComponentData(kvp.Value, new SpawnPointComponent
                 {
-                    Position = position,
+                    Position = pathPosition,
                     Index = spawnIndex++,
                     Random = Unity.Mathematics.Random.CreateFromIndex((uint)random.Next(1, 20000000))
                 });
@@ -100,10 +99,11 @@ namespace Enemy
         private void CreateEntity(ChunkIndex chunkIndex)
         {
             float3 position = ChunkWaveUtility.GetPosition(chunkIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize);
+            float3 pathPosition = PathUtility.GetPos(PathUtility.GetIndex(position.xz));
             Entity entity = entityManager.Instantiate(spawnPrefab);
             entityManager.SetComponentData(entity, new SpawnPointComponent
             {
-                Position = position,
+                Position = pathPosition,
                 Index = spawnIndex++,
                 Random = Unity.Mathematics.Random.CreateFromIndex((uint)random.Next(1, 20000000))
             });

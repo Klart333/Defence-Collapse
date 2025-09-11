@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
-  m_Name: Inverted Hull Outline
+  m_Name: SelectedOutline
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    passTag: Inverted Hull Outline
+    passTag: SelectedOutline
     Event: 300
     filterSettings:
       RenderQueueType: 0
@@ -42,7 +42,7 @@ MonoBehaviour:
       restoreCamera: 1
       offset: {x: 0, y: 0, z: 0, w: 0}
       cameraFieldOfView: 60
---- !u!114 &-178006712409556746
+--- !u!114 &-4110271899411202585
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -52,19 +52,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
-  m_Name: Inverted Hull Outline
-  m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Name: FadeOutline
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.RenderObjects
+  m_Active: 1
   settings:
-    passTag: Inverted Hull Outline
+    passTag: FadeOutline
     Event: 300
     filterSettings:
       RenderQueueType: 0
       LayerMask:
         serializedVersion: 2
-        m_Bits: 2048
+        m_Bits: 4096
       PassNames: []
-    overrideMaterial: {fileID: 2100000, guid: fb28b71efbd79d64ba38564f18eefaf9, type: 2}
+    overrideMaterial: {fileID: 2100000, guid: a152c3702ff12e149b99e77b679294aa, type: 2}
     overrideMaterialPassIndex: 0
     overrideShader: {fileID: 0}
     overrideShaderPassIndex: 0
@@ -113,10 +113,9 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 7359230629339143875}
   - {fileID: 8520204150741078171}
-  - {fileID: 4828896481679000336}
   - {fileID: -6431900306735933552}
-  - {fileID: -178006712409556746}
-  m_RendererFeatureMap: c31eef39443d21669b10bb7a88d83d7610439cf7c3af0343905747aabf4cbda6f6783193d69787fd
+  - {fileID: -4110271899411202585}
+  m_RendererFeatureMap: c31eef39443d21669b10bb7a88d83d76905747aabf4cbda6e73d53117c61f5c6
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -145,48 +144,6 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
---- !u!114 &4828896481679000336
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
-  m_Name: Inverted Hull Outline
-  m_EditorClassIdentifier: 
-  m_Active: 0
-  settings:
-    passTag: Inverted Hull Outline
-    Event: 300
-    filterSettings:
-      RenderQueueType: 0
-      LayerMask:
-        serializedVersion: 2
-        m_Bits: 512
-      PassNames: []
-    overrideMaterial: {fileID: 2100000, guid: 8f94eded0d60c0c469099b36bd9f3e21, type: 2}
-    overrideMaterialPassIndex: 0
-    overrideShader: {fileID: 0}
-    overrideShaderPassIndex: 0
-    overrideMode: 1
-    overrideDepthState: 0
-    depthCompareFunction: 4
-    enableWrite: 1
-    stencilSettings:
-      overrideStencilState: 0
-      stencilReference: 0
-      stencilCompareFunction: 8
-      passOperation: 0
-      failOperation: 0
-      zFailOperation: 0
-    cameraSettings:
-      overrideCamera: 0
-      restoreCamera: 1
-      offset: {x: 0, y: 0, z: 0, w: 0}
-      cameraFieldOfView: 60
 --- !u!114 &7359230629339143875
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -223,11 +180,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
-  m_Name: Inverted Hull Outline
+  m_Name: DefaultOutline
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    passTag: Inverted Hull Outline
+    passTag: DefaultOutline
     Event: 300
     filterSettings:
       RenderQueueType: 0

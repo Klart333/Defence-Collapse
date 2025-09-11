@@ -19,7 +19,7 @@ namespace Enemy.ECS
     public struct AttackSpeedComponent : IComponentData
     {
         public float AttackSpeed;
-        public float Timer;
+        public int AttackTimer;
     }
 
     [MaterialProperty("_Strength")]

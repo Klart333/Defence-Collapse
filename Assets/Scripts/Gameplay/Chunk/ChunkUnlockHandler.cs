@@ -70,6 +70,11 @@ namespace Chunks
 
         private void SetupLockedChunk(Chunk chunk)
         {
+            if (!IsChunkAdjacent(chunk))
+            {
+                return;
+            }
+            
             Vector3 pos = chunk.Position + ((Vector3)chunk.ChunkSize).XyZ(0) / 2f + groundGenerator.ChunkWaveFunction.CellSize.XyZ(0) / 2.0f + Vector3.up * 2f;
             ChunkUnlocker unlocker = unlockPrefab.Get<ChunkUnlocker>();
             unlocker.transform.SetParent(canvas.transform, false);
@@ -90,6 +95,11 @@ namespace Chunks
                 
                 unlocker.OnChunkUnlocked -= OnUnlockerOnOnChunkUnlocked;
             }
+        }
+
+        private bool IsChunkAdjacent(Chunk chunk)
+        {
+            return true;
         }
 
         public void UnlockChunk(Chunk chunk)

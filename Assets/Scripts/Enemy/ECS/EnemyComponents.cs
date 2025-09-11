@@ -13,5 +13,6 @@ namespace Enemy.ECS
         public float2 Facing;
         public float3 Position;
         public float EnemySize;
+        public int EnemyType;
     }
 }

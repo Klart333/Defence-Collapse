@@ -1,15 +1,14 @@
-using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine.InputSystem;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
-using Gameplay.Money;
-using System.Linq;
-using DG.Tweening;
 using Gameplay.Event;
+using Gameplay.Money;
 using InputCamera;
+using DG.Tweening;
+using System.Linq;
 using UnityEngine;
 
 namespace Buildings
@@ -184,7 +183,7 @@ namespace Buildings
                 }
                 
                 // Top Right
-                if (chunks.TryGetValue(chunk.ChunkIndex + new int3(1, 0, 1), out QueryMarchedChunk topRightChunk) 
+                if (chunks.ContainsKey(chunk.ChunkIndex + new int3(1, 0, 1)) 
                     && topChunk != null && rightChunk != null)
                 {
                     int x = chunk.Width - 1;

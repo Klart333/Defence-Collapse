@@ -1,447 +1,130 @@
-﻿    using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using UnityEngine.InputSystem;
+﻿using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
-using Math = Utility.Math;
-using Unity.Mathematics;
+using Gameplay.Event;
 using Gameplay.Money;
 using UnityEngine;
-using System.Linq;
-using InputCamera;
-using DG.Tweening;
 using System;
-using Gameplay.Event;
 
 namespace Buildings
 {
     public class BuildingPlacer : MonoBehaviour
     {
-        public static bool Displaying = false;
-        
         [Title("Placing")]
         [SerializeField]
-        private PooledMonoBehaviour unableToPlacePrefab;
-
-        [SerializeField]
-        private PlaceSquare placeSquarePrefab;
-
+        private TileBuilder tileBuilder;
+        
         [SerializeField]
         private BarricadePlacer barricadePlacer;
         
         [Title("References")]
         [SerializeField]
         private DistrictGenerator districtGenerator;
-
-        private readonly Dictionary<ChunkIndex, PlaceSquare> spawnedSpawnPlaces = new Dictionary<ChunkIndex, PlaceSquare>();
-        private readonly List<PooledMonoBehaviour> spawnedUnablePlaces = new List<PooledMonoBehaviour>();
-
+        
         private BuildingHandler buildingHandler;
         private BuildingManager buildingManager;
-        private GroundGenerator groundGenerator;
-        private PlaceSquare hoveredSquare;
-        private InputManager inputManager;
-        private PlaceSquare pressedSquare;
-        private Vector3 targetScale;
-        private Camera cam;
-
-        private bool manualCancel;
-
-        public Dictionary<ChunkIndex, PlaceSquare> SpawnedSpawnPlaces => spawnedSpawnPlaces;
-        private bool Canceled => inputManager.Cancel.WasPerformedThisFrame() || manualCancel;
-        public bool SquareWasPressed { get; set; }
-        public ChunkIndex? SquareIndex { get; set; }
 
         private void OnEnable()
         {
-            cam = Camera.main;
-            groundGenerator = FindFirstObjectByType<GroundGenerator>();
             buildingHandler = FindFirstObjectByType<BuildingHandler>();
-
-            Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
+            
+            tileBuilder.OnCancelPlacement += OnBuildingCanceled;
             UIEvents.OnFocusChanged += OnBuildingCanceled;
             Events.OnBuildingClicked += BuildingClicked;
-            Events.OnBuiltIndexBuilt += OnBuiltIndexBuilt;
-            
-            AwaitManagers().Forget();
+
+            GetManagers().Forget();
         }
 
-        private async UniTaskVoid AwaitManagers()
+        private async UniTaskVoid GetManagers()
         {
             buildingManager = await BuildingManager.Get();
-            buildingManager.OnLoaded += InitializeSpawnPlaces;
-            
-            inputManager = await InputManager.Get();
-            inputManager.Fire.started += MouseOnDown;
-            inputManager.Fire.canceled += MouseOnUp;
         }
 
         private void OnDisable()
         {
-            buildingManager.OnLoaded -= InitializeSpawnPlaces;
-            Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
-            inputManager.Fire.started -= MouseOnDown;
-            inputManager.Fire.canceled -= MouseOnUp;
             UIEvents.OnFocusChanged -= OnBuildingCanceled;
             Events.OnBuildingClicked -= BuildingClicked;
-            Events.OnBuiltIndexBuilt -= OnBuiltIndexBuilt;
+            tileBuilder.OnTilePressed -= OnTilePressed;
+            tileBuilder.OnCancelPlacement -= OnBuildingCanceled;
         }
-
-        private void Update()
-        {
-            if (!Displaying || CameraController.IsDragging)
-            {
-                SquareIndex = null;
-                return;
-            }
-
-            Vector3 mousePoint = Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
-            if (!buildingManager.TryGetIndex(mousePoint, out ChunkIndex chunkIndex))
-            {
-                SquareIndex = null;
-                return;
-            }
-
-            if (!spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare placeSquare))
-            {
-                hoveredSquare?.OnHoverExit();
-                hoveredSquare = null;
-                SquareIndex = null;
-                return;
-            }
-
-            if (hoveredSquare != placeSquare && !placeSquare.Locked)
-            {
-                SquareWasPressed = false;
-                SquareIndex = chunkIndex;
-
-                hoveredSquare?.OnHoverExit();
-                hoveredSquare = placeSquare;
-                hoveredSquare.OnHover();
-            }
-        }
-
-        private void MouseOnUp(InputAction.CallbackContext obj)
-        {
-            if (!CameraController.IsDragging && pressedSquare != null && pressedSquare == hoveredSquare)
-            {
-                SquareWasPressed = true;
-            }
-        }
-
-        private void MouseOnDown(InputAction.CallbackContext obj)
-        {
-            pressedSquare = hoveredSquare;
-        }
-
-        private void InitializeSpawnPlaces(QueryMarchedChunk chunk)
-        {
-            targetScale = groundGenerator.ChunkWaveFunction.CellSize.MultiplyByAxis(buildingManager.ChunkWaveFunction.CellSize);
-            for (int x = 0; x < chunk.Width - 1; x++)
-            {
-                for (int z = 0; z < chunk.Depth - 1; z++)
-                {
-                    ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
-                    if (spawnedSpawnPlaces.ContainsKey(chunkIndex)
-                        || !buildingManager.IsBuildable(chunk, new int3(x    , 0, z    ))
-                        || !buildingManager.IsBuildable(chunk, new int3(x + 1, 0, z    ))
-                        || !buildingManager.IsBuildable(chunk, new int3(x    , 0, z + 1))
-                        || !buildingManager.IsBuildable(chunk, new int3(x + 1, 0, z + 1))) continue;
-
-                    Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
-                    SpawnSquare(pos, chunkIndex);
-                }
-            }
-
-            Dictionary<int3, QueryMarchedChunk> chunks = buildingManager.ChunkWaveFunction.Chunks;
-            CheckIntersection(chunk);
-            if (chunks.TryGetValue(chunk.ChunkIndex - new int3(0, 0, 1), out QueryMarchedChunk bottomChunk))
-                CheckIntersection(bottomChunk);
-            if (chunks.TryGetValue(chunk.ChunkIndex - new int3(1, 0, 0), out QueryMarchedChunk leftChunk))
-                CheckIntersection(leftChunk);
-            if (chunks.TryGetValue(chunk.ChunkIndex - new int3(1, 0, 1), out QueryMarchedChunk bottomLeftChunk))
-                CheckIntersection(bottomLeftChunk);
-
-            void CheckIntersection(QueryMarchedChunk chunk)
-            {
-                // Top
-                if (chunks.TryGetValue(chunk.ChunkIndex + new int3(0, 0, 1), out QueryMarchedChunk topChunk))
-                {
-                    int z = chunk.Depth - 1;
-                    for (int x = 0; x < chunk.Width - 1; x++)
-                    {
-                        ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
-                        if (spawnedSpawnPlaces.ContainsKey(chunkIndex)
-                            || !buildingManager.IsBuildable(chunk   , new int3(x    , 0, z))
-                            || !buildingManager.IsBuildable(chunk   , new int3(x + 1, 0, z))
-                            || !buildingManager.IsBuildable(topChunk, new int3(x    , 0, 0))
-                            || !buildingManager.IsBuildable(topChunk, new int3(x + 1, 0, 0))) continue;
-
-                        Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
-                        SpawnSquare(pos, chunkIndex);
-                    }
-                }
-
-                // Right
-                if (chunks.TryGetValue(chunk.ChunkIndex + new int3(1, 0, 0), out QueryMarchedChunk rightChunk))
-                {
-                    int x = chunk.Width - 1;
-                    for (int z = 0; z < chunk.Depth - 1; z++)
-                    {
-                        ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
-                        if (spawnedSpawnPlaces.ContainsKey(chunkIndex)
-                            || !buildingManager.IsBuildable(chunk     , new int3(x, 0, z    ))
-                            || !buildingManager.IsBuildable(chunk     , new int3(x, 0, z + 1))
-                            || !buildingManager.IsBuildable(rightChunk, new int3(0, 0, z    ))
-                            || !buildingManager.IsBuildable(rightChunk, new int3(0, 0, z + 1))) continue;
-
-                        Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
-                        SpawnSquare(pos, chunkIndex);
-                    }
-                }
-
-                // Top Right
-                if (chunks.TryGetValue(chunk.ChunkIndex + new int3(1, 0, 1), out QueryMarchedChunk topRightChunk)
-                    && topChunk != null && rightChunk != null)
-                {
-                    int x = chunk.Width - 1;
-                    int z = chunk.Depth - 1;
-                    ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
-                    if (spawnedSpawnPlaces.ContainsKey(chunkIndex)
-                        || !buildingManager.IsBuildable(chunk        , new int3(x, 0, z))
-                        || !buildingManager.IsBuildable(rightChunk   , new int3(0, 0, z))
-                        || !buildingManager.IsBuildable(topChunk     , new int3(x, 0, 0))
-                        || !buildingManager.IsBuildable(topRightChunk, new int3(0, 0, 0))) return;
-
-                    Vector3 pos = chunk.Cells[x, 0, z].Position + new Vector3(targetScale.x / 2.0f, 0.1f, targetScale.z / 2.0f);
-                    SpawnSquare(pos, chunkIndex);
-                }
-            }
-
-            void SpawnSquare(Vector3 pos, ChunkIndex chunkIndex)
-            {
-                PlaceSquare placeSquare = Instantiate(placeSquarePrefab, pos, placeSquarePrefab.transform.rotation);
-                placeSquare.transform.localScale = targetScale * 0.95f;
-                placeSquare.transform.SetParent(transform, true);
-                placeSquare.gameObject.SetActive(false);
-                spawnedSpawnPlaces.Add(chunkIndex, placeSquare);
-            }
-        }
-
+        
         private void OnBuildingCanceled()
         {
-            manualCancel = true;
+            tileBuilder.CancelDisplay();
+            tileBuilder.OnTilePressed -= OnTilePressed;
         }
 
         private void BuildingClicked(BuildingType buildingType)
         {
             if (buildingType is not BuildingType.Building) return;
 
-            if (Displaying)
+            if (tileBuilder.GetIsDisplaying(out BuildingType type) && type == BuildingType.Building)
             {
                 OnBuildingCanceled();
                 return;
             }
             
-            UIEvents.OnFocusChanged?.Invoke();
-            PlacingTower().Forget();
+            tileBuilder.Display(BuildingType.Building, IsBuildable);
+            tileBuilder.OnTilePressed += OnTilePressed;
         }
 
-        private async UniTaskVoid PlacingTower()
+        private TileAction IsBuildable(ChunkIndex chunkindex)
         {
-            Displaying = true;
-            manualCancel = false;
-            SquareWasPressed = false;
-
-            ToggleSpawnPlaces(true);
-
-            ChunkIndex queryIndex = new ChunkIndex();
-            Dictionary<ChunkIndex, IBuildable> buildables = new Dictionary<ChunkIndex, IBuildable>();
-            while (!Canceled)
+            BuildingType type = tileBuilder.Tiles[chunkindex];
+            return type switch
             {
-                await UniTask.Yield();
+                0 => TileAction.Build,
+                BuildingType.Building => TileAction.Sell,
+                _ => TileAction.None
+            };
+        }
 
-                if (!SquareIndex.HasValue)
-                {
-                    buildingManager.RevertQuery();
-                    queryIndex = default;
-                    continue;
-                }
-
-                if (queryIndex.Equals(SquareIndex.Value))
-                {
-                    if (buildables.Count > 0 && SquareWasPressed && !districtGenerator.IsGenerating)
-                    {
-                        if (pressedSquare.Placed)
-                        {
-                            RemoveBuilding();
-                        }
-                        else
-                        {
-                            PlaceBuilding();
-                        }
-                    }
-
-                    continue;
-                }
-
-                buildingManager.RevertQuery();
-                await UniTask.NextFrame();
-                if (!SquareIndex.HasValue || spawnedSpawnPlaces[SquareIndex.Value].Locked) continue;
-
-                queryIndex = SquareIndex.Value;
-                buildables = buildingManager.Query(queryIndex);
-
-                foreach (IBuildable item in buildables.Values)
-                {
-                    item.ToggleIsBuildableVisual(true, hoveredSquare.Placed);
-                }
-
-                if (buildables.Count == 0)
-                {
-                    ShowUnablePlaces(buildingManager.GetCellsToCollapse(queryIndex).Select(x => buildingManager.GetPos(x) + Vector3.up * buildingManager.ChunkScale.y / 2.0f)
-                        .ToList());
-                    continue;
-                }
-
-                if (!SquareWasPressed || districtGenerator.IsGenerating) continue;
-
-                if (pressedSquare.Placed)
-                {
-                    RemoveBuilding();
-                }
-                else
-                {
-                    PlaceBuilding();
-                }
-            }
-
-            Displaying = false;
-            if (Canceled)
+        private void OnTilePressed(ChunkIndex index, TileAction action)
+        {
+            switch (action)
             {
-                SquareIndex = null;
-                ToggleSpawnPlaces(false);
-                DisablePlaces();
-                buildingManager.RevertQuery();
+                case TileAction.None:
+                    Debug.LogError("Wot");
+                    break;
+                case TileAction.Build:
+                    PlaceBuilding(index);
+                    break;
+                case TileAction.Sell:
+                    RemoveBuilding(index);
+                    break;            
             }
         }
 
-        public void ToggleSpawnPlaces(bool enabled)
+        private void PlaceBuilding(ChunkIndex index)
         {
-            foreach (PlaceSquare placeSquare in spawnedSpawnPlaces.Values)
-            {
-                if (enabled)
-                {
-                    placeSquare.gameObject.SetActive(true);
-                    placeSquare.transform.DOKill();
-                    placeSquare.transform.DOScale(targetScale * 0.95f, 0.5f).SetEase(Ease.OutCirc);
-                }
-                else
-                {
-                    placeSquare.transform.DOKill();
-                    placeSquare.transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.OutCirc).OnComplete(() => { placeSquare.gameObject.SetActive(false); });
-
-                }
-            }
-        }
-
-        private void PlaceBuilding()
-        {
-            SquareWasPressed = false;
-            if (!SquareIndex.HasValue)
-            {
-                return;
-            }
-
             if (!MoneyManager.Instance.CanPurchase(BuildingType.Building))
             {
-                //buildingManager.RevertQuery();
                 return;
             }
 
+            tileBuilder.Tiles[index] = BuildingType.Building;
+            
             MoneyManager.Instance.Purchase(BuildingType.Building);
-            spawnedSpawnPlaces[SquareIndex.Value].OnPlaced();
+            buildingManager.Query(index);
             buildingManager.Place();
         }
 
-        private void OnBuiltIndexBuilt(IEnumerable<ChunkIndex> indexes)
+        private void RemoveBuilding(ChunkIndex index)
         {
-            foreach (ChunkIndex chunkIndex in indexes)
-            {
-                if (spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare square))
-                {
-                    if (!square.Placed)
-                    {
-                        square.Locked = true;
-                    }
-                }
-            }
-        }
+            tileBuilder.Tiles[index] = 0;
 
-        private void RemoveBuilding()
-        {
-            SquareWasPressed = false;
-            if (!SquareIndex.HasValue)
-            {
-                return;
-            }
+            Vector3 pos = buildingManager.GetPos(index);
+            MoneyManager.Instance.AddMoneyParticles(MoneyManager.Instance.BuildingCost, pos);
 
-            MoneyManager.Instance.AddMoneyParticles(MoneyManager.Instance.BuildingCost, hoveredSquare.transform.position);
-
-            buildingHandler.BuildingDestroyed(SquareIndex.Value);
-        }
-
-        private void OnBuiltIndexDestroyed(ChunkIndex chunkIndex)
-        {
-            if (!spawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare square)) return;
-
-            square.Locked = false;
-
-            if (Displaying)
-            {
-                square.UnPlaced();
-            }
-            else
-            {
-                square.Placed = false;
-            }
-        }
-
-        private void ShowUnablePlaces(List<Vector3> positions)
-        {
-            for (int i = 0; i < positions.Count; i++)
-            {
-                spawnedUnablePlaces.Add(unableToPlacePrefab.GetAtPosAndRot<PooledMonoBehaviour>(positions[i], Quaternion.identity));
-            }
-        }
-
-        private void DisablePlaces()
-        {
-            for (int i = 0; i < spawnedUnablePlaces.Count; i++)
-            {
-                spawnedUnablePlaces[i].gameObject.SetActive(false);
-            }
-        }
-
-        private void BarricadeIndexBuilt(ChunkIndex index)
-        {
-            if (spawnedSpawnPlaces.TryGetValue(index, out PlaceSquare square))
-            {
-            }   
-        }
-        
-        private void BarricadeIndexSold(ChunkIndex index)
-        {
-            if (spawnedSpawnPlaces.TryGetValue(index, out PlaceSquare square))
-            {
-                square.Locked = false;
-            }
+            buildingHandler.BuildingDestroyed(index);
         }
     }
 
+    [Flags]
     public enum BuildingType
     {
-        Building,
-        Barricade
+        Building = 1 << 0,
+        Barricade = 2 << 0,
+        District = 3 << 0,
     }
 }

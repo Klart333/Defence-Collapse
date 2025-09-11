@@ -1,17 +1,17 @@
-using Object = UnityEngine.Object;
-using System.Collections.Generic;
-using UnityEngine.InputSystem;
-using Buildings.District.ECS;
-using WaveFunctionCollapse;
-using Unity.Mathematics;
-using Unity.Collections;
-using Gameplay.Buffs;
-using UnityEngine;
-using InputCamera;
-using Gameplay;
-using Utility;
 using System;
+using System.Collections.Generic;
+using Buildings.District.ECS;
+using Gameplay;
+using Gameplay.Buffs;
 using Gameplay.Event;
+using InputCamera;
+using Unity.Collections;
+using Unity.Mathematics;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using Utility;
+using WaveFunctionCollapse;
+using Object = UnityEngine.Object;
 
 namespace Buildings.District
 {
@@ -202,7 +202,7 @@ namespace Buildings.District
 
         private void OnHoverEnter()
         {
-            if (DistrictPlacer.Placing || BarricadePlacer.Displaying || BuildingPlacer.Displaying)
+            if (FocusManager.Instance.GetIsFocused())
             {
                 return;
             }
@@ -219,7 +219,7 @@ namespace Buildings.District
         {
             if (CameraController.IsDragging 
                 || UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()
-                || BarricadePlacer.Displaying || BuildingPlacer.Displaying || DistrictPlacer.Placing)
+                || FocusManager.Instance.GetIsFocused())
             {
                 return;
             }

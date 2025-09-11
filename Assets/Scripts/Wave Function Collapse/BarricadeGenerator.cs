@@ -113,7 +113,10 @@ namespace WaveFunctionCollapse
                 GetNeighbours(chunkIndexes[i], 1);
             }
             queriedChunks = this.GetChunks(cellsToUpdate);
-            this.MakeBuildable(cellsToUpdate, PrototypeInfo);
+            foreach (ChunkIndex index in cellsToUpdate)
+            {
+                this.MakeBuildable(index, PrototypeInfo);
+            }
 
             waveFunction.Propagate();
 
@@ -217,16 +220,19 @@ namespace WaveFunctionCollapse
             if (cellsToCollapse.Count <= 0) return QuerySpawnedBuildings;
 
             this.queryIndex = queryIndex;
-            
             queriedChunks = this.GetChunks(cellsToCollapse);
             waveFunction.Chunks[queryIndex.Index].SetBuiltCells(queryIndex.CellIndex);
-            this.MakeBuildable(cellsToCollapse, PrototypeInfo);
+            
+            foreach (ChunkIndex index in cellsToCollapse)
+            {
+                this.MakeBuildable(index, PrototypeInfo);
+            }
 
             waveFunction.Propagate();
 
             IsGenerating = true;
             int tries = 1000;
-            while (cellsToCollapse.Any(x => !waveFunction[x].Collapsed) && tries-- > 0)
+            while (!AllCollapsed() && tries-- > 0)
             {
                 ChunkIndex index = waveFunction.GetLowestEntropyIndex(cellsToCollapse);
                 PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index]);
@@ -243,6 +249,19 @@ namespace WaveFunctionCollapse
             }
 
             return QuerySpawnedBuildings;
+
+            bool AllCollapsed()
+            {
+                foreach (ChunkIndex x in cellsToCollapse)
+                {
+                    if (!waveFunction[x].Collapsed)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
         }
 
         public IBuildable GenerateMesh(Vector3 position, ChunkIndex index, PrototypeData prototypeData, bool animate = false)

@@ -1,9 +1,9 @@
-using Unity.Mathematics;
-using Unity.Collections;
-using Unity.Transforms;
-using Unity.Entities;
-using Unity.Burst;
 using Enemy.ECS;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 
 namespace Buildings.District.ECS
 {

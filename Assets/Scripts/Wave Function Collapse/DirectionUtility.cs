@@ -12,6 +12,17 @@ namespace WaveFunctionCollapse
         Forward = 4,
         Backward = 5,
     }
+    
+    [Flags]
+    public enum MultiDirection
+    {
+        Right = 1 << 0,
+        Left = 1 << 1,
+        Up = 1 << 2,
+        Down = 1 << 3,
+        Forward = 1 << 4,
+        Backward = 1 << 5,
+    }
 
     public static class DirectionUtility
     {
@@ -35,16 +46,23 @@ namespace WaveFunctionCollapse
             };
         }
         
-        public static int2 DirectionToInt2(Direction dir)
+        public static MultiDirection Int2ToMultiDirection(int2 dir)
         {
-            return dir switch
+            MultiDirection multiDirection = dir.x switch
             {
-                Direction.Right => new int2(1, 0),
-                Direction.Left => new int2(-1, 0),
-                Direction.Forward => new int2(0, 1),
-                Direction.Backward => new int2(0, 1),
-                _ => throw new ArgumentOutOfRangeException(nameof(dir), dir, null)
+                1 => MultiDirection.Right,
+                -1 => MultiDirection.Left,
+                _ => 0,
             };
+            multiDirection |= dir.y switch
+            {
+                1 => MultiDirection.Forward,
+                -1 => MultiDirection.Backward,
+                _ => 0,
+            };
+            
+            return multiDirection;
         }
+
     }
 }

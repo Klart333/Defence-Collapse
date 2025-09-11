@@ -717,12 +717,15 @@ namespace WaveFunctionCollapse
             new int2(-1, 0),
         };
         
+        /// <summary>
+        /// Top Right, Top Left, Bottom Right, Bottom Left 
+        /// </summary>
         public static readonly int2[] Corners =
         {
-            new int2(-1, -1),
-            new int2(1, -1),
-            new int2(1, 1),
             new int2(-1, 1),
+            new int2(1, 1),
+            new int2(1, -1),
+            new int2(-1, -1),
         };
         
         public const ulong SymmetricalMask = 0x0000_0000_FFFF_FFFF;

@@ -1,28 +1,26 @@
 using System.Collections.Generic;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using WaveFunctionCollapse;
 using Sirenix.Utilities;
 using Unity.Mathematics;
+using Gameplay.Event;
 using Gameplay.Money;
 using UnityEngine;
 using System.Linq;
-using InputCamera;
 using Gameplay;
 using System;
-using Gameplay.Event;
 using TMPro;
 
 namespace Buildings.District
 {
     public class DistrictPlacer : SerializedMonoBehaviour
     {
-        public static bool Placing;
-
         public event Action OnPlacingCanceled; // Does not mean it failed
+
+        [Title("Placing")]
+        [SerializeField]
+        private TileBuilder tileBuilder;
         
         [Title("District")]
         [SerializeField]
@@ -32,6 +30,9 @@ namespace Buildings.District
         private BuildingManager buildingGenerator;
         
         [SerializeField]
+        private GroundGenerator groundGenerator;
+        
+        [SerializeField]
         private DistrictHandler districtHandler;
         
         [SerializeField]
@@ -39,9 +40,6 @@ namespace Buildings.District
         
         [SerializeField]
         private DistrictPrototypeInfoUtility prototypeUtility;
-        
-        [SerializeField]
-        private PooledMonoBehaviour unableToPlacePrefab;
         
         [Title("Cost")]
         [SerializeField]
@@ -60,172 +58,36 @@ namespace Buildings.District
         [SerializeField]
         private bool verbose = true;
         
-        private readonly HashSet<ChunkIndex> buildingIndexes = new HashSet<ChunkIndex>();
-        private readonly HashSet<ChunkIndex> builtIndexes = new HashSet<ChunkIndex>();
-        
-        private int2[,] districtChunkIndexes;
-        
-        private List<PlaceSquare> hoveredSquares = new List<PlaceSquare>();
-        private PooledMonoBehaviour spawnedUnableToPlace;
-        private DistrictType districtType;
-        private InputManager inputManager;
         private MoneyManager moneyManager;
-        private Vector3 offset;
-        private Camera cam;
-
-        private int additionalBuildingAmount = 0;
-        private bool isPlacementValid;
-        private int districtRadius;
-
+        
+        private DistrictType districtType;
+        
         private void OnEnable()
         {
-            cam = Camera.main;
-            offset = new Vector3(districtGenerator.CellSize.x, 0, districtGenerator.CellSize.z) / -2.0f;
-
-            Events.OnGameReset += OnGameReset;
             UIEvents.OnFocusChanged += CancelPlacement;
             Events.OnDistrictClicked += DistrictClicked;
-
-            GetInput().Forget();
+            tileBuilder.OnCancelPlacement += CancelPlacement;
+            
             GetMoney().Forget();
         }
-
+        
         private async UniTaskVoid GetMoney()
         {
             moneyManager = await MoneyManager.Get();
         }
-        
-        private async UniTaskVoid GetInput()
-        {
-            inputManager = await InputManager.Get();
-            inputManager.Fire.canceled += FirePerformed;
-            inputManager.Cancel.performed += CancelPerformed;
-        }
 
         private void OnDisable()
         {
-            Events.OnGameReset -= OnGameReset;
-            UIEvents.OnFocusChanged -= CancelPlacement;
+            tileBuilder.OnCancelPlacement -= CancelPlacement;
             Events.OnDistrictClicked -= DistrictClicked;
-            inputManager.Fire.performed -= FirePerformed;
-            inputManager.Cancel.performed -= CancelPerformed;
-        }
-
-        private void Update()
-        {
-            if (!Placing || EventSystem.current.IsPointerOverGameObject()) return;
-            
-            int2[,] lastDistrictChunkIndexes = new int2[districtChunkIndexes.GetLength(0), districtChunkIndexes.GetLength(1)];
-            for (int x = 0; x < districtChunkIndexes.GetLength(0); x++)
-            for (int y = 0; y < districtChunkIndexes.GetLength(1); y++)
-            {
-                lastDistrictChunkIndexes[x, y] = districtChunkIndexes[x, y];
-            }
-
-            for (int i = 0; i < hoveredSquares.Count; i++)
-            {
-                hoveredSquares[i].OnHoverExit();
-            }
-            hoveredSquares.Clear();
-
-            if (!GetChunkIndexes(out bool requireQueryWalls))
-            {
-                // Invalid, Place some red squares
-                SetInvalid();
-                return;
-            }
-            
-            if (ChunkIndexesAreIdentical(lastDistrictChunkIndexes, districtChunkIndexes))
-            {
-                return;
-            }
-
-            if (requireQueryWalls)
-            {
-                if (!QueryWalls())
-                {
-                    if (verbose)
-                    {
-                        Debug.Log("Invalid, Wall Query Failed");
-                    }
-                    SetInvalid();
-                    return;
-                }
-            }
-            else
-            {
-                additionalBuildingAmount = 0;
-                buildingGenerator.RevertQuery();
-            }
-
-            if (!QueryDistrict())
-            {
-                if (verbose)
-                {
-                    Debug.Log("Invalid, District Query Failed");
-                }
-                SetInvalid();
-                return;
-            }
-
-            isPlacementValid = true;
-            spawnedUnableToPlace?.gameObject.SetActive(false);
-            UpdateCost();
-        }
-
-        private bool QueryDistrict()
-        {
-            int height = districtType == DistrictType.TownHall ? 1 : 2;
-            Dictionary<ChunkIndex, IBuildable> districts = districtGenerator.Query(districtChunkIndexes, height, prototypeUtility.GetPrototypeInfo(districtType));
-            if (districts == null)
-            {
-                return false;
-            }
-            
-            bool isDistrictValid = false;
-            foreach (IBuildable buildable in districts.Values)
-            {
-                buildable.ToggleIsBuildableVisual(true, false);
-                isDistrictValid |= buildable.MeshRot.MeshIndex != -1;
-            }
-
-            return isDistrictValid;
-        }
-
-        private bool QueryWalls()
-        {
-            Dictionary<ChunkIndex, IBuildable> buildings = buildingGenerator.Query(buildingIndexes.ToList(), builtIndexes);
-            additionalBuildingAmount = builtIndexes.Count;
-            bool isValid = false;
-            foreach (IBuildable buildable in buildings.Values)
-            {
-                buildable.ToggleIsBuildableVisual(true, false);
-                if (buildable.MeshRot.MeshIndex != -1)
-                {
-                    isValid = true;
-                }
-            }
-
-            return isValid;
-        }
-        
-        private void SetInvalid()
-        {
-            spawnedUnableToPlace?.gameObject.SetActive(false);
-
-            Vector3 mousePos = Utility.Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
-            spawnedUnableToPlace = unableToPlacePrefab.GetAtPosAndRot<PooledMonoBehaviour>(mousePos, Quaternion.identity);
-
-            isPlacementValid = false;
-            buildingGenerator.RevertQuery();
-            districtGenerator.RevertQuery();
+            tileBuilder.OnTilePressed -= OnTilePressed;
+            UIEvents.OnFocusChanged -= CancelPlacement;
         }
         
         private void UpdateCost()
         {
             int amount = districtHandler.GetDistrictAmount(districtType);
             float cost = districtCostData.GetCost(districtType, amount);
-            cost += additionalBuildingAmount * moneyManager.BuildingCost;
             if (cost <= 0) return;
 
             costText.text = $"{cost:N0}g";
@@ -234,149 +96,52 @@ namespace Buildings.District
             costText.gameObject.SetActive(true);
         }
 
-        private bool ChunkIndexesAreIdentical(int2[,] lastDistrictChunkIndexes, int2[,] districtChunkIndexes)
+        private void DistrictClicked(DistrictType districtType)
         {
-            for (int x = 0; x < districtChunkIndexes.GetLength(0); x++)
-            for (int y = 0; y < districtChunkIndexes.GetLength(1); y++)
+            if (tileBuilder.GetIsDisplaying(out BuildingType type) && type.HasFlag(BuildingType.District))
             {
-                if (!lastDistrictChunkIndexes[x, y].Equals(districtChunkIndexes[x, y]))
-                {
-                    return false;
-                }
+                CancelPlacement();
+                return;
             }
             
-            return true;
-        }
+            tileBuilder.Display(BuildingType.District, IsBuildable);
+            tileBuilder.OnTilePressed += OnTilePressed;
 
-        private bool GetChunkIndexes(out bool requireQueryWalls)
-        {
-            requireQueryWalls = true;
-            buildingIndexes.Clear();
-            builtIndexes.Clear();
-            Vector3 mousePos = Utility.Math.GetGroundIntersectionPoint(cam, Mouse.current.position.ReadValue());
-            for (int x = 0; x < districtRadius; x++)
-            for (int z = 0; z < districtRadius; z++)
-            {
-                if (!GetDistrictIndex(x, z, out Vector3 districtPos))
-                {
-                    return false;
-                }
-
-                if (!buildingGenerator.TryGetIndex(districtPos, out ChunkIndex buildIndex)) // + buildingGenerator.CellSize.XyZ(0) / 2.0f)
-                {
-                    if (verbose) Debug.Log("Invalid, Can't find build index");
-                    return false;
-                }
-
-                buildingIndexes.Add(buildIndex);
-                Vector3 buildingCellPosition = buildingGenerator.GetPos(buildIndex);
-                
-                if (TryGetBuiltIndex(buildingCellPosition, buildIndex, districtPos, out ChunkIndex builtIndex))
-                {
-                    if (!buildingGenerator.IsBuildable(builtIndex))
-                    {
-                        if (verbose) Debug.Log($"Invalid, builtIndex: {builtIndex} is not buildable");
-                        return false;
-                    }
-                    
-                    if (!buildingPlacer.SpawnedSpawnPlaces.TryGetValue(builtIndex, out var spawnPlace) || spawnPlace.Locked)
-                    {
-                        if (verbose)
-                        {
-                            Debug.Log("Invalid, Could not find PlaceSquare at index");
-                        }
-                        return false;
-                    }
-                    
-                    spawnPlace.OnHover();
-                    hoveredSquares.Add(spawnPlace);
-                    builtIndexes.Add(builtIndex);
-                    buildingIndexes.AddRange(buildingGenerator.GetCellsSurroundingMarchedIndex(builtIndex));
-                }
-                else
-                {
-                    if (!buildingGenerator.IsBuildable(builtIndex))
-                    {
-                        if (verbose) Debug.Log($"Invalid, builtIndex: {builtIndex} is not buildable");
-                        return false;
-                    }
-                }
-            
-            }
-            requireQueryWalls = builtIndexes.Count > 0;
-            return true;
-
-            // Returns false if index is already built
-            bool TryGetBuiltIndex(Vector3 buildingCellPosition, ChunkIndex buildIndex, Vector3 districtPos, out ChunkIndex builtIndex)
-            {
-                Vector2 dir = (buildingCellPosition.XZ() - districtPos.XZ()).normalized;
-                builtIndex = buildIndex;
-                bool isValid = (dir.x, dir.y) switch
-                {
-                    (x: < 0.1f, y: < 0.1f) => true,
-                    (x: < 0.1f, y: > 0) => buildingGenerator.TryGetIndex(buildingCellPosition - Vector3.forward * buildingGenerator.CellSize.z / 2.0f, out builtIndex),
-                    (x: > 0, y: < 0.1f) => buildingGenerator.TryGetIndex(buildingCellPosition - Vector3.right * buildingGenerator.CellSize.z / 2.0f, out builtIndex),
-                    (x: > 0, y: > 0) => buildingGenerator.TryGetIndex(buildingCellPosition - buildingGenerator.CellSize / 2.0f, out builtIndex),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-
-                if (!isValid)
-                {
-                    builtIndex = default;
-                    return false;
-                }
-                
-                if (buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z] 
-                    && !buildingGenerator.ChunkWaveFunction.Chunks[builtIndex.Index].QueryBuiltCells.Contains(builtIndex.CellIndex))
-                {
-                    // BuiltIndex is alread built
-                    return false;
-                }
-                
-                return true;
-            }
-
-            bool GetDistrictIndex(int x, int z, out Vector3 districtPos)
-            {
-                Vector3 pos = mousePos + new Vector3(x * districtGenerator.ChunkScale.x, 0, z * districtGenerator.ChunkScale.z);
-                districtPos = pos + offset - districtGenerator.CellSize.XyZ() * (districtRadius % 2 == 0 ? 0.5f : 0.25f);
-                districtChunkIndexes[x, z] = ChunkWaveUtility.GetDistrictIndex2(districtPos, districtGenerator.ChunkScale);
-                if (districtHandler.IsBuilt(districtChunkIndexes[x, z]))
-                {
-                    if (verbose) Debug.Log("Invalid, District index is already built");
-                    return false;
-                }
-                
-                districtPos = ChunkWaveUtility.GetPosition(districtChunkIndexes[x, z].XyZ(0), districtGenerator.ChunkScale);
-                if (!buildingGenerator.TryGetIndex(districtPos + buildingGenerator.CellSize / 2.0f, out ChunkIndex buildingIndex))
-                {
-                    if (verbose) Debug.Log("Invalid, District index is out of bounds");
-                    return false;
-                }
-                
-                GroundType groundType = buildingGenerator.ChunkWaveFunction.Chunks[buildingIndex.Index].GroundTypes[buildingIndex.CellIndex.x, buildingIndex.CellIndex.y, buildingIndex.CellIndex.z];
-                if (!IsBuildable(groundType))
-                {
-                    if (verbose) Debug.Log($"Invalid, The groundType: {groundType} does not match the district's restrictions");
-                    return false;
-                }
-
-                return true;
-            }
-        }
-
-        private void DistrictClicked(DistrictType districtType, int radius)
-        {
-            UIEvents.OnFocusChanged?.Invoke();
-            
-            buildingPlacer.ToggleSpawnPlaces(true);
             this.districtType = districtType;
-            districtChunkIndexes = new int2[radius, radius];
-            districtRadius = radius;
-            Placing = true;
-            isPlacementValid = false;
         }
 
+        private TileAction IsBuildable(ChunkIndex chunkIndex)
+        {
+            switch (tileBuilder.Tiles[chunkIndex])
+            {
+                case BuildingType.Barricade:
+                    return TileAction.None;
+
+                case BuildingType.District:
+                    return TileAction.Sell;
+            }
+            
+            if (!CheckGroundType(chunkIndex))
+            {
+                return TileAction.None;
+            }
+
+            UpdateCost();
+            return TileAction.Build;
+        }
+        
+        private bool CheckGroundType(ChunkIndex index)
+        {
+            GroundType groundType = buildingGenerator.ChunkWaveFunction.Chunks[index.Index].GroundTypes[index.CellIndex.x, index.CellIndex.y, index.CellIndex.z, 1];
+            if (!IsBuildable(groundType))
+            {
+                if (verbose) Debug.Log($"Invalid, The groundType: {groundType} does not match the district's restrictions");
+                return false;
+            }
+            
+            return true;
+        }
+        
         private bool IsBuildable(GroundType groundType)
         {
             return districtType switch
@@ -385,73 +150,61 @@ namespace Buildings.District
                 _ => groundType is GroundType.Grass or GroundType.Crystal
             };
         }
-
-        private void CancelPerformed(InputAction.CallbackContext obj)
+        
+        private void OnTilePressed(ChunkIndex index, TileAction action)
         {
-            if (Placing)
+            switch (action)
             {
-                CancelPlacement();
+                case TileAction.None:
+                    Debug.Log("Wot");
+                    break;
+                case TileAction.Build:
+                    PlaceDistrict(index);
+                    break;
+                case TileAction.Sell:
+                    break;
             }
         }
 
         private void CancelPlacement()
         {
-            buildingGenerator.RevertQuery();
-            districtGenerator.RevertQuery();
             costText.gameObject.SetActive(false);
+            tileBuilder.OnTilePressed -= OnTilePressed;
 
-            Placing = false;
-            isPlacementValid = false;
-            spawnedUnableToPlace?.gameObject.SetActive(false);
-            buildingPlacer.ToggleSpawnPlaces(false);
-
+            tileBuilder.CancelDisplay();
             OnPlacingCanceled?.Invoke();
         }
 
-        private void FirePerformed(InputAction.CallbackContext obj)
-        {
-            if (!Placing || CameraController.IsDragging || !isPlacementValid)
-            {
-                return;
-            }
-
-            PlaceDistrict();
-        }
-
-        private void PlaceDistrict()
+        private void PlaceDistrict(ChunkIndex groundIndex)
         {
             int amount = districtHandler.GetDistrictAmount(districtType);
-            if (!moneyManager.CanPurchase(districtType, amount, additionalBuildingAmount, out float cost))
+            if (!moneyManager.CanPurchase(districtType, amount, out float cost))
             {
                 return;
             }
 
+            tileBuilder.Tiles[groundIndex] = BuildingType.District;
+            
             moneyManager.RemoveMoney(cost);
-            
+
             PrototypeInfoData protInfo = prototypeUtility.GetPrototypeInfo(districtType);
-            HashSet<QueryChunk> chunks = districtGenerator.QueriedChunks.Where(x => x.PrototypeInfoData == protInfo).ToHashSet();
-            districtHandler.AddBuiltDistrict(chunks, districtType);
-
-            if (buildingGenerator.QueryBuiltIndexes != null)
-            {
-                foreach (ChunkIndex chunkIndex in buildingGenerator.QueryBuiltIndexes)
-                {
-                    if (buildingPlacer.SpawnedSpawnPlaces.TryGetValue(chunkIndex, out PlaceSquare spawnPlace))
-                    {
-                        spawnPlace.OnPlaced();
-                    }
-                }
-            }
             
-            districtGenerator.Place();
-
-            bool shouldUpdate = buildingGenerator.QuerySpawnedBuildings.Count <= 0;
+            buildingGenerator.Query(groundIndex);
             buildingGenerator.Place(); 
             
-            if (shouldUpdate)
+            Vector3 position = ChunkWaveUtility.GetPosition(groundIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize) + groundGenerator.ChunkWaveFunction.CellSize.XyZ(0) / 2.0f;
+            districtGenerator.Query(position, 2, protInfo);
+            HashSet<QueryChunk> chunks = new HashSet<QueryChunk>();
+            foreach (QueryChunk chunk in districtGenerator.QueriedChunks)
             {
-                UpdateBuildingIndexes();
+                if (chunk.PrototypeInfoData == protInfo)
+                {
+                    chunks.Add(chunk);
+                }
             }
+
+            districtHandler.AddBuiltDistrict(chunks, districtType);
+            districtGenerator.Place();
             
             costText.gameObject.SetActive(false);
             
@@ -459,62 +212,6 @@ namespace Buildings.District
             {
                 CancelPlacement();
             }
-            else
-            {
-                SetInvalid();
-            }
-
-            void UpdateBuildingIndexes()
-            {
-                List<IBuildable> buildables = new List<IBuildable>();
-                foreach (ChunkIndex chunkIndex in buildingIndexes)
-                {
-                    buildables.Add(buildingGenerator.SpawnedMeshes[chunkIndex]);
-                }
-                districtGenerator.UpdateChunksAtBuildables(buildables);
-            }
         }
-
-        private void OnGameReset()
-        {
-            Placing = false;
-        }
-        
-        #region Debug
-
-        private void OnDrawGizmosSelected()
-        {
-#if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlaying || districtChunkIndexes == null) return;
-#endif
-
-            foreach (int2 chunkIndex in districtChunkIndexes)
-            {
-                Vector3 districtPos = ChunkWaveUtility.GetPosition(chunkIndex.XyZ(0), districtGenerator.ChunkScale) - offset;
-                Gizmos.color = Color.blue; 
-                Gizmos.DrawWireCube(districtPos + districtGenerator.CellSize.XyZ() * 0.5f, districtGenerator.ChunkScale * 0.95f);
-            }
-            
-            foreach (QueryMarchedChunk chunk in buildingGenerator.ChunkWaveFunction.Chunks.Values)
-            {
-                for (int y = 0; y < chunk.Cells.GetLength(2); y++)
-                {
-                    for (int x = 0; x < chunk.Cells.GetLength(0); x++)
-                    {
-                        Vector3 pos = chunk.Cells[x, 0, y].Position;
-                        ChunkIndex index = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, y));
-                        Gizmos.color = builtIndexes.Contains(index) 
-                            ? Color.magenta
-                            : buildingIndexes.Contains(index)
-                                ? Color.red 
-                                : Color.black;
-                        Gizmos.DrawWireCube(pos, buildingGenerator.CellSize * 0.95f);
-                    }
-                }
-            }
-        
-        }
-
-        #endregion
     }
 }

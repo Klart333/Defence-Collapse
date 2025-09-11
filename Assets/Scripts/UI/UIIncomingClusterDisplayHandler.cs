@@ -35,8 +35,6 @@ namespace UI
         private void OnDisable()
         {
             Events.OnTurnIncreased -= OnTurnIncreased;
-
-            //incomingClusterQuery.Dispose();
         }
 
         private void OnTurnIncreased(int increased, int total)

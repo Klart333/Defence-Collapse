@@ -1,3 +1,5 @@
+using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
@@ -5,6 +7,8 @@ namespace InputCamera
 {
     public class InputManager : Singleton<InputManager>
     {
+        private Camera cam;
+        
         private InputActions InputActions;
 
         public InputAction Move { get; private set; }
@@ -18,11 +22,15 @@ namespace InputCamera
         public InputAction Cancel { get; private set; }
         public InputAction Space { get; private set; }
         public InputAction Tab { get; private set; }
-
+        
+        public Vector2 CurrentMouseScreenPosition { get; private set; }
+        public Vector3 CurrentMouseWorldPosition { get; private set; }
+        
         public bool GetShift => Shift.IsPressed();
 
         private void OnEnable()
         {
+            cam = Camera.main;
             InputActions = new InputActions();
 
             Move = InputActions.Player.Move;
@@ -77,6 +85,12 @@ namespace InputCamera
             Move.Disable();
             Fire.Disable();
             Tab.Disable();
+        }
+
+        private void Update()
+        {
+            CurrentMouseScreenPosition = Mouse.ReadValue<Vector2>();
+            CurrentMouseWorldPosition = Utility.Math.GetGroundIntersectionPoint(cam, CurrentMouseScreenPosition);
         }
 
         public bool MouseOverUI()

@@ -8,6 +8,7 @@ using UnityEngine;
 using Buildings;
 using System;
 using Gameplay.Event;
+using Unity.Mathematics;
 
 namespace Chunks
 {
@@ -53,6 +54,8 @@ namespace Chunks
         private readonly List<PooledMonoBehaviour> spawnedTrees = new List<PooledMonoBehaviour>();
         
         private List<ChunkIndex> chunkIndexes = new List<ChunkIndex>();
+
+        private float treeRadiusSq;
         
         public ChunkIndex ChunkIndex { get; set; }
         public bool HasGrown { get; set; }
@@ -66,6 +69,8 @@ namespace Chunks
             {
                 Events.OnBuildingBuilt += OnBuildingBuilt;   
             }
+            
+            treeRadiusSq = treeRadius * treeRadius;
         }
 
         protected override void OnDisable()
@@ -85,13 +90,13 @@ namespace Chunks
             Vector3 offset = raycastArea.ToXyZ(1).MultiplyByAxis(transform.localScale) / 2.0f;
             Vector3 min = transform.position - offset;
             Vector3 max = transform.position + offset;
-            List<Vector2> positions = new List<Vector2>();
+            List<float2> positions = new List<float2>();
             TimeSpan delay = TimeSpan.FromSeconds(totalTime / raycastCount);
             
             for (int i = 0; i < raycastCount; i++)
             {
                 Vector3 pos = new Vector3(Random.Range(min.x, max.x), 2, Random.Range(min.z, max.z));
-                if (!CheckCollisionWithTrees(pos.XZ())) continue;
+                if (!CheckCollisionWithTrees(new float2(pos.x, pos.z))) continue;
 
                 Ray ray = new Ray(pos, Vector3.down);
                 Material mat = GetHitMaterial(ray, out RaycastHit hit);
@@ -105,11 +110,11 @@ namespace Chunks
 
             return;
             
-            bool CheckCollisionWithTrees(Vector2 pos)
+            bool CheckCollisionWithTrees(float2 pos)
             {
                 for (int j = 0; j < positions.Count; j++)
                 {
-                    if (Vector2.Distance(positions[j], pos) < treeRadius)
+                    if (math.distancesq(positions[j], pos) < treeRadiusSq)
                     {
                         return false;
                     }

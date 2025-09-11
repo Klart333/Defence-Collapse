@@ -59,6 +59,12 @@ namespace Chunks
 
         private void OnCellCollapsed(ChunkIndex chunkIndex)
         {
+            int2 totalIndex = chunkIndex.Index.xz.MultiplyByAxis(groundGenerator.ChunkSize.xz) + chunkIndex.CellIndex.xz;
+            if (builtIndexesMap.ContainsKey(totalIndex))
+            {
+                return;
+            }
+            
             Cell cell = groundGenerator.ChunkWaveFunction[chunkIndex];
             if (!cell.PossiblePrototypes[0].MaterialIndexes.Contains(treeMaterialIndex)) return;
 
@@ -71,34 +77,9 @@ namespace Chunks
             spawned.ChunkIndex = chunkIndex;
             spawned.Cell = cell;
 
-            Chunk chunk = groundGenerator.ChunkWaveFunction.Chunks[chunkIndex.Index];
-
-            if (treeGrowersByChunk.TryGetValue(chunkIndex.Index, out List<TreeGrower> value))
-            {
-                value.Add(spawned);
-            }
-            else
-            {
-                treeGrowersByChunk.Add(chunkIndex.Index, new List<TreeGrower> { spawned });
-                chunk.OnCleared += ChunkCleared;
-            }
-
-            void ChunkCleared()
-            {
-                chunk.OnCleared -= ChunkCleared;
-
-                if (!treeGrowersByChunk.TryGetValue(chunkIndex.Index, out List<TreeGrower> growers)) return;
-                
-                for (int i = 0; i < growers.Count; i++)
-                {
-                    growers[i].ClearTrees();
-                    growers[i].gameObject.SetActive(false);
-                    int2 totalChunkIndex = growers[i].ChunkIndex.Index.xz.MultiplyByAxis(groundGenerator.ChunkSize.xz) + growers[i].ChunkIndex.CellIndex.xz;
-                    builtIndexesMap.Remove(totalChunkIndex);
-                }
-                
-                treeGrowersByChunk.Remove(chunk.ChunkIndex);
-            }
+            if (treeGrowersByChunk.TryGetValue(chunkIndex.Index, out List<TreeGrower> value)) value.Add(spawned);
+            else treeGrowersByChunk.Add(chunkIndex.Index, new List<TreeGrower> { spawned });
+            
         }
 
         private void OnGenerationFinished()
@@ -133,34 +114,6 @@ namespace Chunks
             }
 
             growingTrees = null;
-            //DeallocateGrownChunks(chunksGrown);
-        }
-
-        private void DeallocateGrownChunks(List<int3> chunksGrown)
-        {
-            foreach (int3 chunks in chunksGrown)
-            {
-                if (!treeGrowersByChunk.TryGetValue(chunks, out List<TreeGrower> value)) continue;
-                
-                bool removeChunk = true;
-                foreach (TreeGrower grower in value)
-                {
-                    if (grower.ShouldRemoveWhenPlaced)
-                    {
-                        removeChunk = false;
-                        grower.OnPlaced += GrowerOnPlaced;
-
-                        continue;
-                    }
-                    
-                    grower.gameObject.SetActive(false);
-                }
-
-                if (removeChunk)
-                {
-                    treeGrowersByChunk.Remove(chunks);
-                }
-            }
         }
 
         private int GetGroupIndex(int2 index)
@@ -178,20 +131,6 @@ namespace Chunks
             }
             
             return Random.Range(0, groupCount);
-        }
-
-        private void GrowerOnPlaced(TreeGrower grower)
-        {
-            grower.OnPlaced -= GrowerOnPlaced;
-            grower.gameObject.SetActive(false);
-            
-            int3 key = grower.ChunkIndex.Index;
-            if (!treeGrowersByChunk.TryGetValue(key, out List<TreeGrower> list)) return;
-            list.RemoveSwapBack(grower);
-            if (list.Count == 0)
-            {
-                treeGrowersByChunk.Remove(key);
-            }
         }
     }
 }

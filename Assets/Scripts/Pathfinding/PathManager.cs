@@ -6,10 +6,10 @@ using Unity.Collections;
 using Unity.Mathematics;
 using Pathfinding.ECS;
 using Unity.Entities;
+using Gameplay.Event;
 using UnityEngine;
 using Unity.Jobs;
 using System;
-using Gameplay.Event;
 
 namespace Pathfinding
 {
@@ -106,8 +106,8 @@ namespace Pathfinding
         {
             GetPathInformation?.Invoke();
 
-            int quadrantWidth = PathUtility.GRID_WIDTH / 2;
-            int quadrantHeight = PathUtility.GRID_WIDTH / 2;
+            const int quadrantWidth = PathUtility.GRID_WIDTH / 2;
+            const int quadrantHeight = PathUtility.GRID_WIDTH / 2;
             int chunksLength = pathChunks.Value.PathChunks.Length;
 
             for (int i = 3; i >= 0; i--)
@@ -121,7 +121,7 @@ namespace Pathfinding
                     _ => throw new ArgumentOutOfRangeException()
                 };
                 
-                var job = new PathJob
+                PathJob job = new PathJob
                 {
                     Start = start,
                     PathChunks = pathChunks,
@@ -202,11 +202,12 @@ namespace Pathfinding
             new int2(1, -1),
         };
         
-        public const float HALF_BUILDING_CELL = 0.25f;
-        public const float FULL_BUILDING_CELL = 0.5f;
-        public const float CELL_SCALE = 1.0f;
-        public const float CHUNK_SIZE = 8;
-        public const int GRID_WIDTH = 8; 
+        public const float FULL_BUILDING_CELL = 1f;
+        public const float CELL_SCALE = 2.0f;
+        public const int GRID_WIDTH = 4; 
+        
+        public const float HALF_BUILDING_CELL = FULL_BUILDING_CELL / 2.0f;
+        public const float CHUNK_SIZE = GRID_WIDTH * CELL_SCALE;
         public const int GRID_LENGTH = GRID_WIDTH * GRID_WIDTH;
         
         public static float2 ByteToDirection(byte directionByte)
@@ -229,7 +230,7 @@ namespace Pathfinding
         public static float3 GetPos(PathIndex index)
         {
             float3 chunkPos = ChunkIndexToWorld(index.ChunkIndex);
-            float3 gridPos = new float3(index.GridIndex % GRID_WIDTH - FULL_BUILDING_CELL, 0, Mathf.FloorToInt((float)index.GridIndex / GRID_WIDTH) - FULL_BUILDING_CELL) * CELL_SCALE;
+            float3 gridPos = new float3(index.GridIndex % GRID_WIDTH + HALF_BUILDING_CELL, 0, Mathf.FloorToInt((float)index.GridIndex / GRID_WIDTH) + HALF_BUILDING_CELL) * CELL_SCALE;
             
             return chunkPos + gridPos;
         }
@@ -239,8 +240,8 @@ namespace Pathfinding
         public static PathIndex GetIndex(float xPos, float zPos)
         {
             // Find which chunk the position is in
-            int chunkZ = Utility.Math.GetMultipleFloored(zPos + FULL_BUILDING_CELL, CHUNK_SIZE);
-            int chunkX = Utility.Math.GetMultipleFloored(xPos + FULL_BUILDING_CELL, CHUNK_SIZE);
+            int chunkZ = Utility.Math.GetMultipleFloored(zPos, CHUNK_SIZE);
+            int chunkX = Utility.Math.GetMultipleFloored(xPos, CHUNK_SIZE);
             int2 chunkIndex = new int2(chunkX, chunkZ);
         
             // Calculate position relative to the chunk's origin
@@ -248,34 +249,13 @@ namespace Pathfinding
             float localZ = zPos - chunkZ * CHUNK_SIZE;
         
             // Find grid indices within the chunk
-            int gridX = Utility.Math.GetMultiple(localX + HALF_BUILDING_CELL, CELL_SCALE);
-            int gridZ = Utility.Math.GetMultiple(localZ + HALF_BUILDING_CELL, CELL_SCALE);
+            int gridX = Utility.Math.GetMultipleFloored(localX, CELL_SCALE);
+            int gridZ = Utility.Math.GetMultipleFloored(localZ, CELL_SCALE);
         
             // Convert 2D grid index to 1D
             int targetIndex = gridZ * GRID_WIDTH + gridX;
         
             return new PathIndex(chunkIndex, targetIndex);
-        }
-        
-        public static PathIndex AddToPathIndex(PathIndex index, int2 add)
-        {
-            int2 chunkIndexAdd = int2.zero;
-            chunkIndexAdd.x = (index.GridIndex + add.x) switch
-            {
-                >= GRID_LENGTH => 1,
-                < 0 => -1,
-                _ => 0
-            };
-            
-            chunkIndexAdd.y = (index.GridIndex + add.y * GRID_WIDTH) switch
-            {
-                >= GRID_LENGTH => 1,
-                < 0 => -1,
-                _ => 0
-            };
-
-            int flatAdd = add.x - chunkIndexAdd.x * GRID_WIDTH + add.y * GRID_WIDTH - chunkIndexAdd.y * GRID_LENGTH;
-            return new PathIndex(index.ChunkIndex + chunkIndexAdd, index.GridIndex + flatAdd);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
