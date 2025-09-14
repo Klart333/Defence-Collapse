@@ -97,7 +97,7 @@ namespace Gameplay.Upgrades
             canvasGroup.blocksRaycasts = true;
             canvasGroup.DOFade(1, fadeInDuration).SetEase(fadeInEase);
             
-            int seed = gameManager.Seed + lastCardTurn;
+            int seed = (int)gameManager.Seed + lastCardTurn;
             List<UpgradeCardData.UpgradeCardInstance> datas = upgradeDataUtility.GetRandomData(seed, upgradeCards.Length);
 
             for (int i = 0; i < upgradeCards.Length; i++)
@@ -111,7 +111,7 @@ namespace Gameplay.Upgrades
         public void RerollUpgradeCards()
         {
             rerollCount++;
-            int seed = gameManager.Seed + lastCardTurn + rerollCount;
+            int seed = (int)gameManager.Seed + lastCardTurn + rerollCount;
             List<UpgradeCardData.UpgradeCardInstance> datas = upgradeDataUtility.GetRandomData(seed, upgradeCards.Length);
 
             for (int i = 0; i < upgradeCards.Length; i++)

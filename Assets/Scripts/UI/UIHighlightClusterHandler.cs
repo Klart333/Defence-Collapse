@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 using Enemy.ECS;
+using Gameplay;
 
 namespace UI
 {
@@ -10,6 +11,8 @@ namespace UI
     {
         // Needs to handle unhovering and re-hovering current highlighted cluster
 
+        private GameManager gameManager;
+        
         private EntityManager entityManager;
         private EntityQuery highlightClusterQuery;
 
@@ -19,11 +22,17 @@ namespace UI
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             highlightClusterQuery = entityManager.CreateEntityQuery(typeof(HighlightClusterDataComponent));
+            GetGameManager().Forget();
+        }
+
+        private async UniTaskVoid GetGameManager()
+        {
+            gameManager = await GameManager.Get();
         }
 
         private void Update()
         {
-            if (reading)
+            if (reading || gameManager.IsGameOver)
             {
                 return;
             }

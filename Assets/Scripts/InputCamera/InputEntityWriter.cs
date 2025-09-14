@@ -1,10 +1,10 @@
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
-using Math = Utility.Math;
 using Unity.Mathematics;
 using Unity.Entities;
 using UnityEngine;
 using DG.Tweening;
+using Gameplay;
 
 namespace InputCamera
 {
@@ -19,14 +19,15 @@ namespace InputCamera
         [SerializeField]
         private Ease blendEase = Ease.InOutSine;
         
+        private InputManager inputManager;
+        private GameManager gameManager;
+        private Camera cam;
+
         private Vector3 overrideMousePosition;
         private EntityManager entityManager;
         private Entity mousePositionEntity;
-        private InputManager inputManager;
-        private Camera cam;
-
-        private bool isOverridingMousePosition;
         
+        private bool isOverridingMousePosition;
 
         private void OnEnable()
         {
@@ -35,6 +36,7 @@ namespace InputCamera
             mousePositionEntity = entityManager.CreateEntity(typeof(MousePositionComponent));
             
             GetInput().Forget();
+            GetGameManager().Forget();
         }
 
         private async UniTaskVoid GetInput()
@@ -42,9 +44,14 @@ namespace InputCamera
             inputManager = await InputManager.Get();
         }
 
+        private async UniTaskVoid GetGameManager()
+        {
+            gameManager = await GameManager.Get();
+        }
+
         private void Update()
         {
-            if (!inputManager) return;
+            if (inputManager == null || gameManager.IsGameOver) return;
 
             entityManager.SetComponentData(mousePositionEntity, new MousePositionComponent
             {

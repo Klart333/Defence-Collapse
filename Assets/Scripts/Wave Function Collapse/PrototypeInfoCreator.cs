@@ -394,7 +394,42 @@ namespace WaveFunctionCollapse
             {
                 return keys;
             }
+            
+            // Add all four rotations
+            for (int i = 0; i < 4; i++)
+            {
+                Vector2[] pos = Rotated(positions, i);
 
+                if (TryMatchSingleExistingKey(pos, out ulong existingKey))
+                {
+                    keys[i] = existingKey;
+                }
+                else
+                {
+                    ulong key = (ulong)1 << (currentTopIndex + 2 + i);
+                    keys[i] = key;
+                    prototypeData.VerticalSocketList.Add(new DicData(pos, key, Array.Empty<int>()));
+                }
+            }
+
+            currentTopIndex += 4;
+
+            return keys;
+
+            bool TryMatchSingleExistingKey(Vector2[] positions, out ulong key)
+            {
+                key = 0;
+                foreach (DicData value in prototypeData.VerticalSocketList)
+                {
+                    if (!LooseEquals(value.positions, positions)) continue;
+
+                    key = value.socketname;
+                    return true;
+                }
+
+                return false;
+            }
+            
             bool TryMatchExistingVerticalKeys(List<Vector2> positionList, out ulong[] keys)
             {
                 keys = new ulong[4];
@@ -416,19 +451,6 @@ namespace WaveFunctionCollapse
 
                 return math.all(valid);
             }
-
-            // Add all four rotations
-            for (int i = 0; i < 4; i++)
-            {
-                ulong key = ((ulong)1 << (currentTopIndex + 2 + i));
-                Vector2[] pos = Rotated(positions, i);
-                keys[i] = key;
-                prototypeData.VerticalSocketList.Add(new DicData(pos, key, Array.Empty<int>()));
-            }
-
-            currentTopIndex += 4;
-
-            return keys;
         }
         
         private void SetMarchingTable2D(List<PrototypeData> prots)

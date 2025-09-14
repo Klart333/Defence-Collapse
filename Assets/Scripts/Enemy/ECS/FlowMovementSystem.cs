@@ -65,7 +65,7 @@ namespace Enemy.ECS
         {
             flowField.MoveTimer -= TurnIncrease;
             if (flowField.MoveTimer > 0) return;
-            flowField.MoveTimer += (int)math.round(1.0f / speed.Speed);
+            flowField.MoveTimer += speed.Speed;
             
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
             float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[flowField.PathIndex.GridIndex]);
@@ -76,12 +76,15 @@ namespace Enemy.ECS
             
             flowField.PathIndex = movedPathIndex;
             cluster.Position = movedPosition;
-            
+            ECB.AddComponent<UpdatePositioningTag>(sortKey, entity);
+
             ref PathChunk movedPathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[movedPathIndex.ChunkIndex]];
             float2 newDirection = PathUtility.ByteToDirection(movedPathChunk.Directions[movedPathIndex.GridIndex]);
             cluster.Facing = newDirection;
             
-            ECB.AddComponent<UpdatePositioningTag>(sortKey, entity);
+            float3 facingMovedPosition = movedPosition + (math.round(newDirection) * PathUtility.CELL_SCALE).XyZ();
+            PathIndex facingPathIndex = PathUtility.GetIndex(facingMovedPosition.xz);
+            cluster.TargetPathIndex = ChunkIndexToListIndex.ContainsKey(facingPathIndex.ChunkIndex) ? facingPathIndex : movedPathIndex;
         }
     }
 }

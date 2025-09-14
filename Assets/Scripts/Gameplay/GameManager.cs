@@ -14,13 +14,16 @@ namespace Gameplay
     public class GameManager : Singleton<GameManager>
     {
         private SceneTransitionManager sceneTransitionManager; 
+        
+        private EntityManager entityManager;
             
-        public int Seed { get; private set; }
+        public uint Seed { get; private set; }
         public bool IsGameOver { get; private set; }
         
         private void OnEnable()
         {
-            SetupGame(new Random().Next()); // TODO: Call from proper place, or maybe this is fine?
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            SetupGame((uint)UnityEngine.Random.Range(1, 100_000_000)); // TODO: Call from proper place, or maybe this is fine?
             
             Events.OnCapitolDestroyed += OnCapitolDestroyed;
             
@@ -52,10 +55,12 @@ namespace Gameplay
             PersistantGameStats.SaveCurrentGameStats();
         }
 
-        public void SetupGame(int seed)
+        public void SetupGame(uint seed)
         {
             IsGameOver = false;
             Seed = seed;
+            
+            entityManager.AddComponentData(entityManager.CreateEntity(), new RandomSeedComponent { Seed = seed });
             
             PersistantGameStats.CreateNewGameStats(0);
         }
@@ -88,5 +93,10 @@ namespace Gameplay
             
             Events.OnGameReset?.Invoke();
         }
+    }
+
+    public struct RandomSeedComponent : IComponentData
+    {
+        public uint Seed;
     }
 }

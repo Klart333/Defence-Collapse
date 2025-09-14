@@ -73,7 +73,7 @@ namespace Buildings.District.ECS
             attackSpeedComponent.AttackTimer -= TurnIncrease;
             if (attackSpeedComponent.AttackTimer > 0) return;
             
-            attackSpeedComponent.AttackTimer += (int)math.round(1.0f / attackSpeedComponent.AttackSpeed);
+            attackSpeedComponent.AttackTimer += attackSpeedComponent.AttackSpeed;
             targetComponent.HasTarget = false;
 
             Entity entity = ECB.CreateEntity(sortKey);
@@ -97,7 +97,7 @@ namespace Buildings.District.ECS
             attackSpeedComponent.AttackTimer -= TurnIncrease;
             if (attackSpeedComponent.AttackTimer > 0) return;
             
-            attackSpeedComponent.AttackTimer += (int)math.round(1.0f / attackSpeedComponent.AttackSpeed);
+            attackSpeedComponent.AttackTimer += attackSpeedComponent.AttackSpeed;
             
             Entity entity = ECB.CreateEntity(sortKey);
             ECB.AddComponent(sortKey, entity, new DistrictEntityData

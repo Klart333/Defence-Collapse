@@ -1,15 +1,14 @@
-using System;
-using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace InputCamera
 {
     public class InputManager : Singleton<InputManager>
     {
-        private Camera cam;
-        
         private InputActions InputActions;
+        private Camera cam;
 
         public InputAction Move { get; private set; }
         public InputAction Escape { get; private set; }
@@ -30,6 +29,8 @@ namespace InputCamera
 
         private void OnEnable()
         {
+            if (Instance != this) return;
+            
             cam = Camera.main;
             InputActions = new InputActions();
 
@@ -65,6 +66,8 @@ namespace InputCamera
 
             Escape = InputActions.Player.Escape;
             Escape.Enable();
+            
+            SceneManager.sceneLoaded += SceneManagerOnsceneLoaded;
         }
 
         private void OnDisable()
@@ -85,10 +88,22 @@ namespace InputCamera
             Move.Disable();
             Fire.Disable();
             Tab.Disable();
+            
+            SceneManager.sceneLoaded -= SceneManagerOnsceneLoaded;
+        }
+
+        private void SceneManagerOnsceneLoaded(Scene arg0, LoadSceneMode arg1)
+        {
+            cam = Camera.main;
         }
 
         private void Update()
         {
+            if (cam == null)
+            {
+                return;
+            }
+            
             CurrentMouseScreenPosition = Mouse.ReadValue<Vector2>();
             CurrentMouseWorldPosition = Utility.Math.GetGroundIntersectionPoint(cam, CurrentMouseScreenPosition);
         }

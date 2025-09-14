@@ -20,7 +20,7 @@ namespace Effects.LittleDudes
                 AddComponent(prefab, new LittleDudeComponent());
                 AddComponent(prefab, new RandomComponent());
                 AddComponent(prefab, new ReloadHitsComponent { MaxHitAmount = 1, ReloadInterval = 1.0f / authoring.stats.AttackSpeed });
-                AddComponent(prefab, new SpeedComponent { Speed = authoring.stats.MovementSpeed.Value, });
+                AddComponent(prefab, new SpeedComponent { Speed = 1.0f / authoring.stats.MovementSpeed.Value, });
                 AddComponent(prefab, new ColliderComponent { Radius = 0.5f });
                 
                 AddComponent(prefab, new CritComponent

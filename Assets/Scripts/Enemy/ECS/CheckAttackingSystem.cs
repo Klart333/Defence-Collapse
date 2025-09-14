@@ -57,12 +57,12 @@ namespace Enemy.ECS
         public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
         
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in FlowFieldComponent flowField)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in EnemyClusterComponent clusterComponent)
         {
-            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
-            if (valuePathChunk.Directions[flowField.PathIndex.GridIndex] == byte.MaxValue)
+            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[clusterComponent.TargetPathIndex.ChunkIndex]];
+            if (valuePathChunk.Directions[clusterComponent.TargetPathIndex.GridIndex] == byte.MaxValue)
             {
-                ECB.AddComponent(sortKey, entity, new AttackingComponent { Target = flowField.PathIndex });
+                ECB.AddComponent(sortKey, entity, new AttackingComponent { Target = clusterComponent.TargetPathIndex });
             }
         }
     }

@@ -243,7 +243,6 @@ namespace Buildings.District
 #endif
             int count = targetIndexes.Count;
             float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
-            float delay = attackSpeedValue / count;
             
             NativeArray<Entity> entities = entityManager.Instantiate(requireTargeting ? targetingEntityPrefab : simpleTargetingEntityPrefab, count, Allocator.Temp);
             
@@ -268,7 +267,7 @@ namespace Buildings.District
 
             void SetupShooterEntity(Entity spawnedEntity, int i, Vector3 pos)
             {
-                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent { AttackSpeed = attackSpeedValue});
+                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent { AttackSpeed = attackSpeedValue, AttackTimer = (int)math.ceil(attackSpeedValue)});
                 entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = stats.Range.Value });
                 entityManager.SetComponentData(spawnedEntity, new DistrictDataComponent { DistrictID = Key, });
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = pos });
@@ -521,7 +520,7 @@ namespace Buildings.District
 
         protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
-            return DistrictStateUtility.GetPerimeterEntityChunks(chunkIndexes, occupiedTargetMeshChunkIndex, DistrictData.DistrictGenerator, PrototypeInfo, 3);
+            return DistrictStateUtility.GetPerimeterEntityChunks(chunkIndexes, occupiedTargetMeshChunkIndex, DistrictData.DistrictGenerator, PrototypeInfo, 2);
         }
 
         public override void OnSelected(Vector3 pos)

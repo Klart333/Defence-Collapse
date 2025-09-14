@@ -7,6 +7,7 @@ using Unity.Burst;
 using Effects.ECS;
 using Pathfinding;
 using System;
+using UnityEngine;
 
 namespace Enemy.ECS
 {
@@ -16,10 +17,12 @@ namespace Enemy.ECS
         public static readonly Dictionary<PathIndex, Action<float>> DamageEvent = new Dictionary<PathIndex, Action<float>>();
         
         private NativeQueue<DamageIndex> damageQueue;
+        private BufferLookup<ManagedEntityBuffer> bufferLookup;
 
         protected override void OnCreate()
         {
             damageQueue = new NativeQueue<DamageIndex>(Allocator.Persistent);
+            bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>();
             
             RequireForUpdate<TurnIncreaseComponent>();
         }
@@ -27,13 +30,14 @@ namespace Enemy.ECS
         protected override void OnUpdate()
         {
             TurnIncreaseComponent turnIncrease = SystemAPI.GetSingleton<TurnIncreaseComponent>();
-
-            new AttackingJob
+            bufferLookup.Update(this);
+            
+            Dependency = new AttackingJob
             {
                 DamageQueue = damageQueue.AsParallelWriter(),
                 TurnIncrease = turnIncrease.TurnIncrease,
-            }.ScheduleParallel();
-
+                BufferLookup = bufferLookup,
+            }.ScheduleParallel(Dependency);
             Dependency.Complete();
 
             HashSet<PathIndex> failedAttacks = new HashSet<PathIndex>();
@@ -64,6 +68,7 @@ namespace Enemy.ECS
     [BurstCompile, WithAll(typeof(EnemyClusterComponent))]
     public partial struct AttackingJob : IJobEntity
     {
+        [ReadOnly]
         public BufferLookup<ManagedEntityBuffer> BufferLookup;
         
         public NativeQueue<DamageIndex>.ParallelWriter DamageQueue;
@@ -75,7 +80,7 @@ namespace Enemy.ECS
         {
             attackSpeedComponent.AttackTimer -= TurnIncrease;
             if (attackSpeedComponent.AttackTimer > 0) return;
-            attackSpeedComponent.AttackTimer = (int)math.round(1.0f / attackSpeedComponent.AttackSpeed);
+            attackSpeedComponent.AttackTimer += attackSpeedComponent.AttackSpeed;
 
             int enemyCount = BufferLookup[entity].Length;
             float damage = damageComponent.Damage * enemyCount;

@@ -1,5 +1,5 @@
+using Random = Unity.Mathematics.Random;
 using System.Collections.Generic;
-using Random = System.Random;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
@@ -40,7 +40,7 @@ namespace Enemy
         {
             groundGenerator.OnChunkGenerated += OnChunkUnlocked;
             
-            random = new Random(GameManager.Instance?.Seed ?? -1);
+            random = new Random(GameManager.Instance?.Seed ?? (uint)UnityEngine.Random.Range(1, int.MaxValue));
             
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             spawnPrefab = entityManager.CreateEntity(typeof(SpawnPointComponent), typeof(Prefab));
@@ -81,7 +81,7 @@ namespace Enemy
                 {
                     Position = pathPosition,
                     Index = spawnIndex++,
-                    Random = Unity.Mathematics.Random.CreateFromIndex((uint)random.Next(1, 20000000))
+                    Random = Random.CreateFromIndex(random.NextUInt(1, 20000000))
                 });
             }
         }
@@ -105,7 +105,7 @@ namespace Enemy
             {
                 Position = pathPosition,
                 Index = spawnIndex++,
-                Random = Unity.Mathematics.Random.CreateFromIndex((uint)random.Next(1, 20000000))
+                Random = Random.CreateFromIndex(random.NextUInt(1, 20000000))
             });
             
             spawnedEntities.Add(chunkIndex, entity);

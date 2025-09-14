@@ -1,5 +1,6 @@
 using Unity.Mathematics;
 using Unity.Entities;
+using Pathfinding;
 
 namespace Enemy.ECS
 {
@@ -10,8 +11,10 @@ namespace Enemy.ECS
     
     public struct EnemyClusterComponent : IComponentData
     {
-        public float2 Facing;
+        public PathIndex TargetPathIndex;
         public float3 Position;
+        public float2 Facing;
+        
         public float EnemySize;
         public int EnemyType;
     }

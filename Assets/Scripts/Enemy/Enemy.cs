@@ -48,7 +48,7 @@ namespace Enemy
                 AddComponent(enemyEntity, new AttackSpeedComponent { AttackSpeed = 1.0f / stats.AttackSpeed.Value });
                 AddComponent(enemyEntity, new MoneyOnDeathComponent { Amount = authoring.enemyData.MoneyOnDeath});
                 AddComponent(enemyEntity, new SimpleDamageComponent { Damage = stats.HealthDamage.Value, });
-                AddComponent(enemyEntity, new SpeedComponent { Speed = stats.MovementSpeed.Value });
+                AddComponent(enemyEntity, new SpeedComponent { Speed = 1.0f / stats.MovementSpeed.Value });
                 AddComponent(enemyEntity, new FresnelComponent { Value = 5f });
                 
                 AddComponent(enemyEntity, new HealthComponent

@@ -13,13 +13,13 @@ namespace Enemy.ECS
     public struct FlowFieldComponent : IComponentData
     {
         public PathIndex PathIndex;
-        public int MoveTimer;
+        public float MoveTimer;
     }
 
     public struct AttackSpeedComponent : IComponentData
     {
         public float AttackSpeed;
-        public int AttackTimer;
+        public float AttackTimer;
     }
 
     [MaterialProperty("_Strength")]

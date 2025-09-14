@@ -51,14 +51,12 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  icon: {fileID: 21300000, guid: eb5df30e2bf6f274c821acebbf71247e, type: 3}
   iconReference:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: 089ea1addb3d38f47995c3b0e4bfc5e7, type: 2}
-    VariableValuePreview: {fileID: 21300000, guid: 71b1a5b8cad01664ab92e8fc2c3c8a9a,
+    VariableValuePreview: {fileID: 21300000, guid: 1224c37b966d53d41a1a27fa1687fd24,
       type: 3}
-  description: +5 <color=red>Poison Tick Damage</color>.
   descriptionReference:
     Mode: 0
     ConstantValue: +5 <color=red>Poison Tick Damage</color>.
@@ -66,7 +64,7 @@ MonoBehaviour:
     VariableValuePreview: 
   upgradeRank: 1
   upgradeCardType: 4096
-  weight: 1
+  weight: 0
   weightStrategy: 16
   weightChangeOnPicked: -0.1
   weightChangeOnCardsPicked: 1
