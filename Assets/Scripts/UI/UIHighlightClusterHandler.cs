@@ -10,9 +10,6 @@ namespace UI
     public class UIHighlightClusterHandler : MonoBehaviour 
     {
         // Needs to handle unhovering and re-hovering current highlighted cluster
-
-        [SerializeField]
-        private 
         
         private GameManager gameManager;
         
