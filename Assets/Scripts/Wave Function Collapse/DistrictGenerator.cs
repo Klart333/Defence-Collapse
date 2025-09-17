@@ -663,14 +663,13 @@ namespace WaveFunctionCollapse
                 }
             }
             
-            return;
-            foreach (QueryChunk chunk in waveFunction.Chunks.Values)
+            /*foreach (QueryChunk chunk in waveFunction.Chunks.Values)
             {
                 /*foreach (Cell cell in chunk.Cells)
                 {
                     Gizmos.color = !cell.Collapsed ? Color.red : cell.PossiblePrototypes[0].MeshRot.MeshIndex == -1 ? Color.blue : Color.white;
                     Gizmos.DrawWireCube(cell.Position + CellSize / 2.0f, CellSize * 0.75f);
-                }*/
+                }#1#
                 
                 Vector3 pos = ChunkWaveUtility.GetPosition(chunk.ChunkIndex, ChunkScale);
                 if (QueriedChunks.Contains(chunk))
@@ -683,7 +682,7 @@ namespace WaveFunctionCollapse
                 }
 
                 Gizmos.DrawWireCube(pos + ChunkScale / 2.0f, ChunkScale * 0.75f);
-            }
+            }*/
         }
 #endif
         #endregion

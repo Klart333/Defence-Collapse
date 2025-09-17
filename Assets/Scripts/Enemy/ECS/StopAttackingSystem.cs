@@ -55,10 +55,10 @@ namespace Enemy.ECS
         {
             for (int i = 0; i < Length; i++)
             {
-                if (attackingComponent.Target.Equals(KilledIndexes[i]))
-                {
-                    ECB.RemoveComponent<AttackingComponent>(sortKey, entity);
-                }
+                if (!attackingComponent.Target.Equals(KilledIndexes[i])) continue;
+                
+                ECB.RemoveComponent<AttackingComponent>(sortKey, entity);
+                ECB.RemoveComponent<UpdateClusterAttackingComponent>(sortKey, entity);
             }
         }
     }

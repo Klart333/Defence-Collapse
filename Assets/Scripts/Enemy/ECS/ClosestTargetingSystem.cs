@@ -1,37 +1,35 @@
+using Buildings.District.ECS;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
-using UnityEngine;
-using Gameplay;
-using Gameplay.Turns.ECS;
 
 namespace Enemy.ECS
 {
-    [UpdateAfter(typeof(EnemyHashGridSystem))]
+    [BurstCompile, UpdateAfter(typeof(EnemyHashGridSystem))]
     public partial struct ClosestTargetingSystem : ISystem
     {
+        private ComponentLookup<LocalTransform> transformLookup;
+        
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<TurnIncreaseComponent>();
-            state.RequireForUpdate<EnemyClusterComponent>();
-            
-            EntityQuery query = SystemAPI.QueryBuilder().WithAspect<EnemyTargetAspect>().Build();
-            state.RequireForUpdate(query);
+            state.RequireForUpdate<TargetingActivationComponent>();
+
+            transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
-
+            transformLookup.Update(ref state);
+            
             new ClosestTargetingJob
             {
-                TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                TransformLookup = transformLookup,
                 SpatialGrid = spatialGrid.AsReadOnly(),
-                CellSize = 1,
             }.ScheduleParallel();
         }
 
@@ -42,33 +40,32 @@ namespace Enemy.ECS
         }
     }
     
-    [BurstCompile]
-    public partial struct ClosestTargetingJob : IJobEntity // TODO: Don't execute every frame dumbass
-    {
+    // CELL SIZE = 1
+    [BurstCompile, WithAll(typeof(TargetingActivationComponent))]
+    public partial struct ClosestTargetingJob : IJobEntity 
+    {   
         [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
         
         [ReadOnly]
         public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
-
-        public float CellSize;
-
+        
         [BurstCompile]
-        public void Execute(EnemyTargetAspect enemyTargetAspect)
+        public void Execute(in DirectionRangeComponent directionComponent, ref EnemyTargetComponent enemyTargetComponent, in RangeComponent rangeComponent, in LocalTransform localTransform)
         {
-            float2 towerPosition = enemyTargetAspect.LocalTransform.ValueRO.Position.xz;
-            int2 towerCell = HashGridUtility.GetCell(towerPosition, CellSize);
-            float range = enemyTargetAspect.RangeComponent.ValueRO.Range;
-            int radiusCells = Mathf.CeilToInt(range / CellSize);
+            float2 towerPosition = localTransform.Position.xz;
+            int2 towerCell = HashGridUtility.GetCellForCellSize1(towerPosition);
+            float range = rangeComponent.Range;
+            int radiusCells = (int)math.ceil(range);
             float rangeSq = range * range;
-            float maxCellDist = range + CellSize * 1.414f; // Diagonal of cell
+            float maxCellDist = range * 1.414f; // Diagonal of cell
             float maxCellDistSq = maxCellDist * maxCellDist;
 
             // Common target finding variables
             float bestDistSq = rangeSq;
             float3 bestEnemyPosition = default;
 
-            if (enemyTargetAspect.DirectionComponent.ValueRO.Angle >= 360f)
+            if (directionComponent.Angle >= 360f)
             {
                 // Optimized 360-degree path
                 for (int dx = -radiusCells; dx <= radiusCells; dx++)
@@ -77,7 +74,7 @@ namespace Enemy.ECS
                     int2 cell = new int2(towerCell.x + dx, towerCell.y + dy);
                     
                     // Quick distance check at cell level
-                    float2 cellCenter = ((float2)cell + 0.5f) * CellSize;
+                    float2 cellCenter = (float2)cell + 0.5f;
                     float2 toCell = cellCenter - towerPosition;
                     float cellDistSq = math.lengthsq(toCell);
                     if (cellDistSq > maxCellDistSq
@@ -93,19 +90,18 @@ namespace Enemy.ECS
                         float2 enemyPosition = enemyTransform.ValueRO.Position.xz;
                         float distSq = math.distancesq(towerPosition, enemyPosition);
 
-                        if (distSq < bestDistSq)
-                        {
-                            bestDistSq = distSq;
-                            bestEnemyPosition = enemyTransform.ValueRO.Position;
-                        }
+                        if (distSq >= bestDistSq) continue;
+                        
+                        bestDistSq = distSq;
+                        bestEnemyPosition = enemyTransform.ValueRO.Position;
                     } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
                 }
             }
             else
             {
                 // Directional cone path
-                float2 direction = enemyTargetAspect.DirectionComponent.ValueRO.Direction;
-                float halfAngleRad = math.radians(enemyTargetAspect.DirectionComponent.ValueRO.Angle * 0.5f);
+                float2 direction = directionComponent.Direction;
+                float halfAngleRad = math.radians(directionComponent.Angle * 0.5f);
                 float cosHalfAngle = math.cos(halfAngleRad);
                 float2 coneLeft = math.mul(float2x2.Rotate(halfAngleRad), direction);
                 float2 coneRight = math.mul(float2x2.Rotate(-halfAngleRad), direction);
@@ -114,7 +110,7 @@ namespace Enemy.ECS
                 for (int dy = -radiusCells; dy <= radiusCells; dy++)
                 {
                     int2 cell = new int2(towerCell.x + dx, towerCell.y + dy);
-                    float2 cellCenter = ((float2)cell + 0.5f) * CellSize;
+                    float2 cellCenter = (float2)cell + 0.5f;
                     float2 toCell = cellCenter - towerPosition;
                     float cellDistSq = math.lengthsq(toCell);
 
@@ -147,24 +143,21 @@ namespace Enemy.ECS
                         float2 toEnemy = enemyPosition - towerPosition;
                         float distSq = math.lengthsq(toEnemy);
 
-                        if (distSq < bestDistSq)
-                        {
-                            float2 normToEnemy = math.normalize(toEnemy);
-                            if (math.dot(normToEnemy, direction) >= cosHalfAngle)
-                            {
-                                bestDistSq = distSq;
-                                bestEnemyPosition = enemyTransform.ValueRO.Position;
-                            }
-                        }
+                        if (distSq >= bestDistSq) continue;
+                        
+                        float2 normToEnemy = math.normalize(toEnemy);
+                        if (math.dot(normToEnemy, direction) < cosHalfAngle) continue;
+                        
+                        bestDistSq = distSq;
+                        bestEnemyPosition = enemyTransform.ValueRO.Position;
                     } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
                 }
             }
 
-            if (!bestEnemyPosition.Equals(default))
-            {
-                enemyTargetAspect.EnemyTargetComponent.ValueRW.TargetPosition = bestEnemyPosition;
-                enemyTargetAspect.EnemyTargetComponent.ValueRW.HasTarget = true;
-            }
+            if (bestEnemyPosition.Equals(default)) return;
+            
+            enemyTargetComponent.TargetPosition = bestEnemyPosition;
+            enemyTargetComponent.HasTarget = true;
         }
     }
     

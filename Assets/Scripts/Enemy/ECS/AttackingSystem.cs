@@ -16,29 +16,34 @@ namespace Enemy.ECS
     {
         public static readonly Dictionary<PathIndex, Action<float>> DamageEvent = new Dictionary<PathIndex, Action<float>>();
         
-        private NativeQueue<DamageIndex> damageQueue;
         private BufferLookup<ManagedEntityBuffer> bufferLookup;
+        private NativeQueue<DamageIndex> damageQueue;
+
+        private EntityQuery updateEnemiesQuery;
 
         protected override void OnCreate()
         {
             damageQueue = new NativeQueue<DamageIndex>(Allocator.Persistent);
             bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>();
             
-            RequireForUpdate<TurnIncreaseComponent>();
+            RequireForUpdate<UpdateClusterAttackingComponent>();
         }
 
         protected override void OnUpdate()
         {
-            TurnIncreaseComponent turnIncrease = SystemAPI.GetSingleton<TurnIncreaseComponent>();
             bufferLookup.Update(this);
+            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
             
             Dependency = new AttackingJob
             {
                 DamageQueue = damageQueue.AsParallelWriter(),
-                TurnIncrease = turnIncrease.TurnIncrease,
                 BufferLookup = bufferLookup,
+                ECB = ecb.AsParallelWriter(),
             }.ScheduleParallel(Dependency);
+            
             Dependency.Complete();
+            ecb.Playback(EntityManager);
+            ecb.Dispose();
 
             HashSet<PathIndex> failedAttacks = new HashSet<PathIndex>();
             while (damageQueue.TryDequeue(out DamageIndex item))
@@ -65,23 +70,26 @@ namespace Enemy.ECS
         }
     }
     
-    [BurstCompile, WithAll(typeof(EnemyClusterComponent))]
+    [BurstCompile, WithNone(typeof(MovingClusterComponent))]
     public partial struct AttackingJob : IJobEntity
     {
         [ReadOnly]
         public BufferLookup<ManagedEntityBuffer> BufferLookup;
         
         public NativeQueue<DamageIndex>.ParallelWriter DamageQueue;
-        
-        public int TurnIncrease;
+        public EntityCommandBuffer.ParallelWriter ECB;
         
         [BurstCompile]
-        public void Execute(Entity entity, in AttackingComponent attackingComponent, ref AttackSpeedComponent attackSpeedComponent, in SimpleDamageComponent damageComponent)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in AttackingComponent attackingComponent, ref UpdateClusterAttackingComponent updateClusterComponent, in SimpleDamageComponent damageComponent, in SpeedComponent speed)
         {
-            attackSpeedComponent.AttackTimer -= TurnIncrease;
-            if (attackSpeedComponent.AttackTimer > 0) return;
-            attackSpeedComponent.AttackTimer += attackSpeedComponent.AttackSpeed;
-
+            updateClusterComponent.Count--;
+            if (updateClusterComponent.Count <= 0)
+            {
+                ECB.RemoveComponent<UpdateClusterAttackingComponent>(sortKey, entity);
+            }
+            
+            ECB.AddComponent(sortKey, entity, new MovingClusterComponent { TimeLeft = 0.2f * speed.Speed });
+            
             int enemyCount = BufferLookup[entity].Length;
             float damage = damageComponent.Damage * enemyCount;
             DamageQueue.Enqueue(new DamageIndex { Damage = damage, Index = attackingComponent.Target });

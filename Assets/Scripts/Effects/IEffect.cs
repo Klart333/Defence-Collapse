@@ -17,6 +17,7 @@ using Gameplay;
 using VFX.ECS;
 using System;
 using Effects.LittleDudes;
+using Gameplay.Turns.ECS;
 using Variables;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
@@ -1007,6 +1008,7 @@ namespace Effects
                 typeof(RotateTowardsVelocityComponent),
                 typeof(AddComponentInitComponent),
                 typeof(ArchedMovementComponent),
+                typeof(ProgressionBlockerTag),
                 typeof(InitTrailComponent),
                 typeof(ColliderComponent),
                 typeof(LifetimeComponent),

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
+using Utility;
 
 namespace WaveFunctionCollapse
 {
@@ -11,11 +11,12 @@ namespace WaveFunctionCollapse
     public class MeshRaycaster : ScriptableObject, IMeshRayService
     {
         [SerializeField]
-        private MaterialData materialData;
-        
-        [SerializeField]
         private MeshRaycastDummy meshRaycastDummy;
 
+        [Title("Atlas")]
+        [SerializeField]
+        private AtlasAnalyzer atlasAnalyzer;
+        
         [Title("Ray Settings")]
         [SerializeField]
         private LayerMask layerMask;
@@ -27,20 +28,22 @@ namespace WaveFunctionCollapse
             Direction.Forward,
             Direction.Backward,
         };
-        
+
         /// <summary>
         /// Returns an array of material indexes in the order of directions above
         /// </summary>
-        public Dictionary<Direction, int[]> GetMeshIndices(Mesh mesh, Material[] mats)
+        public Dictionary<Direction, int[]> GetMeshIndices(Mesh mesh)
         {
-            MeshRaycastDummy dummy = meshRaycastDummy.SpawnMesh(mesh, mats);
+            MeshRaycastDummy dummy = meshRaycastDummy.SpawnMesh(mesh);
 
             Dictionary<Direction, int[]> result = new Dictionary<Direction, int[]>();
+
+            List<Color> atlasColors = atlasAnalyzer.GetAtlasColors();
 
             const float halfSize = 1f;
             foreach (Direction direction in directions)
             {
-                HashSet<int> submeshIndices = new HashSet<int>();
+                HashSet<Color> colors = new HashSet<Color>();
 
                 // Ray should face TOWARD the mesh, so we invert the face direction
                 Vector3 faceNormal = direction switch
@@ -73,18 +76,11 @@ namespace WaveFunctionCollapse
                     Ray ray = new Ray(origin, rayDir);
 
                     if (!Physics.Raycast(ray, out RaycastHit hit, 10f)) continue;
-                    int triangleIndex = hit.triangleIndex;
-                    int triangleStart = triangleIndex * 3;
-
-                    for (int submesh = 0; submesh < mesh.subMeshCount; submesh++)
-                    {
-                        SubMeshDescriptor desc = mesh.GetSubMesh(submesh);
-                        if (triangleStart < desc.indexStart || triangleStart >= desc.indexStart + desc.indexCount) continue;
-                        submeshIndices.Add(submesh);
-                        break;
-                    }
+                    
+                    Color color = atlasAnalyzer.Atlas.GetPixel((int)(hit.textureCoord.x * atlasAnalyzer.Atlas.width), (int)(hit.textureCoord.y * atlasAnalyzer.Atlas.height));
+                    colors.Add(color);
                 }
-                result.Add(direction, submeshIndices.Select(x => mats[x]).Select(x => materialData.Materials.IndexOf(x)).ToArray());
+                result.Add(direction, colors.Select(x => atlasColors.IndexOf(x)).ToArray());
             }
 
             DestroyImmediate(dummy.gameObject);

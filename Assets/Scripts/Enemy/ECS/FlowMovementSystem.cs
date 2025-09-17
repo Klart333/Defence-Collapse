@@ -1,36 +1,32 @@
-using Gameplay.Turns.ECS;
 using Unity.Mathematics;
 using Unity.Collections;
-using Unity.Transforms;
 using Pathfinding.ECS;
 using Unity.Entities;
 using Unity.Burst;
 using Pathfinding;
-using Utility;
 
 namespace Enemy.ECS
 {
-    [UpdateInGroup(typeof(TransformSystemGroup))]
     public partial struct FlowMovementSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<TurnIncreaseComponent>();
             state.RequireForUpdate<PathBlobber>();
+
+            EntityQuery query = SystemAPI.QueryBuilder().WithAll<UpdateClusterPositionComponent>().WithNone<MovingClusterComponent>().Build();
+            state.RequireForUpdate(query);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            PathBlobber pathBlobber = SystemAPI.GetSingleton<PathBlobber>();
-            TurnIncreaseComponent turnIncrease = SystemAPI.GetSingleton<TurnIncreaseComponent>();
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            PathBlobber pathBlobber = SystemAPI.GetSingleton<PathBlobber>();
             
             state.Dependency = new FlowMovementJob
             {
                 ChunkIndexToListIndex = pathBlobber.ChunkIndexToListIndex,
-                TurnIncrease = turnIncrease.TurnIncrease,
                 PathChunks = pathBlobber.PathBlob,
                 ECB = ecb.AsParallelWriter(),
             }.ScheduleParallel(state.Dependency);
@@ -47,7 +43,8 @@ namespace Enemy.ECS
         }
     }
 
-    [BurstCompile, WithNone(typeof(AttackingComponent))]
+    [BurstCompile, 
+     WithNone(typeof(AttackingComponent), typeof(MovingClusterComponent))]
     public partial struct FlowMovementJob : IJobEntity
     {
         [ReadOnly]
@@ -55,18 +52,12 @@ namespace Enemy.ECS
         
         [ReadOnly]
         public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
-
-        public int TurnIncrease;
-
+        
         public EntityCommandBuffer.ParallelWriter ECB;
         
         [BurstCompile]
-        private void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in SpeedComponent speed, ref FlowFieldComponent flowField, ref EnemyClusterComponent cluster)
+        private void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ref FlowFieldComponent flowField, ref EnemyClusterComponent cluster, in SpeedComponent speed, ref UpdateClusterPositionComponent updateClusterComponent)
         {
-            flowField.MoveTimer -= TurnIncrease;
-            if (flowField.MoveTimer > 0) return;
-            flowField.MoveTimer += speed.Speed;
-            
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
             float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[flowField.PathIndex.GridIndex]);
             
@@ -76,7 +67,12 @@ namespace Enemy.ECS
             
             flowField.PathIndex = movedPathIndex;
             cluster.Position = movedPosition;
+            
+            updateClusterComponent.Count--;
+            if (updateClusterComponent.Count <= 0) ECB.RemoveComponent<UpdateClusterPositionComponent>(sortKey, entity);
+            
             ECB.AddComponent<UpdatePositioningTag>(sortKey, entity);
+            ECB.AddComponent(sortKey, entity, new MovingClusterComponent { TimeLeft = speed.Speed });
 
             ref PathChunk movedPathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[movedPathIndex.ChunkIndex]];
             float2 newDirection = PathUtility.ByteToDirection(movedPathChunk.Directions[movedPathIndex.GridIndex]);

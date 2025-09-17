@@ -1,7 +1,6 @@
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Collections;
 using Unity.Mathematics;
-using Unity.Transforms;
 using Pathfinding.ECS;
 using Unity.Entities;
 using Unity.Burst;
@@ -9,7 +8,7 @@ using Pathfinding;
 
 namespace Enemy.ECS
 {
-    [UpdateAfter(typeof(FlowMovementSystem))]
+    [BurstCompile, UpdateAfter(typeof(FlowMovementSystem))]
     public partial struct CheckAttackingSystem : ISystem
     {
         [BurstCompile]

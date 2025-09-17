@@ -21,6 +21,11 @@ namespace Enemy.ECS
         public float AttackSpeed;
         public float AttackTimer;
     }
+    
+    public struct MovementSpeedComponent : IComponentData
+    {       
+        public float Speed;
+    }
 
     [MaterialProperty("_Strength")]
     public struct FresnelComponent : IComponentData

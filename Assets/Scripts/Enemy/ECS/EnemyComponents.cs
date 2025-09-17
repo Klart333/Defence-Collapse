@@ -18,4 +18,19 @@ namespace Enemy.ECS
         public float EnemySize;
         public int EnemyType;
     }
+
+    public struct MovingClusterComponent : IComponentData
+    {
+        public float TimeLeft;
+    }
+
+    public struct UpdateClusterPositionComponent : IComponentData
+    {
+        public int Count;
+    }
+
+    public struct UpdateClusterAttackingComponent : IComponentData
+    {
+        public int Count;
+    }
 }

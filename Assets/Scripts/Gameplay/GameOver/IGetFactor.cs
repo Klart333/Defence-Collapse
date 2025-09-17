@@ -13,7 +13,7 @@ namespace Gameplay.GameOver
     {
         public float GetFactor(AnimationCurve curve, out float level)
         {
-            level = PersistantGameStats.CurrentPersistantGameStats.WaveCount;
+            level = PersistantGameStats.CurrentPersistantGameStats.TurnCount;
             return curve.Evaluate(level);
         }
 

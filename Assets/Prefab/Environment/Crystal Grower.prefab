@@ -50,11 +50,12 @@ MonoBehaviour:
     - {fileID: 2573037696340128031, guid: 8e3fb16734c965044b091e5e2ebfed04, type: 3}
     - {fileID: 1089026275716465711, guid: 772b09e88528ecb43a16a9d133255309, type: 3}
     - {fileID: 8282742661359379387, guid: c9a7792da0faed542b6733e12b6a7eae, type: 3}
-  treeMaterial: {fileID: 2100000, guid: c36a4497441bc1d48ad8c03477895bc7, type: 2}
+  objectGroundType: 2
   raycastArea: {x: 2, y: 2}
   treeRadius: 0.65
   raycastCount: 20
   totalTime: 2
+  atlasAnalyzer: {fileID: 11400000, guid: 3fd3a20e79dcd55468bdbdb395b2d176, type: 2}
   shouldRemoveWhenPlaced: 1
   goldPerTree: 20
   distanceMultiplier: 4

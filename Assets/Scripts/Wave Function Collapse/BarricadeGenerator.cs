@@ -13,7 +13,6 @@ namespace WaveFunctionCollapse
     public class BarricadeGenerator : MonoBehaviour, IQueryWaveFunction
     {
         public event Action<QueryMarchedChunk> OnLoaded;
-        public event Action<ChunkIndex> OnCellCollapsed;
 
         [Title("Wave Function")]
         [SerializeField]
@@ -64,14 +63,14 @@ namespace WaveFunctionCollapse
             groundGenerator = FindFirstObjectByType<GroundGenerator>();
             buildingAnimator = GetComponent<BuildingAnimator>();
 
-            groundGenerator.OnChunkGenerated += LoadCells;
-            Events.OnBuiltIndexDestroyed += RemoveBuiltIndex;
+            //groundGenerator.OnChunkGenerated += LoadCells;
+            //Events.OnBuiltIndexDestroyed += RemoveBuiltIndex;
         }
 
         private void OnDisable()
         {
-            groundGenerator.OnChunkGenerated -= LoadCells;
-            Events.OnBuiltIndexDestroyed -= RemoveBuiltIndex;
+            //groundGenerator.OnChunkGenerated -= LoadCells;
+            //Events.OnBuiltIndexDestroyed -= RemoveBuiltIndex;
         }
 
         private void LoadCells(Chunk chunk)

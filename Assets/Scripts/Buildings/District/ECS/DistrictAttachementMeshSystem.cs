@@ -1,30 +1,30 @@
-using Enemy.ECS;
-using Unity.Burst;
-using Unity.Collections;
-using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Collections;
 using Unity.Transforms;
+using Unity.Entities;
+using Unity.Burst;
+using Enemy.ECS;
 
 namespace Buildings.District.ECS
 {
-    public partial struct DistrictTargetMeshSystem : ISystem
+    public partial struct DistrictAttachementMeshSystem : ISystem
     {
         private ComponentLookup<EnemyTargetComponent> targetLookup;
         
         [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        public void OnCreate(ref SystemState state) 
         {
-            targetLookup = SystemAPI.GetComponentLookup<EnemyTargetComponent>();
+            targetLookup = SystemAPI.GetComponentLookup<EnemyTargetComponent>(true); 
             
-            state.RequireForUpdate<FlowFieldComponent>(); // Require Enemy
+            state.RequireForUpdate<TargetingActivationComponent>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             targetLookup.Update(ref state);
-
-            new RotateTargetMeshJob
+ 
+            new RotateAttachementMeshJob
             {
                 TargetLookup = targetLookup,
             }.ScheduleParallel();
@@ -37,15 +37,15 @@ namespace Buildings.District.ECS
         }
     }
 
-    [BurstCompile]
-    public partial struct RotateTargetMeshJob : IJobEntity
+    [BurstCompile, WithAll(typeof(TargetingActivationComponent))]
+    public partial struct RotateAttachementMeshJob : IJobEntity
     {
         [ReadOnly]
         public ComponentLookup<EnemyTargetComponent> TargetLookup;
         
-        public void Execute(in TargetMeshComponent targetMesh, ref LocalTransform transform)
+        public void Execute(in AttachementMeshComponent attachementMesh, ref LocalTransform transform)
         {
-            if (!TargetLookup.TryGetComponent(targetMesh.Target, out EnemyTargetComponent target) || !target.HasTarget)
+            if (!TargetLookup.TryGetComponent(attachementMesh.Target, out EnemyTargetComponent target) || !target.HasTarget)
             {
                 return;
             }

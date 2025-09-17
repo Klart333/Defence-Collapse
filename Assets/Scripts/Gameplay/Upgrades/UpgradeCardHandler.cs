@@ -69,6 +69,7 @@ namespace Gameplay.Upgrades
             upgradeDataUtility.StopObserving();
             
             Events.OnUpgradeCardPicked -= OnUpgradePicked;
+            Events.OnTurnComplete -= DisplayUpgradeCards;
             Events.OnTurnIncreased -= OnTurnIncreased;
         }
 
@@ -78,9 +79,9 @@ namespace Gameplay.Upgrades
             if (diff % turnInterval != 0) return;
             
             lastCardTurn = total;
-            DisplayUpgradeCards();
+            Events.OnTurnComplete += DisplayUpgradeCards;
         }
-
+        
         private void OnUpgradePicked(UpgradeCardData.UpgradeCardInstance _)
         {
             HideCards();
@@ -88,6 +89,8 @@ namespace Gameplay.Upgrades
         
         public void DisplayUpgradeCards()
         {
+            Events.OnTurnComplete -= DisplayUpgradeCards;
+            
             UIEvents.OnFocusChanged?.Invoke();
             Events.OnUpgradeCardsDisplayed?.Invoke();
             rerollCount = 0;

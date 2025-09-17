@@ -260,7 +260,7 @@ namespace Buildings
             {
                 if (MeshRot.MeshIndex != -1 && buildableCornerData.BuildableDictionary.TryGetValue(protoypeMeshes[MeshRot.MeshIndex], out BuildableCorners cornerData))
                 {
-                    bool value = cornerData.CornerDictionary[BuildableCornerData.VectorToCorner(DirectionUtility.BuildableCorners[i].x, DirectionUtility.BuildableCorners[i].y)].Buildable;
+                    bool value = cornerData.CornerDictionary[BuildableCornerData.VectorToCorner(DirectionUtility.BuildableCorners[i].x, DirectionUtility.BuildableCorners[i].y)].IsBuildable;
                     cornerColliders[i].gameObject.SetActive(value);
                 }
                 else

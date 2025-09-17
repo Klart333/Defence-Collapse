@@ -220,36 +220,25 @@ namespace Buildings
         {
             if (verbose)
             {
-                //Debug.Log($"Damaged {damage} at {index}");
+                Debug.Log($"Damaged {damage} at {index}");
             }
 
-            List<ChunkIndex> damageIndexes = buildingManager.GetSurroundingMarchedIndexes(index);
-            damage /= damageIndexes.Count;
-            bool didDamage = false;
-            for (int i = 0; i < damageIndexes.Count; i++)
-            {
-                ChunkIndex damageIndex = damageIndexes[i];
-                if (!WallStates.TryGetValue(damageIndex, out WallState state)) continue;
-
-                float startingHealth = state.Health.CurrentHealth;
-                state.TakeDamage(damage);
-                didDamage = true;
-
-                DisplayHealth(state, damageIndex, startingHealth);
-            }
-
-            if (!didDamage)
+            if (!WallStates.TryGetValue(index, out WallState wallState))
             {
                 AttackingSystem.DamageEvent.Remove(pathIndex);
                 StopAttackingSystem.KilledIndexes.Enqueue(pathIndex);
+                return;
             }
+
+            wallState.TakeDamage(damage);
+            DisplayHealth(wallState, index, wallState.Health.CurrentHealth);
+            
 
             void DisplayHealth(WallState state, ChunkIndex damageIndex, float startingHealth)
             {
                 if (!state.Health.Alive || !wallStatesWithHealth.Add(damageIndex)) return;
 
-                UIWallHealth wallHealth = wallHealthPrefab.Get<UIWallHealth>();
-                wallHealth.transform.SetParent(canvasParent.transform, false);
+                UIWallHealth wallHealth = wallHealthPrefab.Get<UIWallHealth>(canvasParent.transform);
                 wallHealth.Setup(state, startingHealth, canvasParent);
                 wallHealth.TweenFill();
                 wallHealth.OnReturnToPool += OnReturnToPool;

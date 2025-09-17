@@ -1,14 +1,15 @@
-using Random = UnityEngine.Random;
+using Random = Unity.Mathematics.Random;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
+using Unity.Mathematics;
 using Gameplay.Money;
+using Gameplay.Event;
 using UnityEngine;
 using Buildings;
+using Utility;
 using System;
-using Gameplay.Event;
-using Unity.Mathematics;
 
 namespace Chunks
 {
@@ -27,7 +28,7 @@ namespace Chunks
         private PooledArray[] trees;
 
         [SerializeField]
-        private Material treeMaterial;
+        private GroundType objectGroundType;
 
         [SerializeField]
         private Vector2 raycastArea;
@@ -41,6 +42,9 @@ namespace Chunks
         [SerializeField]
         private float totalTime = 2.0f;
         
+        [SerializeField]
+        private AtlasAnalyzer atlasAnalyzer;
+        
         [Title("Remove")]
         [SerializeField]
         private bool shouldRemoveWhenPlaced = true;
@@ -53,8 +57,6 @@ namespace Chunks
 
         private readonly List<PooledMonoBehaviour> spawnedTrees = new List<PooledMonoBehaviour>();
         
-        private List<ChunkIndex> chunkIndexes = new List<ChunkIndex>();
-
         private float treeRadiusSq;
         
         public ChunkIndex ChunkIndex { get; set; }
@@ -80,12 +82,11 @@ namespace Chunks
             spawnedTrees.Clear();
             HasGrown = false;
             
-            chunkIndexes.Clear();
             Events.OnBuildingBuilt -= OnBuildingBuilt;   
         }
 
         [Button]
-        public async UniTaskVoid GrowTrees(int groupIndex)
+        public async UniTaskVoid GrowTrees(int groupIndex, Random random)
         {
             Vector3 offset = raycastArea.ToXyZ(1).MultiplyByAxis(transform.localScale) / 2.0f;
             Vector3 min = transform.position - offset;
@@ -93,18 +94,21 @@ namespace Chunks
             List<float2> positions = new List<float2>();
             TimeSpan delay = TimeSpan.FromSeconds(totalTime / raycastCount);
             
+            List<Color> colors = atlasAnalyzer.GetAtlasColorsBuildable(out List<GroundType> groundTypes);
             for (int i = 0; i < raycastCount; i++)
             {
-                Vector3 pos = new Vector3(Random.Range(min.x, max.x), 2, Random.Range(min.z, max.z));
+                Vector3 pos = new Vector3(random.NextFloat(min.x, max.x), 2, random.NextFloat(min.z, max.z));
                 if (!CheckCollisionWithTrees(new float2(pos.x, pos.z))) continue;
 
                 Ray ray = new Ray(pos, Vector3.down);
-                Material mat = GetHitMaterial(ray, out RaycastHit hit);
-
-                if (mat != treeMaterial) continue;
+                if (!Physics.Raycast(ray, out RaycastHit hit)) continue;
+                
+                Color color = atlasAnalyzer.Atlas.GetPixel((int)(hit.textureCoord.x * atlasAnalyzer.Atlas.width), (int)(hit.textureCoord.y * atlasAnalyzer.Atlas.height));
+                int index = colors.IndexOf(color);
+                if ((groundTypes[index] & objectGroundType) != objectGroundType) continue;
                 
                 positions.Add(pos.XZ());
-                SpawnTree(hit.point, groupIndex);
+                SpawnTree(hit.point, groupIndex, random);
                 await UniTask.Delay(delay);
             }
 
@@ -124,10 +128,10 @@ namespace Chunks
             }
         }
         
-        private void SpawnTree(Vector3 pos, int groupIndex)
+        private void SpawnTree(Vector3 pos, int groupIndex, Random random)
         {
-            PooledMonoBehaviour treePrefab = trees[groupIndex].Array[Random.Range(0, trees[groupIndex].Array.Length)];
-            Quaternion rot = Quaternion.AngleAxis(Random.value * 360, Vector3.up);
+            PooledMonoBehaviour treePrefab = trees[groupIndex].Array[random.NextInt(0, trees[groupIndex].Array.Length)];
+            Quaternion rot = Quaternion.AngleAxis(random.NextFloat() * 360, Vector3.up);
             PooledMonoBehaviour spawned = treePrefab.GetAtPosAndRot<PooledMonoBehaviour>(pos, rot);
             spawnedTrees.Add(spawned);
         }
@@ -144,21 +148,12 @@ namespace Chunks
         
         private void OnBuildingBuilt(ICollection<IBuildable> buildables)
         {
-            if (chunkIndexes.Count == 0)
-            {
-                GetIndexes();
-            }
-
             foreach (IBuildable buildable in buildables)
             {
-                if (buildable is not Building building) continue;
-                foreach (ChunkIndex chunkIndex in chunkIndexes)
-                {
-                    if (!chunkIndex.Equals(buildable.ChunkIndex)) continue;
-                    
-                    Placed();
-                    return;
-                }
+                if (buildable is not Building || !ChunkIndex.Equals(buildable.ChunkIndex)) continue;
+                
+                Placed();
+                break;
             }
 
             void Placed()
@@ -167,26 +162,13 @@ namespace Chunks
                 float gold = goldPerTree + goldPerTree * distanceMultiplier * distance;
                 gold *= MoneyManager.Instance.MoneyMultiplier.Value;
 
-                foreach (PooledMonoBehaviour tree in spawnedTrees)  
+                foreach (PooledMonoBehaviour tree in spawnedTrees)
                 {
                     MoneyManager.Instance.AddMoneyParticles(gold, tree.transform.position);
                 }
-                    
+
                 ClearTrees();
                 OnPlaced?.Invoke(this);
-            }
-        }
-
-        private void GetIndexes()
-        {
-            for (int x = 0; x < raycastArea.x; x++)
-            for (int y = 0; y < raycastArea.y; y++)
-            {
-                Vector3 pos = transform.position + new Vector3(x, 0, y);
-                if (BuildingManager.Instance.TryGetIndex(pos, out ChunkIndex index))
-                {
-                    chunkIndexes.Add(index);
-                }
             }
         }
 
@@ -197,64 +179,6 @@ namespace Chunks
             Gizmos.DrawWireCube(transform.position + Vector3.up, raycastArea.ToXyZ(1).MultiplyByAxis(transform.localScale));
         }
 
-        #endregion
-        
-        #region Static 
-        
-        private static readonly Dictionary<Collider, Renderer> ColliderToRenderers = new Dictionary<Collider, Renderer>();
-        public static Material GetHitMaterial(Ray ray, out RaycastHit hit)
-        {
-            if (!Physics.Raycast(ray, out hit, 3, 1 << LayerMask.NameToLayer("Ground"))) 
-                return null;
-
-            if (hit.collider is not MeshCollider { sharedMesh: { } mesh }) 
-                return null;
-
-            int subMeshIndex = GetSubmeshIndex(mesh, hit.triangleIndex);
-            if (subMeshIndex == -1) 
-                return null;
-
-            if (!ColliderToRenderers.TryGetValue(hit.collider, out Renderer renderer))
-            {
-                if (!hit.collider.TryGetComponent(out renderer))
-                {
-                    return null;
-                }
-                
-                ColliderToRenderers.Add(hit.collider, renderer);
-            }
-            
-            return subMeshIndex < renderer.sharedMaterials.Length 
-                ? renderer.sharedMaterials[subMeshIndex] 
-                : null;
-        }
-
-        private static readonly Dictionary<Tuple<Mesh, int>, int> SavedSubMeshIndexes = new Dictionary<Tuple<Mesh, int>, int>();
-        private static int GetSubmeshIndex(Mesh mesh, int triangleIndex)
-        {
-            if (SavedSubMeshIndexes.TryGetValue(new Tuple<Mesh, int>(mesh, triangleIndex), out int index))
-            {
-                return index;
-            }
-            
-            int baseIndex = 0;
-            for (int i = 0; i < mesh.subMeshCount; i++)
-            {
-                int[] triangles = mesh.GetTriangles(i);
-                int triangleCount = triangles.Length / 3;
-
-                if (triangleIndex < baseIndex + triangleCount)
-                {
-                    SavedSubMeshIndexes.Add(new Tuple<Mesh, int>(mesh, triangleIndex), i);
-                    return i;
-                }
-
-                baseIndex += triangleCount;
-            }
-
-            return -1;
-        }
-        
         #endregion
     }
 }

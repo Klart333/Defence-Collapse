@@ -287,17 +287,19 @@ namespace WaveFunctionCollapse
         private void OnGroundAnimatorFinished()
         {
             groundAnimator.OnAnimationFinished -= OnGroundAnimatorFinished;
-
-            if (shouldCombine)
+            
+            foreach (int3 chunkIndex in chunksToCombine)
             {
-                foreach (int3 chunkIndex in chunksToCombine)
+                if (shouldCombine)
                 {
                     CombineChunk(waveFunction.Chunks[chunkIndex]);
                 }
-                
-                chunksToCombine.Clear();
+
+                spawnedChunks.Add(chunkIndex);
             }
-            
+                
+            chunksToCombine.Clear();
+
             IsGenerating = false;
             OnGenerationFinished?.Invoke();
         }
@@ -311,7 +313,6 @@ namespace WaveFunctionCollapse
         private void CombineMeshes(int3 chunkIndex, Transform chunkParent)
         {
             meshCombiner.CombineMeshes(chunkParent, out GameObject spawnedMesh);
-            spawnedChunks.Add(chunkIndex);
         }
     }
 }

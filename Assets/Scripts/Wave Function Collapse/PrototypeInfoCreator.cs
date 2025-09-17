@@ -109,10 +109,8 @@ namespace WaveFunctionCollapse
                 List<Vector3> negYs = new List<Vector3>();
                 List<Vector3> posZs = new List<Vector3>();
                 List<Vector3> negZs = new List<Vector3>();
-                Material[] materials = meshes[i].gameObject.GetComponent<MeshRenderer>().sharedMaterials;
-                int[] matIndexes = materials.Select(x => materialData.Materials.IndexOf(x)).ToArray();
-
-                Dictionary<Direction, int[]> materialInfo = useMaterialForKeys ? meshRayService.GetMeshIndices(mesh, materials) : null;
+                
+                Dictionary<Direction, int[]> materialInfo = useMaterialForKeys ? meshRayService.GetMeshIndices(mesh) : null;
                 
                 Vector3[] verts = mesh.vertices;
                 Vector3[] noDupes = verts.Distinct().ToArray();
@@ -130,6 +128,9 @@ namespace WaveFunctionCollapse
                         GetSideKeys_OnlyInside(vec, posXs, negXs, posYs, negYs, posZs, negZs);
                     }
                 }
+                
+                Material[] materials = meshes[i].gameObject.GetComponent<MeshRenderer>().sharedMaterials;
+                int[] matIndexes = materials.Select(x => materialData.Materials.IndexOf(x)).ToArray();
 
                 ulong posX = GetSideKey(posXs, Direction.Right, materialInfo);
                 ulong negX = GetSideKey(negXs, Direction.Left, materialInfo);
@@ -138,7 +139,6 @@ namespace WaveFunctionCollapse
 
                 ulong[] negY = GetTopKeys(negYs);
                 ulong[] posY = GetTopKeys(posYs);
-
                 // Add all rotations
                 // Need to rotate the vertical too
                 List<PrototypeData> prots = new List<PrototypeData>
@@ -297,10 +297,10 @@ namespace WaveFunctionCollapse
             {
                 CornerDictionary = new Dictionary<Corner, CornerData>()
                 {
-                    {Corner.TopLeft, topLeft}, 
-                    {Corner.TopRight, topRight}, 
-                    {Corner.BottomLeft, botLeft}, 
-                    {Corner.BottomRight, botRight}, 
+                    {Corner.TopLeft, new CornerData(topLeft ? GroundType.Buildable : 0)}, 
+                    {Corner.TopRight, new CornerData(topRight ? GroundType.Buildable : 0)}, 
+                    {Corner.BottomLeft, new CornerData(botLeft ? GroundType.Buildable : 0)}, 
+                    {Corner.BottomRight, new CornerData(botRight ? GroundType.Buildable : 0)}, 
                 }
             };
             return corner;
@@ -726,7 +726,7 @@ namespace WaveFunctionCollapse
 
     public interface IMeshRayService
     {
-        public Dictionary<Direction, int[]> GetMeshIndices(Mesh mesh, Material[] mats);
+        public Dictionary<Direction, int[]> GetMeshIndices(Mesh mesh);
     }
     
 #endif

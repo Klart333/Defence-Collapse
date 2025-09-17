@@ -200,18 +200,6 @@ namespace WaveFunctionCollapse
             Propagate();
             return index;
         }
-        
-        public ChunkIndex Iterate(TChunk chunk)
-        {
-            ChunkIndex index = GetLowestEntropyIndex(chunk);
-
-            PrototypeData chosenPrototype = Collapse(this[index]);
-            //Debug.Log("Collapsing: " + index.CellIndex + "\n ChosenPrototype: " + chosenPrototype);
-            SetCell(index, chosenPrototype);
-
-            Propagate();
-            return index;
-        }
 
         public ChunkIndex GetLowestEntropyIndex()
         {
@@ -426,14 +414,16 @@ namespace WaveFunctionCollapse
             if (gameObjectPool.TryPop(out GameObject gameObject))
             {
                 gameObject.SetActive(true);
-                gameObject.GetComponent<MeshFilter>().mesh = mesh;
-                gameObject.GetComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
+                gameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
+                gameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
+                gameObject.GetComponent<MeshRenderer>().SetSharedMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
                 return gameObject;
             }
 
             var gm = new GameObject(mesh.name);
-            gm.AddComponent<MeshFilter>().mesh = mesh;
-            gm.AddComponent<MeshRenderer>().SetMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
+            gm.AddComponent<MeshFilter>().sharedMesh = mesh;
+            gm.AddComponent<MeshCollider>().sharedMesh = mesh;
+            gm.AddComponent<MeshRenderer>().SetSharedMaterials(materialData.GetMaterials(prototypeData.MaterialIndexes));
             gm.layer = (int)Mathf.Log(layerMask.value, 2);
             return gm;
         }

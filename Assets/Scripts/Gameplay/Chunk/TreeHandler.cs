@@ -1,13 +1,12 @@
-using System.Collections;
-using Random = UnityEngine.Random;
+using Random = Unity.Mathematics.Random;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
+using System.Collections;
 using Unity.Mathematics;
-using Unity.Collections;
-using System.Linq;
 using UnityEngine;
+using Gameplay;
 
 namespace Chunks
 {
@@ -17,12 +16,18 @@ namespace Chunks
         [SerializeField]
         private GroundGenerator groundGenerator;
         
+        [SerializeField]
+        private BuildableCornerData groundCornerData;
+        
+        [SerializeField]
+        private ProtoypeMeshes protoypeMeshes;
+        
         [Title("Tree")]
         [SerializeField]
         private TreeGrower treeGrowerPrefab;
         
         [SerializeField]
-        private int treeMaterialIndex = 1;
+        private GroundType objectGroundType;
 
         [Title("Tree Settings")]
         [SerializeField]
@@ -35,7 +40,9 @@ namespace Chunks
         
         private Dictionary<int2, int> builtIndexesMap = new Dictionary<int2, int>();
 
+        private GameManager gameManager;
         private Coroutine growingTrees;
+        private Random random;
 
         private int2[] neighbours = new int2[4]
         {
@@ -49,6 +56,8 @@ namespace Chunks
         {
             groundGenerator.OnGenerationFinished += OnGenerationFinished;
             groundGenerator.OnCellCollapsed += OnCellCollapsed;
+
+            GetGameManager().Forget();
         }
 
         private void OnDisable()
@@ -57,7 +66,13 @@ namespace Chunks
             groundGenerator.OnCellCollapsed -= OnCellCollapsed;
         }
 
-        private void OnCellCollapsed(ChunkIndex chunkIndex)
+        private async UniTaskVoid GetGameManager()
+        {
+            gameManager = await GameManager.Get();
+            random = Random.CreateFromIndex(gameManager.Seed);
+        }
+        
+        private void OnCellCollapsed(ChunkIndex chunkIndex) 
         {
             int2 totalIndex = chunkIndex.Index.xz.MultiplyByAxis(groundGenerator.ChunkSize.xz) + chunkIndex.CellIndex.xz;
             if (builtIndexesMap.ContainsKey(totalIndex))
@@ -66,7 +81,9 @@ namespace Chunks
             }
             
             Cell cell = groundGenerator.ChunkWaveFunction[chunkIndex];
-            if (!cell.PossiblePrototypes[0].MaterialIndexes.Contains(treeMaterialIndex)) return;
+            Mesh mesh = protoypeMeshes.Meshes[cell.PossiblePrototypes[0].MeshRot.MeshIndex];
+            BuildableCorners corners = groundCornerData.BuildableDictionary[mesh];
+            if (AllCornersInvalid(corners)) return;
 
             if (growingTrees != null)
             {
@@ -79,7 +96,19 @@ namespace Chunks
 
             if (treeGrowersByChunk.TryGetValue(chunkIndex.Index, out List<TreeGrower> value)) value.Add(spawned);
             else treeGrowersByChunk.Add(chunkIndex.Index, new List<TreeGrower> { spawned });
+        }
+        
+        private bool AllCornersInvalid(BuildableCorners corners)
+        {
+            for (int i = 0; i < CornerUtility.AllCorners.Length; i++)
+            {
+                if (corners.CornerDictionary[CornerUtility.AllCorners[i]].GroundType.HasFlag(objectGroundType))
+                {
+                    return false;
+                }
+            }       
             
+            return true;
         }
 
         private void OnGenerationFinished()
@@ -99,14 +128,15 @@ namespace Chunks
                         continue;
                     }
                     int groupIndex = 0;
+                    int2 totalChunkIndex = grower.ChunkIndex.Index.xz.MultiplyByAxis(groundGenerator.ChunkSize.xz) + grower.ChunkIndex.CellIndex.xz;
                     if (groupCount > 1)
                     {
-                        int2 totalChunkIndex = grower.ChunkIndex.Index.xz.MultiplyByAxis(groundGenerator.ChunkSize.xz) + grower.ChunkIndex.CellIndex.xz;
                         groupIndex = GetGroupIndex(totalChunkIndex);
                         builtIndexesMap.Add(totalChunkIndex, groupIndex);
                     }
-                    
-                    grower.GrowTrees(groupIndex).Forget();
+
+                    uint seed = gameManager.Seed + (uint)(totalChunkIndex.x * 100 + totalChunkIndex.y * 10 + i);  
+                    grower.GrowTrees(groupIndex, Random.CreateFromIndex(seed)).Forget();
                     grower.HasGrown = true;
                     yield return null;
                 }
@@ -123,14 +153,14 @@ namespace Chunks
                 int2 neighbour = index + neighbours[i];
                 if (!builtIndexesMap.TryGetValue(neighbour, out int value)) continue;
                 
-                float randValue = Random.value;
+                float randValue = random.NextFloat();
                 if (randValue < groupingFactor)
                 {
                     return value;
                 }
             }
             
-            return Random.Range(0, groupCount);
+            return random.NextInt(0, groupCount);
         }
     }
 }

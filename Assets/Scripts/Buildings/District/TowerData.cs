@@ -49,15 +49,12 @@ namespace Buildings.District
 
         [Title("Targeting")]
         [SerializeField]
-        private bool requireTargeting = true;
-
-        [SerializeField, ShowIf(nameof(requireTargeting))]
         private float attackAngle = 360;
         
-        [SerializeField, ShowIf(nameof(requireTargeting))]
+        [SerializeField]
         private bool useMeshBasedPlacement = true;
         
-        [SerializeField, ShowIf(nameof(requireTargeting))]
+        [SerializeField]
         private bool useTargetMesh;
 
         [SerializeField, ShowIf(nameof(useTargetMesh))]
@@ -85,7 +82,6 @@ namespace Buildings.District
         public List<IEffect> CreatedEffects => createdEffects;
         public MeshVariable MeshVariable => meshVariable;
         public DistrictType DistrictType => districtType;
-        public bool RequireTargeting => requireTargeting;
         public CategoryType CategoryType => categoryType;
         public bool UseTargetMesh => useTargetMesh;
         public Sprite IconSmall => iconSmall.Value;

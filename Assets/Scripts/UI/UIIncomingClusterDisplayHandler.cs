@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Unity.Collections;
 using Unity.Entities;
+using Gameplay.Event;
 using UnityEngine;
 using Enemy.ECS;
-using Gameplay.Event;
 
 namespace UI
 {
@@ -55,13 +55,14 @@ namespace UI
 
             if (!array.IsCreated) return;
 
+            HideDisplays();
+
             if (array.Length == 0)
             {
                 array.Dispose();
                 return;
             }
 
-            HideDisplays();
             foreach (SpawningComponent data in array)
             {
                 if (data.Turns <= 0)

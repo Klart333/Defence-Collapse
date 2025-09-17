@@ -25,7 +25,7 @@ namespace WaveFunctionCollapse
             }
 
             Corner rotatedCorner = RotateCorner(meshRot.Rot, corner);
-            return buildableCorners.CornerDictionary[rotatedCorner].Buildable;
+            return buildableCorners.CornerDictionary[rotatedCorner].IsBuildable;
         }
         
         public bool IsCornerBuildable(MeshWithRotation meshRot, int2 corner, out bool meshIsBuildable)
@@ -38,7 +38,7 @@ namespace WaveFunctionCollapse
 
             meshIsBuildable = true;
             Corner rotatedCorner = RotateCorner(meshRot.Rot, corner);
-            return buildableCorners.CornerDictionary[rotatedCorner].Buildable;
+            return buildableCorners.CornerDictionary[rotatedCorner].IsBuildable;
         }
         
         public bool IsCornerBuildable(MeshWithRotation meshRot, int2 corner, out GroundType groundType)
@@ -52,7 +52,7 @@ namespace WaveFunctionCollapse
             Corner rotatedCorner = RotateCorner(meshRot.Rot, corner);
             CornerData cornerData = buildableCorners.CornerDictionary[rotatedCorner];
             groundType = cornerData.GroundType;
-            return cornerData.Buildable;
+            return cornerData.IsBuildable;
         }
 
         public static Corner RotateCorner(int rot, int2 corner)
@@ -110,24 +110,13 @@ namespace WaveFunctionCollapse
     public struct CornerData
     {
         [InlineProperty]
-        public bool Buildable;
-        [InlineProperty, ShowIf(nameof(Buildable))]
         public GroundType GroundType;
 
-        public CornerData(bool buildable)
+        public bool IsBuildable => (GroundType & GroundType.Buildable) > 0;
+
+        public CornerData(GroundType groundType)
         {
-            Buildable = buildable;
-            GroundType = GroundType.Grass;
-        }
-        
-        public static implicit operator bool(CornerData cornerData)
-        {
-            return cornerData.Buildable;
-        }
-        
-        public static implicit operator CornerData(bool buildable)
-        {
-            return new CornerData(buildable);
+            GroundType = groundType;
         }
     }
 
@@ -136,6 +125,7 @@ namespace WaveFunctionCollapse
     {
         Grass = 1 << 0, 
         Crystal = 1 << 1,
+        Tree = 1 << 2,
         Buildable = Grass | Crystal,
     }
 
@@ -145,5 +135,16 @@ namespace WaveFunctionCollapse
         TopRight, 
         BottomLeft, 
         BottomRight,
+    }
+
+    public static class CornerUtility
+    {
+        public static Corner[] AllCorners = new Corner[]
+        {
+            Corner.TopLeft,
+            Corner.TopRight,
+            Corner.BottomLeft,
+            Corner.BottomRight,
+        };
     }
 }

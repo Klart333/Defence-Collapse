@@ -11,6 +11,9 @@ namespace UI
     {
         // Needs to handle unhovering and re-hovering current highlighted cluster
 
+        [SerializeField]
+        private 
+        
         private GameManager gameManager;
         
         private EntityManager entityManager;
@@ -54,17 +57,16 @@ namespace UI
 
             if (!array.IsCreated) return;
 
-            if (array.Length == 0)
+            switch (array.Length)
             {
-                array.Dispose();
-                return;
-            }
-            
-            if (array.Length > 1)
-            {
-                Debug.LogError("Should not exceed lenght 1!!!");
-                array.Dispose();
-                return;
+                case 0:
+                    array.Dispose();
+                    return;
+                case > 1:
+                    Debug.LogError("Should not exceed length 1!!!");
+                    entityManager.DestroyEntity(highlightClusterQuery);
+                    array.Dispose();
+                    return;
             }
 
             foreach (HighlightClusterDataComponent cluster in array)

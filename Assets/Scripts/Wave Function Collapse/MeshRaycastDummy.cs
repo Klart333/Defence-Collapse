@@ -14,12 +14,12 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private MeshCollider meshCollider;
         
-        public MeshRaycastDummy SpawnMesh(Mesh mesh, Material[] mats)
+        public MeshRaycastDummy SpawnMesh(Mesh mesh)
         {
             MeshRaycastDummy dummy = Instantiate(this);
             
             dummy.meshFilter.sharedMesh = mesh;
-            dummy.meshRenderer.sharedMaterials = mats;
+            //dummy.meshRenderer.sharedMaterial = mat;
             dummy.meshCollider.sharedMesh = mesh;
             return dummy;
         }

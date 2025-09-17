@@ -2745,9 +2745,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundGenerator: {fileID: 1024001993}
+  groundCornerData: {fileID: 11400000, guid: 9f292ac4f74867d4f95ddedbee3bce46, type: 2}
+  protoypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
   treeGrowerPrefab: {fileID: 8308232050752938920, guid: f5248643b05c52c46bf24e412cec980a,
     type: 3}
-  treeMaterialIndex: 1
+  objectGroundType: 4
   groupCount: 2
   groupingFactor: 0.6
 --- !u!1001 &193847968
@@ -3436,7 +3438,7 @@ MonoBehaviour:
     type: 3}
   canvasParent: {fileID: 448074541}
   districtGenerator: {fileID: 1551488502}
-  verbose: 1
+  verbose: 0
 --- !u!1 &245307584
 GameObject:
   m_ObjectHideFlags: 0
@@ -3820,74 +3822,6 @@ MonoBehaviour:
     m_ColorSpace: 0
     m_NumColorKeys: 8
     m_NumAlphaKeys: 2
---- !u!1001 &320826092
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 01de1697a12e54745913dd1774974677,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 10.061163
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 01de1697a12e54745913dd1774974677,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 6.2809954
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 01de1697a12e54745913dd1774974677,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -6.6148763
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 01de1697a12e54745913dd1774974677,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 01de1697a12e54745913dd1774974677,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 01de1697a12e54745913dd1774974677,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 01de1697a12e54745913dd1774974677,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 01de1697a12e54745913dd1774974677,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 01de1697a12e54745913dd1774974677,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 01de1697a12e54745913dd1774974677,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 01de1697a12e54745913dd1774974677,
-        type: 3}
-      propertyPath: m_Name
-      value: GroundModules_Offset
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 01de1697a12e54745913dd1774974677, type: 3}
 --- !u!1001 &324122136
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9547,7 +9481,7 @@ MonoBehaviour:
   awaitEveryFrame: 0
   awaitTimeMs: 1
   maxMillisecondsPerFrame: 12
-  shouldCombine: 1
+  shouldCombine: 0
   enemySpawnHandler: {fileID: 342113231}
   shouldRun: 1
   compilePrototypeMeshes: 1
@@ -9835,9 +9769,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundGenerator: {fileID: 1024001993}
+  groundCornerData: {fileID: 11400000, guid: 9f292ac4f74867d4f95ddedbee3bce46, type: 2}
+  protoypeMeshes: {fileID: 11400000, guid: e0e31b2b21049ba46a644ea5321310b5, type: 2}
   treeGrowerPrefab: {fileID: 8308232050752938920, guid: 5be1d375224d84e4f9bbd6cbbcf62b6e,
     type: 3}
-  treeMaterialIndex: 2
+  objectGroundType: 2
   groupCount: 1
   groupingFactor: 0.4
 --- !u!1 &1086664063
@@ -14155,58 +14091,12 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects:
-    - {fileID: 2100000, guid: 0edd488554943ba4d9add75316d5cba6, type: 2}
-    - {fileID: 2100000, guid: c36a4497441bc1d48ad8c03477895bc7, type: 2}
+    ReferencedUnityObjects: []
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes:
-    - Name: buildableMaterials
-      Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[UnityEngine.Material, UnityEngine.CoreModule],[WaveFunctionCollapse.GroundType,
-        Core]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 1|System.Collections.Generic.ObjectEqualityComparer`1[[UnityEngine.Material,
-        UnityEngine.CoreModule]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 10
-      Data: 0
-    - Name: $v
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 10
-      Data: 1
-    - Name: $v
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+    SerializationNodes: []
   buildableCornerData: {fileID: 11400000, guid: 9f292ac4f74867d4f95ddedbee3bce46,
     type: 2}
   meshFilters:
@@ -14234,6 +14124,7 @@ MonoBehaviour:
   - {fileID: 164605640}
   - {fileID: 1714317675}
   - {fileID: 744236005}
+  atlasAnalyzer: {fileID: 11400000, guid: 3fd3a20e79dcd55468bdbdb395b2d176, type: 2}
   cellSize: 2
 --- !u!224 &1659307443 stripped
 RectTransform:
@@ -20255,6 +20146,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1080383292460972389, guid: 46298695f0056184a9aa656dd0416175,
         type: 3}
+    - target: {fileID: 1080383292460972389, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: pieceWeights.Array.data[12].Weight
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1080383292460972389, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: pieceWeights.Array.data[13].Weight
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 1390547192382168199, guid: 46298695f0056184a9aa656dd0416175,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -20340,6 +20241,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2763239879536195447, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3992733278269622899, guid: 46298695f0056184a9aa656dd0416175,
         type: 3}
       propertyPath: m_Enabled
@@ -20355,6 +20261,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4835861540287397978, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4877567071659429059, guid: 46298695f0056184a9aa656dd0416175,
         type: 3}
       propertyPath: m_Enabled
@@ -20365,12 +20276,22 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5281954601450473247, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5995896700937584852, guid: 46298695f0056184a9aa656dd0416175,
         type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6154880759492164809, guid: 46298695f0056184a9aa656dd0416175,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6411703081720106421, guid: 46298695f0056184a9aa656dd0416175,
         type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -21687,4 +21608,3 @@ SceneRoots:
   - {fileID: 606289848}
   - {fileID: 920425043}
   - {fileID: 637114056}
-  - {fileID: 320826092}

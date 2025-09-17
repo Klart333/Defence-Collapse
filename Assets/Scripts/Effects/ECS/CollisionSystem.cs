@@ -9,7 +9,7 @@ using Enemy.ECS;
 
 namespace Effects.ECS
 {
-    [BurstCompile, UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(EnemyHashGridSystem))]
+    [BurstCompile, UpdateAfter(typeof(EnemyHashGridSystem))]
     public partial struct CollisionSystem : ISystem
     {
         private ComponentLookup<LocalTransform> transformLookup;

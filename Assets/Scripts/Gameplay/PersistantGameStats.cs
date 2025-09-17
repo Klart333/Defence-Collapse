@@ -23,7 +23,7 @@ namespace Gameplay
     public class GameStats
     {
         public int Difficulty;
-        public int WaveCount;
+        public int TurnCount;
         public int TownHallLevel;
         public int ChunksExplored;
     }

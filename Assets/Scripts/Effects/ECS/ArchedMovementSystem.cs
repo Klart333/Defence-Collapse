@@ -8,7 +8,7 @@ using Unity.Transforms;
 
 namespace Effects.ECS
 {
-    [UpdateBefore(typeof(CollisionSystem))]
+    [BurstCompile, UpdateBefore(typeof(CollisionSystem))]
     public partial struct ArchedMovementSystem : ISystem
     {
         [BurstCompile]
@@ -17,6 +17,7 @@ namespace Effects.ECS
             state.RequireForUpdate<GameSpeedComponent>();
         }
 
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;

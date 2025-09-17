@@ -1,22 +1,23 @@
-﻿using System;
+﻿using LocalToWorld = Unity.Transforms.LocalToWorld;
+using Vector2 = UnityEngine.Vector2;
+using Math = Utility.Math;
+
 using System.Collections.Generic;
 using Buildings.District.ECS;
-using Effects;
-using Effects.ECS;
-using Enemy.ECS;
+using UnityEngine.Rendering;
+using WaveFunctionCollapse;
 using Gameplay.Upgrades;
 using Unity.Collections;
-using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Rendering;
 using Unity.Transforms;
+using Unity.Rendering;
+using Unity.Entities;
+using Effects.ECS;
 using UnityEngine;
-using UnityEngine.Rendering;
+using Enemy.ECS;
+using Effects;
 using Utility;
-using WaveFunctionCollapse;
-using LocalToWorld = Unity.Transforms.LocalToWorld;
-using Math = Utility.Math;
-using Vector2 = UnityEngine.Vector2;
+using System;
 
 namespace Buildings.District
 {
@@ -28,25 +29,21 @@ namespace Buildings.District
         private readonly Dictionary<int2, List<Entity>> entityIndexes = new Dictionary<int2, List<Entity>>();
         protected readonly HashSet<int3> occupiedTargetMeshChunkIndex = new HashSet<int3>();
         protected readonly HashSet<Entity> spawnedDataEntities = new HashSet<Entity>();
-        protected readonly HashSet<Entity> allSpawnedEntities = new HashSet<Entity>();
-        
-        protected readonly List<ChunkIndex> collapsedIndexes = new List<ChunkIndex>();
-        
-        protected DamageInstance lastDamageDone;
-        protected EntityManager entityManager;
+        private readonly HashSet<Entity> allSpawnedEntities = new HashSet<Entity>();
+        private readonly List<ChunkIndex> collapsedIndexes = new List<ChunkIndex>();
+
         protected TowerData districtData;
         protected Stats stats;
 
-        private Entity simpleTargetingEntityPrefab;
+        protected EntityManager entityManager;
         private Entity targetingEntityPrefab;
         private Entity targetEntityPrefab;
         
-        protected bool requireTargeting;
-        
         public CategoryType CategoryType => districtData.CategoryType;
-        public DamageInstance LastDamageDone => lastDamageDone;
+
         public Stats Stats => stats;
 
+        public DamageInstance LastDamageDone { get; private set; }
         public abstract List<IUpgradeStat> UpgradeStats { get; }
         public PrototypeInfoData PrototypeInfo { get; set; }
         protected DistrictData DistrictData { get; }
@@ -61,7 +58,6 @@ namespace Buildings.District
         protected DistrictState(DistrictData districtData, Vector3 position, int key, TowerData towerData)
         {
             this.districtData = towerData;
-            requireTargeting = towerData.RequireTargeting;
             
             DistrictData = districtData;
             OriginPosition = position;
@@ -140,21 +136,12 @@ namespace Buildings.District
             };
             targetingEntityPrefab = entityManager.CreateEntity(targetingComponentTypes);
             
-            ComponentType[] simpleComponentTypes =
-            {
-                typeof(DistrictDataComponent),
-                typeof(AttackSpeedComponent),
-                typeof(LocalTransform),
-                typeof(Prefab),
-            };
-            simpleTargetingEntityPrefab = entityManager.CreateEntity(simpleComponentTypes);
-
             if (districtData.UseTargetMesh)
             {
                 ComponentType[] targetComponents =
                 {
                     typeof(ArchedMovementComponent),
-                    typeof(TargetMeshComponent),
+                    typeof(AttachementMeshComponent),
                     typeof(LocalTransform),
                     typeof(SpeedComponent),
                     typeof(LocalToWorld),
@@ -179,7 +166,7 @@ namespace Buildings.District
             OnStatisticsChanged?.Invoke();
             if (!damageCallback.TriggerDamageDone) return;
             
-            lastDamageDone = new DamageInstance
+            LastDamageDone = new DamageInstance
             {
                 Damage = damageCallback.DamageTaken,
                 AttackPosition = damageCallback.Position,
@@ -191,7 +178,7 @@ namespace Buildings.District
 
         public void OnUnitDoneDamage(DamageInstance damageInstance)
         {
-            lastDamageDone = damageInstance;
+            LastDamageDone = damageInstance;
 
             Attack?.OnDoneDamage(this);
         }
@@ -209,7 +196,6 @@ namespace Buildings.District
 
             DamageCallbackHandler.DamageDoneEvent.Remove(Key);
             
-            entityManager.DestroyEntity(simpleTargetingEntityPrefab);
             entityManager.DestroyEntity(targetingEntityPrefab);
             entityManager.DestroyEntity(targetEntityPrefab);
             
@@ -244,15 +230,14 @@ namespace Buildings.District
             int count = targetIndexes.Count;
             float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
             
-            NativeArray<Entity> entities = entityManager.Instantiate(requireTargeting ? targetingEntityPrefab : simpleTargetingEntityPrefab, count, Allocator.Temp);
+            NativeArray<Entity> entities = entityManager.Instantiate(targetingEntityPrefab, count, Allocator.Temp);
             
             for (int i = 0; i < count; i++)
             {
                 TargetEntityIndex index = targetIndexes[i];
                 Vector3 pos = GetPosition(index.ChunkIndex, index.Offset);
 
-                if (requireTargeting) SetupShooterEntity(entities[i], i, pos);
-                else SetupSimpleShooterEntity(entities[i], i, pos);
+                SetupShooterEntity(entities[i], i, pos);
                 
                 int2 key = index.ChunkIndex.Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + index.ChunkIndex.CellIndex.xz;
                 AddEntityToDictionary(key, entities[i], true);
@@ -267,7 +252,7 @@ namespace Buildings.District
 
             void SetupShooterEntity(Entity spawnedEntity, int i, Vector3 pos)
             {
-                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent { AttackSpeed = attackSpeedValue, AttackTimer = (int)math.ceil(attackSpeedValue)});
+                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent { AttackSpeed = attackSpeedValue, AttackTimer = attackSpeedValue});
                 entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = stats.Range.Value });
                 entityManager.SetComponentData(spawnedEntity, new DistrictDataComponent { DistrictID = Key, });
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = pos });
@@ -276,13 +261,6 @@ namespace Buildings.District
                     Direction = targetIndexes[i].Direction,
                     Angle = districtData.AttackAngle,
                 });
-            }
-            
-            void SetupSimpleShooterEntity(Entity spawnedEntity, int i, Vector3 pos)
-            {
-                entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent { AttackSpeed = attackSpeedValue});
-                entityManager.SetComponentData(spawnedEntity, new DistrictDataComponent { DistrictID = Key, });
-                entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = pos });
             }
         }
         
@@ -305,7 +283,7 @@ namespace Buildings.District
             void SetupTargetEntity(Entity spawnedEntity, Entity shooterEntity, Vector3 pos, Vector2 direction)
             {
                 Vector3 upPosition = pos + new Vector3(0, 1.5f, 0);
-                entityManager.SetComponentData(spawnedEntity, new TargetMeshComponent { Target = shooterEntity });
+                entityManager.SetComponentData(spawnedEntity, new AttachementMeshComponent { Target = shooterEntity });
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform
                 {
                     Position = upPosition,
@@ -723,8 +701,6 @@ namespace Buildings.District
 
             CreateStats();
             Attack = new Attack(mineData.BaseAttack);
-            
-            Attack.OnEffectsAdded += AttackEffectsAdded;
         }
 
         protected override void RangeChanged()
@@ -735,20 +711,6 @@ namespace Buildings.District
             {
                 rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
             }
-        }
-
-        private void AttackEffectsAdded(List<IEffect> effects)
-        {
-            if (requireTargeting)
-            {
-                Attack.OnEffectsAdded -= AttackEffectsAdded;
-                return;
-            }
-            
-            if (!DistrictStateUtility.SearchEffects(effects)) return; 
-            
-            Attack.OnEffectsAdded -= AttackEffectsAdded;
-            requireTargeting = true;
         }
 
         private void CreateStats()
@@ -775,7 +737,7 @@ namespace Buildings.District
         
         public override void OnSelected(Vector3 pos)
         {
-            if (!requireTargeting || selected) return;
+            if (selected) return;
             
             selected = true;
             rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
@@ -786,7 +748,7 @@ namespace Buildings.District
 
         public override void OnDeselected()
         {
-            if (!requireTargeting || rangeIndicator is null) return;
+            if (rangeIndicator is null) return;
             
             selected = false;
             rangeIndicator.SetActive(false);
@@ -997,8 +959,6 @@ namespace Buildings.District
             CreateStats(); 
             Attack = new Attack(churchData.BaseAttack);
             
-            Attack.OnEffectsAdded += AttackEffectsAdded;
-            
             Stats.Productivity.OnValueChanged += OnStatsChanged;
         }
 
@@ -1060,20 +1020,6 @@ namespace Buildings.District
                     revertableEffect.Revert(this);
                 }
             }
-        }
-
-        private void AttackEffectsAdded(List<IEffect> effects)
-        {
-            if (requireTargeting)
-            {
-                Attack.OnEffectsAdded -= AttackEffectsAdded;
-                return;
-            }
-            
-            if (!DistrictStateUtility.SearchEffects(effects)) return; 
-            
-            Attack.OnEffectsAdded -= AttackEffectsAdded;
-            requireTargeting = true;
         }
 
         private void CreateStats()

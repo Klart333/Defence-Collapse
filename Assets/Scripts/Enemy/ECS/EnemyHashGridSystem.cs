@@ -9,8 +9,7 @@ using System;
 
 namespace Enemy.ECS
 {
-    [BurstCompile, UpdateInGroup(typeof(SimulationSystemGroup)), 
-     UpdateAfter(typeof(SpawnerSystem)), UpdateAfter(typeof(DeathSystem))]
+    [BurstCompile, UpdateAfter(typeof(SpawnerSystem)), UpdateAfter(typeof(DeathSystem)), UpdateAfter(typeof(EnemyCountSystem))]
     public partial struct EnemyHashGridSystem : ISystem
     {
         [BurstCompile]
@@ -19,13 +18,13 @@ namespace Enemy.ECS
             var entity = state.EntityManager.CreateEntity();
             state.EntityManager.AddComponentData(entity, new SpatialHashMapSingleton());
             
-            state.RequireForUpdate<ManagedClusterComponent>(); // Require enemy (or little dude)
+            state.RequireForUpdate<WaveStateComponent>();
         }
         
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            int enemyCount = SystemAPI.GetSingletonRW<WaveStateComponent>().ValueRO.EnemyCount;
+            int enemyCount = SystemAPI.GetSingleton<WaveStateComponent>().EnemyCount;
             RefRW<SpatialHashMapSingleton> mapSingleton = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>();
             mapSingleton.ValueRW.Value = new NativeParallelMultiHashMap<int2, Entity>((int)(enemyCount * 2.5f) + 100, state.WorldUpdateAllocator); // Double for loadfactor stuff
             if (enemyCount == 0)
@@ -58,7 +57,7 @@ namespace Enemy.ECS
         [BurstCompile]
         public void Execute(in LocalTransform enemyTransform, in Entity entity)
         {
-            int2 cell = HashGridUtility.GetCellForCellSize1(enemyTransform.Position);
+            int2 cell = HashGridUtility.GetCellForCellSize1(enemyTransform.Position.xz);
             SpatialGrid.Add(cell, entity);
         }
     }
@@ -89,10 +88,10 @@ namespace Enemy.ECS
             return new int2(cellX, cellY);
         }
         
-        public static int2 GetCellForCellSize1(float3 position)
+        public static int2 GetCellForCellSize1(float2 position)
         {
             int cellX = (int)position.x;
-            int cellY = (int)position.z;
+            int cellY = (int)position.y;
             return new int2(cellX, cellY);
         }
     }

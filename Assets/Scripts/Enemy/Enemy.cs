@@ -1,5 +1,6 @@
 using HealthComponent = Effects.ECS.HealthComponent;
 using Random = Unity.Mathematics.Random;
+
 using Sirenix.OdinInspector;
 using Unity.Collections;
 using Unity.Entities;
@@ -40,17 +41,21 @@ namespace Enemy
                 
                 Stats stats = new Stats(authoring.enemyData.Stats);
                 Entity enemyEntity = GetEntity(TransformUsageFlags.Dynamic);
+
+                float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
                 
                 AddComponent<EnemySpawnedTag>(enemyEntity);
                 AddComponent<ManagedClusterComponent>(enemyEntity);
                 
                 AddComponent(enemyEntity, new RandomComponent { Random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 1000000)) });
-                AddComponent(enemyEntity, new AttackSpeedComponent { AttackSpeed = 1.0f / stats.AttackSpeed.Value });
+                AddComponent(enemyEntity, new AttackSpeedComponent { AttackTimer = attackSpeedValue + 1, AttackSpeed = attackSpeedValue });
+                AddComponent(enemyEntity, new HealthScalingComponent { Multiplier = authoring.EnemyData.HealthScalingMultiplier });
                 AddComponent(enemyEntity, new MoneyOnDeathComponent { Amount = authoring.enemyData.MoneyOnDeath});
+                AddComponent(enemyEntity, new MovementSpeedComponent { Speed = 1.0f / stats.MovementSpeed.Value });
                 AddComponent(enemyEntity, new SimpleDamageComponent { Damage = stats.HealthDamage.Value, });
-                AddComponent(enemyEntity, new SpeedComponent { Speed = 1.0f / stats.MovementSpeed.Value });
                 AddComponent(enemyEntity, new FresnelComponent { Value = 5f });
-                
+                AddComponent(enemyEntity, new SpeedComponent { Speed = 1 });
+
                 AddComponent(enemyEntity, new HealthComponent
                 {
                     Bar = GetEntity(authoring.healthbar, TransformUsageFlags.Dynamic),
@@ -66,11 +71,6 @@ namespace Enemy
                     Shield = stats.MaxShield.Value,
                 });
                 
-                AddComponent(enemyEntity, new HealthScalingComponent
-                {
-                    Multiplier = authoring.EnemyData.HealthScalingMultiplier
-                });
-
                 if (authoring.enemyData.ExplodeOnDeath)
                 {
                     AddComponent(enemyEntity, new ExplosionOnDeathComponent { Size = authoring.enemyData.ExplosionSize });
@@ -94,10 +94,7 @@ namespace Enemy
         }
     }
 
-    public struct EnemySpawnedTag : IComponentData
-    {
-        
-    }
+    public struct EnemySpawnedTag : IComponentData { }
 
     public struct ManagedClusterComponent : IComponentData
     {

@@ -15,6 +15,7 @@ namespace Enemy.ECS
     [UpdateAfter(typeof(DeathSystem))]
     public partial struct SpawnerSystem : ISystem
     {
+        private ComponentLookup<MovementSpeedComponent> movementSpeedLookup; 
         private ComponentLookup<SimpleDamageComponent> simpleDamageLookup; 
         private ComponentLookup<AttackSpeedComponent> attackSpeedLookup;
         private ComponentLookup<SpawnPointComponent> spawnPointLookup;
@@ -22,30 +23,33 @@ namespace Enemy.ECS
         private ComponentLookup<SpeedComponent> speedLookup; 
             
         private EntityQuery spawnerQuery;
+        private EntityQuery updateEnemiesQuery;
         private uint seed;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            simpleDamageLookup = SystemAPI.GetComponentLookup<SimpleDamageComponent>();
-            attackSpeedLookup = SystemAPI.GetComponentLookup<AttackSpeedComponent>();
+            movementSpeedLookup = SystemAPI.GetComponentLookup<MovementSpeedComponent>(true);
+            simpleDamageLookup = SystemAPI.GetComponentLookup<SimpleDamageComponent>(true);
+            attackSpeedLookup = SystemAPI.GetComponentLookup<AttackSpeedComponent>(true);
             spawnPointLookup = SystemAPI.GetComponentLookup<SpawnPointComponent>();
-            transformLookup = SystemAPI.GetComponentLookup<LocalTransform>();
-            speedLookup = SystemAPI.GetComponentLookup<SpeedComponent>();
+            transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+            speedLookup = SystemAPI.GetComponentLookup<SpeedComponent>(true);
 
             spawnerQuery = SystemAPI.QueryBuilder().WithAll<SpawnPointComponent>().Build();
+            updateEnemiesQuery = SystemAPI.QueryBuilder().WithAll<TurnIncreaseComponent, UpdateEnemiesTag>().Build();
             
-            state.RequireForUpdate<TurnIncreaseComponent>();
             state.RequireForUpdate<EnemyBossDatabaseTag>();
             state.RequireForUpdate<RandomSeedComponent>();
             state.RequireForUpdate<SpawnPointComponent>();
             state.RequireForUpdate<EnemyDatabaseTag>();
+            state.RequireForUpdate<UpdateEnemiesTag>();
             state.RequireForUpdate<PathBlobber>();
         }
 
         public void OnUpdate(ref SystemState state)
         {
-            TurnIncreaseComponent turnIncrease = SystemAPI.GetSingleton<TurnIncreaseComponent>();
+            TurnIncreaseComponent turnIncrease = updateEnemiesQuery.GetSingleton<TurnIncreaseComponent>();
             if (turnIncrease.TurnIncrease <= 0) return;
 
             if (seed == 0)
@@ -70,6 +74,7 @@ namespace Enemy.ECS
             PathBlobber pathBlobber = SystemAPI.GetSingleton<PathBlobber>();
             EntityQueryMask queryMask = state.EntityManager.UniversalQuery.GetEntityQueryMask();
             
+            movementSpeedLookup.Update(ref state);
             simpleDamageLookup.Update(ref state);
             attackSpeedLookup.Update(ref state);
             spawnPointLookup.Update(ref state);
@@ -79,6 +84,7 @@ namespace Enemy.ECS
             state.Dependency = new SpawnEnemiesJob
             {
                 ChunkIndexToListIndex = pathBlobber.ChunkIndexToListIndex,
+                MovementSpeedLookup = movementSpeedLookup,
                 AttackSpeedLookup = attackSpeedLookup,
                 SpawnPointLookup = spawnPointLookup,
                 DamageLookup = simpleDamageLookup,
@@ -201,8 +207,11 @@ namespace Enemy.ECS
         public ComponentLookup<LocalTransform> TransformLookup;
         
         [ReadOnly]
+        public ComponentLookup<MovementSpeedComponent> MovementSpeedLookup;
+        
+        [ReadOnly]
         public ComponentLookup<SpeedComponent> SpeedLookup;
-
+        
         [ReadOnly]
         public ComponentLookup<AttackSpeedComponent> AttackSpeedLookup;
         
@@ -259,13 +268,14 @@ namespace Enemy.ECS
 
         private DynamicBuffer<ManagedEntityBuffer> SpawnCluster(int sortKey, Entity clusterEntity, float3 spawnPosition, int enemyIndex, Entity prefabEntity)
         {
-            SpeedComponent speed = SpeedLookup[prefabEntity];
-            
+            MovementSpeedComponent moveSpeed = MovementSpeedLookup[prefabEntity];
+            // This ain't it cheif
             ECB.AddComponent<UpdatePositioningTag>(sortKey, clusterEntity);
             ECB.AddComponent(sortKey, clusterEntity, AttackSpeedLookup[prefabEntity]);
             ECB.AddComponent(sortKey, clusterEntity, DamageLookup[prefabEntity]);
-            ECB.AddComponent(sortKey, clusterEntity, speed);
-            ECB.AddComponent(sortKey, clusterEntity, new FlowFieldComponent { MoveTimer = speed.Speed, PathIndex = PathUtility.GetIndex(spawnPosition.xz) });
+            ECB.AddComponent(sortKey, clusterEntity, SpeedLookup[prefabEntity]);
+            ECB.AddComponent(sortKey, clusterEntity, moveSpeed);
+            ECB.AddComponent(sortKey, clusterEntity, new FlowFieldComponent { MoveTimer = moveSpeed.Speed, PathIndex = PathUtility.GetIndex(spawnPosition.xz) });
 
             PathIndex pathIndex = PathUtility.GetIndex(spawnPosition.xz);
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[pathIndex.ChunkIndex]];

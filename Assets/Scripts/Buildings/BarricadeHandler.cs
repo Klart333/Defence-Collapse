@@ -117,6 +117,8 @@ namespace Buildings
         
         public void BarricadeTakeDamage(ChunkIndex index, float damage, PathIndex pathIndex)
         {
+            Debug.Log("Barricade taking damage");
+            
             List<ChunkIndex> damageIndexes = barricadeGenerator.GetSurroundingMarchedIndexes(index);
             damage /= damageIndexes.Count;
             bool didDamage = false;

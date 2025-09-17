@@ -8,15 +8,20 @@ namespace Buildings.District.ECS
         public int DistrictID;
     }
 
-    public struct TargetMeshComponent : IComponentData
+    public struct AttachementMeshComponent : IComponentData
     {
         public Entity Target;
+    }
+
+    public struct TargetingActivationComponent : IComponentData
+    {
+        public int Count;
     }
     
     public struct DistrictEntityData : IComponentData
     {
-        public int DistrictID;
-        public float3 TargetPosition;
         public float3 OriginPosition;
+        public float3 TargetPosition;
+        public int DistrictID;
     }
 }

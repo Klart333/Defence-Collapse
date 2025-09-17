@@ -37,7 +37,7 @@ namespace Utility
             float spinAmount = Time.deltaTime * spinSpeed;
             if (useGameSpeed) spinAmount *= gameSpeed.Value;
             
-            transform.Rotate(spinAxis, spinAmount, Space.World);
+            transform.Rotate(spinAxis, spinAmount, space);
         }
     }
 }
