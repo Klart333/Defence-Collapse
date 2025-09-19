@@ -17,57 +17,45 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
 
         [SerializeField]
         private Channel _channel = Channel.UV8;
+        
+        [SerializeField]
+        private string folderFilePath = "Art/Meshes";
 
         private void OnGUI()
         {
             _smoothingAngle = EditorGUILayout.Slider("Smoothing Angle", _smoothingAngle, 0, MaxSmoothingAngle);
             _channel = (Channel) EditorGUILayout.EnumPopup("Channel", _channel);
             
-            if (_channel == Channel.UV8)
-            {
-                var uvs = new List<Vector4>();
-                _sourceMesh.GetUVs(UvChannel, uvs);
-                if (uvs.Count > 0)
-                {
-                    EditorGUILayout.HelpBox($"UV{UvChannel} is busy, it will be overwritten.", MessageType.Warning);
-                }
-
-                var boneWeights = new List<BoneWeight>();
-                _sourceMesh.GetBoneWeights(boneWeights);
-
-                if (boneWeights.Count > 0)
-                {
-                    EditorGUILayout.HelpBox(
-                        "The mesh seems to be a skinned mesh. Change the Channel to Tangents for correct behavior.",
-                        MessageType.Warning
-                    );
-                }
-            }
-
             if (GUILayout.Button("Compute Smoothed Normals"))
             {
                 ComputeSmoothedNormals();
             }
         }
 
-        [MenuItem("Window/Toon RP/Normals Smoothing Utility")]
+        [MenuItem("Window/Toon RP/Normals Smoothing Utility - ALL")]
         private static void OpenWindow()
         {
-            NormalsSmoothingUtility window = CreateWindow<NormalsSmoothingUtility>();
-            window.titleContent = new GUIContent("Normals Smoothing Utility");
+            AllNormalsSmoothingUtility window = CreateWindow<AllNormalsSmoothingUtility>();
+            window.titleContent = new GUIContent("Normals Smoothing Utility - ALL");
             window.ShowUtility();
         }
 
         private void ComputeSmoothedNormals()
         {
+            var meshes = AssetDatabase.FindAssets("t:mesh");
 
-            Assert.IsNotNull(_sourceMesh);
-            Assert.IsTrue(_smoothingAngle > 0f);
+            foreach (var mesh in meshes)
+            {
+                Mesh sourceMesh = AssetDatabase.LoadAssetAtPath<Mesh>(AssetDatabase.GUIDToAssetPath(mesh));
+                Assert.IsNotNull(sourceMesh);
+                Assert.IsTrue(_smoothingAngle > 0f);
 
-            Mesh smoothedMesh = Instantiate(_sourceMesh);
-            smoothedMesh.name = _sourceMesh.name + "_SmoothedNormals";
-            smoothedMesh.CalculateNormalsAndWriteToChannel(_smoothingAngle, _channel == Channel.UV8 ? UvChannel : null);
-            CreateMeshAsset(smoothedMesh);
+                Mesh smoothedMesh = Instantiate(sourceMesh);
+                smoothedMesh.name = sourceMesh.name + "_SmoothedNormals";
+                smoothedMesh.CalculateNormalsAndWriteToChannel(_smoothingAngle, _channel == Channel.UV8 ? UvChannel : null);
+                CreateMeshAsset(smoothedMesh, AssetDatabase.GUIDToAssetPath(mesh));
+            }
+            
             AssetDatabase.SaveAssets();
             Close();
         }
@@ -80,7 +68,7 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
                 return;
             }
 
-            AssetDatabase.CreateAsset(mesh, path);
+            AssetDatabase.CreateAsset(mesh, assetPath);
         }
 
         private enum Channel
