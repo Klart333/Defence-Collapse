@@ -1,18 +1,18 @@
-using System;
+using Object = UnityEngine.Object;
+
 using System.Collections.Generic;
 using Buildings.District.ECS;
-using Cysharp.Threading.Tasks;
-using Gameplay;
-using Gameplay.Buffs;
-using Gameplay.Event;
-using InputCamera;
+using UnityEngine.InputSystem;
+using WaveFunctionCollapse;
 using Unity.Collections;
 using Unity.Mathematics;
+using Gameplay.Buffs;
+using Gameplay.Event;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using InputCamera;
+using Gameplay;
 using Utility;
-using WaveFunctionCollapse;
-using Object = UnityEngine.Object;
+using System;
 
 namespace Buildings.District
 {
@@ -28,6 +28,9 @@ namespace Buildings.District
 
         private MeshCollider meshCollider;
         protected TowerData towerData;
+        
+        private float hoveredTimer;
+        private bool hovered;
 
         public Dictionary<int3, QueryChunk> DistrictChunks { get; } 
         public DistrictHandler DistrictHandler { get; set; }
@@ -66,15 +69,28 @@ namespace Buildings.District
             };
             State.PrototypeInfo = prototypeInfo;
             
-            Events.OnTurnIncreased += OnTurnIncreased;
+            Events.OnTurnComplete += OnTurnComplete;
             Events.OnWallsDestroyed += OnWallsDestroyed;
+            Events.OnGameReset += Dispose;
         }
 
-        private void OnTurnIncreased(int increase, int total)
+        public void Update()
         {
-            if (State is ITurnIncreaseSubscriber turnIncreaseSubscriber)
+            if (!hovered || FocusManager.Instance.GetIsFocused()) return;
+            
+            hoveredTimer += Time.deltaTime;
+            if (hoveredTimer >= 0.5f)
             {
-                turnIncreaseSubscriber.TurnsIncreased(increase, total);
+                hoveredTimer = float.MinValue;
+                DistrictHandler.DisplayDistrictDisplay(this);
+            }
+        }
+        
+        private void OnTurnComplete()
+        {
+            if (State is ITurnCompleteSubscriber turnComplete)
+            {
+                turnComplete.TurnComplete();
             }
         }
 
@@ -208,11 +224,14 @@ namespace Buildings.District
                 return;
             }
             
+            hovered = true;
+            hoveredTimer = 0.0f;
             DistrictHandler.SetHoverOnObjects(DistrictChunks.Values, true);
         }
 
         private void OnHoverExit()
         {
+            hovered = false;
             DistrictHandler.SetHoverOnObjects(DistrictChunks.Values, false);
         }
 
@@ -248,7 +267,7 @@ namespace Buildings.District
         {
             OnLevelup?.Invoke();
         }
-
+        
         public void Dispose()
         {
             State.Dispose();
@@ -256,7 +275,8 @@ namespace Buildings.District
             InputManager.Instance.Cancel.performed -= OnDeselected;
             Events.OnWallsDestroyed -= OnWallsDestroyed;
             UIEvents.OnFocusChanged -= Deselect;
-            Events.OnTurnIncreased -= OnTurnIncreased;
+            Events.OnTurnComplete -= OnTurnComplete;
+            Events.OnGameReset -= Dispose;
             
             if (meshCollider)
             {
@@ -266,10 +286,10 @@ namespace Buildings.District
             OnDisposed?.Invoke();
         }
 
-        public void PerformAttack(DistrictEntityData data)
+        public void PerformAttack(DistrictEntityDataComponent dataComponent)
         {
-            State.OriginPosition = data.OriginPosition;
-            State.PerformAttack(data.TargetPosition);
+            State.OriginPosition = dataComponent.OriginPosition;
+            State.PerformAttack(dataComponent.TargetPosition);
         }
     }
 

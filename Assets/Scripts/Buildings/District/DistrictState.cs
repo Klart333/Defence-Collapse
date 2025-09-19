@@ -18,6 +18,7 @@ using Enemy.ECS;
 using Effects;
 using Utility;
 using System;
+using Gameplay;
 
 namespace Buildings.District
 {
@@ -135,25 +136,24 @@ namespace Buildings.District
                 typeof(Prefab),
             };
             targetingEntityPrefab = entityManager.CreateEntity(targetingComponentTypes);
+
+            if (!districtData.UseTargetMesh) return;
             
-            if (districtData.UseTargetMesh)
+            ComponentType[] targetComponents =
             {
-                ComponentType[] targetComponents =
-                {
-                    typeof(ArchedMovementComponent),
-                    typeof(AttachementMeshComponent),
-                    typeof(LocalTransform),
-                    typeof(SpeedComponent),
-                    typeof(LocalToWorld),
-                    typeof(Prefab),
-                };
-                targetEntityPrefab = entityManager.CreateEntity(targetComponents);
-                entityManager.SetComponentData(targetEntityPrefab, new SpeedComponent { Speed = 1});
+                typeof(ArchedMovementComponent),
+                typeof(AttachementMeshComponent),
+                typeof(LocalTransform),
+                typeof(SpeedComponent),
+                typeof(LocalToWorld),
+                typeof(Prefab),
+            };
+            targetEntityPrefab = entityManager.CreateEntity(targetComponents);
+            entityManager.SetComponentData(targetEntityPrefab, new SpeedComponent { Speed = 1});
                     
-                RenderMeshDescription desc = new RenderMeshDescription(shadowCastingMode: ShadowCastingMode.On, receiveShadows: true);
-                RenderMeshArray renderMeshArray = new RenderMeshArray(new Material[] { districtData.MeshVariable.Material }, new Mesh[] { districtData.MeshVariable.Mesh });
-                RenderMeshUtility.AddComponents(targetEntityPrefab, entityManager, desc, renderMeshArray, MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
-            }
+            RenderMeshDescription desc = new RenderMeshDescription(shadowCastingMode: ShadowCastingMode.On, receiveShadows: true);
+            RenderMeshArray renderMeshArray = new RenderMeshArray(new Material[] { districtData.MeshVariable.Material }, new Mesh[] { districtData.MeshVariable.Mesh });
+            RenderMeshUtility.AddComponents(targetEntityPrefab, entityManager, desc, renderMeshArray, MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
         }
 
         public abstract void OnSelected(Vector3 pos);
@@ -195,7 +195,13 @@ namespace Buildings.District
             DistrictData.DistrictGenerator.OnCellCollapsed -= OnCellCollapsed;
 
             DamageCallbackHandler.DamageDoneEvent.Remove(Key);
-            
+
+            if (GameManager.Instance.IsGameOver || !World.DefaultGameObjectInjectionWorld.IsCreated)
+            {
+                return;
+            }
+
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             entityManager.DestroyEntity(targetingEntityPrefab);
             entityManager.DestroyEntity(targetEntityPrefab);
             
@@ -551,6 +557,11 @@ namespace Buildings.District
                 rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
             }
         }
+        
+        protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
+        {
+            return DistrictStateUtility.GetFourCornersEntityIndexes(chunkIndexes, occupiedTargetMeshChunkIndex, DistrictData.DistrictGenerator, PrototypeInfo, 2);
+        }
 
         private void CreateStats()
         {
@@ -608,7 +619,7 @@ namespace Buildings.District
 
     #region Town Hall
 
-    public sealed class TownHallState : DistrictState
+    public sealed class TownHallState : DistrictState, ITurnCompleteSubscriber
     {
         private GameObject rangeIndicator;
         private bool selected;
@@ -680,13 +691,23 @@ namespace Buildings.District
                 rangeIndicator = null;
             }
         }
+        
+        public void TurnComplete()
+        {
+            foreach (IEffect effect in districtData.EndWaveEffects)
+            {
+                effect.Perform(this);
+            }
+                
+            InvokeStatisticsChanged();
+        }
     }
 
     #endregion
     
     #region Mine
 
-    public sealed class MineState : DistrictState, ITurnIncreaseSubscriber
+    public sealed class MineState : DistrictState, ITurnCompleteSubscriber
     {
         private GameObject rangeIndicator;
         
@@ -755,7 +776,7 @@ namespace Buildings.District
             rangeIndicator = null;
         }
 
-        public void TurnsIncreased(int increase, int total)
+        public void TurnComplete()
         {
             foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
             {
@@ -994,7 +1015,7 @@ namespace Buildings.District
         protected override void RemoveAllEntities()
         {
             base.RemoveAllEntities();
-
+            
             RevertCreateEffects();
         }
         
@@ -1101,25 +1122,18 @@ namespace Buildings.District
 
     public static class DistrictStateUtility
     {
+        private enum MeshTargetType
+        {
+            None,
+            Corner,
+            Side,
+            Full,
+            InCorner,
+        }
+
         public const int Width = 2;
         public const int Height = 2;
         public static int2 Size => new int2(Width, Height);
-        
-        public static bool SearchEffects(List<IEffect> effects)
-        {
-            foreach (IEffect effect in effects)
-            {
-                switch (effect)
-                {
-                    case IDamageEffect damageEffect:
-                        return damageEffect.IsDamageEffect;
-                    case IEffectHolder holder when SearchEffects(holder.Effects):
-                        return true;
-                }
-            }
-
-            return false;
-        }
         
         // Order of neighbours:
         // Right, Forward, Left, Back 
@@ -1152,8 +1166,9 @@ namespace Buildings.District
             return true;
         }
 
-        public static MeshTargetType GetMeshTargetType(ChunkIndex[] neighbours, DistrictGenerator waveFunction, PrototypeInfoData protInfo, int rotation)
+        private static MeshTargetType GetMeshTargetType(ChunkIndex chunkIndex, ChunkIndex[] neighbours, DistrictGenerator waveFunction, PrototypeInfoData protInfo, int rotation)
         {
+            rotation %= 4;
             bool[] sides = GetIfAdjacentSidesExist(neighbours, waveFunction, protInfo);
             ListRotator.RotateInPlace(sides, rotation);
             
@@ -1162,7 +1177,12 @@ namespace Buildings.District
             {
                 (true, false, false, true) => MeshTargetType.Corner,
                 (true, false, true, true) => MeshTargetType.Side,
-                (true, true, true, true) => MeshTargetType.Full,
+                (true, true, true, true) => PrototypeDataUtility.IsKeySymmetrical(rotation switch
+                   {
+                       0 or 1 => waveFunction.ChunkWaveFunction[chunkIndex].PossiblePrototypes[0].PosZ,
+                       2 or 3 => waveFunction.ChunkWaveFunction[chunkIndex].PossiblePrototypes[0].NegZ,
+                       _ => throw new ArgumentOutOfRangeException(rotation.ToString()),
+                   } ) ? MeshTargetType.Full : MeshTargetType.InCorner,
                 _ => MeshTargetType.None
             };
         }
@@ -1179,15 +1199,6 @@ namespace Buildings.District
                 }
             }
         }
-
-        public enum MeshTargetType
-        {
-            None,
-            Corner,
-            Side,
-            Full,
-        }
-        
         
         public static List<TargetEntityIndex> GetPerimeterEntityChunks(List<ChunkIndex> chunkIndexes, HashSet<int3> occupiedTargetMeshChunkIndex, DistrictGenerator districtGenerator, PrototypeInfoData protInfo, int rotationOffset)
         {
@@ -1196,7 +1207,7 @@ namespace Buildings.District
             {
                 ChunkIndex[] neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, Width,  Height);
                 int rotation = districtGenerator.ChunkWaveFunction[chunkIndex].PossiblePrototypes[0].MeshRot.Rot + rotationOffset;
-                MeshTargetType targetType = GetMeshTargetType(neighbours, districtGenerator, protInfo, rotation);
+                MeshTargetType targetType = GetMeshTargetType(chunkIndex, neighbours, districtGenerator, protInfo, rotation);
                 
                 Vector2 forwardDir = Math.RotateVector2(new Vector2(0, 1), -90 * rotation * math.TORADIANS);
                 Vector2 leftDir = Math.RotateVector2(new Vector2(-1, 0), -90 * rotation * math.TORADIANS);
@@ -1275,6 +1286,70 @@ namespace Buildings.District
             
             return entityIndexes;
         }
+
+        public static List<TargetEntityIndex> GetFourCornersEntityIndexes(List<ChunkIndex> chunkIndexes, HashSet<int3> occupiedTargetMeshChunkIndex, DistrictGenerator districtGenerator,
+            PrototypeInfoData protInfo, int rotationOffset)
+        {
+            List<TargetEntityIndex> entityIndexes = new List<TargetEntityIndex>();
+            foreach (ChunkIndex chunkIndex in chunkIndexes)
+            {
+                ChunkIndex[] neighbours = ChunkWaveUtility.GetNeighbouringChunkIndexes(chunkIndex, Width,  Height);
+                int rotation = districtGenerator.ChunkWaveFunction[chunkIndex].PossiblePrototypes[0].MeshRot.Rot + rotationOffset;
+                MeshTargetType targetType = GetMeshTargetType(chunkIndex, neighbours, districtGenerator, protInfo, rotation);
+                float2 baseKey = chunkIndex.Index.xz.MultiplyByAxis(Size) + chunkIndex.CellIndex.xz + new float2(0.5f, 0.5f);
+
+                // Down right, it's always valid 
+                {
+                    Vector2 downRight = Math.RotateVector2(new Vector2(0.25f, -0.25f), -90 * rotation * math.TORADIANS);
+                    float2 downRightKey = baseKey + Math.Rotate90Float2(new float2(0.5f, -0.5f), rotation);
+                        
+                    AddPosition(downRight, chunkIndex, new int3((int)downRightKey.x, (int)downRightKey.y, 0));
+                }
+
+                // Down Left
+                if (targetType is MeshTargetType.Side or MeshTargetType.InCorner or MeshTargetType.Full)
+                {
+                    Vector2 downLeft = Math.RotateVector2(new Vector2(-0.25f, -0.25f), -90 * rotation * math.TORADIANS);
+                    float2 downLeftKey = baseKey + Math.Rotate90Float2(new float2(-0.5f, -0.5f), rotation);
+                    AddPosition(downLeft, chunkIndex, new int3((int)downLeftKey.x, (int)downLeftKey.y, 0));
+                }
+                
+                // Top Right
+                if (targetType is MeshTargetType.InCorner or MeshTargetType.Full)
+                {
+                    Vector2 topRight = Math.RotateVector2(new Vector2(0.25f, 0.25f), -90 * rotation * math.TORADIANS);
+                    float2 topRightKey = baseKey + Math.Rotate90Float2(new float2(0.5f, 0.5f), rotation);
+                    AddPosition(topRight, chunkIndex, new int3((int)topRightKey.x, (int)topRightKey.y, 0));
+                }
+                
+                // Top Left
+                if (targetType is MeshTargetType.Full)
+                {
+                    Vector2 topLeft = Math.RotateVector2(new Vector2(-0.25f, 0.25f), -90 * rotation * math.TORADIANS);
+                    float2 topLeftKey = baseKey + Math.Rotate90Float2(new float2(-0.5f, 0.5f), rotation);
+                    AddPosition(topLeft, chunkIndex, new int3((int)topLeftKey.x, (int)topLeftKey.y, 0));
+                }
+            } 
+            
+            return entityIndexes;
+            
+            void AddPosition(Vector2 offset, ChunkIndex chunkIndex, int3 index)
+            {
+                if (occupiedTargetMeshChunkIndex.Contains(index))
+                {
+                    return;
+                }
+                
+                entityIndexes.Add(new TargetEntityIndex
+                {
+                    ChunkIndex = chunkIndex,
+                    Offset = offset.ToXyZ(0),
+                    Direction = new Vector2(0, 1)
+                });
+                
+                occupiedTargetMeshChunkIndex.Add(index); 
+            }
+        }
     }
 
     public struct TargetEntityIndex
@@ -1284,8 +1359,8 @@ namespace Buildings.District
         public Vector2 Direction;
     }
 
-    public interface ITurnIncreaseSubscriber
+    public interface ITurnCompleteSubscriber
     {
-        public void TurnsIncreased(int increase, int total);
+        public void TurnComplete();
     }
 }

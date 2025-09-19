@@ -113,7 +113,7 @@ namespace Buildings
 
         private bool ShouldDisplay()
         {
-            return !inputManager.MouseOverUI() && displaying;
+            return !InputManager.MouseOverUI() && displaying;
         }
 
         private void UnSelect()
@@ -131,8 +131,7 @@ namespace Buildings
         {
             pendingAction = tileAction;
             selectedTile = index;
-            selectedTileHandler.SelectTile(index);
-            selectedTileHandler.DisplayAction(tileAction);
+            selectedTileHandler.SelectTile(index, tileAction);
         }
 
         private bool IsTileValid(ChunkIndex index, out TileAction action)

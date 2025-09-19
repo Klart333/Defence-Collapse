@@ -21,14 +21,15 @@ namespace Gameplay
         [SerializeField]
         private float slowDownDuration = 1.0f;
         
-        private EntityManager entityManager;
         private InputManager inputManager;
-        private Entity gameSpeedEntity;
-        private Tween slowDownTween;
-        
-        private Modifier speedUpModifier;
         private Modifier speedUpModifier2;
+        private Modifier speedUpModifier;
+        private Tween slowDownTween;
         private Stat gameSpeedStat;
+        
+        private EntityManager entityManager;
+        private Entity gameSpeedEntity;
+        
         
         public float Value => gameSpeedStat.Value;
 

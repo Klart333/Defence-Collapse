@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Gameplay.Turns.ECS;
 using Gameplay.Event;
 using Unity.Entities;
@@ -7,6 +8,8 @@ namespace Gameplay.Turns
 {
     public class TurnHandler : MonoBehaviour
     {
+        private GameManager gameManager;
+        
         private Entity turnIncreaseEntityPrefab;
         private EntityManager entityManager;
         private EntityQuery turnQuery;
@@ -23,6 +26,13 @@ namespace Gameplay.Turns
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             turnQuery = entityManager.CreateEntityQuery(typeof(TurnIncreaseComponent));
             CreateEntityPrefab();
+            
+            GetGameManager().Forget();
+        }
+
+        private async UniTaskVoid GetGameManager()
+        {
+            gameManager = await GameManager.Get();
         }
 
         private void OnDisable()
@@ -33,11 +43,11 @@ namespace Gameplay.Turns
 
         private void Update()
         {
-            if (listeningForTurnComplete && turnQuery.IsEmpty)
-            {
-                listeningForTurnComplete = false;
-                Events.OnTurnComplete?.Invoke();
-            }
+            if (gameManager.IsGameOver) return;
+            if (!listeningForTurnComplete || !turnQuery.IsEmpty) return;
+
+            listeningForTurnComplete = false;
+            Events.OnTurnComplete?.Invoke();
         }
 
         private void CreateEntityPrefab()

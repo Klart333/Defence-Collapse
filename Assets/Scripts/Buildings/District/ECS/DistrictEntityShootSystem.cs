@@ -51,7 +51,7 @@ namespace Buildings.District.ECS
             }
 
             Entity dataEntity = ECB.CreateEntity(sortKey);
-            ECB.AddComponent(sortKey, dataEntity, new DistrictEntityData
+            ECB.AddComponent(sortKey, dataEntity, new DistrictEntityDataComponent
             {
                 TargetPosition = targetComponent.TargetPosition,
                 DistrictID = districtData.DistrictID,

@@ -10,6 +10,7 @@ using Gameplay.Event;
 using UnityEngine;
 using Unity.Jobs;
 using System;
+using Unity.Burst;
 
 namespace Pathfinding
 {
@@ -134,6 +135,17 @@ namespace Pathfinding
             }
         }
 
+        
+        public bool TryMoveAlongFlowField(PathIndex pathIndex, float3 pathPosition, out PathIndex movedPathIndex, out float3 movedPathPosition)
+        {
+            ref PathChunk valuePathChunk = ref pathChunks.Value.PathChunks[chunkIndexToListIndex[pathIndex.ChunkIndex]];
+            float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[pathIndex.GridIndex]);
+            
+            movedPathPosition = pathPosition + (math.round(direction) * PathUtility.CELL_SCALE).XyZ();
+            movedPathIndex = PathUtility.GetIndex(movedPathPosition.xz);
+            return chunkIndexToListIndex.ContainsKey(movedPathIndex.ChunkIndex);
+        }
+        
         #region Debug
 
         private void OnDrawGizmosSelected()
@@ -185,7 +197,6 @@ namespace Pathfinding
         }
 
         #endregion
-
     }
 
     public static class PathUtility
@@ -427,6 +438,7 @@ namespace Pathfinding
         }
     }
 
+    [BurstCompile]
     public readonly struct PathIndex : IEquatable<PathIndex>
     {
         public readonly int2 ChunkIndex;
@@ -438,16 +450,19 @@ namespace Pathfinding
             GridIndex = gridIndex;
         }
 
+        [BurstCompile]
         public bool Equals(PathIndex other)
         {
             return ChunkIndex.Equals(other.ChunkIndex) && GridIndex.Equals(other.GridIndex);
         }
 
+        [BurstCompile]
         public override bool Equals(object obj)
         {
             return obj is PathIndex other && Equals(other);
         }
 
+        [BurstCompile]
         public override int GetHashCode()
         {
             return HashCode.Combine(ChunkIndex, GridIndex);

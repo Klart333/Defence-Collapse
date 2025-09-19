@@ -1,25 +1,24 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Buildings.District.ECS;
 using Cysharp.Threading.Tasks;
-using Gameplay;
-using Gameplay.Event;
-using Gameplay.Upgrades;
+using Buildings.District.ECS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using WaveFunctionCollapse;
 using Sirenix.Utilities;
 using Unity.Collections;
-using Unity.Entities;
 using Unity.Mathematics;
+using Gameplay.Upgrades;
+using Unity.Entities;
+using Gameplay.Event;
 using UnityEngine;
-using UnityEngine.Assertions;
-using WaveFunctionCollapse;
+using Gameplay;
+using System;
 
 namespace Buildings.District
 {
     public class DistrictHandler : SerializedMonoBehaviour
     {
+        public event Action<DistrictData> OnDistrictDisplayed;
         public event Action<DistrictData> OnDistrictCreated;
         
         [Title("District")]
@@ -55,20 +54,35 @@ namespace Buildings.District
             Events.OnDistrictBuilt += OnDistrictBuilt;
             Events.OnTurnIncreased += OnTurnIncreased;
             districtGenerator.OnDistrictChunkRemoved += OnDistrictChunkRemoved;
+            Events.OnGameReset += OnGameReset;
             
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            districtEntityQuery = entityManager.CreateEntityQuery(typeof(DistrictEntityData));
+            districtEntityQuery = entityManager.CreateEntityQuery(typeof(DistrictEntityDataComponent));
         }
-        
+
         private void OnDisable()
         {
             Events.OnWallsDestroyed -= OnWallsDestroyed;
             Events.OnDistrictBuilt -= OnDistrictBuilt;
             Events.OnTurnIncreased -= OnTurnIncreased;
+            Events.OnGameReset -= OnGameReset;
             
             districtGenerator.OnDistrictChunkRemoved -= OnDistrictChunkRemoved;
         }
-        
+
+        private void OnGameReset()
+        {
+            districts.Clear();
+        }
+
+        private void Update()
+        {
+            foreach (DistrictData districtData in uniqueDistricts.Values)
+            {
+                districtData.Update();
+            }
+        }
+
         /// <summary>
         /// District Generator Rebuilding/Removing Chunk
         /// </summary>
@@ -99,7 +113,7 @@ namespace Buildings.District
         {
             await UniTask.NextFrame();
             
-            NativeList<DistrictEntityData> array = districtEntityQuery.ToComponentDataListAsync<DistrictEntityData>(Allocator.TempJob, out var awaitJobHandle);
+            NativeList<DistrictEntityDataComponent> array = districtEntityQuery.ToComponentDataListAsync<DistrictEntityDataComponent>(Allocator.TempJob, out var awaitJobHandle);
             awaitJobHandle.Complete();
             while (!awaitJobHandle.IsCompleted)
             {
@@ -114,7 +128,7 @@ namespace Buildings.District
                 return;
             }
             
-            foreach (DistrictEntityData data in array)
+            foreach (DistrictEntityDataComponent data in array)
             {
                 if (uniqueDistricts.TryGetValue(data.DistrictID, out DistrictData districtData))
                 {
@@ -358,7 +372,6 @@ namespace Buildings.District
         {
             if (districtObjects.TryGetValue(district.ChunkIndex.Index.xz, out HashSet<District> list)) list.Add(district);
             else districtObjects.Add(district.ChunkIndex.Index.xz, new HashSet<District> { district });
-
         }
 
         public void RemoveDistrictObject(District district)
@@ -367,6 +380,11 @@ namespace Buildings.District
 
             list.Remove(district);
             if (list.Count <= 0) districtObjects.Remove(district.ChunkIndex.Index.xz);
+        }
+
+        public void DisplayDistrictDisplay(DistrictData districtData)
+        {
+            OnDistrictDisplayed?.Invoke(districtData);
         }
     }
 }

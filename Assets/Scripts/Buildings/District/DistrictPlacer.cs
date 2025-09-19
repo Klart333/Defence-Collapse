@@ -202,7 +202,7 @@ namespace Buildings.District
                     chunks.Add(chunk);
                 }
             }
-
+            
             districtHandler.AddBuiltDistrict(chunks, districtType);
             districtGenerator.Place();
             

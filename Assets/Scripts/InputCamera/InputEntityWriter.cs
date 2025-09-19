@@ -4,12 +4,14 @@ using Unity.Mathematics;
 using Unity.Entities;
 using UnityEngine;
 using DG.Tweening;
+using Pathfinding;
 using Gameplay;
 
 namespace InputCamera
 {
     public class InputEntityWriter : MonoBehaviour
     {
+        private static readonly int UseMousePos = Shader.PropertyToID("_UseMousePos");
         private static readonly int MousePos = Shader.PropertyToID("_MousePos");
         
         [Title("Animation")]
@@ -21,7 +23,6 @@ namespace InputCamera
         
         private InputManager inputManager;
         private GameManager gameManager;
-        private Camera cam;
 
         private Vector3 overrideMousePosition;
         private EntityManager entityManager;
@@ -31,7 +32,6 @@ namespace InputCamera
 
         private void OnEnable()
         {
-            cam = Camera.main;
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             mousePositionEntity = entityManager.CreateEntity(typeof(MousePositionComponent));
             
@@ -57,9 +57,13 @@ namespace InputCamera
             {
                 ScreenPosition = inputManager.CurrentMouseScreenPosition,
                 WorldPosition = inputManager.CurrentMouseWorldPosition,
+                PathIndex = inputManager.CurrentMousePathIndex,
             });
 
-            Vector4 pos = isOverridingMousePosition ? new Vector4(overrideMousePosition.x, overrideMousePosition.z, 0, 0) : new Vector4(inputManager.CurrentMouseWorldPosition.x, inputManager.CurrentMouseWorldPosition.z, 0, 0);
+            Shader.SetGlobalInteger(UseMousePos, isOverridingMousePosition ? 1 : 0);
+            if (!isOverridingMousePosition) return;
+
+            Vector4 pos = new Vector4(overrideMousePosition.x, overrideMousePosition.z, 0, 0);
             Shader.SetGlobalVector(MousePos, pos);
         }
 
@@ -70,9 +74,9 @@ namespace InputCamera
             if (blend)
             {
                 DOTween.Kill(0);
-                
-                overrideMousePosition = inputManager.CurrentMouseWorldPosition;
-                DOTween.To(() => overrideMousePosition, x => overrideMousePosition = x, mousePosition, blendDuration).SetEase(blendEase).SetId(0);
+
+                Vector3 lastPos = overrideMousePosition;
+                DOTween.To(() => lastPos, x => overrideMousePosition = x, mousePosition, blendDuration).SetEase(blendEase).SetId(0);
             }
             else
             {
@@ -90,5 +94,6 @@ namespace InputCamera
     {
         public float2 ScreenPosition;
         public float3 WorldPosition;
+        public PathIndex PathIndex;
     }
 }

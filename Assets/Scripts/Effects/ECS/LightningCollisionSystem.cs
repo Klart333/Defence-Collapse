@@ -37,7 +37,7 @@ namespace Effects.ECS
             state.RequireForUpdate<VFXChainLightningSingleton>();
             
             lightningRequestQueue = new NativeQueue<VFXChainLightningRequest>(Allocator.Persistent);
-            pendingDamageMap = new NativeParallelMultiHashMap<Entity, PendingDamageComponent>(1000, Allocator.Persistent);
+            pendingDamageMap = new NativeParallelMultiHashMap<Entity, PendingDamageComponent>(10000, Allocator.Persistent);
         }
 
         [BurstCompile]

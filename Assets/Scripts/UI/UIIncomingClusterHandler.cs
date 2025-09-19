@@ -8,7 +8,7 @@ using Enemy.ECS;
 
 namespace UI
 {
-    public class UIIncomingClusterDisplayHandler : MonoBehaviour
+    public class UIIncomingClusterHandler : MonoBehaviour
     {
         [SerializeField]
         private UIIncomingClusterDisplay displayPrefab;
@@ -29,23 +29,21 @@ namespace UI
 
         private void OnEnable()
         {
-            Events.OnTurnIncreased += OnTurnIncreased;
+            Events.OnTurnComplete += OnTurnComplete;
         }
 
         private void OnDisable()
         {
-            Events.OnTurnIncreased -= OnTurnIncreased;
+            Events.OnTurnComplete -= OnTurnComplete;
         }
 
-        private void OnTurnIncreased(int increased, int total)
+        private void OnTurnComplete()
         {
-            DelayedTurnIncrease().Forget();
+            ReadSpawnData().Forget();
         }
 
-        private async UniTaskVoid DelayedTurnIncrease()
+        private async UniTaskVoid ReadSpawnData()
         {
-            await UniTask.NextFrame();
-            
             NativeList<SpawningComponent> array = incomingClusterQuery.ToComponentDataListAsync<SpawningComponent>(Allocator.TempJob, out var awaitJobHandle);
             awaitJobHandle.Complete();
             while (!awaitJobHandle.IsCompleted)
@@ -87,7 +85,7 @@ namespace UI
         {
             for (int i = 0; i < spawnedDisplays.Count; i++)
             {
-                spawnedDisplays[i].gameObject.SetActive(false);
+                spawnedDisplays[i].Hide();
             }
             
             spawnedDisplays.Clear();

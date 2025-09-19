@@ -1,5 +1,8 @@
+using Cysharp.Threading.Tasks;
+using UnityEngine.InputSystem;
 using Gameplay.Event;
 using UnityEngine.UI;
+using InputCamera;
 using UnityEngine;
 
 namespace Gameplay.Turns
@@ -10,6 +13,7 @@ namespace Gameplay.Turns
         private Button increaseTurnButton;
         
         private TurnHandler turnHandler;
+        private InputManager inputManager;
 
         private bool isProcessingTurn;
         
@@ -21,17 +25,29 @@ namespace Gameplay.Turns
         private void OnEnable()
         {
             Events.OnTurnComplete += OnTurnComplete;
+            GetInput().Forget();
         }
-
+        
         private void OnDisable()
         {
             Events.OnTurnComplete -= OnTurnComplete;
+            inputManager.Space.performed -= SpacePerformed;
+        }
+        
+        private async UniTaskVoid GetInput()
+        {
+            inputManager = await InputManager.Get();
+            inputManager.Space.performed += SpacePerformed;
         }
 
-        private void OnTurnComplete()
+        private void SpacePerformed(InputAction.CallbackContext obj)
         {
-            isProcessingTurn = false;
-            increaseTurnButton.interactable = !isProcessingTurn;
+            if (isProcessingTurn)
+            {
+                return;
+            }
+            
+            IncreaseTurn();    
         }
 
         public void IncreaseTurn()
@@ -39,6 +55,12 @@ namespace Gameplay.Turns
             Events.OnTurnIncreased?.Invoke(1, turnHandler.Turn + 1);
             
             isProcessingTurn = true;
+            increaseTurnButton.interactable = !isProcessingTurn;
+        }
+        
+        private void OnTurnComplete()
+        {
+            isProcessingTurn = false;
             increaseTurnButton.interactable = !isProcessingTurn;
         }
     }

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Effects;
-using Gameplay;
-using Gameplay.Upgrades;
+﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using Gameplay.Upgrades;
 using UnityEngine;
 using Variables;
+using Gameplay;
+using Effects;
+using System;
 
 namespace Buildings.District
 {
@@ -71,7 +71,7 @@ namespace Buildings.District
         [OdinSerialize]
         private List<IEffect> createdEffects = new List<IEffect>();
 
-        [Title("On End Wave")]
+        [Title("On Turn Complete")]
         [OdinSerialize]
         private List<IEffect> endWaveEffects = new List<IEffect>();
 

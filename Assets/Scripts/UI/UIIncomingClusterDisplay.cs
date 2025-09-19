@@ -1,3 +1,4 @@
+using Buildings;
 using UnityEngine.EventSystems;
 using Sirenix.OdinInspector;
 using DG.Tweening;
@@ -21,6 +22,9 @@ namespace UI
         [SerializeField]
         private UIEnemyIcon enemyIcon;
 
+        [SerializeField]
+        private CanvasGroup fadeCanvasgroup;
+        
         [SerializeField]
         private CanvasGroup selectedCanvasGroup;
         
@@ -60,21 +64,30 @@ namespace UI
         
         public void Display(SpawningComponent spawningComponent)
         {
+            fadeCanvasgroup.DOKill();
+            fadeCanvasgroup.alpha = 0;
+            fadeCanvasgroup.DOFade(1f, 0.1f).SetEase(ease);
+            
             EnemyUtility utility = spawningComponent.EnemyIndex >= 100 ? bossUtility : enemyUtility;
             EnemyData data = utility.GetEnemy(spawningComponent.EnemyIndex);
 
-            turnText.text = spawningComponent.Turns.ToString("N0");
+            turnText.text = $"<u>{spawningComponent.Turns:N0}</u> Turns" ;
             enemyAmount.text = spawningComponent.Amount.ToString("N0");
             enemyIcon.DisplayEnemy(data);
 
             targetPosition = spawningComponent.Position;
         }
 
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+        }
+
         public void OnPointerEnter(PointerEventData eventData)
         {
             selectedCanvasGroup.DOKill();
             selectedCanvasGroup.DOFade(1, fadeDuration).SetEase(ease);
-            selectedTileHandler.SelectTile(targetPosition);
+            selectedTileHandler.SelectTile(targetPosition, TileAction.None);
         }
 
         public void OnPointerExit(PointerEventData eventData)

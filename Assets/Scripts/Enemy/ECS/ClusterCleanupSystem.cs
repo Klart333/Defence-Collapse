@@ -5,7 +5,7 @@ using Effects.ECS;
 
 namespace Enemy.ECS
 {
-    [UpdateBefore(typeof(DeathSystem))] 
+    [BurstCompile, UpdateBefore(typeof(DeathSystem))] 
     public partial struct ClusterCleanupSystem : ISystem
     {
         private BufferLookup<ManagedEntityBuffer> bufferLookup; 
@@ -54,13 +54,20 @@ namespace Enemy.ECS
             DynamicBuffer<ManagedEntityBuffer> buffer = BufferLookup[cluster.ClusterParent];
             for (int i = 0; i < buffer.Length; i++)
             {
-                if (buffer[i].Entity != entity) continue;
+                if (!buffer[i].Entity.Equals(entity)) continue;
                 
                 buffer.RemoveAtSwapBack(i);
                 break;
             }
-            
-            ECB.AddComponent<UpdatePositioningTag>(cluster.ClusterParent);
+
+            if (buffer.Length > 0)
+            {
+                ECB.AddComponent<UpdatePositioningTag>(cluster.ClusterParent);
+            }
+            else
+            {
+                ECB.AddComponent<DeathTag>(cluster.ClusterParent);
+            }
         }
     }
 }

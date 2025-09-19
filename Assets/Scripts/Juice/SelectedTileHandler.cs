@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using DG.Tweening;
@@ -10,11 +11,9 @@ namespace Juice
 {
     public class SelectedTileHandler : MonoBehaviour
     {
-        private static readonly int ColorProperty = Shader.PropertyToID("_BaseColor");
-
         [Title("Setup")]
         [SerializeField]
-        private GameObject selectedTile;
+        private TileSelector selectedTilePrefab;
         
         [SerializeField]
         private Vector3 offset = new Vector3(0, -0.1f, 0);
@@ -26,101 +25,50 @@ namespace Juice
         [SerializeField]
         private InputEntityWriter inputWriter;
         
-        [Title("Color")]
-        [SerializeField]
-        private MeshRenderer meshRenderer;
-        
-        [SerializeField]
-        private float colorStrength = 1.5f;
-        
-        [SerializeField]
-        private ColorReference defaultColor;
-        
-        [SerializeField]
-        private ColorReference buildableColor;
-        
-        [SerializeField]
-        private ColorReference sellColor;
-        
-        [SerializeField]
-        private ColorReference invalidColor;
+        private List<TileSelector> spawnedTiles = new List<TileSelector>();
 
-        [Title("Animation", "Movement")]
-        [SerializeField]
-        private float smoothMovementHeight = 0.2f;
-        
-        [SerializeField]
-        private float smoothMovementDuration = 0.2f;
-        
-        [SerializeField]
-        private Ease smoothMovementEase = Ease.OutQuad;
-        
-        [Title("Animation", "Color")]
-        [SerializeField]
-        private float colorBlendDuration = 0.2f;
-        
-        [SerializeField]
-        private Ease colorBlendEase = Ease.OutQuad;
-
-        private MaterialPropertyBlock block;
-
-        private void OnEnable()
-        {
-            block = new MaterialPropertyBlock();    
-            meshRenderer.GetPropertyBlock(block);
-            
-            BlendColor(defaultColor.Value);
-        }
-
-        public void SelectTile(ChunkIndex chunkIndex)
+        public void SelectTile(ChunkIndex chunkIndex, TileAction tileAction)
         {
             Vector3 pos = ChunkWaveUtility.GetPosition(chunkIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize); 
-            SelectTile(pos + groundGenerator.ChunkWaveFunction.CellSize.XyZ(0) / 2.0f);
+            SelectTile(pos + groundGenerator.ChunkWaveFunction.CellSize.XyZ(0) / 2.0f, tileAction);
         }
 
-        public void SelectTile(Vector3 position)
+        public void SelectTile(Vector3 position, TileAction tileAction, bool clearSelected = true)
         {
-            if (selectedTile.activeSelf)
+            if (clearSelected)
             {
-                selectedTile.transform.DOKill();
-                selectedTile.transform.position += Vector3.up * smoothMovementHeight;
-                selectedTile.transform.DOMove(position + offset, smoothMovementDuration).SetEase(smoothMovementEase);
+                Hide();
             }
-            else
-            {
-                selectedTile.transform.position = position + offset;
-                selectedTile.SetActive(true);
-            }
+            
+            position += offset;
+            
+            TileSelector spawned = selectedTilePrefab.GetAtPosAndRot<TileSelector>(position, Quaternion.identity);
+            spawned.Display(position);
+            spawned.DisplayAction(tileAction);
+            spawnedTiles.Add(spawned);
             
             inputWriter.OverrideShaderMousePosition(position);
         }
-
+        
+        public void SelectTiles(List<Vector3> tilePositions, TileAction tileAction)
+        {
+            Hide();
+            
+            for (int i = 0; i < tilePositions.Count; i++)
+            {
+                SelectTile(tilePositions[i], tileAction, false);
+            }
+        }
+        
         public void Hide()
         {
-            selectedTile.SetActive(false);
+            for (int i = 0; i < spawnedTiles.Count; i++)
+            {
+                spawnedTiles[i].Hide();
+            }
+            spawnedTiles.Clear();
             
             inputWriter.DisableOverride();
-        }
-
-        public void DisplayAction(TileAction tileAction)
-        {
-            Color targetColor = tileAction switch
-            {
-                TileAction.Build => buildableColor.Value,
-                TileAction.Sell => sellColor.Value,
-                _ => invalidColor.Value,
-            };
-            BlendColor(targetColor);
-        }
-
-        private void BlendColor(Color targetColor)
-        {
-            meshRenderer.DOKill();
-            DOTween.To(() => block.GetColor(ColorProperty), value =>
-            {
-                block.SetColor(ColorProperty, value);
-                meshRenderer.SetPropertyBlock(block);
-            }, targetColor * colorStrength, colorBlendDuration).SetEase(colorBlendEase).SetId(meshRenderer);
         }
     }
 }

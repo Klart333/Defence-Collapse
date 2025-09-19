@@ -1,3 +1,4 @@
+using Pathfinding;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine;
@@ -24,6 +25,7 @@ namespace InputCamera
         
         public Vector2 CurrentMouseScreenPosition { get; private set; }
         public Vector3 CurrentMouseWorldPosition { get; private set; }
+        public PathIndex CurrentMousePathIndex { get; private set; }
         
         public bool GetShift => Shift.IsPressed();
 
@@ -106,9 +108,10 @@ namespace InputCamera
             
             CurrentMouseScreenPosition = Mouse.ReadValue<Vector2>();
             CurrentMouseWorldPosition = Utility.Math.GetGroundIntersectionPoint(cam, CurrentMouseScreenPosition);
+            CurrentMousePathIndex = PathUtility.GetIndex(CurrentMouseWorldPosition.XZ());
         }
 
-        public bool MouseOverUI()
+        public static bool MouseOverUI()
         {
             return EventSystem.current.IsPointerOverGameObject();
         }

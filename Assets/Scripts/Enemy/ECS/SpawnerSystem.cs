@@ -260,10 +260,10 @@ namespace Enemy.ECS
                 buffer.Add(new ManagedEntityBuffer { Entity = spawnedEntity });
             }
 
-            if (!EntityQueryMask.MatchesIgnoreFilter(spawningComponent.SpawnPoint)) return;
-            
-            SpawnPointLookup.GetRefRW(spawningComponent.SpawnPoint).ValueRW.IsSpawning = false;
             ECB.AddComponent<DeathTag>(sortKey, entity);
+            
+            if (!EntityQueryMask.MatchesIgnoreFilter(spawningComponent.SpawnPoint)) return;
+            SpawnPointLookup.GetRefRW(spawningComponent.SpawnPoint).ValueRW.IsSpawning = false;
         }
 
         private DynamicBuffer<ManagedEntityBuffer> SpawnCluster(int sortKey, Entity clusterEntity, float3 spawnPosition, int enemyIndex, Entity prefabEntity)

@@ -9,7 +9,7 @@
         [Toggle(CLIP_SPACE)]
         _ClipSpace ("Clip Space", Float) = 1
         [Toggle(CUSTOM_NORMALS)]
-        _CustomNormals ("Custom Normals (UV2)", Float) = 0
+        _CustomNormals ("Custom Normals (Tangent)", Float) = 0
 
         [Toggle(USE_DITHER)]
         _UseDither ("Use Dither", Float) = 1
@@ -39,7 +39,7 @@
             {
                 float3 vertex : POSITION;
                 #ifdef CUSTOM_NORMALS
-                float3 normal : TEXCOORD2;
+                float3 normal : TEXCOORD7;
                 #else
                 float3 normal : NORMAL;
                 #endif
@@ -58,6 +58,7 @@
             float _DitherThreshold;
             CBUFFER_END
             float4 _MousePos;
+            int _UseMousePos;
 
             v2f vert (const appdata input)
             {
@@ -82,21 +83,26 @@
             float4 frag(const v2f input) : SV_Target
             {
 #ifdef USE_DITHER
-                float dist = distance(_MousePos.xy, input.position_ws.xz);
-                float2 uv = input.position_cs.xy * _ScreenParams.xy;
-                const float DITHER_THRESHOLDS[16] =
+                if (_UseMousePos == 1)
                 {
-                    1.0 / 17.0,  9.0 / 17.0,  3.0 / 17.0, 11.0 / 17.0,
-                    13.0 / 17.0,  5.0 / 17.0, 15.0 / 17.0,  7.0 / 17.0,
-                    4.0 / 17.0, 12.0 / 17.0,  2.0 / 17.0, 10.0 / 17.0,
-                    16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
-                };
-                uint index = (uint(uv.x) % 4) * 4 + uint(uv.y) % 4;
-                float threshold = (dist - _DitherThreshold) - DITHER_THRESHOLDS[index];
+                    const float DITHER_THRESHOLDS[16] =
+                    {
+                        1.0 / 17.0,  9.0 / 17.0,  3.0 / 17.0, 11.0 / 17.0,
+                        13.0 / 17.0,  5.0 / 17.0, 15.0 / 17.0,  7.0 / 17.0,
+                        4.0 / 17.0, 12.0 / 17.0,  2.0 / 17.0, 10.0 / 17.0,
+                        16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
+                    };
+                    
+                    float dist = distance(_MousePos.xy, input.position_ws.xz);
+                    float2 uv = input.position_cs.xy * _ScreenParams.xy;
+                    uint index = (uint(uv.x) % 4) * 4 + uint(uv.y) % 4;
+                    float threshold = (dist - _DitherThreshold) - DITHER_THRESHOLDS[index];
+                    
+                    // Clip based on dithering threshold
+                    if (threshold <= 0)
+                        discard;
+                }
                 
-                // Clip based on dithering threshold
-                if (threshold <= 0)
-                    discard;
 #endif
 
                 float4 output = _Color;

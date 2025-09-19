@@ -1,15 +1,18 @@
+using Gameplay.Turns.ECS;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Entities;
 using InputCamera;
+using Pathfinding;
 using Unity.Burst;
 
 namespace Enemy.ECS
 {
     public partial struct ClusterHighlightingSystem : ISystem
     {
+        private ComponentLookup<AttackingComponent> attackingLookup;
         private BufferLookup<ManagedEntityBuffer> bufferLookup;
-        private NativeReference<float3> lastHightlightPosition;
+        private NativeReference<PathIndex> lastHightlightPosition;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
@@ -17,21 +20,30 @@ namespace Enemy.ECS
             state.RequireForUpdate<MousePositionComponent>();
             state.RequireForUpdate<EnemyClusterComponent>();
 
+            attackingLookup = SystemAPI.GetComponentLookup<AttackingComponent>(true);
             bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>();
-            lastHightlightPosition = new NativeReference<float3>(Allocator.Persistent);
+            lastHightlightPosition = new NativeReference<PathIndex>(Allocator.Persistent);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            if (SystemAPI.TryGetSingleton<TurnIncreaseComponent>(out _))
+            {
+                lastHightlightPosition.Value = new PathIndex(0, -1);
+            }
+            
             MousePositionComponent mousePosition = SystemAPI.GetSingleton<MousePositionComponent>();
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            
+            attackingLookup.Update(ref state);
             bufferLookup.Update(ref state);
             
             state.Dependency = new ClusterHighlightingJob
             { 
-                MouseWorldPosition = mousePosition.WorldPosition,
-                LastPosition = lastHightlightPosition,
+                MousePathIndex = mousePosition.PathIndex,
+                LastIndex = lastHightlightPosition,
+                AttackingLookup = attackingLookup,
                 ECB = ecb.AsParallelWriter(),
                 BufferLookup = bufferLookup,
             }.ScheduleParallel(state.Dependency);
@@ -49,45 +61,54 @@ namespace Enemy.ECS
     }
 
     [BurstCompile]
-    public partial struct ClusterHighlightingJob : IJobEntity // TODO: Maybe Hash it you know
+    public partial struct ClusterHighlightingJob : IJobEntity
     {
         [ReadOnly]
         public BufferLookup<ManagedEntityBuffer> BufferLookup;
+        
+        [ReadOnly]
+        public ComponentLookup<AttackingComponent> AttackingLookup;
 
         [NativeDisableParallelForRestriction]
-        public NativeReference<float3> LastPosition;
+        public NativeReference<PathIndex> LastIndex;
         
         public EntityCommandBuffer.ParallelWriter ECB;
         
-        public float3 MouseWorldPosition;
+        public PathIndex MousePathIndex;
 
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in EnemyClusterComponent cluster)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in EnemyClusterComponent cluster, 
+            in FlowFieldComponent flowField, in AttackSpeedComponent attackSpeedComponent, in MovementSpeedComponent movementSpeedComponent)
         {
-            if (cluster.Position.Equals(LastPosition.Value))
-            {
-                return;
-            }
-            
-            float distX = math.abs(MouseWorldPosition.x - cluster.Position.x);
-            float distZ = math.abs(MouseWorldPosition.z - cluster.Position.z);
-            if (distX >= 1 || distZ >= 1) return;
+            if (flowField.PathIndex.Equals(LastIndex.Value)) return;
+            if (!flowField.PathIndex.Equals(MousePathIndex)) return;
                 
-            LastPosition.Value = cluster.Position;
+            LastIndex.Value = flowField.PathIndex;
             Entity highlightData = ECB.CreateEntity(sortKey);
             ECB.AddComponent(sortKey, highlightData, new HighlightClusterDataComponent
             {
+                IsAttacking = AttackingLookup.HasComponent(entity),
+                AttackSpeed = attackSpeedComponent.AttackSpeed,
+                AttackTimer = attackSpeedComponent.AttackTimer,
+                MovementSpeed = movementSpeedComponent.Speed,
                 EnemyAmount = BufferLookup[entity].Length,
-                TargetDirection = cluster.Facing,
+                PathIndex = flowField.PathIndex,
+                MoveTimer = flowField.MoveTimer,
                 EnemyType = cluster.EnemyType,
-                Position = cluster.Position,
             });
         }
     }
 
     public struct HighlightClusterDataComponent : IComponentData
     {
-        public float2 TargetDirection;
-        public float3 Position;
+        public PathIndex PathIndex;
+
+        public bool IsAttacking;
+        public float AttackTimer;
+        public float AttackSpeed;
+        
+        public float MovementSpeed;
+        public float MoveTimer;
+        
         public int EnemyAmount;
         public int EnemyType;
     }

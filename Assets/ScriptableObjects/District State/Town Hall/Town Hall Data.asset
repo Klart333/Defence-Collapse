@@ -256,7 +256,19 @@ MonoBehaviour:
       Data: 21|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 22|Effects.AddMoneyEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 50
+    - Name: multiplyWithAttackSpeed
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -294,7 +306,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b5bf9ae6f97b5e548abe324f059a1523, type: 3}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
-  requireTargeting: 1
   attackAngle: 360
   useMeshBasedPlacement: 0
   useTargetMesh: 0
