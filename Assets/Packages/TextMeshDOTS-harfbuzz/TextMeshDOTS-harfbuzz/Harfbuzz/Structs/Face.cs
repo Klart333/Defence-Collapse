@@ -64,7 +64,7 @@ namespace TextMeshDOTS.HarfBuzz
         {
             HB.hb_face_make_immutable(ptr);
         }
-        public void Dispose()
+        public readonly void Dispose()
         {
             HB.hb_face_destroy(ptr);
         }

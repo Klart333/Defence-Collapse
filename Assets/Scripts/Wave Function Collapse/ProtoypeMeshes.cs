@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 namespace WaveFunctionCollapse
 {
@@ -102,5 +103,59 @@ namespace WaveFunctionCollapse
             }
         }
         #endif
+
+        public bool TryGetPrototypeData(PrototypeInfoData infoData, Mesh mesh, out PrototypeData prototype)
+        {
+            prototype = default;
+            int index = -1;
+            foreach (KeyValuePair<int, Mesh> pair in Meshes)
+            {
+                if (pair.Value != mesh) continue;
+                
+                index = pair.Key;
+                break;
+            }
+            if (index == -1) return false;
+
+            for (int i = 0; i < infoData.Prototypes.Count; i++)
+            {
+                if (infoData.Prototypes[i].MeshRot.MeshIndex != index) continue;
+                    
+                prototype = infoData.Prototypes[i]; 
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TryGetPrototypeDataRandom(PrototypeInfoData infoData, Mesh mesh, Random random, out PrototypeData prototype)
+        {
+            prototype = default;
+            int index = -1;
+            foreach (KeyValuePair<int, Mesh> pair in Meshes)
+            {
+                if (pair.Value != mesh) continue;
+                
+                index = pair.Key;
+                break;
+            }
+            if (index == -1) return false;
+
+            List<PrototypeData> matchingPrototypes = new List<PrototypeData>();
+            for (int i = 0; i < infoData.Prototypes.Count; i++)
+            {
+                if (infoData.Prototypes[i].MeshRot.MeshIndex != index) continue;
+                    
+                matchingPrototypes.Add(infoData.Prototypes[i]); 
+            }
+
+            if (matchingPrototypes.Count == 0)
+            {
+                return false;
+            }
+            
+            prototype = matchingPrototypes[random.NextInt(matchingPrototypes.Count)];
+            return true;
+        }
     }
 }

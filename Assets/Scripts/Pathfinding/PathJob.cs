@@ -6,6 +6,7 @@ using Unity.Entities;
 using Pathfinding;
 using Unity.Burst;
 using Unity.Jobs;
+using UnityEngine;
 
 [BurstCompile(FloatPrecision.Low, FloatMode.Fast, OptimizeFor = OptimizeFor.Performance)]
 public struct PathJob : IJobFor
@@ -23,7 +24,7 @@ public struct PathJob : IJobFor
     [BurstCompile]
     public void Execute(int index)
     {
-        NativeArray<PathIndex> neighbours = new NativeArray<PathIndex>(8, Allocator.Temp);
+        NativeArray<PathIndex> neighbours = new NativeArray<PathIndex>(4, Allocator.Temp);
 
         for (int y = 0; y < QuadrantHeight; y++)
         for (int x = QuadrantWidth * y; x < QuadrantWidth * (y + 1); x++)
@@ -46,7 +47,7 @@ public struct PathJob : IJobFor
             {
                 if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out int dirIdx))
                 {
-                    pathChunk.Directions[index] = PathUtility.GetDirection(PathUtility.NeighbourDirections[dirIdx]);
+                    pathChunk.Directions[index] = PathUtility.GetDirection(PathUtility.NeighbourDirectionsCardinal[dirIdx]);
                     pathChunk.Distances[index] = pathChunk.NotWalkableIndexes[index] ? 1_000_000_000 : dist;
                 }
                 return;
@@ -77,24 +78,31 @@ public struct PathJob : IJobFor
             
         shortestDistance = int.MaxValue;
         dirIndex = 0;
-        for (int j = 0; j < 8; j++)
+        for (int i = 0; i < 4; i++)
         {
-            PathIndex neighbourIndex = neighbours[j];
+            PathIndex neighbourIndex = neighbours[i];
             if (neighbourIndex.GridIndex == -1) continue;
                 
             ref PathChunk neighbour = ref neighbourIndex.ChunkIndex.Equals(currentChunkIndex) 
                 ? ref pathChunk 
                 : ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[neighbourIndex.ChunkIndex]];
                 
-            int manhattanDist = j % 2 == 0 ? 5 : 7;
-            int dist = neighbour.Distances[neighbourIndex.GridIndex] 
-                       + neighbour.MovementCosts[neighbourIndex.GridIndex] * manhattanDist 
-                       + neighbour.ExtraDistance[neighbourIndex.GridIndex];
+            int manhattanDist = i % 2 == 0 ? 5 : 7;
+            int indexOccupied = neighbour.IndexOccupied[neighbourIndex.GridIndex] ? 1_000 : 0;
+            int dist = neighbour.Distances[neighbourIndex.GridIndex]
+                       + neighbour.MovementCosts[neighbourIndex.GridIndex] * manhattanDist
+                       + neighbour.ExtraDistance[neighbourIndex.GridIndex]
+                       + indexOccupied;
+            
+            if (neighbour.IndexOccupied[neighbourIndex.GridIndex])
+            {
+                //Debug.Log("TRUE");
+            }
             
             if (dist >= shortestDistance) continue;
                 
             shortestDistance = dist;
-            dirIndex = j;
+            dirIndex = i;
         }
 
         return shortestDistance < int.MaxValue;
@@ -106,12 +114,12 @@ public struct PathJob : IJobFor
         int x = gridIndex % PathUtility.GRID_WIDTH;
         int y = gridIndex /  PathUtility.GRID_WIDTH;
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 4; i++)
         {
-            int2 dir = PathUtility.NeighbourDirections[i];
+            int2 dir = PathUtility.NeighbourDirectionsCardinal[i];
             int2 neighbour = new int2(x + dir.x, y + dir.y);
 
-            array[i] = neighbour switch // Grid width / height = 16, // NO DIAGONALS BUT IT'S FINE
+            array[i] = neighbour switch
             {
                 {x: < 0} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x - 1, chunkIndex.y)) 
                     ? new PathIndex(new int2(chunkIndex.x - 1, chunkIndex.y), PathUtility.GRID_WIDTH - 1 + y * PathUtility.GRID_WIDTH )

@@ -109,19 +109,11 @@ namespace Enemy.ECS
  
         private void SpawnSpawners(ref SystemState state, TurnIncreaseComponent turnIncrease, uint seed)
         {
-            int spawnAmount = EnemySpawnHandler.SpawnDataUtility.GetSpawnAmount(turnIncrease.TurnIncrease, turnIncrease.TotalTurn, Random.CreateFromIndex(seed));
-            if (spawnAmount <= 0)
-            {
-                return;
-            }
-            
             NativeArray<SpawningComponent> possibleSpawns = EnemySpawnHandler.SpawnDataUtility.GetSpawnPointData(turnIncrease.TotalTurn, Random.CreateFromIndex(seed));
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            NativeArray<bool> shouldSpawns = GetShouldSpawns(spawnAmount);
             state.Dependency = new SpawnSpawningJob
             {
                 ECB = ecb.AsParallelWriter(),
-                ShouldSpawn = shouldSpawns.AsReadOnly(),
                 PossibleSpawns = possibleSpawns.AsReadOnly()
             }.ScheduleParallel(state.Dependency);
             
@@ -129,30 +121,9 @@ namespace Enemy.ECS
             ecb.Playback(state.EntityManager);
             
             ecb.Dispose();
-            shouldSpawns.Dispose();
             possibleSpawns.Dispose();
         }
 
-        [BurstCompile]
-        private NativeArray<bool> GetShouldSpawns(int amountToSpawn)
-        {
-            int count = spawnerQuery.CalculateEntityCount();
-            NativeArray<bool> shouldSpawns = new NativeArray<bool>(count, Allocator.TempJob);
-            Random random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 200000000));
-
-            for (int i = 0; i < math.min(count, amountToSpawn); i++)
-            {
-                shouldSpawns[i] = true;
-            }
-
-            for (int i = 0; i < count - 1; i++)
-            {
-                int index = random.NextInt(i, count);
-                (shouldSpawns[i], shouldSpawns[index]) = (shouldSpawns[index], shouldSpawns[i]);
-            }
-            
-            return shouldSpawns;
-        }
 
         [BurstCompile]
         public void OnDestroy(ref SystemState state)
@@ -165,9 +136,6 @@ namespace Enemy.ECS
     public partial struct SpawnSpawningJob : IJobEntity
     {
         [ReadOnly]
-        public NativeArray<bool>.ReadOnly ShouldSpawn;
-
-        [ReadOnly]
         public NativeArray<SpawningComponent>.ReadOnly PossibleSpawns;
         
         public EntityCommandBuffer.ParallelWriter ECB;
@@ -175,10 +143,11 @@ namespace Enemy.ECS
         [BurstCompile]
         public void Execute([EntityIndexInChunk] int sortKey, Entity entity, ref SpawnPointComponent spawnPointComponent)
         {
-            if (spawnPointComponent.IsSpawning || !ShouldSpawn[spawnPointComponent.Index])
+            if (spawnPointComponent.IsSpawning)
             {
                 return;
             }
+            
             spawnPointComponent.IsSpawning = true;
             
             Entity spawned = ECB.CreateEntity(sortKey);
@@ -239,21 +208,29 @@ namespace Enemy.ECS
         {
             spawningComponent.Turns -= TurnIncrease;
             if (spawningComponent.Turns > 0) return;
+
+            float3 spawnPosition = spawningComponent.Position;
+            PathIndex pathIndex = PathUtility.GetIndex(spawnPosition.xz);
+            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[pathIndex.ChunkIndex]];
+            if (valuePathChunk.IndexOccupied[pathIndex.GridIndex]) return;
+            
+            valuePathChunk.IndexOccupied[pathIndex.GridIndex] = true;
             
             int enemyIndex = spawningComponent.EnemyIndex;
             Entity prefabEntity = enemyIndex >= 100 ? BossBuffer[enemyIndex - 100].EnemyEntity : EnemyBuffer[enemyIndex].EnemyEntity;
-            float3 spawnPosition = spawningComponent.Position;
             
+            LocalTransform prefabTransform = TransformLookup[prefabEntity];
+            float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[pathIndex.GridIndex]);
+
             Entity clusterEntity = ECB.CreateEntity(sortKey);
-            DynamicBuffer<ManagedEntityBuffer> buffer = SpawnCluster(sortKey, clusterEntity, spawnPosition, enemyIndex, prefabEntity);
+            DynamicBuffer<ManagedEntityBuffer> buffer = SpawnCluster(sortKey, clusterEntity, spawnPosition, prefabTransform.Scale, enemyIndex, prefabEntity, pathIndex, direction);
 
             for (int i = 0; i < spawningComponent.Amount; i++)
             {
                 Entity spawnedEntity = ECB.Instantiate(sortKey, prefabEntity);
             
-                LocalTransform prefabTransform = TransformLookup[prefabEntity];
                 LocalTransform newTransform = LocalTransform.FromPositionRotationScale(spawnPosition, quaternion.identity, prefabTransform.Scale);
-                ECB.SetComponent(sortKey, spawnedEntity, new RandomComponent { Random = Random.CreateFromIndex((uint)(sortKey + Seed)) });
+                ECB.SetComponent(sortKey, spawnedEntity, new RandomComponent { Random = Random.CreateFromIndex((uint)(sortKey + Seed + i + 1)) });
                 ECB.SetComponent(sortKey, spawnedEntity, newTransform);
                 ECB.SetComponent(sortKey, spawnedEntity, new ManagedClusterComponent { ClusterParent = clusterEntity });
                 
@@ -266,20 +243,17 @@ namespace Enemy.ECS
             SpawnPointLookup.GetRefRW(spawningComponent.SpawnPoint).ValueRW.IsSpawning = false;
         }
 
-        private DynamicBuffer<ManagedEntityBuffer> SpawnCluster(int sortKey, Entity clusterEntity, float3 spawnPosition, int enemyIndex, Entity prefabEntity)
+        private DynamicBuffer<ManagedEntityBuffer> SpawnCluster(int sortKey, Entity clusterEntity, float3 spawnPosition, float enemySize, int enemyIndex, Entity prefabEntity, PathIndex pathIndex, float2 direction)
         {
             MovementSpeedComponent moveSpeed = MovementSpeedLookup[prefabEntity];
+            
             // This ain't it cheif
-            ECB.AddComponent<UpdatePositioningTag>(sortKey, clusterEntity);
             ECB.AddComponent(sortKey, clusterEntity, AttackSpeedLookup[prefabEntity]);
             ECB.AddComponent(sortKey, clusterEntity, DamageLookup[prefabEntity]);
             ECB.AddComponent(sortKey, clusterEntity, SpeedLookup[prefabEntity]);
             ECB.AddComponent(sortKey, clusterEntity, moveSpeed);
             ECB.AddComponent(sortKey, clusterEntity, new FlowFieldComponent { MoveTimer = moveSpeed.Speed, PathIndex = PathUtility.GetIndex(spawnPosition.xz) });
-
-            PathIndex pathIndex = PathUtility.GetIndex(spawnPosition.xz);
-            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[pathIndex.ChunkIndex]];
-            float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[pathIndex.GridIndex]);
+            ECB.AddComponent(sortKey, clusterEntity, new RandomComponent { Random = Random.CreateFromIndex((uint)(sortKey + Seed)) });
             
             float3 facingPosition = spawnPosition + (math.round(direction) * PathUtility.CELL_SCALE).XyZ();
             PathIndex facingPathIndex = PathUtility.GetIndex(facingPosition.xz);
@@ -290,9 +264,16 @@ namespace Enemy.ECS
                 TargetPathIndex = facingIndex,
                 Position = spawnPosition, 
                 EnemyType = enemyIndex,
+                EnemySize = enemySize,
                 Facing = direction,
-                EnemySize = 0.25f,
             });
+            
+            ECB.AddComponent(sortKey, clusterEntity, new UpdatePositioningComponent
+            {
+                CurrentTile = pathIndex,
+                PreviousTile = new PathIndex(0, -1),
+            });
+            
             
             DynamicBuffer<ManagedEntityBuffer> buffer = ECB.AddBuffer<ManagedEntityBuffer>(sortKey, clusterEntity);
             return buffer;

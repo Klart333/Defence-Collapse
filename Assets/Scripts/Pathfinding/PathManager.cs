@@ -213,6 +213,14 @@ namespace Pathfinding
             new int2(1, -1),
         };
         
+        public static readonly int2[] NeighbourDirectionsCardinal =
+        {
+            new int2(1, 0),
+            new int2(0, 1),
+            new int2(-1, 0),
+            new int2(0, -1),
+        };
+        
         public const float FULL_BUILDING_CELL = 1f;
         public const float CELL_SCALE = 2.0f;
         public const int GRID_WIDTH = 4; 
@@ -276,13 +284,13 @@ namespace Pathfinding
             return (direction.x, direction.y) switch
             {
                 (1, 0) => 0,       // Right
-                (1, 1) => 32,      // Up-Right
+                //(1, 1) => 32,      // Up-Right
                 (0, 1) => 64,      // Up
-                (-1, 1) => 96,     // Up-Left
+                //(-1, 1) => 96,     // Up-Left
                 (-1, 0) => 128,    // Left
-                (-1, -1) => 160,   // Down-Left
+                //(-1, -1) => 160,   // Down-Left
                 (0, -1) => 192,    // Down
-                (1, -1) => 224,    // Down-Right
+                //(1, -1) => 224,    // Down-Right
                 _ => 0             
             };
         }
@@ -303,10 +311,10 @@ namespace Pathfinding
                 ref PathChunk oldChunk = ref oldPathChunks.Value.PathChunks[i];
                 newChunk.ChunkIndex = oldChunk.ChunkIndex;
                 
-                BlobBuilderArray<int> units = builder.Allocate(ref newChunk.Units, GRID_LENGTH);
+                BlobBuilderArray<bool> indexOccupied = builder.Allocate(ref newChunk.IndexOccupied, GRID_LENGTH);
                 for (int j = 0; j < GRID_LENGTH; j++)
                 {
-                    units[j] = oldChunk.Units[j];
+                    indexOccupied[j] = oldChunk.IndexOccupied[j];
                 }
                 
                 BlobBuilderArray<int> distances = builder.Allocate(ref newChunk.Distances, GRID_LENGTH);
@@ -361,11 +369,11 @@ namespace Pathfinding
             {
                 pathChunk.ChunkIndex = chunkIndex;
                 
-                builder.Allocate(ref pathChunk.Units, GRID_LENGTH);
-                builder.Allocate(ref pathChunk.Directions, GRID_LENGTH);
-                builder.Allocate(ref pathChunk.TargetIndexes, GRID_LENGTH);
                 builder.Allocate(ref pathChunk.NotWalkableIndexes, GRID_LENGTH);
+                builder.Allocate(ref pathChunk.IndexOccupied, GRID_LENGTH);
+                builder.Allocate(ref pathChunk.TargetIndexes, GRID_LENGTH);
                 builder.Allocate(ref pathChunk.ExtraDistance, GRID_LENGTH);
+                builder.Allocate(ref pathChunk.Directions, GRID_LENGTH);
                 BlobBuilderArray<int> distances = builder.Allocate(ref pathChunk.Distances, GRID_LENGTH);
                 BlobBuilderArray<int> movements = builder.Allocate(ref pathChunk.MovementCosts, GRID_LENGTH);
 
@@ -482,7 +490,7 @@ namespace Pathfinding
     public struct PathChunk
     {
         public BlobArray<int> MovementCosts;
-        public BlobArray<int> Units;
+        public BlobArray<bool> IndexOccupied;
         
         public BlobArray<bool> NotWalkableIndexes;
         public BlobArray<byte> TargetIndexes;

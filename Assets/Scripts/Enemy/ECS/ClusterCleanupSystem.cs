@@ -1,39 +1,35 @@
+using Unity.Mathematics;
 using Unity.Collections;
+using Pathfinding.ECS;
 using Unity.Entities;
 using Unity.Burst;
 using Effects.ECS;
+using Pathfinding;
 
 namespace Enemy.ECS
 {
-    [BurstCompile, UpdateBefore(typeof(DeathSystem))] 
+    [BurstCompile, UpdateAfter(typeof(ManagedEntityCleanupSystem)), UpdateBefore(typeof(DeathSystem))]
     public partial struct ClusterCleanupSystem : ISystem
     {
-        private BufferLookup<ManagedEntityBuffer> bufferLookup; 
-        
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>();
+            state.RequireForUpdate<PathBlobber>();
+            EntityQuery query = SystemAPI.QueryBuilder().WithAll<EnemyClusterComponent, DeathTag>().Build();
             
-            EntityQuery dyingEnemyQuery = SystemAPI.QueryBuilder().WithAll<ManagedClusterComponent, DeathTag>().Build();
-            state.RequireForUpdate(dyingEnemyQuery); 
+            state.RequireForUpdate(query);
         }
- 
+
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            bufferLookup.Update(ref state);
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            
-            state.Dependency = new ClustCleanupJob
+            PathBlobber pathBlobber = SystemAPI.GetSingleton<PathBlobber>();
+            state.Dependency = new ClusterCleanupJob
             {
-                BufferLookup = bufferLookup,
-                ECB = ecb
+                ChunkIndexToListIndex = pathBlobber.ChunkIndexToListIndex,
+                PathChunks = pathBlobber.PathBlob,
             }.Schedule(state.Dependency);
-            
             state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
         }
 
         [BurstCompile]
@@ -42,32 +38,20 @@ namespace Enemy.ECS
 
         }
     }
-
+    
     [BurstCompile, WithAll(typeof(DeathTag))]
-    public partial struct ClustCleanupJob : IJobEntity
+    public partial struct ClusterCleanupJob : IJobEntity
     {
-        public BufferLookup<ManagedEntityBuffer> BufferLookup;
-        public EntityCommandBuffer ECB;
+        [ReadOnly]
+        public BlobAssetReference<PathChunkArray> PathChunks;
         
-        public void Execute(Entity entity, in ManagedClusterComponent cluster)
+        [ReadOnly]
+        public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
+        
+        public void Execute(in EnemyClusterComponent cluster, in FlowFieldComponent flowField)
         {
-            DynamicBuffer<ManagedEntityBuffer> buffer = BufferLookup[cluster.ClusterParent];
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                if (!buffer[i].Entity.Equals(entity)) continue;
-                
-                buffer.RemoveAtSwapBack(i);
-                break;
-            }
-
-            if (buffer.Length > 0)
-            {
-                ECB.AddComponent<UpdatePositioningTag>(cluster.ClusterParent);
-            }
-            else
-            {
-                ECB.AddComponent<DeathTag>(cluster.ClusterParent);
-            }
+            ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
+            valuePathChunk.IndexOccupied[flowField.PathIndex.GridIndex] = false;
         }
     }
 }

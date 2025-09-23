@@ -1,5 +1,8 @@
-using System.Collections.Generic;
+using Random = Unity.Mathematics.Random;
 using Debug = UnityEngine.Debug;
+
+using System.Collections.Generic;
+using UnityEngine.Serialization;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using Sirenix.OdinInspector;
@@ -7,8 +10,8 @@ using System.Diagnostics;
 using Unity.Mathematics;
 using Gameplay.Event;
 using UnityEngine;
+using Gameplay;
 using System;
-using Enemy;
 
 namespace WaveFunctionCollapse
 {
@@ -25,8 +28,9 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private Vector3Int chunkSize;
         
+        [FormerlySerializedAs("defaultPrototypeInfoData")]
         [SerializeField]
-        private PrototypeInfoData defaultPrototypeInfoData;
+        private PrototypeInfoData groundPrototypeInfoData;
 
         [SerializeField]
         private int maximumSize = 1;
@@ -46,8 +50,8 @@ namespace WaveFunctionCollapse
 
         [Title("Enemy Spawning")]
         [SerializeField]
-        private EnemySpawnHandler enemySpawnHandler; 
-        
+        private Mesh[] portalMeshes;
+       
         [Title("Debug")]
         [SerializeField]
         private bool shouldRun = true;
@@ -56,19 +60,19 @@ namespace WaveFunctionCollapse
         private bool compilePrototypeMeshes = true;
         
         private Dictionary<int3, HashSet<int3>> generatedChunkIndexes = new Dictionary<int3, HashSet<int3>>();
-        private HashSet<int3> generatedChunks = new HashSet<int3>();
         private HashSet<int3> spawnedChunks = new HashSet<int3>();
         private List<int3> chunksToCombine = new List<int3>();
         
         private GroundAnimator groundAnimator;
         private MeshCombiner meshCombiner;
-
+        
+        public HashSet<int3> GeneratedChunks { get; } = new HashSet<int3>();
+        public HashSet<int3> LoadedFullChunks { get; } = new HashSet<int3>();
         public bool IsGenerating { get; private set; }
         
         public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.CellSize.x, chunkSize.y * ChunkWaveFunction.CellSize.y, chunkSize.z * ChunkWaveFunction.CellSize.z);
         public int3 ChunkSize => new int3(chunkSize.x, chunkSize.y, chunkSize.z);
         public ChunkWaveFunction<Chunk> ChunkWaveFunction => waveFunction;
-        public HashSet<int3> GeneratedChunks => generatedChunks;
         
 #if UNITY_EDITOR
         private async UniTaskVoid Start()
@@ -95,15 +99,18 @@ namespace WaveFunctionCollapse
 
         private async UniTaskVoid SetupGround()
         {
+            GameManager gameManager = await GameManager.Get();
+            Random random = Random.CreateFromIndex(gameManager.Seed);
+
             Stopwatch stopwatch = Stopwatch.StartNew();
-            await PreGenerate();
+            await PreGenerate(random);
             stopwatch.Stop();
             Debug.Log("Generated In: " + stopwatch.Elapsed.TotalMilliseconds + "ms");
             
             LoadChunk(new int3(0, 0, 0));
         }
 
-        private async UniTask PreGenerate()
+        private async UniTask PreGenerate(Random random)
         {
             IsGenerating = true;
             
@@ -113,7 +120,25 @@ namespace WaveFunctionCollapse
                 int3 chunkIndex = new int3(x, 0, z);
                 if (waveFunction.Chunks.ContainsKey(chunkIndex)) continue;
                 
-                waveFunction.LoadChunk(chunkIndex, chunkSize, defaultPrototypeInfoData, false);
+                Chunk generatedChunk = waveFunction.LoadChunk(chunkIndex, chunkSize, groundPrototypeInfoData, false);
+                AddPortalTile(generatedChunk);
+
+                void AddPortalTile(Chunk chunk)
+                {
+                    Mesh portalMesh = portalMeshes[random.NextInt(portalMeshes.Length)];
+                    if (!waveFunction.ProtoypeMeshes.TryGetPrototypeDataRandom(groundPrototypeInfoData, portalMesh, random, out PrototypeData prot))
+                    {
+                        Debug.LogError($"Did not find mesh {portalMesh} as prototypeData");
+                        return;
+                    }
+
+                    int xCord = random.NextInt(1, chunk.Width - 1);
+                    int zCord = random.NextInt(1, chunk.Depth - 1);
+                    Cell cell = chunk.Cells[xCord, 0, zCord];
+                    cell.PossiblePrototypes = new List<PrototypeData> { prot };
+                    chunk.Cells[xCord, 0, zCord] = cell;
+                    waveFunction.CellStack.Push(new ChunkIndex(chunkIndex, new int3(xCord, 0, zCord)));
+                }
             }
             
             waveFunction.Propagate();
@@ -166,8 +191,24 @@ namespace WaveFunctionCollapse
 
             OnChunkGenerated?.Invoke(chunk);
             chunksToCombine.Add(chunkIndex);
-            generatedChunks.Add(chunkIndex);
+            GeneratedChunks.Add(chunkIndex);
+            LoadedFullChunks.Add(chunkIndex);
         }
+        
+        private void LoadAdjacentChunk(Chunk adjacentChunk, MultiDirection direction)
+        {
+            List<ChunkIndex> cells = GetSideIndexes(adjacentChunk, direction);
+            if (cells.Count == 0) return;
+                
+            DisplayCells(cells);
+            chunksToCombine.Add(adjacentChunk.ChunkIndex);
+
+            if (spawnedChunks.Contains(adjacentChunk.ChunkIndex)) return;
+
+            GeneratedChunks.Add(adjacentChunk.ChunkIndex);
+            Events.OnGroundChunkGenerated?.Invoke(adjacentChunk);
+        }
+
 
         private void DisplayChunk(Chunk chunk)
         {
@@ -217,23 +258,10 @@ namespace WaveFunctionCollapse
             
             for (int i = 0; i < adjacentChunks.Count; i++)
             {
-                List<ChunkIndex> cells = GetSideIndexes(adjacentChunks[i], directions[i]);
-                if (cells.Count == 0) continue;
-                
-                DisplayCells(cells);
-                enemySpawnHandler.AddSpawnPoints(cells);
-                chunksToCombine.Add(adjacentChunks[i].ChunkIndex);
-
-                if (spawnedChunks.Contains(adjacentChunks[i].ChunkIndex))
-                {
-                    continue;
-                }
-
-                generatedChunks.Add(adjacentChunks[i].ChunkIndex);
-                Events.OnGroundChunkGenerated?.Invoke(adjacentChunks[i]);
+                LoadAdjacentChunk(adjacentChunks[i], directions[i]);
             }
         }
-
+        
         private List<ChunkIndex> GetSideIndexes(Chunk chunk, MultiDirection direction)
         {
             HashSet<int3> builtCells = generatedChunkIndexes.GetValueOrDefault(chunk.ChunkIndex, new HashSet<int3>());

@@ -1,9 +1,9 @@
 using Random = Unity.Mathematics.Random;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
-using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 using Pathfinding;
@@ -22,8 +22,11 @@ namespace Enemy
         
         [SerializeField]
         private SpawnDataUtility spawnDataUtility;
+        
+        [SerializeField]
+        private BuildableCornerData groundCornerData;
 
-        private Dictionary<ChunkIndex, Entity> spawnedEntities = new Dictionary<ChunkIndex, Entity>();
+        private HashSet<(PathIndex, int3)> portalIndexes = new HashSet<(PathIndex, int3)>();
         
         private EntityManager entityManager;
         private Entity spawnPrefab;
@@ -38,68 +41,55 @@ namespace Enemy
 
         private void OnEnable()
         {
-            groundGenerator.OnChunkGenerated += OnChunkUnlocked;
-            
-            random = new Random(GameManager.Instance?.Seed ?? (uint)UnityEngine.Random.Range(1, int.MaxValue));
+            groundGenerator.OnCellCollapsed += OnCellCollapsed;
+            groundGenerator.OnGenerationFinished += OnGenerationFinished;
             
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             spawnPrefab = entityManager.CreateEntity(typeof(SpawnPointComponent), typeof(Prefab));
+            
+            GetGameManager().Forget();
         }
-
+        
         private void OnDisable()
         {
-            groundGenerator.OnChunkGenerated -= OnChunkUnlocked;
+            groundGenerator.OnCellCollapsed -= OnCellCollapsed;
+            groundGenerator.OnGenerationFinished -= OnGenerationFinished;
         }
-
-        private void OnChunkUnlocked(Chunk chunk)
+        
+        private async UniTaskVoid GetGameManager()
         {
-            List<ChunkIndex> toRemove = new List<ChunkIndex>();
-            foreach (ChunkIndex index in spawnedEntities.Keys)
-            {
-                if (math.all(index.Index == chunk.ChunkIndex))
-                {
-                    toRemove.Add(index);
-                }
-            }
-
-            NativeArray<Entity> entitiesToRemove = new NativeArray<Entity>(toRemove.Count, Allocator.Temp);
-            for (int i = 0; i < toRemove.Count; i++)
-            {
-                entitiesToRemove[i] = spawnedEntities[toRemove[i]];
-                spawnedEntities.Remove(toRemove[i]);
-            }
-            
-            entityManager.DestroyEntity(entitiesToRemove);
-            entitiesToRemove.Dispose();
-
-            spawnIndex = 0;
-            foreach (var kvp in spawnedEntities)
-            {
-                float3 position = ChunkWaveUtility.GetPosition(kvp.Key, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize);
-                float3 pathPosition = PathUtility.GetPos(PathUtility.GetIndex(position.xz));
-                entityManager.SetComponentData(kvp.Value, new SpawnPointComponent
-                {
-                    Position = pathPosition,
-                    Index = spawnIndex++,
-                    Random = Random.CreateFromIndex(random.NextUInt(1, 20000000))
-                });
-            }
+            GameManager gameManager = await GameManager.Get();
+            random = new Random(gameManager.Seed);
         }
-
-        public void AddSpawnPoints(List<ChunkIndex> cells)
+        
+        private void OnGenerationFinished()
         {
-            foreach (ChunkIndex chunkIndex in cells)
+            foreach ((PathIndex, int3) pathIndex in portalIndexes)
             {
-                if (spawnedEntities.ContainsKey(chunkIndex)) continue;
+                if (!groundGenerator.LoadedFullChunks.Contains(pathIndex.Item2)) continue;
                 
-                CreateEntity(chunkIndex);
+                CreateEntity(pathIndex.Item1);
+            }
+        }
+        
+        private void OnCellCollapsed(ChunkIndex chunkIndex)
+        {
+            PrototypeData prot = groundGenerator.ChunkWaveFunction[chunkIndex].PossiblePrototypes[0];
+            for (int i = 0; i < WaveFunctionUtility.Corners.Length; i++)
+            {
+                int2 corner = WaveFunctionUtility.Corners[i];
+                if (!groundCornerData.TryGetCornerType(prot.MeshRot, corner, out GroundType groundType)) continue;
+                if (groundType != GroundType.Portal) continue;
+
+                Vector3 pos = ChunkWaveUtility.GetPosition(chunkIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize) 
+                    + (Vector3)corner.MultiplyByAxis(groundGenerator.ChunkWaveFunction.CellSize.XZ() / 2.0f).XyZ();
+                portalIndexes.Add((PathUtility.GetIndex(pos.XZ()), chunkIndex.Index));
             }
         }
 
-        private void CreateEntity(ChunkIndex chunkIndex)
+        private void CreateEntity(PathIndex pathIndex)
         {
-            float3 position = ChunkWaveUtility.GetPosition(chunkIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize);
-            float3 pathPosition = PathUtility.GetPos(PathUtility.GetIndex(position.xz));
+            float3 pathPosition = PathUtility.GetPos(pathIndex);
             Entity entity = entityManager.Instantiate(spawnPrefab);
             entityManager.SetComponentData(entity, new SpawnPointComponent
             {
@@ -107,8 +97,6 @@ namespace Enemy
                 Index = spawnIndex++,
                 Random = Random.CreateFromIndex(random.NextUInt(1, 20000000))
             });
-            
-            spawnedEntities.Add(chunkIndex, entity);
         }
     }
 }

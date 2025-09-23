@@ -6,7 +6,7 @@ using System;
 
 namespace Effects.ECS
 {
-    [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(ClusterCleanupSystem))]
+    [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(ManagedEntityCleanupSystem))]
     public partial class DeathSystem : SystemBase
     {
         public static readonly Dictionary<int, Action> DeathCallbacks = new Dictionary<int, Action>();

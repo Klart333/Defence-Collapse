@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Random = Unity.Mathematics.Random;
 using Gameplay.Upgrades;
 using Unity.Mathematics;
@@ -51,6 +52,7 @@ namespace Effects.ECS
 		public float3 StartPosition;
 		public float3 EndPosition;
 		public float3 Pivot;
+		public Ease Ease;
 		
 		public float Value;
 	}

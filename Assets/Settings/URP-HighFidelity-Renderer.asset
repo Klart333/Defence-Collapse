@@ -42,6 +42,24 @@ MonoBehaviour:
       restoreCamera: 1
       offset: {x: 0, y: 0, z: 0, w: 0}
       cameraFieldOfView: 60
+--- !u!114 &-5344887567510302819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90269b8e228f40b4a298a2ebbc10222e, type: 3}
+  m_Name: OutlineRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::Engine.Rendering.OutlineRendererFeature
+  m_Active: 1
+  outlineMaterial: {fileID: 2100000, guid: 58995d034b9f3fb4a9edd24ccd8c8bd5, type: 2}
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  outlinePixelWidth: 10
 --- !u!114 &-4110271899411202585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198,7 +216,7 @@ MonoBehaviour:
     overrideShaderPassIndex: 0
     overrideMode: 1
     overrideDepthState: 0
-    depthCompareFunction: 0
+    depthCompareFunction: 8
     enableWrite: 1
     stencilSettings:
       overrideStencilState: 0

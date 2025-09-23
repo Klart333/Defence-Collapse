@@ -47,19 +47,22 @@ MonoBehaviour:
   initialPoolSize: 50
   trees:
   - Array:
-    - {fileID: 6374199612806757939, guid: 231b662285aadb342bcfedf822c91888, type: 3}
-    - {fileID: 6847336590971307081, guid: 5b60aa2e2021f214fafeb5c8bfbb3e64, type: 3}
-    - {fileID: 8814856876609908704, guid: 34420115e143dd04999c07be844f00f4, type: 3}
+    - {fileID: 7005380725374298481, guid: 3de007ab8f32f8c45bdee76a00ec5311, type: 3}
+    - {fileID: -2824077123499707291, guid: 7a097b23a52dd5a42ba54ba6055a2271, type: 3}
+    - {fileID: -1047286843985639914, guid: a83ad38b35747474b8d1e8116ec3c75a, type: 3}
   - Array:
-    - {fileID: 6890637349657512617, guid: 7a097b23a52dd5a42ba54ba6055a2271, type: 3}
-    - {fileID: 5407493672094619264, guid: a83ad38b35747474b8d1e8116ec3c75a, type: 3}
-    - {fileID: 5997956637164749335, guid: 3de007ab8f32f8c45bdee76a00ec5311, type: 3}
+    - {fileID: -7246077010477362540, guid: 231b662285aadb342bcfedf822c91888, type: 3}
+    - {fileID: -5776248546517806736, guid: 5b60aa2e2021f214fafeb5c8bfbb3e64, type: 3}
+    - {fileID: -4486309859091908341, guid: 34420115e143dd04999c07be844f00f4, type: 3}
+  treeScale: 0.4
   objectGroundType: 4
   raycastArea: {x: 2, y: 2}
-  treeRadius: 0.7
-  raycastCount: 10
+  treeRadius: 0.5
+  raycastCount: 20
   totalTime: 2
   atlasAnalyzer: {fileID: 11400000, guid: 3fd3a20e79dcd55468bdbdb395b2d176, type: 2}
+  groundObjectsUtility: {fileID: 11400000, guid: 58391b3d3b8e93e41b3b2ce1e774079c,
+    type: 2}
   shouldRemoveWhenPlaced: 0
   goldPerTree: 0
   distanceMultiplier: 3

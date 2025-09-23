@@ -46,10 +46,6 @@ namespace Enemy
         [HideIf(nameof(isBoss))]
         public int CreditCost = 1;
 
-        [Title("Movement")]
-        [SerializeField]
-        private int flowFieldImportance = 1;
-
         [Title("OnDeath", "Money")]
         [SerializeField]
         private float moneyOnDeath = 5;
@@ -74,7 +70,6 @@ namespace Enemy
         public float VerticalNameOffset => verticalNameOffset;
         public string Description => description.Value;
         public float DropLootChance => dropLootChance;
-        public int Importance => flowFieldImportance;
         public bool ExplodeOnDeath => explodeOnDeath;
         public float ExplosionSize => explosionSize;
         public float MoneyOnDeath => moneyOnDeath;

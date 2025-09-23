@@ -60,7 +60,7 @@ namespace Enemy.ECS
             
             textRenderControl = new TextRenderControl { flags = TextRenderControl.Flags.Dirty };            
             
-            EntityQuery query = SystemAPI.QueryBuilder().WithAll<EnemyBossComponent, EnemySpawnedTag>().Build();
+            EntityQuery query = SystemAPI.QueryBuilder().WithAll<EntityNameComponent, EnemySpawnedTag>().Build();
             state.RequireForUpdate(query);
         }
 
@@ -150,7 +150,7 @@ namespace Enemy.ECS
         public BlobAssetReference<FontBlob> FontReference;
 
         [BurstCompile]
-        public void Execute([EntityIndexInQuery] int entityIndex, Entity entity, in LocalTransform transform, in EnemyBossComponent bossComponent)
+        public void Execute([EntityIndexInQuery] int entityIndex, Entity entity, in LocalTransform transform, in EntityNameComponent bossComponent)
         {
             Entity textEntity = ECB.CreateEntity(entityIndex, TextArchetype);
             ECB.SetSharedComponent(entityIndex, textEntity, RenderFilterSettings);

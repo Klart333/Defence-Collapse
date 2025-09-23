@@ -1,6 +1,7 @@
 ﻿using Unity.Mathematics;
 using UnityEngine;
 using Chunks;
+using Unity.Burst;
 
 namespace Utility
 {
@@ -102,6 +103,30 @@ namespace Utility
                 default: // 0° (no rotation)
                     return v;
             }
+        }
+
+        [BurstCompile]
+        public static float InOutSine(float value)
+        {
+            return -(math.cos(math.PI * value) - 1.0f) / 2.0f;
+        }
+
+        
+        private const float c4 = (2.0f * math.PI) / 3.0f;
+        [BurstCompile]
+        public static float EaseOutElastic(float value)
+        {
+            return math.pow(2, -10 * value) * math.sin((value * 10f - 0.75f) * c4) + 1.0f;
+        }
+        
+        [BurstCompile]
+        public static float EaseOutElastic_Exact(float value)
+        {
+            return value == 0 
+                ? 0
+                : Mathf.Approximately(value, 1)
+                ? 1
+                : math.pow(2, -10 * value) * math.sin((value * 10f - 0.75f) * c4) + 1.0f;
         }
     }
 }

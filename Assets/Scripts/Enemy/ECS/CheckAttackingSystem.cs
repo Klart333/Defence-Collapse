@@ -8,7 +8,7 @@ using Pathfinding;
 
 namespace Enemy.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(FlowMovementSystem))]
+    [BurstCompile, UpdateAfter(typeof(FlowMovementSystem)), UpdateBefore(typeof(ClusterPositioningSystem))]
     public partial struct CheckAttackingSystem : ISystem
     {
         [BurstCompile]
@@ -45,7 +45,7 @@ namespace Enemy.ECS
         }
     }
 
-    [BurstCompile, WithAll(typeof(EnemyClusterComponent), typeof(UpdatePositioningTag)), WithNone(typeof(AttackingComponent))]
+    [BurstCompile, WithAll(typeof(EnemyClusterComponent), typeof(UpdatePositioningComponent)), WithNone(typeof(AttackingComponent))]
     public partial struct CheckAttackingJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter ECB;

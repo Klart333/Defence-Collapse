@@ -16,6 +16,7 @@ using Enemy.ECS;
 using Gameplay;
 using VFX.ECS;
 using System;
+using DG.Tweening;
 using Effects.LittleDudes;
 using Gameplay.Turns.ECS;
 using Variables;
@@ -478,6 +479,7 @@ namespace Effects
                     StartPosition = unit.OriginPosition,
                     EndPosition = targetPosition,
                     Pivot = Vector3.Lerp(unit.OriginPosition, targetPosition, 0.5f) + Vector3.up * Height,
+                    Ease = Ease.Linear
                 });
                 
                 

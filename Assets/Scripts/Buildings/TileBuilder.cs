@@ -136,7 +136,7 @@ namespace Buildings
 
         private bool IsTileValid(ChunkIndex index, out TileAction action)
         {
-            bool isValid = groundGenerator.GeneratedChunks.Contains(index.Index)
+            bool isValid = IsTileChunkLoaded(index)
                            && tiles.TryGetValue(index, out _);
             if (!isValid)
             {
@@ -146,6 +146,42 @@ namespace Buildings
             
             action = OnTileEntered?.Invoke(index) ?? TileAction.None;
             return action != TileAction.None;
+        }
+
+        private bool IsTileChunkLoaded(ChunkIndex index)
+        {
+            if (groundGenerator.LoadedFullChunks.Contains(index.Index))
+            {
+                return true;
+            }
+
+            bool onRightSide = index.CellIndex.x >= groundGenerator.ChunkSize.x - 1;
+            if (onRightSide)
+            {
+                if (groundGenerator.LoadedFullChunks.Contains(index.Index + new int3(1, 0, 0)))
+                {
+                    return true;
+                }
+            }
+            
+            bool onTopSide = index.CellIndex.z >= groundGenerator.ChunkSize.z - 1;
+            if (onTopSide)
+            {
+                if (groundGenerator.LoadedFullChunks.Contains(index.Index + new int3(0, 0, 1)))
+                {
+                    return true;
+                }
+            }
+
+            if (onRightSide && onTopSide)
+            {
+                if (groundGenerator.LoadedFullChunks.Contains(index.Index + new int3(1, 0, 1)))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
         }
 
         private void InitializeSpawnPlaces(QueryMarchedChunk chunk)

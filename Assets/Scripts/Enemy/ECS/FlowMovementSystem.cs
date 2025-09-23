@@ -7,6 +7,7 @@ using Pathfinding;
 
 namespace Enemy.ECS
 {
+    [BurstCompile]
     public partial struct FlowMovementSystem : ISystem
     {
         [BurstCompile]
@@ -28,8 +29,8 @@ namespace Enemy.ECS
             {
                 ChunkIndexToListIndex = pathBlobber.ChunkIndexToListIndex,
                 PathChunks = pathBlobber.PathBlob,
-                ECB = ecb.AsParallelWriter(),
-            }.ScheduleParallel(state.Dependency);
+                ECB = ecb,
+            }.Schedule(state.Dependency);
             
             state.Dependency.Complete();
             ecb.Playback(state.EntityManager);
@@ -53,26 +54,35 @@ namespace Enemy.ECS
         [ReadOnly]
         public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
         
-        public EntityCommandBuffer.ParallelWriter ECB;
+        public EntityCommandBuffer ECB;
         
         [BurstCompile]
-        private void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ref FlowFieldComponent flowField, ref EnemyClusterComponent cluster, in SpeedComponent speed, ref UpdateClusterPositionComponent updateClusterComponent)
+        private void Execute(Entity entity, ref FlowFieldComponent flowField, ref EnemyClusterComponent cluster, in SpeedComponent speed, ref UpdateClusterPositionComponent updateClusterComponent)
         {
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
             float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[flowField.PathIndex.GridIndex]);
             
             float3 movedPosition = cluster.Position + (math.round(direction) * PathUtility.CELL_SCALE).XyZ();
+          
             PathIndex movedPathIndex = PathUtility.GetIndex(movedPosition.xz);
-            if (!ChunkIndexToListIndex.ContainsKey(movedPathIndex.ChunkIndex)) return;
+            ref PathChunk movedValuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[movedPathIndex.ChunkIndex]];
+            if (!ChunkIndexToListIndex.ContainsKey(movedPathIndex.ChunkIndex) || movedValuePathChunk.IndexOccupied[movedPathIndex.GridIndex]) return;
+
+            valuePathChunk.IndexOccupied[flowField.PathIndex.GridIndex] = false;
+            movedValuePathChunk.IndexOccupied[movedPathIndex.GridIndex] = true;
+            
+            ECB.AddComponent(entity, new UpdatePositioningComponent
+            {
+                PreviousTile = flowField.PathIndex,
+                CurrentTile = movedPathIndex,
+            });
             
             flowField.PathIndex = movedPathIndex;
             cluster.Position = movedPosition;
             
             updateClusterComponent.Count--;
-            if (updateClusterComponent.Count <= 0) ECB.RemoveComponent<UpdateClusterPositionComponent>(sortKey, entity);
-            
-            ECB.AddComponent<UpdatePositioningTag>(sortKey, entity);
-            ECB.AddComponent(sortKey, entity, new MovingClusterComponent { TimeLeft = speed.Speed });
+            if (updateClusterComponent.Count <= 0) ECB.RemoveComponent<UpdateClusterPositionComponent>(entity);
+            ECB.AddComponent(entity, new MovingClusterComponent { TimeLeft = speed.Speed });
 
             ref PathChunk movedPathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[movedPathIndex.ChunkIndex]];
             float2 newDirection = PathUtility.ByteToDirection(movedPathChunk.Directions[movedPathIndex.GridIndex]);

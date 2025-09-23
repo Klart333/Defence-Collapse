@@ -54,6 +54,20 @@ namespace WaveFunctionCollapse
             groundType = cornerData.GroundType;
             return cornerData.IsBuildable;
         }
+        
+        public bool TryGetCornerType(MeshWithRotation meshRot, int2 corner, out GroundType groundType)
+        {
+            if (meshRot.MeshIndex == -1 || !BuildableDictionary.TryGetValue(protoypeMeshes.Meshes[meshRot.MeshIndex], out BuildableCorners buildableCorners))
+            {
+                groundType = default;
+                return false;
+            }
+
+            Corner rotatedCorner = RotateCorner(meshRot.Rot, corner);
+            CornerData cornerData = buildableCorners.CornerDictionary[rotatedCorner];
+            groundType = cornerData.GroundType;
+            return true;
+        }
 
         public static Corner RotateCorner(int rot, int2 corner)
         {
@@ -126,6 +140,7 @@ namespace WaveFunctionCollapse
         Grass = 1 << 0, 
         Crystal = 1 << 1,
         Tree = 1 << 2,
+        Portal = 1 << 3,
         Buildable = Grass | Crystal,
     }
 

@@ -14,24 +14,23 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             state.RequireForUpdate<GameSpeedComponent>();
+            state.RequireForUpdate<TargetRotationComponent>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             
-            state.Dependency = new TargetRotationJob
+            new TargetRotationJob
             {
                 DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
                 ECB = ecb.AsParallelWriter(),
-            }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+            }.ScheduleParallel();
         }
 
         [BurstCompile]

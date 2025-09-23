@@ -1,19 +1,22 @@
-using Enemy.ECS;
-using Gameplay;
-using Unity.Burst;
 using Unity.Collections;
-using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Unity.Entities;
+using Unity.Burst;
+using DG.Tweening;
+using Enemy.ECS;
+using Gameplay;
+using Utility;
 
 namespace Effects.ECS
 {
-    [BurstCompile, UpdateBefore(typeof(CollisionSystem))]
+    [BurstCompile, UpdateAfter(typeof(CollisionSystem))]
     public partial struct ArchedMovementSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             state.RequireForUpdate<GameSpeedComponent>();
         }
 
@@ -21,17 +24,15 @@ namespace Effects.ECS
         public void OnUpdate(ref SystemState state)
         {
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            
+
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+
             state.Dependency = new ArchedMovementJob
             {
                 DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
                 ECB = ecb.AsParallelWriter(),
             }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
         }
 
         [BurstCompile]
@@ -53,7 +54,11 @@ namespace Effects.ECS
         {
             arch.Value = math.min(1.0f, arch.Value + speed.Speed * DeltaTime);
             
-            transform.Position = Utility.Math.CubicLerp(arch.StartPosition, arch.EndPosition, arch.Pivot, arch.Value);
+            transform.Position = Math.CubicLerp(arch.StartPosition, arch.EndPosition, arch.Pivot, arch.Ease switch
+            {
+                Ease.InOutSine => Math.InOutSine(arch.Value), 
+               _ => arch.Value 
+            });
 
             if (arch.Value >= 1.0f)
             {

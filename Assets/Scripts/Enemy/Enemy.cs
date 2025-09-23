@@ -83,7 +83,7 @@ namespace Enemy
 
                 if (authoring.enemyData.IsBoss)
                 {
-                    AddComponent(enemyEntity, new EnemyBossComponent
+                    AddComponent(enemyEntity, new EntityNameComponent
                     {
                         Name = authoring.enemyData.Name,
                         Offset = authoring.enemyData.VerticalNameOffset,
@@ -101,7 +101,7 @@ namespace Enemy
         public Entity ClusterParent;
     }
 
-    public struct EnemyBossComponent : IComponentData
+    public struct EntityNameComponent : IComponentData
     {
         public FixedString64Bytes Name;
         public float Offset;

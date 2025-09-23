@@ -5,6 +5,8 @@ using Unity.Entities;
 using Unity.Burst;
 using Unity.Jobs;
 using Enemy.ECS;
+using Unity.Burst.Intrinsics;
+using Unity.Jobs.LowLevel.Unsafe;
 using VFX;
 
 namespace Effects.ECS
@@ -106,7 +108,7 @@ namespace Effects.ECS
         {
             if (!LightningLookup.TryGetComponent(pendingDamage.SourceEntity, out LightningComponent sourceLightning)) return;
             NativeHashSet<Entity> hitEntities = new NativeHashSet<Entity>(sourceLightning.Bounces, Allocator.TempJob);
-
+            
             float3 sourcePosition = transform.Position;
             int2 cellIndex = new int2((int)transform.Position.x, (int)transform.Position.z);
             
@@ -225,4 +227,28 @@ namespace Effects.ECS
             keys.Dispose();
         }
     }
+    
+    /*[BurstCompile]
+    public struct MoveByJobChunk : IJobChunk 
+    {
+        public ComponentTypeHandle<LocalTransform> transformType;
+ 
+        [ReadOnly]
+        public ComponentTypeHandle<PendingDamageComponent> velocityType;
+ 
+        public float deltaTime;
+ 
+        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) 
+        { 
+            NativeArray<LocalTransform> transforms = chunk.GetNativeArray(ref this.transformType);
+            NativeArray<PendingDamageComponent> velocities = chunk.GetNativeArray(ref this.velocityType);
+            ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+ 
+            while (enumerator.NextEntityIndex(out int i)) {
+                LocalTransform transform = transforms[i];
+                transform.Position += velocities[i].Value * this.deltaTime;
+                transforms[i] = transform; // Modify value
+            }
+        }
+    }*/
 }

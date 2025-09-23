@@ -3,14 +3,14 @@ using WaveFunctionCollapse;
 using UnityEngine.Events;
 using Buildings.District;
 using Unity.Mathematics;
-using Buildings;
 using Gameplay.Upgrades;
+using Buildings;
 
 namespace Gameplay.Event
 {
     public static class Events
     {
-        public static UnityAction<Chunk> OnGroundChunkGenerated;
+        public static UnityAction<WaveFunctionCollapse.Chunk> OnGroundChunkGenerated;
 
         public static UnityAction<IEnumerable<ChunkIndex>> OnBuiltIndexBuilt;
         public static UnityAction<ICollection<IBuildable>> OnBuildingBuilt;

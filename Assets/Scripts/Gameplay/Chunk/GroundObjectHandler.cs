@@ -1,16 +1,20 @@
+using System;
 using Random = Unity.Mathematics.Random;
+
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using System.Collections;
 using Unity.Mathematics;
+using Gameplay.Chunk;
+using Unity.Entities;
 using UnityEngine;
-using Gameplay;
 
-namespace Chunks
+namespace Gameplay.Chunks
 {
-    public class TreeHandler : MonoBehaviour
+    public class GroundObjectHandler : MonoBehaviour
     {
         [Title("References")]
         [SerializeField]
@@ -22,9 +26,10 @@ namespace Chunks
         [SerializeField]
         private ProtoypeMeshes protoypeMeshes;
         
+        [FormerlySerializedAs("treeGrowerPrefab")]
         [Title("Tree")]
         [SerializeField]
-        private TreeGrower treeGrowerPrefab;
+        private GroundObjectGrower groundObjectGrowerPrefab;
         
         [SerializeField]
         private GroundType objectGroundType;
@@ -36,14 +41,17 @@ namespace Chunks
         [SerializeField, Range(0.0f, 1.0f)]
         private float groupingFactor = 0.4f;
 
-        private Dictionary<int3, List<TreeGrower>> treeGrowersByChunk = new Dictionary<int3, List<TreeGrower>>();
+        private Dictionary<int3, List<GroundObjectGrower>> treeGrowersByChunk = new Dictionary<int3, List<GroundObjectGrower>>();
         
         private Dictionary<int2, int> builtIndexesMap = new Dictionary<int2, int>();
 
         private GameManager gameManager;
         private Coroutine growingTrees;
         private Random random;
-
+        
+        private EntityManager entityManager;
+        private Entity groundObjectDatabase;
+        
         private int2[] neighbours = new int2[4]
         {
             new int2(1, 0),
@@ -58,6 +66,13 @@ namespace Chunks
             groundGenerator.OnCellCollapsed += OnCellCollapsed;
 
             GetGameManager().Forget();
+            
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        }
+
+        private void Start()
+        {
+            groundObjectDatabase = entityManager.CreateEntityQuery(typeof(GroundObjectDatabaseTag)).GetSingletonEntity();
         }
 
         private void OnDisable()
@@ -81,6 +96,7 @@ namespace Chunks
             }
             
             Cell cell = groundGenerator.ChunkWaveFunction[chunkIndex];
+            if (cell.PossiblePrototypes[0].MeshRot.MeshIndex == -1) return;
             Mesh mesh = protoypeMeshes.Meshes[cell.PossiblePrototypes[0].MeshRot.MeshIndex];
             BuildableCorners corners = groundCornerData.BuildableDictionary[mesh];
             if (AllCornersInvalid(corners)) return;
@@ -90,12 +106,13 @@ namespace Chunks
                 StopCoroutine(growingTrees);
             }
             
-            TreeGrower spawned = treeGrowerPrefab.GetAtPosAndRot<TreeGrower>(cell.Position, Quaternion.identity);
+            GroundObjectGrower spawned = groundObjectGrowerPrefab.GetAtPosAndRot<GroundObjectGrower>(cell.Position, Quaternion.identity);
+            spawned.DatabaseEntity = groundObjectDatabase;
             spawned.ChunkIndex = chunkIndex;
             spawned.Cell = cell;
 
-            if (treeGrowersByChunk.TryGetValue(chunkIndex.Index, out List<TreeGrower> value)) value.Add(spawned);
-            else treeGrowersByChunk.Add(chunkIndex.Index, new List<TreeGrower> { spawned });
+            if (treeGrowersByChunk.TryGetValue(chunkIndex.Index, out List<GroundObjectGrower> value)) value.Add(spawned);
+            else treeGrowersByChunk.Add(chunkIndex.Index, new List<GroundObjectGrower> { spawned });
         }
         
         private bool AllCornersInvalid(BuildableCorners corners)
@@ -118,11 +135,11 @@ namespace Chunks
 
         private IEnumerator GrowTrees()
         {
-            foreach (KeyValuePair<int3, List<TreeGrower>> kvp in treeGrowersByChunk)
+            foreach (KeyValuePair<int3, List<GroundObjectGrower>> kvp in treeGrowersByChunk)
             {
                 for (int i = 0; i < kvp.Value.Count; i++)
                 {
-                    TreeGrower grower = kvp.Value[i];
+                    GroundObjectGrower grower = kvp.Value[i];
                     if (grower.HasGrown)
                     {
                         continue;

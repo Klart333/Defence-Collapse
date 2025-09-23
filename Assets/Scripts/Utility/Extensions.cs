@@ -76,6 +76,11 @@ public static class Extensions
     {
         return new int2(a.x * b.x, a.y * b.y);
     }
+    
+    public static float2 MultiplyByAxis(this int2 a, float2 b)
+    {
+        return new float2(a.x * b.x, a.y * b.y);
+    }
 
     public static Tween ScaleWithGameSpeed(this Tween tween, IGameSpeed gameSpeed)
     {

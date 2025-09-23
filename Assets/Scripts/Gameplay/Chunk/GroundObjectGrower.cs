@@ -1,32 +1,42 @@
 using Random = Unity.Mathematics.Random;
+
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
+using Gameplay.Chunk.ECS;
 using Unity.Mathematics;
+using Unity.Collections;
+using Unity.Transforms;
+using Unity.Entities;
 using Gameplay.Money;
+using Gameplay.Chunk;
 using Gameplay.Event;
+using Pathfinding;
 using UnityEngine;
 using Buildings;
 using Utility;
 using System;
 
-namespace Chunks
+namespace Gameplay.Chunks
 {
     [Serializable]
     public struct PooledArray
     {
-        public PooledMonoBehaviour[] Array;
+        public GroundObject[] Array;
     }
     
-    public class TreeGrower : PooledMonoBehaviour
+    public class GroundObjectGrower : PooledMonoBehaviour
     {
-        public event Action<TreeGrower> OnPlaced;
+        public event Action<GroundObjectGrower> OnPlaced;
         
         [Title("Tree")]
         [SerializeField]
         private PooledArray[] trees;
 
+        [SerializeField]
+        private float treeScale = 1f;
+        
         [SerializeField]
         private GroundType objectGroundType;
 
@@ -45,6 +55,9 @@ namespace Chunks
         [SerializeField]
         private AtlasAnalyzer atlasAnalyzer;
         
+        [SerializeField]
+        private GroundObjectsUtility groundObjectsUtility;
+        
         [Title("Remove")]
         [SerializeField]
         private bool shouldRemoveWhenPlaced = true;
@@ -55,7 +68,9 @@ namespace Chunks
         [SerializeField, ShowIf(nameof(shouldRemoveWhenPlaced))]
         private float distanceMultiplier = 3;
 
-        private readonly List<PooledMonoBehaviour> spawnedTrees = new List<PooledMonoBehaviour>();
+        private List<Entity> spawnedTrees = new List<Entity>();
+        
+        private EntityManager entityManager;
         
         private float treeRadiusSq;
         
@@ -64,6 +79,7 @@ namespace Chunks
         public Cell Cell { get; set; }
         
         public bool ShouldRemoveWhenPlaced => shouldRemoveWhenPlaced;
+        public Entity DatabaseEntity { get; set; }
 
         private void OnEnable()
         {
@@ -73,6 +89,8 @@ namespace Chunks
             }
             
             treeRadiusSq = treeRadius * treeRadius;
+            
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         }
 
         protected override void OnDisable()
@@ -130,18 +148,31 @@ namespace Chunks
         
         private void SpawnTree(Vector3 pos, int groupIndex, Random random)
         {
-            PooledMonoBehaviour treePrefab = trees[groupIndex].Array[random.NextInt(0, trees[groupIndex].Array.Length)];
-            Quaternion rot = Quaternion.AngleAxis(random.NextFloat() * 360, Vector3.up);
-            PooledMonoBehaviour spawned = treePrefab.GetAtPosAndRot<PooledMonoBehaviour>(pos, rot);
+            quaternion rot = quaternion.AxisAngle(new float3(0, 1, 0), random.NextFloat() * 360);
+            
+            GroundObject objectPrefab = trees[groupIndex].Array[random.NextInt(0, trees[groupIndex].Array.Length)];
+            int index = groundObjectsUtility.GetIndex(objectPrefab);
+            GroundObjectElement entityPrefab = entityManager.GetBuffer<GroundObjectElement>(DatabaseEntity)[index];
+
+            Entity spawned = entityManager.Instantiate(entityPrefab.GroundObjectEntity);
+            entityManager.SetComponentData(spawned, new LocalTransform
+            {
+                Position = pos,
+                Rotation = rot,
+                Scale = 0,
+            });
+            entityManager.SetComponentData(spawned, new GroundObjectComponent
+            {
+                PathIndex = PathUtility.GetIndex(pos.XZ())
+            });
             spawnedTrees.Add(spawned);
         }
 
         public void ClearTrees()
         {
-            for (int i = 0; i < spawnedTrees.Count; i++)
-            {
-                spawnedTrees[i].gameObject.SetActive(false);
-            }
+            NativeArray<Entity> array = spawnedTrees.ToNativeArray(Allocator.Temp);
+            entityManager.DestroyEntity(array);
+            array.Dispose();
             
             spawnedTrees.Clear();
         }
@@ -162,9 +193,10 @@ namespace Chunks
                 float gold = goldPerTree + goldPerTree * distanceMultiplier * distance;
                 gold *= MoneyManager.Instance.MoneyMultiplier.Value;
 
-                foreach (PooledMonoBehaviour tree in spawnedTrees)
+                foreach (Entity tree in spawnedTrees) // Giga slow
                 {
-                    MoneyManager.Instance.AddMoneyParticles(gold, tree.transform.position);
+                    float3 position = entityManager.GetComponentData<LocalTransform>(tree).Position;
+                    MoneyManager.Instance.AddMoneyParticles(gold, position);
                 }
 
                 ClearTrees();

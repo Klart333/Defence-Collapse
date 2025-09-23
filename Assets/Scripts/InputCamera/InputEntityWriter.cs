@@ -12,7 +12,7 @@ namespace InputCamera
     public class InputEntityWriter : MonoBehaviour
     {
         private static readonly int UseMousePos = Shader.PropertyToID("_UseMousePos");
-        private static readonly int MousePos = Shader.PropertyToID("_MousePos");
+        private static readonly int MousePos01 = Shader.PropertyToID("_MousePos_01");
         
         [Title("Animation")]
         [SerializeField]
@@ -64,7 +64,7 @@ namespace InputCamera
             if (!isOverridingMousePosition) return;
 
             Vector4 pos = new Vector4(overrideMousePosition.x, overrideMousePosition.z, 0, 0);
-            Shader.SetGlobalVector(MousePos, pos);
+            Shader.SetGlobalVector(MousePos01, pos);
         }
 
         public void OverrideShaderMousePosition(Vector3 mousePosition, bool blend = true)

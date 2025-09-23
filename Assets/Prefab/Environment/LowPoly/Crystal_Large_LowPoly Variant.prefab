@@ -8,27 +8,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1656545394775029048, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
-        type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: -5544151371924294233, guid: aa3ce85044ea5464a8ccf63661407f02,
-        type: 3}
-    - target: {fileID: 1695970915118675022, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1695970915118675022, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1695970915118675022, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1695970915118675022, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -42,7 +21,7 @@ PrefabInstance:
     - target: {fileID: 1695970915118675022, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -7.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1695970915118675022, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
         type: 3}
@@ -79,11 +58,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2002396853688834524, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
-        type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
     - target: {fileID: 3899289254301757010, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
         type: 3}
       propertyPath: m_Name
@@ -92,31 +66,33 @@ PrefabInstance:
     - target: {fileID: 3899289254301757010, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
         type: 3}
       propertyPath: m_Layer
-      value: 12
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3912545099148046602, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.15
-      objectReference: {fileID: 0}
-    - target: {fileID: 3912545099148046602, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.15
-      objectReference: {fileID: 0}
-    - target: {fileID: 3912545099148046602, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.15
-      objectReference: {fileID: 0}
-    - target: {fileID: 6268164492304934865, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
-        type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: -3772918788279796163, guid: 939ef5a5934a1f54ebdaded56ad9d948,
-        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3899289254301757010, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1062935248877664740}
   m_SourcePrefab: {fileID: 100100000, guid: 12b75eb0eda7b2b4bb4bded9c619c10c, type: 3}
+--- !u!1 &4913483547630016386 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3899289254301757010, guid: 12b75eb0eda7b2b4bb4bded9c619c10c,
+    type: 3}
+  m_PrefabInstance: {fileID: 8227299895251433936}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1062935248877664740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4913483547630016386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37f321cbc85c4a4694336f891afd58a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::Gameplay.Chunk.ECS.GroundObject
+  scalingDuration: 1.3

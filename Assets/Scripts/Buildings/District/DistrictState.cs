@@ -12,13 +12,14 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Rendering;
 using Unity.Entities;
+using DG.Tweening;
 using Effects.ECS;
 using UnityEngine;
 using Enemy.ECS;
+using Gameplay;
 using Effects;
 using Utility;
 using System;
-using Gameplay;
 
 namespace Buildings.District
 {
@@ -301,7 +302,8 @@ namespace Buildings.District
                 {
                     EndPosition = pos,
                     StartPosition = upPosition,
-                    Pivot = (pos + upPosition) / 2.0f
+                    Pivot = (pos + upPosition) / 2.0f,
+                    Ease = Ease.Linear,
                 });
             }
         }

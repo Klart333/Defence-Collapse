@@ -320,9 +320,12 @@ namespace WaveFunctionCollapse
 
         public PrototypeData Collapse(Cell cell)
         {
-            if (cell.PossiblePrototypes.Count == 0)
+            switch (cell.PossiblePrototypes.Count)
             {
-                return emptyPrototype;
+                case 0:
+                    return emptyPrototype;
+                case 1:
+                    return cell.PossiblePrototypes[0];
             }
 
             float totalCount = 0;
@@ -502,7 +505,6 @@ namespace WaveFunctionCollapse
     public class Chunk : IChunk
     {
 #if UNITY_EDITOR
-        [FormerlySerializedAs("position")]
         [SerializeField, Sirenix.OdinInspector.ReadOnly]
         private Vector3 editorOnlyPosition;
 #endif

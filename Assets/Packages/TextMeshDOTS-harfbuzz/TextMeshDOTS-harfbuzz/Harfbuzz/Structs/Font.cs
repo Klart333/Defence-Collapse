@@ -106,7 +106,7 @@ namespace TextMeshDOTS.HarfBuzz
         {
             HB.hb_font_make_immutable(ptr);
         }
-        public void Dispose()
+        public readonly void Dispose()
         {
             HB.hb_font_destroy(ptr);
         }
