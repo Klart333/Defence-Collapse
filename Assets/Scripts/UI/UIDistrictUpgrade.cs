@@ -210,13 +210,13 @@ namespace UI
 
             SpawnUpgradeDisplays(districtData);
             DisplayExtraInfo(districtData);
-            panelTitleText.text = GetDistrictName(districtData);
+            panelTitleText.text = districtData.TowerData.DistrictName;
 
             districtData.OnDisposed += DistrictDataOnOnDisposed;
             
             if (statPanel.gameObject.activeSelf)
             {
-                statPanel.DisplayStats(StatDisplayableType.District, GetDistrictName(districtData), districtData.State.Stats);
+                statPanel.DisplayStats(StatDisplayableType.District, districtData.TowerData.DistrictName, districtData.State.Stats);
             }
 
             void DistrictDataOnOnDisposed()
@@ -237,24 +237,28 @@ namespace UI
             }
         }
 
-        private void DisplayExtraInfo(DistrictData districtData)
+        private void DisplayExtraInfo(DistrictData districtData) // TODO: Convert to LocalizedString
         {
-            if (districtData.State is not IAttackerStatistics stats)
+            bool spawned = false;
+
+            if (districtData.State is IAttackerStatistics stats)
             {
-                return;
+                if (stats.DamageDone > 0)
+                {
+                    AddText($"Damage Dealt - {stats.DamageDone:N0}");
+                }
+
+                if (stats.GoldGained > 0)
+                {
+                    AddText($"Gold Gained - {stats.GoldGained:N0}");
+                }
+            }
+
+            if (districtData.State is ILumbermillStatistics lumbermillStatistics)
+            {
+                AddText($"Forest chopped in <u>{lumbermillStatistics.TurnsUntilComplete}</u> Turns!");
             }
             
-            bool spawned = false;
-            if (stats.DamageDone > 0)
-            {
-                AddText($"Damage Dealt - {stats.DamageDone:N0}");
-            }
-
-            if (stats.GoldGained > 0)
-            {
-                AddText($"Gold Gained - {stats.GoldGained:N0}");
-            }
-
             if (spawned)
             {
                 extraInfoParent.gameObject.SetActive(true);
@@ -414,28 +418,10 @@ namespace UI
             statPanel.gameObject.SetActive(!statPanel.gameObject.activeSelf);
             if (statPanel.gameObject.activeSelf)
             {
-                statPanel.DisplayStats(StatDisplayableType.District, GetDistrictName(districtData), districtData.State.Stats);
+                statPanel.DisplayStats(StatDisplayableType.District, districtData.TowerData.DistrictName, districtData.State.Stats);
             }
         }
 
         #endregion
-        
-        private static string GetDistrictName(DistrictData districtData)
-        {
-            return districtData.State switch
-            {
-                TownHallState => "Town Hall",
-                MineState => "Mine District",
-                BombState => "Bomb District",
-                ArcherState => "Archer District",
-                FlameState => "Flame District",
-                LightningState => "Lightning District",
-                ChurchState => "Church District",
-                BarracksState => "Barrack District",
-
-                _ => throw new ArgumentOutOfRangeException()
-            };
-        }
-
     }
 }

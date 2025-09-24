@@ -1,23 +1,18 @@
-using UnityEngine.EventSystems;
+using DG.Tweening.Plugins.Options;
 using Sirenix.OdinInspector;
+using DG.Tweening.Core;
 using UnityEngine.UI;
 using DG.Tweening;
-using DG.Tweening.Core;
-using DG.Tweening.Plugins.Options;
 using UnityEngine;
-using Variables;
 
 namespace UI
 {
-    public class UIDistrictFoldout : MonoBehaviour//, IPointerEnterHandler, IPointerExitHandler
+    public class UIFoldoutController : MonoBehaviour
     {
         [Title("Setup")]
         [SerializeField]
         private RectTransform foldoutTransform;
 
-        [SerializeField]
-        private Canvas canvas;
-        
         [Title("Animation Settings", "Open")]
         [SerializeField]
         private float openDuration = 0.5f;
@@ -30,22 +25,6 @@ namespace UI
         
         [SerializeField]
         private Ease closeEase = Ease.Linear;
-
-        [Title("Animation Settings", "Color")]
-        [SerializeField]
-        private Image[] highlightImages; 
-        
-        [SerializeField]
-        private ColorReference defaultColor;
-        
-        [SerializeField]
-        private ColorReference highlightColorTint;
-
-        [SerializeField]
-        private float colorAnimationDuration = 0.5f;
-        
-        [SerializeField]
-        private Ease colorAnimationEase = Ease.InOutSine;
         
         public bool IsOpen { get; private set; }
 
@@ -93,25 +72,5 @@ namespace UI
                 };
             }
         }
-
-        /*public void OnPointerEnter(PointerEventData eventData)
-        {
-            Color endColor = defaultColor.Value * highlightColorTint.Value;
-            for (int i = 0; i < highlightImages.Length; i++)
-            {
-                highlightImages[i].DORewind();
-                highlightImages[i].color = defaultColor.Value;
-                highlightImages[i].DOColor(endColor, colorAnimationDuration).SetEase(colorAnimationEase).SetLoops(-1, LoopType.Yoyo);
-            }
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            for (int i = 0; i < highlightImages.Length; i++)
-            {
-                highlightImages[i].DOKill();
-                highlightImages[i].DOColor(defaultColor.Value, 0.2f).SetEase(colorAnimationEase);
-            }
-        }*/
     }
 }

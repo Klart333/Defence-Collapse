@@ -332,15 +332,7 @@ namespace Buildings
             {
                 return;
             }
-            
-            if (!MoneyManager.Instance.CanPurchase(BuildingType.Barricade))
-            {
-                //pathGenerator.RevertQuery();
-                return;
-            }
 
-            MoneyManager.Instance.Purchase(BuildingType.Barricade);
-            
             spawnedSpawnPlaces[SquareIndex.Value].OnPlaced();
             barricadeGenerator.Place();
 
@@ -354,8 +346,6 @@ namespace Buildings
             {
                 return;
             }
-            
-            MoneyManager.Instance.AddMoneyParticles(MoneyManager.Instance.PathCost, pressedSquare.transform.position);
             
             barricadeHandler.BarricadeDestroyed(SquareIndex.Value);
         }

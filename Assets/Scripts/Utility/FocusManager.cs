@@ -1,23 +1,28 @@
 using System.Collections.Generic;
-using System;
 using Gameplay.Event;
+using System;
 
 namespace Utility
 {
     public class FocusManager : Singleton<FocusManager>
     {
-        private List<Focus> focuses = new List<Focus>();
+        private HashSet<Focus> focuses = new HashSet<Focus>();
 
         public void RegisterFocus(Focus focusToRegister)
         {
             UIEvents.OnFocusChanged?.Invoke();
 
-            for (int i = focuses.Count - 1; i >= 0; i--)
+            HashSet<Focus> toRemove = new HashSet<Focus>();
+            foreach (Focus focus in focuses)
             {
-                if (focuses[i].ChangeType != FocusChangeType.Unique) continue;
-                
-                focuses[i].OnFocusExit();
-                focuses.RemoveAt(i);
+                if (focus.ChangeType != FocusChangeType.Unique) continue;
+
+                toRemove.Add(focus);
+            }
+
+            foreach (Focus focus in toRemove)
+            {
+                RemoveFocus(focus);
             }
             
             focuses.Add(focusToRegister);
@@ -25,24 +30,24 @@ namespace Utility
 
         public void UnregisterFocus(Focus focusToRemove)
         {
-            for (int i = 0; i < focuses.Count; i++)
+            RemoveFocus(focusToRemove);
+        }
+        
+        private void RemoveFocus(Focus focus)
+        {
+            if (focuses.Remove(focus))
             {
-                Focus focus = focuses[i];
-                if (focusToRemove != focus) continue;
-                
-                focuses.RemoveAt(i);
-                focus.OnFocusExit();
-                break;
+                focus.OnFocusExit?.Invoke();
             }
         }
-
+        
         public bool GetIsFocused(HashSet<FocusType> blackList = null)
         {
             if (blackList == null) return focuses.Count > 0;
-            
-            for (int i = 0; i < focuses.Count; i++)
+
+            foreach (Focus focus in focuses)
             {
-                if (!blackList.Contains(focuses[i].FocusType))
+                if (!blackList.Contains(focus.FocusType))
                 {
                     return true;
                 }

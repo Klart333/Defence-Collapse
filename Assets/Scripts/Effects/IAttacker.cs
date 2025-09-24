@@ -33,4 +33,11 @@ namespace Effects
         public float DamageDone { get; set; } // Make into a seperate class
         public float GoldGained { get; set; }
     }
+    
+    public interface ILumbermillStatistics 
+    {
+        public event Action OnStatisticsChanged;
+        
+        public int TurnsUntilComplete { get; set; }
+    }
 }

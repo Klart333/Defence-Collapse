@@ -40,6 +40,7 @@ namespace Buildings.District
         public Vector3 Position { get; }
         
         public List<IUpgradeStat> UpgradeStats => State.UpgradeStats;
+        public TowerData TowerData => towerData;
         public Stats Stats => State.Stats;
 
         public DistrictData(TowerData towerData, HashSet<QueryChunk> chunks, Vector3 position, IChunkWaveFunction<QueryChunk> chunkDistrictGenerator, int key, PrototypeInfoData prototypeInfo)
@@ -57,6 +58,7 @@ namespace Buildings.District
             this.towerData = towerData;
             State = towerData.DistrictType switch
             {
+                DistrictType.Lumbermill => new LumbermillState(this, towerData, position, key),
                 DistrictType.Lightning => new LightningState(this, towerData, position, key),
                 DistrictType.TownHall => new TownHallState(this, towerData, position, key),
                 DistrictType.Barracks => new BarracksState(this, towerData, position, key),

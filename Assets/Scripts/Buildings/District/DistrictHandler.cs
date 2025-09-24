@@ -148,27 +148,22 @@ namespace Buildings.District
 
         public void AddBuiltDistrict(HashSet<QueryChunk> chunks, DistrictType districtType)
         {
-            if (CheckMerge(chunks, out HashSet<DistrictData> overlappingDistricts) > 0)
+            TowerData districtData = towerDataUtility.GetTowerData(districtType);
+            if (!districtData.ShouldCombine)
             {
-                DistrictData districtToMergeInto = GetHighestLevel(overlappingDistricts);
-                overlappingDistricts.Remove(districtToMergeInto);
-
-                foreach (DistrictData data in overlappingDistricts)
-                {
-                    chunks.AddRange(data.DistrictChunks.Values);
-                    data.Dispose();
-                }
-                
-                foreach (QueryChunk chunk in chunks)
-                {
-                    districts.TryAdd(chunk.ChunkIndex.xz, districtToMergeInto);
-                }
-                
-                districtToMergeInto.ExpandDistrict(chunks);
+                RemoveOverlappingChunks(chunks);
+                CreateDistrictData(districtData, chunks);
             }
             else
             {
-                CreateDistrictData(districtType, chunks);
+                if (IsOverlapping(chunks, out HashSet<DistrictData> overlappingDistricts))
+                {
+                    MergeIntoDistricts(chunks, overlappingDistricts);
+                }
+                else
+                {
+                    CreateDistrictData(districtData, chunks);
+                }   
             }
 
             foreach (QueryChunk chunk in chunks)
@@ -186,6 +181,42 @@ namespace Buildings.District
             Events.OnDistrictBuilt?.Invoke(districtType);
         }
 
+        private void RemoveOverlappingChunks(HashSet<QueryChunk> chunks)
+        {
+            List<QueryChunk> toRemove = new List<QueryChunk>(); 
+            foreach (QueryChunk chunk in chunks)
+            {
+                if (districts.ContainsKey(chunk.ChunkIndex.xz))
+                {
+                    toRemove.Add(chunk);
+                }
+            }
+
+            for (int i = 0; i < toRemove.Count; i++)
+            {
+                chunks.Remove(toRemove[i]);
+            }
+        }
+
+        private void MergeIntoDistricts(HashSet<QueryChunk> chunks, HashSet<DistrictData> overlappingDistricts)
+        {
+            DistrictData districtToMergeInto = GetHighestLevel(overlappingDistricts);
+            overlappingDistricts.Remove(districtToMergeInto);
+
+            foreach (DistrictData data in overlappingDistricts)
+            {
+                chunks.AddRange(data.DistrictChunks.Values);
+                data.Dispose();
+            }
+                
+            foreach (QueryChunk chunk in chunks)
+            {
+                districts.TryAdd(chunk.ChunkIndex.xz, districtToMergeInto);
+            }
+                
+            districtToMergeInto.ExpandDistrict(chunks);
+        }
+
         private DistrictData GetHighestLevel(HashSet<DistrictData> datas)
         {
             int highest = -1;
@@ -201,7 +232,7 @@ namespace Buildings.District
             return highestDistrict;
         }
 
-        private int CheckMerge(HashSet<QueryChunk> chunks, out HashSet<DistrictData> overlappingDistricts)
+        private bool IsOverlapping(HashSet<QueryChunk> chunks, out HashSet<DistrictData> overlappingDistricts)
         {
             overlappingDistricts = new HashSet<DistrictData>();
             foreach (QueryChunk chunk in chunks)
@@ -212,13 +243,12 @@ namespace Buildings.District
                 }
             }
 
-            return overlappingDistricts.Count;
+            return overlappingDistricts.Count > 0;
         }
 
-        private DistrictData CreateDistrictData(DistrictType districtType, HashSet<QueryChunk> chunks)
+        private DistrictData CreateDistrictData(TowerData towerData, HashSet<QueryChunk> chunks)
         {
-            PrototypeInfoData prototypeInfo = prototypeInfoUtility.GetPrototypeInfo(districtType);
-            TowerData towerData = towerDataUtility.GetTowerData(districtType);
+            PrototypeInfoData prototypeInfo = prototypeInfoUtility.GetPrototypeInfo(towerData.DistrictType);
             Vector3 position = GetAveragePosition(chunks);
             int key = districtKey++;
             DistrictData districtData = new DistrictData(towerData, chunks, position, districtGenerator, key, prototypeInfo)

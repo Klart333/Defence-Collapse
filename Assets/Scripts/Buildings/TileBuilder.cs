@@ -1,4 +1,5 @@
 using FocusType = Utility.FocusType;
+
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine.InputSystem;
@@ -28,8 +29,6 @@ namespace Buildings
         
         [SerializeField]
         private GroundGenerator groundGenerator;
-        
-        private Dictionary<ChunkIndex, BuildingType> tiles = new Dictionary<ChunkIndex, BuildingType>();
 
         private BuildingManager buildingManager;
         private InputManager inputManager;
@@ -41,10 +40,11 @@ namespace Buildings
 
         private TileAction pendingAction;
         private BuildingType currentType;
+        private GroundType buildableGroundType;
         
         private bool displaying;
         
-        public Dictionary<ChunkIndex, BuildingType> Tiles => tiles;
+        public Dictionary<ChunkIndex, BuildingType> Tiles { get; } = new Dictionary<ChunkIndex, BuildingType>();
 
         private void OnEnable()
         {
@@ -136,8 +136,9 @@ namespace Buildings
 
         private bool IsTileValid(ChunkIndex index, out TileAction action)
         {
-            bool isValid = IsTileChunkLoaded(index)
-                           && tiles.TryGetValue(index, out _);
+            bool isValid = Tiles.TryGetValue(index, out _)
+                           && IsGroundTypeValid(index) 
+                           && IsTileChunkLoaded(index);
             if (!isValid)
             {
                 action = TileAction.None;
@@ -146,6 +147,12 @@ namespace Buildings
             
             action = OnTileEntered?.Invoke(index) ?? TileAction.None;
             return action != TileAction.None;
+        }
+        
+        private bool IsGroundTypeValid(ChunkIndex index)
+        {
+            GroundType groundType = buildingManager.ChunkWaveFunction.Chunks[index.Index].GroundTypes[index.CellIndex.x, index.CellIndex.y, index.CellIndex.z, 1];
+            return (buildableGroundType & groundType) > 0;
         }
 
         private bool IsTileChunkLoaded(ChunkIndex index)
@@ -190,17 +197,7 @@ namespace Buildings
             for (int z = 0; z < chunk.Depth; z++)
             {
                 ChunkIndex chunkIndex = new ChunkIndex(chunk.ChunkIndex, new int3(x, 0, z));
-                TryAdd(chunkIndex);
-            }
-            
-            void TryAdd(ChunkIndex chunkIndex)
-            {
-                if (!buildingManager.IsBuildable(chunkIndex))
-                {
-                    return;
-                }
-                
-                tiles.TryAdd(chunkIndex, 0);
+                Tiles.TryAdd(chunkIndex, 0);
             }
         }
         
@@ -227,8 +224,9 @@ namespace Buildings
             }
         }
 
-        public void Display(BuildingType type, IsTileBuildable buildable)
+        public void Display(BuildingType type, GroundType groundBuildable, IsTileBuildable buildable)
         {
+            buildableGroundType = groundBuildable;
             currentType = type;
             displaying = true;
             focusManager.RegisterFocus(focus);

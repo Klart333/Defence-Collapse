@@ -36,6 +36,10 @@ namespace Buildings.District
         [SerializeField]
         private DistrictType districtType;
 
+        [Title("Construction")]
+        [SerializeField]
+        private bool shouldCombine = true;
+
         [TitleGroup("Stats")]
         [OdinSerialize, NonSerialized]
         public Stats Stats;
@@ -84,6 +88,7 @@ namespace Buildings.District
         public DistrictType DistrictType => districtType;
         public CategoryType CategoryType => categoryType;
         public bool UseTargetMesh => useTargetMesh;
+        public bool ShouldCombine => shouldCombine;
         public Sprite IconSmall => iconSmall.Value;
         public float AttackAngle => attackAngle;
         public Sprite Icon => icon.Value;

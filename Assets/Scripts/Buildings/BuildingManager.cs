@@ -269,22 +269,20 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         QuerySpawnedBuildings.Clear();
     }
 
-    public Dictionary<ChunkIndex, IBuildable> Query(ChunkIndex queryIndex)
+    public void Query(ChunkIndex queryIndex)
     {
         List<ChunkIndex> cellsToCollapse = this.GetCellsToCollapse(queryIndex);
-        return Query(cellsToCollapse, new List<ChunkIndex> { queryIndex });
+        Query(cellsToCollapse, new List<ChunkIndex> { queryIndex });
     }
     
-    public Dictionary<ChunkIndex, IBuildable> Query(List<ChunkIndex> cellsToCollapse, IEnumerable<ChunkIndex> builtIndexes)
+    public void Query(List<ChunkIndex> cellsToCollapse, IEnumerable<ChunkIndex> builtIndexes)
     {
-        if (IsGenerating)
-        {
-            return new Dictionary<ChunkIndex, IBuildable>();
-        }
+        if (IsGenerating) return;
         
         RevertQuery();
 
-        if (cellsToCollapse.Count <= 0) return QuerySpawnedBuildings;
+        if (cellsToCollapse.Count <= 0) return;
+
         queriedChunks = this.GetChunks(cellsToCollapse);
         queryBuiltIndexes = builtIndexes;
 
@@ -315,9 +313,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         if (tries <= 0)
         {
             Debug.LogError("Ran out of attempts to collapse");
-        }
-
-        return QuerySpawnedBuildings;
+        } 
     }
 
     public IBuildable GenerateMesh(Vector3 position, ChunkIndex index, PrototypeData prototypeData, bool animate = false)

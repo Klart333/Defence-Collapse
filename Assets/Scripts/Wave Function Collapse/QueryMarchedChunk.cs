@@ -151,7 +151,7 @@ namespace WaveFunctionCollapse
                 for (int i = 0; i < WaveFunctionUtility.Corners.Length; i++)
                 {
                     int2 corner = WaveFunctionUtility.Corners[i];
-                    if (cellBuildableCornerData.IsCornerBuildable(groundCell.PossiblePrototypes[0].MeshRot, corner, out GroundType type))
+                    if (cellBuildableCornerData.TryGetCornerType(groundCell.PossiblePrototypes[0].MeshRot, corner, out GroundType type))
                     {
                         GroundTypes[cellIndex.x, cellIndex.y, cellIndex.z, i] = type;
                     }   

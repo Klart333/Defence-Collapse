@@ -3,6 +3,7 @@ using Buildings.District;
 using Gameplay.Event;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace UI
 {
@@ -10,9 +11,10 @@ namespace UI
     {
         public event Action<TowerData, UIDistrictButton> OnDistrictButtonSpawned;
         
+        [FormerlySerializedAs("districtFoldout")]
         [Title("Settings")]
         [SerializeField]
-        private UIDistrictFoldout districtFoldout;
+        private UIFoldoutController foldoutController;
 
         [SerializeField]
         private UIDistrictButton districtButtonPrefab;
@@ -48,9 +50,9 @@ namespace UI
             
             OnDistrictButtonSpawned?.Invoke(towerData, districtButton);
 
-            if (districtFoldout.IsOpen)
+            if (foldoutController.IsOpen)
             {
-                districtFoldout.ToggleOpen(true);
+                foldoutController.ToggleOpen(true);
             }
         }
     }

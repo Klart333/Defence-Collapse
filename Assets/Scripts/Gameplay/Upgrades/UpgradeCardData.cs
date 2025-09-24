@@ -143,10 +143,11 @@ namespace Gameplay.Upgrades
         TownHall = 1 << 3,
         Mine = 1 << 4,
         Flame = 1 << 5,
+        Mana = 1 << 6,
         Lightning = 1 << 10,
         Barracks = 1 << 11,
-        Mana = 1 << 6,
-        AllDistrict = Archer | Bomb | Church | TownHall | Mine | Flame | Lightning | Barracks | Mana,
+        Lumbermill = 1 << 12,
+        AllDistrict = Archer | Bomb | Church | TownHall | Mine | Flame | Lightning | Barracks | Mana | Lumbermill,
 
         // Attack
         Projectile = 1 << 7,

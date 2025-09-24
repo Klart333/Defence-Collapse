@@ -60,31 +60,28 @@ namespace WaveFunctionCollapse
 
         [OdinSerialize]
         public readonly Dictionary<ChunkIndex, HashSet<int3>> ChunkIndexToChunks = new Dictionary<ChunkIndex, HashSet<int3>>();
-
-        public Dictionary<int3, PrototypeInfoData> QueryChangedData { get; } = new Dictionary<int3, PrototypeInfoData>();
-        public Dictionary<ChunkIndex, IBuildable> QuerySpawnedBuildings { get; } = new Dictionary<ChunkIndex, IBuildable>();
-        public Dictionary<ChunkIndex, IBuildable> SpawnedMeshes { get; } = new Dictionary<ChunkIndex, IBuildable>();
-        
-        private readonly Queue<List<IBuildable>> buildQueue = new Queue<List<IBuildable>>();
-
-        private readonly Queue<Func<UniTask>> GeneratorActionQueue = new Queue<Func<UniTask>>();
+       
+        private Queue<List<IBuildable>> buildQueue = new Queue<List<IBuildable>>();
 
         private BuildingAnimator buildingAnimator;
         private Vector3 offset;
 
         private bool isUpdatingChunks;
         private bool isRemovingChunks;
-
-        public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.CellSize.x, chunkSize.y * ChunkWaveFunction.CellSize.y, chunkSize.z * ChunkWaveFunction.CellSize.z);
-        public HashSet<QueryChunk> QueriedChunks { get; } = new HashSet<QueryChunk>();
-
-        public Vector3 CellSize => waveFunction.CellSize;
-        public Vector3Int ChunkSize => chunkSize;
         
-        public ChunkWaveFunction<QueryChunk> ChunkWaveFunction => waveFunction;
-        private bool ShouldAwait => awaitEveryFrame > 0;
+        public Dictionary<ChunkIndex, IBuildable> QuerySpawnedBuildings { get; } = new Dictionary<ChunkIndex, IBuildable>();
+        public Dictionary<int3, PrototypeInfoData> QueryChangedData { get; } = new Dictionary<int3, PrototypeInfoData>();
+        public Dictionary<ChunkIndex, IBuildable> SpawnedMeshes { get; } = new Dictionary<ChunkIndex, IBuildable>();
+        public Queue<Func<UniTask>> GeneratorActionQueue { get; } = new Queue<Func<UniTask>>();
+        public HashSet<QueryChunk> QueriedChunks { get; } = new HashSet<QueryChunk>();
         public bool IsGenerating { get; private set; }
 
+        public Vector3 ChunkScale => new Vector3(chunkSize.x * ChunkWaveFunction.CellSize.x, chunkSize.y * ChunkWaveFunction.CellSize.y, chunkSize.z * ChunkWaveFunction.CellSize.z);
+        public ChunkWaveFunction<QueryChunk> ChunkWaveFunction => waveFunction;
+        public Vector3 CellSize => waveFunction.CellSize;
+        private bool ShouldAwait => awaitEveryFrame > 0;
+        public Vector3Int ChunkSize => chunkSize;
+        
         private void OnEnable()
         {
             offset = waveFunction.CellSize.XyZ(0) / 2.0f;
@@ -422,7 +419,7 @@ namespace WaveFunctionCollapse
             
             foreach (KeyValuePair<ChunkIndex, IBuildable> item in QuerySpawnedBuildings)
             {
-                SpawnedMeshes.Add(item.Key, item.Value);
+                SpawnedMeshes.TryAdd(item.Key, item.Value);
             }
 
             foreach (IBuildable item in QuerySpawnedBuildings.Values)
@@ -518,7 +515,7 @@ namespace WaveFunctionCollapse
                     return null;
                 }
                 PrototypeData chosenPrototype = waveFunction.Collapse(waveFunction[index.Value]);
-                SetCell(index.Value, chosenPrototype);
+                SetCell(index.Value, chosenPrototype, true);
 
                 waveFunction.Propagate();
             }
@@ -608,7 +605,7 @@ namespace WaveFunctionCollapse
             if (query) 
             {
                 QuerySpawnedBuildings.Add(index, spawned);
-                return;
+                //return;
             }
 
             spawned.ToggleIsBuildableVisual(false, false);

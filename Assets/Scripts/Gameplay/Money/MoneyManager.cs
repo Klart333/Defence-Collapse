@@ -20,10 +20,6 @@ namespace Gameplay.Money
         [ReadOnly, SerializeField]
         private float money = 0;
 
-        [Title("Building Info")]
-        [SerializeField]
-        private BuildableCostData costData;
-
         [Title("District Info")]
         [SerializeField]
         private DistrictCostUtility districtCostUtility;
@@ -38,10 +34,7 @@ namespace Gameplay.Money
         
         private EntityManager entityManager;
         private Entity moneyEntity;
-
-        public int BuildingCost => costData.GetCost(BuildingType.Building);
-        public float PathCost => costData.GetCost(BuildingType.Barricade);
-
+        
         public float Money => money;
         public Stat MoneyMultiplier { get; private set; }
 
@@ -74,18 +67,6 @@ namespace Gameplay.Money
                 AddMoneyDebug();
             }
         }
-        
-        public bool CanPurchase(BuildingType buildingType)
-        {
-            if (Money >= costData.GetCost(buildingType))
-            {
-                return true;
-            }
-
-            Debug.Log("Tell player not enough money");
-            return false;
-        }
-
 
         public bool CanPurchase(DistrictType districtType, int districtAmount, out float cost)
         {
@@ -97,11 +78,6 @@ namespace Gameplay.Money
 
             InsufficientFunds(cost);
             return false;
-        }
-
-        public void Purchase(BuildingType buildingType)
-        {
-            RemoveMoney(costData.GetCost(buildingType));
         }
         
         public void AddMoney(float amount, bool addMultiplier = true)

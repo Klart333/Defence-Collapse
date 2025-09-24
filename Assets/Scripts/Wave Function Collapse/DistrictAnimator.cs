@@ -45,7 +45,7 @@ namespace WaveFunctionCollapse
 
         private void Update()
         {
-            if (timer > -0.016f)
+            if (timer > 0)
             {
                 timer -= Time.deltaTime;
             }

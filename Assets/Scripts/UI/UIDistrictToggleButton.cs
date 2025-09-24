@@ -1,8 +1,8 @@
 using Buildings.District;
+using Gameplay.Event;
 using UnityEngine.UI;
 using UnityEngine;
 using System;
-using Gameplay.Event;
 
 namespace UI
 {

@@ -64,7 +64,7 @@ namespace Buildings
                 return;
             }
             
-            tileBuilder.Display(BuildingType.Building, IsBuildable);
+            tileBuilder.Display(BuildingType.Building, GroundType.Buildable, IsBuildable);
             tileBuilder.OnTilePressed += OnTilePressed;
         }
 
@@ -97,14 +97,8 @@ namespace Buildings
 
         private void PlaceBuilding(ChunkIndex index)
         {
-            if (!MoneyManager.Instance.CanPurchase(BuildingType.Building))
-            {
-                return;
-            }
-
             tileBuilder.Tiles[index] = BuildingType.Building;
             
-            MoneyManager.Instance.Purchase(BuildingType.Building);
             buildingManager.Query(index);
             buildingManager.Place();
         }
@@ -112,10 +106,7 @@ namespace Buildings
         private void RemoveBuilding(ChunkIndex index)
         {
             tileBuilder.Tiles[index] = 0;
-
-            Vector3 pos = buildingManager.GetPos(index);
-            MoneyManager.Instance.AddMoneyParticles(MoneyManager.Instance.BuildingCost, pos);
-
+            
             buildingHandler.BuildingDestroyed(index);
         }
     }
@@ -126,5 +117,6 @@ namespace Buildings
         Building = 1 << 0,
         Barricade = 2 << 0,
         District = 3 << 0,
+        Lumbermill = 4 << 0,
     }
 }

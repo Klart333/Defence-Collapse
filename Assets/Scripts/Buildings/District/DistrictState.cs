@@ -1121,6 +1121,87 @@ namespace Buildings.District
     }
 
     #endregion
+    
+     #region Mine
+
+     public sealed class LumbermillState : DistrictState, ITurnCompleteSubscriber, ILumbermillStatistics
+     { 
+         private GameObject rangeIndicator;
+         private bool selected;
+
+         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
+         public int TurnsUntilComplete { get; set; }
+         public override Attack Attack { get; }
+         
+ 
+         public LumbermillState(DistrictData districtData, TowerData lumbermillData, Vector3 position, int key) : base(districtData, position, key, lumbermillData)
+         {
+             this.districtData = lumbermillData;
+             TurnsUntilComplete = 5;
+             
+             CreateStats();
+             Attack = new Attack(lumbermillData.BaseAttack);
+         }
+ 
+         protected override void RangeChanged()
+         {
+             base.RangeChanged();
+ 
+             if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
+             {
+                 rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+             }
+         }
+ 
+         private void CreateStats()
+         {
+             stats = new Stats(districtData.Stats);
+             SubscribeToStats();
+         }
+         
+         public override void OnSelected(Vector3 pos)
+         {
+             if (selected) return;
+             
+             selected = true;
+             rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
+             rangeIndicator.transform.position = pos;
+             rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+             rangeIndicator.gameObject.SetActive(true);
+         }
+ 
+         public override void OnDeselected()
+         {
+             if (rangeIndicator is null) return;
+             
+             selected = false;
+             rangeIndicator.SetActive(false);
+             rangeIndicator = null;
+         }
+ 
+         public void TurnComplete()
+         {
+             TurnsUntilComplete--;
+
+             foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)
+             {
+                 OriginPosition = chunk.Position;
+                 foreach (IEffect effect in districtData.EndWaveEffects)
+                 {
+                     effect.Perform(this);
+                 }
+                 
+                 InvokeStatisticsChanged();
+             }
+             
+             if (TurnsUntilComplete <= 0)
+             {
+                 Debug.Log("FOREST IS GONE!");
+             }
+         }
+     }
+
+    #endregion
 
     public static class DistrictStateUtility
     {

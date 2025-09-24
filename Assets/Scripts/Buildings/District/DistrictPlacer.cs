@@ -2,12 +2,9 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
-using Sirenix.Utilities;
-using Unity.Mathematics;
 using Gameplay.Event;
 using Gameplay.Money;
 using UnityEngine;
-using System.Linq;
 using Gameplay;
 using System;
 using TMPro;
@@ -104,7 +101,7 @@ namespace Buildings.District
                 return;
             }
             
-            tileBuilder.Display(BuildingType.District, IsBuildable);
+            tileBuilder.Display(BuildingType.District, GetBuildableGroundType(), IsBuildable);
             tileBuilder.OnTilePressed += OnTilePressed;
 
             this.districtType = districtType;
@@ -121,33 +118,16 @@ namespace Buildings.District
                     return TileAction.Sell;
             }
             
-            if (!CheckGroundType(chunkIndex))
-            {
-                return TileAction.None;
-            }
-
             UpdateCost();
             return TileAction.Build;
         }
         
-        private bool CheckGroundType(ChunkIndex index)
-        {
-            GroundType groundType = buildingGenerator.ChunkWaveFunction.Chunks[index.Index].GroundTypes[index.CellIndex.x, index.CellIndex.y, index.CellIndex.z, 1];
-            if (!IsBuildable(groundType))
-            {
-                if (verbose) Debug.Log($"Invalid, The groundType: {groundType} does not match the district's restrictions");
-                return false;
-            }
-            
-            return true;
-        }
-        
-        private bool IsBuildable(GroundType groundType)
+        private GroundType GetBuildableGroundType()
         {
             return districtType switch
             {
-                DistrictType.Mine => groundType is GroundType.Crystal,
-                _ => groundType is GroundType.Grass or GroundType.Crystal
+                DistrictType.Mine => GroundType.Crystal,
+                _ => GroundType.Grass | GroundType.Crystal
             };
         }
         
@@ -159,7 +139,7 @@ namespace Buildings.District
                     Debug.Log("Wot");
                     break;
                 case TileAction.Build:
-                    PlaceDistrict(index);
+                    PlaceDistrict(index).Forget();
                     break;
                 case TileAction.Sell:
                     break;
@@ -175,7 +155,7 @@ namespace Buildings.District
             OnPlacingCanceled?.Invoke();
         }
 
-        private void PlaceDistrict(ChunkIndex groundIndex)
+        private async UniTaskVoid PlaceDistrict(ChunkIndex groundIndex)
         {
             int amount = districtHandler.GetDistrictAmount(districtType);
             if (!moneyManager.CanPurchase(districtType, amount, out float cost))
@@ -190,7 +170,9 @@ namespace Buildings.District
             PrototypeInfoData protInfo = prototypeUtility.GetPrototypeInfo(districtType);
             
             buildingGenerator.Query(groundIndex);
-            buildingGenerator.Place(); 
+            buildingGenerator.Place();
+
+            await UniTask.WaitUntil(() => districtGenerator.GeneratorActionQueue.Count == 0);
             
             Vector3 position = ChunkWaveUtility.GetPosition(groundIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize) + groundGenerator.ChunkWaveFunction.CellSize.XyZ(0) / 2.0f;
             districtGenerator.Query(position, 2, protInfo);
