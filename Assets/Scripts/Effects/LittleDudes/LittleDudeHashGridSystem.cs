@@ -6,6 +6,7 @@ using Unity.Burst;
 using Effects.ECS;
 using Enemy.ECS;
 using System;
+using Pathfinding;
 
 namespace Effects.LittleDudes
 {
@@ -59,7 +60,7 @@ namespace Effects.LittleDudes
         [BurstCompile]
         public void Execute(Entity entity, in LocalTransform enemyTransform)
         {
-            int2 cell = HashGridUtility.GetCell(enemyTransform.Position, CellSize);
+            int2 cell = PathUtility.GetPathGridIndex(enemyTransform.Position.xz);
             SpatialGrid.Add(cell, entity);
         }
     }

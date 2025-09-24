@@ -1,4 +1,5 @@
 using Buildings.District.ECS;
+using Pathfinding;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
@@ -11,25 +12,33 @@ namespace Enemy.ECS
     public partial struct ClosestTargetingSystem : ISystem
     {
         private ComponentLookup<LocalTransform> transformLookup;
-        
+        private ComponentLookup<EnemyClusterComponent> clusterLookup;
+        private BufferLookup<ManagedEntityBuffer> bufferLookup;
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<TargetingActivationComponent>();
 
             transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+            //clusterLookup = SystemAPI.GetComponentLookup<EnemyClusterComponent>(true);
+            bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
+            NativeParallelHashMap<int, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             transformLookup.Update(ref state);
-            
+            //clusterLookup.Update(ref state);
+            bufferLookup.Update(ref state);
+
             new ClosestTargetingJob
             {
                 TransformLookup = transformLookup,
                 SpatialGrid = spatialGrid.AsReadOnly(),
+                //ClusterLookup = clusterLookup,
+                BufferLookup = bufferLookup,
             }.ScheduleParallel();
         }
 
@@ -48,18 +57,22 @@ namespace Enemy.ECS
         public ComponentLookup<LocalTransform> TransformLookup;
         
         [ReadOnly]
-        public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
+        public NativeParallelHashMap<int, Entity>.ReadOnly SpatialGrid;
+        
+        [ReadOnly]
+        public BufferLookup<ManagedEntityBuffer> BufferLookup;
         
         [BurstCompile]
         public void Execute(in DirectionRangeComponent directionComponent, ref EnemyTargetComponent enemyTargetComponent, in RangeComponent rangeComponent, in LocalTransform localTransform)
         {
             float2 towerPosition = localTransform.Position.xz;
-            int2 towerCell = HashGridUtility.GetCellForCellSize1(towerPosition);
+            int towerCell = PathUtility.GetPathGridIndex(towerPosition);
+            
             float range = rangeComponent.Range;
-            int radiusCells = (int)math.ceil(range);
             float rangeSq = range * range;
             float maxCellDist = range * 1.414f; // Diagonal of cell
             float maxCellDistSq = maxCellDist * maxCellDist;
+            int radiusCells = (int)(range / PathUtility.CELL_SCALE + 0.5f);
 
             // Common target finding variables
             float bestDistSq = rangeSq;
@@ -71,30 +84,17 @@ namespace Enemy.ECS
                 for (int dx = -radiusCells; dx <= radiusCells; dx++)
                 for (int dy = -radiusCells; dy <= radiusCells; dy++)
                 {
-                    int2 cell = new int2(towerCell.x + dx, towerCell.y + dy);
+                    int cell = towerCell + dx + dy * PathUtility.CELL_SCALE;
                     
                     // Quick distance check at cell level
-                    float2 cellCenter = (float2)cell + 0.5f;
+                    float2 cellCenter = PathUtility.GetPos(cell) + PathUtility.HALF_CELL_SCALE;
                     float2 toCell = cellCenter - towerPosition;
                     float cellDistSq = math.lengthsq(toCell);
                     if (cellDistSq > maxCellDistSq
                         || cellDistSq > bestDistSq)
                         continue;
 
-                    if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) 
-                        continue;
-                    
-                    do
-                    {
-                        RefRO<LocalTransform> enemyTransform = TransformLookup.GetRefRO(enemy);
-                        float2 enemyPosition = enemyTransform.ValueRO.Position.xz;
-                        float distSq = math.distancesq(towerPosition, enemyPosition);
-
-                        if (distSq >= bestDistSq) continue;
-                        
-                        bestDistSq = distSq;
-                        bestEnemyPosition = enemyTransform.ValueRO.Position;
-                    } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
+                    bestDistSq = GetClosestEnemy(cell, towerPosition, bestDistSq, ref bestEnemyPosition);
                 }
             }
             else
@@ -109,8 +109,8 @@ namespace Enemy.ECS
                 for (int dx = -radiusCells; dx <= radiusCells; dx++)
                 for (int dy = -radiusCells; dy <= radiusCells; dy++)
                 {
-                    int2 cell = new int2(towerCell.x + dx, towerCell.y + dy);
-                    float2 cellCenter = (float2)cell + 0.5f;
+                    int cell = towerCell + dx + dy * PathUtility.CELL_SCALE;
+                    float2 cellCenter = PathUtility.GetPos(cell) + PathUtility.HALF_CELL_SCALE;
                     float2 toCell = cellCenter - towerPosition;
                     float cellDistSq = math.lengthsq(toCell);
 
@@ -133,24 +133,7 @@ namespace Enemy.ECS
                         }
                     }
 
-                    if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) 
-                        continue;
-                    
-                    do
-                    {
-                        RefRO<LocalTransform> enemyTransform = TransformLookup.GetRefRO(enemy);
-                        float2 enemyPosition = enemyTransform.ValueRO.Position.xz + direction;
-                        float2 toEnemy = enemyPosition - towerPosition;
-                        float distSq = math.lengthsq(toEnemy);
-
-                        if (distSq >= bestDistSq) continue;
-                        
-                        float2 normToEnemy = math.normalize(toEnemy);
-                        if (math.dot(normToEnemy, direction) < cosHalfAngle) continue;
-                        
-                        bestDistSq = distSq;
-                        bestEnemyPosition = enemyTransform.ValueRO.Position;
-                    } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
+                    bestDistSq = GetClosestEnemy(cell, towerPosition, bestDistSq, ref bestEnemyPosition);
                 }
             }
 
@@ -158,6 +141,27 @@ namespace Enemy.ECS
             
             enemyTargetComponent.TargetPosition = bestEnemyPosition;
             enemyTargetComponent.HasTarget = true;
+        }
+
+        private float GetClosestEnemy(int cell, float2 towerPosition, float bestDistSq, ref float3 bestEnemyPosition)
+        {
+            if (!SpatialGrid.TryGetValue(cell, out Entity cluster) || !BufferLookup.TryGetBuffer(cluster, out DynamicBuffer<ManagedEntityBuffer> buffer)) 
+                return bestDistSq;
+
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                Entity enemy = buffer[i].Entity;
+                LocalTransform enemyTransform = TransformLookup[enemy];
+                float2 enemyPosition = enemyTransform.Position.xz;
+                float distSq = math.distancesq(towerPosition, enemyPosition);
+
+                if (distSq >= bestDistSq) continue;
+                        
+                bestDistSq = distSq;
+                bestEnemyPosition = enemyTransform.Position;
+            } 
+
+            return bestDistSq;
         }
     }
     

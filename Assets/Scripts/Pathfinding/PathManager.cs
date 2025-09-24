@@ -222,7 +222,8 @@ namespace Pathfinding
         };
         
         public const float FULL_BUILDING_CELL = 1f;
-        public const float CELL_SCALE = 2.0f;
+        public const int CELL_SCALE = 2;
+        public const int HALF_CELL_SCALE = 1;
         public const int GRID_WIDTH = 4; 
         
         public const float HALF_BUILDING_CELL = FULL_BUILDING_CELL / 2.0f;
@@ -249,9 +250,16 @@ namespace Pathfinding
         public static float3 GetPos(PathIndex index)
         {
             float3 chunkPos = ChunkIndexToWorld(index.ChunkIndex);
-            float3 gridPos = new float3(index.GridIndex % GRID_WIDTH + HALF_BUILDING_CELL, 0, Mathf.FloorToInt((float)index.GridIndex / GRID_WIDTH) + HALF_BUILDING_CELL) * CELL_SCALE;
+            float3 gridPos = new float3(index.GridIndex % GRID_WIDTH + HALF_BUILDING_CELL, 0, math.floor((float)index.GridIndex / GRID_WIDTH) + HALF_BUILDING_CELL) * CELL_SCALE;
             
             return chunkPos + gridPos;
+        }
+        
+        public static float2 GetPos(int gridIndex)
+        {
+            float2 gridPos = new float2(gridIndex % GRID_WIDTH + HALF_BUILDING_CELL, math.floor((float)gridIndex / GRID_WIDTH) + HALF_BUILDING_CELL) * CELL_SCALE;
+            
+            return gridPos;
         }
         
         public static PathIndex GetIndex(float2 pos) => GetIndex(pos.x, pos.y);
@@ -259,8 +267,8 @@ namespace Pathfinding
         public static PathIndex GetIndex(float xPos, float zPos)
         {
             // Find which chunk the position is in
-            int chunkZ = Utility.Math.GetMultipleFloored(zPos, CHUNK_SIZE);
             int chunkX = Utility.Math.GetMultipleFloored(xPos, CHUNK_SIZE);
+            int chunkZ = Utility.Math.GetMultipleFloored(zPos, CHUNK_SIZE);
             int2 chunkIndex = new int2(chunkX, chunkZ);
         
             // Calculate position relative to the chunk's origin
@@ -275,6 +283,14 @@ namespace Pathfinding
             int targetIndex = gridZ * GRID_WIDTH + gridX;
         
             return new PathIndex(chunkIndex, targetIndex);
+        }
+
+        public static int GetPathGridIndex(float2 pos)
+        {
+            int gridX = Utility.Math.GetMultipleFloored(pos.x, CELL_SCALE);
+            int gridZ = Utility.Math.GetMultipleFloored(pos.y, CELL_SCALE);
+        
+            return gridZ * GRID_WIDTH + gridX;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

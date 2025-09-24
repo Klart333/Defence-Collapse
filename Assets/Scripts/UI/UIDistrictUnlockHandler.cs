@@ -44,7 +44,7 @@ namespace UI
         {
             UIDistrictButton districtButton = Instantiate(districtButtonPrefab, districtContainer);
             districtButton.Setup(districtHandler, towerData);
-            districtButton.transform.SetSiblingIndex(1);
+            districtButton.transform.SetSiblingIndex(2);
             
             OnDistrictButtonSpawned?.Invoke(towerData, districtButton);
 

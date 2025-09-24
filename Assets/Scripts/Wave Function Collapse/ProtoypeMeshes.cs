@@ -39,8 +39,10 @@ namespace WaveFunctionCollapse
                 {
                     if (!Meshes.TryAdd(index, protInfo.PrototypeMeshes[j])) continue;
                     
-                    meshesToIndex.Add(protInfo.PrototypeMeshes[j], index);
-                    index++;
+                    if (meshesToIndex.TryAdd(protInfo.PrototypeMeshes[j], index))
+                    {
+                        index++;
+                    }
                 }
 
                 for (int j = 0; j < protInfo.Prototypes.Count; j++)

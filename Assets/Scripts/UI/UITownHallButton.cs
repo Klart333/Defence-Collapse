@@ -44,7 +44,8 @@ namespace UI
             {
                 return;
             }
-            
+            Events.OnDistrictBuilt -= OnDistrictBuilt;
+
             townHallButton.SetActive(false);
             for (int i = 0; i < disabledFoldoutObjects.Length; i++)
             {

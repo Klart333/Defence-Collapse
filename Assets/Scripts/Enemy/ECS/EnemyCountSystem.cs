@@ -1,4 +1,3 @@
-using Effects.LittleDudes;
 using Unity.Entities;
 using Effects.ECS;
 using Unity.Burst;
@@ -10,11 +9,11 @@ namespace Enemy.ECS
     [BurstCompile]
     public partial struct EnemyCountSystem : ISystem // TODO: Remove this basically
     {
-        private EntityQuery enemyQuery;
+        private EntityQuery clusterQuery;
         
         public void OnCreate(ref SystemState state)
         {
-            enemyQuery = SystemAPI.QueryBuilder().WithAll<ManagedClusterComponent>().Build();
+            clusterQuery = SystemAPI.QueryBuilder().WithAll<EnemyClusterComponent>().Build();
             
            state.EntityManager.CreateEntity(typeof(WaveStateComponent));
         }
@@ -22,7 +21,7 @@ namespace Enemy.ECS
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            SystemAPI.GetSingletonRW<WaveStateComponent>().ValueRW.EnemyCount = enemyQuery.CalculateEntityCount();
+            SystemAPI.GetSingletonRW<WaveStateComponent>().ValueRW.ClusterCount = clusterQuery.CalculateEntityCount();
         }
 
         [BurstCompile]
@@ -34,6 +33,6 @@ namespace Enemy.ECS
 
     public struct WaveStateComponent : IComponentData
     {
-        public int EnemyCount;
+        public int ClusterCount;
     }
 }

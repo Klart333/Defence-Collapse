@@ -5,8 +5,10 @@ using Unity.Entities;
 using Unity.Burst;
 using Unity.Jobs;
 using Enemy.ECS;
+using Pathfinding;
 using Unity.Burst.Intrinsics;
 using Unity.Jobs.LowLevel.Unsafe;
+using UnityEngine;
 using VFX;
 
 namespace Effects.ECS
@@ -20,7 +22,8 @@ namespace Effects.ECS
         private ComponentLookup<LightningComponent> lightningComponentLookup;
         private ComponentLookup<LocalTransform> transformComponentLookup;
         private ComponentLookup<PendingDamageComponent> pendingDamageComponentLookup;
-        
+        private BufferLookup<ManagedEntityBuffer> bufferLookup;
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
@@ -28,7 +31,8 @@ namespace Effects.ECS
             lightningComponentLookup = SystemAPI.GetComponentLookup<LightningComponent>(true);
             transformComponentLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
             pendingDamageComponentLookup = SystemAPI.GetComponentLookup<PendingDamageComponent>(true);
-            
+            bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>();
+                
             EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<LightningComponent>();
             state.RequireForUpdate(state.GetEntityQuery(builder));
             
@@ -48,8 +52,9 @@ namespace Effects.ECS
             lightningComponentLookup.Update(ref state);
             transformComponentLookup.Update(ref state);
             pendingDamageComponentLookup.Update(ref state);
+            bufferLookup.Update(ref state);
             
-            NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
+            NativeParallelHashMap<int, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
 
             state.Dependency = new LightningCollisionJob
             {
@@ -58,6 +63,7 @@ namespace Effects.ECS
                 SpatialGrid = spatialGrid.AsReadOnly(),
                 LightningRequestQueue = lightningRequestQueue.AsParallelWriter(),
                 PendingDamageMap = pendingDamageMap.AsParallelWriter(), 
+                BufferLookup = bufferLookup,
             }.ScheduleParallel(state.Dependency);
             state.Dependency.Complete();
 
@@ -98,8 +104,11 @@ namespace Effects.ECS
         public ComponentLookup<LocalTransform> TransformLookup;
 
         [ReadOnly]
-        public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
-
+        public NativeParallelHashMap<int, Entity>.ReadOnly SpatialGrid;
+        
+        [ReadOnly]
+        public BufferLookup<ManagedEntityBuffer> BufferLookup;
+        
         public NativeParallelMultiHashMap<Entity, PendingDamageComponent>.ParallelWriter PendingDamageMap;
 
         public NativeQueue<VFXChainLightningRequest>.ParallelWriter LightningRequestQueue;
@@ -110,7 +119,7 @@ namespace Effects.ECS
             NativeHashSet<Entity> hitEntities = new NativeHashSet<Entity>(sourceLightning.Bounces, Allocator.TempJob);
             
             float3 sourcePosition = transform.Position;
-            int2 cellIndex = new int2((int)transform.Position.x, (int)transform.Position.z);
+            int cellIndex = PathUtility.GetPathGridIndex(sourcePosition.xz);
             
             for (int i = 0; i < sourceLightning.Bounces; i++)
             {
@@ -127,9 +136,9 @@ namespace Effects.ECS
                 LightningRequestQueue.Enqueue(new VFXChainLightningRequest
                 {
                     Position = (sourcePosition + targetPosition) / 2.0f,
-                    Size =  new float3(math.distance(sourcePosition, targetPosition) * 2, 1, 1),
-                    Color = new float3(1, 1, 1),
-                    Angle = new float3(0, zAngle, 0),
+                    Size =  new Vector3(math.distance(sourcePosition, targetPosition) * 2, 1, 1),
+                    Color = new Vector3(1, 1, 1),
+                    Angle = new Vector3(0, zAngle, 0),
                 });
                 
                 sourcePosition = targetPosition;
@@ -146,7 +155,7 @@ namespace Effects.ECS
             hitEntities.Dispose();
         }
 
-        private bool GetClosest(NativeHashSet<Entity> hitEntities, float3 sourcePosition, int2 cellIndex, out int2 closestIndex, out Entity closestEntity)
+        private bool GetClosest(NativeHashSet<Entity> hitEntities, float3 sourcePosition, int cellIndex, out int closestIndex, out Entity closestEntity)
         {
             closestEntity = default;
             float closest = float.MaxValue;
@@ -154,11 +163,12 @@ namespace Effects.ECS
             for (int x = -1; x <= 1; x++)
             for (int y = -1; y <= 1; y++)
             {
-                int2 cell = cellIndex + new int2(x, y);
-                if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) continue;
+                int cell = cellIndex + x + y * PathUtility.CELL_SCALE;
+                if (!SpatialGrid.TryGetValue(cell, out Entity cluster) || !BufferLookup.TryGetBuffer(cluster, out DynamicBuffer<ManagedEntityBuffer> buffer)) return false;
 
-                do
+                for (int i = 0; i < buffer.Length; i++)
                 {
+                    Entity enemy = buffer[i].Entity;
                     if (!TransformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform) || hitEntities.Contains(enemy)) continue;
 
                     float distSq = math.distancesq(sourcePosition, enemyTransform.Position);
@@ -167,7 +177,7 @@ namespace Effects.ECS
                     closestEntity = enemy;
                     closest = distSq;
                     closestIndex = cell;
-                } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
+                }
             }
             
             return closestEntity != default;

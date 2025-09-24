@@ -6,6 +6,7 @@ using Unity.Entities;
 using Unity.Burst;
 using Unity.Jobs;
 using Enemy.ECS;
+using Pathfinding;
 
 namespace Effects.ECS
 {
@@ -13,6 +14,7 @@ namespace Effects.ECS
     public partial struct CollisionSystem : ISystem
     {
         private ComponentLookup<LocalTransform> transformLookup;
+        private BufferLookup<ManagedEntityBuffer> bufferLookup;
         private EntityQuery collisionQuery;
 
         [BurstCompile]
@@ -23,9 +25,10 @@ namespace Effects.ECS
                 .Build();
             
             transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+            bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>();
+            
             state.RequireForUpdate<WaveStateComponent>();
             state.RequireForUpdate<SpatialHashMapSingleton>();   
-            
             state.RequireForUpdate<FlowFieldComponent>();
         }
 
@@ -37,19 +40,20 @@ namespace Effects.ECS
                 return;
             }
 
-            int enemyCount = SystemAPI.GetSingleton<WaveStateComponent>().EnemyCount;
+            int enemyCount = SystemAPI.GetSingleton<WaveStateComponent>().ClusterCount;
             NativeParallelMultiHashMap<Entity, PendingDamageComponent> pendingDamageMap = new NativeParallelMultiHashMap<Entity, PendingDamageComponent>(enemyCount * 2 + 10, state.WorldUpdateAllocator);
 
-            NativeParallelMultiHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
+            NativeParallelHashMap<int, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
             transformLookup.Update(ref state);
-             
+            bufferLookup.Update(ref state);
             state.Dependency = new CollisionJob
             {
                 PendingDamageMap = pendingDamageMap.AsParallelWriter(),
                 SpatialGrid = spatialGrid.AsReadOnly(),
                 TransformLookup = transformLookup,
                 ECB = ecb.AsParallelWriter(),
+                BufferLookup = bufferLookup,
             }.ScheduleParallel(state.Dependency);
             state.Dependency.Complete(); 
 
@@ -77,10 +81,13 @@ namespace Effects.ECS
     public partial struct CollisionJob : IJobEntity
     {
         [ReadOnly]
-        public NativeParallelMultiHashMap<int2, Entity>.ReadOnly SpatialGrid;
+        public NativeParallelHashMap<int, Entity>.ReadOnly SpatialGrid;
 
         [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
+        
+        [ReadOnly]
+        public BufferLookup<ManagedEntityBuffer> BufferLookup;
         
         public NativeParallelMultiHashMap<Entity, PendingDamageComponent>.ParallelWriter PendingDamageMap;
 
@@ -104,7 +111,7 @@ namespace Effects.ECS
             float radius = colliderComponent.Radius;
             float radiusSq = radius * radius;
 
-            int2 centerCell = new int2((int)pos.x, (int)pos.z);
+            int centerCell = PathUtility.GetPathGridIndex(pos.xz);
             if (CollideWithinCell(entity, ref randomComponent, critComponent, ref damageComponent, centerCell, pos.xz, radiusSq))
             {
                 if (damageComponent.IsOneShot)
@@ -114,18 +121,12 @@ namespace Effects.ECS
                 return;
             }
 
-            int searchRadius = (int)(radius + 0.5f);
-            int minX = centerCell.x - searchRadius;
-            int maxX = centerCell.x + searchRadius;
-            int minZ = centerCell.y - searchRadius;
-            int maxZ = centerCell.y + searchRadius;
-            
-            for (int z = minZ; z <= maxZ; z++)
+            int searchRadius = (int)(radius / PathUtility.CELL_SCALE + 0.5f); // 0.5 for rounding
+            for (int z = -searchRadius; z <= searchRadius; z++)
             {
-                for (int x = minX; x <= maxX; x++)
+                for (int x = -searchRadius; x <= searchRadius; x++)
                 {
-                    int2 cell = new int2(x, z);
-                    if (math.all(cell == centerCell)) continue;
+                    if (z == 0 && x == 0) continue;
                     
                     // Fast approximate distance check
                     float cellDistX = math.abs(x + 0.5f - pos.x);
@@ -134,6 +135,7 @@ namespace Effects.ECS
                     
                     if (cellDistX * cellDistX + cellDistZ * cellDistZ > radiusSq) continue;
                     
+                    int cell = centerCell + x + z * PathUtility.CELL_SCALE;
                     if (CollideWithinCell(entity, ref randomComponent, critComponent, ref damageComponent, cell, pos.xz, radiusSq)) return;
                 }
             }
@@ -145,12 +147,13 @@ namespace Effects.ECS
         }
 
         [BurstCompile]
-        private bool CollideWithinCell(Entity entity, ref RandomComponent randomComponent, CritComponent critComponent, ref DamageComponent damageComponent, int2 cell, float2 pos, float radiusSq)
+        private bool CollideWithinCell(Entity entity, ref RandomComponent randomComponent, CritComponent critComponent, ref DamageComponent damageComponent, int cell, float2 pos, float radiusSq)
         {
-            if (!SpatialGrid.TryGetFirstValue(cell, out Entity enemy, out var iterator)) return false;
+            if (!SpatialGrid.TryGetValue(cell, out Entity cluster) || !BufferLookup.TryGetBuffer(cluster, out DynamicBuffer<ManagedEntityBuffer> buffer)) return false;
 
-            do
+            for (int i = 0; i < buffer.Length; i++)
             {
+                Entity enemy = buffer[i].Entity;
                 if (!TransformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform)) continue;
 
                 float distSq = math.distancesq(pos, enemyTransform.Position.xz);
@@ -169,8 +172,7 @@ namespace Effects.ECS
                         return true;
                     }
                 }
-
-            } while (SpatialGrid.TryGetNextValue(out enemy, ref iterator));
+            }
 
             return false;
         }

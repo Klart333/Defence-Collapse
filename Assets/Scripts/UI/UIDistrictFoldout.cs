@@ -1,29 +1,23 @@
 using UnityEngine.EventSystems;
 using Sirenix.OdinInspector;
-using DG.Tweening;
-using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
+using DG.Tweening.Core;
+using DG.Tweening.Plugins.Options;
+using UnityEngine;
 using Variables;
 
 namespace UI
 {
-    public class UIDistrictFoldout : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public class UIDistrictFoldout : MonoBehaviour//, IPointerEnterHandler, IPointerExitHandler
     {
+        [Title("Setup")]
         [SerializeField]
         private RectTransform foldoutTransform;
 
         [SerializeField]
-        private float headerButtonWidth = 120;
+        private Canvas canvas;
         
-        [SerializeField]
-        private float districtButtonWidth = 110;
-        
-        [SerializeField]
-        private float buttonSpacing = 10;
-        
-        [SerializeField]
-        private float padding = 10;
-
         [Title("Animation Settings", "Open")]
         [SerializeField]
         private float openDuration = 0.5f;
@@ -70,27 +64,37 @@ namespace UI
 
         private void OpenFoldout()
         {
-            foldoutTransform.DOKill();
-            int buttonCount = 0;
-            for (int i = 1; i < foldoutTransform.childCount; i++)
+            for (int i = 2; i < foldoutTransform.childCount - 1; i++)
             {
-                if (foldoutTransform.GetChild(i).gameObject.activeSelf)
+                Transform element = foldoutTransform.GetChild(i);
+                element.DOKill();
+                element.gameObject.SetActive(true);
+                element.DOScaleX(1.0f, openDuration).SetEase(openEase).onUpdate = () =>
                 {
-                    buttonCount++;
-                }
+                    LayoutRebuilder.MarkLayoutForRebuild(foldoutTransform);
+                };
             }
-            
-            float targetX = headerButtonWidth + buttonCount * (districtButtonWidth + buttonSpacing) + padding;
-            foldoutTransform.DOAnchorPosX(targetX, openDuration).SetEase(openEase);
         }
 
         private void CloseFoldout()
         {
-            foldoutTransform.DOKill();
-            foldoutTransform.DOAnchorPosX(districtButtonWidth + buttonSpacing, closeDuration).SetEase(closeEase);
+            for (int i = 2; i < foldoutTransform.childCount - 1; i++)
+            {
+                Transform element = foldoutTransform.GetChild(i);
+                element.DOKill();
+                TweenerCore<Vector3,Vector3,VectorOptions> tween = element.DOScaleX(0.0f, closeDuration + (i - 2.0f) * 0.03f).SetEase(closeEase);
+                tween.onUpdate = () =>
+                {
+                    LayoutRebuilder.MarkLayoutForRebuild(foldoutTransform);
+                };
+                tween.onComplete = () =>
+                {
+                    element.gameObject.SetActive(false);
+                };
+            }
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
+        /*public void OnPointerEnter(PointerEventData eventData)
         {
             Color endColor = defaultColor.Value * highlightColorTint.Value;
             for (int i = 0; i < highlightImages.Length; i++)
@@ -108,6 +112,6 @@ namespace UI
                 highlightImages[i].DOKill();
                 highlightImages[i].DOColor(defaultColor.Value, 0.2f).SetEase(colorAnimationEase);
             }
-        }
+        }*/
     }
 }

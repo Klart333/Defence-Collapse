@@ -5,6 +5,7 @@ using Unity.Burst;
 
 namespace Utility
 {
+    [BurstCompile]
     public static class Math
     {
         public static float Round(float x, float multiple)
@@ -127,6 +128,20 @@ namespace Utility
                 : Mathf.Approximately(value, 1)
                 ? 1
                 : math.pow(2, -10 * value) * math.sin((value * 10f - 0.75f) * c4) + 1.0f;
+        }
+
+        [BurstCompile]
+        public static float PunchLinear(float value)
+        {
+            return -math.abs(2 * value - 1) + 1;
+        }
+        
+        [BurstCompile]
+        public static float PunchInOut(float value)
+        {
+            return value > 0.09f
+                ? 1.0f - math.sin(((value - 0.09f) * math.PI * 1.098901099f) / 2.0f)
+                : math.log(value + 0.01f) + 2.0f;
         }
     }
 }

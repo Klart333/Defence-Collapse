@@ -1,4 +1,3 @@
-using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Entities;
@@ -16,7 +15,7 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
+            state.RequireForUpdate<BeforeCollisionECBSystem.Singleton>();
             state.RequireForUpdate<GameSpeedComponent>();
         }
 
@@ -25,7 +24,7 @@ namespace Effects.ECS
         {
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
 
-            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecbSingleton = SystemAPI.GetSingleton<BeforeCollisionECBSystem.Singleton>();
             EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
             state.Dependency = new ArchedMovementJob
