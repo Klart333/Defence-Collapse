@@ -35,15 +35,14 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     [Title("Debug")]
     [SerializeField]
     private PooledMonoBehaviour unableToPlacePrefab;
-    
-    public Dictionary<ChunkIndex, IBuildable> QuerySpawnedBuildings { get; } = new Dictionary<ChunkIndex, IBuildable>();
-    public Dictionary<ChunkIndex, IBuildable> SpawnedMeshes  { get; } = new Dictionary<ChunkIndex, IBuildable>();
 
     private HashSet<QueryMarchedChunk> queriedChunks = new HashSet<QueryMarchedChunk>();
+    
     private IEnumerable<ChunkIndex> queryBuiltIndexes;
 
     private BuildingAnimator buildingAnimator;
     private GroundGenerator groundGenerator;
+    
     private Vector3? gridScale;
     
     public int3 ChunkSize => new int3(Mathf.FloorToInt(groundGenerator.ChunkSize.x / waveFunction.CellSize.x), 1, Mathf.FloorToInt(groundGenerator.ChunkSize.z / waveFunction.CellSize.z));
@@ -51,6 +50,9 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     public IEnumerable<ChunkIndex> QueryBuiltIndexes => queryBuiltIndexes;
     public PrototypeInfoData PrototypeInfo => townPrototypeInfo;
     public Vector3 ChunkScale => groundGenerator.ChunkScale;
+    
+    public Dictionary<ChunkIndex, IBuildable> QuerySpawnedBuildings { get; } = new Dictionary<ChunkIndex, IBuildable>();
+    public Dictionary<ChunkIndex, IBuildable> SpawnedMeshes  { get; } = new Dictionary<ChunkIndex, IBuildable>();
     public bool IsGenerating { get; private set; }
     
     public Vector3 CellSize
@@ -68,16 +70,19 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         buildingAnimator = GetComponent<BuildingAnimator>();
 
         groundGenerator.OnChunkGenerated += OnFirstChunkGenerated;
-        Events.OnGroundChunkGenerated += LoadCells;
+        groundGenerator.OnCellReplaced += OnCellReplaced;
+        
         Events.OnBuiltIndexDestroyed += RemoveBuiltIndex;
+        Events.OnGroundChunkGenerated += LoadCells;
     }
 
     private void OnDisable()
     {
         groundGenerator.OnChunkGenerated -= OnFirstChunkGenerated;
-
-        Events.OnGroundChunkGenerated -= LoadCells;
+        groundGenerator.OnCellReplaced -= OnCellReplaced;
+        
         Events.OnBuiltIndexDestroyed -= RemoveBuiltIndex;
+        Events.OnGroundChunkGenerated -= LoadCells;
     }
     
     private void Update()
@@ -126,6 +131,12 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         waveFunction.LoadChunk(index, queryChunk);
         
         OnLoaded?.Invoke(queryChunk);
+    }
+    
+    private void OnCellReplaced(ChunkIndex chunkIndex)
+    {
+        IChunk groundChunk = groundGenerator.ChunkWaveFunction.Chunks[chunkIndex.Index];
+        waveFunction.Chunks[chunkIndex.Index].SetGroundType(chunkIndex.CellIndex, chunkIndex.CellIndex, groundChunk, cellBuildableCornerData);
     }
 
     public void RemoveBuiltIndex(ChunkIndex builtIndex)

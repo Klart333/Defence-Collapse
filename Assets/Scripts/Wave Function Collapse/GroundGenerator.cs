@@ -17,8 +17,9 @@ namespace WaveFunctionCollapse
 {
     public class GroundGenerator : MonoBehaviour, IChunkWaveFunction<Chunk>
     {
-        public event Action<Chunk> OnChunkGenerated;
         public event Action<ChunkIndex> OnCellCollapsed;
+        public event Action<ChunkIndex> OnCellReplaced;
+        public event Action<Chunk> OnChunkGenerated;
         public event Action OnGenerationFinished;
 
         [Title("Wave Function")]
@@ -28,7 +29,6 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private Vector3Int chunkSize;
         
-        [FormerlySerializedAs("defaultPrototypeInfoData")]
         [SerializeField]
         private PrototypeInfoData groundPrototypeInfoData;
 
@@ -51,7 +51,11 @@ namespace WaveFunctionCollapse
         [Title("Enemy Spawning")]
         [SerializeField]
         private Mesh[] portalMeshes;
-       
+
+        [Title("Ground Swapping")]
+        [SerializeField]
+        private BuildableCornerData groundCornerData;
+        
         [Title("Debug")]
         [SerializeField]
         private bool shouldRun = true;
@@ -60,6 +64,7 @@ namespace WaveFunctionCollapse
         private bool compilePrototypeMeshes = true;
         
         private Dictionary<int3, HashSet<int3>> generatedChunkIndexes = new Dictionary<int3, HashSet<int3>>();
+        private Dictionary<ChunkIndex, GameObject> SpawnedMeshes = new Dictionary<ChunkIndex, GameObject>();
         private HashSet<int3> spawnedChunks = new HashSet<int3>();
         private List<int3> chunksToCombine = new List<int3>();
         
@@ -334,13 +339,64 @@ namespace WaveFunctionCollapse
         
         private void CombineChunk(Chunk chunk)
         {
-            CombineMeshes(chunk.ChunkIndex, ChunkWaveFunction.ChunkParents[chunk.ChunkIndex]);
+            CombineMeshes(ChunkWaveFunction.ChunkParents[chunk.ChunkIndex]);
             chunk.ClearSpawnedMeshes(waveFunction.GameObjectPool);
         }
         
-        private void CombineMeshes(int3 chunkIndex, Transform chunkParent)
+        private void CombineMeshes(Transform chunkParent)
         {
-            meshCombiner.CombineMeshes(chunkParent, out GameObject spawnedMesh);
+            meshCombiner.CombineMeshes(chunkParent, out _);
+        }
+
+        public void ChangeGroundType(Vector2 position, GroundType grass)
+        {
+            List<(ChunkIndex, PrototypeData)> tilesToChange = new List<(ChunkIndex, PrototypeData)>();
+            for (int i = 0; i < WaveFunctionUtility.DiagonalNeighbourDirections.Length; i++)
+            {
+                int2 direction = WaveFunctionUtility.DiagonalNeighbourDirections[i];
+                Vector2 offset = direction.MultiplyByAxis(waveFunction.CellSize.XZ() / 2.0f);
+                Vector2 offsetPosition = position + offset;
+                ChunkIndex chunkIndex = ChunkWaveUtility.GetChunkIndex(offsetPosition.ToXyZ(), ChunkScale, waveFunction.CellSize);
+                
+                if (TryGetPrototypeData(chunkIndex, -direction, grass, out PrototypeData prototypeData))
+                {
+                    tilesToChange.Add((chunkIndex, prototypeData));
+                }
+                else
+                {
+                    Debug.LogError($"Could not get prototypeData for {chunkIndex}");
+                }
+            }
+
+            foreach ((ChunkIndex chunkIndex, PrototypeData prototypeData) in tilesToChange)
+            {
+                Destroy(waveFunction.Chunks[chunkIndex.Index].SpawnedMeshes[chunkIndex.CellIndex]);
+                waveFunction.SetCell(chunkIndex, prototypeData);
+                OnCellReplaced?.Invoke(chunkIndex);
+            }
+        }
+        
+        private bool TryGetPrototypeData(ChunkIndex chunkIndex, int2 cornerDir, GroundType cornerGroundType, out PrototypeData prototypeData)
+        {
+            MeshWithRotation meshRot = waveFunction[chunkIndex].PossiblePrototypes[0].MeshRot;
+            BuildableCorners targetCorners = groundCornerData.GetRotatedCorners(meshRot);
+            Corner corner = BuildableCornerData.VectorToCorner(cornerDir.x, cornerDir.y);
+            targetCorners.CornerDictionary[corner] = new CornerData(cornerGroundType);
+
+            foreach (KeyValuePair<Mesh, BuildableCorners> kvp in groundCornerData.BuildableDictionary)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    BuildableCorners rotatedCorners = groundCornerData.GetRotatedCorners(kvp.Value, i);
+                    if (targetCorners.Equals(rotatedCorners))
+                    {
+                        return waveFunction.ProtoypeMeshes.TryGetPrototypeData(groundPrototypeInfoData, kvp.Key, i, out prototypeData);
+                    }
+                }
+            }
+
+            prototypeData = default;
+            return false;
         }
     }
 }

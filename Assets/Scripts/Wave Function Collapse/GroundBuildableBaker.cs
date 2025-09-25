@@ -46,7 +46,7 @@ namespace WaveFunctionCollapse
 
             foreach (MeshFilter meshFilter in meshFilters)
             {
-                BuildableCorners buildableCorners = new BuildableCorners{CornerDictionary = new Dictionary<Corner, CornerData>()};
+                BuildableCorners buildableCorners = new BuildableCorners();
                 Vector3 position = meshFilter.transform.position + Vector3.up;
                 for (int i = 0; i < corners.Length; i++)
                 {
@@ -57,7 +57,7 @@ namespace WaveFunctionCollapse
                     Corner corner = BuildableCornerData.VectorToCorner(corners[i].x, corners[i].y);
                     Color color = atlasAnalyzer.Atlas.GetPixel((int)(hit.textureCoord.x * atlasAnalyzer.Atlas.width), (int)(hit.textureCoord.y * atlasAnalyzer.Atlas.height));
                     int index = colors.IndexOf(color);
-                    buildableCorners.CornerDictionary.Add(corner, new CornerData(groundTypes[index]));
+                    buildableCorners.CornerDictionary[corner] = new CornerData(groundTypes[index]);
                 }
 
                 buildable.Add(meshFilter.sharedMesh, buildableCorners);

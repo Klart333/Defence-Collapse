@@ -1,6 +1,5 @@
 using Random = UnityEngine.Random;
 using System.Collections.Generic;
-using UnityEngine.Serialization;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using Unity.Collections;
@@ -29,16 +28,16 @@ namespace WaveFunctionCollapse
         private LayerMask layerMask;
 
         private readonly Stack<GameObject> gameObjectPool = new Stack<GameObject>();
-        private PrototypeData emptyPrototype;
-
+        
         private IChunkWaveFunction<TChunk> handler;
 
-        public ProtoypeMeshes ProtoypeMeshes => protoypeMeshes; 
-        public Stack<ChunkIndex> CellStack { get; } = new Stack<ChunkIndex>();
-        public Dictionary<int3, TChunk> Chunks { get; } = new Dictionary<int3, TChunk>();
         public Dictionary<int3, Transform> ChunkParents { get; } = new Dictionary<int3, Transform>();
-        public Stack<GameObject> GameObjectPool => gameObjectPool;
+        public Dictionary<int3, TChunk> Chunks { get; } = new Dictionary<int3, TChunk>();
+        public Stack<ChunkIndex> CellStack { get; } = new Stack<ChunkIndex>();
         public Transform ParentTransform { get; set; }
+        
+        public Stack<GameObject> GameObjectPool => gameObjectPool;
+        public ProtoypeMeshes ProtoypeMeshes => protoypeMeshes; 
         public Vector3 CellSize => gridScale;
 
         public Cell this[ChunkIndex index]
@@ -323,7 +322,7 @@ namespace WaveFunctionCollapse
             switch (cell.PossiblePrototypes.Count)
             {
                 case 0:
-                    return emptyPrototype;
+                    return PrototypeData.Empty;
                 case 1:
                     return cell.PossiblePrototypes[0];
             }
@@ -367,7 +366,7 @@ namespace WaveFunctionCollapse
             GameObject spawned = GenerateMesh(position, chosenPrototype, parent);
             if (spawned is not null)
             {
-                Chunks[index.Index].SpawnedMeshes.Add(spawned);
+                Chunks[index.Index].SpawnedMeshes[index.CellIndex] = spawned;
             }
         }
 
@@ -516,7 +515,7 @@ namespace WaveFunctionCollapse
         public IChunk[] AdjacentChunks { get; private set; }
         public Cell[,,] Cells { get; private set; }
 
-        public List<GameObject> SpawnedMeshes { get; } = new List<GameObject>();
+        public Dictionary<int3, GameObject> SpawnedMeshes { get; } = new Dictionary<int3, GameObject>();
 
         public PrototypeInfoData PrototypeInfoData { get; set; }
         public bool UseSideConstraints { get; private set; }
@@ -695,12 +694,13 @@ namespace WaveFunctionCollapse
 
         public void ClearSpawnedMeshes(Stack<GameObject> pool)
         {
-            for (int i = SpawnedMeshes.Count - 1; i >= 0; i--)
+            foreach (GameObject spawned in SpawnedMeshes.Values)
             {
-                SpawnedMeshes[i].SetActive(false);
-                pool.Push(SpawnedMeshes[i]);
-                SpawnedMeshes.RemoveAt(i);
+                spawned.SetActive(false);
+                pool.Push(spawned);
             }
+            
+            SpawnedMeshes.Clear();
         }
 
         public void InvokeOnCleared()
@@ -718,8 +718,8 @@ namespace WaveFunctionCollapse
 
     public interface IChunk
     {
+        public Dictionary<int3, GameObject> SpawnedMeshes { get; }
         public PrototypeInfoData PrototypeInfoData { get; }
-        public List<GameObject> SpawnedMeshes { get; }
         public IChunk[] AdjacentChunks { get; }
         public bool AllCollapsed { get; }
         public int3 ChunkIndex { get; }

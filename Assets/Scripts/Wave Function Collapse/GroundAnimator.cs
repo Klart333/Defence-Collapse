@@ -22,7 +22,7 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private int queueSpeedCapacity = 20;
         
-        [Title("Animation Settings")]
+        [Title("Animation", "Falling")]
         [SerializeField]
         private float height = 1.5f;
         
@@ -32,6 +32,13 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private Ease fallEase = Ease.OutQuad;
         
+        [Title("Animation", "Flipping")]
+        [SerializeField]
+        private float flipDuration = 1.0f;
+        
+        [SerializeField]
+        private Ease flipEase = Ease.OutSine;
+
         private DeletableQueue<Tuple<Transform, Vector3>> builtQueue = new DeletableQueue<Tuple<Transform, Vector3>>();
         
         private bool queueIsEmpty = true;
@@ -40,11 +47,13 @@ namespace WaveFunctionCollapse
         private void OnEnable()
         {
             groundGenerator.OnCellCollapsed += OnCellCollapsed;
+            groundGenerator.OnCellReplaced += OnCellReplaced;
         }
 
         private void OnDisable()
         {
             groundGenerator.OnCellCollapsed -= OnCellCollapsed;
+            groundGenerator.OnCellReplaced -= OnCellReplaced;
         }
 
         private void Update()
@@ -83,18 +92,25 @@ namespace WaveFunctionCollapse
 
         private void OnCellCollapsed(ChunkIndex index)
         {
-            if (groundGenerator.ChunkWaveFunction.Chunks[index.Index].SpawnedMeshes.Count == 0)
-            {
-                return;
-            }
+            if (groundGenerator.ChunkWaveFunction.Chunks[index.Index].SpawnedMeshes.Count == 0) return;
             
             queueIsEmpty = false;
             
-            Transform cellTransform = groundGenerator.ChunkWaveFunction.Chunks[index.Index].SpawnedMeshes[^1].transform;
+            Transform cellTransform = groundGenerator.ChunkWaveFunction.Chunks[index.Index].SpawnedMeshes[index.CellIndex].transform;
             Vector3 targetScale = cellTransform.transform.localScale;
             cellTransform.transform.localScale = Vector3.zero;
             
             builtQueue.Enqueue(Tuple.Create(cellTransform, targetScale));
+        }
+        
+        
+        private void OnCellReplaced(ChunkIndex index)
+        {
+            Transform cellTransform = groundGenerator.ChunkWaveFunction.Chunks[index.Index].SpawnedMeshes[index.CellIndex].transform;
+            Vector3 position = cellTransform.transform.position + Vector3.down * 0.1f;
+            cellTransform.position = position;
+            //cellTransform.transform.rotation = Quaternion.AngleAxis(180, Vector3.right) * cellTransform.transform.rotation;
+            //cellTransform.DOBlendableLocalRotateBy(Vector3.right * 180, flipDuration, RotateMode.FastBeyond360).SetEase(flipEase);
         }
 
         private void AnimateGroundCell(Transform cellTransform, Vector3 targetScale)

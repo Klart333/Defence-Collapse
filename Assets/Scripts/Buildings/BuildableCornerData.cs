@@ -68,6 +68,43 @@ namespace WaveFunctionCollapse
             groundType = cornerData.GroundType;
             return true;
         }
+        
+        public BuildableCorners GetRotatedCorners(MeshWithRotation meshRot)
+        {
+            BuildableCorners rotatedCorners = new BuildableCorners();
+            for (int i = 0; i < CornerUtility.CornerDirections.Length; i++)
+            {
+                if (!TryGetCornerType(meshRot, CornerUtility.CornerDirections[i], out GroundType groundType))
+                {
+                    Debug.LogError("Could not find corner for: " + meshRot);
+                    continue;
+                }
+                
+                Corner corner = CornerUtility.AllCorners[i];
+                rotatedCorners.CornerDictionary[corner] = new CornerData { GroundType = groundType };
+            }
+            
+            return rotatedCorners;
+        }
+        
+        public BuildableCorners GetRotatedCorners(BuildableCorners corners, int rotation)
+        {
+            if (rotation == 0)
+            {
+                return corners;
+            }
+            
+            BuildableCorners rotatedCorners = new BuildableCorners();
+            for (int i = 0; i < CornerUtility.CornerDirections.Length; i++)
+            {
+                Corner corner = CornerUtility.AllCorners[i];
+                Corner rotatedCorner = RotateCorner(rotation, CornerUtility.CornerDirections[i]);
+                
+                rotatedCorners.CornerDictionary[corner] = corners.CornerDictionary[rotatedCorner];
+            }
+            
+            return rotatedCorners;
+        }
 
         public static Corner RotateCorner(int rot, int2 corner)
         {
@@ -107,16 +144,51 @@ namespace WaveFunctionCollapse
     }
 
     [System.Serializable]
-    public class BuildableCorners
+    public class BuildableCorners : IEquatable<BuildableCorners>
     {
         [InlineProperty]
-        public Dictionary<Corner, CornerData> CornerDictionary = new Dictionary<Corner, CornerData>() 
+        public readonly Dictionary<Corner, CornerData> CornerDictionary = new Dictionary<Corner, CornerData>() 
         {
             { Corner.TopLeft, new CornerData() },
             { Corner.TopRight, new CornerData() },
             { Corner.BottomLeft, new CornerData() },
             { Corner.BottomRight, new CornerData() },
         };
+
+        public BuildableCorners() { }
+        
+        public BuildableCorners(Dictionary<Corner, CornerData> cornerDictionary)
+        {
+            CornerDictionary = cornerDictionary;
+        }
+        
+        public bool Equals(BuildableCorners other)
+        {
+            if (other == null) return false;
+            
+            for (int i = 0; i < CornerUtility.AllCorners.Length; i++)
+            {
+                Corner corner = CornerUtility.AllCorners[i];
+                if (CornerDictionary[corner].GroundType != other.CornerDictionary[corner].GroundType)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((BuildableCorners)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return CornerDictionary.GetHashCode();
+        }
     }
         
     [InlineProperty]    
@@ -154,7 +226,15 @@ namespace WaveFunctionCollapse
 
     public static class CornerUtility
     {
-        public static Corner[] AllCorners = new Corner[]
+        public static readonly int2[] CornerDirections = 
+        {
+            new int2(-1, 1),
+            new int2(1, 1),
+            new int2(-1, -1),
+            new int2(1, -1),
+        };
+        
+        public static Corner[] AllCorners =
         {
             Corner.TopLeft,
             Corner.TopRight,

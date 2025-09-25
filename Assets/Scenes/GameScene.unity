@@ -9660,6 +9660,7 @@ MonoBehaviour:
   - {fileID: 4364889489563284555, guid: 01de1697a12e54745913dd1774974677, type: 3}
   - {fileID: -8824338085883422227, guid: 01de1697a12e54745913dd1774974677, type: 3}
   - {fileID: 6279255939028248072, guid: 01de1697a12e54745913dd1774974677, type: 3}
+  groundCornerData: {fileID: 11400000, guid: 9f292ac4f74867d4f95ddedbee3bce46, type: 2}
   shouldRun: 1
   compilePrototypeMeshes: 1
 --- !u!114 &1024001994
@@ -12276,6 +12277,55 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 5
   m_TargetDisplay: 0
+--- !u!1 &1292415804
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1292415805}
+  - component: {fileID: 1292415806}
+  m_Layer: 0
+  m_Name: LumbermillHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1292415805
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292415804}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1411626119}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1292415806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292415804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 667dc5bcdbf44507adf20d3366e867f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::Buildings.Lumbermill.LumbermillHandler
+  districtHandler: {fileID: 491554922}
+  districtGenerator: {fileID: 1551488502}
+  groundGenerator: {fileID: 1024001993}
+  moneyReward: 300
+  barricadeAmount: 2
 --- !u!1 &1295701607
 GameObject:
   m_ObjectHideFlags: 0
@@ -12974,6 +13024,7 @@ Transform:
   - {fileID: 1967713493}
   - {fileID: 1843548455}
   - {fileID: 523026462}
+  - {fileID: 1292415805}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1416224650

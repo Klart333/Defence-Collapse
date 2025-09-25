@@ -12,6 +12,9 @@ namespace WaveFunctionCollapse
         [Title("Meshes"), ReadOnly]
         public readonly Dictionary<int, Mesh> Meshes = new Dictionary<int, Mesh>();
 
+        [ReadOnly]
+        public readonly Dictionary<Mesh, int> MeshesToIndex = new Dictionary<Mesh, int>();
+        
         [Title("References")]
         [SerializeField]
         private PrototypeInfoData[] protoypeInfos;
@@ -28,8 +31,8 @@ namespace WaveFunctionCollapse
         public void CompileData()
         {
             Meshes.Clear();
-            
-            Dictionary<Mesh, int> meshesToIndex = new Dictionary<Mesh, int>();
+            MeshesToIndex.Clear();
+
             int index = protoypeInfos[0].PrototypeMeshes.Count;
             for (int i = 0; i < protoypeInfos.Length; i++)
             {
@@ -39,7 +42,7 @@ namespace WaveFunctionCollapse
                 {
                     if (!Meshes.TryAdd(index, protInfo.PrototypeMeshes[j])) continue;
                     
-                    if (meshesToIndex.TryAdd(protInfo.PrototypeMeshes[j], index))
+                    if (MeshesToIndex.TryAdd(protInfo.PrototypeMeshes[j], index))
                     {
                         index++;
                     }
@@ -51,7 +54,7 @@ namespace WaveFunctionCollapse
                     if (prot.MeshRot.MeshIndex == -1) continue;
                     if (prot.MeshRot.MeshIndex >= protInfo.PrototypeMeshes.Count) continue;
                     
-                    int meshIndex = meshesToIndex[protInfo.PrototypeMeshes[prot.MeshRot.MeshIndex]];
+                    int meshIndex = MeshesToIndex[protInfo.PrototypeMeshes[prot.MeshRot.MeshIndex]];
                     PrototypeData prototypeData = new PrototypeData(
                         new MeshWithRotation(meshIndex, prot.MeshRot.Rot),
                         prot.PosX, prot.NegX, prot.PosY, prot.NegY, prot.PosZ, prot.NegZ,
@@ -75,7 +78,7 @@ namespace WaveFunctionCollapse
                         if (prot.MeshRot.MeshIndex == -1) continue;
                         if (prot.MeshRot.MeshIndex >= protInfo.PrototypeMeshes.Count) continue;
 
-                        int meshIndex = meshesToIndex[protInfo.PrototypeMeshes[prot.MeshRot.MeshIndex]];
+                        int meshIndex = MeshesToIndex[protInfo.PrototypeMeshes[prot.MeshRot.MeshIndex]];
                         PrototypeData prototypeData = new PrototypeData(
                             new MeshWithRotation(meshIndex, prot.MeshRot.Rot),
                             prot.PosX, prot.NegX, prot.PosY, prot.NegY, prot.PosZ, prot.NegZ,
@@ -109,19 +112,28 @@ namespace WaveFunctionCollapse
         public bool TryGetPrototypeData(PrototypeInfoData infoData, Mesh mesh, out PrototypeData prototype)
         {
             prototype = default;
-            int index = -1;
-            foreach (KeyValuePair<int, Mesh> pair in Meshes)
-            {
-                if (pair.Value != mesh) continue;
-                
-                index = pair.Key;
-                break;
-            }
-            if (index == -1) return false;
-
+            if (!MeshesToIndex.TryGetValue(mesh, out int index)) return false;
+            
             for (int i = 0; i < infoData.Prototypes.Count; i++)
             {
                 if (infoData.Prototypes[i].MeshRot.MeshIndex != index) continue;
+                    
+                prototype = infoData.Prototypes[i]; 
+                return true;
+            }
+
+            return false;
+        }
+        
+        public bool TryGetPrototypeData(PrototypeInfoData infoData, Mesh mesh, int rotation, out PrototypeData prototype)
+        {
+            prototype = default;
+            if (!MeshesToIndex.TryGetValue(mesh, out int index)) return false;
+            
+            for (int i = 0; i < infoData.Prototypes.Count; i++)
+            {
+                MeshWithRotation meshRot = infoData.Prototypes[i].MeshRot;
+                if (meshRot.MeshIndex != index || meshRot.Rot != rotation) continue;
                     
                 prototype = infoData.Prototypes[i]; 
                 return true;
@@ -133,15 +145,7 @@ namespace WaveFunctionCollapse
         public bool TryGetPrototypeDataRandom(PrototypeInfoData infoData, Mesh mesh, Random random, out PrototypeData prototype)
         {
             prototype = default;
-            int index = -1;
-            foreach (KeyValuePair<int, Mesh> pair in Meshes)
-            {
-                if (pair.Value != mesh) continue;
-                
-                index = pair.Key;
-                break;
-            }
-            if (index == -1) return false;
+            if (!MeshesToIndex.TryGetValue(mesh, out int index)) return false;
 
             List<PrototypeData> matchingPrototypes = new List<PrototypeData>();
             for (int i = 0; i < infoData.Prototypes.Count; i++)

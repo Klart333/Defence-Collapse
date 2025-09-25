@@ -7,7 +7,7 @@ using TMPro;
 using WaveFunctionCollapse;
 using UnityEngine;
 
-namespace Buildings
+namespace Buildings.Lumbermill
 {
     public class LumbermillPlacer : MonoBehaviour
     {

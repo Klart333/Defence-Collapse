@@ -290,15 +290,15 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public async UniTask RemoveChunks(List<ChunkIndex> chunkIndexes)
+        public async UniTask RemoveChunks(IEnumerable<ChunkIndex> chunkIndexes)
         {
             isRemovingChunks = true;
 
             HashSet<QueryChunk> neighbours = new HashSet<QueryChunk>();
             HashSet<int3> killIndexes = new HashSet<int3>();
-            for (int i = 0; i < chunkIndexes.Count; i++)
+            foreach (ChunkIndex chunkIndex in chunkIndexes)
             {
-                if (!ChunkIndexToChunks.TryGetValue(chunkIndexes[i], out HashSet<int3> indexes))
+                if (!ChunkIndexToChunks.TryGetValue(chunkIndex, out HashSet<int3> indexes))
                 {
                     continue;
                 }
@@ -314,7 +314,7 @@ namespace WaveFunctionCollapse
                     ResetNeighbours(neighbours, waveFunction.Chunks[index], 1);
                 }
                 
-                ChunkIndexToChunks.Remove(chunkIndexes[i]);
+                ChunkIndexToChunks.Remove(chunkIndex);
             }
 
             foreach (int3 index in killIndexes)

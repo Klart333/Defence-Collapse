@@ -102,7 +102,6 @@ namespace Buildings.District
         {
             districtGenerator.AddAction(async () => await districtGenerator.RemoveChunks(chunkIndexes));
         }
-
         
         private void OnTurnIncreased(int increase, int total)
         {

@@ -1,3 +1,4 @@
+using Effects.ECS;
 using Sirenix.OdinInspector;
 using Unity.Entities;
 using UnityEngine;
@@ -19,6 +20,8 @@ namespace Gameplay.Chunk.ECS
                 Entity enemyEntity = GetEntity(TransformUsageFlags.Dynamic);
                 
                 AddComponent<GroundObjectComponent>(enemyEntity);
+                AddComponent<RandomComponent>(enemyEntity);
+                
                 AddComponent(enemyEntity, new SpeedComponent { Speed = 1 });
                 AddComponent(enemyEntity, new ScaleComponent
                 {
@@ -26,6 +29,7 @@ namespace Gameplay.Chunk.ECS
                     StartScale = 0,
                     TargetScale = authoring.transform.localScale.x,
                 });
+                
             }
         }
     }

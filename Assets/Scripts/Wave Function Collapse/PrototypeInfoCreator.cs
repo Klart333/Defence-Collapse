@@ -111,6 +111,13 @@ namespace WaveFunctionCollapse
                 List<Vector3> negZs = new List<Vector3>();
                 
                 Dictionary<Direction, int[]> materialInfo = useMaterialForKeys ? meshRayService.GetMeshIndices(mesh) : null;
+                if (Debug && materialInfo != null)
+                {   
+                    foreach (var array in materialInfo.Values)
+                    {
+                        UnityEngine.Debug.Log("matIndexes: " + string.Join(", ", array));
+                    }
+                }
                 
                 Vector3[] verts = mesh.vertices;
                 Vector3[] noDupes = verts.Distinct().ToArray();
@@ -293,16 +300,13 @@ namespace WaveFunctionCollapse
             bool botLeft = rightBuildableCodes.Contains(prot.NegZ);
             bool botRight = rightBuildableCodes.Contains(prot.PosX);
             
-            BuildableCorners corner = new BuildableCorners()
-            {
-                CornerDictionary = new Dictionary<Corner, CornerData>()
+            BuildableCorners corner = new BuildableCorners(new Dictionary<Corner, CornerData>()
                 {
                     {Corner.TopLeft, new CornerData(topLeft ? GroundType.Buildable : 0)}, 
                     {Corner.TopRight, new CornerData(topRight ? GroundType.Buildable : 0)}, 
                     {Corner.BottomLeft, new CornerData(botLeft ? GroundType.Buildable : 0)}, 
                     {Corner.BottomRight, new CornerData(botRight ? GroundType.Buildable : 0)}, 
-                }
-            };
+                });
             return corner;
         }
 

@@ -24,12 +24,12 @@ namespace WaveFunctionCollapse
         public readonly List<int3> QueryBuiltCells = new List<int3>();
         
         // In the Following order: Right, Left, Up, Down, Forward, Backward
+        public Dictionary<int3, GameObject> SpawnedMeshes { get; } = new Dictionary<int3, GameObject>();
+        public GroundType[,,,] GroundTypes { get; private set; }
         public IChunk[] AdjacentChunks { get; private set; }
+        public bool[,,] BuiltCells { get; private set; }
         public IQueryWaveFunction Handler { get; set; }
         public Cell[,,] Cells { get; private set; }
-        public bool[,,] BuiltCells { get; private set; }
-        public GroundType[,,,] GroundTypes { get; private set; }
-        public List<GameObject> SpawnedMeshes { get; } = new List<GameObject>();
         public Vector3 Position { get; private set;}
         public int Width { get; private set;}
         public int Height { get; private set;}
@@ -113,7 +113,7 @@ namespace WaveFunctionCollapse
             }
         }
         
-        public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, Chunk groundChunk, Vector3 offset, BuildableCornerData cellBuildableCornerData)
+        public void LoadCells(PrototypeInfoData prototypeInfoData, Vector3 gridScale, IChunk groundChunk, Vector3 offset, BuildableCornerData cellBuildableCornerData)
         {
             PrototypeInfoData = prototypeInfoData;
             IsClear = false;
@@ -133,29 +133,21 @@ namespace WaveFunctionCollapse
             {
                 int3 cellIndex = new int3(x, y, z);
                 int3 gridIndex = new int3(Mathf.FloorToInt(x * gridScale.x / 2.0f), 0, Mathf.FloorToInt(z * gridScale.z / 2.0f));
-                // Set GroundTypes
-                SetGroundType(cellIndex, gridIndex); 
+                SetGroundType(cellIndex, gridIndex, groundChunk, cellBuildableCornerData); 
             }
-            
-            void SetGroundType(int3 cellIndex, int3 groundIndex)
+        }
+
+        public void SetGroundType(int3 cellIndex, int3 groundIndex, IChunk groundChunk, BuildableCornerData cellBuildableCornerData)
+        {
+            Cell groundCell = groundChunk.Cells[groundIndex.x, 0, groundIndex.z];
+
+            for (int i = 0; i < WaveFunctionUtility.Corners.Length; i++)
             {
-                Vector3 cellPosition = Cells[cellIndex.x, cellIndex.y, cellIndex.z].Position;
-
-                if (!groundChunk.Cells.IsInBounds(groundIndex.x, 0, groundIndex.z))
+                int2 corner = WaveFunctionUtility.Corners[i];
+                if (cellBuildableCornerData.TryGetCornerType(groundCell.PossiblePrototypes[0].MeshRot, corner, out GroundType type))
                 {
-                    Debug.LogError("Not in bounds: " + groundIndex + ", cell: " + cellIndex);
-                    return;
-                }
-                Cell groundCell = groundChunk.Cells[groundIndex.x, 0, groundIndex.z];
-
-                for (int i = 0; i < WaveFunctionUtility.Corners.Length; i++)
-                {
-                    int2 corner = WaveFunctionUtility.Corners[i];
-                    if (cellBuildableCornerData.TryGetCornerType(groundCell.PossiblePrototypes[0].MeshRot, corner, out GroundType type))
-                    {
-                        GroundTypes[cellIndex.x, cellIndex.y, cellIndex.z, i] = type;
-                    }   
-                }
+                    GroundTypes[cellIndex.x, cellIndex.y, cellIndex.z, i] = type;
+                }   
             }
         }
 
@@ -307,13 +299,13 @@ namespace WaveFunctionCollapse
         {
             IsClear = true;
 
-            for (int i = SpawnedMeshes.Count - 1; i >= 0; i--)
+            foreach (GameObject spawned in SpawnedMeshes.Values)
             {
-                SpawnedMeshes[i].SetActive(false);
-                pool.Push(SpawnedMeshes[i]);
-                SpawnedMeshes.RemoveAt(i);
+                spawned.SetActive(false);
+                pool.Push(spawned);
             }
-            
+            SpawnedMeshes.Clear();
+
             OnCleared?.Invoke();
         }
 

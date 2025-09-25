@@ -17,6 +17,7 @@ using UnityEngine;
 using Buildings;
 using Utility;
 using System;
+using Effects.ECS;
 
 namespace Gameplay.Chunks
 {
@@ -165,6 +166,7 @@ namespace Gameplay.Chunks
             {
                 PathIndex = PathUtility.GetIndex(pos.XZ())
             });
+            entityManager.SetComponentData(spawned, new RandomComponent { Random = Random.CreateFromIndex(random.NextUInt()) });
             spawnedTrees.Add(spawned);
         }
 

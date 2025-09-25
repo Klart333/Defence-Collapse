@@ -1190,14 +1190,9 @@ namespace Buildings.District
                  {
                      effect.Perform(this);
                  }
-                 
-                 InvokeStatisticsChanged();
              }
              
-             if (TurnsUntilComplete <= 0)
-             {
-                 Debug.Log("FOREST IS GONE!");
-             }
+             InvokeStatisticsChanged(); 
          }
      }
 

@@ -18,7 +18,7 @@ namespace WaveFunctionCollapse
         public event Action OnCleared;
         
         public Tuple<int3, Cell>[,,] QueryChangedCells;
-        public List<GameObject> SpawnedMeshes => throw new NotImplementedException();
+        public Dictionary<int3, GameObject> SpawnedMeshes => throw new NotImplementedException();
 
         public bool IsChunkQueryAdded { get; private set; } = true;
         
