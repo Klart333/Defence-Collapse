@@ -26,21 +26,19 @@ namespace Buildings.Lumbermill
         private DistrictGenerator districtGenerator;
         
         [SerializeField]
-        private PrototypeInfoData lumbermillPrototypeData;
+        private TowerData lumberMillData;
 
         [Title("Display")]
         [SerializeField]
         private TextMeshProUGUI costText;
         
         private MoneyManager moneyManager;
-        private BuildingManager buildingManager;
         
         private void OnEnable()
         {
             tileBuilder.OnTilePressed += OnTilePressed;
 
             GetMoney().Forget();
-            GetBuilding().Forget();
         }
 
         private async UniTaskVoid GetMoney()
@@ -48,10 +46,6 @@ namespace Buildings.Lumbermill
             moneyManager = await MoneyManager.Get();
         }
         
-        private async UniTaskVoid GetBuilding()
-        {
-            buildingManager = await BuildingManager.Get();
-        }
         private void OnDisable()
         {
             tileBuilder.OnTilePressed -= OnTilePressed;
@@ -91,18 +85,18 @@ namespace Buildings.Lumbermill
             tileBuilder.Tiles[groundIndex] = BuildingType.Lumbermill;
             
             Vector3 position = ChunkWaveUtility.GetPosition(groundIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize) + groundGenerator.ChunkWaveFunction.CellSize.XyZ(0) / 2.0f;
-            districtGenerator.Query(position, 1, lumbermillPrototypeData);
+            districtGenerator.Query(position, lumberMillData.DistrictHeight, lumberMillData.PrototypeInfoData);
             HashSet<QueryChunk> chunks = new HashSet<QueryChunk>();
             foreach (QueryChunk chunk in districtGenerator.QueriedChunks)
             {
-                if (chunk.PrototypeInfoData == lumbermillPrototypeData)
+                if (chunk.PrototypeInfoData == lumberMillData.PrototypeInfoData)
                 {
                     chunks.Add(chunk);
                 }
             }
             districtGenerator.Place();
             
-            districtHandler.AddBuiltDistrict(chunks, DistrictType.Lumbermill);
+            districtHandler.AddBuiltDistrict(chunks, lumberMillData);
             
             costText.gameObject.SetActive(false);
         }

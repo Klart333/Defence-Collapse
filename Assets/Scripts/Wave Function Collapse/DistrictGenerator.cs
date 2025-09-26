@@ -102,22 +102,26 @@ namespace WaveFunctionCollapse
         {
             if (Input.GetKeyDown(KeyCode.R))
             {
-                IsGenerating = false;
-                foreach (QueryChunk chunk in waveFunction.Chunks.Values)
-                {
-                    chunk.Clear(waveFunction.GameObjectPool);
-                    ClearChunkMeshes(chunk.ChunkIndex, false);
-                }
-                
-                foreach (QueryChunk chunk in waveFunction.Chunks.Values)
-                {
-                    waveFunction.LoadCells(chunk, chunk.PrototypeInfoData);
-                }
-
-                Run(waveFunction.Chunks.Values, true).Forget();
+                AddAction(() => RegenerateChunks(waveFunction.Chunks.Values, null));
             }
         }
-        
+
+        public async UniTask RegenerateChunks(ICollection<QueryChunk> chunks, Func<IChunk, PrototypeInfoData> GetPrototypeInfoData)
+        {
+            foreach (QueryChunk chunk in chunks)
+            {
+                chunk.Clear(waveFunction.GameObjectPool);
+                ClearChunkMeshes(chunk.ChunkIndex, false);
+            }
+                
+            foreach (QueryChunk chunk in chunks)
+            {
+                waveFunction.LoadCells(chunk, GetPrototypeInfoData?.Invoke(chunk) ?? chunk.PrototypeInfoData);
+            }
+
+            await Run(chunks, true);
+        }
+
         private async UniTaskVoid UpdateActions()
         {
             GameManager gameManager = await GameManager.Get();

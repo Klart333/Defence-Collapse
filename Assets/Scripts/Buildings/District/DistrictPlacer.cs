@@ -35,9 +35,6 @@ namespace Buildings.District
         [SerializeField]
         private BuildingPlacer buildingPlacer;
         
-        [SerializeField]
-        private DistrictPrototypeInfoUtility prototypeUtility;
-        
         [Title("Cost")]
         [SerializeField]
         private TextMeshProUGUI costText;
@@ -57,7 +54,7 @@ namespace Buildings.District
         
         private MoneyManager moneyManager;
         
-        private DistrictType districtType;
+        private TowerData towerData;
         
         private void OnEnable()
         {
@@ -83,8 +80,8 @@ namespace Buildings.District
         
         private void UpdateCost()
         {
-            int amount = districtHandler.GetDistrictAmount(districtType);
-            float cost = districtCostData.GetCost(districtType, amount);
+            int amount = districtHandler.GetDistrictAmount(towerData.DistrictType);
+            float cost = districtCostData.GetCost(towerData.DistrictType, amount);
             if (cost <= 0) return;
 
             costText.text = $"{cost:N0}g";
@@ -93,7 +90,7 @@ namespace Buildings.District
             costText.gameObject.SetActive(true);
         }
 
-        private void DistrictClicked(DistrictType districtType)
+        private void DistrictClicked(TowerData towerData)
         {
             if (tileBuilder.GetIsDisplaying(out BuildingType type) && type.HasFlag(BuildingType.District))
             {
@@ -101,10 +98,10 @@ namespace Buildings.District
                 return;
             }
             
+            this.towerData = towerData;
+            
             tileBuilder.Display(BuildingType.District, GetBuildableGroundType(), IsBuildable);
             tileBuilder.OnTilePressed += OnTilePressed;
-
-            this.districtType = districtType;
         }
 
         private TileAction IsBuildable(ChunkIndex chunkIndex)
@@ -124,7 +121,7 @@ namespace Buildings.District
         
         private GroundType GetBuildableGroundType()
         {
-            return districtType switch
+            return towerData.DistrictType switch
             {
                 DistrictType.Mine => GroundType.Crystal,
                 _ => GroundType.Grass | GroundType.Crystal
@@ -157,8 +154,8 @@ namespace Buildings.District
 
         private async UniTaskVoid PlaceDistrict(ChunkIndex groundIndex)
         {
-            int amount = districtHandler.GetDistrictAmount(districtType);
-            if (!moneyManager.CanPurchase(districtType, amount, out float cost))
+            int amount = districtHandler.GetDistrictAmount(towerData.DistrictType);
+            if (!moneyManager.CanPurchase(towerData.DistrictType, amount, out float cost))
             {
                 return;
             }
@@ -166,31 +163,28 @@ namespace Buildings.District
             tileBuilder.Tiles[groundIndex] = BuildingType.District;
             
             moneyManager.RemoveMoney(cost);
-
-            PrototypeInfoData protInfo = prototypeUtility.GetPrototypeInfo(districtType);
-            
             buildingGenerator.Query(groundIndex);
             buildingGenerator.Place();
 
             await UniTask.WaitUntil(() => districtGenerator.GeneratorActionQueue.Count == 0);
             
             Vector3 position = ChunkWaveUtility.GetPosition(groundIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize) + groundGenerator.ChunkWaveFunction.CellSize.XyZ(0) / 2.0f;
-            districtGenerator.Query(position, 2, protInfo);
+            districtGenerator.Query(position, towerData.DistrictHeight, towerData.PrototypeInfoData);
             HashSet<QueryChunk> chunks = new HashSet<QueryChunk>();
             foreach (QueryChunk chunk in districtGenerator.QueriedChunks)
             {
-                if (chunk.PrototypeInfoData == protInfo)
+                if (chunk.PrototypeInfoData == towerData.PrototypeInfoData)
                 {
                     chunks.Add(chunk);
                 }
             }
             
-            districtHandler.AddBuiltDistrict(chunks, districtType);
+            districtHandler.AddBuiltDistrict(chunks, towerData);
             districtGenerator.Place();
             
             costText.gameObject.SetActive(false);
             
-            if (districtType == DistrictType.TownHall)
+            if (towerData.DistrictType == DistrictType.TownHall)
             {
                 CancelPlacement();
             }

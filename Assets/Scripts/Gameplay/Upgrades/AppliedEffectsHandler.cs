@@ -94,7 +94,7 @@ namespace Gameplay.Upgrades
         
         public void AddUpgradeEffect(CategoryType appliedDistrict, IEffect effect)
         {
-            foreach (DistrictData district in districtHandler.Districts.Values)
+            foreach (DistrictData district in districtHandler.UniqueDistricts.Values)
             {
                 if (appliedDistrict.HasFlag(district.State.CategoryType))
                 {
@@ -115,7 +115,7 @@ namespace Gameplay.Upgrades
         
         public void AddUpgradeEffectOnDamage(CategoryType appliedDistrict, List<IEffect> effects)
         {
-            foreach (DistrictData district in districtHandler.Districts.Values)
+            foreach (DistrictData district in districtHandler.UniqueDistricts.Values)
             {
                 if (appliedDistrict.HasFlag(district.State.CategoryType))
                 {

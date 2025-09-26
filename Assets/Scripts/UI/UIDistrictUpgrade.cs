@@ -318,7 +318,9 @@ namespace UI
                     continue;
                 }
                 
-                descriptions[i].text = string.Format(stat.Descriptions[i], i == 1 ? stat.Value.ToString("N") : stat.GetIncrease().ToString(stat.GetFormat()));
+                descriptions[i].text = string.Format(stat.Descriptions[i], i == 1 
+                    ? "stat.Value.ToString(\"N\")" 
+                    : stat.GetIncrease().ToString(stat.GetFormat()));
             }
 
             costText.text = $"Cost: {stat.GetCost()}";

@@ -145,18 +145,30 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: upgradeStats
+      Entry: 7
+      Data: 14|Effects.IUpgradeStatEditor[], Core
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 14|Attack, Core
+      Data: 15|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 16|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 16|Effects.DamageColliderEffect, Core
+      Data: 17|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 2
@@ -198,7 +210,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 17|Effects.VisualEffectEffect, Core
+      Data: 18|Effects.VisualEffectEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 1
@@ -222,7 +234,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -237,7 +249,7 @@ MonoBehaviour:
       Data: 
     - Name: createdEffects
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -249,7 +261,7 @@ MonoBehaviour:
       Data: 
     - Name: endWaveEffects
       Entry: 7
-      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 21|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -259,11 +271,15 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  districtName: Flame District
   districtNameReference:
     Mode: 1
     ConstantValue: 
     Variable: {fileID: 11400000, guid: 9173ec6b8c0ad584e99355cdfd3d9b18, type: 2}
+    VariableValuePreview: 
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: a5f3899665cbf734b9b3ed73d66bcd56, type: 2}
     VariableValuePreview: 
   icon:
     Mode: 1
@@ -277,27 +293,9 @@ MonoBehaviour:
     Variable: {fileID: 11400000, guid: 89a79b345b894154bb013437f6bdb0ef, type: 2}
     VariableValuePreview: {fileID: 21300000, guid: 21d4083274bcfb447b1ce7f615d7d136,
       type: 3}
-  description: 'Burns enemies with fire, dealing AoE damage and applies <b>Burn</b>.
-
-
-    Size:
-    3 x 3
-
-    Cost: 500'
-  descriptionReference:
-    Mode: 1
-    ConstantValue: 
-    Variable: {fileID: 11400000, guid: a5f3899665cbf734b9b3ed73d66bcd56, type: 2}
-    VariableValuePreview: 
   districtType: 5
-  LevelDatas:
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  UpgradeIcons:
-  - {fileID: 21300000, guid: 740f5e97fe6a90547844fb62858ab085, type: 3}
-  - {fileID: 21300000, guid: 612aeacb80233d741a233eb3a8940f4d, type: 3}
-  - {fileID: 21300000, guid: 5c91aec45c337e54285b8f9e8434bec1, type: 3}
+  shouldCombine: 1
+  prototypeInfoData: {fileID: 11400000, guid: 78c9d3f9d472dc64296ab95b899cfe91, type: 2}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
   attackAngle: 90

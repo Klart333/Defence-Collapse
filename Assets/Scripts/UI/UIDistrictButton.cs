@@ -46,7 +46,7 @@ namespace UI
             UpdateCostText();
         }
         
-        private void OnDistrictBuilt(DistrictType arg0)
+        private void OnDistrictBuilt(TowerData _)
         {
             UpdateCostText();
         }

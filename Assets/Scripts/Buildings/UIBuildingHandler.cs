@@ -33,10 +33,9 @@ public class UIBuildingHandler : MonoBehaviour
     {
         UIDistrictToggleButton toggleButton = districtButton.GetComponentInChildren<UIDistrictToggleButton>();
         
-        DistrictType districtType = towerData.DistrictType;
         Action onClick = () =>
         {
-            ClickDistrict(districtType);
+            ClickDistrict(towerData);
         };
         toggleButton.OnClick += onClick;
                 
@@ -54,7 +53,7 @@ public class UIBuildingHandler : MonoBehaviour
         Events.OnBuildingClicked?.Invoke(BuildingType.Barricade);
     }
 
-    public void ClickDistrict(DistrictType district)
+    public void ClickDistrict(TowerData district)
     {
         Events.OnDistrictClicked?.Invoke(district);
     }

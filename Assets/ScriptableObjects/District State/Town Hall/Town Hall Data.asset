@@ -16,8 +16,8 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 950717614191496012, guid: b85e15ed555b81648aba7d70d53e4ffa, type: 3}
-    - {fileID: 11400000, guid: 4878382a6277da94399ff391d3a06c4d, type: 2}
+    - {fileID: 21300000, guid: 8d371ebf1ad8df644a36b2a3ac12177c, type: 3}
+    - {fileID: 11400000, guid: 76b706ff9f7a73c4d8e1c7731e67264f, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -58,7 +58,7 @@ MonoBehaviour:
       Data: 4|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0.8
+      Data: 0.5
     - Name: 
       Entry: 8
       Data: 
@@ -67,7 +67,7 @@ MonoBehaviour:
       Data: 5|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 8
+      Data: 7
     - Name: 
       Entry: 8
       Data: 
@@ -146,60 +146,72 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: BaseAttack
+    - Name: upgradeStats
       Entry: 7
-      Data: 14|Attack, Core
-    - Name: Effects
-      Entry: 7
-      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 14|Effects.IUpgradeStatEditor[], Core
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 16|Effects.ArchedDamageColliderEffect, Core
-    - Name: ModifierValue
-      Entry: 4
-      Data: 4
-    - Name: LimitedHits
-      Entry: 5
-      Data: true
-    - Name: Hits
+      Data: 15|Effects.TownHallUpgradeStatEditor, Core
+    - Name: statName
+      Entry: 7
+      Data: 16|Variables.StringReference, Core
+    - Name: Mode
       Entry: 3
-      Data: 1
-    - Name: TriggerDamageDone
-      Entry: 5
-      Data: true
-    - Name: Radius
-      Entry: 4
-      Data: 0.6
-    - Name: Height
-      Entry: 4
-      Data: 0.5
-    - Name: UnitsPerSecond
-      Entry: 4
-      Data: 12
-    - Name: Effects
+      Data: 0
+    - Name: ConstantValue
+      Entry: 1
+      Data: Level
+    - Name: Variable
+      Entry: 6
+      Data: 
+    - Name: VariableValuePreview
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: descriptions
       Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 17|Variables.StringReference[], Core
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 7
-      Data: 18|Effects.VisualEffectEffect, Core
-    - Name: ModifierValue
-      Entry: 4
-      Data: 1
-    - Name: AttackEffect
-      Entry: 10
+      Data: 18|Variables.StringReference, Core
+    - Name: Mode
+      Entry: 3
       Data: 0
-    - Name: spawnAtUnitOrigin
-      Entry: 5
-      Data: false
-    - Name: orientEffectToAttackPosition
-      Entry: 5
-      Data: false
+    - Name: ConstantValue
+      Entry: 1
+      Data: +1 Level - Choose 1 of 2 districts to unlock
+    - Name: Variable
+      Entry: 6
+      Data: 
+    - Name: VariableValuePreview
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 19|Variables.StringReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 0
+    - Name: ConstantValue
+      Entry: 1
+      Data: 'Current Level: {0}'
+    - Name: Variable
+      Entry: 6
+      Data: 
+    - Name: VariableValuePreview
+      Entry: 1
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -209,15 +221,36 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: Mesh
+    - Name: statIcon
+      Entry: 10
+      Data: 0
+    - Name: useStatType
+      Entry: 5
+      Data: false
+    - Name: statType
+      Entry: 3
+      Data: 0
+    - Name: levelData
       Entry: 10
       Data: 1
-    - Name: TrailScaleFactor
-      Entry: 4
-      Data: 0.8
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: BaseAttack
+      Entry: 7
+      Data: 20|Attack, Core
+    - Name: Effects
+      Entry: 7
+      Data: 21|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -226,7 +259,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 22|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -241,7 +274,7 @@ MonoBehaviour:
       Data: 
     - Name: createdEffects
       Entry: 7
-      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 23|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -253,13 +286,13 @@ MonoBehaviour:
       Data: 
     - Name: endWaveEffects
       Entry: 7
-      Data: 21|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 24|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 22|Effects.AddMoneyEffect, Core
+      Data: 25|Effects.AddMoneyEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 50
@@ -275,11 +308,15 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  districtName: Town Hall
   districtNameReference:
     Mode: 1
     ConstantValue: 
     Variable: {fileID: 11400000, guid: a8c703f68119adc40984f621badd0088, type: 2}
+    VariableValuePreview: 
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: 63924b239de398c4e855789e55b14656, type: 2}
     VariableValuePreview: 
   icon:
     Mode: 1
@@ -293,17 +330,9 @@ MonoBehaviour:
     Variable: {fileID: 11400000, guid: 3dd9c867991ad6f4aa0ca055e8d6fdc5, type: 2}
     VariableValuePreview: {fileID: 21300000, guid: a116b685f9445784b9645f815ec1e4f6,
       type: 3}
-  description: 
-  descriptionReference:
-    Mode: 1
-    ConstantValue: 
-    Variable: {fileID: 11400000, guid: 63924b239de398c4e855789e55b14656, type: 2}
-    VariableValuePreview: 
   districtType: 3
-  LevelDatas:
-  - {fileID: 11400000, guid: 76b706ff9f7a73c4d8e1c7731e67264f, type: 2}
-  UpgradeIcons:
-  - {fileID: 21300000, guid: b5bf9ae6f97b5e548abe324f059a1523, type: 3}
+  shouldCombine: 1
+  prototypeInfoData: {fileID: 11400000, guid: ab0696a35eef117499e0fdc29a15b776, type: 2}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
   attackAngle: 360

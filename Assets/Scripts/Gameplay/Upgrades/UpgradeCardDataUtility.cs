@@ -122,14 +122,14 @@ namespace Gameplay.Upgrades
             }
         }
 
-        private void OnDistrictBuilt(DistrictType type)
+        private void OnDistrictBuilt(TowerData towerData)
         {
             for (int i = UpgradeCardInstances.Count - 1; i >= 0; i--)
             {
                 var upgradeInstance = UpgradeCardInstances[i];
              
                 if (upgradeInstance.WeightStrategy.HasFlag(WeightStrategy.ChangeWithDistrictsBuilt) 
-                    && DoesMatch(type, upgradeInstance.UpgradeCardType))
+                    && DoesMatch(towerData.DistrictType, upgradeInstance.UpgradeCardType))
                 {
                     upgradeInstance.Weight += upgradeInstance.WeightChangeOnDistrictBuilt;
                 }

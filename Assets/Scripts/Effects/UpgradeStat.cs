@@ -1,200 +1,347 @@
-using Cysharp.Threading.Tasks;
-using Sirenix.OdinInspector;
-using UnityEngine;
-using Gameplay;
-using System;
-using System.Threading.Tasks;
-using Buildings.District;
-using Effects;
-using Gameplay.Event;
-using UnityEngine.InputSystem;
-using WaveFunctionCollapse;
 using Object = UnityEngine.Object;
 
-public interface IUpgradeStat : IStat
+using Sirenix.OdinInspector;
+using WaveFunctionCollapse;
+using Buildings.District;
+using Gameplay.Event;
+using UnityEngine;
+using Variables;
+using Gameplay;
+using System;
+
+namespace Effects
 {
-    public string Name { get; }
-    public string[] Descriptions { get; }
-    public Sprite Icon { get; }
-
-    public float GetCost();
-    public float GetIncrease();
-    public void IncreaseLevel();
-    public string GetFormat();
-}
-
-[Serializable, InlineProperty]
-public class UpgradeStat : IUpgradeStat
-{
-    [Title("Stat")]
-    public Stat Stat = new Stat(1);
-    
-    [Title("Upgrade Settings")]
-    public string Name { get; } = "Stat Name";
-    public string[] Descriptions { get; }
-    public Sprite Icon { get; }
-    
-    public LevelData LevelData;
-
-    private Modifier increaseModifier;
-
-    public event Action OnValueChanged;
-    
-    public float BaseValue => Stat.BaseValue;
-    public float Value => Stat.Value;
-
-    public DistrictState DistrictState { get; set; }
-    private int Level { get; set; } = 1;
-
-    public UpgradeStat()
+    public interface IUpgradeStatEditor
     {
-        Stat.OnValueChanged += () => OnValueChanged?.Invoke();
+        public IUpgradeStat GetUpgradeStat(DistrictState districtState);
     }
 
-    public UpgradeStat(Stat stat, LevelData levelData, string name, string[] descriptions, Sprite icon)
+    public interface IUpgradeStat
     {
-        Stat = stat;
-        LevelData = levelData;
-        Name = name;
-        Descriptions = descriptions;
-        Icon = icon;
+        public string Name { get; }
+        public string[] Descriptions { get; }
+        public Sprite Icon { get; }
+
+        public void IncreaseLevel();
+        public float GetIncrease();
+        public string GetFormat();
+        public float GetCost();
+    }
+
+    #region Upgrade Stat
+    
+    [Serializable]
+    public class UpgradeStatEditor : IUpgradeStatEditor
+    {
+        [Title("Visual")]
+        [SerializeField]
+        private StringReference statName;
+
+        [SerializeField]
+        private StringReference[] descriptions;
+
+        [SerializeField]
+        private Sprite statIcon;
+     
+        [Title("Stat")]
+        [SerializeField]
+        private bool useStatType;
+
+        [ShowIf(nameof(useStatType))]
+        [SerializeField]
+        private StatType statType;
         
-        Stat.OnValueChanged += () => OnValueChanged?.Invoke();
-    }
-    
-    public void AddModifier(Modifier mod)
-    {
-        Stat.AddModifier(mod);
-    }
+        [Title("Upgrade Settings")]
+        [SerializeField]
+        private LevelData levelData;
 
-    public void RemoveModifier(Modifier mod)
-    {
-        Stat.RemoveModifier(mod);
-    }
-
-    public void RemoveAllModifiers()
-    {
-        Stat.RemoveAllModifiers();
-    }
-
-    public void IncreaseLevel()
-    {
-        if (increaseModifier == null)
+        public IUpgradeStat GetUpgradeStat(DistrictState districtState)
         {
-            increaseModifier = new Modifier
+            Stat stat = useStatType ? districtState.Stats.Get(statType) : new Stat(0);
+            
+            string[] descriptionsValues = new string[descriptions.Length];
+            for (int i = 0; i < descriptions.Length; i++)
             {
-                Type = Modifier.ModifierType.Additive
-            };
+                descriptionsValues[i] = descriptions[i].Value;
+            }
 
-            Stat.AddModifier(increaseModifier);
+            UpgradeStat upgradeStat = new UpgradeStat(districtState, stat, levelData, statName.Value, descriptionsValues, statIcon);
+            return upgradeStat;
+        }
+    }
+
+    public class UpgradeStat : IUpgradeStat
+    {
+        public event Action OnValueChanged;
+
+        private Modifier increaseModifier;
+        
+        public DistrictState DistrictState { get; set; }
+        public string[] Descriptions { get; }
+        public int Level { get; set; } = 1;
+        public LevelData LevelData { get; }
+        public string Name { get; }
+        public Sprite Icon { get; }
+        public Stat Stat { get; }
+        
+        public float BaseValue => Stat.BaseValue;
+        public float Value => Stat.Value;
+
+        public UpgradeStat(DistrictState districtState, Stat stat, LevelData levelData, string name, string[] descriptions, Sprite icon)
+        {
+            DistrictState = districtState;
+            Descriptions = descriptions;
+            LevelData = levelData;
+            Stat = stat;
+            Name = name;
+            Icon = icon;
+            
+            Stat.OnValueChanged += () => OnValueChanged?.Invoke();
         }
         
-        increaseModifier.Value += GetIncrease();
-        Stat.SetDirty(false);
-        DistrictState.Level++;
-        Level++;
-    }
-
-    public float GetCost()
-    {
-        return LevelData.GetCost(DistrictState.Level);
-    }
-    
-    public float GetIncrease()
-    {
-        return LevelData.GetIncrease(Level);
-    }
-
-    public string GetFormat() => "N";
-}
-
-[Serializable, InlineProperty]
-public class TownHallUpgradeStat : IUpgradeStat
-{
-    [Title("Stat")]
-    public Stat Stat;
-    
-    [Title("Upgrade Settings")]
-    public string Name { get; }
-    public string[] Descriptions { get; }
-    public Sprite Icon { get; }
-    
-    public LevelData LevelData;
-
-    private Modifier increaseModifier;
-
-    private int Level { get; set; } = 1;
-    public float BaseValue => Stat.BaseValue;
-    public event Action OnValueChanged;
-    public float Value => Stat.Value;
-    
-    public DistrictState DistrictState { get; set; }
-
-    public TownHallUpgradeStat(Stat stat, LevelData levelData, string name, string[] descriptions, Sprite icon)
-    {
-        Stat = stat;
-        LevelData = levelData;
-        Name = name;
-        Descriptions = descriptions;
-        Icon = icon;
-        
-        Stat.OnValueChanged += () => OnValueChanged?.Invoke();
-    }
-    
-    public void AddModifier(Modifier mod)
-    {
-        Stat.AddModifier(mod);
-    }
-
-    public void RemoveModifier(Modifier mod)
-    {
-        Stat.RemoveModifier(mod);
-    }
-
-    public void RemoveAllModifiers()
-    {
-        Stat.RemoveAllModifiers();
-    }
-
-    public void IncreaseLevel()
-    {
-        IncreaseDistrictHeight();
-
-        if (increaseModifier == null)
+        public void AddModifier(Modifier mod)
         {
-            increaseModifier = new Modifier
-            {
-                Type = Modifier.ModifierType.Additive
-            };
+            Stat.AddModifier(mod);
+        }
 
-            Stat.AddModifier(increaseModifier);
+        public void RemoveModifier(Modifier mod)
+        {
+            Stat.RemoveModifier(mod);
+        }
+
+        public void RemoveAllModifiers()
+        {
+            Stat.RemoveAllModifiers();
+        }
+
+        public void IncreaseLevel()
+        {
+            if (increaseModifier == null)
+            {
+                increaseModifier = new Modifier
+                {
+                    Type = Modifier.ModifierType.Additive
+                };
+
+                Stat.AddModifier(increaseModifier);
+            }
+            
+            increaseModifier.Value += GetIncrease();
+            Stat.SetDirty(false);
+            DistrictState.Level++;
+            Level++;
+        }
+
+        public float GetCost()
+        {
+            return LevelData.GetCost(DistrictState.Level);
         }
         
-        increaseModifier.Value += GetIncrease();
-        Stat.SetDirty(false);
-        DistrictState.Level++;
-        Level++;
+        public float GetIncrease()
+        {
+            return LevelData.GetIncrease(Level);
+        }
+
+        public string GetFormat() => "N";
+    }
+
+    #endregion
+
+    #region Town Hall Upgrade
+
+    [Serializable]
+    public class TownHallUpgradeStatEditor : IUpgradeStatEditor
+    {
+        [Title("Visual")]
+        [SerializeField]
+        private StringReference statName;
+
+        [SerializeField]
+        private StringReference[] descriptions;
+
+        [SerializeField]
+        private Sprite statIcon;
+     
+        [Title("Stat")]
+        [SerializeField]
+        private bool useStatType;
+
+        [ShowIf(nameof(useStatType))]
+        [SerializeField]
+        private StatType statType;
         
-        UIEvents.OnFocusChanged?.Invoke();
-        Object.FindFirstObjectByType<DistrictUnlockHandler>().DisplayUnlockableDistricts();
+        [Title("Upgrade Settings")]
+        [SerializeField]
+        private LevelData levelData;
 
-        PersistantGameStats.CurrentPersistantGameStats.TownHallLevel++;
-    }
+        public IUpgradeStat GetUpgradeStat(DistrictState districtState)
+        {
+            Stat stat = useStatType ? districtState.Stats.Get(statType) : new Stat(0);
+            
+            string[] descriptionsValues = new string[descriptions.Length];
+            for (int i = 0; i < descriptions.Length; i++)
+            {
+                descriptionsValues[i] = descriptions[i].Value;
+            }
 
-    private void IncreaseDistrictHeight()
-    {
-        Object.FindFirstObjectByType<DistrictGenerator>().AddAction(Object.FindFirstObjectByType<DistrictHandler>().IncreaseTownHallHeight);
-    }
-
-    public float GetCost()
-    {
-        return LevelData.GetCost(DistrictState.Level);
+            TownHallUpgradeStat upgradeStat = new TownHallUpgradeStat(districtState, stat, levelData, statName.Value, descriptionsValues, statIcon);
+            return upgradeStat;
+        }
     }
     
-    public float GetIncrease()
+    public class TownHallUpgradeStat : IUpgradeStat
     {
-        return LevelData.GetIncrease(Level);
+        public event Action OnValueChanged;
+
+        private DistrictUnlockHandler districtUnlockHandler;
+        private DistrictGenerator districtGenerator;
+        private Modifier increaseModifier;
+        
+        public DistrictState DistrictState { get; }
+        public string[] Descriptions { get; }
+        public LevelData LevelData { get; }
+        private int Level { get; set; } = 1;
+        public string Name { get; }
+        public Sprite Icon { get; }
+        public Stat Stat { get; }
+        
+        public float BaseValue => Stat.BaseValue;
+        public float Value => Stat.Value;
+
+        public TownHallUpgradeStat(DistrictState districtState, Stat stat, LevelData levelData, string name, string[] descriptions, Sprite icon)
+        {
+            DistrictState = districtState;
+            Descriptions = descriptions;
+            LevelData = levelData;
+            Stat = stat;
+            Name = name;
+            Icon = icon;
+            
+            Stat.OnValueChanged += () => OnValueChanged?.Invoke();
+
+            districtUnlockHandler = Object.FindFirstObjectByType<DistrictUnlockHandler>();
+            districtGenerator = Object.FindFirstObjectByType<DistrictGenerator>();
+        }
+
+        public void IncreaseLevel()
+        {
+            IncreaseDistrictHeight();
+
+            if (increaseModifier == null)
+            {
+                increaseModifier = new Modifier
+                {
+                    Type = Modifier.ModifierType.Additive
+                };
+
+                Stat.AddModifier(increaseModifier);
+            }
+            
+            increaseModifier.Value += GetIncrease();
+            Stat.SetDirty(false);
+            DistrictState.Level++;
+            Level++;
+            
+            UIEvents.OnFocusChanged?.Invoke();
+            districtUnlockHandler.DisplayUnlockableDistricts();
+
+            PersistantGameStats.CurrentPersistantGameStats.TownHallLevel++;
+        }
+
+        private void IncreaseDistrictHeight()
+        {
+            districtGenerator.AddAction(DistrictState.DistrictData.DistrictHandler.IncreaseTownHallHeight);
+        }
+
+        public float GetCost()
+        {
+            return LevelData.GetCost(DistrictState.Level);
+        }
+        
+        public float GetIncrease()
+        {
+            return LevelData.GetIncrease(Level);
+        }
+        
+        public string GetFormat() => "N0";
     }
     
-    public string GetFormat() => "N0";
+    #endregion
+    
+    #region Upgrade State
+    
+    [Serializable]
+    public class UpgradeStateEditor : IUpgradeStatEditor
+    {
+        [Title("Visual")]
+        [SerializeField]
+        private StringReference statName;
+
+        [SerializeField]
+        private StringReference[] descriptions;
+
+        [SerializeField]
+        private Sprite statIcon;
+     
+        [Title("Upgrade State")]
+        [SerializeField]
+        private TowerData towerData;
+        
+        [Title("Upgrade Settings")]
+        [SerializeField]
+        private LevelData levelData;
+
+        public IUpgradeStat GetUpgradeStat(DistrictState districtState)
+        {
+            string[] descriptionsValues = new string[descriptions.Length];
+            for (int i = 0; i < descriptions.Length; i++)
+            {
+                descriptionsValues[i] = descriptions[i].Value;
+            }
+
+            UpgradeState upgradeStat = new UpgradeState(districtState, towerData, levelData, statName.Value, descriptionsValues, statIcon);
+            return upgradeStat;
+        }
+    }
+
+    public class UpgradeState : IUpgradeStat
+    {
+        public DistrictState DistrictState { get; }
+        public TowerData UpgradeStateData { get; }
+        public string[] Descriptions { get; }
+        public int Level { get; set; } = 1;
+        public LevelData LevelData { get; }
+        public string Name { get; }
+        public Sprite Icon { get; }
+        
+        public UpgradeState(DistrictState districtState, TowerData upgradeStateData, LevelData levelData, string name, string[] descriptions, Sprite icon)
+        {
+            UpgradeStateData = upgradeStateData;
+            DistrictState = districtState;
+            Descriptions = descriptions;
+            LevelData = levelData;
+            Name = name;
+            Icon = icon;
+        }
+
+        public void IncreaseLevel()
+        {
+            DistrictState.DistrictData.ChangeState(UpgradeStateData);
+        }
+
+        public float GetCost()
+        {
+            return LevelData.GetCost(DistrictState.Level);
+        }
+        
+        public float GetIncrease()
+        {
+            return LevelData.GetIncrease(Level);
+        }
+
+        public string GetFormat() => "N";
+    }
+
+    #endregion
+
 }

@@ -30,7 +30,7 @@ MonoBehaviour:
       Data: 1|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 8
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -39,7 +39,7 @@ MonoBehaviour:
       Data: 2|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 8
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -48,7 +48,7 @@ MonoBehaviour:
       Data: 3|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 18
+      Data: 25
     - Name: 
       Entry: 8
       Data: 
@@ -57,7 +57,7 @@ MonoBehaviour:
       Data: 4|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 0.5
+      Data: 0.65
     - Name: 
       Entry: 8
       Data: 
@@ -145,18 +145,30 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: upgradeStats
+      Entry: 7
+      Data: 14|Effects.IUpgradeStatEditor[], Core
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 14|Attack, Core
+      Data: 15|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 16|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 16|Effects.DamageColliderEffect, Core
+      Data: 17|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 5
@@ -198,7 +210,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 17|Effects.VisualEffectEffect, Core
+      Data: 18|Effects.VisualEffectEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 1
@@ -222,7 +234,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -237,7 +249,7 @@ MonoBehaviour:
       Data: 
     - Name: createdEffects
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -249,7 +261,7 @@ MonoBehaviour:
       Data: 
     - Name: endWaveEffects
       Entry: 7
-      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 21|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -259,11 +271,15 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  districtName: Lightning District
   districtNameReference:
     Mode: 1
     ConstantValue: 
     Variable: {fileID: 11400000, guid: 081685a8feb6ece44a64fd676af125ed, type: 2}
+    VariableValuePreview: 
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: 1f15b0b2019caa946a2e46d11eb37dd7, type: 2}
     VariableValuePreview: 
   icon:
     Mode: 1
@@ -277,30 +293,11 @@ MonoBehaviour:
     Variable: {fileID: 11400000, guid: e68dbc97e37b07149a3d2e955677b995, type: 2}
     VariableValuePreview: {fileID: 21300000, guid: 6016784dc6005ce4db71c12333c0c7de,
       type: 3}
-  description: 'Zaps enemies with lightning, dealing chain damage.
-
-
-    Size: 1
-    x 1
-
-    Cost: 300'
-  descriptionReference:
-    Mode: 1
-    ConstantValue: 
-    Variable: {fileID: 11400000, guid: 1f15b0b2019caa946a2e46d11eb37dd7, type: 2}
-    VariableValuePreview: 
   districtType: 6
-  LevelDatas:
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  UpgradeIcons:
-  - {fileID: 21300000, guid: 740f5e97fe6a90547844fb62858ab085, type: 3}
-  - {fileID: 21300000, guid: 612aeacb80233d741a233eb3a8940f4d, type: 3}
-  - {fileID: 21300000, guid: 5c91aec45c337e54285b8f9e8434bec1, type: 3}
+  shouldCombine: 1
+  prototypeInfoData: {fileID: 11400000, guid: 9430843d50aa70c4fa143490b21bda6d, type: 2}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
-  requireTargeting: 1
   attackAngle: 360
   useMeshBasedPlacement: 1
   useTargetMesh: 0

@@ -1,0 +1,291 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e365721dcb580ea40b5bdb0b995bd4ec, type: 3}
+  m_Name: Ballista Data
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 11400000, guid: 4878382a6277da94399ff391d3a06c4d, type: 2}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: Stats
+      Entry: 7
+      Data: 0|Stats, Core
+    - Name: HealthDamage
+      Entry: 7
+      Data: 1|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ArmorDamage
+      Entry: 7
+      Data: 2|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ShieldDamage
+      Entry: 7
+      Data: 3|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AttackSpeed
+      Entry: 7
+      Data: 4|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Range
+      Entry: 7
+      Data: 5|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MovementSpeed
+      Entry: 7
+      Data: 6|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritChance
+      Entry: 7
+      Data: 7|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0.01
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritMultiplier
+      Entry: 7
+      Data: 8|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxHealth
+      Entry: 7
+      Data: 9|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxArmor
+      Entry: 7
+      Data: 10|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxShield
+      Entry: 7
+      Data: 11|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Healing
+      Entry: 7
+      Data: 12|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Productivity
+      Entry: 7
+      Data: 13|Effects.Stat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upgradeStats
+      Entry: 7
+      Data: 14|Effects.IUpgradeStatEditor[], Core
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: BaseAttack
+      Entry: 7
+      Data: 15|Attack, Core
+    - Name: Effects
+      Entry: 7
+      Data: 16|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 17|Effects.ArchedDamageColliderEffect, Core
+    - Name: ModifierValue
+      Entry: 4
+      Data: 10
+    - Name: LimitedHits
+      Entry: 5
+      Data: true
+    - Name: Hits
+      Entry: 3
+      Data: 1
+    - Name: TriggerDamageDone
+      Entry: 5
+      Data: true
+    - Name: Radius
+      Entry: 4
+      Data: 0.35
+    - Name: Height
+      Entry: 4
+      Data: 0.2
+    - Name: UnitsPerSecond
+      Entry: 4
+      Data: 15
+    - Name: Effects
+      Entry: 7
+      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Mesh
+      Entry: 10
+      Data: 0
+    - Name: TrailScaleFactor
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DoneDamageEffects
+      Entry: 7
+      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: createdEffects
+      Entry: 7
+      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: endWaveEffects
+      Entry: 7
+      Data: 21|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  districtNameReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: 2605effa9a85a3a4481b2445ceb85b12, type: 2}
+    VariableValuePreview: 
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: 60a75b6abfb9b6846a43f08225de94c2, type: 2}
+    VariableValuePreview: 
+  icon:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: 4982f82c7de9be34b92ac71805465076, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 7cf737b1942c8304b9633c7d65566295,
+      type: 3}
+  iconSmall:
+    Mode: 1
+    ConstantValue: {fileID: 0}
+    Variable: {fileID: 11400000, guid: 4abfd7f2106dbb344bae4d98a65f7d8b, type: 2}
+    VariableValuePreview: {fileID: 21300000, guid: 2e014047ede1b5343a7e1d3560b493b2,
+      type: 3}
+  districtType: 10
+  shouldCombine: 0
+  districtHeight: 3
+  prototypeInfoData: {fileID: 11400000, guid: 1d069a3b5f1f3fb40991741568ac96fa, type: 2}
+  RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
+    type: 3}
+  attackAngle: 90
+  useMeshBasedPlacement: 1
+  useTargetMesh: 1
+  meshVariable: {fileID: 11400000, guid: 599e40df05832474aa7d200baa2e82bf, type: 2}
+  categoryType: 1

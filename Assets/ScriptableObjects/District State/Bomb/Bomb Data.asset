@@ -31,7 +31,7 @@ MonoBehaviour:
       Data: 1|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 8
+      Data: 15
     - Name: 
       Entry: 8
       Data: 
@@ -40,7 +40,7 @@ MonoBehaviour:
       Data: 2|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 12
+      Data: 30
     - Name: 
       Entry: 8
       Data: 
@@ -49,7 +49,7 @@ MonoBehaviour:
       Data: 3|Effects.Stat, Core
     - Name: baseValue
       Entry: 4
-      Data: 5
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -146,18 +146,30 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: upgradeStats
+      Entry: 7
+      Data: 14|Effects.IUpgradeStatEditor[], Core
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 14|Attack, Core
+      Data: 15|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 16|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 16|Effects.ArchedDamageColliderEffect, Core
+      Data: 17|Effects.ArchedDamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 0
@@ -181,13 +193,13 @@ MonoBehaviour:
       Data: 4.5
     - Name: Effects
       Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 18|Effects.DamageColliderEffect, Core
+      Data: 19|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 10
@@ -229,7 +241,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 19|Effects.VisualEffectEffect, Core
+      Data: 20|Effects.VisualEffectEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 0.2
@@ -268,7 +280,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 21|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -283,7 +295,7 @@ MonoBehaviour:
       Data: 
     - Name: createdEffects
       Entry: 7
-      Data: 21|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 22|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -295,7 +307,7 @@ MonoBehaviour:
       Data: 
     - Name: endWaveEffects
       Entry: 7
-      Data: 22|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 23|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -305,11 +317,15 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  districtName: Bomb District
   districtNameReference:
     Mode: 1
     ConstantValue: 
     Variable: {fileID: 11400000, guid: 7499b79c8cd09b74098ce3d5c3ac1b56, type: 2}
+    VariableValuePreview: 
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: bae25befa525ae0478261aa98f04ec79, type: 2}
     VariableValuePreview: 
   icon:
     Mode: 1
@@ -323,27 +339,9 @@ MonoBehaviour:
     Variable: {fileID: 11400000, guid: 16830215ead314645b9dc9f68294888c, type: 2}
     VariableValuePreview: {fileID: 21300000, guid: a066951a319336a4ca77035477ed93a5,
       type: 3}
-  description: 'Throws bombs at enemies, dealing AoE damage.
-
-
-    Min size: 3 x
-    3
-
-    Cost: 500'
-  descriptionReference:
-    Mode: 1
-    ConstantValue: 
-    Variable: {fileID: 11400000, guid: bae25befa525ae0478261aa98f04ec79, type: 2}
-    VariableValuePreview: 
   districtType: 1
-  LevelDatas:
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  UpgradeIcons:
-  - {fileID: 21300000, guid: 740f5e97fe6a90547844fb62858ab085, type: 3}
-  - {fileID: 21300000, guid: 612aeacb80233d741a233eb3a8940f4d, type: 3}
-  - {fileID: 21300000, guid: 5c91aec45c337e54285b8f9e8434bec1, type: 3}
+  shouldCombine: 1
+  prototypeInfoData: {fileID: 11400000, guid: 20071b5325a2e33418874ae5d70b303e, type: 2}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
   attackAngle: 360

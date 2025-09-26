@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using Effects;
+using Sirenix.OdinInspector;
 using Gameplay.Money;
 using UnityEngine.UI;
 using UnityEngine;

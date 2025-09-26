@@ -1,4 +1,5 @@
 using System;
+using Buildings.District;
 using Gameplay.Event;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -12,6 +13,9 @@ namespace UI
         
         [SerializeField]
         private GameObject townHallButton;
+        
+        [SerializeField]
+        private TowerData townHallData;
 
         [FormerlySerializedAs("townHallFlipButton")]
         [SerializeField]
@@ -38,12 +42,13 @@ namespace UI
             townHallToggleButton.OnClick -= OnClick;
         }
 
-        private void OnDistrictBuilt(DistrictType type)
+        private void OnDistrictBuilt(TowerData towerData)
         {
-            if (type is not DistrictType.TownHall)
+            if (towerData.DistrictType is not DistrictType.TownHall)
             {
                 return;
             }
+            
             Events.OnDistrictBuilt -= OnDistrictBuilt;
 
             townHallButton.SetActive(false);
@@ -55,7 +60,7 @@ namespace UI
 
         public void OnClick()
         {
-            Events.OnDistrictClicked?.Invoke(DistrictType.TownHall);
+            Events.OnDistrictClicked?.Invoke(townHallData);
         }
     }
 }

@@ -28,9 +28,6 @@ namespace Buildings.District
         [SerializeField]
         private TowerDataUtility towerDataUtility;
         
-        [SerializeField]
-        private DistrictPrototypeInfoUtility prototypeInfoUtility;
-        
         [Title("Debug")]
         [OdinSerialize, Sirenix.OdinInspector.ReadOnly]
         private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
@@ -38,7 +35,6 @@ namespace Buildings.District
         public bool IsDebug;
         
         private readonly Dictionary<int2, HashSet<District>> districtObjects = new Dictionary<int2, HashSet<District>>();
-        private readonly Dictionary<int, DistrictData> uniqueDistricts = new Dictionary<int, DistrictData>();
         private readonly Dictionary<DistrictType, int> districtAmounts = new Dictionary<DistrictType, int>();
         
         private EntityManager entityManager;
@@ -46,14 +42,14 @@ namespace Buildings.District
         
         private int districtKey;
         
-        public Dictionary<int, DistrictData> Districts => uniqueDistricts;
+        public Dictionary<int, DistrictData> UniqueDistricts { get; } = new Dictionary<int, DistrictData>();
 
         private void OnEnable()
         {
+            districtGenerator.OnDistrictChunkRemoved += OnDistrictChunkRemoved;
             Events.OnWallsDestroyed += OnWallsDestroyed;
             Events.OnDistrictBuilt += OnDistrictBuilt;
             Events.OnTurnIncreased += OnTurnIncreased;
-            districtGenerator.OnDistrictChunkRemoved += OnDistrictChunkRemoved;
             Events.OnGameReset += OnGameReset;
             
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -77,7 +73,7 @@ namespace Buildings.District
 
         private void Update()
         {
-            foreach (DistrictData districtData in uniqueDistricts.Values)
+            foreach (DistrictData districtData in UniqueDistricts.Values)
             {
                 districtData.Update();
             }
@@ -89,7 +85,7 @@ namespace Buildings.District
         /// <param name="chunk"></param>
         private void OnDistrictChunkRemoved(IChunk chunk)
         {
-            foreach (DistrictData districtData in uniqueDistricts.Values)
+            foreach (DistrictData districtData in UniqueDistricts.Values)
             {
                 if (districtData.OnDistrictChunkRemoved(chunk))
                 {
@@ -129,7 +125,7 @@ namespace Buildings.District
             
             foreach (DistrictEntityDataComponent data in array)
             {
-                if (uniqueDistricts.TryGetValue(data.DistrictID, out DistrictData districtData))
+                if (UniqueDistricts.TryGetValue(data.DistrictID, out DistrictData districtData))
                 {
                     districtData.PerformAttack(data);
                 }
@@ -145,13 +141,12 @@ namespace Buildings.District
             UpdateDistrictEntities().Forget();
         }
 
-        public void AddBuiltDistrict(HashSet<QueryChunk> chunks, DistrictType districtType)
+        public void AddBuiltDistrict(HashSet<QueryChunk> chunks, TowerData towerData)
         {
-            TowerData districtData = towerDataUtility.GetTowerData(districtType);
-            if (!districtData.ShouldCombine)
+            if (!towerData.ShouldCombine)
             {
                 RemoveOverlappingChunks(chunks);
-                CreateDistrictData(districtData, chunks);
+                CreateDistrictData(towerData, chunks);
             }
             else
             {
@@ -161,7 +156,7 @@ namespace Buildings.District
                 }
                 else
                 {
-                    CreateDistrictData(districtData, chunks);
+                    CreateDistrictData(towerData, chunks);
                 }   
             }
 
@@ -177,7 +172,7 @@ namespace Buildings.District
                 else districtGenerator.ChunkIndexToChunks.Add(chunkIndex, new HashSet<int3> { chunk.ChunkIndex });
             }
             
-            Events.OnDistrictBuilt?.Invoke(districtType);
+            Events.OnDistrictBuilt?.Invoke(towerData);
         }
 
         private void RemoveOverlappingChunks(HashSet<QueryChunk> chunks)
@@ -247,16 +242,15 @@ namespace Buildings.District
 
         private DistrictData CreateDistrictData(TowerData towerData, HashSet<QueryChunk> chunks)
         {
-            PrototypeInfoData prototypeInfo = prototypeInfoUtility.GetPrototypeInfo(towerData.DistrictType);
             Vector3 position = GetAveragePosition(chunks);
             int key = districtKey++;
-            DistrictData districtData = new DistrictData(towerData, chunks, position, districtGenerator, key, prototypeInfo)
+            DistrictData districtData = new DistrictData(towerData, chunks, position, districtGenerator, key)
             {
                 GameSpeed = GameSpeedManager.Instance,
                 DistrictHandler = this
             };
             
-            uniqueDistricts.Add(key, districtData);
+            UniqueDistricts.Add(key, districtData);
                 
             foreach (QueryChunk chunk in chunks)
             {
@@ -273,7 +267,7 @@ namespace Buildings.District
             {
                 districtData.OnDisposed -= OnDispose;
                 districtData.OnChunksLost -= OnChunksLost;
-                uniqueDistricts.Remove(key);
+                UniqueDistricts.Remove(key);
 
                 foreach (QueryChunk chunk in chunks)
                 {
@@ -322,11 +316,11 @@ namespace Buildings.District
             return districts.TryGetValue(index, out districtData);
         }
         
-        private void OnDistrictBuilt(DistrictType districtType)
+        private void OnDistrictBuilt(TowerData towerData)
         {
-            if (!districtAmounts.TryAdd(districtType, 1))
+            if (!districtAmounts.TryAdd(towerData.DistrictType, 1))
             {
-                districtAmounts[districtType]++;
+                districtAmounts[towerData.DistrictType]++;
             }
         }
         
@@ -339,7 +333,7 @@ namespace Buildings.District
         {
             HashSet<QueryChunk> addedChunks = new HashSet<QueryChunk>();
 
-            foreach (DistrictData districtData in uniqueDistricts.Values)
+            foreach (DistrictData districtData in UniqueDistricts.Values)
             {
                 if ((districtData.State.CategoryType & CategoryType.TownHall) == 0) continue;
                 

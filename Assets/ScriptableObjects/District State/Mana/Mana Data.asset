@@ -144,12 +144,24 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: upgradeStats
+      Entry: 7
+      Data: 14|Effects.IUpgradeStatEditor[], Core
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 14|Attack, Core
+      Data: 15|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 16|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -161,7 +173,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -176,7 +188,7 @@ MonoBehaviour:
       Data: 
     - Name: createdEffects
       Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -188,7 +200,7 @@ MonoBehaviour:
       Data: 
     - Name: endWaveEffects
       Entry: 7
-      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -198,11 +210,15 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  districtName: Town Hall
   districtNameReference:
     Mode: 1
     ConstantValue: 
     Variable: {fileID: 11400000, guid: f7bc761d8e6c123438ccb854ae0e0b9e, type: 2}
+    VariableValuePreview: 
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: 517369ede3418d548b5d105a2cdfc28a, type: 2}
     VariableValuePreview: 
   icon:
     Mode: 1
@@ -216,18 +232,10 @@ MonoBehaviour:
     Variable: {fileID: 11400000, guid: 2f0c173a9c657f04baaa2c62ddef3175, type: 2}
     VariableValuePreview: {fileID: 21300000, guid: 71b1a5b8cad01664ab92e8fc2c3c8a9a,
       type: 3}
-  description: 
-  descriptionReference:
-    Mode: 1
-    ConstantValue: 
-    Variable: {fileID: 11400000, guid: 517369ede3418d548b5d105a2cdfc28a, type: 2}
-    VariableValuePreview: 
   districtType: 8
-  LevelDatas: []
-  UpgradeIcons: []
+  shouldCombine: 1
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
-  requireTargeting: 0
   attackAngle: 360
   useMeshBasedPlacement: 0
   useTargetMesh: 0

@@ -11,6 +11,7 @@ using Gameplay.Event;
 using UnityEngine;
 using InputCamera;
 using Gameplay;
+using Effects;
 using Utility;
 using System;
 
@@ -36,14 +37,15 @@ namespace Buildings.District
         public DistrictHandler DistrictHandler { get; set; }
         public DistrictGenerator DistrictGenerator { get; }
         public IGameSpeed GameSpeed { get; set; }
-        public DistrictState State { get; }
+        public DistrictState State { get; set; }
         public Vector3 Position { get; }
         
         public List<IUpgradeStat> UpgradeStats => State.UpgradeStats;
         public TowerData TowerData => towerData;
         public Stats Stats => State.Stats;
 
-        public DistrictData(TowerData towerData, HashSet<QueryChunk> chunks, Vector3 position, IChunkWaveFunction<QueryChunk> chunkDistrictGenerator, int key, PrototypeInfoData prototypeInfo)
+        public DistrictData(TowerData towerData, HashSet<QueryChunk> chunks, Vector3 position, 
+            IChunkWaveFunction<QueryChunk> chunkDistrictGenerator, int key)
         {
             DistrictChunks = new Dictionary<int3, QueryChunk>();
             foreach (QueryChunk chunk in chunks)
@@ -56,20 +58,7 @@ namespace Buildings.District
             GenerateCollider();
             
             this.towerData = towerData;
-            State = towerData.DistrictType switch
-            {
-                DistrictType.Lumbermill => new LumbermillState(this, towerData, position, key),
-                DistrictType.Lightning => new LightningState(this, towerData, position, key),
-                DistrictType.TownHall => new TownHallState(this, towerData, position, key),
-                DistrictType.Barracks => new BarracksState(this, towerData, position, key),
-                DistrictType.Church => new ChurchState(this, towerData, position, key),
-                DistrictType.Archer => new ArcherState(this, towerData, position, key),
-                DistrictType.Flame => new FlameState(this, towerData, position, key),
-                DistrictType.Mine => new MineState(this, towerData, position, key),
-                DistrictType.Bomb => new BombState(this, towerData, position, key),
-                _ => throw new ArgumentOutOfRangeException(nameof(towerData.DistrictType), towerData.DistrictType, null)
-            };
-            State.PrototypeInfo = prototypeInfo;
+            State = GetDistrictState(towerData, position, key);
             
             Events.OnTurnComplete += OnTurnComplete;
             Events.OnWallsDestroyed += OnWallsDestroyed;
@@ -269,6 +258,40 @@ namespace Buildings.District
         {
             OnLevelup?.Invoke();
         }
+
+        public void PerformAttack(DistrictEntityDataComponent dataComponent)
+        {
+            State.OriginPosition = dataComponent.OriginPosition;
+            State.PerformAttack(dataComponent.TargetPosition);
+        }
+
+        public void ChangeState(TowerData upgradeStateData)
+        {
+            int key = State.Key;
+            UIEvents.OnFocusChanged?.Invoke();
+            State.Dispose();
+            
+            State = GetDistrictState(upgradeStateData, Position, key);
+            // Add chunks if needed
+            DistrictGenerator.AddAction(() => DistrictGenerator.RegenerateChunks(DistrictChunks.Values, _ => upgradeStateData.PrototypeInfoData));
+        }
+        
+        private DistrictState GetDistrictState(TowerData towerData, Vector3 position, int key)
+        {
+            return towerData.DistrictType switch
+            {
+                DistrictType.Archer or DistrictType.Archer_Upgraded => new ArcherState(this, towerData, position, key),
+                DistrictType.Lumbermill => new LumbermillState(this, towerData, position, key),
+                DistrictType.Lightning => new LightningState(this, towerData, position, key),
+                DistrictType.TownHall => new TownHallState(this, towerData, position, key),
+                DistrictType.Barracks => new BarracksState(this, towerData, position, key),
+                DistrictType.Church => new ChurchState(this, towerData, position, key),
+                DistrictType.Flame => new FlameState(this, towerData, position, key),
+                DistrictType.Mine => new MineState(this, towerData, position, key),
+                DistrictType.Bomb => new BombState(this, towerData, position, key),
+                _ => throw new ArgumentOutOfRangeException(nameof(towerData.DistrictType), towerData.DistrictType, null)
+            };
+        }
         
         public void Dispose()
         {
@@ -286,12 +309,6 @@ namespace Buildings.District
             }
             
             OnDisposed?.Invoke();
-        }
-
-        public void PerformAttack(DistrictEntityDataComponent dataComponent)
-        {
-            State.OriginPosition = dataComponent.OriginPosition;
-            State.PerformAttack(dataComponent.TargetPosition);
         }
     }
 

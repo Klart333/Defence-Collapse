@@ -16,6 +16,9 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
+    - {fileID: 21300000, guid: 7cf737b1942c8304b9633c7d65566295, type: 3}
+    - {fileID: 11400000, guid: 9422bf13996efa142987004115514f91, type: 2}
+    - {fileID: 11400000, guid: 94c4652154e33a743ab09dade8572bd6, type: 2}
     - {fileID: 11400000, guid: 061d5ea0a9eab7c40a9b46aa7f91b4dd, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
@@ -145,18 +148,93 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: BaseAttack
+    - Name: upgradeStats
       Entry: 7
-      Data: 14|Attack, Core
-    - Name: Effects
-      Entry: 7
-      Data: 15|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 14|Effects.IUpgradeStatEditor[], Core
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 16|Effects.ArchedDamageColliderEffect, Core
+      Data: 15|Effects.UpgradeStateEditor, Core
+    - Name: statName
+      Entry: 7
+      Data: 16|Variables.StringReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 0
+    - Name: ConstantValue
+      Entry: 1
+      Data: Upgrade!
+    - Name: Variable
+      Entry: 6
+      Data: 
+    - Name: VariableValuePreview
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: descriptions
+      Entry: 7
+      Data: 17|Variables.StringReference[], Core
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 18|Variables.StringReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 0
+    - Name: ConstantValue
+      Entry: 1
+      Data: Upgrade to a ballista tower!
+    - Name: Variable
+      Entry: 6
+      Data: 
+    - Name: VariableValuePreview
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: statIcon
+      Entry: 10
+      Data: 0
+    - Name: towerData
+      Entry: 10
+      Data: 1
+    - Name: levelData
+      Entry: 10
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: BaseAttack
+      Entry: 7
+      Data: 19|Attack, Core
+    - Name: Effects
+      Entry: 7
+      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 21|Effects.ArchedDamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 5
@@ -180,7 +258,7 @@ MonoBehaviour:
       Data: 12
     - Name: Effects
       Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 22|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -192,7 +270,7 @@ MonoBehaviour:
       Data: 
     - Name: Mesh
       Entry: 10
-      Data: 0
+      Data: 3
     - Name: TrailScaleFactor
       Entry: 4
       Data: 0.8
@@ -207,7 +285,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 23|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -222,7 +300,7 @@ MonoBehaviour:
       Data: 
     - Name: createdEffects
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 24|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -234,7 +312,7 @@ MonoBehaviour:
       Data: 
     - Name: endWaveEffects
       Entry: 7
-      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 25|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -244,11 +322,15 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  districtName: Archer District
   districtNameReference:
     Mode: 1
     ConstantValue: 
     Variable: {fileID: 11400000, guid: ee37126f0c5752440a82fbbf126033fd, type: 2}
+    VariableValuePreview: 
+  descriptionReference:
+    Mode: 1
+    ConstantValue: 
+    Variable: {fileID: 11400000, guid: bd3ad041d64ead749b43fe90687bbf61, type: 2}
     VariableValuePreview: 
   icon:
     Mode: 1
@@ -262,28 +344,10 @@ MonoBehaviour:
     Variable: {fileID: 11400000, guid: 1ef955698bc6c6c489cfb817578bf826, type: 2}
     VariableValuePreview: {fileID: 21300000, guid: 2e014047ede1b5343a7e1d3560b493b2,
       type: 3}
-  description: 'Fires arrows at enemies, dealing single target damage.
-
-
-    Min
-    size: 1 x 1
-
-    Cost: 50'
-  descriptionReference:
-    Mode: 1
-    ConstantValue: 
-    Variable: {fileID: 11400000, guid: bd3ad041d64ead749b43fe90687bbf61, type: 2}
-    VariableValuePreview: 
   districtType: 0
   shouldCombine: 1
-  LevelDatas:
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  - {fileID: 11400000, guid: b263593b173b9ca40aa691ae984adb51, type: 2}
-  UpgradeIcons:
-  - {fileID: 21300000, guid: 740f5e97fe6a90547844fb62858ab085, type: 3}
-  - {fileID: 21300000, guid: 612aeacb80233d741a233eb3a8940f4d, type: 3}
-  - {fileID: 21300000, guid: 5c91aec45c337e54285b8f9e8434bec1, type: 3}
+  districtHeight: 3
+  prototypeInfoData: {fileID: 11400000, guid: 245db626b31676a4183321c87b450a27, type: 2}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
   attackAngle: 75

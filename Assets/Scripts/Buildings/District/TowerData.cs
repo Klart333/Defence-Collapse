@@ -7,6 +7,7 @@ using Variables;
 using Gameplay;
 using Effects;
 using System;
+using WaveFunctionCollapse;
 
 namespace Buildings.District
 {
@@ -15,10 +16,10 @@ namespace Buildings.District
     {
         [Title("Display")]
         [SerializeField]
-        private string districtName = "___ District";
+        private StringReference districtNameReference;
 
         [SerializeField]
-        private StringReference districtNameReference;
+        private StringReference descriptionReference;
         
         [SerializeField]
         private SpriteReference icon;
@@ -27,27 +28,26 @@ namespace Buildings.District
         private SpriteReference iconSmall;
 
         [SerializeField]
-        [TextArea]
-        private string description;
-        
-        [SerializeField]
-        private StringReference descriptionReference;
-
-        [SerializeField]
         private DistrictType districtType;
 
         [Title("Construction")]
         [SerializeField]
         private bool shouldCombine = true;
 
+        [SerializeField]
+        private int districtHeight = 2;
+        
+        [SerializeField]
+        private PrototypeInfoData prototypeInfoData;
+
         [TitleGroup("Stats")]
         [OdinSerialize, NonSerialized]
         public Stats Stats;
 
-        public LevelData[] LevelDatas;
-
-        public Sprite[] UpgradeIcons;
-
+        [TitleGroup("Stats", "Upgrade Stats")]
+        [SerializeField]
+        private IUpgradeStatEditor[] upgradeStats = Array.Empty<IUpgradeStatEditor>();
+        
         [Title("References")]
         public PooledMonoBehaviour RangeIndicator;
 
@@ -79,14 +79,17 @@ namespace Buildings.District
         [OdinSerialize]
         private List<IEffect> endWaveEffects = new List<IEffect>();
 
+        public PrototypeInfoData PrototypeInfoData => prototypeInfoData;
         public bool UseMeshBasedPlacement => useMeshBasedPlacement;
         public string DistrictName => districtNameReference.Value;
+        public IUpgradeStatEditor[] UpgradeStats => upgradeStats;
         public string Description => descriptionReference.Value;
         public List<IEffect> EndWaveEffects => endWaveEffects;
         public List<IEffect> CreatedEffects => createdEffects;
         public MeshVariable MeshVariable => meshVariable;
         public DistrictType DistrictType => districtType;
         public CategoryType CategoryType => categoryType;
+        public int DistrictHeight => districtHeight;
         public bool UseTargetMesh => useTargetMesh;
         public bool ShouldCombine => shouldCombine;
         public Sprite IconSmall => iconSmall.Value;
