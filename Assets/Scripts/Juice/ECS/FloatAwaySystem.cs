@@ -12,6 +12,7 @@ namespace Juice.Ecs
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             state.RequireForUpdate<GameSpeedComponent>();
             state.RequireForUpdate<FloatAwayComponent>();
         }
@@ -27,16 +28,14 @@ namespace Juice.Ecs
                 DeltaTime = deltaTime * gameSpeed,
             }.ScheduleParallel();
 
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            state.Dependency = new DecreaseDurationJob
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
+            new DecreaseDurationJob
             {
                 DeltaTime = deltaTime * gameSpeed,
                 ECB = ecb.AsParallelWriter(),
-            }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
@@ -79,10 +78,12 @@ namespace Juice.Ecs
                 StartScale = 1,
                 TargetScale = 0,
             });
+            
             ECB.AddComponent(sortKey, entity, new RotationComponent
             {
-                Duration = 0.2f,
-                TargetRotation = 1f,
+                StartRotation = quaternion.identity,
+                EndRotation = quaternion.AxisAngle(new float3(0, 0, 1), math.PI2),
+                Speed = 5,
             });
         }
     }

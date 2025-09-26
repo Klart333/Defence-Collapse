@@ -5,11 +5,12 @@ using Unity.Entities;
 using Unity.Burst;
 using DG.Tweening;
 using Effects.ECS;
+using Juice.Ecs;
 using Pathfinding;
 
 namespace Enemy.ECS
 {
-    [BurstCompile]
+    [BurstCompile, UpdateAfter(typeof(FlowMovementSystem))]
     public partial struct ClusterPositioningSystem : ISystem 
     {
         private ComponentLookup<LocalTransform> transformLookup;
@@ -69,7 +70,7 @@ namespace Enemy.ECS
             int rows = (int)math.floor(math.sqrt(bufferLength));
             int enemiesPerRow = (int)math.ceil((float)bufferLength / rows);
             float size = math.min(cluster.EnemySize, tileSize / rows); 
-            quaternion targetRotation = quaternion.LookRotation(new float3(cluster.Facing.x, 0, cluster.Facing.y), new float3(0, 1, 0));
+            quaternion targetRotation = quaternion.LookRotation(cluster.Facing.XyZ(), new float3(0, 1, 0));
             
             int bufferIndex = 0;
             for (int i = 0; i < rows; i++)
@@ -93,10 +94,11 @@ namespace Enemy.ECS
                         Ease = Ease.InOutSine,
                     });
                     
-                    ECB.AddComponent(sortKey, enemyEntity, new TargetRotationComponent
+                    ECB.AddComponent(sortKey, enemyEntity, new RotationComponent
                     {
                         StartRotation = enemyTransform.Rotation,
                         EndRotation = targetRotation,
+                        Speed = 1
                     });
                 }
             }

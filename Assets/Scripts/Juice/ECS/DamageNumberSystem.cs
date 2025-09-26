@@ -11,6 +11,7 @@ using InputCamera.ECS;
 using Unity.Entities;
 using UnityEngine;
 using Effects.ECS;
+using Enemy.ECS;
 using Unity.Burst;
 using Juice.Ecs;
 using Health;
@@ -29,14 +30,14 @@ namespace TextMeshDOTS.Authoring
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            textRenderArchetype = GetSingleFontTextArchetype(ref state);
+            textRenderArchetype = GetDamageTextArchetype(ref state);
 
             FontRequest fontRequest = GetFontRequest();
             fontReference = FontBlobber.GetRuntimeFontBlob(fontRequest);
             
             textBaseConfiguration = new TextBaseConfiguration
             {
-                fontSize = 1.6f,
+                fontSize = 5f,
                 color= Color.white,
                 fontStyles = FontStyles.Normal,
                 maxLineWidth = 300,
@@ -110,7 +111,7 @@ namespace TextMeshDOTS.Authoring
             };
         }
         
-        private EntityArchetype GetSingleFontTextArchetype(ref SystemState state)
+        private EntityArchetype GetDamageTextArchetype(ref SystemState state)
         {
             NativeArray<ComponentType> componentTypeStaging = new NativeArray<ComponentType>(20, Allocator.Temp);
             componentTypeStaging[0]  = ComponentType.ReadWrite<FontBlobReference>();            
@@ -134,7 +135,9 @@ namespace TextMeshDOTS.Authoring
             componentTypeStaging[18] = ComponentType.ReadWrite<FloatAwayComponent>();            
             componentTypeStaging[19] = ComponentType.ReadWrite<RandomComponent>();            
 
-            return state.EntityManager.CreateArchetype(componentTypeStaging);
+            EntityArchetype archetype = state.EntityManager.CreateArchetype(componentTypeStaging);
+            componentTypeStaging.Dispose();
+            return archetype;
         }
     }
     

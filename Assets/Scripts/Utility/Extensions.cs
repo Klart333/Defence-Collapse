@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using Gameplay;
+using Unity.Burst;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = System.Random;
 
+[BurstCompile]
 public static class Extensions
 {
     public static Vector2 XZ(this Vector3 v)

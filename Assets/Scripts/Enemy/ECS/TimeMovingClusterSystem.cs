@@ -1,4 +1,3 @@
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Burst;
 using Gameplay;
@@ -11,8 +10,9 @@ namespace Enemy.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<GameSpeedComponent>();
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             state.RequireForUpdate<MovingClusterComponent>();
+            state.RequireForUpdate<GameSpeedComponent>();
         }
 
         [BurstCompile]
@@ -20,17 +20,14 @@ namespace Enemy.ECS
         {
             float deltaTime = SystemAPI.Time.DeltaTime;
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-
-            state.Dependency = new TimeMovingClusterJob
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
+            new TimeMovingClusterJob
             {
                 DeltaTime = deltaTime * gameSpeed,
-                ECB = ecb
-            }.Schedule(state.Dependency);
-            
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+                ECB = ecb.AsParallelWriter()
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
@@ -43,16 +40,16 @@ namespace Enemy.ECS
     [BurstCompile]
     public partial struct TimeMovingClusterJob : IJobEntity
     {
-        public EntityCommandBuffer ECB;
+        public EntityCommandBuffer.ParallelWriter ECB;
 
         public float DeltaTime;
         
-        public void Execute(Entity entity, ref MovingClusterComponent movingCluster)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ref MovingClusterComponent movingCluster)
         {
             movingCluster.TimeLeft -= DeltaTime;
             if (movingCluster.TimeLeft <= 0)
             {
-                ECB.RemoveComponent<MovingClusterComponent>(entity);
+                ECB.RemoveComponent<MovingClusterComponent>(sortKey, entity);
             }
         }
     }

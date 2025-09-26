@@ -122,13 +122,6 @@ namespace Effects.ECS
 
 		public float Strength;
 	}
-
-	public struct TargetRotationComponent : IComponentData
-	{
-		public quaternion StartRotation;
-		public quaternion EndRotation;
-		public float Value;
-	}
 	
 	#region Effect Components
 	
