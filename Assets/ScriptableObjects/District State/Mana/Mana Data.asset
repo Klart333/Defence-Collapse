@@ -156,12 +156,21 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: districtStateCreator
+      Entry: 7
+      Data: 15|Buildings.District.GenericDistrictStateCreator, Core
+    - Name: stateType
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 15|Attack, Core
+      Data: 16|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -173,7 +182,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -188,7 +197,7 @@ MonoBehaviour:
       Data: 
     - Name: createdEffects
       Entry: 7
-      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -200,7 +209,7 @@ MonoBehaviour:
       Data: 
     - Name: endWaveEffects
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -234,6 +243,8 @@ MonoBehaviour:
       type: 3}
   districtType: 8
   shouldCombine: 1
+  districtHeight: 2
+  prototypeInfoData: {fileID: 0}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}
   attackAngle: 360

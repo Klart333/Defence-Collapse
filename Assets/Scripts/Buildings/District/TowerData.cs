@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using WaveFunctionCollapse;
 using Gameplay.Upgrades;
 using UnityEngine;
 using Variables;
-using Gameplay;
 using Effects;
 using System;
-using WaveFunctionCollapse;
 
 namespace Buildings.District
 {
@@ -47,6 +46,10 @@ namespace Buildings.District
         [TitleGroup("Stats", "Upgrade Stats")]
         [SerializeField]
         private IUpgradeStatEditor[] upgradeStats = Array.Empty<IUpgradeStatEditor>();
+        
+        [Title("State")]
+        [SerializeField]
+        private IDistrictStateCreator districtStateCreator;
         
         [Title("References")]
         public PooledMonoBehaviour RangeIndicator;
@@ -121,6 +124,11 @@ namespace Buildings.District
 
                 Productivity = Stats.Productivity != null ? new Stat(Stats.Productivity.Value) : new Stat(1),
             };
+        }
+
+        public DistrictState GetDistrictState(DistrictData districtData, Vector3 position, int key)
+        {
+            return districtStateCreator.CreateDistrictState(districtData, this, position, key);
         }
     }
 }

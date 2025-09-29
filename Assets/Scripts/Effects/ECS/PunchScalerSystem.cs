@@ -26,7 +26,7 @@ namespace Effects.ECS
             PunchScaleLookup.Update(ref state);
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-            new PunchScalerJob()
+            new PunchScalerJob
             {
                 ECB = ecb.AsParallelWriter(),
                 PunchScaleLookup = PunchScaleLookup,
@@ -56,7 +56,7 @@ namespace Effects.ECS
                 float scaleMult = 1.0f + math.log10(damage) / 8.0f;
                 ECB.SetComponent(sortKey, entity, new PunchScaleComponent
                 {
-                    Duration = punchScale.Duration + 0.02f,
+                    Duration = punchScale.Duration + 0.05f,
                     StartScale = punchScale.StartScale,
                     PunchScale = punchScale.StartScale * scaleMult,
                     Damage = damage

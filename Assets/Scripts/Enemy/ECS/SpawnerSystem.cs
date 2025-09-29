@@ -1,4 +1,5 @@
 using Random = Unity.Mathematics.Random;
+
 using Gameplay.Turns.ECS;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -20,15 +21,18 @@ namespace Enemy.ECS
         private ComponentLookup<AttackSpeedComponent> attackSpeedLookup;
         private ComponentLookup<SpawnPointComponent> spawnPointLookup;
         private ComponentLookup<LocalTransform> transformLookup;
-        private ComponentLookup<SpeedComponent> speedLookup; 
-            
-        private EntityQuery spawnerQuery;
+        private ComponentLookup<SpeedComponent> speedLookup;
+
+        private DynamicBuffer<EnemyBufferElement> enemyBuffer;
+        private DynamicBuffer<EnemyBossElement> bossBuffer;
+        
         private EntityQuery updateEnemiesQuery;
         private uint seed;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             movementSpeedLookup = SystemAPI.GetComponentLookup<MovementSpeedComponent>(true);
             simpleDamageLookup = SystemAPI.GetComponentLookup<SimpleDamageComponent>(true);
             attackSpeedLookup = SystemAPI.GetComponentLookup<AttackSpeedComponent>(true);
@@ -36,7 +40,6 @@ namespace Enemy.ECS
             transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
             speedLookup = SystemAPI.GetComponentLookup<SpeedComponent>(true);
 
-            spawnerQuery = SystemAPI.QueryBuilder().WithAll<SpawnPointComponent>().Build();
             updateEnemiesQuery = SystemAPI.QueryBuilder().WithAll<TurnIncreaseComponent, UpdateEnemiesTag>().Build();
             
             state.RequireForUpdate<EnemyBossDatabaseTag>();
@@ -56,23 +59,23 @@ namespace Enemy.ECS
             {
                 seed = SystemAPI.GetSingleton<RandomSeedComponent>().Seed;
             }
-
+            
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             uint totalSeed = (uint)(seed + turnIncrease.TotalTurn);
-            UpdateSpawners(ref state, turnIncrease.TurnIncrease, totalSeed);
-            SpawnSpawners(ref state, turnIncrease, totalSeed);
+            SpawnSpawners(ref state, turnIncrease, totalSeed, ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged));
+            UpdateSpawners(ref state, turnIncrease.TurnIncrease, totalSeed, ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged));
         }
 
         [BurstCompile]
-        private void UpdateSpawners(ref SystemState state, int turnsIncrease, uint seed)
+        private void UpdateSpawners(ref SystemState state, int turnsIncrease, uint seed, EntityCommandBuffer ecb)
         {
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-
-            Entity enemyDatabase = SystemAPI.GetSingletonEntity<EnemyDatabaseTag>();
-            Entity bossDatabase = SystemAPI.GetSingletonEntity<EnemyBossDatabaseTag>();
-            NativeArray<EnemyBufferElement> enemyBuffer = SystemAPI.GetBuffer<EnemyBufferElement>(enemyDatabase).AsNativeArray();
-            NativeArray<EnemyBossElement> bossBuffer = SystemAPI.GetBuffer<EnemyBossElement>(bossDatabase).AsNativeArray();
             PathBlobber pathBlobber = SystemAPI.GetSingleton<PathBlobber>();
             EntityQueryMask queryMask = state.EntityManager.UniversalQuery.GetEntityQueryMask();
+            
+            Entity bossDatabase = SystemAPI.GetSingletonEntity<EnemyBossDatabaseTag>();
+            Entity enemyDatabase = SystemAPI.GetSingletonEntity<EnemyDatabaseTag>();
+            enemyBuffer = SystemAPI.GetBuffer<EnemyBufferElement>(enemyDatabase);
+            bossBuffer = SystemAPI.GetBuffer<EnemyBossElement>(bossDatabase);
             
             movementSpeedLookup.Update(ref state);
             simpleDamageLookup.Update(ref state);
@@ -81,7 +84,7 @@ namespace Enemy.ECS
             transformLookup.Update(ref state);
             speedLookup.Update(ref state);
             
-            state.Dependency = new SpawnEnemiesJob
+            new SpawnEnemiesJob
             {
                 ChunkIndexToListIndex = pathBlobber.ChunkIndexToListIndex,
                 MovementSpeedLookup = movementSpeedLookup,
@@ -97,34 +100,19 @@ namespace Enemy.ECS
                 EnemyBuffer = enemyBuffer,
                 BossBuffer = bossBuffer,
                 Seed = seed, 
-            }.ScheduleParallel(state.Dependency);
-
-            state.Dependency.Complete(); 
-            ecb.Playback(state.EntityManager);
-
-            ecb.Dispose();
-            enemyBuffer.Dispose();
-            bossBuffer.Dispose();
+            }.ScheduleParallel();
         }
  
-        private void SpawnSpawners(ref SystemState state, TurnIncreaseComponent turnIncrease, uint seed)
+        private void SpawnSpawners(ref SystemState state, TurnIncreaseComponent turnIncrease, uint seed, EntityCommandBuffer ecb)
         {
             NativeArray<SpawningComponent> possibleSpawns = EnemySpawnHandler.SpawnDataUtility.GetSpawnPointData(turnIncrease.TotalTurn, Random.CreateFromIndex(seed));
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            state.Dependency = new SpawnSpawningJob
+            new SpawnSpawningJob
             {
                 ECB = ecb.AsParallelWriter(),
-                PossibleSpawns = possibleSpawns.AsReadOnly()
-            }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete(); 
-            ecb.Playback(state.EntityManager);
-            
-            ecb.Dispose();
-            possibleSpawns.Dispose();
+                PossibleSpawns = possibleSpawns
+            }.ScheduleParallel();
         }
-
-
+        
         [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
@@ -135,8 +123,8 @@ namespace Enemy.ECS
     [BurstCompile]
     public partial struct SpawnSpawningJob : IJobEntity
     {
-        [ReadOnly]
-        public NativeArray<SpawningComponent>.ReadOnly PossibleSpawns;
+        [ReadOnly, DeallocateOnJobCompletion]
+        public NativeArray<SpawningComponent> PossibleSpawns;
         
         public EntityCommandBuffer.ParallelWriter ECB;
         
@@ -167,10 +155,10 @@ namespace Enemy.ECS
     public partial struct SpawnEnemiesJob : IJobEntity
     {
         [ReadOnly]
-        public NativeArray<EnemyBufferElement> EnemyBuffer;
+        public DynamicBuffer<EnemyBufferElement> EnemyBuffer;
         
         [ReadOnly]
-        public NativeArray<EnemyBossElement> BossBuffer;
+        public DynamicBuffer<EnemyBossElement> BossBuffer;
 
         [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
@@ -231,8 +219,8 @@ namespace Enemy.ECS
             
                 LocalTransform newTransform = LocalTransform.FromPositionRotationScale(spawnPosition, quaternion.identity, prefabTransform.Scale);
                 ECB.SetComponent(sortKey, spawnedEntity, new RandomComponent { Random = Random.CreateFromIndex((uint)(sortKey + Seed + i + 1)) });
-                ECB.SetComponent(sortKey, spawnedEntity, newTransform);
                 ECB.SetComponent(sortKey, spawnedEntity, new ManagedClusterComponent { ClusterParent = clusterEntity });
+                ECB.SetComponent(sortKey, spawnedEntity, newTransform);
                 
                 buffer.Add(new ManagedEntityBuffer { Entity = spawnedEntity });
             }

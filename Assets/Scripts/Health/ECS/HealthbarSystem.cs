@@ -20,30 +20,23 @@ namespace Health.ECS
             armorLookup = state.GetComponentLookup<ArmorPropertyComponent>();
             shieldLookup = state.GetComponentLookup<ShieldPropertyComponent>();
 
-            EntityQueryBuilder builder = new EntityQueryBuilder(Allocator.Temp).WithAll<DamageTakenComponent>();
-            damageTakenQuery = state.GetEntityQuery(builder);
-            
-            builder.Dispose();
+            damageTakenQuery = SystemAPI.QueryBuilder().WithAll<DamageTakenComponent>().Build();
+            state.RequireForUpdate(damageTakenQuery);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            if (damageTakenQuery.IsEmpty)
-            {
-                return;
-            }
-            
             healthLookup.Update(ref state);
             armorLookup.Update(ref state);
             shieldLookup.Update(ref state);
 
-            state.Dependency = new UpdateBarsJob
+            new UpdateBarsJob
             {
                 HealthLookup = healthLookup,
                 ShieldLookup =  shieldLookup,
                 ArmorLookup = armorLookup
-            }.Schedule(state.Dependency);
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
@@ -56,13 +49,13 @@ namespace Health.ECS
     [BurstCompile]
     public partial struct UpdateBarsJob : IJobEntity
     {
-        [WriteOnly]
+        [WriteOnly, NativeDisableParallelForRestriction]
         public ComponentLookup<HealthPropertyComponent> HealthLookup;
         
-        [WriteOnly]
+        [WriteOnly, NativeDisableParallelForRestriction]
         public ComponentLookup<ArmorPropertyComponent> ArmorLookup;
         
-        [WriteOnly]
+        [WriteOnly, NativeDisableParallelForRestriction]
         public ComponentLookup<ShieldPropertyComponent> ShieldLookup;
 
         [BurstCompile]

@@ -58,7 +58,7 @@ namespace Buildings.District
             GenerateCollider();
             
             this.towerData = towerData;
-            State = GetDistrictState(towerData, position, key);
+            State = towerData.GetDistrictState(this, position, key);
             
             Events.OnTurnComplete += OnTurnComplete;
             Events.OnWallsDestroyed += OnWallsDestroyed;
@@ -271,26 +271,9 @@ namespace Buildings.District
             UIEvents.OnFocusChanged?.Invoke();
             State.Dispose();
             
-            State = GetDistrictState(upgradeStateData, Position, key);
+            State = upgradeStateData.GetDistrictState(this, Position, key);
             // Add chunks if needed
             DistrictGenerator.AddAction(() => DistrictGenerator.RegenerateChunks(DistrictChunks.Values, _ => upgradeStateData.PrototypeInfoData));
-        }
-        
-        private DistrictState GetDistrictState(TowerData towerData, Vector3 position, int key)
-        {
-            return towerData.DistrictType switch
-            {
-                DistrictType.Archer or DistrictType.Archer_Upgraded => new ArcherState(this, towerData, position, key),
-                DistrictType.Lumbermill => new LumbermillState(this, towerData, position, key),
-                DistrictType.Lightning => new LightningState(this, towerData, position, key),
-                DistrictType.TownHall => new TownHallState(this, towerData, position, key),
-                DistrictType.Barracks => new BarracksState(this, towerData, position, key),
-                DistrictType.Church => new ChurchState(this, towerData, position, key),
-                DistrictType.Flame => new FlameState(this, towerData, position, key),
-                DistrictType.Mine => new MineState(this, towerData, position, key),
-                DistrictType.Bomb => new BombState(this, towerData, position, key),
-                _ => throw new ArgumentOutOfRangeException(nameof(towerData.DistrictType), towerData.DistrictType, null)
-            };
         }
         
         public void Dispose()

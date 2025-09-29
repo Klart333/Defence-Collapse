@@ -1,6 +1,6 @@
-using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Effects.ECS.ECB;
 using Unity.Entities;
 using DG.Tweening;
 using Unity.Burst;

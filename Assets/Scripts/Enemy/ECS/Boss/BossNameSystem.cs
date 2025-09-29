@@ -11,13 +11,12 @@ using Unity.Rendering;
 using Unity.Entities;
 using TextMeshDOTS;
 using UnityEngine;
-using Effects.ECS;
 using Unity.Burst;
 
 namespace Enemy.ECS
 {
     [BurstCompile, UpdateAfter(typeof(SpawnerSystem)), UpdateBefore(typeof(EnemyModifierSystem))]
-    public partial struct BossNameSystem : ISystem
+    public partial struct BossNameSystem : ISystem 
     {
         private BlobAssetReference<FontBlob> fontReference;
         private EntityArchetype textRenderArchetype;

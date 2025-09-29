@@ -19,15 +19,11 @@ namespace Effects.ECS
             base.OnStartRunning();
 
             deathQuery = SystemAPI.QueryBuilder().WithAll<DeathTag>().Build();
+            RequireForUpdate(deathQuery);
         }
 
         protected override void OnUpdate()
         {
-            if (deathQuery.IsEmpty)
-            {
-                return;
-            }
-
             foreach (RefRO<DeathCallbackComponent> callback in SystemAPI.Query<RefRO<DeathCallbackComponent>>().WithAll<DeathTag>())
             {
                 if (DeathCallbacks.TryGetValue(callback.ValueRO.Key, out Action action))

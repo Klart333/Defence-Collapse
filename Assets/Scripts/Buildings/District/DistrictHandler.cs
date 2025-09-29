@@ -25,17 +25,12 @@ namespace Buildings.District
         [SerializeField]
         private DistrictGenerator districtGenerator;
         
-        [SerializeField]
-        private TowerDataUtility towerDataUtility;
-        
         [Title("Debug")]
-        [OdinSerialize, Sirenix.OdinInspector.ReadOnly]
-        private readonly Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
-
         public bool IsDebug;
         
-        private readonly Dictionary<int2, HashSet<District>> districtObjects = new Dictionary<int2, HashSet<District>>();
-        private readonly Dictionary<DistrictType, int> districtAmounts = new Dictionary<DistrictType, int>();
+        private Dictionary<int2, HashSet<District>> districtObjects = new Dictionary<int2, HashSet<District>>();
+        private Dictionary<DistrictType, int> districtAmounts = new Dictionary<DistrictType, int>();
+        private Dictionary<int2, DistrictData> districts = new Dictionary<int2, DistrictData>();
         
         private EntityManager entityManager;
         private EntityQuery districtEntityQuery;

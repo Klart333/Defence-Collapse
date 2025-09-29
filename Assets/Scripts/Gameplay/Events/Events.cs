@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using WaveFunctionCollapse;
-using UnityEngine.Events;
 using Buildings.District;
 using Unity.Mathematics;
 using Gameplay.Upgrades;
@@ -8,41 +7,48 @@ using Buildings;
 
 namespace Gameplay.Event
 {
+    public delegate void EventAction<in T0, in T1>(T0 arg0, T1 arg1);
+    public delegate void EventAction<in T0>(T0 arg0);
+    public delegate void EventAction();
+
     public static class Events
     {
-        public static UnityAction<WaveFunctionCollapse.Chunk> OnGroundChunkGenerated;
+        public static EventAction<WaveFunctionCollapse.Chunk> OnGroundChunkGenerated;
 
-        public static UnityAction<IEnumerable<ChunkIndex>> OnBuiltIndexBuilt;
-        public static UnityAction<ICollection<IBuildable>> OnBuildingBuilt;
-        public static UnityAction<BuildingType> OnBuildingClicked;
+        public static EventAction<ICollection<ChunkIndex>> OnBuiltIndexBuilt;
+        public static EventAction<ICollection<IBuildable>> OnBuildingBuilt;
+        public static EventAction<BuildingType> OnBuildingClicked;
 
-        public static UnityAction<int, int> OnTurnIncreased;
-        public static UnityAction OnTurnComplete;
+        public static EventAction<int, int> OnTurnIncreased;
+        public static EventAction OnTurnComplete;
 
-        public static UnityAction<List<ChunkIndex>> OnWallsDestroyed;
-        public static UnityAction<ChunkIndex> OnBuiltIndexDestroyed;
-        public static UnityAction<DistrictData> OnCapitolDestroyed;
+        public static EventAction<List<ChunkIndex>> OnWallsDestroyed;
+        public static EventAction<ChunkIndex> OnBuiltIndexDestroyed;
+        public static EventAction<DistrictData> OnCapitolDestroyed;
 
-        public static UnityAction<TowerData> OnDistrictClicked;
-        public static UnityAction<TowerData> OnDistrictBuilt;
-        public static UnityAction<TowerData> OnDistrictUnlocked;
+        public static EventAction<TowerData> OnDistrictClicked;
+        public static EventAction<TowerData> OnDistrictBuilt;
+        public static EventAction<TowerData> OnDistrictUnlocked;
 
-        public static UnityAction OnUpgradeCardsDisplayed;
-        public static UnityAction<UpgradeCardData.UpgradeCardInstance> OnUpgradeCardPicked;
+        public static EventAction<UpgradeCardData.UpgradeCardInstance> OnUpgradeCardPicked;
+        public static EventAction OnUpgradeCardsDisplayed;
 
-        public static UnityAction OnGameReset;
+        public static EventAction OnGameReset;
+
+        public static EventAction OnDistrictLimitReached;
+        public static EventAction OnDistrictLimitUnReached;
     }
 
     public static class ECSEvents
     {
-        public static UnityAction<float3> OnLootSpawn; // TODO: Remove
+        public static EventAction<float3> OnLootSpawn; // TODO: Remove
     }
 
     public static class UIEvents
     {
-        public static UnityAction<IDraggable> OnBeginDrag;
-        public static UnityAction<IDraggable> OnEndDrag;
+        public static EventAction<IDraggable> OnBeginDrag;
+        public static EventAction<IDraggable> OnEndDrag;
 
-        public static UnityAction OnFocusChanged;
+        public static EventAction OnFocusChanged;
     }
 }

@@ -17,13 +17,13 @@ namespace Gameplay.Chunk.ECS
         {
             public override void Bake(GroundObject authoring)
             {
-                Entity enemyEntity = GetEntity(TransformUsageFlags.Dynamic);
+                Entity groundEntity = GetEntity(TransformUsageFlags.Dynamic);
                 
-                AddComponent<GroundObjectComponent>(enemyEntity);
-                AddComponent<RandomComponent>(enemyEntity);
+                AddComponent<GroundObjectComponent>(groundEntity);
+                AddComponent<RandomComponent>(groundEntity);
                 
-                AddComponent(enemyEntity, new SpeedComponent { Speed = 1 });
-                AddComponent(enemyEntity, new ScaleComponent
+                AddComponent(groundEntity, new SpeedComponent { Speed = 1 });
+                AddComponent(groundEntity, new ScaleComponent
                 {
                     Duration = authoring.scalingDuration,
                     StartScale = 0,

@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 25779065}
   - component: {fileID: 25779066}
   m_Layer: 0
-  m_Name: LittleDudeAuthoing
+  m_Name: LittleDudeAuthoring
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -265,7 +265,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1798582829}
-  - component: {fileID: 1798582828}
+  - component: {fileID: 1798582830}
   m_Layer: 0
   m_Name: GroundObjectDatabase
   m_TagString: Untagged
@@ -273,20 +273,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1798582828
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1798582827}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 422a33806d52487bb19d3fadd5805471, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Core::Gameplay.Chunk.GroundObjectsAuthoring
-  groundObjectsUtility: {fileID: 11400000, guid: 58391b3d3b8e93e41b3b2ce1e774079c,
-    type: 2}
 --- !u!4 &1798582829
 Transform:
   m_ObjectHideFlags: 0
@@ -302,6 +288,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1798582830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798582827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 422a33806d52487bb19d3fadd5805471, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::Gameplay.Chunk.GroundObjectsAuthoring
+  GroundObjectsUtility: {fileID: 11400000, guid: 58391b3d3b8e93e41b3b2ce1e774079c,
+    type: 2}
 --- !u!4 &145740057962055505
 Transform:
   m_ObjectHideFlags: 0
@@ -352,8 +352,8 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 637114056}
   - {fileID: 1798582829}
+  - {fileID: 637114056}
   - {fileID: 360009206}
   - {fileID: 145740057962055505}
   - {fileID: 25779065}

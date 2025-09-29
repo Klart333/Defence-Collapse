@@ -73,7 +73,8 @@ namespace UI
             fadeCanvasGroup.DOFade(1.0f, fadeDuration).SetEase(fadeEase);
          
             EnemyUtility utility = highlightData.EnemyType >= 100 ? bossUtility : enemyUtility;
-            EnemyData data = utility.GetEnemy(highlightData.EnemyType);
+            int index = highlightData.EnemyType >= 100 ? highlightData.EnemyType - 100 : highlightData.EnemyType;
+            EnemyData data = utility.GetEnemy(index);
 
             predictionText.text = highlightData.IsAttacking ? $"Will attack in <u>{highlightData.AttackTimer:N0}</u> turns!" : $"Will move in <u>{highlightData.MoveTimer:N0}</u> turns";
             

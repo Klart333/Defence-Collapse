@@ -193,7 +193,6 @@ namespace Gameplay.Chunks
             {
                 int distance = Mathf.Abs(ChunkIndex.Index.x) + Mathf.Abs(ChunkIndex.Index.z);
                 float gold = goldPerTree + goldPerTree * distanceMultiplier * distance;
-                gold *= MoneyManager.Instance.MoneyMultiplier.Value;
 
                 foreach (Entity tree in spawnedTrees) // Giga slow
                 {

@@ -1,25 +1,36 @@
-using System;
+using Sirenix.OdinInspector;
 using Buildings.District;
 using Gameplay.Event;
+using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace UI
 {
     public class UITownHallButton : MonoBehaviour
     {
+        [Title("Disabling")]
         [SerializeField]
         private GameObject[] disabledFoldoutObjects;
+
+        [SerializeField]
+        private CanvasGroup fadeInCanvasGroup;
         
+        [Title("References")]
         [SerializeField]
         private GameObject townHallButton;
         
         [SerializeField]
         private TowerData townHallData;
 
-        [FormerlySerializedAs("townHallFlipButton")]
         [SerializeField]
         private UIDistrictToggleButton townHallToggleButton;
+        
+        [Title("Animation")]
+        [SerializeField]
+        private float fadeInDuration = 0.5f;
+        
+        [SerializeField]
+        private Ease fadeInEase = Ease.InOutSine;
         
         private void Awake()
         {
@@ -51,6 +62,8 @@ namespace UI
             
             Events.OnDistrictBuilt -= OnDistrictBuilt;
 
+            fadeInCanvasGroup.alpha = 0;
+            fadeInCanvasGroup.DOFade(1.0f, fadeInDuration).SetEase(fadeInEase);
             townHallButton.SetActive(false);
             for (int i = 0; i < disabledFoldoutObjects.Length; i++)
             {

@@ -69,7 +69,8 @@ namespace UI
             fadeCanvasgroup.DOFade(1f, 0.1f).SetEase(ease);
             
             EnemyUtility utility = spawningComponent.EnemyIndex >= 100 ? bossUtility : enemyUtility;
-            EnemyData data = utility.GetEnemy(spawningComponent.EnemyIndex);
+            int index = spawningComponent.EnemyIndex >= 100 ? spawningComponent.EnemyIndex - 100 : spawningComponent.EnemyIndex;
+            EnemyData data = utility.GetEnemy(index);
 
             turnText.text = $"<u>{spawningComponent.Turns:N0}</u> Turns" ;
             enemyAmount.text = spawningComponent.Amount.ToString("N0");

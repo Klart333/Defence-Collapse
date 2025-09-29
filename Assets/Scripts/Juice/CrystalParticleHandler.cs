@@ -1,16 +1,17 @@
-using System;
+using Random = UnityEngine.Random;
+
 using System.Collections.Generic;
-using System.Diagnostics;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
-using Gameplay;
-using Gameplay.Money;
 using Sirenix.OdinInspector;
+using System.Diagnostics;
 using Unity.Collections;
 using Unity.Mathematics;
+using Gameplay.Money;
+using DG.Tweening;
 using UnityEngine;
+using Gameplay;
+using System;
 using Debug = UnityEngine.Debug;
-using Random = UnityEngine.Random;
 
 namespace Juice
 {
@@ -36,9 +37,10 @@ namespace Juice
         [SerializeField, MinMaxRange(0, 1)]
         private RangedFloat spawnDuration = new RangedFloat(0.1f, 1.0f);
         
-        private readonly List<Tuple<PooledMonoBehaviour, Vector3>> spawnedCrystals = new List<Tuple<PooledMonoBehaviour, Vector3>>();
+        private List<Tuple<PooledMonoBehaviour, Vector3>> spawnedCrystals = new List<Tuple<PooledMonoBehaviour, Vector3>>();
 
         private IGameSpeed gameSpeed;
+        
         private Camera cam;
 
         private void Start()
@@ -55,11 +57,13 @@ namespace Juice
                 return;
             }
             
-            Vector3 targetPosition = UICrystalTarget.position;
+            Vector3 screenPos = RectTransformUtility.WorldToScreenPoint(null, UICrystalTarget.position);
+            screenPos.z = 1;
+            Vector3 targetPosition = cam.ScreenToWorldPoint(screenPos);
             for (int i = count - 1; i >= 0; i--)
             {
                 float value = (spawnedCrystals[i].Item1.Delay.Lifetime - spawnedCrystals[i].Item1.Delay.LifeLeft) / spawnedCrystals[i].Item1.Delay.Lifetime;
-                spawnedCrystals[i].Item1.transform.position = Vector3.Lerp(spawnedCrystals[i].Item2, targetPosition, Mathf.SmoothStep(0.0f, 1.0f, value));
+                spawnedCrystals[i].Item1.transform.position = math.lerp(spawnedCrystals[i].Item2, targetPosition, math.smoothstep(0.0f, 1.0f, value));
 
                 if (value >= 1.0f)
                 {

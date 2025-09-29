@@ -1,6 +1,7 @@
-using Unity.Burst;
 using Unity.Collections;
+using Effects.ECS.ECB;
 using Unity.Entities;
+using Unity.Burst;
 
 namespace Effects.ECS
 {

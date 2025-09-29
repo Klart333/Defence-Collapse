@@ -5,8 +5,7 @@ namespace Gameplay.Chunk
 {
     public class GroundObjectsAuthoring : MonoBehaviour
     {
-        [SerializeField]
-        private GroundObjectsUtility groundObjectsUtility;
+        public GroundObjectsUtility GroundObjectsUtility;
         
         private class GroundObjectsAuthoringBaker : Baker<GroundObjectsAuthoring>
         {
@@ -14,11 +13,11 @@ namespace Gameplay.Chunk
             {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
                 DynamicBuffer<GroundObjectElement> buffer = AddBuffer<GroundObjectElement>(entity);
-                for (int i = 0; i < authoring.groundObjectsUtility.GroundObjects.Count; i++)
+                for (int i = 0; i < authoring.GroundObjectsUtility.GroundObjects.Count; i++)
                 {
                     buffer.Add(new GroundObjectElement
                     {
-                        GroundObjectEntity = GetEntity(authoring.groundObjectsUtility.GroundObjects[i], TransformUsageFlags.Dynamic)
+                        GroundObjectEntity = GetEntity(authoring.GroundObjectsUtility.GroundObjects[i], TransformUsageFlags.Dynamic)
                     });
                 }
 
@@ -32,7 +31,5 @@ namespace Gameplay.Chunk
         public Entity GroundObjectEntity;
     }
 
-    public struct GroundObjectDatabaseTag : IComponentData
-    {
-    }
+    public struct GroundObjectDatabaseTag : IComponentData { }
 }

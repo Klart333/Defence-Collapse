@@ -31,7 +31,10 @@ namespace Gameplay.Turns
         private void OnDisable()
         {
             Events.OnTurnComplete -= OnTurnComplete;
-            inputManager.Space.performed -= SpacePerformed;
+            if (inputManager != null)
+            {
+                inputManager.Space.performed -= SpacePerformed;
+            }
         }
         
         private async UniTaskVoid GetInput()

@@ -60,6 +60,8 @@ namespace Buildings.District
         {
             UIEvents.OnFocusChanged += CancelPlacement;
             Events.OnDistrictClicked += DistrictClicked;
+            Events.OnDistrictLimitReached += CancelPlacement;
+            
             tileBuilder.OnCancelPlacement += CancelPlacement;
             
             GetMoney().Forget();
@@ -72,10 +74,12 @@ namespace Buildings.District
 
         private void OnDisable()
         {
-            tileBuilder.OnCancelPlacement -= CancelPlacement;
+            Events.OnDistrictLimitReached -= CancelPlacement;
             Events.OnDistrictClicked -= DistrictClicked;
-            tileBuilder.OnTilePressed -= OnTilePressed;
             UIEvents.OnFocusChanged -= CancelPlacement;
+            
+            tileBuilder.OnCancelPlacement -= CancelPlacement;
+            tileBuilder.OnTilePressed -= OnTilePressed;
         }
         
         private void UpdateCost()
@@ -145,6 +149,12 @@ namespace Buildings.District
 
         private void CancelPlacement()
         {
+            tileBuilder.GetIsDisplaying(out BuildingType type);
+            if (!type.HasFlag(BuildingType.District))
+            {
+                return;
+            }
+            
             costText.gameObject.SetActive(false);
             tileBuilder.OnTilePressed -= OnTilePressed;
 

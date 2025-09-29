@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using Gameplay.Chunk.ECS;
 using UnityEngine;
 
 namespace Gameplay.Chunk
 {
-    [CreateAssetMenu(fileName = "Ground Objects Utility", menuName = "Ground Objects/Utility", order = 0)]
+    [InlineEditor, CreateAssetMenu(fileName = "Ground Objects Utility", menuName = "Ground Objects/Utility", order = 0)]
     public class GroundObjectsUtility : ScriptableObject
     {
         public List<GroundObject> GroundObjects = new List<GroundObject>();

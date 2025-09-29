@@ -14,11 +14,15 @@ public class UIBuildingHandler : MonoBehaviour
     private List<UIDistrictToggleButton> districtButtons = new List<UIDistrictToggleButton>();
     private List<Action> clickActions = new List<Action>();
     
+    private bool locked;
+    
     private void OnEnable()
     {
         districtUnlockHandler.OnDistrictButtonSpawned += SubscribeToDistrictButton;
+        Events.OnDistrictLimitReached += LockDistricts;
+        Events.OnDistrictLimitUnReached += UnlockDistricts;
     }
-    
+
     private void OnDisable()
     {
         for (int i = 0; i < districtButtons.Count; i++)
@@ -27,7 +31,13 @@ public class UIBuildingHandler : MonoBehaviour
         }
         
         districtUnlockHandler.OnDistrictButtonSpawned -= SubscribeToDistrictButton;
+        
+        Events.OnDistrictLimitReached -= LockDistricts;
+        Events.OnDistrictLimitUnReached -= UnlockDistricts;
     }
+    
+    private void UnlockDistricts() => locked = false;
+    private void LockDistricts() => locked = true;
 
     private void SubscribeToDistrictButton(TowerData towerData, UIDistrictButton districtButton)
     {
@@ -55,6 +65,11 @@ public class UIBuildingHandler : MonoBehaviour
 
     public void ClickDistrict(TowerData district)
     {
+        if (locked)
+        {
+            return;
+        }
+        
         Events.OnDistrictClicked?.Invoke(district);
     }
 }

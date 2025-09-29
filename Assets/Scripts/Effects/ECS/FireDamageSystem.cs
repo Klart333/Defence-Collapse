@@ -1,5 +1,6 @@
 using Unity.Mathematics;
 using Unity.Collections;
+using Effects.ECS.ECB;
 using Unity.Entities;
 using Unity.Burst;
 using Gameplay;

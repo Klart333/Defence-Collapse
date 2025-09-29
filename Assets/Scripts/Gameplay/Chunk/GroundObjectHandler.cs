@@ -70,11 +70,6 @@ namespace Gameplay.Chunks
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         }
 
-        private void Start()
-        {
-            groundObjectDatabase = entityManager.CreateEntityQuery(typeof(GroundObjectDatabaseTag)).GetSingletonEntity();
-        }
-
         private void OnDisable()
         {
             groundGenerator.OnGenerationFinished -= OnGenerationFinished;
@@ -104,6 +99,11 @@ namespace Gameplay.Chunks
             if (growingTrees != null)
             {
                 StopCoroutine(growingTrees);
+            }
+
+            if (groundObjectDatabase == Entity.Null)
+            {
+                groundObjectDatabase = entityManager.CreateEntityQuery(typeof(GroundObjectDatabaseTag)).GetSingletonEntity();
             }
             
             GroundObjectGrower spawned = groundObjectGrowerPrefab.GetAtPosAndRot<GroundObjectGrower>(cell.Position, Quaternion.identity);

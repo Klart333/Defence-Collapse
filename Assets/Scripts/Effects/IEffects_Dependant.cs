@@ -29,14 +29,14 @@ namespace Effects
         public void Perform(IAttacker unit)
         {
             Vector3 pos = unit.OriginPosition;
-            float amount = ModifierValue * unit.Stats.Productivity.Value * MoneyManager.Instance.MoneyMultiplier.Value;
+            float amount = ModifierValue * unit.Stats.Productivity.Value;
             if (multiplyWithAttackSpeed) amount *= unit.Stats.AttackSpeed.Value;
             
-            MoneyManager.Instance.AddMoneyParticles(amount, pos);
+            float amountGained = MoneyManager.Instance.AddMoneyParticles(amount, pos);
 
             if (unit is IAttackerStatistics stats)
             {
-                stats.GoldGained += amount;
+                stats.GoldGained += amountGained;
             }
         }
     }

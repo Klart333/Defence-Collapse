@@ -1,14 +1,13 @@
+using Effects.ECS.ECB;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
+using Pathfinding;
+using UnityEngine;
 using Unity.Jobs;
 using Enemy.ECS;
-using Pathfinding;
-using Unity.Burst.Intrinsics;
-using Unity.Jobs.LowLevel.Unsafe;
-using UnityEngine;
 using VFX;
 
 namespace Effects.ECS

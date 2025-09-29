@@ -158,18 +158,33 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: districtStateCreator
+      Entry: 7
+      Data: 15|Buildings.District.GenericDistrictStateCreator, Core
+    - Name: stateType
+      Entry: 7
+      Data: 16|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Buildings.District.BombState, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 15|Attack, Core
+      Data: 17|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 17|Effects.ArchedDamageColliderEffect, Core
+      Data: 19|Effects.ArchedDamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 0
@@ -193,13 +208,13 @@ MonoBehaviour:
       Data: 4.5
     - Name: Effects
       Entry: 7
-      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 19|Effects.DamageColliderEffect, Core
+      Data: 21|Effects.DamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 10
@@ -241,7 +256,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 20|Effects.VisualEffectEffect, Core
+      Data: 22|Effects.VisualEffectEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 0.2
@@ -280,7 +295,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 21|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 23|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -295,7 +310,7 @@ MonoBehaviour:
       Data: 
     - Name: createdEffects
       Entry: 7
-      Data: 22|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 24|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -307,7 +322,7 @@ MonoBehaviour:
       Data: 
     - Name: endWaveEffects
       Entry: 7
-      Data: 23|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 25|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -341,6 +356,7 @@ MonoBehaviour:
       type: 3}
   districtType: 1
   shouldCombine: 1
+  districtHeight: 2
   prototypeInfoData: {fileID: 11400000, guid: 20071b5325a2e33418874ae5d70b303e, type: 2}
   RangeIndicator: {fileID: 6167429381404046516, guid: af83bdc12e06e7f47b530a1d31662322,
     type: 3}

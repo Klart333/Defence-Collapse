@@ -2,7 +2,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 
-namespace Effects.ECS
+namespace Effects.ECS.ECB
 {
     // You should specify where exactly in the frame this ECB system should update.
     [UpdateInGroup(typeof(SimulationSystemGroup))]

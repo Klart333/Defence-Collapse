@@ -91,9 +91,12 @@ namespace Gameplay.Money
             OnMoneyChanged?.Invoke(money);
         }
 
-        public void AddMoneyParticles(float amount, Vector3 position)
+        public float AddMoneyParticles(float amount, Vector3 position)
         {
+            amount *= MoneyMultiplier.Value;
             particleHandler.CollectCrystals((int)amount, position).Forget();
+
+            return amount;
         }
 
         public void RemoveMoney(float amount)

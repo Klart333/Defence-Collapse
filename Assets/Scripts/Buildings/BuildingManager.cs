@@ -38,7 +38,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
 
     private HashSet<QueryMarchedChunk> queriedChunks = new HashSet<QueryMarchedChunk>();
     
-    private IEnumerable<ChunkIndex> queryBuiltIndexes;
+    private ICollection<ChunkIndex> queryBuiltIndexes;
 
     private BuildingAnimator buildingAnimator;
     private GroundGenerator groundGenerator;
@@ -47,7 +47,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     
     public int3 ChunkSize => new int3(Mathf.FloorToInt(groundGenerator.ChunkSize.x / waveFunction.CellSize.x), 1, Mathf.FloorToInt(groundGenerator.ChunkSize.z / waveFunction.CellSize.z));
     public ChunkWaveFunction<QueryMarchedChunk> ChunkWaveFunction => waveFunction;
-    public IEnumerable<ChunkIndex> QueryBuiltIndexes => queryBuiltIndexes;
+    public ICollection<ChunkIndex> QueryBuiltIndexes => queryBuiltIndexes;
     public PrototypeInfoData PrototypeInfo => townPrototypeInfo;
     public Vector3 ChunkScale => groundGenerator.ChunkScale;
     
@@ -286,7 +286,7 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
         Query(cellsToCollapse, new List<ChunkIndex> { queryIndex });
     }
     
-    public void Query(List<ChunkIndex> cellsToCollapse, IEnumerable<ChunkIndex> builtIndexes)
+    public void Query(List<ChunkIndex> cellsToCollapse, ICollection<ChunkIndex> builtIndexes)
     {
         if (IsGenerating) return;
         

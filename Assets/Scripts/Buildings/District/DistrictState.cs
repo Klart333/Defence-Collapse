@@ -516,9 +516,11 @@ namespace Buildings.District
 
     #region Bomb
 
+    [System.Serializable]
     public sealed class BombState : DistrictState
     {
         private GameObject rangeIndicator;
+        
         private bool selected;
 
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
@@ -587,7 +589,7 @@ namespace Buildings.District
             
             Attack = new Attack(townhallData.BaseAttack);
         }
-
+        
         protected override void RangeChanged()
         {
             base.RangeChanged();
@@ -776,7 +778,7 @@ namespace Buildings.District
 
             Attack = new Attack(flameData.BaseAttack);
         }
-
+        
         protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
             return DistrictStateUtility.GetFullChunkEntityIndexes(chunkIndexes, DistrictData.DistrictGenerator.ChunkScale);
@@ -835,7 +837,7 @@ namespace Buildings.District
             
             Stats.Productivity.OnValueChanged += OnStatsChanged;
         }
-
+        
         private void OnStatsChanged()
         {
             RevertCreateEffects();
@@ -969,6 +971,7 @@ namespace Buildings.District
             CreateStats();
             Attack = new Attack(lumbermillData.BaseAttack);
         }
+        
         protected override void RangeChanged()
         {
             base.RangeChanged();

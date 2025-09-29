@@ -18,25 +18,31 @@ namespace Gameplay.Upgrades
     {
         [SerializeField]
         private UpgradeCardData[] upgradeCards;
-        
-        public readonly List<UpgradeCardData.UpgradeCardInstance> UpgradeCardInstances = new List<UpgradeCardData.UpgradeCardInstance>();
 
-        private HashSet<DistrictType> unlockedDistricts;
+        [SerializeField]
+        private TowerData[] startingDistricts;
+
+        private List<UpgradeCardData.UpgradeCardInstance> upgradeCardInstances = new List<UpgradeCardData.UpgradeCardInstance>();
+        
+        private HashSet<DistrictType> unlockedDistricts = new HashSet<DistrictType>();
         
         public void InitializeUpgrades()
         {
-            UpgradeCardInstances.Clear();
-            unlockedDistricts = new HashSet<DistrictType> { DistrictType.Archer };
+            upgradeCardInstances.Clear();
+            foreach (TowerData startingDistrict in startingDistricts)
+            {
+                unlockedDistricts.Add(startingDistrict.DistrictType);
+            }
             
             for (int i = 0; i < upgradeCards.Length; i++)
             {
-                UpgradeCardInstances.Add(upgradeCards[i].GetUpgradeCardInstance());
+                upgradeCardInstances.Add(upgradeCards[i].GetUpgradeCardInstance());
             }
         }
         
         public List<UpgradeCardData.UpgradeCardInstance> GetRandomData(int seed, int amount)
         {
-            List<UpgradeCardData.UpgradeCardInstance> availableUpgrades = new List<UpgradeCardData.UpgradeCardInstance>(UpgradeCardInstances);
+            List<UpgradeCardData.UpgradeCardInstance> availableUpgrades = new List<UpgradeCardData.UpgradeCardInstance>(upgradeCardInstances);
             List<UpgradeCardData.UpgradeCardInstance> result = new List<UpgradeCardData.UpgradeCardInstance>();
             
             System.Random random = new System.Random(seed);
@@ -97,14 +103,14 @@ namespace Gameplay.Upgrades
 
         private void OnUpgradePicked(UpgradeCardData.UpgradeCardInstance pickedUpgradeInstance)
         {
-            for (int i = UpgradeCardInstances.Count - 1; i >= 0; i--)
+            for (int i = upgradeCardInstances.Count - 1; i >= 0; i--)
             {
-                var upgradeInstance = UpgradeCardInstances[i];
+                var upgradeInstance = upgradeCardInstances[i];
                 if (upgradeInstance == pickedUpgradeInstance)
                 {
                     if (upgradeInstance.WeightStrategy.HasFlag(WeightStrategy.RemoveOnPicked))
                     {
-                        UpgradeCardInstances.RemoveAtSwapBack(i);         
+                        upgradeCardInstances.RemoveAtSwapBack(i);         
                         continue;
                     }
 
@@ -124,9 +130,9 @@ namespace Gameplay.Upgrades
 
         private void OnDistrictBuilt(TowerData towerData)
         {
-            for (int i = UpgradeCardInstances.Count - 1; i >= 0; i--)
+            for (int i = upgradeCardInstances.Count - 1; i >= 0; i--)
             {
-                var upgradeInstance = UpgradeCardInstances[i];
+                var upgradeInstance = upgradeCardInstances[i];
              
                 if (upgradeInstance.WeightStrategy.HasFlag(WeightStrategy.ChangeWithDistrictsBuilt) 
                     && DoesMatch(towerData.DistrictType, upgradeInstance.UpgradeCardType))

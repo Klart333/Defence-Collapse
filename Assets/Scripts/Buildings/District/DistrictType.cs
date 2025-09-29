@@ -1,4 +1,4 @@
-public enum DistrictType // TODO: Remove this
+public enum DistrictType
 {
     Archer = 0,
     Bomb = 1,
@@ -10,5 +10,5 @@ public enum DistrictType // TODO: Remove this
     Barracks = 7,
     Mana = 8,
     Lumbermill = 9,
-    Archer_Upgraded = 10,
+    Ballista = 10,
 }

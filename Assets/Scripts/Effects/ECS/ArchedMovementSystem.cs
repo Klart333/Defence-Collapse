@@ -1,5 +1,6 @@
 using Unity.Mathematics;
 using Unity.Transforms;
+using Effects.ECS.ECB;
 using Unity.Entities;
 using Unity.Burst;
 using DG.Tweening;

@@ -25,25 +25,21 @@ namespace Enemy.ECS
                 indexes[i] = KilledIndexes.Dequeue();
             }
                 
-            var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(World.Unmanaged);
             new StopAttackingJob
             {
                 ECB = ecb.AsParallelWriter(),
                 KilledIndexes = indexes,
                 Length = count,
             }.ScheduleParallel();
-                
-            Dependency.Complete();
-            ecb.Playback(EntityManager);
-            ecb.Dispose();
-            indexes.Dispose();
         }
     }
     
     [BurstCompile]
     public partial struct StopAttackingJob : IJobEntity
     {
-        [ReadOnly]
+        [ReadOnly, DeallocateOnJobCompletion]
         public NativeArray<PathIndex> KilledIndexes;
 
         public EntityCommandBuffer.ParallelWriter ECB;
