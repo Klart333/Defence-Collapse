@@ -95,7 +95,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8246353459683069539}
   - component: {fileID: 3327036121700018643}
-  - component: {fileID: 7820552576644637048}
+  - component: {fileID: 9170646571570546675}
   m_Layer: 0
   m_Name: Shadow
   m_TagString: Untagged
@@ -130,7 +130,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 675230651623350654}
   m_CullTransparentMesh: 1
---- !u!114 &7820552576644637048
+--- !u!114 &9170646571570546675
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 961711388201650002}
   - component: {fileID: 5294548687875869503}
   m_Layer: 0
-  m_Name: GameOverCanvas
+  m_Name: VictoryCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -203,6 +203,7 @@ RectTransform:
   m_Children:
   - {fileID: 1593030131187487782}
   - {fileID: 2732840285538458547}
+  - {fileID: 7081335767648922820}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -451,10 +452,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2213864190491725583}
-        m_TargetAssemblyTypeName: Exp.Gemstones.UIGemstoneHandler, Core
-        m_MethodName: SpawnGemstones
-        m_Mode: 1
+      - m_Target: {fileID: 6324931445898556671}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -463,10 +464,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 439331126591365435}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 5721615755251587787}
+        m_TargetAssemblyTypeName: Exp.Gemstones.UIGemstoneHandler, Core
+        m_MethodName: SpawnGemstones
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -562,7 +563,6 @@ RectTransform:
   - {fileID: 3894920432780626561}
   - {fileID: 6962968443196924806}
   - {fileID: 4538782236833804263}
-  - {fileID: 3718723885479262464}
   m_Father: {fileID: 6466357776961026015}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -619,7 +619,7 @@ GameObject:
   - component: {fileID: 8873262210515882909}
   - component: {fileID: 8362906051956973187}
   m_Layer: 0
-  m_Name: Skull
+  m_Name: HeaderImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -672,7 +672,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b8ff227cf7126ac4a8d2be3ec5ca4e04, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a116b685f9445784b9645f815ec1e4f6, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -684,7 +684,7 @@ MonoBehaviour:
   m_PixelsPerUnitMultiplier: 1
   spriteReference:
     Mode: 0
-    ConstantValue: {fileID: 21300000, guid: b8ff227cf7126ac4a8d2be3ec5ca4e04, type: 3}
+    ConstantValue: {fileID: 21300000, guid: a116b685f9445784b9645f815ec1e4f6, type: 3}
     Variable: {fileID: 0}
     VariableValuePreview: {fileID: 0}
   colorReference:
@@ -1075,8 +1075,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4292861919
-  m_fontColor: {r: 0.8745099, g: 0.8745099, b: 0.8745099, a: 1}
+    rgba: 4279442572
+  m_fontColor: {r: 0.54901963, g: 0.10980393, b: 0.07450981, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1146,7 +1146,7 @@ MonoBehaviour:
   colorReference:
     Mode: 1
     ConstantValue: {r: 0, g: 0, b: 0, a: 0}
-    Variable: {fileID: 11400000, guid: aaf9388cfe535a844aed49594dd920f9, type: 2}
+    Variable: {fileID: 11400000, guid: 29a79831a54fdaf4bb6cc16234e853f0, type: 2}
     VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &3706352754993856307
 GameObject:
@@ -1158,7 +1158,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5720156092417810932}
   - component: {fileID: 258994751096299133}
-  - component: {fileID: 4236307627236898036}
+  - component: {fileID: 764732119975275711}
   m_Layer: 0
   m_Name: Shadow
   m_TagString: Untagged
@@ -1193,7 +1193,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3706352754993856307}
   m_CullTransparentMesh: 1
---- !u!114 &4236307627236898036
+--- !u!114 &764732119975275711
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1641,7 +1641,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.32156864, g: 0, b: 0.015686275, a: 1}
+  m_Color: {r: 0.8745099, g: 0.8745099, b: 0.8745099, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1666,7 +1666,7 @@ MonoBehaviour:
   colorReference:
     Mode: 1
     ConstantValue: {r: 0, g: 0, b: 0, a: 0}
-    Variable: {fileID: 11400000, guid: 905ac7dced4c4654f8eb67da8f6d8502, type: 2}
+    Variable: {fileID: 11400000, guid: aaf9388cfe535a844aed49594dd920f9, type: 2}
     VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &7945986848531841292
 GameObject:
@@ -1680,7 +1680,7 @@ GameObject:
   - component: {fileID: 1637354873834392751}
   - component: {fileID: 240566009878023492}
   m_Layer: 0
-  m_Name: DeathText
+  m_Name: VictoryText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1733,17 +1733,18 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: You died
+  m_text: You did it!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3a1b3067318700840878d31e47678c1e, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 228422141f8c5144bb77e9db979073ad, type: 2}
+  m_sharedMaterial: {fileID: -2475147182593723023, guid: 3a1b3067318700840878d31e47678c1e,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4279243039
-  m_fontColor: {r: 0.121568635, g: 0.06666667, b: 0.0627451, a: 1}
+    rgba: 4292861919
+  m_fontColor: {r: 0.8745099, g: 0.8745099, b: 0.8745099, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1813,7 +1814,7 @@ MonoBehaviour:
   colorReference:
     Mode: 1
     ConstantValue: {r: 0, g: 0, b: 0, a: 0}
-    Variable: {fileID: 11400000, guid: b621be65952b801419750767137ceb7b, type: 2}
+    Variable: {fileID: 11400000, guid: aaf9388cfe535a844aed49594dd920f9, type: 2}
     VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8671577773646551178
 GameObject:
@@ -1825,7 +1826,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5827630389633626}
   - component: {fileID: 3081317885729039312}
-  - component: {fileID: 5303614417777180457}
+  - component: {fileID: 5731100350968146515}
   m_Layer: 0
   m_Name: Shadow
   m_TagString: Untagged
@@ -1860,7 +1861,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8671577773646551178}
   m_CullTransparentMesh: 1
---- !u!114 &5303614417777180457
+--- !u!114 &5731100350968146515
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1990,13 +1991,13 @@ MonoBehaviour:
   fadeInFactorDuration: 1
   textCountingEase: 4
   textCountingDuration: 0.5
---- !u!1001 &631193086370925372
+--- !u!1001 &6421016188019105528
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 2732840285538458547}
+    m_TransformParent: {fileID: 6466357776961026015}
     m_Modifications:
     - target: {fileID: 1070347702112512519, guid: dba107c0149c79349a8393ed503a6e6d,
         type: 3}
@@ -2108,27 +2109,27 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dba107c0149c79349a8393ed503a6e6d, type: 3}
---- !u!1 &439331126591365435 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1070347702112512519, guid: dba107c0149c79349a8393ed503a6e6d,
-    type: 3}
-  m_PrefabInstance: {fileID: 631193086370925372}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2213864190491725583 stripped
+--- !u!114 &5721615755251587787 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1619970975798248499, guid: dba107c0149c79349a8393ed503a6e6d,
     type: 3}
-  m_PrefabInstance: {fileID: 631193086370925372}
+  m_PrefabInstance: {fileID: 6421016188019105528}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 439331126591365435}
+  m_GameObject: {fileID: 6324931445898556671}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8928765c53f449ea8272befc9e628f64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!224 &3718723885479262464 stripped
+--- !u!1 &6324931445898556671 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1070347702112512519, guid: dba107c0149c79349a8393ed503a6e6d,
+    type: 3}
+  m_PrefabInstance: {fileID: 6421016188019105528}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &7081335767648922820 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4276727975456682556, guid: dba107c0149c79349a8393ed503a6e6d,
     type: 3}
-  m_PrefabInstance: {fileID: 631193086370925372}
+  m_PrefabInstance: {fileID: 6421016188019105528}
   m_PrefabAsset: {fileID: 0}

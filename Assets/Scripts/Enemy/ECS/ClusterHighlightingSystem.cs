@@ -16,6 +16,7 @@ namespace Enemy.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             state.RequireForUpdate<MousePositionComponent>();
             state.RequireForUpdate<EnemyClusterComponent>();
 
@@ -33,23 +34,19 @@ namespace Enemy.ECS
             }
             
             MousePositionComponent mousePosition = SystemAPI.GetSingleton<MousePositionComponent>();
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);            
             attackingLookup.Update(ref state);
             bufferLookup.Update(ref state);
             
-            state.Dependency = new ClusterHighlightingJob
+            new ClusterHighlightingJob
             { 
                 MousePathIndex = mousePosition.PathIndex,
                 LastIndex = lastHightlightPosition,
                 AttackingLookup = attackingLookup,
                 ECB = ecb.AsParallelWriter(),
                 BufferLookup = bufferLookup,
-            }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+            }.ScheduleParallel();
         }
 
         [BurstCompile]

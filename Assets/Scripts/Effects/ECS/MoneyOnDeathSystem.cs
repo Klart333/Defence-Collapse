@@ -8,18 +8,15 @@ using Unity.Burst;
 
 namespace Effects.ECS
 {
-    [UpdateAfter(typeof(HealthSystem))]
+    [BurstCompile, UpdateAfter(typeof(HealthSystem))]
     public partial struct MoneyOnDeathSystem : ISystem
     {
-        
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<MoneyToAddComponent>();
+            state.RequireForUpdate(SystemAPI.QueryBuilder().WithAll<DeathTag, MoneyOnDeathComponent>().Build());
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             state.RequireForUpdate<MoneyPrefabComponent>();
-            
-            EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<DeathTag, MoneyOnDeathComponent>();
-            state.RequireForUpdate(state.GetEntityQuery(builder));
         }
 
         [BurstCompile]
@@ -27,24 +24,18 @@ namespace Effects.ECS
         {
             Entity moneyPrefab = SystemAPI.GetSingleton<MoneyPrefabComponent>().MoneyPrefab;
             float scale = state.EntityManager.GetComponentData<LocalTransform>(moneyPrefab).Scale; 
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            NativeReference<float> moneyArray = new NativeReference<float>(0, Allocator.TempJob);
 
-            state.Dependency = new MoneyOnDeathJob
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+
+            new MoneyOnDeathJob
             {
                 MoneyPrefab = moneyPrefab,
-                ECB = ecb,
+                ECB = ecb.AsParallelWriter(),
                 Scale = scale,
-                BaseSeed = UnityEngine.Random.Range(0, 100000),
-                TotalMoney = moneyArray,
-            }.Schedule(state.Dependency);
+                BaseSeed = UnityEngine.Random.Range(0, 1000000),
+            }.ScheduleParallel();
             
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
-
-            SystemAPI.SetSingleton(new MoneyToAddComponent { Money = moneyArray.Value });
-            moneyArray.Dispose();
         }
 
         [BurstCompile]
@@ -57,24 +48,27 @@ namespace Effects.ECS
     [BurstCompile, WithAll(typeof(DeathTag))]
     public partial struct MoneyOnDeathJob : IJobEntity
     {
-        public NativeReference<float> TotalMoney;
         public Entity MoneyPrefab;
         public float Scale;
         public int BaseSeed;
         
-        public EntityCommandBuffer ECB;
+        public EntityCommandBuffer.ParallelWriter ECB;
         
         public void Execute([EntityIndexInChunk] int sortKey, in LocalTransform localTransform, in MoneyOnDeathComponent money)
         {
-            TotalMoney.Value += money.Amount;
+            Entity entity = ECB.CreateEntity(sortKey);
+            ECB.AddComponent(sortKey, entity, new MoneyToAddComponent
+            {
+                Money = money.Amount,
+            });
 
             for (int i = 0; i < money.Amount; i++)
             {
-                Entity spawnedMoney = ECB.Instantiate(MoneyPrefab);
+                Entity spawnedMoney = ECB.Instantiate(sortKey, MoneyPrefab);
                 Random random = Random.CreateFromIndex((uint)(BaseSeed + sortKey + i));
-                ECB.SetComponent(spawnedMoney, new RandomComponent { Random = random});
-                ECB.SetComponent(spawnedMoney, new MovementDirectionComponent { Direction = random.NextFloat3Direction() });
-                ECB.SetComponent(spawnedMoney, new LocalTransform
+                ECB.SetComponent(sortKey, spawnedMoney, new RandomComponent { Random = random});
+                ECB.SetComponent(sortKey, spawnedMoney, new MovementDirectionComponent { Direction = random.NextFloat3Direction() });
+                ECB.SetComponent(sortKey, spawnedMoney, new LocalTransform
                 {
                     Position = localTransform.Position + random.NextFloat3(new float3(-1, 1f, -1), new float3(1, 2f, 1)) * Scale * 5,
                     Rotation = random.NextQuaternionRotation(),

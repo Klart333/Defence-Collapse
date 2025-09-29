@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Burst;
 using Effects.ECS;
+using Effects.ECS.ECB;
 
 namespace Enemy.ECS
 {
@@ -17,23 +18,22 @@ namespace Enemy.ECS
             
             EntityQuery dyingEnemyQuery = SystemAPI.QueryBuilder().WithAll<ManagedClusterComponent, DeathTag>().Build();
             state.RequireForUpdate(dyingEnemyQuery); 
+            state.RequireForUpdate<BeforeDeathECBSystem.Singleton>();
         }
  
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             bufferLookup.Update(ref state);
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            
+            var ecbSingleton = SystemAPI.GetSingleton<BeforeDeathECBSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             
             state.Dependency = new ManagedEntityCleanupJob
             {
                 BufferLookup = bufferLookup,
                 ECB = ecb
             }.Schedule(state.Dependency);
-            
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
         }
 
         [BurstCompile]

@@ -6,7 +6,7 @@ using Enemy.ECS;
 
 namespace Gameplay.Turns.ECS
 {
-    [UpdateBefore(typeof(DeathSystem)), BurstCompile]
+    [BurstCompile, UpdateBefore(typeof(DeathSystem))]
     public partial struct TurnSystem : ISystem
     {
         private EntityQuery updateDistrictQuery;

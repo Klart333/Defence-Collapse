@@ -68,7 +68,6 @@ namespace Buildings.District.DistrictLimit
             {
                 BossIndex = 100,
                 SpawnPointIndex = spawnIndex,
-                IsFinal = true,
             });
         }
     }

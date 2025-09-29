@@ -127,7 +127,6 @@ namespace Effects.ECS
 	
 	public struct LightningComponent : IComponentData
 	{
-		public float Radius;
 		public float Damage;
 		public int Bounces;
 	}

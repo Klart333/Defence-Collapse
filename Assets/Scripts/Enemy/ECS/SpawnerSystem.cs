@@ -13,7 +13,7 @@ using Gameplay;
 
 namespace Enemy.ECS
 {
-    [UpdateAfter(typeof(DeathSystem))]
+    [BurstCompile, UpdateAfter(typeof(DeathSystem))]
     public partial struct SpawnerSystem : ISystem
     {
         private ComponentLookup<MovementSpeedComponent> movementSpeedLookup; 
@@ -42,9 +42,9 @@ namespace Enemy.ECS
 
             updateEnemiesQuery = SystemAPI.QueryBuilder().WithAll<TurnIncreaseComponent, UpdateEnemiesTag>().Build();
             
+            state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<SpawnPointComponent, SpawningComponent>().Build());
             state.RequireForUpdate<EnemyBossDatabaseTag>();
             state.RequireForUpdate<RandomSeedComponent>();
-            state.RequireForUpdate<SpawnPointComponent>();
             state.RequireForUpdate<EnemyDatabaseTag>();
             state.RequireForUpdate<UpdateEnemiesTag>();
             state.RequireForUpdate<PathBlobber>();
@@ -149,6 +149,8 @@ namespace Enemy.ECS
                 Turns = PossibleSpawns[index].Turns,
                 SpawnPoint = entity
             });
+            
+            ECB.AddComponent<EnemyAddComponent>(sortKey, spawned);
         }
     }
 
@@ -192,7 +194,7 @@ namespace Enemy.ECS
         public int TurnIncrease;
         public uint Seed;
 
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ref SpawningComponent spawningComponent)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, ref SpawningComponent spawningComponent, in EnemyAddComponent addComponent)
         {
             spawningComponent.Turns -= TurnIncrease;
             if (spawningComponent.Turns > 0) return;
@@ -221,6 +223,7 @@ namespace Enemy.ECS
                 ECB.SetComponent(sortKey, spawnedEntity, new RandomComponent { Random = Random.CreateFromIndex((uint)(sortKey + Seed + i + 1)) });
                 ECB.SetComponent(sortKey, spawnedEntity, new ManagedClusterComponent { ClusterParent = clusterEntity });
                 ECB.SetComponent(sortKey, spawnedEntity, newTransform);
+                ECB.SetComponent(sortKey, spawnedEntity, addComponent);
                 
                 buffer.Add(new ManagedEntityBuffer { Entity = spawnedEntity });
             }

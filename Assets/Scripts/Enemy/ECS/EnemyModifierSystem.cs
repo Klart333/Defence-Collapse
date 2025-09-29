@@ -1,7 +1,6 @@
+using Unity.Entities;
 using Effects.ECS;
 using Unity.Burst;
-using Unity.Collections;
-using Unity.Entities;
 using Unity.Jobs;
 
 namespace Enemy.ECS
@@ -12,8 +11,8 @@ namespace Enemy.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<EnemySpawnedTag>();
-            state.RequireForUpdate(state.GetEntityQuery(builder));       
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
+            state.RequireForUpdate(SystemAPI.QueryBuilder().WithAll<EnemySpawnedTag>().Build());
         }
 
         [BurstCompile]
@@ -31,23 +30,23 @@ namespace Enemy.ECS
             JobHandle damageHandle = default;
             if (SystemAPI.TryGetSingleton(out EnemyDamageModifierComponent damageModifier))
             {
-                damageHandle = new ModifyDamageJob()
+                damageHandle = new ModifyDamageJob
                 {
                     Multiplier = damageModifier.DamageMultiplier
                 }.ScheduleParallel(damageHandle);
             }
 
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            JobHandle removeHandle = JobHandle.CombineDependencies(speedHandle, damageHandle);
-            removeHandle = new RemoveTagJob
+            JobHandle modifierHandle = JobHandle.CombineDependencies(speedHandle, damageHandle);
+            modifierHandle.Complete();
+            
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+
+            new RemoveTagJob
             {
                 ECB = ecb.AsParallelWriter(),
-            }.ScheduleParallel(removeHandle);
-            
-            removeHandle.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
-        }
+            }.ScheduleParallel();
+        } 
 
         [BurstCompile]
         public void OnDestroy(ref SystemState state)

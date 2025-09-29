@@ -44,8 +44,9 @@ namespace Enemy
 
                 float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
                 
-                AddComponent<EnemySpawnedTag>(enemyEntity);
                 AddComponent<ManagedClusterComponent>(enemyEntity);
+                AddComponent<EnemyAddComponent>(enemyEntity);
+                AddComponent<EnemySpawnedTag>(enemyEntity);
                 
                 AddComponent(enemyEntity, new RandomComponent { Random = Random.CreateFromIndex((uint)UnityEngine.Random.Range(1, 1000000)) });
                 AddComponent(enemyEntity, new AttackSpeedComponent { AttackTimer = attackSpeedValue + 1, AttackSpeed = attackSpeedValue });

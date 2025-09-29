@@ -27,6 +27,7 @@ namespace Enemy.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             textRenderArchetype = GetSingleFontTextArchetype(ref state);
 
             FontRequest fontRequest = GetFontRequest();
@@ -66,9 +67,10 @@ namespace Enemy.ECS
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-
-            state.Dependency = new BossNameJob
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+         
+            new BossNameJob
             {
                 ECB = ecb.AsParallelWriter(),
                 FontReference = fontReference, 
@@ -76,11 +78,7 @@ namespace Enemy.ECS
                 RenderFilterSettings = renderFilterSettings,
                 TextRenderControl = textRenderControl,
                 TextArchetype = textRenderArchetype,
-            }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete(); 
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+            }.ScheduleParallel();
         }
 
         [BurstCompile]

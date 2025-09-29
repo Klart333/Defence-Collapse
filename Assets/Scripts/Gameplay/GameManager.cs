@@ -26,6 +26,7 @@ namespace Gameplay
             SetupGame((uint)UnityEngine.Random.Range(1, 100_000_000)); // TODO: Call from proper place, or maybe this is fine?
             
             Events.OnCapitolDestroyed += OnCapitolDestroyed;
+            Events.OnFinalBossDeafeted += SetGameOver;
             
             GetSceneManager().Forget();
         }
@@ -33,6 +34,7 @@ namespace Gameplay
         private void OnDisable()
         {
             Events.OnCapitolDestroyed -= OnCapitolDestroyed;
+            Events.OnFinalBossDeafeted -= SetGameOver;
             sceneTransitionManager.OnSceneBeginChange -= OnBeginSceneChange;
             Pool.Clear();
         }
@@ -51,10 +53,15 @@ namespace Gameplay
         
         private void OnCapitolDestroyed(DistrictData destroyedDistrict)
         {
+            SetGameOver();
+        }
+        
+        private void SetGameOver()
+        {
             IsGameOver = true;
             PersistantGameStats.SaveCurrentGameStats();
         }
-
+        
         public void SetupGame(uint seed)
         {
             IsGameOver = false;

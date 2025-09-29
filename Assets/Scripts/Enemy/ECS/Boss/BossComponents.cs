@@ -6,7 +6,6 @@ namespace Enemy.ECS.Boss
     {
         public int SpawnPointIndex;
         public int BossIndex;
-        public bool IsFinal;
     }
 
     public struct WinOnDeathTag : IComponentData { }

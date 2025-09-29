@@ -3465,6 +3465,9 @@ MonoBehaviour:
   gameOverPanelPrefab: {fileID: 771872902865767285, guid: fb08c264a5895f04f93a0db9baf21105,
     type: 3}
   gameOverDelay: 2
+  victoryPanelPrefab: {fileID: 771872902865767285, guid: a742fa70b464d384c95c48ccd7d78812,
+    type: 3}
+  victoryDelay: 2
 --- !u!1 &304523226
 GameObject:
   m_ObjectHideFlags: 0
@@ -6457,12 +6460,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 565000690}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1411626119}
+  m_Father: {fileID: 1531255970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &565000692
 MonoBehaviour:
@@ -13772,7 +13775,6 @@ Transform:
   - {fileID: 1843548455}
   - {fileID: 523026462}
   - {fileID: 1292415805}
-  - {fileID: 565000691}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1416224650
@@ -14516,6 +14518,7 @@ Transform:
   m_Children:
   - {fileID: 491554920}
   - {fileID: 1388225832}
+  - {fileID: 565000691}
   m_Father: {fileID: 1411626119}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1544124688
@@ -19312,7 +19315,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 42eb147ba1b06a04c92f1b3e953f27c4, type: 2}
   - {fileID: 11400000, guid: fe23badb5416a0047a9fff8d174e06cd, type: 2}
   - {fileID: 11400000, guid: c72edacfe17715c41b6e653b8df44e57, type: 2}
-  giveStartingLootData: 1
+  giveStartingLootData: 0
 --- !u!1 &2108250015
 GameObject:
   m_ObjectHideFlags: 0

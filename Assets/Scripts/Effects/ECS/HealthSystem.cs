@@ -91,7 +91,7 @@ namespace Effects.ECS
             
             if (health.Health <= 0)
             {
-                ECB.AddComponent(index, entity, new DeathTag());
+                ECB.AddComponent<DeathTag>(index, entity);
             }
         }
     }

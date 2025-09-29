@@ -2,6 +2,7 @@ using Gameplay.Turns.ECS;
 using Unity.Collections;
 using Effects.ECS.ECB;
 using Unity.Entities;
+using Effects.ECS;
 using Unity.Burst;
 using Unity.Jobs;
 
@@ -81,16 +82,19 @@ namespace Enemy.ECS.Boss
         public void Execute()
         {
             RefRW<SpawnPointComponent> spawnPoint = default;
-            Entity spawnPointEntity = default;
+            Entity spawnPointEntity = Entity.Null;
 
             for (int i = 0; i < SpawnPointEntities.Length; i++)
             {
+                ECB.AddComponent<DeathTag>(SpawnPointEntities[i]);
+                
+                if (spawnPointEntity != Entity.Null) continue;
+                
                 RefRW<SpawnPointComponent> point = SpawnPointComponentLookup.GetRefRW(SpawnPointEntities[i]);
                 if (point.ValueRO.Index != SpawnBossData.SpawnPointIndex) continue;
                 
                 spawnPointEntity = SpawnPointEntities[i];
                 spawnPoint = point;
-                break;
             }
 
             if (spawnPoint.ValueRO.IsSpawning)
@@ -99,16 +103,21 @@ namespace Enemy.ECS.Boss
                 {
                     RefRW<SpawningComponent> point = SpawningComponentLookup.GetRefRW(SpawningEntities[i]);
                     if (point.ValueRO.SpawnPoint != spawnPointEntity) continue;
-                    
                     point.ValueRW = new SpawningComponent
                     {
                         Position = spawnPoint.ValueRO.Position,
                         Random = spawnPoint.ValueRO.Random,
                         EnemyIndex = SpawnBossData.BossIndex,
+                        SpawnPoint = spawnPointEntity,
                         Amount = 1,
                         Turns = 5,
-                        SpawnPoint = spawnPointEntity
                     };
+                    
+                    ECB.AddComponent(SpawningEntities[i], new EnemyAddComponent
+                    {
+                        AddComponents = EnemyAddComponents.WinOnDeath,
+                        OnCluster = true,
+                    });
                     break;
                 }
             }
@@ -121,13 +130,19 @@ namespace Enemy.ECS.Boss
                     Position = spawnPoint.ValueRO.Position,
                     Random = spawnPoint.ValueRO.Random,
                     EnemyIndex = SpawnBossData.BossIndex,
+                    SpawnPoint = spawnPointEntity,
                     Amount = 1,
                     Turns = 5,
-                    SpawnPoint = spawnPointEntity
+                });
+                
+                ECB.AddComponent(spawned, new EnemyAddComponent
+                {
+                    AddComponents = EnemyAddComponents.WinOnDeath,
+                    OnCluster = true,
                 });
             }
             
-            ECB.DestroyEntity(SpawnBossEntity);
+            ECB.AddComponent<DeathTag>(SpawnBossEntity);
         }
     }
 }

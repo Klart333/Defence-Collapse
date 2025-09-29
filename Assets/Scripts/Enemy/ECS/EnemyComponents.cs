@@ -1,3 +1,4 @@
+using System;
 using Unity.Mathematics;
 using Unity.Entities;
 using Pathfinding;
@@ -32,5 +33,17 @@ namespace Enemy.ECS
     public struct UpdateClusterAttackingComponent : IComponentData
     {
         public int Count;
+    }
+
+    public struct EnemyAddComponent : IComponentData
+    {
+        public EnemyAddComponents AddComponents;
+        public bool OnCluster;
+    }
+
+    [Flags]
+    public enum EnemyAddComponents
+    {
+        WinOnDeath = 1 << 0,
     }
 }

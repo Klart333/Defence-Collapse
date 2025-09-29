@@ -364,7 +364,6 @@ namespace Effects
                     {
                         Damage = lightningDamage,
                         Bounces = lightningBounces,
-                        Radius = 1,
                     });
                 }
             

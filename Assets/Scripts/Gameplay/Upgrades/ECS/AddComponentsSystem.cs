@@ -1,11 +1,12 @@
 using Unity.Collections;
+using Effects.ECS.ECB;
 using Unity.Entities;
 using Effects.ECS;
 using Unity.Burst;
 
 namespace Gameplay.Upgrades.ECS
 {
-    [UpdateBefore(typeof(CollisionSystem)), BurstCompile]
+    [BurstCompile, UpdateBefore(typeof(CollisionSystem))]
     public partial struct AddComponentsSystem : ISystem 
     {
         private EntityQuery componentQuery;
@@ -13,41 +14,33 @@ namespace Gameplay.Upgrades.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<AddComponentInitComponent>();
-            state.RequireForUpdate(state.GetEntityQuery(builder));
-
-            EntityQueryBuilder builder2 = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<AddComponentComponent>();
-            componentQuery = state.GetEntityQuery(builder2);
+            componentQuery = SystemAPI.QueryBuilder().WithAll<AddComponentComponent>().Build();
+            
+            state.RequireForUpdate<BeforeCollisionECBSystem.Singleton>();
+            state.RequireForUpdate(SystemAPI.QueryBuilder().WithAll<AddComponentInitComponent>().Build());
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            var ecbSingleton = SystemAPI.GetSingleton<BeforeCollisionECBSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
             if (componentQuery.IsEmpty)
             {
-                state.Dependency = new RemoveTagJob
+                new RemoveTagJob
                 {
                     ECB = ecb.AsParallelWriter(),
-                }.ScheduleParallel(state.Dependency);
-                
-                state.Dependency.Complete();
-                ecb.Playback(state.EntityManager);
-                ecb.Dispose();
+                }.ScheduleParallel();
                 return;
             }
             
             NativeArray<AddComponentComponent> components = componentQuery.ToComponentDataArray<AddComponentComponent>(Allocator.TempJob);
-            state.Dependency = new AddComponentJob
+            new AddComponentJob
             {
                 AddComponents = components,
                 ECB = ecb.AsParallelWriter(),
-            }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
-            components.Dispose();
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
@@ -60,7 +53,7 @@ namespace Gameplay.Upgrades.ECS
     [BurstCompile]
     public partial struct AddComponentJob : IJobEntity
     {
-        [ReadOnly]
+        [ReadOnly, DeallocateOnJobCompletion]
         public NativeArray<AddComponentComponent> AddComponents;
 
         public EntityCommandBuffer.ParallelWriter ECB;
@@ -76,7 +69,7 @@ namespace Gameplay.Upgrades.ECS
                 switch (component.ComponentType)
                 {
                     case UpgradeComponentType.MoneyOnDeath: ECB.AddComponent(sortKey, entity, new MoneyOnDeathComponent { Amount = component.Strength }); break;
-                    case UpgradeComponentType.Lightning: ECB.AddComponent(sortKey, entity, new LightningComponent { Bounces = (int)component.Strength, Damage = component.Strength * 5, Radius = 1}); break;
+                    case UpgradeComponentType.Lightning: ECB.AddComponent(sortKey, entity, new LightningComponent { Bounces = (int)component.Strength, Damage = component.Strength * 5}); break;
                     case UpgradeComponentType.Poison: ECB.AddComponent(sortKey, entity, new PoisonComponent { TotalDamage = component.Strength }); break;
                     case UpgradeComponentType.Fire: ECB.AddComponent(sortKey, entity, new FireComponent { TotalDamage = component.Strength }); break;
                     case UpgradeComponentType.Explosion: ECB.AddComponent(sortKey, entity, new ExplosionComponent()); break;

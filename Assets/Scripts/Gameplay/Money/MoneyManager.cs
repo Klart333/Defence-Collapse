@@ -4,8 +4,11 @@ using Unity.Entities;
 using UnityEngine;
 using System;
 using Buildings;
+using Cysharp.Threading.Tasks;
 using Effects;
+using Enemy.ECS;
 using Juice;
+using Unity.Collections;
 
 namespace Gameplay.Money
 {
@@ -17,7 +20,7 @@ namespace Gameplay.Money
         [SerializeField]
         private int startingMoney = 10;
 
-        [ReadOnly, SerializeField]
+        [Sirenix.OdinInspector.ReadOnly, SerializeField]
         private float money = 0;
 
         [Title("District Info")]
@@ -33,7 +36,9 @@ namespace Gameplay.Money
         private bool verbose = true;
         
         private EntityManager entityManager;
-        private Entity moneyEntity;
+        private EntityQuery moneyToAddQuery;
+
+        private bool readingMoneyData;
         
         public float Money => money;
         public Stat MoneyMultiplier { get; private set; }
@@ -41,8 +46,7 @@ namespace Gameplay.Money
         private void OnEnable()
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            moneyEntity = entityManager.CreateEntity(); 
-            entityManager.AddComponent<MoneyToAddComponent>(moneyEntity);
+            moneyToAddQuery = entityManager.CreateEntityQuery(typeof(MoneyToAddComponent));
 
             MoneyMultiplier = new Stat(1);
             money = startingMoney;
@@ -55,19 +59,50 @@ namespace Gameplay.Money
                 return;
             }
             
-            float amount = entityManager.GetComponentData<MoneyToAddComponent>(moneyEntity).Money;
-            if (amount > 0)
-            {
-                AddMoney(amount);
-                entityManager.SetComponentData(moneyEntity, new MoneyToAddComponent { Money = 0 });
-            }
-            
+            GetMoneyToAdd().Forget();
+
             if (Input.GetKeyDown(KeyCode.M))
             {
                 AddMoneyDebug();
             }
         }
 
+        private async UniTaskVoid GetMoneyToAdd()
+        {
+            if (readingMoneyData)
+            {
+                return;
+            }
+            
+            readingMoneyData = true;
+            NativeList<MoneyToAddComponent> array = moneyToAddQuery.ToComponentDataListAsync<MoneyToAddComponent>(Allocator.TempJob, out var awaitJobHandle);
+            awaitJobHandle.Complete();
+            while (!awaitJobHandle.IsCompleted)
+            {
+                await UniTask.Yield();
+            }
+            readingMoneyData = false;
+            
+            if (!array.IsCreated) return;
+            
+            if (array.Length == 0)
+            {
+                array.Dispose();
+                return;
+            }
+
+            float total = 0;
+            foreach (MoneyToAddComponent data in array)
+            {
+                total += data.Money;
+            }
+            
+            AddMoney(total);
+            
+            array.Dispose();
+            entityManager.DestroyEntity(moneyToAddQuery);
+        }
+        
         public bool CanPurchase(DistrictType districtType, int districtAmount, out float cost)
         {
             cost = districtCostUtility.GetCost(districtType, districtAmount);
