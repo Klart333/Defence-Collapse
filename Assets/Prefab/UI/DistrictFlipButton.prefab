@@ -478,6 +478,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   districtButton: {fileID: 7810715764767419126}
+  visualElement: {fileID: 1048735747810059150}
+  defaultColor:
+    Mode: 1
+    ConstantValue: {r: 0, g: 0, b: 0, a: 0}
+    Variable: {fileID: 11400000, guid: bc5b6f93095aa15458a6f3d7573e367e, type: 2}
+    VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
+  placingColor:
+    Mode: 1
+    ConstantValue: {r: 0, g: 0, b: 0, a: 0}
+    Variable: {fileID: 11400000, guid: b621be65952b801419750767137ceb7b, type: 2}
+    VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
+  colorAnimationDuration: 0.4
+  colorAnimationEase: 4
 --- !u!114 &7810715764767419126 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 604264079844408855, guid: ec4731a09368da74080b0ab071ae4c64,

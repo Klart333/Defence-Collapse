@@ -242,10 +242,11 @@ namespace Buildings
 
         public void Display(BuildingType type, GroundType groundBuildable, IsTileBuildable buildable)
         {
+            focusManager.RegisterFocus(focus);
+            
             buildableGroundType = groundBuildable;
             currentType = type;
             displaying = true;
-            focusManager.RegisterFocus(focus);
             
             OnTileEntered = buildable; 
         }
@@ -254,10 +255,10 @@ namespace Buildings
         {
             if (!displaying) return;
             
+            OnCancelPlacement?.Invoke();
+            
             displaying = false;
             UnSelect();
-            
-            OnCancelPlacement?.Invoke();
         }
 
         public bool GetIsDisplaying(out BuildingType placingType)

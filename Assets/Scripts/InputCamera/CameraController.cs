@@ -7,7 +7,9 @@ using Gameplay.Event;
 using InputCamera.ECS;
 using Sirenix.OdinInspector;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace InputCamera
 {
@@ -35,10 +37,10 @@ namespace InputCamera
         private float zoomSensitivity = 1f;
 
         [SerializeField]
-        private float minZoomDistance = 1f;
+        private float minZoomHeight = 1f;
 
         [SerializeField]
-        private float maxZoomDistance = 100f;
+        private float maxZoomHeight = 40;
 
         [Title("Pan Settings")]
         [SerializeField]
@@ -138,10 +140,19 @@ namespace InputCamera
             // Raycast-based zoom (towards what the camera is pointing at)
             Vector3 groundPos = Utility.Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
             Vector3 directionToTarget = (transform.position - groundPos).normalized;
-            float currentDistance = Vector3.Distance(transform.position, groundPos);
-            float newDistance = Mathf.Clamp(currentDistance - zoomAmount, minZoomDistance, maxZoomDistance);
+            float distance = Vector3.Distance(transform.position, groundPos);
+            float hypotenuse = distance - zoomAmount;
+            Vector3 targetPosition = groundPos + directionToTarget * hypotenuse;
+            if (targetPosition.y > maxZoomHeight)
+            {
+                targetPosition.y = maxZoomHeight;
+            }
+            else if (targetPosition.y < minZoomHeight)
+            {
+                targetPosition.y = minZoomHeight;
+            }
 
-            transform.position = groundPos + directionToTarget * newDistance;
+            transform.position = targetPosition;
         }
 
         private void HandleRotation()
@@ -149,14 +160,13 @@ namespace InputCamera
             float rotateInput = inputManager.Rotate.ReadValue<float>();
             if (rotateInput == 0) return;
 
-            Vector3 currentMousePoint = Utility.Math.GetGroundIntersectionPoint(controlledCamera, Mouse.current.position.ReadValue());
-            if (currentMousePoint == Vector3.zero) return;
+            Vector3 groundPos = Utility.Math.GetGroundIntersectionPoint(transform.position, transform.forward);
+            if (groundPos == Vector3.zero) return;
 
             float rotationAmount = rotationSpeed * Time.deltaTime * (inputManager.Shift.IsPressed() ? fastMoveMultiplier : 1f);
             float yaw = rotateInput * rotationAmount;
 
-            transform.RotateAround(currentMousePoint, Vector3.up, yaw);
-            //transform.LookAt(currentMousePoint);
+            transform.RotateAround(groundPos, Vector3.up, yaw);
         }
 
         private void StartPan(InputAction.CallbackContext obj)
@@ -206,8 +216,7 @@ namespace InputCamera
             IsDragging = true;
             transform.position += delta * 0.5f;
         }
-
-
+        
         private void OnGameReset()
         {
             IsDragging = false;

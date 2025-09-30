@@ -63,6 +63,19 @@ namespace Utility
             return Vector3.zero;
         }
         
+        public static Vector3 GetGroundIntersectionPoint(Vector3 pos, Vector3 dir)
+        {
+            Ray ray = new Ray(pos, dir);
+            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+
+            if (groundPlane.Raycast(ray, out float distance))
+            {
+                return ray.GetPoint(distance);
+            }
+
+            return Vector3.zero;
+        }
+        
         public static Vector2 RotateVector2(Vector2 vector, float angle)
         {
             float x = vector.x * math.cos(angle) - vector.y * math.sin(angle);

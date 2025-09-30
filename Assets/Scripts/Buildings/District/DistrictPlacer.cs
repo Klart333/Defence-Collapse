@@ -59,7 +59,6 @@ namespace Buildings.District
         
         private void OnEnable()
         {
-            UIEvents.OnFocusChanged += CancelPlacement;
             Events.OnDistrictClicked += DistrictClicked;
             Events.OnDistrictLimitReached += CancelPlacement;
             
@@ -77,7 +76,6 @@ namespace Buildings.District
         {
             Events.OnDistrictLimitReached -= CancelPlacement;
             Events.OnDistrictClicked -= DistrictClicked;
-            UIEvents.OnFocusChanged -= CancelPlacement;
             
             tileBuilder.OnCancelPlacement -= CancelPlacement;
             tileBuilder.OnTilePressed -= OnTilePressed;
@@ -97,7 +95,7 @@ namespace Buildings.District
 
         private void DistrictClicked(TowerData towerData)
         {
-            if (tileBuilder.GetIsDisplaying(out BuildingType type) && type.HasFlag(BuildingType.District))
+            if (this.towerData == towerData && tileBuilder.GetIsDisplaying(out BuildingType type) && type.HasFlag(BuildingType.District))
             {
                 CancelPlacement();
                 return;
@@ -151,8 +149,7 @@ namespace Buildings.District
 
         private void CancelPlacement()
         {
-            tileBuilder.GetIsDisplaying(out BuildingType type);
-            if (!type.HasFlag(BuildingType.District))
+            if (!tileBuilder.GetIsDisplaying(out BuildingType type) || !type.HasFlag(BuildingType.District))
             {
                 return;
             }

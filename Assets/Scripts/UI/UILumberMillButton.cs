@@ -18,6 +18,9 @@ namespace UI
         private UIDistrictButton districtButton;
 
         [SerializeField]
+        private UIDistrictToggleButton toggleButton;
+        
+        [SerializeField]
         private TowerData lumbermillData;
         
         private FocusManager focusManager;
@@ -78,6 +81,8 @@ namespace UI
         {
             displaying = false;
             focusManager.UnregisterFocus(focus);
+            
+            toggleButton.Hide();
         }
     }
 }
