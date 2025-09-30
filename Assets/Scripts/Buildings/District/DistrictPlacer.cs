@@ -24,16 +24,17 @@ namespace Buildings.District
         private DistrictGenerator districtGenerator;
         
         [SerializeField]
-        private BuildingManager buildingGenerator;
-        
-        [SerializeField]
         private GroundGenerator groundGenerator;
         
         [SerializeField]
         private DistrictHandler districtHandler;
         
+        [Title("Building")]
         [SerializeField]
-        private BuildingPlacer buildingPlacer;
+        private BuildingManager buildingGenerator;
+        
+        [SerializeField]
+        private BuildingHandler buildingHandler;
         
         [Title("Cost")]
         [SerializeField]
@@ -143,6 +144,7 @@ namespace Buildings.District
                     PlaceDistrict(index).Forget();
                     break;
                 case TileAction.Sell:
+                    SellDistrict(index);
                     break;
             }
         }
@@ -198,6 +200,17 @@ namespace Buildings.District
             {
                 CancelPlacement();
             }
+        }
+        
+        private void SellDistrict(ChunkIndex index)
+        {
+            int amount = districtHandler.GetDistrictAmount(towerData.DistrictType) - 1;
+            float cost = districtCostData.GetCost(towerData.DistrictType, amount);
+            
+            Vector3 pos = ChunkWaveUtility.GetPosition(index, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize) + groundGenerator.ChunkWaveFunction.CellSize.XyZ(0) / 2.0f;
+            moneyManager.AddMoneyParticles(cost, pos);
+            
+            buildingHandler.BuildingDestroyed(index);
         }
     }
 }

@@ -22,14 +22,12 @@ namespace Gameplay
         private float slowDownDuration = 1.0f;
         
         private InputManager inputManager;
-        private Modifier speedUpModifier2;
         private Modifier speedUpModifier;
         private Tween slowDownTween;
         private Stat gameSpeedStat;
         
         private EntityManager entityManager;
         private Entity gameSpeedEntity;
-        
         
         public float Value => gameSpeedStat.Value;
 
@@ -43,7 +41,6 @@ namespace Gameplay
                 Value = speedySpeed,
                 Type = Modifier.ModifierType.Multiplicative,
             };
-            speedUpModifier2 = new Modifier(speedUpModifier);
         }
 
         private void OnEnable()
@@ -61,8 +58,6 @@ namespace Gameplay
         private async UniTaskVoid GetInputManager()
         {
             inputManager = await InputManager.Get();
-            inputManager.Space.started += SpaceStarted;
-            inputManager.Space.canceled += SpaceCanceled;
             inputManager.Shift.started += ShiftStarted;
             inputManager.Shift.canceled += ShiftCanceled;
         }
@@ -72,33 +67,19 @@ namespace Gameplay
             Events.OnCapitolDestroyed -= OnCapitolDestroyed;
             Events.OnGameReset -= OnGameReset;
             
-            inputManager.Space.started -= SpaceStarted;
-            inputManager.Space.canceled -= SpaceCanceled;
             inputManager.Shift.started -= ShiftStarted;
             inputManager.Shift.canceled -= ShiftCanceled;
         }
 
-        private void SpaceStarted(InputAction.CallbackContext obj)
+        private void ShiftStarted(InputAction.CallbackContext obj)
         {
             gameSpeedStat.AddModifier(speedUpModifier);
             entityManager.SetComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
         }
 
-        private void SpaceCanceled(InputAction.CallbackContext obj)
-        {
-            gameSpeedStat.RemoveModifier(speedUpModifier);
-            entityManager.SetComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
-        }
-
-        private void ShiftStarted(InputAction.CallbackContext obj)
-        {
-            gameSpeedStat.AddModifier(speedUpModifier2);
-            entityManager.SetComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
-        }
-
         private void ShiftCanceled(InputAction.CallbackContext obj)
         {
-            gameSpeedStat.RemoveModifier(speedUpModifier2);
+            gameSpeedStat.RemoveModifier(speedUpModifier);
             entityManager.SetComponentData(gameSpeedEntity, new GameSpeedComponent { Speed = Value });
         }
         

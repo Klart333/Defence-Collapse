@@ -10,6 +10,7 @@ using UnityEngine;
 using InputCamera;
 using Utility;
 using System;
+using Gameplay.Event;
 using Juice;
 
 namespace Buildings
@@ -58,8 +59,10 @@ namespace Buildings
                 FocusType = FocusType.Placing,
                 ChangeType = FocusChangeType.Unique,
             };
+            
+            Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
         }
-
+        
         private async UniTaskVoid GetInput()
         {
             inputManager = await InputManager.Get();
@@ -81,6 +84,8 @@ namespace Buildings
         
         private void OnDisable()
         {
+            Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
+            
             buildingManager.OnLoaded -= InitializeSpawnPlaces;
             inputManager.Cancel.performed -= CancelPerformed;
             inputManager.Fire.started -= MouseOnDown;
@@ -206,6 +211,7 @@ namespace Buildings
             if (!CameraController.IsDragging && pressedTile.HasValue && selectedTile.Equals(pressedTile))
             {
                 OnTilePressed?.Invoke(pressedTile.Value, pendingAction);
+                selectedTile = null;
             }
             
             pressedTile = null;
@@ -216,12 +222,22 @@ namespace Buildings
             pressedTile = selectedTile;
         }
         
+        private void OnBuiltIndexDestroyed(ChunkIndex chunkIndex)
+        {
+            Tiles[chunkIndex] = 0;
+        }
+        
         private void CancelPerformed(InputAction.CallbackContext obj)
         {
             if (displaying)
             {
                 CancelDisplay();
             }
+        }
+
+        public void CancelDisplay()
+        {
+            focusManager.UnregisterFocus(focus);
         }
 
         public void Display(BuildingType type, GroundType groundBuildable, IsTileBuildable buildable)
@@ -232,11 +248,6 @@ namespace Buildings
             focusManager.RegisterFocus(focus);
             
             OnTileEntered = buildable; 
-        }
-
-        public void CancelDisplay()
-        {
-            focusManager.UnregisterFocus(focus);
         }
 
         private void Hide()

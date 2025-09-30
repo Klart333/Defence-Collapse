@@ -2,7 +2,6 @@
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Gameplay.Event;
-using Gameplay.Money;
 using UnityEngine;
 using System;
 
@@ -105,7 +104,6 @@ namespace Buildings
 
         private void RemoveBuilding(ChunkIndex index)
         {
-            tileBuilder.Tiles[index] = 0;
             
             buildingHandler.BuildingDestroyed(index);
         }

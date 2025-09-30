@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Buildings.District.ECS;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using WaveFunctionCollapse;
 using Sirenix.Utilities;
 using Unity.Collections;
@@ -20,10 +19,15 @@ namespace Buildings.District
     {
         public event Action<DistrictData> OnDistrictDisplayed;
         public event Action<DistrictData> OnDistrictCreated;
+        public event Action OnDistrictAmountChanged;
         
         [Title("District")]
         [SerializeField]
         private DistrictGenerator districtGenerator;
+        
+        [Title("References")]
+        [SerializeField]
+        private GroundGenerator groundGenerator;
         
         [Title("Debug")]
         public bool IsDebug;
@@ -42,7 +46,7 @@ namespace Buildings.District
         private void OnEnable()
         {
             districtGenerator.OnDistrictChunkRemoved += OnDistrictChunkRemoved;
-            Events.OnWallsDestroyed += OnWallsDestroyed;
+            Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
             Events.OnDistrictBuilt += OnDistrictBuilt;
             Events.OnTurnIncreased += OnTurnIncreased;
             Events.OnGameReset += OnGameReset;
@@ -53,7 +57,7 @@ namespace Buildings.District
 
         private void OnDisable()
         {
-            Events.OnWallsDestroyed -= OnWallsDestroyed;
+            Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
             Events.OnDistrictBuilt -= OnDistrictBuilt;
             Events.OnTurnIncreased -= OnTurnIncreased;
             Events.OnGameReset -= OnGameReset;
@@ -82,16 +86,11 @@ namespace Buildings.District
         {
             foreach (DistrictData districtData in UniqueDistricts.Values)
             {
-                if (districtData.OnDistrictChunkRemoved(chunk))
+                if (districtData.RemoveDistrictChunk(new List<QueryChunk> { chunk as QueryChunk }))
                 {
                     break;
                 }
             }
-        }
-
-        private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
-        {
-            districtGenerator.AddAction(async () => await districtGenerator.RemoveChunks(chunkIndexes));
         }
         
         private void OnTurnIncreased(int increase, int total)
@@ -311,14 +310,72 @@ namespace Buildings.District
             return districts.TryGetValue(index, out districtData);
         }
         
+        private void OnBuiltIndexDestroyed(ChunkIndex chunkIndex)
+        {
+            if (!TryGetDistrictChunks(chunkIndex, out List<QueryChunk> districtChunks, out DistrictData districtData))
+            {
+                return;
+            }
+            
+            RemoveDistrictAmount(districtData);
+            districtData.RemoveDistrictChunk(districtChunks);
+            
+            HashSet<ChunkIndex> buildingIndexes = new HashSet<ChunkIndex>();
+            foreach (QueryChunk chunk in districtChunks)
+            {
+                if (districtGenerator.TryGetBuildingCell(chunk.ChunkIndex, out ChunkIndex buildingIndex))
+                {
+                    buildingIndexes.Add(buildingIndex);
+                }
+            }
+            districtGenerator.AddAction(async () => await districtGenerator.RemoveChunks(buildingIndexes));
+        }
+
+        private bool TryGetDistrictChunks(ChunkIndex groundIndex, out List<QueryChunk> queryChunks, out DistrictData districtData)
+        {
+            queryChunks = new List<QueryChunk>();
+            Vector3 pos = ChunkWaveUtility.GetPosition(groundIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize)
+                          + groundGenerator.ChunkWaveFunction.CellSize.XyZ() / 2.0f;
+            districtData = null;
+            
+            for (int i = 0; i < WaveFunctionUtility.DiagonalNeighbourDirections.Length; i++)
+            {
+                int2 direction = WaveFunctionUtility.DiagonalNeighbourDirections[i];
+                Vector3 cornerPosition = pos + (Vector3)direction.MultiplyByAxis(districtGenerator.ChunkScale.XZ() / 2.0f).XyZ(0); 
+                int3 districtIndex = ChunkWaveUtility.GetDistrictIndex3(cornerPosition, districtGenerator.ChunkScale);
+                districtIndex.y = 0;
+                
+                while (districtGenerator.ChunkWaveFunction.Chunks.TryGetValue(districtIndex, out QueryChunk chunk))
+                {
+                    queryChunks.Add(chunk);
+                    if (chunk.IsTop) break;
+                    
+                    districtIndex = chunk.AdjacentChunks[2].ChunkIndex;
+                }
+
+                if (districtData == null)
+                {
+                    districts.TryGetValue(districtIndex.xz, out districtData);
+                }
+            }
+            
+            return queryChunks.Count > 0;
+        }
+
         private void OnDistrictBuilt(TowerData towerData)
         {
-            if (!districtAmounts.TryAdd(towerData.DistrictType, 1))
-            {
-                districtAmounts[towerData.DistrictType]++;
-            }
+            if (districtAmounts.TryAdd(towerData.DistrictType, 1)) return;
+            
+            districtAmounts[towerData.DistrictType]++;
+            OnDistrictAmountChanged?.Invoke();
         }
-        
+
+        private void RemoveDistrictAmount(DistrictData districtData)
+        {
+            districtAmounts[districtData.TowerData.DistrictType]--;
+            OnDistrictAmountChanged?.Invoke();
+        }
+
         public int GetDistrictAmount(DistrictType districtType)
         {
             return districtAmounts.GetValueOrDefault(districtType, 0);

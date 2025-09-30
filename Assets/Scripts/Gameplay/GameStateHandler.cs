@@ -28,8 +28,8 @@ namespace Gameplay
         private EntityManager entityManager;
         private EntityQuery winOnDeathQuery;
         
-        private bool winOnDeathSpawned = false;
-        private bool checkForWinOnDeath = false;
+        private bool winOnDeathSpawned;
+        private bool checkForWinOnDeath;
         
         private void OnEnable()
         {

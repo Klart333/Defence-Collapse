@@ -6033,6 +6033,7 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   districtGenerator: {fileID: 1551488502}
+  groundGenerator: {fileID: 1024001993}
   IsDebug: 0
 --- !u!114 &491554923
 MonoBehaviour:
@@ -6934,10 +6935,10 @@ MonoBehaviour:
     SerializationNodes: []
   tileBuilder: {fileID: 523026463}
   districtGenerator: {fileID: 1551488502}
-  buildingGenerator: {fileID: 771210304}
   groundGenerator: {fileID: 1024001993}
   districtHandler: {fileID: 491554922}
-  buildingPlacer: {fileID: 604477866}
+  buildingGenerator: {fileID: 771210304}
+  buildingHandler: {fileID: 231546246}
   costText: {fileID: 104919697}
   districtCostData: {fileID: 11400000, guid: a6d3084868d171045b5e0972b383d96e, type: 2}
   affordableColor: {r: 0.40156865, g: 1, b: 0.2999999, a: 1}

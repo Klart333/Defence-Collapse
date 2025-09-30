@@ -22,7 +22,6 @@ namespace Gameplay.Event
         public static EventAction<int, int> OnTurnIncreased;
         public static EventAction OnTurnComplete;
 
-        public static EventAction<List<ChunkIndex>> OnWallsDestroyed;
         public static EventAction<ChunkIndex> OnBuiltIndexDestroyed;
         public static EventAction<DistrictData> OnCapitolDestroyed;
         public static EventAction OnFinalBossDeafeted;

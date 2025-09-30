@@ -256,30 +256,6 @@ namespace Buildings
             buildingManager.RevertQuery();
             districtGenerator.RevertQuery();
             
-            if (!Buildings.Remove(chunkIndex, out HashSet<Building> buildings))
-            {
-                Debug.LogError("Could not find building");
-                WallStates.Remove(chunkIndex);
-                Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
-                return;
-            }
-
-            List<ChunkIndex> destroyedIndexes = new List<ChunkIndex>();
-            foreach (Building building in buildings)
-            {
-                if (buildingManager.GetSurroundingMarchedIndexes(building.ChunkIndex).Any(x => !x.Equals(chunkIndex)))
-                {
-                    continue;
-                }
-                
-                destroyedIndexes.Add(building.ChunkIndex);
-            }
-
-            if (destroyedIndexes.Count > 0)
-            {
-                Events.OnWallsDestroyed?.Invoke(destroyedIndexes);
-            }
-
             WallStates.Remove(chunkIndex);
             Events.OnBuiltIndexDestroyed?.Invoke(chunkIndex);
         }

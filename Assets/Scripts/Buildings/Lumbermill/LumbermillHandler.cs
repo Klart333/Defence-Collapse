@@ -58,11 +58,11 @@ namespace Buildings.Lumbermill
             void StateOnOnStatisticsChanged()
             {
                 HashSet<ChunkIndex> chunkIndexes = new HashSet<ChunkIndex>();
-                foreach (KeyValuePair<int3, QueryChunk> kvp in districtData.DistrictChunks)
+                foreach (int3 index in districtData.DistrictChunks.Keys)
                 {
-                    if (districtGenerator.TryGetBuildingCell(kvp.Key, out ChunkIndex index))
+                    if (districtGenerator.TryGetBuildingCell(index, out ChunkIndex chunkIndex))
                     {
-                        chunkIndexes.Add(index);
+                        chunkIndexes.Add(chunkIndex);
                     }
                 }
                 bool isComplete = state.TurnsUntilComplete <= 0;

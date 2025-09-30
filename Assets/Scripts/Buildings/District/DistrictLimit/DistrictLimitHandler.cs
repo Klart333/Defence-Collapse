@@ -5,11 +5,14 @@ using Gameplay.Event;
 using Sirenix.OdinInspector;
 using Unity.Entities;
 using UnityEngine;
+using WaveFunctionCollapse;
 
 namespace Buildings.District.DistrictLimit
 {
     public class DistrictLimitHandler : MonoBehaviour
     {
+        public event Action<int> DistrictsBuiltChanged;
+        
         [Title("References")]
         [SerializeField]
         private UIDistrictLimitDisplay districtLimitDisplay;
@@ -23,36 +26,62 @@ namespace Buildings.District.DistrictLimit
 
         private EntityManager entityManager;
         
+        private bool districtLimitReached;
         private bool spawnedBossData;
         private int districtsBuilt;
         
         private void OnEnable()
         {
-            Events.OnDistrictBuilt += OnDistrictBuilt;
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;            
+            
+            Events.OnDistrictBuilt += OnDistrictBuilt;
+            Events.OnBuiltIndexDestroyed += OnBuiltIndexDestroyed;
         }
 
         private void OnDisable()
         {
             Events.OnDistrictBuilt -= OnDistrictBuilt;
+            Events.OnBuiltIndexDestroyed -= OnBuiltIndexDestroyed;
         }
 
         private void OnDistrictBuilt(TowerData towerData)
         {
-            if (towerData.DistrictType == DistrictType.TownHall)
+            switch (towerData.DistrictType)
             {
-                districtLimitDisplay.DisplaySegments(districtLimit);
-                return;
+                case DistrictType.Lumbermill:
+                    return;
+                case DistrictType.TownHall:
+                    districtLimitDisplay.DisplaySegments(this, districtLimit);
+                    return;
             }
 
             districtsBuilt++;
+            DistrictsBuiltChanged?.Invoke(1);
+            
             if (districtsBuilt < districtLimit) return;
             
-            Debug.Log("District limit reached");
+            districtLimitReached = true;
             Events.OnDistrictLimitReached?.Invoke();
             if (!spawnedBossData)
             {
                 SpawnBossData();
+            }
+        }
+        
+        private void OnBuiltIndexDestroyed(ChunkIndex arg0)
+        {
+            districtsBuilt--;
+            DistrictsBuiltChanged?.Invoke(-1);
+
+            if (districtLimitReached)
+            {
+                districtLimitReached = false;
+                Events.OnDistrictLimitUnReached?.Invoke();
+            }
+            
+            if (districtsBuilt < 0)
+            {
+                Debug.LogWarning("District limit should never be negative: " + districtsBuilt);
             }
         }
 

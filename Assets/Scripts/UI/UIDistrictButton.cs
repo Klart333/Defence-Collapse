@@ -1,9 +1,7 @@
 using Sirenix.OdinInspector;
 using Buildings.District;
-using UnityEngine.UI;
 using UnityEngine;
 using Gameplay;
-using Gameplay.Event;
 using TMPro;
 
 namespace UI
@@ -25,14 +23,9 @@ namespace UI
 
         private DistrictType districtType;
 
-        private void OnEnable()
-        {
-            Events.OnDistrictBuilt += OnDistrictBuilt;
-        }
-
         private void OnDisable()
         {
-            Events.OnDistrictBuilt -= OnDistrictBuilt;
+            districtHandler.OnDistrictAmountChanged -= UpdateCostText;
         }
 
         public void Setup(DistrictHandler districtHandler, TowerData towerData)
@@ -44,11 +37,8 @@ namespace UI
             districtIcon.DisplayDistrict(towerData, null);
             
             UpdateCostText();
-        }
-        
-        private void OnDistrictBuilt(TowerData _)
-        {
-            UpdateCostText();
+
+            districtHandler.OnDistrictAmountChanged += UpdateCostText;
         }
 
         private void UpdateCostText()

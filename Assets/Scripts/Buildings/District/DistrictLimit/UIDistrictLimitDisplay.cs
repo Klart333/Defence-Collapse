@@ -7,6 +7,7 @@ using DG.Tweening;
 using UnityEngine;
 using Variables;
 using System;
+using Unity.Mathematics;
 
 namespace Buildings.District.DistrictLimit
 {
@@ -38,15 +39,22 @@ namespace Buildings.District.DistrictLimit
         
         private List<Image> spawnedSegments = new List<Image>();
         
+        private DistrictLimitHandler limitHandler;
+        
         private int currentSegment;
         
         private void OnDisable()
         {
-            Events.OnDistrictBuilt -= OnDistrictBuilt;
+            if (limitHandler)
+            {
+                limitHandler.DistrictsBuiltChanged -= OnDistrictsBuiltChanged;
+            }
         }
 
-        public void DisplaySegments(int amount)
+        public void DisplaySegments(DistrictLimitHandler handler, int amount)
         {
+            limitHandler = handler;
+            
             float delay = (totalAnimationDuration - segmentColorAnimationDuration) / (amount - 1);
             for (int i = 0; i < amount; i++)
             {
@@ -56,10 +64,28 @@ namespace Buildings.District.DistrictLimit
                 spawnedSegments.Add(segment);
             }
             
-            Events.OnDistrictBuilt += OnDistrictBuilt;
+            limitHandler.DistrictsBuiltChanged += OnDistrictsBuiltChanged;
         }
         
-        private void OnDistrictBuilt(TowerData towerData)
+        private void OnDistrictsBuiltChanged(int changeAmount)
+        {
+            if (changeAmount > 0)
+            {
+                for (int i = 0; i < changeAmount; i++)
+                {
+                    IncreaseSegment();
+                }
+            }
+            else
+            {
+                for (int i = 0; i < math.abs(changeAmount); i++)
+                {
+                    DecreaseSegment();
+                }
+            }
+        }
+        
+        private void IncreaseSegment()
         {
             if (currentSegment >= spawnedSegments.Count)
             {
@@ -68,6 +94,17 @@ namespace Buildings.District.DistrictLimit
             
             AnimateColor(spawnedSegments[currentSegment], highlightedSegmentColor.Value);
             currentSegment++;
+        }
+        
+        private void DecreaseSegment()
+        {
+            if (currentSegment <= 0)
+            {
+                return;
+            }
+            
+            currentSegment--;
+            AnimateColor(spawnedSegments[currentSegment], segmentColor.Value);
         }
 
         private async UniTaskVoid AnimateColor(Image segment, Color targetColor, float delay)

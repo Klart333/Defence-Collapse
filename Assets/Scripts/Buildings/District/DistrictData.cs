@@ -1,8 +1,8 @@
 using Object = UnityEngine.Object;
 
 using System.Collections.Generic;
-using Buildings.District.ECS;
 using UnityEngine.InputSystem;
+using Buildings.District.ECS;
 using WaveFunctionCollapse;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -61,7 +61,6 @@ namespace Buildings.District
             State = towerData.GetDistrictState(this, position, key);
             
             Events.OnTurnComplete += OnTurnComplete;
-            Events.OnWallsDestroyed += OnWallsDestroyed;
             Events.OnGameReset += Dispose;
         }
 
@@ -87,31 +86,12 @@ namespace Buildings.District
 
         private void GenerateCollider()
         {
-            CreateChunkIndexCache();
-
             ClickCallbackComponent clickCallback = DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, ref meshCollider);
             if (!clickCallback) return;
             
             clickCallback.OnClick += InvokeOnClicked;
             clickCallback.OnHoverEnter += OnHoverEnter;
             clickCallback.OnHoverExit += OnHoverExit;
-        }
-
-        private void CreateChunkIndexCache()
-        {
-            cachedBuildingChunkIndexes.Clear();
-            foreach (QueryChunk chunk in DistrictChunks.Values)
-            {
-                Vector3 pos = chunk.Position + BuildingManager.Instance.CellSize.XyZ(0) / 2.0f;
-                if (!BuildingManager.Instance.TryGetIndex(pos, out ChunkIndex index))
-                {
-                    Debug.LogError("Chunk index could not be found, VERY WERID");
-                    return;
-                }
-                
-                if (!cachedBuildingChunkIndexes.TryGetValue(index, out List<int3> chunkIndex)) cachedBuildingChunkIndexes.Add(index, new List<int3> { chunk.ChunkIndex });
-                else chunkIndex.Add(chunk.ChunkIndex);
-            }
         }
 
         public void ExpandDistrict(HashSet<QueryChunk> chunks)
@@ -125,37 +105,29 @@ namespace Buildings.District
         }
 
         /// <summary>
-        /// This is from the Chunks being sold/destroyed
+        /// Called from OnBuiltIndexDestroyed (and the district generator rebuilding the district based on the shape of the walls)
         /// </summary>
-        /// <param name="chunkIndexes"></param>
-        private void OnWallsDestroyed(List<ChunkIndex> chunkIndexes)
+        public bool RemoveDistrictChunk(ICollection<QueryChunk> chunks)
         {
             HashSet<int3> destroyedIndexes = new HashSet<int3>();
-            for (int i = 0; i < chunkIndexes.Count; i++)
+
+            foreach (IChunk chunk in chunks)
             {
-                if (!cachedBuildingChunkIndexes.TryGetValue(chunkIndexes[i], out List<int3> indexes)) continue;
-            
-                for (int j = indexes.Count - 1; j >= 0; j--)
+                if (!DistrictChunks.ContainsKey(chunk.ChunkIndex)) 
                 {
-                    if (!DistrictChunks.TryGetValue(indexes[j], out QueryChunk chunk)) continue;
-                    
-                    destroyedIndexes.Add(chunk.ChunkIndex);
-                    DistrictChunks.Remove(indexes[j]);
-                    indexes.RemoveAtSwapBack(j);
-                }
-
-                if (indexes.Count == 0)
-                {
-                    cachedBuildingChunkIndexes.Remove(chunkIndexes[i]);
-                }
-            }
-
 #if UNITY_EDITOR
-            if (DistrictHandler.IsDebug)
-            {
-                Debug.Log($"OnWallsDestroyed, Destroyed Indexes: {destroyedIndexes.Count}");
-            }
+                    if (DistrictHandler.IsDebug)
+                    {
+                        Debug.Log($"({this.towerData.DistrictType}) DistrictChunks did not contain: {chunk.ChunkIndex}");
+                    }
 #endif
+                    continue;
+                }
+                
+                destroyedIndexes.Add(chunk.ChunkIndex);
+                DistrictChunks.Remove(chunk.ChunkIndex);
+            }
+            
             bool isDead = DistrictChunks.Count <= 0;
             if (destroyedIndexes.Count > 0)
             {
@@ -172,38 +144,6 @@ namespace Buildings.District
             {
                 Dispose();
             }
-        }
-
-        /// <summary>
-        /// This is from the district generator rebuilding the district based on the shape of the walls
-        /// </summary>
-        /// <param name="chunk"></param>
-        /// <returns></returns>
-        public bool OnDistrictChunkRemoved(IChunk chunk)
-        {
-            if (!DistrictChunks.ContainsKey(chunk.ChunkIndex))
-            {
-#if UNITY_EDITOR
-                if (DistrictHandler.IsDebug)
-                {
-                    Debug.Log($"({this.towerData.DistrictType}) DistrictChunks did not contain: {chunk.ChunkIndex}");
-                }
-#endif
-                return false;
-            }
-            
-#if UNITY_EDITOR
-            if (DistrictHandler.IsDebug)
-            {
-                Debug.Log($"({towerData.DistrictType})Removing: " + chunk.ChunkIndex + " from DistrictChunks");
-            }
-#endif
-            HashSet<int3> destroyedIndexes = new HashSet<int3> { chunk.ChunkIndex };
-            State.RemoveEntities(destroyedIndexes); 
-            OnChunksLost?.Invoke(destroyedIndexes);
-            
-            DistrictChunks.Remove(chunk.ChunkIndex);
-            GenerateCollider();
             
             return true;
         }
@@ -281,7 +221,6 @@ namespace Buildings.District
             State.Dispose();
             
             InputManager.Instance.Cancel.performed -= OnDeselected;
-            Events.OnWallsDestroyed -= OnWallsDestroyed;
             UIEvents.OnFocusChanged -= Deselect;
             Events.OnTurnComplete -= OnTurnComplete;
             Events.OnGameReset -= Dispose;
