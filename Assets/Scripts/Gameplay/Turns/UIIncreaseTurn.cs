@@ -25,12 +25,16 @@ namespace Gameplay.Turns
         private void OnEnable()
         {
             Events.OnTurnComplete += OnTurnComplete;
+            Events.OnTurnIncreased += OnTurnIncreased;
+            
             GetInput().Forget();
         }
-        
+
         private void OnDisable()
         {
             Events.OnTurnComplete -= OnTurnComplete;
+            Events.OnTurnIncreased -= OnTurnIncreased;
+            
             if (inputManager != null)
             {
                 inputManager.Space.performed -= SpacePerformed;
@@ -56,7 +60,10 @@ namespace Gameplay.Turns
         public void IncreaseTurn()
         {
             Events.OnTurnIncreased?.Invoke(1, turnHandler.Turn + 1);
-            
+        }
+        
+        private void OnTurnIncreased(int arg0, int arg1)
+        {
             isProcessingTurn = true;
             increaseTurnButton.interactable = !isProcessingTurn;
         }

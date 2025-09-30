@@ -15,8 +15,10 @@ namespace Gameplay.Turns
         private EntityQuery turnQuery;
 
         private bool listeningForTurnComplete;
+        private int turnAmountToComplete;
         
         public int Turn { get; private set; }
+        public int TurnAmount { get; set; }
 
         private void OnEnable()
         {
@@ -43,10 +45,27 @@ namespace Gameplay.Turns
 
         private void Update()
         {
+            if (!listeningForTurnComplete && turnAmountToComplete > 0)
+            {
+                int turnAmount = turnAmountToComplete;
+                
+                Events.OnTurnIncreased?.Invoke(1, Turn + 1);
+                
+                turnAmountToComplete = turnAmount;
+                return;
+            }
+            
             if (gameManager.IsGameOver) return;
             if (!listeningForTurnComplete || !turnQuery.IsEmpty) return;
 
+            CompleteTurn();
+        }
+
+        private void CompleteTurn()
+        {
+            turnAmountToComplete--;
             listeningForTurnComplete = false;
+            
             Events.OnTurnComplete?.Invoke();
         }
 
@@ -62,6 +81,7 @@ namespace Gameplay.Turns
         private void OnTurnIncreased(int increase, int total)
         {
             listeningForTurnComplete = true;
+            turnAmountToComplete = TurnAmount;
             Turn = total;
 
             Entity spawned = entityManager.Instantiate(turnIncreaseEntityPrefab);

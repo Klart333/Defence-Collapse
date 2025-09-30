@@ -1141,7 +1141,7 @@ namespace Buildings.District
                     return;
                 }
                 
-                Vector2 pivotOffset = -dir * 0.125f;
+                Vector2 pivotOffset = -dir * 0.0625f;
                 entityIndexes.Add(new TargetEntityIndex
                 {
                     ChunkIndex = chunkIndex,
