@@ -60,7 +60,7 @@ namespace Effects.LittleDudes
         [BurstCompile]
         public void Execute(Entity entity, in LocalTransform enemyTransform)
         {
-            int2 cell = PathUtility.GetPathGridIndex(enemyTransform.Position.xz);
+            int2 cell = PathUtility.GetCombinedIndex(enemyTransform.Position.xz);
             SpatialGrid.Add(cell, entity);
         }
     }

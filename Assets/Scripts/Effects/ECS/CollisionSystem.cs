@@ -111,7 +111,7 @@ namespace Effects.ECS
             float radius = colliderComponent.Radius;
             float radiusSq = radius * radius;
 
-            int centerCell = PathUtility.GetPathGridIndex(pos.xz);
+            int centerCell = PathUtility.GetCombinedIndex(pos.xz);
             if (CollideWithinCell(entity, ref randomComponent, critComponent, ref damageComponent, centerCell, pos.xz, radiusSq))
             {
                 if (damageComponent.IsOneShot)

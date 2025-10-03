@@ -11,6 +11,7 @@ using UnityEngine;
 using Unity.Jobs;
 using System;
 using Unity.Burst;
+using Math = Utility.Math;
 
 namespace Pathfinding
 {
@@ -199,6 +200,7 @@ namespace Pathfinding
         #endregion
     }
 
+    [BurstCompile]
     public static class PathUtility
     {
         public static readonly int2[] NeighbourDirections =
@@ -220,15 +222,23 @@ namespace Pathfinding
             new int2(-1, 0),
             new int2(0, -1),
         };
+
+        public static readonly float2[] NeighbourPositionOffsets =
+        {
+            new float2(CELL_SCALE, 0),
+            new float2(-CELL_SCALE, 0),
+            new float2(0, CELL_SCALE),
+            new float2(0, -CELL_SCALE),
+        };
         
         public const float FULL_BUILDING_CELL = 1f;
         public const int CELL_SCALE = 2;
-        public const int HALF_CELL_SCALE = 1;
         public const int GRID_WIDTH = 4; 
         
         public const float HALF_BUILDING_CELL = FULL_BUILDING_CELL / 2.0f;
         public const float CHUNK_SIZE = GRID_WIDTH * CELL_SCALE;
         public const int GRID_LENGTH = GRID_WIDTH * GRID_WIDTH;
+        public const int HALF_CELL_SCALE = CELL_SCALE / 2;
         
         public static float2 ByteToDirection(byte directionByte)
         {
@@ -267,8 +277,8 @@ namespace Pathfinding
         public static PathIndex GetIndex(float xPos, float zPos)
         {
             // Find which chunk the position is in
-            int chunkX = Utility.Math.GetMultipleFloored(xPos, CHUNK_SIZE);
-            int chunkZ = Utility.Math.GetMultipleFloored(zPos, CHUNK_SIZE);
+            int chunkX = Math.GetMultipleFloored(xPos, CHUNK_SIZE);
+            int chunkZ = Math.GetMultipleFloored(zPos, CHUNK_SIZE);
             int2 chunkIndex = new int2(chunkX, chunkZ);
         
             // Calculate position relative to the chunk's origin
@@ -276,8 +286,8 @@ namespace Pathfinding
             float localZ = zPos - chunkZ * CHUNK_SIZE;
         
             // Find grid indices within the chunk
-            int gridX = Utility.Math.GetMultipleFloored(localX, CELL_SCALE);
-            int gridZ = Utility.Math.GetMultipleFloored(localZ, CELL_SCALE);
+            int gridX = Math.GetMultipleFloored(localX, CELL_SCALE);
+            int gridZ = Math.GetMultipleFloored(localZ, CELL_SCALE);
         
             // Convert 2D grid index to 1D
             int targetIndex = gridZ * GRID_WIDTH + gridX;
@@ -285,12 +295,35 @@ namespace Pathfinding
             return new PathIndex(chunkIndex, targetIndex);
         }
 
-        public static int GetPathGridIndex(float2 pos)
+        public static int GetCombinedIndex(float2 pos)
         {
-            int gridX = Utility.Math.GetMultipleFloored(pos.x, CELL_SCALE);
-            int gridZ = Utility.Math.GetMultipleFloored(pos.y, CELL_SCALE);
+            int gridX = Math.GetMultipleFloored(pos.x, CELL_SCALE);
+            int gridZ = Math.GetMultipleFloored(pos.y, CELL_SCALE);
         
             return gridZ * GRID_WIDTH + gridX;
+        }
+        
+        public static int GetCombinedIndex(PathIndex index)
+        {
+            return index.ChunkIndex.x * GRID_WIDTH + index.ChunkIndex.y * GRID_WIDTH + index.GridIndex;
+        }
+        
+        public static void NativeGetNeighbouringPathIndexes(NativeArray<PathIndex> neighbours, float2 pathPosition)
+        {
+            for (int i = 0; i < NeighbourPositionOffsets.Length; i++)
+            {
+                neighbours[i] = GetIndex(pathPosition + NeighbourPositionOffsets[i]);
+            }
+        }
+        
+        public static int GetDistance(PathIndex a, PathIndex b)
+        {
+            int aX = a.ChunkIndex.x * GRID_WIDTH + a.GridIndex % GRID_WIDTH;
+            int bX = b.ChunkIndex.x * GRID_WIDTH + b.GridIndex % GRID_WIDTH;
+            
+            int aY = a.ChunkIndex.y * GRID_WIDTH + Math.GetMultipleFloored(a.GridIndex, GRID_WIDTH);
+            int bY = b.ChunkIndex.y * GRID_WIDTH + Math.GetMultipleFloored(b.GridIndex, GRID_WIDTH);
+            return math.abs(aX - bX) + math.abs(aY - bY);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

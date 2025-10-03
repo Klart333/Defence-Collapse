@@ -118,7 +118,7 @@ namespace Effects.ECS
             NativeHashSet<Entity> hitEntities = new NativeHashSet<Entity>(sourceLightning.Bounces, Allocator.TempJob);
             
             float3 sourcePosition = transform.Position;
-            int cellIndex = PathUtility.GetPathGridIndex(sourcePosition.xz);
+            int cellIndex = PathUtility.GetCombinedIndex(sourcePosition.xz);
             
             for (int i = 0; i < sourceLightning.Bounces; i++)
             {

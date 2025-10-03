@@ -56,9 +56,9 @@ namespace Enemy.ECS
         public NativeParallelHashMap<int, Entity>.ParallelWriter SpatialGrid;
 
         [BurstCompile]
-        public void Execute(in EnemyClusterComponent enemyClusterComponent, in Entity entity)
+        public void Execute(in Entity entity, in EnemyClusterComponent enemyClusterComponent)
         {
-            int gridIndex = PathUtility.GetPathGridIndex(enemyClusterComponent.Position.xz);
+            int gridIndex = PathUtility.GetCombinedIndex(enemyClusterComponent.Position.xz);
             SpatialGrid.TryAdd(gridIndex, entity);
         }
     }

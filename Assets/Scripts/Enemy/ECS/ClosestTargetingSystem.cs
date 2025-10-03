@@ -6,6 +6,7 @@ using Unity.Entities;
 using Unity.Burst;
 using Pathfinding;
 using Utility;
+using System;
 
 namespace Enemy.ECS
 {
@@ -47,8 +48,7 @@ namespace Enemy.ECS
         }
     }
     
-    // CELL SIZE = 1
-    [BurstCompile, WithAll(typeof(UpdateTargetingTag))]
+    [BurstCompile(FloatPrecision.Low, FloatMode.Fast), WithAll(typeof(UpdateTargetingTag))]
     public partial struct ClosestTargetingJob : IJobEntity 
     {   
         [ReadOnly]
@@ -64,9 +64,8 @@ namespace Enemy.ECS
         public void Execute(in DirectionRangeComponent directionComponent, ref EnemyTargetComponent enemyTargetComponent, 
             in RangeComponent rangeComponent, in LocalTransform localTransform)
         {
-            
             float2 towerPosition = localTransform.Position.xz;
-            int towerCell = PathUtility.GetPathGridIndex(towerPosition);
+            PathIndex towerCell = PathUtility.GetIndex(towerPosition);
             
             float range = rangeComponent.Range;
             float rangeSq = range * range;
@@ -74,69 +73,48 @@ namespace Enemy.ECS
             float maxCellDistSq = maxCellDist * maxCellDist;
             int radiusCells = (int)(range / PathUtility.CELL_SCALE + 0.5f);
 
-            int capacity = (radiusCells + 1) * (radiusCells + 1) * 4;
-            using MyNativePriorityHeap<int> priorityHeap = new MyNativePriorityHeap<int>(capacity, Allocator.Temp);
-            // Common target finding variables 
-            float bestDistSq = rangeSq;
+            MyNativePriorityHeap<DistanceIndex> frontier = new MyNativePriorityHeap<DistanceIndex>(radiusCells * radiusCells * 4, Allocator.Temp);
+            NativeHashSet<PathIndex> reached = new NativeHashSet<PathIndex>((radiusCells + 1) * (radiusCells + 1) * 4, Allocator.Temp);
+            NativeArray<PathIndex> neighbours = new NativeArray<PathIndex>(4, Allocator.Temp);
+            
+            frontier.Push(new DistanceIndex { Distance = 0, PathIndex = towerCell, });
+            
             float3 bestEnemyPosition = default;
+            float2 direction = directionComponent.Direction;
+            float halfAngleRad = math.radians(directionComponent.Angle * 0.5f);
+            float cosHalfAngle = math.cos(halfAngleRad);
+            float2 coneLeft = math.mul(float2x2.Rotate(halfAngleRad), direction);
+            float2 coneRight = math.mul(float2x2.Rotate(-halfAngleRad), direction);
 
-            if (directionComponent.Angle >= 360f)
+            while (frontier.Count > 0)
             {
-                // Optimized 360-degree path
-                for (int dx = -radiusCells; dx <= radiusCells; dx++)
-                for (int dy = -radiusCells; dy <= radiusCells; dy++)
-                {
-                    int cell = towerCell + dx + dy * PathUtility.CELL_SCALE;
-                    
-                    // Quick distance check at cell level
-                    float2 cellCenter = PathUtility.GetPos(cell) + PathUtility.HALF_CELL_SCALE;
-                    float2 toCell = cellCenter - towerPosition;
-                    float cellDistSq = math.lengthsq(toCell);
-                    
-                    if (cellDistSq > maxCellDistSq || cellDistSq > bestDistSq) continue;
+                PathIndex index = frontier.Pop().PathIndex;
+                float2 position = PathUtility.GetPos(index).xz;
+                float2 cellCenter = PathUtility.GetPos(index).xz + PathUtility.HALF_CELL_SCALE;
+                float2 toCell = cellCenter - towerPosition;
+                
+                if (!IsIndexWithinRange(toCell, maxCellDistSq))
+                    continue;
+                
+                if (directionComponent.Angle < 360f && !IsIndexWithinAngle(toCell, direction, coneLeft, coneRight, cosHalfAngle))
+                    continue;
 
-                    bestDistSq = GetClosestEnemy(cell, towerPosition, bestDistSq, ref bestEnemyPosition);
+                if (CellContainsEnemy(index, towerPosition, rangeSq, out bestEnemyPosition))
+                    break;
+                
+                PathUtility.NativeGetNeighbouringPathIndexes(neighbours, position);
+                for (int i = 0; i < neighbours.Length; i++)
+                {
+                    if (!reached.Add(neighbours[i])) continue;
+                    
+                    int distance = PathUtility.GetDistance(towerCell, neighbours[i]);
+                    frontier.Push(new DistanceIndex { Distance = distance, PathIndex = neighbours[i] });
                 }
             }
-            else
-            {
-                // Directional cone path
-                float2 direction = directionComponent.Direction;
-                float halfAngleRad = math.radians(directionComponent.Angle * 0.5f);
-                float cosHalfAngle = math.cos(halfAngleRad);
-                float2 coneLeft = math.mul(float2x2.Rotate(halfAngleRad), direction);
-                float2 coneRight = math.mul(float2x2.Rotate(-halfAngleRad), direction);
-
-                for (int dx = -radiusCells; dx <= radiusCells; dx++)
-                for (int dy = -radiusCells; dy <= radiusCells; dy++)
-                {
-                    int cell = towerCell + dx + dy * PathUtility.CELL_SCALE;
-                    float2 cellCenter = PathUtility.GetPos(cell) + PathUtility.HALF_CELL_SCALE;
-                    float2 toCell = cellCenter - towerPosition;
-                    float cellDistSq = math.lengthsq(toCell);
-
-                    // Cell-level culling
-                    if (cellDistSq > maxCellDistSq
-                        || cellDistSq > bestDistSq)
-                        continue;
-
-                    if (math.lengthsq(toCell) > 0.001f) // Avoid division by zero
-                    {
-                        float2 normToCell = math.normalize(toCell);
-                        float dotDirection = math.dot(normToCell, direction);
-                        
-                        if (dotDirection < cosHalfAngle - 0.1f) // With safety margin
-                        {
-                            float dotLeft = math.dot(normToCell, coneLeft);
-                            float dotRight = math.dot(normToCell, coneRight);
-                            if (dotLeft < 0 && dotRight < 0)
-                                continue;
-                        }
-                    }
-
-                    bestDistSq = GetClosestEnemy(cell, towerPosition, bestDistSq, ref bestEnemyPosition);
-                }
-            }
+            
+            frontier.Dispose();
+            reached.Dispose();
+            neighbours.Dispose();
             
             if (bestEnemyPosition.Equals(default)) return;
             
@@ -144,10 +122,12 @@ namespace Enemy.ECS
             enemyTargetComponent.HasTarget = true;
         }
 
-        private float GetClosestEnemy(int cell, float2 towerPosition, float bestDistSq, ref float3 bestEnemyPosition)
+        private bool CellContainsEnemy(PathIndex index, float2 towerPosition, float bestDistSq, out float3 bestEnemyPosition)
         {
+            bestEnemyPosition = default;
+            int cell = PathUtility.GetCombinedIndex(index);
             if (!SpatialGrid.TryGetValue(cell, out Entity cluster) || !BufferLookup.TryGetBuffer(cluster, out DynamicBuffer<ManagedEntityBuffer> buffer)) 
-                return bestDistSq;
+                return false;
 
             for (int i = 0; i < buffer.Length; i++)
             {
@@ -162,7 +142,38 @@ namespace Enemy.ECS
                 bestEnemyPosition = enemyTransform.Position;
             } 
 
-            return bestDistSq;
+            return true;
+        }
+
+        private bool IsIndexWithinAngle(float2 toCell, float2 direction, float2 coneLeft, float2 coneRight, float cosHalfAngle)
+        {
+            if (math.lengthsq(toCell) < 0.001f) return true;
+            
+            float2 normToCell = math.normalize(toCell);
+            float dotDirection = math.dot(normToCell, direction);
+
+            if (dotDirection > cosHalfAngle - 0.1f) return true; 
+            
+            float dotLeft = math.dot(normToCell, coneLeft);
+            float dotRight = math.dot(normToCell, coneRight);
+            return dotLeft >= 0 || dotRight >= 0;
+        }
+        
+        private bool IsIndexWithinRange(float2 toCell, float maxDistanceSq)
+        {
+            float cellDistSq = math.lengthsq(toCell);
+            return cellDistSq < maxDistanceSq;
+        }
+
+        public struct DistanceIndex : IComparable<DistanceIndex>
+        {
+            public int Distance;
+            public PathIndex PathIndex;
+
+            public int CompareTo(DistanceIndex other)
+            {
+                return Distance.CompareTo(other.Distance);
+            }
         }
     }
     
