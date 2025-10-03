@@ -152,8 +152,8 @@ namespace Buildings.District
             
             ComponentType[] targetComponents =
             {
-                typeof(ArchedMovementComponent),
                 typeof(AttachementMeshComponent),
+                typeof(SmoothMovementComponent),
                 typeof(LocalTransform),
                 typeof(SpeedComponent),
                 typeof(LocalToWorld),
@@ -224,13 +224,17 @@ namespace Buildings.District
         protected virtual List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
             List<TargetEntityIndex> indexes = new List<TargetEntityIndex>();
+            HashSet<int3> uniqueChunks = new HashSet<int3>();
             for (int i = 0; i < chunkIndexes.Count; i++)
             {
-                indexes.Add(new TargetEntityIndex
+                if (uniqueChunks.Add(chunkIndexes[i].Index))
                 {
-                    ChunkIndex = chunkIndexes[i],
-                    Direction = Vector2.up,
-                });
+                    indexes.Add(new TargetEntityIndex
+                    {
+                        ChunkIndex = chunkIndexes[i],
+                        Direction = Vector2.up,
+                    });
+                }
             }
             return indexes;
         }
@@ -308,11 +312,10 @@ namespace Buildings.District
                     Scale = districtData.MeshVariable.Scale
                 });
                 
-                entityManager.SetComponentData(spawnedEntity, new ArchedMovementComponent
+                entityManager.SetComponentData(spawnedEntity, new SmoothMovementComponent
                 {
                     EndPosition = pos,
                     StartPosition = upPosition,
-                    Pivot = (pos + upPosition) / 2.0f,
                     Ease = Ease.Linear,
                 });
             }
@@ -357,30 +360,6 @@ namespace Buildings.District
             {
                 entityManager.SetComponentData(entity, new RangeComponent { Range = stats.Range.Value });
             }
-        }
-
-        public void RemoveEntities(ChunkIndex chunkIndex)
-        {
-            int2 index = chunkIndex.Index.xz.MultiplyByAxis(DistrictStateUtility.Size) + chunkIndex.CellIndex.xz;
-#if UNITY_EDITOR
-            if (DistrictData.DistrictHandler.IsDebug)
-            {
-                Debug.Log($"Removing entities from index: {index}");
-            }
-#endif
-            if (!entityIndexes.TryGetValue(index, out List<Entity> entities)) return;
-                
-            for (int i = 0; i < entities.Count; i++)
-            {
-                Entity entity = entities[i];
-                
-                DistrictStateUtility.RemoveChunkIndexFromOccupied(index, occupiedTargetMeshChunkIndex);
-                spawnedDataEntities.Remove(entity);
-                allSpawnedEntities.Remove(entity);
-                entityManager.DestroyEntity(entity);
-            }
-            
-            entityIndexes.Remove(index);
         }
         
         public void RemoveEntities(HashSet<int3> destroyedIndexes)
@@ -452,6 +431,29 @@ namespace Buildings.District
         {
             AttackPosition = targetPosition;
             Attack.TriggerAttack(this);
+        }
+
+        public DistrictAttachmentData[] GetAttachmentDatas()
+        {
+            DistrictAttachmentData[] attachmentDatas = new DistrictAttachmentData[spawnedDataEntities.Count];
+            int index = 0;
+            foreach (Entity dataEntity in spawnedDataEntities)
+            {
+                AttackSpeedComponent attackSpeed = entityManager.GetComponentData<AttackSpeedComponent>(dataEntity);
+                EnemyTargetComponent enemyTarget = entityManager.GetComponentData<EnemyTargetComponent>(dataEntity);
+                LocalTransform transform = entityManager.GetComponentData<LocalTransform>(dataEntity);
+                
+                attachmentDatas[index++] = new DistrictAttachmentData
+                {
+                    TargetPosition = enemyTarget.TargetPosition,
+                    AttackSpeed = attackSpeed.AttackSpeed,
+                    AttackTimer = attackSpeed.AttackTimer,
+                    HasTarget = enemyTarget.HasTarget,
+                    Position = transform.Position,
+                };
+            }
+            
+            return attachmentDatas;
         }
         
         #endregion

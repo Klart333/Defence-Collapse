@@ -5,7 +5,6 @@ using Unity.Entities;
 using Unity.Burst;
 using Effects.ECS;
 using Enemy.ECS;
-using UnityEngine;
 
 namespace Buildings.District.ECS
 {
@@ -20,7 +19,6 @@ namespace Buildings.District.ECS
             updateDistrictQuery = SystemAPI.QueryBuilder().WithAll<TurnIncreaseComponent, UpdateDistrictTag>().Build();
             
             state.RequireForUpdate<UpdateDistrictTag>();
-            state.RequireForUpdate<EnemyClusterComponent>();
         }
 
         [BurstCompile]
@@ -61,8 +59,13 @@ namespace Buildings.District.ECS
         
         public void Execute([ChunkIndexInQuery]int sortKey, Entity entity, ref AttackSpeedComponent attackSpeedComponent)
         {
+            ECB.AddComponent<UpdateTargetingTag>(sortKey, entity);
+
             attackSpeedComponent.AttackTimer -= TurnIncrease;
-            if (attackSpeedComponent.AttackTimer > 0) return;
+            if (attackSpeedComponent.AttackTimer > 0)
+            {
+                return;
+            }
             
             int count = math.max(1, (int)math.ceil(-attackSpeedComponent.AttackTimer / attackSpeedComponent.AttackSpeed));
             attackSpeedComponent.AttackTimer += attackSpeedComponent.AttackSpeed * count;

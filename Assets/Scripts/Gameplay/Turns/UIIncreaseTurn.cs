@@ -59,7 +59,7 @@ namespace Gameplay.Turns
 
         public void IncreaseTurn()
         {
-            Events.OnTurnIncreased?.Invoke(1, turnHandler.Turn + 1);
+            Events.OnTurnSequenceStarted?.Invoke();
         }
         
         private void OnTurnIncreased(int arg0, int arg1)

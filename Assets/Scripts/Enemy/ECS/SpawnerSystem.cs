@@ -243,7 +243,7 @@ namespace Enemy.ECS
             ECB.AddComponent(sortKey, clusterEntity, DamageLookup[prefabEntity]);
             ECB.AddComponent(sortKey, clusterEntity, SpeedLookup[prefabEntity]);
             ECB.AddComponent(sortKey, clusterEntity, moveSpeed);
-            ECB.AddComponent(sortKey, clusterEntity, new FlowFieldComponent { MoveTimer = moveSpeed.Speed, PathIndex = PathUtility.GetIndex(spawnPosition.xz) });
+            ECB.AddComponent(sortKey, clusterEntity, new FlowFieldComponent { MoveTimer = 1, PathIndex = PathUtility.GetIndex(spawnPosition.xz) });
             ECB.AddComponent(sortKey, clusterEntity, new RandomComponent { Random = Random.CreateFromIndex((uint)(sortKey + Seed)) });
             
             float3 facingPosition = spawnPosition + (math.round(direction) * PathUtility.CELL_SCALE).XyZ();
@@ -264,7 +264,6 @@ namespace Enemy.ECS
                 CurrentTile = pathIndex,
                 PreviousTile = new PathIndex(0, -1),
             });
-            
             
             DynamicBuffer<ManagedEntityBuffer> buffer = ECB.AddBuffer<ManagedEntityBuffer>(sortKey, clusterEntity);
             return buffer;

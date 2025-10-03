@@ -1,6 +1,7 @@
 using Unity.Mathematics;
 using Unity.Collections;
 using Pathfinding.ECS;
+using Effects.ECS.ECB;
 using Unity.Entities;
 using Unity.Burst;
 using Effects.ECS;
@@ -8,7 +9,7 @@ using Pathfinding;
 
 namespace Enemy.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(ManagedEntityCleanupSystem)), UpdateBefore(typeof(DeathSystem))]
+    [BurstCompile, UpdateAfter(typeof(BeforeDeathECBSystem)), UpdateBefore(typeof(DeathSystem))]
     public partial struct ClusterCleanupSystem : ISystem
     {
         [BurstCompile]

@@ -1,7 +1,5 @@
-using System;
-using Unity.Burst;
-using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Entities;
 
 namespace Buildings.District.ECS
 {
@@ -20,42 +18,12 @@ namespace Buildings.District.ECS
         public int Count;
     }
     
-    //[BurstCompile]
-    public struct DistrictEntityDataComponent : IComponentData/*, IEquatable<DistrictEntityDataComponent>*/
+    public struct UpdateTargetingTag : IComponentData { }
+    
+    public struct DistrictEntityDataComponent : IComponentData
     {
         public float3 OriginPosition;
         public float3 TargetPosition;
         public int DistrictID;
-
-        /*
-        [BurstCompile]
-        public bool Equals(DistrictEntityDataComponent other)
-        {
-            return DistrictID == other.DistrictID;
-        }
-
-        [BurstCompile]
-        public override bool Equals(object obj)
-        {
-            return obj is DistrictEntityDataComponent other && Equals(other);
-        }
-
-        [BurstCompile]
-        public override int GetHashCode()
-        {
-            return DistrictID.GetHashCode();
-        }
-
-        [BurstCompile]
-        public static bool operator ==(DistrictEntityDataComponent left, DistrictEntityDataComponent right)
-        {
-            return left.Equals(right);
-        }
-
-        [BurstCompile]
-        public static bool operator !=(DistrictEntityDataComponent left, DistrictEntityDataComponent right)
-        {
-            return !left.Equals(right);
-        }*/
     }
 }

@@ -1,4 +1,3 @@
-using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
@@ -12,22 +11,20 @@ namespace Buildings.District.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             state.RequireForUpdate<TargetingActivationComponent>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);            
             
-            state.Dependency = new UpdateTargetedDistrictEntitiesJob
+            new UpdateTargetedDistrictEntitiesJob
             {
                 ECB = ecb.AsParallelWriter(),
-            }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
@@ -42,10 +39,12 @@ namespace Buildings.District.ECS
     {
         public EntityCommandBuffer.ParallelWriter ECB;
         
-        public void Execute([ChunkIndexInQuery]int sortKey, Entity entity, ref EnemyTargetComponent targetComponent, ref TargetingActivationComponent targetingActivationComponent, in LocalTransform transform, in DistrictDataComponent districtData)
+        public void Execute([ChunkIndexInQuery]int sortKey, Entity entity, ref EnemyTargetComponent targetComponent, ref TargetingActivationComponent targetingActivationComponent, 
+            in LocalTransform transform, in DistrictDataComponent districtData, ref AttackSpeedComponent attackSpeedComponent)
         {
             if (!targetComponent.HasTarget)
             {
+                attackSpeedComponent.AttackTimer = 0;
                 ECB.RemoveComponent<TargetingActivationComponent>(sortKey, entity);
                 return;
             }
@@ -60,10 +59,10 @@ namespace Buildings.District.ECS
 
             targetComponent.HasTarget = false;
             targetingActivationComponent.Count--;
-            if (targetingActivationComponent.Count <= 0)
-            {
-                ECB.RemoveComponent<TargetingActivationComponent>(sortKey, entity);
-            }
+            if (targetingActivationComponent.Count > 0) return;
+            
+            ECB.RemoveComponent<TargetingActivationComponent>(sortKey, entity);
+            ECB.AddComponent<UpdateTargetingTag>(sortKey, entity);
         }
     }
 }

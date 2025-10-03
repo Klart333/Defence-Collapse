@@ -20,7 +20,7 @@ public class Attack
 
     [ReadOnly, OdinSerialize]
     public List<IEffectHolder> EffectHolders => effectHolders ??= new List<IEffectHolder>();
-
+    
     public Attack()
     {
         Effects = new List<IEffect>();

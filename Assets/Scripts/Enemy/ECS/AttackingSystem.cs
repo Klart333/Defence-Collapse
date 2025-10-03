@@ -1,13 +1,10 @@
 using System.Collections.Generic;
-using Gameplay.Turns.ECS;
 using Unity.Collections;
-using Unity.Mathematics;
 using Unity.Entities;
 using Unity.Burst;
 using Effects.ECS;
 using Pathfinding;
 using System;
-using UnityEngine;
 
 namespace Enemy.ECS
 {

@@ -156,6 +156,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 418315291951384129}
     m_Modifications:
+    - target: {fileID: 365231240779658466, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+        type: 3}
+      propertyPath: defaultColor.Variable
+      value: 
+      objectReference: {fileID: 11400000, guid: bc5b6f93095aa15458a6f3d7573e367e,
+        type: 2}
     - target: {fileID: 1048735747810059150, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
         type: 3}
       propertyPath: m_Color.b
@@ -394,6 +400,27 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 8537259270442882950, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0.027450982
+      objectReference: {fileID: 0}
+    - target: {fileID: 8537259270442882950, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8537259270442882950, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 0.41960788
+      objectReference: {fileID: 0}
+    - target: {fileID: 8537259270442882950, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+        type: 3}
+      propertyPath: colorReference.Variable
+      value: 
+      objectReference: {fileID: 11400000, guid: bc5b6f93095aa15458a6f3d7573e367e,
+        type: 2}
     - target: {fileID: 9037995040542540746, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
         type: 3}
       propertyPath: m_Color.b

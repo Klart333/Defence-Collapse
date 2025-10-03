@@ -94,11 +94,6 @@ public struct PathJob : IJobFor
                        + neighbour.ExtraDistance[neighbourIndex.GridIndex]
                        + indexOccupied;
             
-            if (neighbour.IndexOccupied[neighbourIndex.GridIndex])
-            {
-                //Debug.Log("TRUE");
-            }
-            
             if (dist >= shortestDistance) continue;
                 
             shortestDistance = dist;
@@ -112,7 +107,7 @@ public struct PathJob : IJobFor
     private void GetNeighbours(int2 chunkIndex, int gridIndex, NativeArray<PathIndex> array)
     {
         int x = gridIndex % PathUtility.GRID_WIDTH;
-        int y = gridIndex /  PathUtility.GRID_WIDTH;
+        int y = gridIndex / PathUtility.GRID_WIDTH;
 
         for (int i = 0; i < 4; i++)
         {

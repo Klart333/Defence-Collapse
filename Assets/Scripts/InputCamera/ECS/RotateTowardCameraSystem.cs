@@ -1,4 +1,5 @@
 using System.Numerics;
+using Effects.ECS;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -7,6 +8,7 @@ using Unity.Transforms;
 
 namespace InputCamera.ECS
 {
+    [BurstCompile, UpdateAfter(typeof(DeathSystem))]
     public partial struct RotateTowardCameraSystem : ISystem
     {
         private ComponentLookup<LocalToWorld> transformLookup;

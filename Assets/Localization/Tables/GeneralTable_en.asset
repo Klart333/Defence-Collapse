@@ -16,7 +16,8 @@ MonoBehaviour:
     m_Code: en
   m_SharedData: {fileID: 11400000, guid: 3bab26c89fedbae478d2d02b60fa09a7, type: 2}
   m_Metadata:
-    m_Items: []
+    m_Items:
+    - rid: 7274273324191449191
   m_TableData:
   - m_Id: 8765083648
     m_Localized: Applies to
@@ -138,6 +139,17 @@ MonoBehaviour:
     m_Localized: Clears forest, granting money and barricades.
     m_Metadata:
       m_Items: []
+  - m_Id: 15177630159507456
+    m_Localized: Attacks in {0} turn{0:cond:>1?s|}.
+    m_Metadata:
+      m_Items:
+      - rid: 7274273324191449191
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 7274273324191449191
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 
+        m_SharedEntries:
+        - id: 15177630159507456

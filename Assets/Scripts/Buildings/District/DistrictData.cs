@@ -24,9 +24,7 @@ namespace Buildings.District
         public event Action<DistrictData> OnClicked;
         public event Action OnDisposed;
         public event Action OnLevelup;
-
-        protected Dictionary<ChunkIndex, List<int3>> cachedBuildingChunkIndexes = new Dictionary<ChunkIndex, List<int3>>();
-
+        
         private MeshCollider meshCollider;
         protected TowerData towerData;
         
@@ -86,7 +84,7 @@ namespace Buildings.District
 
         private void GenerateCollider()
         {
-            ClickCallbackComponent clickCallback = DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, DistrictGenerator.ChunkWaveFunction.CellSize, Position, ref meshCollider);
+            ClickCallbackComponent clickCallback = DistrictUtility.GenerateCollider(DistrictChunks.Values, DistrictGenerator.ChunkScale, Position, ref meshCollider);
             if (!clickCallback) return;
             
             clickCallback.OnClick += InvokeOnClicked;
@@ -215,6 +213,8 @@ namespace Buildings.District
             // Add chunks if needed
             DistrictGenerator.AddAction(() => DistrictGenerator.RegenerateChunks(DistrictChunks.Values, _ => upgradeStateData.PrototypeInfoData));
         }
+
+        public DistrictAttachmentData[] GetAttachmentDatas() => State.GetAttachmentDatas();
         
         public void Dispose()
         {
@@ -234,9 +234,25 @@ namespace Buildings.District
         }
     }
 
+    public struct DistrictAttachmentData : IComparable<DistrictAttachmentData>
+    {
+        public float3 TargetPosition;
+        public float AttackSpeed;
+        public float AttackTimer;
+        public float3 Position;
+        public bool HasTarget;
+
+        public int CompareTo(DistrictAttachmentData other)
+        {
+            int targetComparison = other.HasTarget.CompareTo(HasTarget);
+            if (targetComparison != 0) return targetComparison;
+            return AttackTimer.CompareTo(other.AttackTimer);
+        }
+    }
+    
     public static class DistrictUtility
     {
-        public static ClickCallbackComponent GenerateCollider(IEnumerable<IChunk> chunks, Vector3 ChunkScale, Vector3 CellSize, Vector3 pos, ref MeshCollider meshCollider)
+        public static ClickCallbackComponent GenerateCollider(IEnumerable<IChunk> chunks, Vector3 ChunkScale, Vector3 pos, ref MeshCollider meshCollider)
         {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();

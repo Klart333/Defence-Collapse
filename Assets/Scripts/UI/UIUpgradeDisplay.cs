@@ -1,8 +1,9 @@
-﻿using Effects;
+﻿using Buildings.District.UI;
 using Sirenix.OdinInspector;
 using Gameplay.Money;
 using UnityEngine.UI;
 using UnityEngine;
+using Effects;
 
 namespace UI
 {

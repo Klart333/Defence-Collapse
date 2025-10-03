@@ -16,7 +16,7 @@ namespace Buildings.District.ECS
         {
             targetLookup = SystemAPI.GetComponentLookup<EnemyTargetComponent>(true); 
             
-            state.RequireForUpdate<TargetingActivationComponent>();
+            state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<TargetingActivationComponent, UpdateTargetingTag>().Build());
         }
 
         [BurstCompile]
@@ -37,7 +37,7 @@ namespace Buildings.District.ECS
         }
     }
 
-    [BurstCompile, WithAll(typeof(TargetingActivationComponent))]
+    [BurstCompile]
     public partial struct RotateAttachementMeshJob : IJobEntity
     {
         [ReadOnly]

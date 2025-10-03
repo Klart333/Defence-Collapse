@@ -1,10 +1,11 @@
 using Buildings.District.ECS;
-using Pathfinding;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
+using Pathfinding;
+using Utility;
 
 namespace Enemy.ECS
 {
@@ -12,16 +13,14 @@ namespace Enemy.ECS
     public partial struct ClosestTargetingSystem : ISystem
     {
         private ComponentLookup<LocalTransform> transformLookup;
-        private ComponentLookup<EnemyClusterComponent> clusterLookup;
         private BufferLookup<ManagedEntityBuffer> bufferLookup;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<TargetingActivationComponent>();
+            state.RequireForUpdate<UpdateTargetingTag>();
 
             transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
-            //clusterLookup = SystemAPI.GetComponentLookup<EnemyClusterComponent>(true);
             bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>();
         }
 
@@ -30,16 +29,15 @@ namespace Enemy.ECS
         {
             NativeParallelHashMap<int, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             transformLookup.Update(ref state);
-            //clusterLookup.Update(ref state);
             bufferLookup.Update(ref state);
 
-            new ClosestTargetingJob
+            state.Dependency = new ClosestTargetingJob
             {
                 TransformLookup = transformLookup,
                 SpatialGrid = spatialGrid.AsReadOnly(),
-                //ClusterLookup = clusterLookup,
                 BufferLookup = bufferLookup,
-            }.ScheduleParallel();
+            }.ScheduleParallel(state.Dependency);
+            state.Dependency.Complete();
         }
 
         [BurstCompile]
@@ -50,7 +48,7 @@ namespace Enemy.ECS
     }
     
     // CELL SIZE = 1
-    [BurstCompile, WithAll(typeof(TargetingActivationComponent))]
+    [BurstCompile, WithAll(typeof(UpdateTargetingTag))]
     public partial struct ClosestTargetingJob : IJobEntity 
     {   
         [ReadOnly]
@@ -63,8 +61,10 @@ namespace Enemy.ECS
         public BufferLookup<ManagedEntityBuffer> BufferLookup;
         
         [BurstCompile]
-        public void Execute(in DirectionRangeComponent directionComponent, ref EnemyTargetComponent enemyTargetComponent, in RangeComponent rangeComponent, in LocalTransform localTransform)
+        public void Execute(in DirectionRangeComponent directionComponent, ref EnemyTargetComponent enemyTargetComponent, 
+            in RangeComponent rangeComponent, in LocalTransform localTransform)
         {
+            
             float2 towerPosition = localTransform.Position.xz;
             int towerCell = PathUtility.GetPathGridIndex(towerPosition);
             
@@ -74,7 +74,9 @@ namespace Enemy.ECS
             float maxCellDistSq = maxCellDist * maxCellDist;
             int radiusCells = (int)(range / PathUtility.CELL_SCALE + 0.5f);
 
-            // Common target finding variables
+            int capacity = (radiusCells + 1) * (radiusCells + 1) * 4;
+            using MyNativePriorityHeap<int> priorityHeap = new MyNativePriorityHeap<int>(capacity, Allocator.Temp);
+            // Common target finding variables 
             float bestDistSq = rangeSq;
             float3 bestEnemyPosition = default;
 
@@ -90,9 +92,8 @@ namespace Enemy.ECS
                     float2 cellCenter = PathUtility.GetPos(cell) + PathUtility.HALF_CELL_SCALE;
                     float2 toCell = cellCenter - towerPosition;
                     float cellDistSq = math.lengthsq(toCell);
-                    if (cellDistSq > maxCellDistSq
-                        || cellDistSq > bestDistSq)
-                        continue;
+                    
+                    if (cellDistSq > maxCellDistSq || cellDistSq > bestDistSq) continue;
 
                     bestDistSq = GetClosestEnemy(cell, towerPosition, bestDistSq, ref bestEnemyPosition);
                 }
@@ -136,7 +137,7 @@ namespace Enemy.ECS
                     bestDistSq = GetClosestEnemy(cell, towerPosition, bestDistSq, ref bestEnemyPosition);
                 }
             }
-
+            
             if (bestEnemyPosition.Equals(default)) return;
             
             enemyTargetComponent.TargetPosition = bestEnemyPosition;

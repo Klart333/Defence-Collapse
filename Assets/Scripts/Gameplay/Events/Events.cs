@@ -19,10 +19,14 @@ namespace Gameplay.Event
         public static EventAction<ICollection<IBuildable>> OnBuildingBuilt;
         public static EventAction<BuildingType> OnBuildingClicked;
 
+        public static EventAction OnTurnSequenceStarted;
+        public static EventAction OnTurnSequenceCompleted;
+        
         public static EventAction<int, int> OnTurnIncreased;
         public static EventAction OnTurnComplete;
 
         public static EventAction<ChunkIndex> OnBuiltIndexDestroyed;
+        
         public static EventAction<DistrictData> OnCapitolDestroyed;
         public static EventAction OnFinalBossDeafeted;
 

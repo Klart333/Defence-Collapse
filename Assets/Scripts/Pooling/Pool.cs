@@ -64,10 +64,10 @@ public class Pool : MonoBehaviour
         {
             PooledMonoBehaviour pooledObject = Instantiate(poolPrefab, parent, false); 
             pooledObject.gameObject.name += $" {index + i}"; // Helps keeping track
-            
+            pooledObject.gameObject.SetActive(false);
             pooledObject.OnReturnToPool += AddObjectToAvailableQueue;
             
-            pooledObject.gameObject.SetActive(false); // Here is when it goes into the pool, through PooledMonoBehaviour
+            queueObjects.Enqueue(pooledObject);
         }
 
         index += poolPrefab.InitialPoolSize;

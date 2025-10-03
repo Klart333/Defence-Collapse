@@ -413,7 +413,7 @@ namespace Effects
         
         public void Perform(IAttacker unit)
         {
-            float3 targetPosition = unit.AttackPosition;
+            float3 targetPosition = unit.AttackPosition + Vector3.up * 0.05f;
             
             float distance = Vector3.Distance(unit.OriginPosition, targetPosition) + Height;
             float lifetime = distance / UnitsPerSecond;

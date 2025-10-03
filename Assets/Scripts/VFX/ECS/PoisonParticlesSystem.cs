@@ -12,21 +12,16 @@ using VFX;
 [BurstCompile, UpdateAfter(typeof(HealthSystem))]
 public partial struct PoisonParticleSytem : ISystem
 {
-    private EntityQuery initQuery;
-    private EntityQuery deathQuery;
     private EntityQuery stoppedQuery;
+    private EntityQuery deathQuery;
+    private EntityQuery initQuery;
         
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<PoisonComponent, SpeedComponent>().WithNone<PoisonParticlesComponent>();
-        initQuery = state.GetEntityQuery(builder);
-            
-        EntityQueryBuilder builder2 = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<PoisonParticlesComponent, DeathTag>();
-        deathQuery = state.GetEntityQuery(builder2);
-            
-        EntityQueryBuilder builder3 = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<PoisonParticlesComponent>().WithNone<PoisonComponent>();
-        stoppedQuery = state.GetEntityQuery(builder3);
+        initQuery = SystemAPI.QueryBuilder().WithAll<PoisonComponent, SpeedComponent>().WithNone<PoisonParticlesComponent>().Build();
+        stoppedQuery = SystemAPI.QueryBuilder().WithAll<PoisonParticlesComponent>().WithNone<PoisonComponent>().Build();
+        deathQuery = SystemAPI.QueryBuilder().WithAll<PoisonParticlesComponent, DeathTag>().Build();
             
         state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<PoisonComponent, PoisonParticlesComponent>().Build());
         state.RequireForUpdate<VFXPoisonParticlesSingleton>();

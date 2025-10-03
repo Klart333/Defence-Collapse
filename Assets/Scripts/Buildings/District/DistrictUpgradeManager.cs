@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine.InputSystem;
 using Sirenix.OdinInspector;
+using Buildings.District.UI;
 using Gameplay.Event;
 using InputCamera;
 using UnityEngine;
@@ -13,35 +14,10 @@ namespace Buildings.District
     public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
     {
         public event Action<EffectModifier> OnEffectGained;
-        
-        [Title("State Data")]
-        [SerializeField]
-        private TowerData archerData;
-
-        [SerializeField]
-        private TowerData bombData;
-
-        [SerializeField]
-        private TowerData flameData;
-
-        [SerializeField]
-        private TowerData mineData;
-
-        [SerializeField]
-        private TowerData townHallData;
-
-        [SerializeField]
-        private TowerData lightningData;
-
-        [SerializeField]
-        private TowerData churchData;
-
-        [SerializeField]
-        private TowerData barracksData;
 
         [Title("UI", "Upgrade")]
         [SerializeField]
-        private UI.UIDistrictUpgrade districtUpgrade;
+        private UIDistrictUpgrade districtUpgrade;
 
 #if UNITY_EDITOR
         [Title("Debug")]
@@ -107,13 +83,9 @@ namespace Buildings.District
             districtUpgrade.Close();
         }
 
-        #region Modifier Effects
-
         public void AddModifierEffect(EffectModifier effect)
         {
             OnEffectGained?.Invoke(effect);
         }
-
-        #endregion
     }
 }

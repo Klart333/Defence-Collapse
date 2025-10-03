@@ -7,6 +7,7 @@ using Unity.Transforms;
 
 namespace Effects.ECS
 {
+    [BurstCompile, UpdateAfter(typeof(DeathSystem))]
     public partial struct SimpleMovementSystem : ISystem
     {
         [BurstCompile]

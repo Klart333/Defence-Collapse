@@ -16,7 +16,8 @@ MonoBehaviour:
     m_Code: sv
   m_SharedData: {fileID: 11400000, guid: 3bab26c89fedbae478d2d02b60fa09a7, type: 2}
   m_Metadata:
-    m_Items: []
+    m_Items:
+    - rid: 7274273324191449193
   m_TableData:
   - m_Id: 8765083648
     m_Localized: "Appliceras p\xE5"
@@ -30,6 +31,17 @@ MonoBehaviour:
     m_Localized: Skyttes Distrikt
     m_Metadata:
       m_Items: []
+  - m_Id: 15177630159507456
+    m_Localized: 
+    m_Metadata:
+      m_Items:
+      - rid: 7274273324191449193
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 7274273324191449193
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 
+        m_SharedEntries:
+        - id: 15177630159507456

@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Effects.ECS;
 using Enemy.ECS;
 using Unity.Transforms;
 using Unity.Entities;
@@ -8,6 +9,7 @@ using Unity.Mathematics;
 
 namespace Juice.Ecs
 {
+    [BurstCompile, UpdateAfter(typeof(DeathSystem))]
     public partial struct RotationSystem : ISystem
     {
         [BurstCompile]

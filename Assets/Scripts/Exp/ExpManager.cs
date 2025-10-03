@@ -4,6 +4,7 @@ using Exp.Gemstones;
 using UnityEngine;
 using Saving;
 using System;
+using Cysharp.Threading.Tasks;
 using Effects;
 using Gameplay.Event;
 
@@ -18,6 +19,8 @@ namespace Exp
         [SerializeField]
         private GemstoneGenerator gemstoneGenerator;
         
+        private PersistantSaveManager persistantSaveManager;
+        
         public List<Gemstone> Gemstones { get; private set; }
         public List<Gemstone> ActiveGemstones { get; private set; }
         public int SlotsUnlocked { get; private set; }
@@ -25,19 +28,22 @@ namespace Exp
         
         public Stat ExpMultiplier { get; private set; }
         
-        private ExpSaveLoad saveLoad;
-
         protected override void Awake()
         {
             base.Awake();
 
             if (Instance != this) return;
-            
-            saveLoad = new ExpSaveLoad(new MessagePackSaveSystem());
-            LoadSaveData();
 
+            GetSaveManager().Forget();
+         
             ExpMultiplier = new Stat(1);
             Events.OnGameReset += OnGameReset;
+        }
+
+        private async UniTaskVoid GetSaveManager()
+        {
+            persistantSaveManager = await PersistantSaveManager.Get();
+            LoadSaveData();
         }
 
         private void OnDisable()
@@ -52,7 +58,7 @@ namespace Exp
 
         private void LoadSaveData()
         {
-            ExpSaveData saveData = saveLoad.LoadExpData();
+            ExpSaveData saveData = persistantSaveManager.ExpSaveLoad.LoadExpData();
             Exp = saveData.Exp;
             SlotsUnlocked = Mathf.Max(1, saveData.SlotsUnlocked);
 
@@ -128,7 +134,7 @@ namespace Exp
         {
             if (Instance != this) return;
             
-            saveLoad.SaveExpData(Exp, SlotsUnlocked, Gemstones, ActiveGemstones);
+            persistantSaveManager.ExpSaveLoad.SaveExpData(Exp, SlotsUnlocked, Gemstones, ActiveGemstones);
         }
 
 #if UNITY_EDITOR
