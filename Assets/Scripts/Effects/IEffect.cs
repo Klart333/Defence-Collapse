@@ -5,6 +5,7 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine.Rendering;
 using Gameplay.Upgrades.ECS;
+using Gameplay.Turns.ECS;
 using Gameplay.Upgrades;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -12,14 +13,12 @@ using Unity.Rendering;
 using Unity.Entities;
 using Effects.ECS;
 using UnityEngine;
+using DG.Tweening;
+using Variables;
 using Enemy.ECS;
 using Gameplay;
 using VFX.ECS;
 using System;
-using DG.Tweening;
-using Effects.LittleDudes;
-using Gameplay.Turns.ECS;
-using Variables;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable ConvertToConstant.Global
@@ -499,6 +498,7 @@ namespace Effects
 
     #endregion
 
+    /*
     #region Spawn Dudes
 
     [Serializable]
@@ -572,7 +572,7 @@ namespace Effects
         }
     }
 
-    #endregion
+    #endregion*/
     
     #region Stacking Effect
 

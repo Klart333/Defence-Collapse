@@ -60,16 +60,19 @@ namespace Enemy.ECS
         private void Execute(Entity entity, ref FlowFieldComponent flowField, ref EnemyClusterComponent cluster, in SpeedComponent speed, ref UpdateClusterPositionComponent updateClusterComponent)
         {
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
-            float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[flowField.PathIndex.GridIndex]);
+            int combinedIndex = flowField.PathIndex.GridIndex.x + flowField.PathIndex.GridIndex.y * PathUtility.GRID_WIDTH;
+
+            float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[combinedIndex]);
             
             float3 movedPosition = cluster.Position + (math.round(direction) * PathUtility.CELL_SCALE).XyZ();
-          
             PathIndex movedPathIndex = PathUtility.GetIndex(movedPosition.xz);
+            int combinedMovedIndex = movedPathIndex.GridIndex.x + movedPathIndex.GridIndex.y * PathUtility.GRID_WIDTH;
             ref PathChunk movedValuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[movedPathIndex.ChunkIndex]];
-            if (!ChunkIndexToListIndex.ContainsKey(movedPathIndex.ChunkIndex) || movedValuePathChunk.IndexOccupied[movedPathIndex.GridIndex]) return;
+            if (!ChunkIndexToListIndex.ContainsKey(movedPathIndex.ChunkIndex) || movedValuePathChunk.IndexOccupied[combinedMovedIndex]) return;
 
-            valuePathChunk.IndexOccupied[flowField.PathIndex.GridIndex] = false;
-            movedValuePathChunk.IndexOccupied[movedPathIndex.GridIndex] = true;
+            valuePathChunk.IndexOccupied[combinedIndex] = false;
+            
+            movedValuePathChunk.IndexOccupied[combinedMovedIndex] = true;
             
             ECB.AddComponent(entity, new UpdatePositioningComponent
             {
@@ -85,7 +88,7 @@ namespace Enemy.ECS
             ECB.AddComponent(entity, new MovingClusterComponent { TimeLeft = speed.Speed });
 
             ref PathChunk movedPathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[movedPathIndex.ChunkIndex]];
-            float2 newDirection = PathUtility.ByteToDirection(movedPathChunk.Directions[movedPathIndex.GridIndex]);
+            float2 newDirection = PathUtility.ByteToDirection(movedPathChunk.Directions[combinedMovedIndex]);
             cluster.Facing = newDirection;
             
             float3 facingMovedPosition = movedPosition + (math.round(newDirection) * PathUtility.CELL_SCALE).XyZ();

@@ -7,6 +7,7 @@ using Unity.Burst;
 using Pathfinding;
 using Utility;
 using System;
+using UnityEngine;
 
 namespace Enemy.ECS
 {
@@ -28,7 +29,7 @@ namespace Enemy.ECS
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            NativeParallelHashMap<int, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
+            NativeParallelHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             transformLookup.Update(ref state);
             bufferLookup.Update(ref state);
 
@@ -55,7 +56,7 @@ namespace Enemy.ECS
         public ComponentLookup<LocalTransform> TransformLookup;
         
         [ReadOnly]
-        public NativeParallelHashMap<int, Entity>.ReadOnly SpatialGrid;
+        public NativeParallelHashMap<int2, Entity>.ReadOnly SpatialGrid;
         
         [ReadOnly]
         public BufferLookup<ManagedEntityBuffer> BufferLookup;
@@ -65,7 +66,7 @@ namespace Enemy.ECS
             in RangeComponent rangeComponent, in LocalTransform localTransform)
         {
             float2 towerPosition = localTransform.Position.xz;
-            PathIndex towerCell = PathUtility.GetIndex(towerPosition);
+            int2 towerCell = PathUtility.GetCombinedIndex(towerPosition);
             
             float range = rangeComponent.Range;
             float rangeSq = range * range;
@@ -73,36 +74,32 @@ namespace Enemy.ECS
             float maxCellDistSq = maxCellDist * maxCellDist;
             int radiusCells = (int)(range / PathUtility.CELL_SCALE + 0.5f);
 
-            MyNativePriorityHeap<DistanceIndex> frontier = new MyNativePriorityHeap<DistanceIndex>(radiusCells * radiusCells * 4, Allocator.Temp);
-            NativeHashSet<PathIndex> reached = new NativeHashSet<PathIndex>((radiusCells + 1) * (radiusCells + 1) * 4, Allocator.Temp);
-            NativeArray<PathIndex> neighbours = new NativeArray<PathIndex>(4, Allocator.Temp);
+            MyNativePriorityHeap<DistanceIndex> frontier = new MyNativePriorityHeap<DistanceIndex>(math.max(radiusCells * radiusCells * 4, 13), Allocator.Temp);
+            NativeHashSet<int2> reached = new NativeHashSet<int2>((radiusCells + 1) * (radiusCells + 1) * 4, Allocator.Temp);
+            NativeArray<int2> neighbours = new NativeArray<int2>(4, Allocator.Temp);
             
             frontier.Push(new DistanceIndex { Distance = 0, PathIndex = towerCell, });
             
             float3 bestEnemyPosition = default;
             float2 direction = directionComponent.Direction;
-            float halfAngleRad = math.radians(directionComponent.Angle * 0.5f);
-            float cosHalfAngle = math.cos(halfAngleRad);
-            float2 coneLeft = math.mul(float2x2.Rotate(halfAngleRad), direction);
-            float2 coneRight = math.mul(float2x2.Rotate(-halfAngleRad), direction);
+            float cosHalfAngle = math.cos(directionComponent.Angle * 0.5f * math.TORADIANS);
 
             while (frontier.Count > 0)
             {
-                PathIndex index = frontier.Pop().PathIndex;
-                float2 position = PathUtility.GetPos(index).xz;
-                float2 cellCenter = PathUtility.GetPos(index).xz + PathUtility.HALF_CELL_SCALE;
+                int2 index = frontier.Pop().PathIndex;
+                float2 cellCenter = PathUtility.GetPos(index) + PathUtility.HALF_CELL_SCALE;
                 float2 toCell = cellCenter - towerPosition;
                 
                 if (!IsIndexWithinRange(toCell, maxCellDistSq))
                     continue;
                 
-                if (directionComponent.Angle < 360f && !IsIndexWithinAngle(toCell, direction, coneLeft, coneRight, cosHalfAngle))
+                if (directionComponent.Angle < 360f && !index.Equals(towerCell) && !IsIndexWithinAngle(toCell, direction, cosHalfAngle))
                     continue;
 
                 if (CellContainsEnemy(index, towerPosition, rangeSq, out bestEnemyPosition))
                     break;
                 
-                PathUtility.NativeGetNeighbouringPathIndexes(neighbours, position);
+                PathUtility.NativeGetNeighbouringPathIndexes(neighbours, index);
                 for (int i = 0; i < neighbours.Length; i++)
                 {
                     if (!reached.Add(neighbours[i])) continue;
@@ -112,9 +109,9 @@ namespace Enemy.ECS
                 }
             }
             
+            neighbours.Dispose();
             frontier.Dispose();
             reached.Dispose();
-            neighbours.Dispose();
             
             if (bestEnemyPosition.Equals(default)) return;
             
@@ -122,11 +119,10 @@ namespace Enemy.ECS
             enemyTargetComponent.HasTarget = true;
         }
 
-        private bool CellContainsEnemy(PathIndex index, float2 towerPosition, float bestDistSq, out float3 bestEnemyPosition)
+        private bool CellContainsEnemy(int2 index, float2 towerPosition, float bestDistSq, out float3 bestEnemyPosition)
         {
             bestEnemyPosition = default;
-            int cell = PathUtility.GetCombinedIndex(index);
-            if (!SpatialGrid.TryGetValue(cell, out Entity cluster) || !BufferLookup.TryGetBuffer(cluster, out DynamicBuffer<ManagedEntityBuffer> buffer)) 
+            if (!SpatialGrid.TryGetValue(index, out Entity cluster) || !BufferLookup.TryGetBuffer(cluster, out DynamicBuffer<ManagedEntityBuffer> buffer)) 
                 return false;
 
             for (int i = 0; i < buffer.Length; i++)
@@ -145,18 +141,17 @@ namespace Enemy.ECS
             return true;
         }
 
-        private bool IsIndexWithinAngle(float2 toCell, float2 direction, float2 coneLeft, float2 coneRight, float cosHalfAngle)
+        private bool IsIndexWithinAngle(float2 toCell, float2 direction, float cosHalfAngle)
         {
-            if (math.lengthsq(toCell) < 0.001f) return true;
-            
             float2 normToCell = math.normalize(toCell);
             float dotDirection = math.dot(normToCell, direction);
 
-            if (dotDirection > cosHalfAngle - 0.1f) return true; 
+            if (dotDirection < 0) // Can't have angle over 180
+            {
+                return false;
+            }
             
-            float dotLeft = math.dot(normToCell, coneLeft);
-            float dotRight = math.dot(normToCell, coneRight);
-            return dotLeft >= 0 || dotRight >= 0;
+            return dotDirection > cosHalfAngle;
         }
         
         private bool IsIndexWithinRange(float2 toCell, float maxDistanceSq)
@@ -168,7 +163,7 @@ namespace Enemy.ECS
         public struct DistanceIndex : IComparable<DistanceIndex>
         {
             public int Distance;
-            public PathIndex PathIndex;
+            public int2 PathIndex;
 
             public int CompareTo(DistanceIndex other)
             {

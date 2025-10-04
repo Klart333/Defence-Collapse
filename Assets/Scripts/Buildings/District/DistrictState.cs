@@ -279,7 +279,7 @@ namespace Buildings.District
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = pos });
                 entityManager.SetComponentData(spawnedEntity, new DirectionRangeComponent
                 {
-                    Direction = targetIndexes[i].Direction,
+                    Direction = math.normalize(targetIndexes[i].Direction),
                     Angle = districtData.AttackAngle,
                 });
             }

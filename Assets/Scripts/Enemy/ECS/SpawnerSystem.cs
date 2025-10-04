@@ -201,16 +201,17 @@ namespace Enemy.ECS
 
             float3 spawnPosition = spawningComponent.Position;
             PathIndex pathIndex = PathUtility.GetIndex(spawnPosition.xz);
+            int combinedIndex = pathIndex.GridIndex.x + pathIndex.GridIndex.y * PathUtility.GRID_WIDTH;
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[pathIndex.ChunkIndex]];
-            if (valuePathChunk.IndexOccupied[pathIndex.GridIndex]) return;
+            if (valuePathChunk.IndexOccupied[combinedIndex]) return;
             
-            valuePathChunk.IndexOccupied[pathIndex.GridIndex] = true;
+            valuePathChunk.IndexOccupied[combinedIndex] = true;
             
             int enemyIndex = spawningComponent.EnemyIndex;
             Entity prefabEntity = enemyIndex >= 100 ? BossBuffer[enemyIndex - 100].EnemyEntity : EnemyBuffer[enemyIndex].EnemyEntity;
             
             LocalTransform prefabTransform = TransformLookup[prefabEntity];
-            float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[pathIndex.GridIndex]);
+            float2 direction = PathUtility.ByteToDirection(valuePathChunk.Directions[combinedIndex]);
 
             Entity clusterEntity = ECB.CreateEntity(sortKey);
             DynamicBuffer<ManagedEntityBuffer> buffer = SpawnCluster(sortKey, clusterEntity, spawnPosition, prefabTransform.Scale, enemyIndex, prefabEntity, pathIndex, direction);

@@ -27,6 +27,7 @@ namespace Effects.ECS
             transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
             bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>();
             
+            state.RequireForUpdate(collisionQuery);
             state.RequireForUpdate<WaveStateComponent>();
             state.RequireForUpdate<SpatialHashMapSingleton>();   
             state.RequireForUpdate<FlowFieldComponent>();
@@ -35,18 +36,14 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            if (collisionQuery.IsEmpty)
-            {
-                return;
-            }
-
             int enemyCount = SystemAPI.GetSingleton<WaveStateComponent>().ClusterCount;
             NativeParallelMultiHashMap<Entity, PendingDamageComponent> pendingDamageMap = new NativeParallelMultiHashMap<Entity, PendingDamageComponent>(enemyCount * 100 + 100, state.WorldUpdateAllocator);
 
-            NativeParallelHashMap<int, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
+            NativeParallelHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
             transformLookup.Update(ref state);
             bufferLookup.Update(ref state);
+            
             state.Dependency = new CollisionJob
             {
                 PendingDamageMap = pendingDamageMap.AsParallelWriter(),
@@ -81,7 +78,7 @@ namespace Effects.ECS
     public partial struct CollisionJob : IJobEntity
     {
         [ReadOnly]
-        public NativeParallelHashMap<int, Entity>.ReadOnly SpatialGrid;
+        public NativeParallelHashMap<int2, Entity>.ReadOnly SpatialGrid;
 
         [ReadOnly]
         public ComponentLookup<LocalTransform> TransformLookup;
@@ -93,26 +90,19 @@ namespace Effects.ECS
 
         public EntityCommandBuffer.ParallelWriter ECB;
 
-        // Cellsize = 1
         [BurstCompile]
         public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in ColliderComponent colliderComponent, ref DamageComponent damageComponent, ref RandomComponent randomComponent, in CritComponent critComponent, in LocalTransform transform) 
         {
-            if (damageComponent.LimitedHits <= 0)
-            {
-                return;
-            }
+            if (damageComponent.LimitedHits <= 0) return;
 
-            float3 pos = transform.Position;
-            if (pos.y > 1.0f)
-            {
-                return;
-            }          
+            float2 pos = transform.Position.xz;
+            //if (pos.y > 1.0f) return;
             
             float radius = colliderComponent.Radius;
             float radiusSq = radius * radius;
 
-            int centerCell = PathUtility.GetCombinedIndex(pos.xz);
-            if (CollideWithinCell(entity, ref randomComponent, critComponent, ref damageComponent, centerCell, pos.xz, radiusSq))
+            int2 centerCell = PathUtility.GetCombinedIndex(pos);
+            if (CollideWithinCell(entity, centerCell, ref randomComponent, critComponent, ref damageComponent, pos, radiusSq))
             {
                 if (damageComponent.IsOneShot)
                 {
@@ -121,23 +111,14 @@ namespace Effects.ECS
                 return;
             }
 
-            int searchRadius = (int)(radius / PathUtility.CELL_SCALE + 0.5f); // 0.5 for rounding
+            int searchRadius = (int)(radius / PathUtility.CELL_SCALE + 1f); // ceil that shit
+            for (int x = -searchRadius; x <= searchRadius; x++)
             for (int z = -searchRadius; z <= searchRadius; z++)
             {
-                for (int x = -searchRadius; x <= searchRadius; x++)
-                {
-                    if (z == 0 && x == 0) continue;
-                    
-                    // Fast approximate distance check
-                    float cellDistX = math.abs(x + 0.5f - pos.x);
-                    float cellDistZ = math.abs(z + 0.5f - pos.z);
-                    if (cellDistX > radius || cellDistZ > radius) continue;
-                    
-                    if (cellDistX * cellDistX + cellDistZ * cellDistZ > radiusSq) continue;
-                    
-                    int cell = centerCell + x + z * PathUtility.CELL_SCALE;
-                    if (CollideWithinCell(entity, ref randomComponent, critComponent, ref damageComponent, cell, pos.xz, radiusSq)) return;
-                }
+                if (z == 0 && x == 0) continue;
+                
+                int2 cell = new int2(centerCell.x + x, centerCell.y + z);
+                if (CollideWithinCell(entity, cell, ref randomComponent, critComponent, ref damageComponent, pos, radiusSq)) return;
             }
 
             if (damageComponent.IsOneShot)
@@ -147,7 +128,7 @@ namespace Effects.ECS
         }
 
         [BurstCompile]
-        private bool CollideWithinCell(Entity entity, ref RandomComponent randomComponent, CritComponent critComponent, ref DamageComponent damageComponent, int cell, float2 pos, float radiusSq)
+        private bool CollideWithinCell(Entity entity, int2 cell, ref RandomComponent randomComponent, CritComponent critComponent, ref DamageComponent damageComponent, float2 pos, float radiusSq)
         {
             if (!SpatialGrid.TryGetValue(cell, out Entity cluster) || !BufferLookup.TryGetBuffer(cluster, out DynamicBuffer<ManagedEntityBuffer> buffer)) return false;
 
@@ -164,13 +145,12 @@ namespace Effects.ECS
                 PendingDamageComponent pendingDamage = GetDamage(ref randomComponent, critComponent, ref damageComponent, entity);
                 PendingDamageMap.Add(enemy, pendingDamage);
 
-                if (damageComponent.HasLimitedHits)
+                if (!damageComponent.HasLimitedHits) continue;
+                
+                damageComponent.LimitedHits--;
+                if (damageComponent.LimitedHits == 0)
                 {
-                    damageComponent.LimitedHits--;
-                    if (damageComponent.LimitedHits == 0)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 

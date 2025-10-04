@@ -55,7 +55,7 @@ namespace Buildings.District
         public PooledMonoBehaviour RangeIndicator;
 
         [Title("Targeting")]
-        [SerializeField]
+        [SerializeField, Tooltip("Can't have angle from 180 - 360")]
         private float attackAngle = 360;
         
         [SerializeField]

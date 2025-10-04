@@ -1,12 +1,10 @@
-using Effects.LittleDudes;
 using Unity.Collections;
 using Unity.Mathematics;
-using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
 using Effects.ECS;
-using System;
 using Pathfinding;
+using System;
 
 namespace Enemy.ECS
 {
@@ -28,11 +26,9 @@ namespace Enemy.ECS
         {
             int enemyCount = SystemAPI.GetSingleton<WaveStateComponent>().ClusterCount;
             RefRW<SpatialHashMapSingleton> mapSingleton = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>();
-            mapSingleton.ValueRW.Value = new NativeParallelHashMap<int, Entity>((int)(enemyCount * 2.5f) + 100, state.WorldUpdateAllocator); // Double for loadfactor stuff
-            if (enemyCount == 0)
-            {
-                return;
-            }
+            mapSingleton.ValueRW.Value = new NativeParallelHashMap<int2, Entity>((int)(enemyCount * 2.5f) + 100, state.WorldUpdateAllocator); // Double for loadfactor stuff
+
+            if (enemyCount == 0) return;
 
             state.Dependency = new BuildEnemyHashGridJob
             {
@@ -49,23 +45,22 @@ namespace Enemy.ECS
         }
     }
     
-    [BurstCompile]
+    [BurstCompile, WithAll(typeof(EnemyClusterComponent))]
     public partial struct BuildEnemyHashGridJob : IJobEntity
     {
         [WriteOnly]
-        public NativeParallelHashMap<int, Entity>.ParallelWriter SpatialGrid;
+        public NativeParallelHashMap<int2, Entity>.ParallelWriter SpatialGrid;
 
         [BurstCompile]
-        public void Execute(in Entity entity, in EnemyClusterComponent enemyClusterComponent)
+        public void Execute(in Entity entity, in FlowFieldComponent flowFieldComponent)
         {
-            int gridIndex = PathUtility.GetCombinedIndex(enemyClusterComponent.Position.xz);
-            SpatialGrid.TryAdd(gridIndex, entity);
+            SpatialGrid.TryAdd(PathUtility.GetCombinedIndex(flowFieldComponent.PathIndex), entity);
         }
     }
 
     public struct SpatialHashMapSingleton : IComponentData, IDisposable
     {
-        public NativeParallelHashMap<int, Entity> Value;
+        public NativeParallelHashMap<int2, Entity> Value;
 
         public void Dispose()
         {

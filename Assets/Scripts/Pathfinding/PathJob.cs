@@ -3,133 +3,136 @@ using System.Runtime.CompilerServices;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Entities;
-using Pathfinding;
 using Unity.Burst;
 using Unity.Jobs;
-using UnityEngine;
 
-[BurstCompile(FloatPrecision.Low, FloatMode.Fast, OptimizeFor = OptimizeFor.Performance)]
-public struct PathJob : IJobFor
+namespace Pathfinding
 {
-    [NativeDisableParallelForRestriction]
-    public BlobAssetReference<PathChunkArray> PathChunks;
-
-    [ReadOnly, NativeDisableContainerSafetyRestriction]
-    public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
-
-    public int Start;
-    public int QuadrantWidth;
-    public int QuadrantHeight;
-    
-    [BurstCompile]
-    public void Execute(int index)
+    [BurstCompile(FloatPrecision.Low, FloatMode.Fast, OptimizeFor = OptimizeFor.Performance)]
+    public struct PathJob : IJobFor
     {
-        NativeArray<PathIndex> neighbours = new NativeArray<PathIndex>(4, Allocator.Temp);
+        [NativeDisableParallelForRestriction]
+        public BlobAssetReference<PathChunkArray> PathChunks;
 
-        for (int y = 0; y < QuadrantHeight; y++)
-        for (int x = QuadrantWidth * y; x < QuadrantWidth * (y + 1); x++)
+        [ReadOnly, NativeDisableContainerSafetyRestriction]
+        public NativeHashMap<int2, int>.ReadOnly ChunkIndexToListIndex;
+
+        public int StartX;
+        public int StartY;
+        public int QuadrantWidth;
+        public int QuadrantHeight;
+
+        [BurstCompile]
+        public void Execute(int index)
         {
-            int i = Start + y * QuadrantWidth + x;
-            CalculatePathAtIndex(neighbours, ref PathChunks.Value.PathChunks[index], i);
-        }
+            NativeArray<PathIndex> neighbours = new NativeArray<PathIndex>(4, Allocator.Temp);
 
-        neighbours.Dispose();
-    }
-    
-    private void CalculatePathAtIndex(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int index)
-    {
-        byte targetIndex = pathChunk.TargetIndexes[index];
-
-        switch (targetIndex)
-        {
-            // Handle common case (~99%)
-            case 0:
+            for (int x = StartX; x < QuadrantWidth + StartX; x++)
+            for (int y = StartY; y < QuadrantHeight + StartY; y++)
             {
-                if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out int dirIdx))
-                {
-                    pathChunk.Directions[index] = PathUtility.GetDirection(PathUtility.NeighbourDirectionsCardinal[dirIdx]);
-                    pathChunk.Distances[index] = pathChunk.NotWalkableIndexes[index] ? 1_000_000_000 : dist;
-                }
-                return;
+                CalculatePathAtIndex(neighbours, ref PathChunks.Value.PathChunks[index], new int2(x, y));
             }
-            // Handle barricade case (targetIndex == 255)
-            case byte.MaxValue:
+
+            neighbours.Dispose();
+        }
+
+        private void CalculatePathAtIndex(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int2 index)
+        {
+            int combinedIndex = index.x + index.y * PathUtility.GRID_WIDTH;
+            byte targetIndex = pathChunk.TargetIndexes[combinedIndex];
+
+            switch (targetIndex)
             {
-                if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out _))
+                // Handle common case (~99%)
+                case 0:
                 {
-                    pathChunk.Directions[index] = byte.MaxValue;
-                    pathChunk.Distances[index] = dist;
+                    if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out int dirIdx))
+                    {
+                        pathChunk.Directions[combinedIndex] = PathUtility.GetDirection(PathUtility.NeighbourDirectionsCardinal[dirIdx]);
+                        pathChunk.Distances[combinedIndex] = pathChunk.NotWalkableIndexes[combinedIndex] ? 1_000_000_000 : dist;
+                    }
+
+                    return;
                 }
-                return;
+                // Handle barricade case (targetIndex == 255)
+                case byte.MaxValue:
+                {
+                    if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out _))
+                    {
+                        pathChunk.Directions[combinedIndex] = byte.MaxValue;
+                        pathChunk.Distances[combinedIndex] = dist;
+                    }
+
+                    return;
+                }
+                default:
+                    // Handle building case (targetIndex 1-254)
+                    pathChunk.Distances[combinedIndex] = targetIndex * 50;
+                    pathChunk.Directions[combinedIndex] = byte.MaxValue;
+                    break;
             }
-            default:
-                // Handle building case (targetIndex 1-254)
-                pathChunk.Distances[index] = targetIndex * 50;
-                pathChunk.Directions[index] = byte.MaxValue;
-                break;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool GetClosestNeighbour(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int gridIndex, out int shortestDistance, out int dirIndex)
-    {
-        int2 currentChunkIndex = pathChunk.ChunkIndex;
-        GetNeighbours(currentChunkIndex, gridIndex, neighbours);
-            
-        shortestDistance = int.MaxValue;
-        dirIndex = 0;
-        for (int i = 0; i < 4; i++)
-        {
-            PathIndex neighbourIndex = neighbours[i];
-            if (neighbourIndex.GridIndex == -1) continue;
-                
-            ref PathChunk neighbour = ref neighbourIndex.ChunkIndex.Equals(currentChunkIndex) 
-                ? ref pathChunk 
-                : ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[neighbourIndex.ChunkIndex]];
-                
-            int manhattanDist = i % 2 == 0 ? 5 : 7;
-            int indexOccupied = neighbour.IndexOccupied[neighbourIndex.GridIndex] ? 1_000 : 0;
-            int dist = neighbour.Distances[neighbourIndex.GridIndex]
-                       + neighbour.MovementCosts[neighbourIndex.GridIndex] * manhattanDist
-                       + neighbour.ExtraDistance[neighbourIndex.GridIndex]
-                       + indexOccupied;
-            
-            if (dist >= shortestDistance) continue;
-                
-            shortestDistance = dist;
-            dirIndex = i;
         }
 
-        return shortestDistance < int.MaxValue;
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void GetNeighbours(int2 chunkIndex, int gridIndex, NativeArray<PathIndex> array)
-    {
-        int x = gridIndex % PathUtility.GRID_WIDTH;
-        int y = gridIndex / PathUtility.GRID_WIDTH;
-
-        for (int i = 0; i < 4; i++)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool GetClosestNeighbour(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int2 gridIndex, out int shortestDistance, out int dirIndex)
         {
-            int2 dir = PathUtility.NeighbourDirectionsCardinal[i];
-            int2 neighbour = new int2(x + dir.x, y + dir.y);
+            int2 currentChunkIndex = pathChunk.ChunkIndex;
+            GetNeighbours(currentChunkIndex, gridIndex, neighbours);
 
-            array[i] = neighbour switch
+            shortestDistance = int.MaxValue;
+            dirIndex = 0;
+            for (int i = 0; i < 4; i++)
             {
-                {x: < 0} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x - 1, chunkIndex.y)) 
-                    ? new PathIndex(new int2(chunkIndex.x - 1, chunkIndex.y), PathUtility.GRID_WIDTH - 1 + y * PathUtility.GRID_WIDTH )
-                    : new PathIndex(default, -1),
-                {x: >= PathUtility.GRID_WIDTH} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x + 1, chunkIndex.y)) 
-                    ? new PathIndex(new int2(chunkIndex.x + 1, chunkIndex.y), 0 + y * PathUtility.GRID_WIDTH )
-                    : new PathIndex(default, -1),
-                {y: < 0} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y - 1)) 
-                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y - 1), x + (PathUtility.GRID_WIDTH - 1) * PathUtility.GRID_WIDTH  ) 
-                    : new PathIndex(default, -1),
-                {y: >= PathUtility.GRID_WIDTH} => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y + 1)) 
-                    ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y + 1), x + 0 * PathUtility.GRID_WIDTH ) 
-                    : new PathIndex(default, -1),
-                _ => new PathIndex(chunkIndex, neighbour.x + neighbour.y * PathUtility.GRID_WIDTH),
-            };
+                PathIndex neighbourIndex = neighbours[i];
+                if (neighbourIndex.GridIndex.x == -1) continue;
+
+                int combinedIndex = neighbourIndex.GridIndex.x + neighbourIndex.GridIndex.y * PathUtility.GRID_WIDTH;
+
+                ref PathChunk neighbour = ref neighbourIndex.ChunkIndex.Equals(currentChunkIndex)
+                    ? ref pathChunk
+                    : ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[neighbourIndex.ChunkIndex]];
+
+                int manhattanDist = i % 2 == 0 ? 5 : 7;
+                int indexOccupied = neighbour.IndexOccupied[combinedIndex] ? 1_000 : 0;
+                int dist = neighbour.Distances[combinedIndex]
+                           + neighbour.MovementCosts[combinedIndex] * manhattanDist
+                           + neighbour.ExtraDistance[combinedIndex]
+                           + indexOccupied;
+
+                if (dist >= shortestDistance) continue;
+
+                shortestDistance = dist;
+                dirIndex = i;
+            }
+
+            return shortestDistance < int.MaxValue;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void GetNeighbours(int2 chunkIndex, int2 gridIndex, NativeArray<PathIndex> array)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                int2 dir = PathUtility.NeighbourDirectionsCardinal[i];
+                int2 neighbour = new int2(gridIndex.x + dir.x, gridIndex.y + dir.y);
+
+                array[i] = neighbour switch
+                {
+                    { x: < 0 } => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x - 1, chunkIndex.y))
+                        ? new PathIndex(new int2(chunkIndex.x - 1, chunkIndex.y), new int2(PathUtility.GRID_WIDTH - 1, neighbour.y))
+                        : new PathIndex(default, -1),
+                    { x: >= PathUtility.GRID_WIDTH } => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x + 1, chunkIndex.y))
+                        ? new PathIndex(new int2(chunkIndex.x + 1, chunkIndex.y), new int2(0, neighbour.y))
+                        : new PathIndex(default, -1),
+                    { y: < 0 } => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y - 1))
+                        ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y - 1), new int2(neighbour.x, PathUtility.GRID_WIDTH - 1))
+                        : new PathIndex(default, -1),
+                    { y: >= PathUtility.GRID_WIDTH } => ChunkIndexToListIndex.ContainsKey(new int2(chunkIndex.x, chunkIndex.y + 1))
+                        ? new PathIndex(new int2(chunkIndex.x, chunkIndex.y + 1), new int2(neighbour.x, 0))
+                        : new PathIndex(default, -1),
+                    _ => new PathIndex(chunkIndex, neighbour),
+                };
+            }
         }
     }
 }

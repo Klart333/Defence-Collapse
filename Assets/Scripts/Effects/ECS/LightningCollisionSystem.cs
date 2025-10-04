@@ -53,7 +53,7 @@ namespace Effects.ECS
             pendingDamageComponentLookup.Update(ref state);
             bufferLookup.Update(ref state);
             
-            NativeParallelHashMap<int, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
+            NativeParallelHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
 
             state.Dependency = new LightningCollisionJob
             {
@@ -103,7 +103,7 @@ namespace Effects.ECS
         public ComponentLookup<LocalTransform> TransformLookup;
 
         [ReadOnly]
-        public NativeParallelHashMap<int, Entity>.ReadOnly SpatialGrid;
+        public NativeParallelHashMap<int2, Entity>.ReadOnly SpatialGrid;
         
         [ReadOnly]
         public BufferLookup<ManagedEntityBuffer> BufferLookup;
@@ -118,12 +118,12 @@ namespace Effects.ECS
             NativeHashSet<Entity> hitEntities = new NativeHashSet<Entity>(sourceLightning.Bounces, Allocator.TempJob);
             
             float3 sourcePosition = transform.Position;
-            int cellIndex = PathUtility.GetCombinedIndex(sourcePosition.xz);
+            int2 cellIndex = PathUtility.GetCombinedIndex(sourcePosition.xz);
             
             for (int i = 0; i < sourceLightning.Bounces; i++)
             {
                 hitEntities.Add(sourceEntity);
-                if (!GetClosest(hitEntities, sourcePosition, cellIndex, out cellIndex, out sourceEntity))
+                if (!GetClosest(hitEntities, cellIndex, out cellIndex, out sourceEntity))
                 {
                     hitEntities.Dispose();
                     return;
@@ -154,32 +154,25 @@ namespace Effects.ECS
             hitEntities.Dispose();
         }
 
-        private bool GetClosest(NativeHashSet<Entity> hitEntities, float3 sourcePosition, int cellIndex, out int closestIndex, out Entity closestEntity)
+        private bool GetClosest(NativeHashSet<Entity> hitEntities, int2 cellIndex, out int2 closestIndex, out Entity closestEntity)
         {
             closestEntity = default;
-            float closest = float.MaxValue;
             closestIndex = cellIndex;
             for (int x = -1; x <= 1; x++)
             for (int y = -1; y <= 1; y++)
             {
-                int cell = cellIndex + x + y * PathUtility.CELL_SCALE;
-                if (!SpatialGrid.TryGetValue(cell, out Entity cluster) || !BufferLookup.TryGetBuffer(cluster, out DynamicBuffer<ManagedEntityBuffer> buffer)) return false;
+                int2 cell = new int2(cellIndex.x + x, cellIndex.y + y);
+                if (!SpatialGrid.TryGetValue(cell, out Entity cluster) || !BufferLookup.TryGetBuffer(cluster, out DynamicBuffer<ManagedEntityBuffer> buffer)) continue;
 
-                for (int i = 0; i < buffer.Length; i++)
-                {
-                    Entity enemy = buffer[i].Entity;
-                    if (!TransformLookup.TryGetComponent(enemy, out LocalTransform enemyTransform) || hitEntities.Contains(enemy)) continue;
-
-                    float distSq = math.distancesq(sourcePosition, enemyTransform.Position);
-                    if (distSq > closest) continue;
-
-                    closestEntity = enemy;
-                    closest = distSq;
-                    closestIndex = cell;
-                }
+                Entity enemy = buffer[0].Entity;
+                if (!hitEntities.Add(enemy)) continue;
+                
+                closestEntity = enemy;
+                closestIndex = cell;
+                return true;
             }
             
-            return closestEntity != default;
+            return false;
         }
     }
 

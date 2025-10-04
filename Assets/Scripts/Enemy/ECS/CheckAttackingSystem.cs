@@ -59,7 +59,8 @@ namespace Enemy.ECS
         public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in EnemyClusterComponent clusterComponent)
         {
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[clusterComponent.TargetPathIndex.ChunkIndex]];
-            if (valuePathChunk.Directions[clusterComponent.TargetPathIndex.GridIndex] == byte.MaxValue)
+            int combinedIndex = clusterComponent.TargetPathIndex.GridIndex.x + clusterComponent.TargetPathIndex.GridIndex.y * PathUtility.GRID_WIDTH;
+            if (valuePathChunk.Directions[combinedIndex] == byte.MaxValue)
             {
                 ECB.AddComponent(sortKey, entity, new AttackingComponent { Target = clusterComponent.TargetPathIndex });
             }

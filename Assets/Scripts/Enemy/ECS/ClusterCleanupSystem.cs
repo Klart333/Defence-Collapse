@@ -52,7 +52,8 @@ namespace Enemy.ECS
         public void Execute(in EnemyClusterComponent cluster, in FlowFieldComponent flowField)
         {
             ref PathChunk valuePathChunk = ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[flowField.PathIndex.ChunkIndex]];
-            valuePathChunk.IndexOccupied[flowField.PathIndex.GridIndex] = false;
+            int combinedIndex = flowField.PathIndex.GridIndex.x + flowField.PathIndex.GridIndex.y * PathUtility.GRID_WIDTH;
+            valuePathChunk.IndexOccupied[combinedIndex] = false;
         }
     }
 }

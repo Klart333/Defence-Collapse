@@ -7,6 +7,7 @@ using Enemy.ECS;
 
 namespace Buildings.District.ECS
 {
+    [BurstCompile, UpdateAfter(typeof(ClosestTargetingSystem))]
     public partial struct DistrictAttachementMeshSystem : ISystem
     {
         private ComponentLookup<EnemyTargetComponent> targetLookup;
@@ -16,7 +17,7 @@ namespace Buildings.District.ECS
         {
             targetLookup = SystemAPI.GetComponentLookup<EnemyTargetComponent>(true); 
             
-            state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<TargetingActivationComponent, UpdateTargetingTag>().Build());
+            //state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<TargetingActivationComponent, UpdateTargetingTag>().Build());
         }
 
         [BurstCompile]
