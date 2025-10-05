@@ -35,12 +35,7 @@ namespace Effects.ECS
 		public float Damage;
 	}
 	
-	public struct DamageTakenComponent : IComponentData
-	{
-		public float DamageTaken;
-		public Health.HealthType DamageTakenType;
-		public bool IsCrit;
-	}
+	public struct DamageTakenTag : IComponentData { }
 
 	public struct LifetimeComponent : IComponentData
 	{
@@ -65,18 +60,7 @@ namespace Effects.ECS
 		public float Shield;
 	}
 
-	public struct PendingDamageComponent : IComponentData
-	{
-		public float HealthDamage;
-		public float ArmorDamage;
-		public float ShieldDamage;
-		public bool IsCrit;
-		
-		public bool TriggerDamageDone;
-		public int Key;
-
-		public Entity SourceEntity;
-	}
+	public struct PendingDamageTag : IComponentData { }
 
 	public struct MaxHealthComponent : IComponentData
 	{

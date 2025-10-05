@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Effects.ECS.ECB;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -27,44 +28,32 @@ namespace Effects.ECS
             transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
             bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>();
             
-            state.RequireForUpdate(collisionQuery);
-            state.RequireForUpdate<WaveStateComponent>();
+            state.RequireForUpdate<BeforeDamageEffectsECBSystem.Singleton>();
             state.RequireForUpdate<SpatialHashMapSingleton>();   
-            state.RequireForUpdate<FlowFieldComponent>();
+            state.RequireForUpdate(collisionQuery);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            int enemyCount = SystemAPI.GetSingleton<WaveStateComponent>().ClusterCount;
-            NativeParallelMultiHashMap<Entity, PendingDamageComponent> pendingDamageMap = new NativeParallelMultiHashMap<Entity, PendingDamageComponent>(enemyCount * 100 + 100, state.WorldUpdateAllocator);
-
             NativeParallelHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            var ecbSingleton = SystemAPI.GetSingleton<BeforeDamageEffectsECBSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
             transformLookup.Update(ref state);
             bufferLookup.Update(ref state);
             
             state.Dependency = new CollisionJob
             {
-                PendingDamageMap = pendingDamageMap.AsParallelWriter(),
                 SpatialGrid = spatialGrid.AsReadOnly(),
                 TransformLookup = transformLookup,
                 ECB = ecb.AsParallelWriter(),
                 BufferLookup = bufferLookup,
             }.ScheduleParallel(state.Dependency);
-            state.Dependency.Complete(); 
-
-            state.Dependency = new SumCollisionJob
-            {
-                ECB = ecb,
-                PendingDamageMap = pendingDamageMap.AsReadOnly(),
-            }.Schedule(state.Dependency);
-            state.Dependency.Complete(); 
             
+            state.Dependency.Complete(); 
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
-
-            pendingDamageMap.Dispose();
         }
 
         [BurstCompile]
@@ -86,8 +75,6 @@ namespace Effects.ECS
         [ReadOnly]
         public BufferLookup<ManagedEntityBuffer> BufferLookup;
         
-        public NativeParallelMultiHashMap<Entity, PendingDamageComponent>.ParallelWriter PendingDamageMap;
-
         public EntityCommandBuffer.ParallelWriter ECB;
 
         [BurstCompile]
@@ -96,13 +83,13 @@ namespace Effects.ECS
             if (damageComponent.LimitedHits <= 0) return;
 
             float2 pos = transform.Position.xz;
-            //if (pos.y > 1.0f) return;
+            if (pos.y > 1.0f) return;
             
             float radius = colliderComponent.Radius;
             float radiusSq = radius * radius;
 
             int2 centerCell = PathUtility.GetCombinedIndex(pos);
-            if (CollideWithinCell(entity, centerCell, ref randomComponent, critComponent, ref damageComponent, pos, radiusSq))
+            if (CollideWithinCell(sortKey, entity, centerCell, ref randomComponent, critComponent, ref damageComponent, pos, radiusSq))
             {
                 if (damageComponent.IsOneShot)
                 {
@@ -118,7 +105,7 @@ namespace Effects.ECS
                 if (z == 0 && x == 0) continue;
                 
                 int2 cell = new int2(centerCell.x + x, centerCell.y + z);
-                if (CollideWithinCell(entity, cell, ref randomComponent, critComponent, ref damageComponent, pos, radiusSq)) return;
+                if (CollideWithinCell(sortKey, entity, cell, ref randomComponent, critComponent, ref damageComponent, pos, radiusSq)) return;
             }
 
             if (damageComponent.IsOneShot)
@@ -128,7 +115,7 @@ namespace Effects.ECS
         }
 
         [BurstCompile]
-        private bool CollideWithinCell(Entity entity, int2 cell, ref RandomComponent randomComponent, CritComponent critComponent, ref DamageComponent damageComponent, float2 pos, float radiusSq)
+        private bool CollideWithinCell(int sortKey, Entity entity, int2 cell, ref RandomComponent randomComponent, CritComponent critComponent, ref DamageComponent damageComponent, float2 pos, float radiusSq)
         {
             if (!SpatialGrid.TryGetValue(cell, out Entity cluster) || !BufferLookup.TryGetBuffer(cluster, out DynamicBuffer<ManagedEntityBuffer> buffer)) return false;
 
@@ -142,8 +129,7 @@ namespace Effects.ECS
                 if (distSq > radiusSq) continue;
 
                 // COLLIDE
-                PendingDamageComponent pendingDamage = GetDamage(ref randomComponent, critComponent, ref damageComponent, entity);
-                PendingDamageMap.Add(enemy, pendingDamage);
+                AddDamageBuffer(sortKey, entity, ref randomComponent, critComponent, ref damageComponent, entity);
 
                 if (!damageComponent.HasLimitedHits) continue;
                 
@@ -158,62 +144,24 @@ namespace Effects.ECS
         }
 
         [BurstCompile]
-        private PendingDamageComponent GetDamage(ref RandomComponent randomComponent, CritComponent critComponent, ref DamageComponent damageComponent, Entity sourceEntity)
+        private void AddDamageBuffer(int sortKey, Entity entity, ref RandomComponent randomComponent, CritComponent critComponent, ref DamageComponent damageComponent, Entity sourceEntity)
         {
             bool isCrit = randomComponent.Random.NextFloat() < critComponent.CritChance;
             float critMultiplier = isCrit ? critComponent.CritDamage : 1;
-            return new PendingDamageComponent
+            ECB.AppendToBuffer(sortKey, entity, new DamageBuffer
             {
                 HealthDamage = damageComponent.HealthDamage * critMultiplier,
-                ArmorDamage = damageComponent.ArmorDamage * critMultiplier,
                 ShieldDamage = damageComponent.ShieldDamage * critMultiplier,
-                IsCrit = isCrit,
-                Key = damageComponent.Key,
+                ArmorDamage = damageComponent.ArmorDamage * critMultiplier,
+                
                 TriggerDamageDone = damageComponent.TriggerDamageDone,
+                Key = damageComponent.Key,
+                IsCrit = isCrit,
                 
                 SourceEntity = sourceEntity,
-            };
-        }
-    }
-
-    [BurstCompile]
-    public struct SumCollisionJob : IJob
-    {
-        [ReadOnly]
-        public NativeParallelMultiHashMap<Entity, PendingDamageComponent>.ReadOnly PendingDamageMap;
-        
-        public EntityCommandBuffer ECB;
-        
-        public void Execute()
-        {
-            // Get all unique keys (entities that were hit)
-            NativeArray<Entity> keys = PendingDamageMap.GetKeyArray(Allocator.Temp);
+            });
             
-            foreach (Entity entity in keys)
-            {
-                if (!PendingDamageMap.TryGetFirstValue(entity, out PendingDamageComponent damage, out var iterator)) continue;
-
-                PendingDamageComponent pendingDamage = new PendingDamageComponent
-                {
-                    SourceEntity = damage.SourceEntity
-                };
-                
-                do 
-                {
-                    pendingDamage.HealthDamage += damage.HealthDamage;
-                    pendingDamage.ArmorDamage += damage.ArmorDamage;
-                    pendingDamage.ShieldDamage += damage.ShieldDamage;
-                    pendingDamage.IsCrit |= damage.IsCrit;
-                    
-                    pendingDamage.Key = damage.Key; // A bit inaccurate
-                    pendingDamage.TriggerDamageDone = damage.TriggerDamageDone;
-                } 
-                while (PendingDamageMap.TryGetNextValue(out damage, ref iterator));
-                    
-                ECB.AddComponent(entity, pendingDamage);
-            }
-            
-            keys.Dispose();
+            ECB.AddComponent<PendingDamageTag>(sortKey, entity);
         }
     }
 }

@@ -7,7 +7,6 @@ using Unity.Burst;
 using Pathfinding;
 using Utility;
 using System;
-using UnityEngine;
 
 namespace Enemy.ECS
 {

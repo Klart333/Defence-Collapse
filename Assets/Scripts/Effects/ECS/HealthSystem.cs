@@ -1,18 +1,24 @@
-using Health;
-using Unity.Burst;
-using Unity.Collections;
-using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Collections;
 using Unity.Transforms;
+using Effects.ECS.ECB;
+using Unity.Entities;
+using Unity.Burst;
+using Enemy.ECS;
+using Health;
 
 namespace Effects.ECS
 {
-    [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(CollisionSystem))]
+    [BurstCompile, UpdateAfter(typeof(BeforeHealthECBSystem))]
     public partial struct HealthSystem : ISystem
     {
+        private BufferLookup<DamageBuffer> damageBufferLookup;
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            damageBufferLookup = SystemAPI.GetBufferLookup<DamageBuffer>();
+
             state.RequireForUpdate<DamageCallbackSingletonTag>();
         }
 
@@ -21,9 +27,12 @@ namespace Effects.ECS
         {
             Entity bufferEntity = SystemAPI.GetSingletonEntity<DamageCallbackSingletonTag>();
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            
+            damageBufferLookup.Update(ref state);
 
             state.Dependency = new HealthJob
             {
+                DamageBufferLookup = damageBufferLookup,
                 ECB = ecb.AsParallelWriter(),
                 BufferEntity = bufferEntity,
             }.ScheduleParallel(state.Dependency);
@@ -40,58 +49,73 @@ namespace Effects.ECS
         }
     }
     
-    [BurstCompile]
+    [BurstCompile, WithAll(typeof(PendingDamageTag))]
     public partial struct HealthJob : IJobEntity
     {
+        [ReadOnly]
+        public BufferLookup<DamageBuffer> DamageBufferLookup;
+        
         public Entity BufferEntity;
         
         public EntityCommandBuffer.ParallelWriter ECB;
         
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent health, in PendingDamageComponent pendingDamage, in LocalTransform transform)
+        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent health, in LocalTransform transform)
         {
-            float damageTaken;
-            HealthType damageType;
+            DynamicBuffer<DamageBuffer> damageBuffer = DamageBufferLookup[entity];
+            for (int i = 0; i < damageBuffer.Length; ++i)
+            {
+                TakeDamage(ref health, damageBuffer[i], out float damageTaken, out HealthType damageType);
+                
+                ECB.AppendToBuffer(index, entity, new DamageTakenBuffer
+                {
+                    DamageTaken = damageTaken,
+                    DamageTakenType = damageType,
+                    IsCrit = damageBuffer[i].IsCrit,
+                });
+
+                ECB.AppendToBuffer(index, BufferEntity, new DamageCallbackComponent
+                {
+                    DamageTaken = damageTaken,
+                    DamageTakenType = damageType,
+                    Position = transform.Position,
+                
+                    Key = damageBuffer[i].Key,
+                    TriggerDamageDone = damageBuffer[i].TriggerDamageDone
+                });
+
+            }
+            
+            ECB.AddComponent<DamageTakenTag>(index, entity);
+            
+            ECB.RemoveComponent<PendingDamageTag>(index, entity);
+            ECB.SetBuffer<DamageBuffer>(index, entity);
+            
+            if (health.Health <= 0)
+            {
+                ECB.AddComponent<DeathTag>(index, entity);
+            }
+        }
+
+        private static void TakeDamage(ref HealthComponent health, DamageBuffer damageBuffer, out float damageTaken, out HealthType damageType)
+        {
             if (health.Shield > 0)
             {
                 damageType = HealthType.Shield;
-                damageTaken = pendingDamage.ShieldDamage;
+                damageTaken = damageBuffer.ShieldDamage;
                 health.Shield -= damageTaken;
             }
             else if (health.Armor > 0)
             {
                 damageType = HealthType.Armor;
-                damageTaken = pendingDamage.ArmorDamage;
+                damageTaken = damageBuffer.ArmorDamage;
                 health.Armor -= damageTaken;
             }
             else
             {
                 damageType = HealthType.Health;
-                damageTaken = pendingDamage.HealthDamage;
-                health.Health -= pendingDamage.HealthDamage;
-            }
-            
-            ECB.RemoveComponent<PendingDamageComponent>(index, entity);
-            ECB.AddComponent(index, entity, new DamageTakenComponent
-            {
-                DamageTaken = damageTaken,
-                DamageTakenType = damageType,
-                IsCrit = pendingDamage.IsCrit,
-            });
-
-            ECB.AppendToBuffer(index, BufferEntity, new DamageCallbackComponent
-            {
-                DamageTaken = damageTaken,
-                DamageTakenType = damageType,
-                Position = transform.Position,
-                
-                Key = pendingDamage.Key,
-                TriggerDamageDone = pendingDamage.TriggerDamageDone
-            });
-            
-            if (health.Health <= 0)
-            {
-                ECB.AddComponent<DeathTag>(index, entity);
+                damageTaken = damageBuffer.HealthDamage;
+                health.Health -= damageBuffer.HealthDamage;
             }
         }
     }

@@ -5,24 +5,21 @@ using Unity.Entities;
 using Unity.Burst;
 using Gameplay;
 using System;
+using Enemy.ECS;
 
 namespace Effects.ECS
 {
-    [UpdateAfter(typeof(FireCollisionSystem)), UpdateBefore(typeof(HealthSystem))]
+    [BurstCompile, UpdateAfter(typeof(FireCollisionSystem)), UpdateBefore(typeof(HealthSystem))]
     public partial struct FireDamageSystem : ISystem
     {
-        private ComponentLookup<PendingDamageComponent> pendingDamageLookup;
-        
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<GameSpeedComponent>();
+            state.RequireForUpdate<BeforeDamageEffectsECBSystem.Singleton>();
             state.RequireForUpdate<FireTickDataComponent>();
-            state.RequireForUpdate<PendingDamageECBSystem.Singleton>();
-            pendingDamageLookup = state.GetComponentLookup<PendingDamageComponent>(true);
+            state.RequireForUpdate<GameSpeedComponent>();
             
-            EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<FireComponent, HealthComponent>();
-            state.RequireForUpdate(state.GetEntityQuery(builder));
+            state.RequireForUpdate(SystemAPI.QueryBuilder().WithAll<FireComponent, HealthComponent>().Build());
         }
 
         [BurstCompile]
@@ -31,21 +28,16 @@ namespace Effects.ECS
             FireTickDataComponent fireTickData = SystemAPI.GetSingleton<FireTickDataComponent>();
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
             
-            PendingDamageECBSystem.Singleton singleton = SystemAPI.GetSingleton<PendingDamageECBSystem.Singleton>();
+            BeforeDamageEffectsECBSystem.Singleton singleton = SystemAPI.GetSingleton<BeforeDamageEffectsECBSystem.Singleton>();
             EntityCommandBuffer ecb = singleton.CreateCommandBuffer(state.WorldUnmanaged);
-            
-            pendingDamageLookup.Update(ref state);
-            
-            state.Dependency = new FireDamageJob
+
+            new FireDamageJob
             {
-                PendingDamageLookup = pendingDamageLookup,
-                ECB = ecb.AsParallelWriter(), 
+                DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
                 TickDamage = fireTickData.TickDamage,
                 TickRate = fireTickData.TickRate,
-                DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
-            }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete();
+                ECB = ecb.AsParallelWriter(),
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
@@ -58,9 +50,6 @@ namespace Effects.ECS
     [BurstCompile, WithAll(typeof(HealthComponent))]
     public partial struct FireDamageJob : IJobEntity
     {
-        [ReadOnly]
-        public ComponentLookup<PendingDamageComponent> PendingDamageLookup;
-        
         public EntityCommandBuffer.ParallelWriter ECB;
 
         public float TickDamage;
@@ -76,16 +65,14 @@ namespace Effects.ECS
             float damage = math.min(fireComponent.TotalDamage, TickDamage);
             fireComponent.TotalDamage -= damage;
 
-            if (!PendingDamageLookup.TryGetComponent(entity, out PendingDamageComponent pendingDamage))
+            ECB.AppendToBuffer(sortKey, entity, new DamageBuffer
             {
-                pendingDamage = new PendingDamageComponent
-                {
-                    HealthDamage = damage,
-                    ArmorDamage = damage,
-                    ShieldDamage = damage,
-                };
-            }
-            ECB.AddComponent(sortKey, entity, pendingDamage);
+                HealthDamage = damage,
+                ArmorDamage = damage,
+                ShieldDamage = damage,
+            });
+            
+            ECB.AddComponent<PendingDamageTag>(sortKey, entity);
 
             if (fireComponent.TotalDamage <= 0)
             {

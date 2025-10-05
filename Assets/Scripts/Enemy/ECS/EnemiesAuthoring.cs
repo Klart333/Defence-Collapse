@@ -1,6 +1,6 @@
 using Unity.Entities;
 using UnityEngine;
-using Enemy;
+using Health;
 
 namespace Enemy.ECS
 {
@@ -32,7 +32,29 @@ namespace Enemy.ECS
     {
         public Entity EnemyEntity;
     }
+    
+    [InternalBufferCapacity(10)]
+    public struct DamageBuffer : IBufferElementData
+    {
+        public float HealthDamage;
+		public float ArmorDamage;
+		public float ShieldDamage;
+		public bool IsCrit;
+		
+		public bool TriggerDamageDone;
+		public int Key;
 
+		public Entity SourceEntity;
+    }
+    
+    [InternalBufferCapacity(10)]
+    public struct DamageTakenBuffer : IBufferElementData
+    {
+        public float DamageTaken;
+        public HealthType DamageTakenType;
+        public bool IsCrit;
+    }
+    
     public struct EnemyDatabaseTag : IComponentData
     {
     }

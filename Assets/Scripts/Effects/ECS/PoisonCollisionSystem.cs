@@ -1,5 +1,6 @@
 using Unity.Collections;
 using Effects.ECS.ECB;
+using Enemy.ECS;
 using Unity.Entities;
 using Unity.Burst;
 
@@ -9,33 +10,34 @@ namespace Effects.ECS
     public partial struct PoisonCollisionSystem : ISystem
     {
         private ComponentLookup<PoisonComponent> poisonComponentLookup;
-        
+        private BufferLookup<DamageBuffer> damageBufferLookup;
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<PendingDamageECBSystem.Singleton>();
             poisonComponentLookup = SystemAPI.GetComponentLookup<PoisonComponent>(true);
+            damageBufferLookup = SystemAPI.GetBufferLookup<DamageBuffer>();
             
-            EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<PoisonComponent>();
-            state.RequireForUpdate(state.GetEntityQuery(builder));
-            
-            EntityQueryBuilder builder2 = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<PendingDamageComponent>();
-            state.RequireForUpdate(state.GetEntityQuery(builder2));
+            state.RequireForUpdate<BeforeHealthECBSystem.Singleton>();
+            state.RequireForUpdate<PendingDamageTag>();
+            state.RequireForUpdate<PoisonComponent>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            poisonComponentLookup.Update(ref state);
-            var singleton = SystemAPI.GetSingleton<PendingDamageECBSystem.Singleton>();
+            var singleton = SystemAPI.GetSingleton<BeforeHealthECBSystem.Singleton>();
             EntityCommandBuffer ecb = singleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
+            poisonComponentLookup.Update(ref state);
+            damageBufferLookup.Update(ref state);
 
-            state.Dependency = new PoisonCollisionJob
+            new PoisonCollisionJob
             {
-                ECB = ecb.AsParallelWriter(),
+                DamageBufferLookup = damageBufferLookup,
                 PoisonLookup = poisonComponentLookup,
-            }.ScheduleParallel(state.Dependency);
-            state.Dependency.Complete();
+                ECB = ecb.AsParallelWriter(),
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
@@ -45,24 +47,40 @@ namespace Effects.ECS
         }
     }
     
-    [BurstCompile]
+    [BurstCompile, WithAll(typeof(PendingDamageTag))]
     public partial struct PoisonCollisionJob : IJobEntity
     {
         [ReadOnly]
         public ComponentLookup<PoisonComponent> PoisonLookup;
 
-        public EntityCommandBuffer.ParallelWriter ECB;
+        [ReadOnly]
+        public BufferLookup<DamageBuffer> DamageBufferLookup;
         
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in PendingDamageComponent pendingDamage)
+        public EntityCommandBuffer.ParallelWriter ECB;
+
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity)
         {
-            if (!PoisonLookup.TryGetComponent(pendingDamage.SourceEntity, out PoisonComponent sourcePoison)) return;
+            DynamicBuffer<DamageBuffer> damageBuffer = DamageBufferLookup[entity];
+
+            float totalPoisonPower = 0;
+            for (int i = 0; i < damageBuffer.Length; i++)
+            {
+                if (entity.Equals(damageBuffer[i].SourceEntity) ||
+                    !PoisonLookup.TryGetComponent(damageBuffer[i].SourceEntity, out PoisonComponent sourcePoison)) continue;
+                totalPoisonPower += sourcePoison.TotalDamage;
+            }
+
+            if (totalPoisonPower <= 0)
+            {
+                return;
+            }
             
             if (!PoisonLookup.TryGetComponent(entity, out PoisonComponent poison))
             {
                 poison = new PoisonComponent();                
             }
             
-            poison.TotalDamage += sourcePoison.TotalDamage;
+            poison.TotalDamage += totalPoisonPower;
             ECB.AddComponent(sortKey, entity, poison);
         }
     }

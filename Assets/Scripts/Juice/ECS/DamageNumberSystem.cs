@@ -18,9 +18,11 @@ using Health;
 
 namespace TextMeshDOTS.Authoring
 {
-    [BurstCompile, UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [BurstCompile, UpdateAfter(typeof(HealthSystem)), UpdateBefore(typeof(ClearDamageTakenSystem))]
     public partial struct DamageNumberSystem : ISystem
     {
+        private BufferLookup<DamageTakenBuffer> damageTakenBufferLookup;
+        
         private BlobAssetReference<FontBlob> fontReference;
         private EntityArchetype textRenderArchetype;
         private TextBaseConfiguration textBaseConfiguration;
@@ -30,6 +32,8 @@ namespace TextMeshDOTS.Authoring
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            damageTakenBufferLookup = SystemAPI.GetBufferLookup<DamageTakenBuffer>();
+            
             textRenderArchetype = GetDamageTextArchetype(ref state);
 
             FontRequest fontRequest = GetFontRequest();
@@ -60,28 +64,31 @@ namespace TextMeshDOTS.Authoring
                 StaticShadowCaster = false,
             };
             textRenderControl = new TextRenderControl { flags = TextRenderControl.Flags.Dirty };            
+            
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
+            state.RequireForUpdate<DamageTakenTag>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-
-            state.Dependency = new SpawnNumbersJob
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
+            damageTakenBufferLookup.Update(ref state);
+            
+            new SpawnNumbersJob
             {
-                ECB = ecb.AsParallelWriter(),
-                FontReference = fontReference, 
+                DamageTakenBufferLookup = damageTakenBufferLookup,
+                BaseSeed = UnityEngine.Random.Range(0, 100000),
                 TextBaseConfiguration = textBaseConfiguration,
                 RenderFilterSettings = renderFilterSettings,
                 TextRenderControl = textRenderControl,
-                TextArchetype = textRenderArchetype,
                 SpawnOffset = new float3(0, 0.5f, 0),
-                BaseSeed = UnityEngine.Random.Range(0, 100000),
-            }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete(); 
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+                TextArchetype = textRenderArchetype,
+                FontReference = fontReference, 
+                ECB = ecb.AsParallelWriter(),
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
@@ -141,57 +148,64 @@ namespace TextMeshDOTS.Authoring
         }
     }
     
-    [BurstCompile]
+    [BurstCompile, WithAll(typeof(DamageTakenTag))]
     public partial struct SpawnNumbersJob : IJobEntity
     {
+        [ReadOnly]
+        public BufferLookup<DamageTakenBuffer> DamageTakenBufferLookup;
+        
         public EntityCommandBuffer.ParallelWriter ECB;
         
-        public EntityArchetype TextArchetype;
-        public RenderFilterSettings RenderFilterSettings;
         public TextBaseConfiguration TextBaseConfiguration;
+        public RenderFilterSettings RenderFilterSettings;
         public TextRenderControl TextRenderControl;
+        public EntityArchetype TextArchetype;
         
         public BlobAssetReference<FontBlob> FontReference;
         public float3 SpawnOffset;
         public int BaseSeed;
 
         [BurstCompile]
-        public void Execute([EntityIndexInQuery] int entityIndex, Entity entity, in LocalTransform transform, in DamageTakenComponent damageTaken)
+        public void Execute([EntityIndexInQuery] int entityIndex, Entity entity, in LocalTransform transform)
         {
-            TextBaseConfiguration.color = damageTaken.DamageTakenType switch
+            DynamicBuffer<DamageTakenBuffer> damageTakenBuffer = DamageTakenBufferLookup[entity];
+
+            for (int i = 0; i < damageTakenBuffer.Length; i++)
             {
-                HealthType.Health => Color.green,
-                HealthType.Armor => Color.yellow,
-                HealthType.Shield => Color.blue,
-                _ => Color.black,
-            };
-
-            ECB.RemoveComponent<DamageTakenComponent>(entityIndex, entity);
-
-            Entity textEntity = ECB.CreateEntity(entityIndex, TextArchetype);
-            ECB.SetSharedComponent(entityIndex, textEntity, RenderFilterSettings);
+                DamageTakenBuffer damageTaken = damageTakenBuffer[i];
+                TextBaseConfiguration.color = damageTaken.DamageTakenType switch
+                {
+                    HealthType.Health => Color.green,
+                    HealthType.Armor => Color.yellow,
+                    HealthType.Shield => Color.blue,
+                    _ => Color.black,
+                };
             
-            DynamicBuffer<CalliByte> calliByteBuffer = ECB.AddBuffer<CalliByte>(entityIndex, textEntity);
-            CalliString calliString = new CalliString(calliByteBuffer);
-            float damageText = math.round(damageTaken.DamageTaken);
-            calliString.Append(damageText);
-            if (damageTaken.IsCrit)
-            {
-                calliString.Append('!');
+                Entity textEntity = ECB.CreateEntity(entityIndex, TextArchetype);
+                ECB.SetSharedComponent(entityIndex, textEntity, RenderFilterSettings);
+            
+                DynamicBuffer<CalliByte> calliByteBuffer = ECB.AddBuffer<CalliByte>(entityIndex, textEntity);
+                CalliString calliString = new CalliString(calliByteBuffer);
+                float damageText = math.round(damageTaken.DamageTaken);
+                calliString.Append(damageText);
+                if (damageTaken.IsCrit)
+                {
+                    calliString.Append('!');
+                }
+
+                ECB.SetComponent(entityIndex, textEntity, TextBaseConfiguration);
+                ECB.SetComponent(entityIndex, textEntity, new FontBlobReference { value = FontReference });
+                ECB.SetComponent(entityIndex, textEntity, LocalTransform.FromPosition(transform.Position + SpawnOffset));
+                ECB.SetComponent(entityIndex, textEntity, TextRenderControl);
+            
+                RandomComponent random = new RandomComponent { Random = Random.CreateFromIndex((uint)(BaseSeed + entityIndex + i)) };
+                ECB.SetComponent(entityIndex, textEntity, random);
+                float lifeTime = 0.7f + random.Random.NextFloat(0.2f);
+                ECB.SetComponent(entityIndex, textEntity, new LifetimeComponent { Lifetime = lifeTime });
+                ECB.SetComponent(entityIndex, textEntity, new FloatAwayComponent { Duration = lifeTime, Speed = 0.5f, Direction = random.Random.NextFloat3Direction() });
+
+                ECB.SetComponentEnabled(entityIndex, textEntity, ComponentType.ReadWrite<MaterialMeshInfo>(), false);   
             }
-
-            ECB.SetComponent(entityIndex, textEntity, TextBaseConfiguration);
-            ECB.SetComponent(entityIndex, textEntity, new FontBlobReference { value = FontReference });
-            ECB.SetComponent(entityIndex, textEntity, LocalTransform.FromPosition(transform.Position + SpawnOffset));
-            ECB.SetComponent(entityIndex, textEntity, TextRenderControl);
-            
-            RandomComponent random = new RandomComponent { Random = Random.CreateFromIndex((uint)(BaseSeed + entityIndex)) };
-            ECB.SetComponent(entityIndex, textEntity, random);
-            float lifeTime = 0.7f + random.Random.NextFloat(0.2f);
-            ECB.SetComponent(entityIndex, textEntity, new LifetimeComponent { Lifetime = lifeTime });
-            ECB.SetComponent(entityIndex, textEntity, new FloatAwayComponent { Duration = lifeTime, Speed = 0.5f, Direction = random.Random.NextFloat3Direction() });
-
-            ECB.SetComponentEnabled(entityIndex, textEntity, ComponentType.ReadWrite<MaterialMeshInfo>(), false);
         }
     }
 }

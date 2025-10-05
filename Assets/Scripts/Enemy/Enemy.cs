@@ -44,6 +44,9 @@ namespace Enemy
 
                 float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
                 
+                AddBuffer<DamageBuffer>(enemyEntity);
+                AddBuffer<DamageTakenBuffer>(enemyEntity);
+                
                 AddComponent<ManagedClusterComponent>(enemyEntity);
                 AddComponent<EnemyAddComponent>(enemyEntity);
                 AddComponent<EnemySpawnedTag>(enemyEntity);
@@ -94,7 +97,7 @@ namespace Enemy
             }
         }
     }
-
+    
     public struct EnemySpawnedTag : IComponentData { }
 
     public struct ManagedClusterComponent : IComponentData

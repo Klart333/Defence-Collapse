@@ -12,6 +12,7 @@ namespace Enemy.ECS
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<GameSpeedComponent>();
+            state.RequireForUpdate<FresnelComponent>();
         }
 
         [BurstCompile]
@@ -20,7 +21,10 @@ namespace Enemy.ECS
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
             float deltaTime = SystemAPI.Time.DeltaTime * gameSpeed;
 
-            new ApplyFresnelJob().ScheduleParallel();
+            new ApplyFresnelJob
+            {
+                
+            }.ScheduleParallel();
             
             new ResetFresnelJob
             {
@@ -35,7 +39,7 @@ namespace Enemy.ECS
         }
     }
     
-    [BurstCompile, WithAll(typeof(DamageTakenComponent))]
+    [BurstCompile, WithAll(typeof(DamageTakenTag))]
     public partial struct ApplyFresnelJob : IJobEntity
     {
         [BurstCompile]

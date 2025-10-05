@@ -1,3 +1,4 @@
+using Enemy.ECS;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
@@ -10,26 +11,32 @@ namespace Effects.ECS
     public partial struct PunchScalerSystem : ISystem
     {
         private ComponentLookup<PunchScaleComponent> PunchScaleLookup;
+        private BufferLookup<DamageTakenBuffer> damageTakenBufferLookup;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
-            state.RequireForUpdate<DamageTakenComponent>();
-            
+            damageTakenBufferLookup = SystemAPI.GetBufferLookup<DamageTakenBuffer>();
             PunchScaleLookup = SystemAPI.GetComponentLookup<PunchScaleComponent>();
+            
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
+            state.RequireForUpdate<DamageTakenTag>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            PunchScaleLookup.Update(ref state);
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
+            damageTakenBufferLookup.Update(ref state);
+            PunchScaleLookup.Update(ref state);
+
             new PunchScalerJob
             {
-                ECB = ecb.AsParallelWriter(),
+                DamageTakenBufferLookup = damageTakenBufferLookup,
                 PunchScaleLookup = PunchScaleLookup,
+                ECB = ecb.AsParallelWriter(),
             }.ScheduleParallel();
         }
 
@@ -40,19 +47,30 @@ namespace Effects.ECS
         }
     }
 
-    [BurstCompile, WithNone(typeof(DeathTag))]
+    [BurstCompile, WithAll(typeof(DamageTakenTag)), WithNone(typeof(DeathTag))]
     public partial struct PunchScalerJob : IJobEntity
     {
         [ReadOnly]
         public ComponentLookup<PunchScaleComponent> PunchScaleLookup;
+        
+        [ReadOnly]
+        public BufferLookup<DamageTakenBuffer> DamageTakenBufferLookup;
 
         public EntityCommandBuffer.ParallelWriter ECB;
 
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in DamageTakenComponent damageTakenComponent, in LocalTransform transform)
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in LocalTransform transform)
         {
+            DynamicBuffer<DamageTakenBuffer> damageTakenBuffer = DamageTakenBufferLookup[entity];
+
+            float totalDamage = 0;
+            for (int i = 0; i < damageTakenBuffer.Length; i++)
+            {
+                totalDamage += damageTakenBuffer[i].DamageTaken;
+            }
+            
             if (PunchScaleLookup.TryGetComponent(entity, out PunchScaleComponent punchScale))
             {
-                float damage = damageTakenComponent.DamageTaken + punchScale.Damage;
+                float damage = totalDamage + punchScale.Damage;
                 float scaleMult = 1.0f + math.log10(damage) / 8.0f;
                 ECB.SetComponent(sortKey, entity, new PunchScaleComponent
                 {
@@ -64,13 +82,13 @@ namespace Effects.ECS
             }
             else
             {
-                float scaleMult = 1.0f + math.log10(damageTakenComponent.DamageTaken) / 8.0f;
+                float scaleMult = 1.0f + math.log10(totalDamage) / 8.0f;
                 ECB.AddComponent(sortKey, entity, new PunchScaleComponent
                 {
                     Duration = 0.2f,
                     StartScale = transform.Scale,
                     PunchScale = transform.Scale * scaleMult,
-                    Damage = damageTakenComponent.DamageTaken,
+                    Damage = totalDamage,
                 });
             }
         }

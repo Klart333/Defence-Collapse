@@ -2,10 +2,12 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Burst;
 using Effects.ECS;
+using Enemy.ECS;
+using TextMeshDOTS.Authoring;
 
 namespace Health.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(HealthSystem))]
+    [BurstCompile, UpdateAfter(typeof(HealthSystem)), UpdateBefore(typeof(ClearDamageTakenSystem))]
     public partial struct HealthbarSystem : ISystem
     {
         private ComponentLookup<HealthPropertyComponent> healthLookup;
@@ -20,8 +22,7 @@ namespace Health.ECS
             armorLookup = state.GetComponentLookup<ArmorPropertyComponent>();
             shieldLookup = state.GetComponentLookup<ShieldPropertyComponent>();
 
-            damageTakenQuery = SystemAPI.QueryBuilder().WithAll<DamageTakenComponent>().Build();
-            state.RequireForUpdate(damageTakenQuery);
+            state.RequireForUpdate<DamageTakenTag>();
         }
 
         [BurstCompile]
@@ -46,7 +47,7 @@ namespace Health.ECS
         }
     }
     
-    [BurstCompile]
+    [BurstCompile, WithAll(typeof(DamageTakenTag))]
     public partial struct UpdateBarsJob : IJobEntity
     {
         [WriteOnly, NativeDisableParallelForRestriction]
@@ -57,24 +58,35 @@ namespace Health.ECS
         
         [WriteOnly, NativeDisableParallelForRestriction]
         public ComponentLookup<ShieldPropertyComponent> ShieldLookup;
+        
+        [ReadOnly]
+        public BufferLookup<DamageTakenBuffer> DamageTakenBufferLookup;
 
         [BurstCompile]
-        public void Execute(in Effects.ECS.HealthComponent health, in MaxHealthComponent maxHealth, in DamageTakenComponent damageTaken)
+        public void Execute(Entity entity, in Effects.ECS.HealthComponent health, in MaxHealthComponent maxHealth)
         {
             Entity childEntity = health.Bar;
-
+            DynamicBuffer<DamageTakenBuffer> damageTakenBuffer = DamageTakenBufferLookup[entity];
             float totalHealth = maxHealth.Health + maxHealth.Armor + maxHealth.Shield;
-            switch (damageTaken.DamageTakenType)
+            HealthType updatedHealthTypes = 0;
+
+            for (int i = 0; i < damageTakenBuffer.Length; i++)
             {
-                case HealthType.Health:
-                    HealthLookup.GetRefRW(childEntity).ValueRW.Value = health.Health / totalHealth;
-                    break;
-                case HealthType.Armor:
-                    ArmorLookup.GetRefRW(childEntity).ValueRW.Value = health.Armor / totalHealth;
-                    break;
-                case HealthType.Shield:
-                    ShieldLookup.GetRefRW(childEntity).ValueRW.Value = health.Shield / totalHealth;
-                    break;
+                switch (damageTakenBuffer[i].DamageTakenType)
+                {
+                    case HealthType.Health when !updatedHealthTypes.HasFlag(HealthType.Health):
+                        HealthLookup.GetRefRW(childEntity).ValueRW.Value = health.Health / totalHealth;
+                        updatedHealthTypes |= HealthType.Health;
+                        break;
+                    case HealthType.Armor when !updatedHealthTypes.HasFlag(HealthType.Armor):
+                        ArmorLookup.GetRefRW(childEntity).ValueRW.Value = health.Armor / totalHealth;
+                        updatedHealthTypes |= HealthType.Armor;
+                        break;
+                    case HealthType.Shield when !updatedHealthTypes.HasFlag(HealthType.Shield):
+                        ShieldLookup.GetRefRW(childEntity).ValueRW.Value = health.Shield / totalHealth;
+                        updatedHealthTypes |= HealthType.Shield;
+                        break;
+                }   
             }
         }
     }

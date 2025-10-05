@@ -6,8 +6,8 @@ namespace Effects.ECS.ECB
 {
     // You should specify where exactly in the frame this ECB system should update.
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    [UpdateAfter(typeof(DeathSystem)), UpdateBefore(typeof(HealthSystem))]
-    public partial class PendingDamageECBSystem : EntityCommandBufferSystem
+    [UpdateAfter(typeof(BeforeCollisionECBSystem)), UpdateBefore(typeof(BeforeHealthECBSystem))]
+    public partial class BeforeDamageEffectsECBSystem : EntityCommandBufferSystem
     {
         // The singleton component data access pattern should be used to safely access
         // the command buffer system. This data will be stored in the derived ECB System's

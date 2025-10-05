@@ -5,24 +5,20 @@ using Unity.Entities;
 using Unity.Burst;
 using Gameplay;
 using System;
+using Enemy.ECS;
 
 namespace Effects.ECS
 {
-    [UpdateAfter(typeof(PoisonCollisionSystem)), UpdateBefore(typeof(HealthSystem))]
+    [BurstCompile, UpdateAfter(typeof(PoisonCollisionSystem)), UpdateBefore(typeof(HealthSystem))]
     public partial struct PoisonDamageSystem : ISystem
     {
-        private ComponentLookup<PendingDamageComponent> pendingDamageLookup;
-        
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<GameSpeedComponent>();
+            state.RequireForUpdate(SystemAPI.QueryBuilder().WithAll<PoisonComponent, HealthComponent>().Build());
+            state.RequireForUpdate<BeforeHealthECBSystem.Singleton>();
             state.RequireForUpdate<PoisonTickDataComponent>();
-            state.RequireForUpdate<PendingDamageECBSystem.Singleton>();
-            pendingDamageLookup = state.GetComponentLookup<PendingDamageComponent>(true);
-            
-            EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<PoisonComponent, HealthComponent>();
-            state.RequireForUpdate(state.GetEntityQuery(builder));
+            state.RequireForUpdate<GameSpeedComponent>();
         }
 
         [BurstCompile]
@@ -31,21 +27,16 @@ namespace Effects.ECS
             PoisonTickDataComponent poisonTickData = SystemAPI.GetSingleton<PoisonTickDataComponent>();
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
             
-            PendingDamageECBSystem.Singleton singleton = SystemAPI.GetSingleton<PendingDamageECBSystem.Singleton>();
+            BeforeHealthECBSystem.Singleton singleton = SystemAPI.GetSingleton<BeforeHealthECBSystem.Singleton>();
             EntityCommandBuffer ecb = singleton.CreateCommandBuffer(state.WorldUnmanaged);
             
-            pendingDamageLookup.Update(ref state);
-            
-            state.Dependency = new PoisonDamageJob
+            new PoisonDamageJob
             {
-                PendingDamageLookup = pendingDamageLookup,
                 ECB = ecb.AsParallelWriter(), 
                 TickDamage = poisonTickData.TickDamage,
                 TickRate = poisonTickData.TickRate,
                 DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
-            }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete();
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
@@ -58,9 +49,6 @@ namespace Effects.ECS
     [BurstCompile, WithAll(typeof(HealthComponent))]
     public partial struct PoisonDamageJob : IJobEntity
     {
-        [ReadOnly]
-        public ComponentLookup<PendingDamageComponent> PendingDamageLookup;
-        
         public EntityCommandBuffer.ParallelWriter ECB;
 
         public float TickDamage;
@@ -76,16 +64,14 @@ namespace Effects.ECS
             float damage = math.min(poisonComponent.TotalDamage, TickDamage);
             poisonComponent.TotalDamage -= damage;
 
-            if (!PendingDamageLookup.TryGetComponent(entity, out PendingDamageComponent pendingDamage))
+            ECB.AppendToBuffer(sortKey, entity, new DamageBuffer
             {
-                pendingDamage = new PendingDamageComponent
-                {
-                    HealthDamage = damage,
-                    ArmorDamage = damage,
-                    ShieldDamage = damage,
-                };
-            }
-            ECB.AddComponent(sortKey, entity, pendingDamage);
+                HealthDamage = damage,
+                ArmorDamage = damage,
+                ShieldDamage = damage,
+            });
+            
+            ECB.AddComponent<PendingDamageTag>(sortKey, entity);
 
             if (poisonComponent.TotalDamage <= 0)
             {
