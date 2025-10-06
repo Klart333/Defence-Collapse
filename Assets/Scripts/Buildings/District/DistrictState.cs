@@ -1,16 +1,13 @@
-﻿using LocalToWorld = Unity.Transforms.LocalToWorld;
-using Vector2 = UnityEngine.Vector2;
+﻿using Vector2 = UnityEngine.Vector2;
 using Math = Utility.Math;
 
 using System.Collections.Generic;
 using Buildings.District.ECS;
-using UnityEngine.Rendering;
 using WaveFunctionCollapse;
 using Gameplay.Upgrades;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
-using Unity.Rendering;
 using Unity.Entities;
 using DG.Tweening;
 using Effects.ECS;
@@ -20,6 +17,7 @@ using Gameplay;
 using Effects;
 using Utility;
 using System;
+using Buildings.District.DistrictAttachment;
 
 namespace Buildings.District
 {
@@ -134,7 +132,7 @@ namespace Buildings.District
             RemoveEntities(new HashSet<int3> { chunk.ChunkIndex });
         }
 
-        private void CreatePrefabEntities() // TODO: Don't need to create so many prefabs that are the same
+        private void CreatePrefabEntities()
         {
             ComponentType[] targetingComponentTypes =
             {
@@ -150,21 +148,8 @@ namespace Buildings.District
 
             if (!districtData.UseTargetMesh) return;
             
-            ComponentType[] targetComponents =
-            {
-                typeof(AttachementMeshComponent),
-                typeof(SmoothMovementComponent),
-                typeof(LocalTransform),
-                typeof(SpeedComponent),
-                typeof(LocalToWorld),
-                typeof(Prefab),
-            };
-            targetEntityPrefab = entityManager.CreateEntity(targetComponents);
-            entityManager.SetComponentData(targetEntityPrefab, new SpeedComponent { Speed = 1});
-                    
-            RenderMeshDescription desc = new RenderMeshDescription(shadowCastingMode: ShadowCastingMode.On, receiveShadows: true);
-            RenderMeshArray renderMeshArray = new RenderMeshArray(new Material[] { districtData.MeshVariable.Material }, new Mesh[] { districtData.MeshVariable.Mesh });
-            RenderMeshUtility.AddComponents(targetEntityPrefab, entityManager, desc, renderMeshArray, MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
+            Entity attachmentDatabase = entityManager.CreateEntityQuery(typeof(DistrictAttachmentDatabaseTag)).GetSingletonEntity();
+            targetEntityPrefab = entityManager.GetBuffer<DistrictAttachmentElement>(attachmentDatabase)[districtData.DistrictAttachmentIndex].DistrictAttachment;
         }
 
         public abstract void OnSelected(Vector3 pos);
@@ -309,7 +294,7 @@ namespace Buildings.District
                 {
                     Position = upPosition,
                     Rotation = quaternion.LookRotation(direction.ToXyZ(0), Vector3.up),
-                    Scale = districtData.MeshVariable.Scale
+                    Scale = entityManager.GetComponentData<LocalTransform>(spawnedEntity).Scale,
                 });
                 
                 entityManager.SetComponentData(spawnedEntity, new SmoothMovementComponent

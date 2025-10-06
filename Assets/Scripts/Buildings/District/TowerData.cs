@@ -65,7 +65,7 @@ namespace Buildings.District
         private bool useTargetMesh;
 
         [SerializeField, ShowIf(nameof(useTargetMesh))]
-        private MeshVariable meshVariable;
+        private int districtAttachmentIndex;
         
         [Title("Attack")]
         [SerializeField]
@@ -83,13 +83,13 @@ namespace Buildings.District
         private List<IEffect> endWaveEffects = new List<IEffect>();
 
         public PrototypeInfoData PrototypeInfoData => prototypeInfoData;
+        public int DistrictAttachmentIndex => districtAttachmentIndex;
         public bool UseMeshBasedPlacement => useMeshBasedPlacement;
         public string DistrictName => districtNameReference.Value;
         public IUpgradeStatEditor[] UpgradeStats => upgradeStats;
         public string Description => descriptionReference.Value;
         public List<IEffect> EndWaveEffects => endWaveEffects;
         public List<IEffect> CreatedEffects => createdEffects;
-        public MeshVariable MeshVariable => meshVariable;
         public DistrictType DistrictType => districtType;
         public CategoryType CategoryType => categoryType;
         public int DistrictHeight => districtHeight;
