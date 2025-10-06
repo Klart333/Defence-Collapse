@@ -5,11 +5,13 @@ using Unity.Burst;
 using Effects.ECS;
 using Pathfinding;
 using System;
+using Effects.ECS.ECB;
 
 namespace Enemy.ECS
 {
     [BurstCompile, UpdateAfter(typeof(SpawnerSystem)), 
-     UpdateAfter(typeof(DeathSystem)), UpdateAfter(typeof(EnemyCountSystem))]
+     UpdateAfter(typeof(DeathSystem)), UpdateAfter(typeof(EnemyCountSystem)),
+    UpdateBefore(typeof(BeforeCollisionECBSystem))]
     public partial struct EnemyHashGridSystem : ISystem
     {
         [BurstCompile]

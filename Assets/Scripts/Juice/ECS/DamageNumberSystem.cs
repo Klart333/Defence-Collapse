@@ -23,10 +23,10 @@ namespace TextMeshDOTS.Authoring
     {
         private BufferLookup<DamageTakenBuffer> damageTakenBufferLookup;
         
-        private BlobAssetReference<FontBlob> fontReference;
-        private EntityArchetype textRenderArchetype;
         private TextBaseConfiguration textBaseConfiguration;
+        private BlobAssetReference<FontBlob> fontReference;
         private RenderFilterSettings renderFilterSettings;
+        private EntityArchetype textRenderArchetype;
         private TextRenderControl textRenderControl;
         
         [BurstCompile]
@@ -58,8 +58,8 @@ namespace TextMeshDOTS.Authoring
             {
                 Layer = layer,
                 RenderingLayerMask = 1 << layer,
-                ShadowCastingMode = ShadowCastingMode.Off,
-                ReceiveShadows = false,
+                ShadowCastingMode = ShadowCastingMode.On,
+                ReceiveShadows = true,
                 MotionMode = MotionVectorGenerationMode.ForceNoMotion,
                 StaticShadowCaster = false,
             };
@@ -80,7 +80,7 @@ namespace TextMeshDOTS.Authoring
             new SpawnNumbersJob
             {
                 DamageTakenBufferLookup = damageTakenBufferLookup,
-                BaseSeed = UnityEngine.Random.Range(0, 100000),
+                BaseSeed = UnityEngine.Random.Range(0, 1000000),
                 TextBaseConfiguration = textBaseConfiguration,
                 RenderFilterSettings = renderFilterSettings,
                 TextRenderControl = textRenderControl,
@@ -193,14 +193,15 @@ namespace TextMeshDOTS.Authoring
                     calliString.Append('!');
                 }
 
+                RandomComponent random = new RandomComponent { Random = Random.CreateFromIndex((uint)(BaseSeed + entityIndex + i)) };
+                float lifeTime = 0.7f + random.Random.NextFloat(0.2f);
+                
                 ECB.SetComponent(entityIndex, textEntity, TextBaseConfiguration);
                 ECB.SetComponent(entityIndex, textEntity, new FontBlobReference { value = FontReference });
-                ECB.SetComponent(entityIndex, textEntity, LocalTransform.FromPosition(transform.Position + SpawnOffset));
+                ECB.SetComponent(entityIndex, textEntity, LocalTransform.FromPosition(transform.Position + SpawnOffset + (random.Random.NextFloat3() - 0.5f) * 0.2f));
                 ECB.SetComponent(entityIndex, textEntity, TextRenderControl);
             
-                RandomComponent random = new RandomComponent { Random = Random.CreateFromIndex((uint)(BaseSeed + entityIndex + i)) };
                 ECB.SetComponent(entityIndex, textEntity, random);
-                float lifeTime = 0.7f + random.Random.NextFloat(0.2f);
                 ECB.SetComponent(entityIndex, textEntity, new LifetimeComponent { Lifetime = lifeTime });
                 ECB.SetComponent(entityIndex, textEntity, new FloatAwayComponent { Duration = lifeTime, Speed = 0.5f, Direction = random.Random.NextFloat3Direction() });
 

@@ -4,12 +4,13 @@ using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using DG.Tweening;
+using Effects.ECS;
 using Unity.Burst;
 using Juice.Ecs;
 
 namespace Enemy.ECS
 {
-    [BurstCompile, UpdateBefore(typeof(FlowMovementSystem))]
+    [BurstCompile, UpdateAfter(typeof(DeathSystem)), UpdateBefore(typeof(FlowMovementSystem))]
     public partial struct UpdateClusterPositionSystem : ISystem
     {
         private BufferLookup<ManagedEntityBuffer> bufferLookup;

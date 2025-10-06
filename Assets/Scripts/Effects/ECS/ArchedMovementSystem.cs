@@ -10,7 +10,7 @@ using Utility;
 
 namespace Effects.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(CollisionSystem))]
+    [BurstCompile, UpdateBefore(typeof(BeforeCollisionECBSystem))]
     public partial struct ArchedMovementSystem : ISystem
     {
         [BurstCompile]
@@ -28,11 +28,11 @@ namespace Effects.ECS
             var ecbSingleton = SystemAPI.GetSingleton<BeforeCollisionECBSystem.Singleton>();
             EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            state.Dependency = new ArchedMovementJob
+            new ArchedMovementJob
             {
                 DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
                 ECB = ecb.AsParallelWriter(),
-            }.ScheduleParallel(state.Dependency);
+            }.ScheduleParallel();
         }
 
         [BurstCompile]

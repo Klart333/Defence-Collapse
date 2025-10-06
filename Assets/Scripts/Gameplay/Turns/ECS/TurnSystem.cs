@@ -12,15 +12,20 @@ namespace Gameplay.Turns.ECS
         private EntityQuery updateDistrictQuery;
         private EntityQuery updateEnemiesQuery;
         private EntityQuery blockerQuery;
+
+        private Entity turnCountEntity;
         
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<TurnIncreaseComponent>();
+            turnCountEntity = state.EntityManager.CreateEntity();
+            state.EntityManager.AddComponent<TurnCountComponent>(turnCountEntity);
             
             updateDistrictQuery = SystemAPI.QueryBuilder().WithAll<TurnIncreaseComponent>().WithNone<TurnProgressionComponent>().Build();
             updateEnemiesQuery = SystemAPI.QueryBuilder().WithAll<TurnIncreaseComponent, TurnProgressionComponent>().Build();
             blockerQuery = SystemAPI.QueryBuilder().WithAny<ProgressionBlockerTag, TargetingActivationComponent, MovingClusterComponent>().Build();
+         
+            state.RequireForUpdate<TurnIncreaseComponent>();
         }
 
         [BurstCompile]
@@ -57,6 +62,11 @@ namespace Gameplay.Turns.ECS
             // Already updated enemies, and there are no blockers -> Remove Turn Entity
             Entity turnEntity = SystemAPI.GetSingletonEntity<TurnIncreaseComponent>();
             state.EntityManager.AddComponent<DeathTag>(turnEntity);
+            
+            state.EntityManager.SetComponentData(turnCountEntity, new TurnCountComponent
+            {
+                Value = state.EntityManager.GetComponentData<TurnIncreaseComponent>(turnEntity).TotalTurn,
+            });
         }
 
         private void UpdateDistricts(ref SystemState state)

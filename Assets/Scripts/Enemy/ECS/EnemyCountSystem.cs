@@ -4,10 +4,10 @@ using Unity.Burst;
 
 namespace Enemy.ECS
 {
-    [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(SpawnerSystem)), 
-     UpdateBefore(typeof(CollisionSystem)), UpdateBefore(typeof(EnemyHashGridSystem))]
     [BurstCompile]
-    public partial struct EnemyCountSystem : ISystem // TODO: Remove this basically
+    [UpdateAfter(typeof(SpawnerSystem)), UpdateBefore(typeof(CollisionSystem)), 
+     UpdateBefore(typeof(EnemyHashGridSystem))]
+    public partial struct EnemyCountSystem : ISystem
     {
         private EntityQuery clusterQuery;
         

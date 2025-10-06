@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using Unity.Collections;
+using Effects.ECS.ECB;
 using Unity.Entities;
 using Enemy.ECS;
 using System;
 
 namespace Effects.ECS
 {
-    [UpdateInGroup(typeof(SimulationSystemGroup)), UpdateAfter(typeof(ManagedEntityCleanupSystem))]
+    [UpdateAfter(typeof(ManagedEntityCleanupSystem)), UpdateBefore(typeof(BeforeSpawningECBSystem))]
     public partial class DeathSystem : SystemBase
     {
         public static readonly Dictionary<int, Action> DeathCallbacks = new Dictionary<int, Action>();
@@ -26,11 +27,10 @@ namespace Effects.ECS
         {
             foreach (RefRO<DeathCallbackComponent> callback in SystemAPI.Query<RefRO<DeathCallbackComponent>>().WithAll<DeathTag>())
             {
-                if (DeathCallbacks.TryGetValue(callback.ValueRO.Key, out Action action))
-                {
-                    action.Invoke();
-                    DeathCallbacks.Remove(callback.ValueRO.Key);
-                }
+                if (!DeathCallbacks.TryGetValue(callback.ValueRO.Key, out Action action)) continue;
+                
+                action.Invoke();
+                DeathCallbacks.Remove(callback.ValueRO.Key);
             }
 
             NativeArray<Entity> deathEntities = deathQuery.ToEntityArray(Allocator.Temp);

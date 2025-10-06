@@ -1,13 +1,14 @@
-using Enemy.ECS;
-using Gameplay;
-using Unity.Burst;
-using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Effects.ECS.ECB;
+using Unity.Entities;
+using Unity.Burst;
+using Enemy.ECS;
+using Gameplay;
 
 namespace Effects.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(DeathSystem))]
+    [BurstCompile, UpdateAfter(typeof(DeathSystem)), UpdateBefore(typeof(BeforeCollisionECBSystem))]
     public partial struct SimpleMovementSystem : ISystem
     {
         [BurstCompile]

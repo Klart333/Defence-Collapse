@@ -1,17 +1,16 @@
-using System.Collections.Generic;
-using Effects.ECS.ECB;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Effects.ECS.ECB;
 using Unity.Entities;
-using Unity.Burst;
-using Unity.Jobs;
-using Enemy.ECS;
 using Pathfinding;
+using Unity.Burst;
+using Enemy.ECS;
 
 namespace Effects.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(EnemyHashGridSystem))]
+    [BurstCompile, UpdateAfter(typeof(EnemyHashGridSystem)), 
+     UpdateAfter(typeof(BeforeCollisionECBSystem)), UpdateBefore(typeof(BeforeDamageEffectsECBSystem))]
     public partial struct CollisionSystem : ISystem
     {
         private ComponentLookup<LocalTransform> transformLookup;
@@ -37,8 +36,7 @@ namespace Effects.ECS
         public void OnUpdate(ref SystemState state)
         {
             NativeParallelHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
-            var ecbSingleton = SystemAPI.GetSingleton<BeforeDamageEffectsECBSystem.Singleton>();
-            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
             
             transformLookup.Update(ref state);
             bufferLookup.Update(ref state);
@@ -51,7 +49,7 @@ namespace Effects.ECS
                 BufferLookup = bufferLookup,
             }.ScheduleParallel(state.Dependency);
             
-            state.Dependency.Complete(); 
+            state.Dependency.Complete();
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
         }
@@ -78,13 +76,14 @@ namespace Effects.ECS
         public EntityCommandBuffer.ParallelWriter ECB;
 
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in ColliderComponent colliderComponent, ref DamageComponent damageComponent, ref RandomComponent randomComponent, in CritComponent critComponent, in LocalTransform transform) 
+        public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in ColliderComponent colliderComponent, 
+            ref DamageComponent damageComponent, ref RandomComponent randomComponent, in CritComponent critComponent, 
+            in LocalTransform transform) 
         {
             if (damageComponent.LimitedHits <= 0) return;
-
-            float2 pos = transform.Position.xz;
-            if (pos.y > 1.0f) return;
+            if (transform.Position.y > 1.0f) return;
             
+            float2 pos = transform.Position.xz;
             float radius = colliderComponent.Radius;
             float radiusSq = radius * radius;
 
@@ -129,7 +128,7 @@ namespace Effects.ECS
                 if (distSq > radiusSq) continue;
 
                 // COLLIDE
-                AddDamageBuffer(sortKey, entity, ref randomComponent, critComponent, ref damageComponent, entity);
+                AddDamageBuffer(sortKey, enemy, ref randomComponent, critComponent, ref damageComponent, entity);
 
                 if (!damageComponent.HasLimitedHits) continue;
                 

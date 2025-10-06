@@ -9,7 +9,7 @@ using Enemy.ECS;
 
 namespace Effects.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(FireCollisionSystem)), UpdateBefore(typeof(HealthSystem))]
+    [BurstCompile, UpdateAfter(typeof(CollisionSystem)), UpdateBefore(typeof(BeforeDamageEffectsECBSystem))]
     public partial struct FireDamageSystem : ISystem
     {
         [BurstCompile]

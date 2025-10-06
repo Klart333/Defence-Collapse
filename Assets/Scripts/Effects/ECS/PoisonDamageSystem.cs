@@ -1,16 +1,15 @@
 using Unity.Mathematics;
-using Unity.Collections;
 using Effects.ECS.ECB;
 using Unity.Entities;
 using Unity.Burst;
+using Enemy.ECS;
 using Gameplay;
 using System;
-using Enemy.ECS;
 
 namespace Effects.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(PoisonCollisionSystem)), UpdateBefore(typeof(HealthSystem))]
-    public partial struct PoisonDamageSystem : ISystem
+    [BurstCompile, UpdateAfter(typeof(CollisionSystem)), UpdateBefore(typeof(BeforeDamageEffectsECBSystem))]
+    public partial struct PoisonDamageSystem : ISystem 
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)

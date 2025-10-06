@@ -10,15 +10,15 @@ using Utility;
 
 namespace Effects.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(CollisionSystem))]
+    [BurstCompile, UpdateAfter(typeof(DeathSystem)), UpdateBefore(typeof(BeforeCollisionECBSystem))]
     public partial struct SmoothMovementSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<BeforeCollisionECBSystem.Singleton>();
-            state.RequireForUpdate<GameSpeedComponent>();
             state.RequireForUpdate<SmoothMovementComponent>();
+            state.RequireForUpdate<GameSpeedComponent>();
         }
 
         [BurstCompile]
@@ -28,11 +28,11 @@ namespace Effects.ECS
             var ecbSingleton = SystemAPI.GetSingleton<BeforeCollisionECBSystem.Singleton>();
             EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             
-            state.Dependency = new SmoothMovementJob
+            new SmoothMovementJob
             {
                 DeltaTime = SystemAPI.Time.DeltaTime * gameSpeed,
                 ECB = ecb.AsParallelWriter(),
-            }.ScheduleParallel(state.Dependency);
+            }.ScheduleParallel();
         }
 
         [BurstCompile]

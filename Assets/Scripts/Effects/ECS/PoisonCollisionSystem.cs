@@ -6,7 +6,7 @@ using Unity.Burst;
 
 namespace Effects.ECS
 {
-    [UpdateAfter(typeof(CollisionSystem)), UpdateBefore(typeof(HealthSystem))]
+    [BurstCompile, UpdateAfter(typeof(BeforeDamageEffectsECBSystem)), UpdateBefore(typeof(BeforeHealthECBSystem))]
     public partial struct PoisonCollisionSystem : ISystem
     {
         private ComponentLookup<PoisonComponent> poisonComponentLookup;

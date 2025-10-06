@@ -6,7 +6,7 @@ using Unity.Burst;
 
 namespace Gameplay.Upgrades.ECS
 {
-    [BurstCompile, UpdateBefore(typeof(CollisionSystem))]
+    [BurstCompile, UpdateAfter(typeof(DeathSystem)), UpdateBefore(typeof(CollisionSystem))]
     public partial struct AddComponentsSystem : ISystem 
     {
         private EntityQuery componentQuery;

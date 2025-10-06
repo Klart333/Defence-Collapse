@@ -10,21 +10,19 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var ecb = new EntityCommandBuffer(Allocator.TempJob); 
-            state.Dependency = new LimitedHitsJob
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
+            new LimitedHitsJob
             {
                 ECB = ecb.AsParallelWriter()
-            }.ScheduleParallel(state.Dependency);
-            
-            state.Dependency.Complete(); 
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+            }.ScheduleParallel();
         }
 
         [BurstCompile]

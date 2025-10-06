@@ -12,7 +12,7 @@ using VFX;
 
 namespace Effects.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(CollisionSystem)), UpdateBefore(typeof(HealthSystem))]
+    [BurstCompile, UpdateAfter(typeof(CollisionSystem)), UpdateBefore(typeof(BeforeDamageEffectsECBSystem))]
     public partial struct LightningCollisionSystem : ISystem
     {
         private NativeQueue<VFXChainLightningRequest> lightningRequestQueue;
@@ -42,32 +42,32 @@ namespace Effects.ECS
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            lightningComponentLookup.Update(ref state);
-            transformComponentLookup.Update(ref state);
-            bufferLookup.Update(ref state);
-            
             NativeParallelHashMap<int2, Entity> spatialGrid = SystemAPI.GetSingletonRW<SpatialHashMapSingleton>().ValueRO.Value;
             var singleton = SystemAPI.GetSingleton<BeforeDamageEffectsECBSystem.Singleton>();
             EntityCommandBuffer ecb = singleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
+            lightningComponentLookup.Update(ref state);
+            transformComponentLookup.Update(ref state);
+            damageBufferLookup.Update(ref state);
+            bufferLookup.Update(ref state);
 
-            state.Dependency = new LightningCollisionJob
+            JobHandle jobHandle = new LightningCollisionJob
             {
+                LightningRequestQueue = lightningRequestQueue.AsParallelWriter(),
                 LightningLookup = lightningComponentLookup,
                 TransformLookup = transformComponentLookup,
+                DamageBufferLookup = damageBufferLookup,
                 SpatialGrid = spatialGrid.AsReadOnly(),
-                LightningRequestQueue = lightningRequestQueue.AsParallelWriter(),
+                ECB = ecb.AsParallelWriter(),
                 BufferLookup = bufferLookup,
             }.ScheduleParallel(state.Dependency);
-            state.Dependency.Complete();
-
-            if (lightningRequestQueue.Count <= 0) return;
             
             VFXChainLightningSingleton vfxLightning = SystemAPI.GetSingletonRW<VFXChainLightningSingleton>().ValueRW;
-            new ApplyVFXJob
+            state.Dependency = new ApplyVFXJob
             {
                 LightningRequestQueue = lightningRequestQueue,
                 VFXLightning = vfxLightning,
-            }.Schedule();
+            }.Schedule(jobHandle);
         }
 
         [BurstCompile]

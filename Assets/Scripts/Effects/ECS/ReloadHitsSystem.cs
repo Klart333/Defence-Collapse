@@ -4,12 +4,14 @@ using Unity.Entities;
 
 namespace Effects.ECS
 {
+    [BurstCompile, UpdateAfter(typeof(DeathSystem))]
     public partial struct ReloadHitsSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<GameSpeedComponent>(); 
+            state.RequireForUpdate<ReloadHitsComponent>(); 
         }
 
         [BurstCompile]
@@ -18,10 +20,10 @@ namespace Effects.ECS
             float deltaTime = SystemAPI.Time.DeltaTime;
             float gameSpeed = SystemAPI.GetSingleton<GameSpeedComponent>().Speed;
 
-            state.Dependency = new ReloadHitsJob
+            new ReloadHitsJob
             {
                 DeltaTime = deltaTime * gameSpeed,
-            }.ScheduleParallel(state.Dependency);
+            }.ScheduleParallel();
         }
 
         [BurstCompile]

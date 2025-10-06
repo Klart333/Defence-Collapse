@@ -8,7 +8,7 @@ using Unity.Jobs;
 
 namespace Enemy.ECS.Boss
 {
-    [BurstCompile, UpdateBefore(typeof(SpawnerSystem))]
+    [BurstCompile, UpdateAfter(typeof(DeathSystem)), UpdateBefore(typeof(BeforeSpawningECBSystem))]
     public partial struct BossSpawnerSystem : ISystem
     {
         private EntityQuery spawningComponentQuery;

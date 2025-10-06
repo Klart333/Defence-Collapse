@@ -6,7 +6,7 @@ using System;
 
 namespace Enemy.ECS
 {
-    [BurstCompile, UpdateBefore(typeof(EnemyModifierSystem))]  
+    [BurstCompile, UpdateAfter(typeof(SpawnerSystem)), UpdateBefore(typeof(EnemyModifierSystem))]  
     public partial struct EnemyAddComponentSystem : ISystem
     {
         private NativeArray<EnemyAddComponents> AllAddComponents;

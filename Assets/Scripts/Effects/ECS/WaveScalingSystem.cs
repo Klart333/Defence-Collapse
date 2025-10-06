@@ -1,32 +1,32 @@
-using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
+using Unity.Burst;
+using Enemy.ECS;
 
 namespace Effects.ECS
 {
+    [BurstCompile, UpdateAfter(typeof(SpawnerSystem))]
     public partial struct WaveScalingSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<WaveCountComponent>();
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             state.RequireForUpdate<HealthScalingComponent>();
+            state.RequireForUpdate<TurnCountComponent>(); 
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            int waveCount = SystemAPI.GetSingleton<WaveCountComponent>().Value;
-            var ecb = new EntityCommandBuffer(Allocator.TempJob);
-            state.Dependency = new WaveScalingJob
-            {
-                WaveCount = waveCount,
-                ECB = ecb.AsParallelWriter()
-            }.Schedule(state.Dependency);
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            int turnCount = SystemAPI.GetSingleton<TurnCountComponent>().Value;
             
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+            new WaveScalingJob
+            {
+                TurnCount = turnCount,
+                ECB = ecb.AsParallelWriter()
+            }.ScheduleParallel();
         }
 
         [BurstCompile]
@@ -39,14 +39,14 @@ namespace Effects.ECS
     [BurstCompile]
     public partial struct WaveScalingJob : IJobEntity
     {
-        public int WaveCount;
+        public int TurnCount;
 
         public EntityCommandBuffer.ParallelWriter ECB;
 
         [BurstCompile]
         public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in HealthScalingComponent scalingComponent, ref HealthComponent health, ref MaxHealthComponent maxHealth)
         {
-            float multiplier = scalingComponent.Multiplier * 0.02f * WaveCount * WaveCount + -0.04f * WaveCount + 1; // 0.02x^2 + -0.04x + 1
+            float multiplier = scalingComponent.Multiplier * 0.02f * TurnCount * TurnCount + -0.04f * TurnCount + 1; // 0.02x^2 + -0.04x + 1
             health.Health *= multiplier;
             health.Armor *= multiplier;
             health.Shield *= multiplier;
@@ -59,7 +59,7 @@ namespace Effects.ECS
         }
     }
 
-    public struct WaveCountComponent : IComponentData
+    public struct TurnCountComponent : IComponentData
     {
         public int Value;
     }

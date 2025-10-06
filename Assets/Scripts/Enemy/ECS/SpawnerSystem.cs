@@ -7,13 +7,14 @@ using Unity.Transforms;
 using Pathfinding.ECS;
 using Unity.Entities;
 using Effects.ECS;
+using Effects.ECS.ECB;
 using Pathfinding;
 using Unity.Burst;
 using Gameplay;
 
 namespace Enemy.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(DeathSystem))]
+    [BurstCompile, UpdateAfter(typeof(DeathSystem)), UpdateAfter(typeof(BeforeSpawningECBSystem))]
     public partial struct SpawnerSystem : ISystem
     {
         private ComponentLookup<MovementSpeedComponent> movementSpeedLookup; 

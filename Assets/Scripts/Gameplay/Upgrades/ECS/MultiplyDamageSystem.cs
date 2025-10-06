@@ -6,7 +6,7 @@ using Unity.Entities;
 
 namespace Gameplay.Upgrades.ECS
 {
-    [BurstCompile, UpdateBefore(typeof(AddComponentsSystem))]
+    [BurstCompile, UpdateAfter(typeof(DeathSystem)), UpdateBefore(typeof(AddComponentsSystem))]
     public partial struct MultiplyDamageSystem : ISystem
     {
         private EntityQuery damageComponentQuery;
@@ -14,8 +14,7 @@ namespace Gameplay.Upgrades.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            EntityQueryBuilder builder2 = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<MultiplyDamageComponent>();
-            damageComponentQuery = state.GetEntityQuery(builder2);
+            damageComponentQuery = SystemAPI.QueryBuilder().WithAll<MultiplyDamageComponent>().Build();
             state.RequireForUpdate(damageComponentQuery);
         }
 
