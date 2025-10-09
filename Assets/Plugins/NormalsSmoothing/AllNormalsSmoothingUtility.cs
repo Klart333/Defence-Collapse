@@ -16,15 +16,20 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
         private float _smoothingAngle = MaxSmoothingAngle;
 
         [SerializeField]
-        private Channel _channel = Channel.UV8;
+        private NormalsSmoothingUtility.Channel _channel = NormalsSmoothingUtility.Channel.UV8;
         
         [SerializeField]
         private string folderFilePath = "Art/Meshes";
+        
+        [SerializeField]
+        private string createdFolderName = "Smoothed";
 
         private void OnGUI()
         {
             _smoothingAngle = EditorGUILayout.Slider("Smoothing Angle", _smoothingAngle, 0, MaxSmoothingAngle);
-            _channel = (Channel) EditorGUILayout.EnumPopup("Channel", _channel);
+            _channel = (NormalsSmoothingUtility.Channel) EditorGUILayout.EnumPopup("Channel", _channel);
+            folderFilePath = EditorGUILayout.TextField("Folder Path", folderFilePath);
+            createdFolderName = EditorGUILayout.TextField("Created Folder Name", createdFolderName);
             
             if (GUILayout.Button("Compute Smoothed Normals"))
             {
@@ -32,7 +37,7 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
             }
         }
 
-        [MenuItem("Window/Toon RP/Normals Smoothing Utility - ALL")]
+        [MenuItem("Window/Toon RP/Normals Smoothing Utility - ALL &%w")]
         private static void OpenWindow()
         {
             AllNormalsSmoothingUtility window = CreateWindow<AllNormalsSmoothingUtility>();
@@ -42,24 +47,30 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
 
         private void ComputeSmoothedNormals()
         {
-            var meshes = AssetDatabase.FindAssets("t:mesh");
-
-            foreach (var mesh in meshes)
+            string[] meshesPaths = AssetDatabase.FindAssets("t:mesh", new string[] { folderFilePath });
+            
+            AssetDatabase.CreateFolder(folderFilePath, createdFolderName);
+            AssetDatabase.SaveAssets();
+            
+            foreach (string meshPath in meshesPaths)
             {
-                Mesh sourceMesh = AssetDatabase.LoadAssetAtPath<Mesh>(AssetDatabase.GUIDToAssetPath(mesh));
-                Assert.IsNotNull(sourceMesh);
-                Assert.IsTrue(_smoothingAngle > 0f);
+                Object[] assets = AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GUIDToAssetPath(meshPath));
 
-                Mesh smoothedMesh = Instantiate(sourceMesh);
-                smoothedMesh.name = sourceMesh.name + "_SmoothedNormals";
-                smoothedMesh.CalculateNormalsAndWriteToChannel(_smoothingAngle, _channel == Channel.UV8 ? UvChannel : null);
-                CreateMeshAsset(smoothedMesh, AssetDatabase.GUIDToAssetPath(mesh));
+                foreach (Object asset in assets)
+                {
+                    if (asset is not Mesh sourceMesh) continue;
+                    
+                    var smoothedMesh = NormalsSmoothingUtility.ComputeSmoothedNormals(sourceMesh, _smoothingAngle, _channel);
+                    string path = $"{folderFilePath}/{createdFolderName}/{smoothedMesh.name}.asset";
+                    Debug.Log($"Saving {smoothedMesh.name} at: {path}");
+                    CreateMeshAsset(smoothedMesh, path);
+                }
+                 
             }
             
             AssetDatabase.SaveAssets();
-            Close();
         }
-
+        
         private static void CreateMeshAsset(Mesh mesh, string assetPath)
         {
             if (string.IsNullOrEmpty(assetPath))
@@ -69,12 +80,6 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
             }
 
             AssetDatabase.CreateAsset(mesh, assetPath);
-        }
-
-        private enum Channel
-        {
-            UV8,
-            Tangents,
         }
     }
 }

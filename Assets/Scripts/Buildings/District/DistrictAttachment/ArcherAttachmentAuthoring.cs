@@ -5,6 +5,8 @@ using Unity.Entities;
 using Effects.ECS;
 using UnityEngine;
 using Enemy.ECS;
+using Unity.Entities.Graphics;
+using Unity.Mathematics;
 
 namespace Buildings.District.DistrictAttachment
 {
@@ -16,6 +18,9 @@ namespace Buildings.District.DistrictAttachment
         
         [SerializeField]
         private GameObject upperString;
+
+        [SerializeField]
+        private GameObject arrow;
 
         [SerializeField]
         private float stringLength = 0.8f;
@@ -34,6 +39,7 @@ namespace Buildings.District.DistrictAttachment
                 AddComponent<AttachementMeshComponent>(entity);
                 AddComponent<SmoothMovementComponent>(entity);
                 AddComponent<AttachmentAttackValue>(entity);
+                AddComponent<RenderFilterSettings>(entity);
                 AddComponent<LocalTransform>(entity);
                 AddComponent<LocalToWorld>(entity);
                 
@@ -43,6 +49,9 @@ namespace Buildings.District.DistrictAttachment
                 {
                     LowerString = GetEntity(authoring.lowerString, TransformUsageFlags.Dynamic),
                     UpperString = GetEntity(authoring.upperString, TransformUsageFlags.Dynamic),
+                    ArrowEntity = GetEntity(authoring.arrow, TransformUsageFlags.Dynamic),
+                    ArrowStartPosition = authoring.arrow.transform.position / authoring.transform.localScale.x,
+                    
                     StringLength = authoring.stringLength * authoring.transform.localScale.x,
                     LengthAtFull = authoring.lengthAtFull * authoring.transform.localScale.x,
                 });
@@ -54,7 +63,10 @@ namespace Buildings.District.DistrictAttachment
     {
         public Entity LowerString;
         public Entity UpperString;
+        public Entity ArrowEntity;
+        public float3 ArrowStartPosition;
         public float StringLength;
         public float LengthAtFull;
+
     }
 }

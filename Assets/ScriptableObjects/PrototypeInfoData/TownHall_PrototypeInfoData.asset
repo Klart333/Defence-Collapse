@@ -16,19 +16,19 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: -2509802257238429220, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: 8016391864401015586, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: -2809995132296063752, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: -937842765984775870, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: 6419233933794837348, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: -5857395458245632377, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: -4533713319112024058, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: 5049407065310818307, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: 8511249208067564219, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: -1392772360781432880, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: 7035156127000115413, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: -4485171987006073775, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
-    - {fileID: 50844758048994048, guid: ea70891df610c924ea0bad56285eb5ab, type: 3}
+    - {fileID: 4300000, guid: 57f3d671911b06f4cacef4208861eaaa, type: 2}
+    - {fileID: 4300000, guid: 6f866e4448871f446b27f2eedb9d566f, type: 2}
+    - {fileID: 4300000, guid: 42025b745885b8f488337bd087db625a, type: 2}
+    - {fileID: 4300000, guid: 7e06a0e2b52a66247b67310c19fe086c, type: 2}
+    - {fileID: 4300000, guid: a4a7b768159ba2446bbaa7a380d08d14, type: 2}
+    - {fileID: 4300000, guid: 7d6aac1c7ddd6e64f8a34399712e3fe3, type: 2}
+    - {fileID: 4300000, guid: fd62a7b969546194bb43dfe1c6ddf88d, type: 2}
+    - {fileID: 4300000, guid: 12648fbe31db0324b8460ea0f49c6e2b, type: 2}
+    - {fileID: 4300000, guid: e70f956792bea4b4cb3625bb37046447, type: 2}
+    - {fileID: 4300000, guid: 355dac1f1d546a4479c385768d9f218d, type: 2}
+    - {fileID: 4300000, guid: 6057ec843bf8035419852306e41a1422, type: 2}
+    - {fileID: 4300000, guid: 8916fb07cad659f49835f4478fb9de2e, type: 2}
+    - {fileID: 4300000, guid: 7b4e687e9666214428196072767548cd, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -46,13 +46,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner
+      Data: TownHall_Bot_Corner_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 122
+      Data: 118
     - Name: Rot
       Entry: 3
       Data: 0
@@ -109,13 +109,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner
+      Data: TownHall_Bot_Corner_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 122
+      Data: 118
     - Name: Rot
       Entry: 3
       Data: 1
@@ -154,13 +154,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner
+      Data: TownHall_Bot_Corner_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 122
+      Data: 118
     - Name: Rot
       Entry: 3
       Data: 2
@@ -199,13 +199,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner
+      Data: TownHall_Bot_Corner_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 122
+      Data: 118
     - Name: Rot
       Entry: 3
       Data: 3
@@ -244,13 +244,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner_Door
+      Data: TownHall_Bot_Corner_Door_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 123
+      Data: 119
     - Name: Rot
       Entry: 3
       Data: 0
@@ -310,13 +310,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner_Door
+      Data: TownHall_Bot_Corner_Door_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 123
+      Data: 119
     - Name: Rot
       Entry: 3
       Data: 1
@@ -355,13 +355,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner_Door
+      Data: TownHall_Bot_Corner_Door_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 123
+      Data: 119
     - Name: Rot
       Entry: 3
       Data: 2
@@ -400,13 +400,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner_Door
+      Data: TownHall_Bot_Corner_Door_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 123
+      Data: 119
     - Name: Rot
       Entry: 3
       Data: 3
@@ -445,13 +445,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner_Door_Mirrored
+      Data: TownHall_Bot_Corner_Door_Mirrored_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 124
+      Data: 120
     - Name: Rot
       Entry: 3
       Data: 0
@@ -511,13 +511,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner_Door_Mirrored
+      Data: TownHall_Bot_Corner_Door_Mirrored_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 124
+      Data: 120
     - Name: Rot
       Entry: 3
       Data: 1
@@ -556,13 +556,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner_Door_Mirrored
+      Data: TownHall_Bot_Corner_Door_Mirrored_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 124
+      Data: 120
     - Name: Rot
       Entry: 3
       Data: 2
@@ -601,13 +601,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Corner_Door_Mirrored
+      Data: TownHall_Bot_Corner_Door_Mirrored_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 124
+      Data: 120
     - Name: Rot
       Entry: 3
       Data: 3
@@ -646,13 +646,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Full
+      Data: TownHall_Bot_Full_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 125
+      Data: 121
     - Name: Rot
       Entry: 3
       Data: 0
@@ -706,13 +706,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side
+      Data: TownHall_Bot_Side_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 126
+      Data: 122
     - Name: Rot
       Entry: 3
       Data: 0
@@ -766,13 +766,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side
+      Data: TownHall_Bot_Side_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 126
+      Data: 122
     - Name: Rot
       Entry: 3
       Data: 1
@@ -811,13 +811,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side
+      Data: TownHall_Bot_Side_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 126
+      Data: 122
     - Name: Rot
       Entry: 3
       Data: 2
@@ -856,13 +856,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side
+      Data: TownHall_Bot_Side_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 126
+      Data: 122
     - Name: Rot
       Entry: 3
       Data: 3
@@ -901,13 +901,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side_Door
+      Data: TownHall_Bot_Side_Door_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 127
+      Data: 123
     - Name: Rot
       Entry: 3
       Data: 0
@@ -964,13 +964,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side_Door
+      Data: TownHall_Bot_Side_Door_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 127
+      Data: 123
     - Name: Rot
       Entry: 3
       Data: 1
@@ -1009,13 +1009,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side_Door
+      Data: TownHall_Bot_Side_Door_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 127
+      Data: 123
     - Name: Rot
       Entry: 3
       Data: 2
@@ -1054,13 +1054,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side_Door
+      Data: TownHall_Bot_Side_Door_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 127
+      Data: 123
     - Name: Rot
       Entry: 3
       Data: 3
@@ -1099,13 +1099,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side_Door_Mirrored
+      Data: TownHall_Bot_Side_Door_Mirrored_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 128
+      Data: 124
     - Name: Rot
       Entry: 3
       Data: 0
@@ -1162,13 +1162,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side_Door_Mirrored
+      Data: TownHall_Bot_Side_Door_Mirrored_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 128
+      Data: 124
     - Name: Rot
       Entry: 3
       Data: 1
@@ -1207,13 +1207,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side_Door_Mirrored
+      Data: TownHall_Bot_Side_Door_Mirrored_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 128
+      Data: 124
     - Name: Rot
       Entry: 3
       Data: 2
@@ -1252,13 +1252,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Bot_Side_Door_Mirrored
+      Data: TownHall_Bot_Side_Door_Mirrored_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 128
+      Data: 124
     - Name: Rot
       Entry: 3
       Data: 3
@@ -1297,13 +1297,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Corner
+      Data: TownHall_Mid_Corner_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 129
+      Data: 125
     - Name: Rot
       Entry: 3
       Data: 0
@@ -1357,13 +1357,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Corner
+      Data: TownHall_Mid_Corner_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 129
+      Data: 125
     - Name: Rot
       Entry: 3
       Data: 1
@@ -1402,13 +1402,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Corner
+      Data: TownHall_Mid_Corner_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 129
+      Data: 125
     - Name: Rot
       Entry: 3
       Data: 2
@@ -1447,13 +1447,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Corner
+      Data: TownHall_Mid_Corner_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 129
+      Data: 125
     - Name: Rot
       Entry: 3
       Data: 3
@@ -1492,13 +1492,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Side
+      Data: TownHall_Mid_Side_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 130
+      Data: 126
     - Name: Rot
       Entry: 3
       Data: 0
@@ -1549,13 +1549,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Side
+      Data: TownHall_Mid_Side_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 130
+      Data: 126
     - Name: Rot
       Entry: 3
       Data: 1
@@ -1594,13 +1594,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Side
+      Data: TownHall_Mid_Side_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 130
+      Data: 126
     - Name: Rot
       Entry: 3
       Data: 2
@@ -1639,13 +1639,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Side
+      Data: TownHall_Mid_Side_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 130
+      Data: 126
     - Name: Rot
       Entry: 3
       Data: 3
@@ -1684,13 +1684,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Side_Window
+      Data: TownHall_Mid_Side_Window_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 131
+      Data: 127
     - Name: Rot
       Entry: 3
       Data: 0
@@ -1750,13 +1750,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Side_Window
+      Data: TownHall_Mid_Side_Window_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 131
+      Data: 127
     - Name: Rot
       Entry: 3
       Data: 1
@@ -1795,13 +1795,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Side_Window
+      Data: TownHall_Mid_Side_Window_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 131
+      Data: 127
     - Name: Rot
       Entry: 3
       Data: 2
@@ -1840,13 +1840,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Mid_Side_Window
+      Data: TownHall_Mid_Side_Window_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 131
+      Data: 127
     - Name: Rot
       Entry: 3
       Data: 3
@@ -1885,13 +1885,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Top_Corner_ShortPlank
+      Data: TownHall_Top_Corner_ShortPlank_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 132
+      Data: 128
     - Name: Rot
       Entry: 3
       Data: 0
@@ -1945,13 +1945,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Top_Corner_ShortPlank
+      Data: TownHall_Top_Corner_ShortPlank_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 132
+      Data: 128
     - Name: Rot
       Entry: 3
       Data: 1
@@ -1990,13 +1990,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Top_Corner_ShortPlank
+      Data: TownHall_Top_Corner_ShortPlank_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 132
+      Data: 128
     - Name: Rot
       Entry: 3
       Data: 2
@@ -2035,13 +2035,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Top_Corner_ShortPlank
+      Data: TownHall_Top_Corner_ShortPlank_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 132
+      Data: 128
     - Name: Rot
       Entry: 3
       Data: 3
@@ -2080,13 +2080,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Top_Full
+      Data: TownHall_Top_Full_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 133
+      Data: 129
     - Name: Rot
       Entry: 3
       Data: 0
@@ -2137,13 +2137,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Top_Side_ShortPlank
+      Data: TownHall_Top_Side_ShortPlank_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 134
+      Data: 130
     - Name: Rot
       Entry: 3
       Data: 0
@@ -2197,13 +2197,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Top_Side_ShortPlank
+      Data: TownHall_Top_Side_ShortPlank_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 134
+      Data: 130
     - Name: Rot
       Entry: 3
       Data: 1
@@ -2242,13 +2242,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Top_Side_ShortPlank
+      Data: TownHall_Top_Side_ShortPlank_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 134
+      Data: 130
     - Name: Rot
       Entry: 3
       Data: 2
@@ -2287,13 +2287,13 @@ MonoBehaviour:
       Data: WaveFunctionCollapse.PrototypeData, Core
     - Name: Name_EditorOnly
       Entry: 1
-      Data: TownHall_Top_Side_ShortPlank
+      Data: TownHall_Top_Side_ShortPlank_SmoothedNormals
     - Name: MeshRot
       Entry: 7
       Data: WaveFunctionCollapse.MeshWithRotation, Core
     - Name: MeshIndex
       Entry: 3
-      Data: 134
+      Data: 130
     - Name: Rot
       Entry: 3
       Data: 3
@@ -5042,10 +5042,7 @@ MonoBehaviour:
       Data: 40|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 3
-      Data: 132
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -5057,10 +5054,7 @@ MonoBehaviour:
       Data: 41|System.Collections.Generic.List`1[[System.Int32, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 3
-      Data: 40
+      Data: 0
     - Name: 
       Entry: 13
       Data: 

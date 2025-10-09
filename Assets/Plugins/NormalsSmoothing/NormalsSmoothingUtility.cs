@@ -13,6 +13,9 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
         public const float MaxSmoothingAngle = 180f;
 
         [SerializeField]
+        private Object meshObject;
+        
+        [SerializeField]
         private Mesh _sourceMesh;
 
         [SerializeField]
@@ -68,7 +71,9 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
 
             if (GUILayout.Button("Compute Smoothed Normals"))
             {
-                ComputeSmoothedNormals();
+                var smooth = ComputeSmoothedNormals(_sourceMesh, _smoothingAngle);
+                CreateMeshAsset(smooth);
+                Close();
             }
         }
 
@@ -80,20 +85,18 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
             window.ShowUtility();
         }
 
-        private void ComputeSmoothedNormals()
+        public static Mesh ComputeSmoothedNormals(Mesh _sourceMesh, float _smoothingAngle, Channel _channel = Channel.UV8)
         {
-            Close();
-
             Assert.IsNotNull(_sourceMesh);
             Assert.IsTrue(_smoothingAngle > 0f);
 
             Mesh smoothedMesh = Instantiate(_sourceMesh);
             smoothedMesh.name = _sourceMesh.name + "_SmoothedNormals";
             smoothedMesh.CalculateNormalsAndWriteToChannel(_smoothingAngle, _channel == Channel.UV8 ? UvChannel : null);
-            CreateMeshAsset(smoothedMesh);
+            return smoothedMesh;
         }
 
-        private static void CreateMeshAsset(Mesh mesh)
+        public static void CreateMeshAsset(Mesh mesh)
         {
             string path = EditorUtility.SaveFilePanelInProject("Save mesh", mesh.name, "asset",
                 "Select mesh asset path"
@@ -110,7 +113,7 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
             Selection.activeObject = mesh;
         }
 
-        private enum Channel
+        public enum Channel
         {
             UV8,
             Tangents,

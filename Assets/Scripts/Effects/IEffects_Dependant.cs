@@ -16,7 +16,7 @@ namespace Effects
     #region Money Effect
 
     [Serializable]
-    public class AddMoneyEffect : IEffect 
+    public class AddMoneyEffect : IEffect
     {
         [Title("Default Money")]
         [OdinSerialize]

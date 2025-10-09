@@ -474,7 +474,7 @@ namespace Buildings.District
 
         protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
-            return DistrictStateUtility.GetPerimeterEntityChunks(chunkIndexes, occupiedTargetMeshChunkIndex, DistrictData.DistrictGenerator, districtData.PrototypeInfoData, 2);
+            return DistrictStateUtility.GetFourCornersEntityIndexes(chunkIndexes, occupiedTargetMeshChunkIndex, DistrictData.DistrictGenerator, districtData.PrototypeInfoData, 2);
         }
 
         public override void OnSelected(Vector3 pos)

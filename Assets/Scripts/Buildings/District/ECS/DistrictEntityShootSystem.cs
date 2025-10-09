@@ -16,7 +16,7 @@ namespace Buildings.District.ECS
         }
 
         [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        public void OnUpdate(ref SystemState state) // Todo: Make its own ECB so that other systems can operate after, visual systems
         {
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);            
@@ -57,7 +57,6 @@ namespace Buildings.District.ECS
                 OriginPosition = transform.Position
             });
 
-            targetComponent.HasTarget = false;
             targetingActivationComponent.Count--;
             if (targetingActivationComponent.Count > 0) return;
             

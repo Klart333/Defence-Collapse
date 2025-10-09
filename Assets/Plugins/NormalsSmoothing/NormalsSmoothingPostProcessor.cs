@@ -22,10 +22,12 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
         [UsedImplicitly]
         private void OnPostprocessModel(GameObject gameObject)
         {
+            return;
             string name = gameObject.name;
 
             if (name.Contains(Tag))
             {
+                Debug.Log($"{name} contains tag {Tag}!!");
                 bool? toUv = null;
 
                 bool hasUvTag = name.Contains(UvTag);

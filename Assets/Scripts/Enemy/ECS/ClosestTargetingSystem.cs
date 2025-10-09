@@ -10,7 +10,7 @@ using System;
 
 namespace Enemy.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(EnemyHashGridSystem))]
+    [BurstCompile, UpdateAfter(typeof(EnemyHashGridSystem)), UpdateAfter(typeof(UpdateDistrictEntitiesSystem))]
     public partial struct ClosestTargetingSystem : ISystem
     {
         private ComponentLookup<LocalTransform> transformLookup;
@@ -111,11 +111,11 @@ namespace Enemy.ECS
             neighbours.Dispose();
             frontier.Dispose();
             reached.Dispose();
-            
-            if (bestEnemyPosition.Equals(default)) return;
-            
+
+            bool hasTarget = !bestEnemyPosition.Equals(default);
+
+            enemyTargetComponent.HasTarget = hasTarget;
             enemyTargetComponent.TargetPosition = bestEnemyPosition;
-            enemyTargetComponent.HasTarget = true;
         }
 
         private bool CellContainsEnemy(int2 index, float2 towerPosition, float bestDistSq, out float3 bestEnemyPosition)
