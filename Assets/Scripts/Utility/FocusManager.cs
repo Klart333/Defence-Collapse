@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Gameplay.Event;
 using System;
+using UnityEngine;
 
 namespace Utility
 {
@@ -54,6 +55,12 @@ namespace Utility
             }
 
             return false;
+        }
+        
+        public bool GetIsFocused(out HashSet<Focus> currentFocus)
+        {
+            currentFocus = focuses;
+            return focuses.Count > 0;
         }
     }
     

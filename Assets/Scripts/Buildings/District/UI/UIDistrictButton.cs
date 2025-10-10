@@ -1,5 +1,7 @@
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
-using Buildings.District;
+using Gameplay.Money;
+using UnityEngine.UI;
 using UnityEngine;
 using Gameplay;
 using TMPro;
@@ -8,9 +10,15 @@ namespace Buildings.District.UI
 {
     public class UIDistrictButton : MonoBehaviour
     {
-        [Title("Reference")]
+        [Title("Setup")]
         [SerializeField]
         private UIDistrictIcon districtIcon;
+
+        [SerializeField]
+        private Button button;
+        
+        [SerializeField]
+        private CanvasGroup canvasGroup;
         
         [Title("Cost")]
         [SerializeField]
@@ -20,12 +28,31 @@ namespace Buildings.District.UI
         private DistrictCostUtility costUtility;
 
         private DistrictHandler districtHandler;
+        private MoneyManager moneyManager;
 
         private DistrictType districtType;
+
+        private float cost; 
+
+        private void OnEnable()
+        {
+            GetMoney().Forget();
+        }
+
+        private async UniTaskVoid GetMoney()
+        {
+            moneyManager = await MoneyManager.Get();
+            moneyManager.OnMoneyChanged += OnMoneyChanged;
+        }
 
         private void OnDisable()
         {
             districtHandler.OnDistrictAmountChanged -= UpdateCostText;
+            
+            if (moneyManager)
+            {
+                moneyManager.OnMoneyChanged -= OnMoneyChanged;
+            }
         }
 
         public void Setup(DistrictHandler districtHandler, TowerData towerData)
@@ -44,8 +71,24 @@ namespace Buildings.District.UI
         private void UpdateCostText()
         {
             int amount = districtHandler.GetDistrictAmount(districtType);
-            float cost = costUtility.GetCost(districtType, amount);
+            cost = costUtility.GetCost(districtType, amount);
             costText.text = $"{cost:N0}g";
+            
+            UpdateInteractable();
+        }
+
+        private void UpdateInteractable()
+        {
+            bool isAfforable = (moneyManager ?? MoneyManager.Instance).Money >= cost;
+            button.interactable = isAfforable;
+            canvasGroup.interactable = isAfforable;
+            canvasGroup.blocksRaycasts = isAfforable;
+            canvasGroup.alpha = isAfforable ? 1 : 0.75f;
+        }
+        
+        private void OnMoneyChanged(float _)
+        {
+            UpdateInteractable();
         }
     }
 }

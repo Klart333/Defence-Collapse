@@ -335,7 +335,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8285618638795453120}
-  - component: {fileID: 8285618638795453134}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -367,14 +366,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &8285618638795453134
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8285618638795453123}
-  m_CullTransparentMesh: 1
 --- !u!1 &8285618639659378733
 GameObject:
   m_ObjectHideFlags: 0

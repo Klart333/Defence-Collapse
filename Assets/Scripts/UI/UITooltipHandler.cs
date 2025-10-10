@@ -4,6 +4,8 @@ using UnityEngine;
 using System;
 using InputCamera;
 using UnityEngine.EventSystems;
+using Utility;
+using FocusType = Utility.FocusType;
 
 namespace UI
 {
@@ -52,10 +54,26 @@ namespace UI
             (tooltip.transform as RectTransform).anchoredPosition = position;
 
             tooltip.DisplayTooltip(tooltips);
-            tooltip.OnPointerEnter += PointerEnterPanel;
+            tooltip.OnPointerEnter += PointerEnterTooltipPanel;
             tooltip.OnPointerExit += PointerExitPanel;
             
             spawnedTooltips.Add(tooltip);
+            
+            PointerEnterPanel();
+        }
+
+        private void PointerEnterTooltipPanel()
+        {
+            if (FocusManager.Instance.GetIsFocused(out HashSet<Focus> focuses))
+            {
+                foreach (Focus focus in focuses)
+                {
+                    if (focus.FocusType == FocusType.Placing)
+                    {
+                        return;
+                    }
+                }
+            }
             
             PointerEnterPanel();
         }
@@ -100,7 +118,7 @@ namespace UI
             }
             else
             {
-                screenPosition = (Vector2)rectTransform.position;
+                screenPosition = rectTransform.position;
             }
             
             Vector2 position = screenPosition + Vector2.up * (rectTransform.rect.height / 2.0f - heightOffset);

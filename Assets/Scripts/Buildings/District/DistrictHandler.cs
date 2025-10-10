@@ -364,7 +364,11 @@ namespace Buildings.District
 
         private void OnDistrictBuilt(TowerData towerData)
         {
-            if (districtAmounts.TryAdd(towerData.DistrictType, 1)) return;
+            if (districtAmounts.TryAdd(towerData.DistrictType, 1))
+            {
+                OnDistrictAmountChanged?.Invoke();
+                return;
+            }
             
             districtAmounts[towerData.DistrictType]++;
             OnDistrictAmountChanged?.Invoke();

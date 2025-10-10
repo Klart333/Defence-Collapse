@@ -1,5 +1,4 @@
 using Sirenix.OdinInspector;
-using Buildings.District;
 using Gameplay.Event;
 using UnityEngine.UI;
 using DG.Tweening;
