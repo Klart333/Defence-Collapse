@@ -14,6 +14,9 @@ namespace Buildings.District.DistrictAttachment
     {
         [Title("References")]
         [SerializeField]
+        private RenderFilterAuthoring meepleMesh;
+        
+        [SerializeField]
         private GameObject lowerString;
         
         [SerializeField]
@@ -36,13 +39,13 @@ namespace Buildings.District.DistrictAttachment
             {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
                 
-                AddComponent<AttachementMeshComponent>(entity);
                 AddComponent<SmoothMovementComponent>(entity);
                 AddComponent<AttachmentAttackValue>(entity);
-                AddComponent<RenderFilterSettings>(entity);
                 AddComponent<LocalTransform>(entity);
                 AddComponent<LocalToWorld>(entity);
-                
+
+                Entity attachmentMeshEntity = GetEntity(authoring.meepleMesh, TransformUsageFlags.Dynamic);
+                AddComponent(entity, new AttachementMeshComponent { AttachmentMeshEntity = attachmentMeshEntity });
                 AddComponent(entity, new SpeedComponent { Speed = 1});
                 
                 AddComponent(entity, new AnimateBowComponent

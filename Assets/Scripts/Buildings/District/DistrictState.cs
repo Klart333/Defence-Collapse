@@ -289,7 +289,11 @@ namespace Buildings.District
             void SetupTargetEntity(Entity spawnedEntity, Entity shooterEntity, Vector3 pos, Vector2 direction)
             {
                 Vector3 upPosition = pos + new Vector3(0, 1.5f, 0);
-                entityManager.SetComponentData(spawnedEntity, new AttachementMeshComponent { Target = shooterEntity });
+                entityManager.SetComponentData(spawnedEntity, new AttachementMeshComponent
+                {
+                    Target = shooterEntity,
+                    AttachmentMeshEntity = entityManager.GetComponentData<AttachementMeshComponent>(spawnedEntity).AttachmentMeshEntity,
+                });
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform
                 {
                     Position = upPosition,

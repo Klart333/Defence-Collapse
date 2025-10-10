@@ -1,4 +1,6 @@
 using Buildings.District.DistrictAttachment;
+using Effects.ECS;
+using Effects.ECS.ECB;
 using Enemy.ECS;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -11,20 +13,21 @@ using UnityEngine.Rendering;
 
 namespace Buildings.District.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(DistrictAttachementMeshSystem))]
+    [BurstCompile, UpdateAfter(typeof(DistrictTargetingFinalECBSystem))]
     public partial struct HighlightShootingAttachmentsSystem : ISystem
     {
         private RenderFilterSettings defaultRenderFilterSettings;
         private RenderFilterSettings highlightRenderFilterSettings;
         
-        private BufferLookup<LinkedEntityGroup> childLookup;
         private ComponentLookup<AttackSpeedComponent> attackSpeedLookup;
+        private ComponentLookup<ShakeSystem.ShakeComponent> shakeLookup;
+        private ComponentLookup<LocalTransform> transformLookup;
         
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            const int buildingLayer = 2;
-            const int highlightLayer = 10;
+            const int buildingLayer = 1;
+            const int highlightLayer = 3;
             defaultRenderFilterSettings = new RenderFilterSettings
             {
                 Layer = buildingLayer,
@@ -44,9 +47,10 @@ namespace Buildings.District.ECS
                 MotionMode = MotionVectorGenerationMode.ForceNoMotion,
                 StaticShadowCaster = false,
             };
-
-            childLookup = SystemAPI.GetBufferLookup<LinkedEntityGroup>(true);
+            
             attackSpeedLookup = SystemAPI.GetComponentLookup<AttackSpeedComponent>(true);
+            shakeLookup = SystemAPI.GetComponentLookup<ShakeSystem.ShakeComponent>(true);
+            transformLookup = SystemAPI.GetComponentLookup<LocalTransform>();
             
             state.RequireForUpdate<UpdateTargetingTag>();
             state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
@@ -59,15 +63,17 @@ namespace Buildings.District.ECS
             EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             
             attackSpeedLookup.Update(ref state);
-            childLookup.Update(ref state);
+            transformLookup.Update(ref state);
+            shakeLookup.Update(ref state);
             
             new HighlightShootingAttachmentsJob
             {
                 HighlightRenderFilterSettings = highlightRenderFilterSettings,
                 DefaultRenderFilterSettings = defaultRenderFilterSettings,
                 AttackSpeedLookup = attackSpeedLookup,
+                TransformLookup = transformLookup,
                 ECB = ecb.AsParallelWriter(),
-                ChildLookup = childLookup,
+                ShakeLookup = shakeLookup,
             }.ScheduleParallel();
         }
 
@@ -81,10 +87,13 @@ namespace Buildings.District.ECS
         public partial struct HighlightShootingAttachmentsJob : IJobEntity
         {
             [ReadOnly]
-            public BufferLookup<LinkedEntityGroup> ChildLookup;
-
-            [ReadOnly]
             public ComponentLookup<AttackSpeedComponent> AttackSpeedLookup;
+            
+            [ReadOnly]
+            public ComponentLookup<ShakeSystem.ShakeComponent> ShakeLookup;
+            
+            [NativeDisableParallelForRestriction]
+            public ComponentLookup<LocalTransform> TransformLookup;
             
             public RenderFilterSettings DefaultRenderFilterSettings;
             public RenderFilterSettings HighlightRenderFilterSettings;
@@ -93,11 +102,27 @@ namespace Buildings.District.ECS
             
             public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in AttachementMeshComponent attachmentMeshComponent)
             {
-                Entity meshEntity = ChildLookup[entity][1].Value;
-                 float timer = AttackSpeedLookup[attachmentMeshComponent.Target].AttackTimer;
+                Entity meshEntity = attachmentMeshComponent.AttachmentMeshEntity;
+                float timer = AttackSpeedLookup[attachmentMeshComponent.Target].AttackTimer;
                 ECB.SetSharedComponent(sortKey, meshEntity, timer <= 1.0f 
                     ? HighlightRenderFilterSettings 
                     : DefaultRenderFilterSettings);
+
+                bool isShaking = ShakeLookup.TryGetComponent(entity, out ShakeSystem.ShakeComponent shake);
+                if (timer <= 1.0f && !isShaking)
+                {
+                    ECB.AddComponent(sortKey, entity, new ShakeSystem.ShakeComponent
+                    {
+                        OriginalPosition = TransformLookup[entity].Position,
+                        Amplitude = 0.01f,
+                        Frequency = 7.5f,
+                    });
+                }
+                else if (timer > 1 && isShaking)
+                {
+                    TransformLookup.GetRefRW(entity).ValueRW.Position = shake.OriginalPosition;
+                    ECB.RemoveComponent<ShakeSystem.ShakeComponent>(sortKey, entity);
+                }
             }
         }
     }

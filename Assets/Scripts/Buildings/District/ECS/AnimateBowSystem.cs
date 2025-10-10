@@ -1,4 +1,5 @@
 using Buildings.District.DistrictAttachment;
+using Effects.ECS.ECB;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Entities;
@@ -7,7 +8,7 @@ using Unity.Collections;
 
 namespace Buildings.District.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(DistrictAttachementMeshSystem))]
+    [BurstCompile, UpdateAfter(typeof(DistrictTargetingFinalECBSystem))]
     public partial struct AnimateBowSystem : ISystem
     {
         private ComponentLookup<LocalTransform> transformLookup;

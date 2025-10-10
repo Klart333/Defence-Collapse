@@ -1,3 +1,4 @@
+using Effects.ECS.ECB;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
@@ -11,14 +12,14 @@ namespace Buildings.District.ECS
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
+            state.RequireForUpdate<DistrictTargetingFinalECBSystem.Singleton>();
             state.RequireForUpdate<TargetingActivationComponent>();
         }
 
         [BurstCompile]
-        public void OnUpdate(ref SystemState state) // Todo: Make its own ECB so that other systems can operate after, visual systems
+        public void OnUpdate(ref SystemState state)
         {
-            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecbSingleton = SystemAPI.GetSingleton<DistrictTargetingFinalECBSystem.Singleton>();
             EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);            
             
             new UpdateTargetedDistrictEntitiesJob

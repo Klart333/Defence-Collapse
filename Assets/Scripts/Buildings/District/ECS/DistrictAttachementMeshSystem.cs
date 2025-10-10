@@ -1,4 +1,5 @@
 using Buildings.District.DistrictAttachment;
+using Effects.ECS.ECB;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
@@ -8,7 +9,7 @@ using Enemy.ECS;
 
 namespace Buildings.District.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(ClosestTargetingSystem))]
+    [BurstCompile, UpdateAfter(typeof(DistrictTargetingFinalECBSystem))]
     public partial struct DistrictAttachementMeshSystem : ISystem
     {
         private ComponentLookup<EnemyTargetComponent> targetLookup;

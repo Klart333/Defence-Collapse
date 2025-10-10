@@ -11,6 +11,7 @@ namespace Buildings.District.ECS
     public struct AttachementMeshComponent : IComponentData
     {
         public Entity Target;
+        public Entity AttachmentMeshEntity;
     }
 
     public struct TargetingActivationComponent : IComponentData

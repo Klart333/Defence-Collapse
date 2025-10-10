@@ -1,9 +1,10 @@
+using Effects.ECS.ECB;
 using Unity.Burst;
 using Unity.Entities;
 
 namespace Buildings.District.ECS
 {
-    [BurstCompile, UpdateAfter(typeof(UpdateDistrictEntitiesSystem))]
+    [BurstCompile, UpdateAfter(typeof(DistrictTargetingFinalECBSystem))]
     public partial struct DisableUpdateTargetingSystem : ISystem
     {
         [BurstCompile]
