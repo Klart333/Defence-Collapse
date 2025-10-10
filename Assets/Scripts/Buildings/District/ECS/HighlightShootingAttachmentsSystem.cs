@@ -114,7 +114,7 @@ namespace Buildings.District.ECS
                     ECB.AddComponent(sortKey, entity, new ShakeSystem.ShakeComponent
                     {
                         OriginalPosition = TransformLookup[entity].Position,
-                        Amplitude = 0.01f,
+                        Amplitude = 0.008f,
                         Frequency = 7.5f,
                     });
                 }

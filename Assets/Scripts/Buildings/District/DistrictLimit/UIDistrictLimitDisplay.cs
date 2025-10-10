@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
+using Unity.Mathematics;
 using UnityEngine.UI;
-using Gameplay.Event;
 using DG.Tweening;
 using UnityEngine;
 using Variables;
 using System;
-using Unity.Mathematics;
 
 namespace Buildings.District.DistrictLimit
 {
@@ -26,6 +25,9 @@ namespace Buildings.District.DistrictLimit
         
         [SerializeField]
         private ColorReference highlightedSegmentColor;
+        
+        [SerializeField]
+        private SpriteReference lastSegmentSprite;
 
         [Title("Animation")]
         [SerializeField]
@@ -63,6 +65,12 @@ namespace Buildings.District.DistrictLimit
                 
                 spawnedSegments.Add(segment);
             }
+            
+            Image lastSegment = spawnedSegments[^1];
+            lastSegment.sprite = lastSegmentSprite.Value;
+            lastSegment.type = Image.Type.Simple;
+            lastSegment.preserveAspect = true;
+            lastSegment.transform.DOScale(1.5f, 0.5f).SetEase(Ease.InOutSine);
             
             limitHandler.DistrictsBuiltChanged += OnDistrictsBuiltChanged;
         }

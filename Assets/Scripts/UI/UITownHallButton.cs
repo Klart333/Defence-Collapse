@@ -14,7 +14,7 @@ namespace UI
         private GameObject[] disabledFoldoutObjects;
 
         [SerializeField]
-        private CanvasGroup fadeInCanvasGroup;
+        private CanvasGroup[] fadeInCanvasGroups;
         
         [Title("References")]
         [SerializeField]
@@ -63,8 +63,12 @@ namespace UI
             
             Events.OnDistrictBuilt -= OnDistrictBuilt;
 
-            fadeInCanvasGroup.alpha = 0;
-            fadeInCanvasGroup.DOFade(1.0f, fadeInDuration).SetEase(fadeInEase);
+            foreach (CanvasGroup group in fadeInCanvasGroups)
+            {
+                group.alpha = 0;
+                group.DOFade(1.0f, fadeInDuration).SetEase(fadeInEase);
+            }
+            
             townHallButton.SetActive(false);
             for (int i = 0; i < disabledFoldoutObjects.Length; i++)
             {

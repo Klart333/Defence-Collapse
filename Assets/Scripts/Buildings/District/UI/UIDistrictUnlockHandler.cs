@@ -11,11 +11,7 @@ namespace Buildings.District.UI
     {
         public event Action<TowerData, UIDistrictButton> OnDistrictButtonSpawned;
         
-        [FormerlySerializedAs("districtFoldout")]
         [Title("Settings")]
-        [SerializeField]
-        private UIFoldoutController foldoutController;
-
         [SerializeField]
         private UIDistrictButton districtButtonPrefab;
         
@@ -33,15 +29,27 @@ namespace Buildings.District.UI
             districtHandler = FindFirstObjectByType<DistrictHandler>();
             
             Events.OnDistrictUnlocked += OnDistrictUnlocked;
-            
-            OnDistrictUnlocked(startingTowerData);
+            Events.OnDistrictBuilt += OnDistrictBuilt;
         }
 
         private void OnDisable()
         {
             Events.OnDistrictUnlocked -= OnDistrictUnlocked;
+            Events.OnDistrictBuilt -= OnDistrictBuilt;
         }
 
+        private void OnDistrictBuilt(TowerData towerData)
+        {
+            if (towerData.DistrictType is not DistrictType.TownHall)
+            {
+                return;
+            }
+            
+            Events.OnDistrictBuilt -= OnDistrictBuilt;
+
+            OnDistrictUnlocked(startingTowerData);
+        }
+        
         private void OnDistrictUnlocked(TowerData towerData)
         {
             UIDistrictButton districtButton = Instantiate(districtButtonPrefab, districtContainer);
@@ -49,11 +57,6 @@ namespace Buildings.District.UI
             districtButton.transform.SetSiblingIndex(2);
             
             OnDistrictButtonSpawned?.Invoke(towerData, districtButton);
-
-            if (foldoutController.IsOpen)
-            {
-                foldoutController.ToggleOpen(true);
-            }
         }
     }
 }
