@@ -13,20 +13,14 @@ namespace VFX.ECS
     public partial struct FireParticlesSystem : ISystem
     {
         private EntityQuery initQuery;
-        private EntityQuery deathQuery;
         private EntityQuery stoppedBurningQuery;
         
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            EntityQueryBuilder builder = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<FireComponent, SpeedComponent>().WithNone<FireParticlesComponent>();
-            initQuery = state.GetEntityQuery(builder);
-            
-            EntityQueryBuilder builder2 = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<FireParticlesComponent, DeathTag>();
-            deathQuery = state.GetEntityQuery(builder2);
-            
-            EntityQueryBuilder builder3 = new EntityQueryBuilder(state.WorldUpdateAllocator).WithAll<FireParticlesComponent>().WithNone<FireComponent>();
-            stoppedBurningQuery = state.GetEntityQuery(builder3);
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
+            initQuery = SystemAPI.QueryBuilder().WithAll<FireComponent, SpeedComponent>().WithNone<FireParticlesComponent>().Build();
+            stoppedBurningQuery = SystemAPI.QueryBuilder().WithAll<FireParticlesComponent>().WithNone<FireComponent>().Build();
             
             state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<FireComponent, FireParticlesComponent>().Build());
             state.RequireForUpdate<VFXFireParticlesSingleton>();
@@ -46,11 +40,6 @@ namespace VFX.ECS
                 FireData = VFXFireParticlesSingleton.Manager.Datas,
             }.ScheduleParallel(state.Dependency);
             
-            if (!deathQuery.IsEmpty)
-            {
-                KillFireParticles(ref state, VFXFireParticlesSingleton);
-            }
-            
             if (!stoppedBurningQuery.IsEmpty)
             {
                 StopBurningParticles(ref state, VFXFireParticlesSingleton);
@@ -59,40 +48,26 @@ namespace VFX.ECS
 
         private void InitializeFireParticles(ref SystemState state, VFXFireParticlesSingleton fireSingleton)
         {
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-
-            state.Dependency = new InitializeFireParticlesVFXJob
+            var singleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = singleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
+            new InitializeFireParticlesVFXJob
             { 
                 ECB = ecb,
                 FireParticlesManager = fireSingleton.Manager,
-            }.Schedule(state.Dependency);
-                
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
-        }
-        
-        private void KillFireParticles(ref SystemState state, VFXFireParticlesSingleton fireSingleton)
-        {
-            state.Dependency = new DeathFireParticlesVFXJob
-            {
-                FireParticlesManager = fireSingleton.Manager,
-            }.Schedule(state.Dependency);
-            state.Dependency.Complete();
+            }.Schedule();
         }
         
         private void StopBurningParticles(ref SystemState state, VFXFireParticlesSingleton fireSingleton)
         {
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-            state.Dependency = new StoppedBurningFireParticlesVFXJob
+            var singleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = singleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
+            new StoppedBurningFireParticlesVFXJob
             {
                 FireParticlesManager = fireSingleton.Manager,
                 ECB = ecb,
-            }.Schedule(state.Dependency);
-            
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
+            }.Schedule();
         }
         
         [BurstCompile]
@@ -138,17 +113,6 @@ namespace VFX.ECS
             fireData.Position = transform.Position;
             fireData.Velocity = math.mul(transform.Rotation, math.forward()) * speed.Speed;
             FireData[fire.FireParticleVFXIndex] = fireData;
-        }
-    }
-    
-    [BurstCompile, WithAll(typeof(DeathTag))]
-    public partial struct DeathFireParticlesVFXJob : IJobEntity
-    {
-        public VFXManagerParented<VFXFireData> FireParticlesManager;
-        
-        private void Execute(in FireParticlesComponent fire)
-        {
-            FireParticlesManager.Kill(fire.FireParticleVFXIndex);
         }
     }
     

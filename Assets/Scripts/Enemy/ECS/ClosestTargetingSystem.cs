@@ -7,6 +7,7 @@ using Unity.Burst;
 using Pathfinding;
 using Utility;
 using System;
+using Effects.ECS;
 
 namespace Enemy.ECS
 {
@@ -22,7 +23,7 @@ namespace Enemy.ECS
             state.RequireForUpdate<UpdateTargetingTag>();
 
             transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
-            bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>();
+            bufferLookup = SystemAPI.GetBufferLookup<ManagedEntityBuffer>(true);
         }
 
         [BurstCompile]
@@ -62,7 +63,7 @@ namespace Enemy.ECS
         
         [BurstCompile]
         public void Execute(in DirectionRangeComponent directionComponent, ref EnemyTargetComponent enemyTargetComponent, 
-            in RangeComponent rangeComponent, in LocalTransform localTransform)
+            in RangeComponent rangeComponent, in LocalTransform localTransform, ref RandomComponent randomComponent)
         {
             float2 towerPosition = localTransform.Position.xz;
             int2 towerCell = PathUtility.GetCombinedIndex(towerPosition);
@@ -95,7 +96,7 @@ namespace Enemy.ECS
                 if (directionComponent.Angle < 360f && !index.Equals(towerCell) && !IsIndexWithinAngle(toCell, direction, cosHalfAngle))
                     continue;
 
-                if (CellContainsEnemy(index, towerPosition, rangeSq, out bestEnemyPosition))
+                if (CellContainsEnemy(index, towerPosition, rangeSq, ref randomComponent, out bestEnemyPosition))
                     break;
                 
                 PathUtility.NativeGetNeighbouringPathIndexes(neighbours, index);
@@ -118,13 +119,18 @@ namespace Enemy.ECS
             enemyTargetComponent.TargetPosition = bestEnemyPosition;
         }
 
-        private bool CellContainsEnemy(int2 index, float2 towerPosition, float bestDistSq, out float3 bestEnemyPosition)
+        private bool CellContainsEnemy(int2 index, float2 towerPosition, float bestDistSq, ref RandomComponent randomComponent, out float3 bestEnemyPosition)
         {
             bestEnemyPosition = default;
             if (!SpatialGrid.TryGetValue(index, out Entity cluster) || !BufferLookup.TryGetBuffer(cluster, out DynamicBuffer<ManagedEntityBuffer> buffer)) 
                 return false;
 
-            for (int i = 0; i < buffer.Length; i++)
+            int randIndex = randomComponent.Random.NextInt(buffer.Length);
+            Entity enemy = buffer[randIndex].Entity;
+            LocalTransform enemyTransform = TransformLookup[enemy];
+            bestEnemyPosition = enemyTransform.Position;
+            return true;
+            /*for (int i = 0; i < buffer.Length; i++)
             {
                 Entity enemy = buffer[i].Entity;
                 LocalTransform enemyTransform = TransformLookup[enemy];
@@ -137,7 +143,7 @@ namespace Enemy.ECS
                 bestEnemyPosition = enemyTransform.Position;
             } 
 
-            return true;
+            return true;*/
         }
 
         private bool IsIndexWithinAngle(float2 toCell, float2 direction, float cosHalfAngle)

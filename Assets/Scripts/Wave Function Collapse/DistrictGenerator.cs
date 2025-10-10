@@ -257,7 +257,7 @@ namespace WaveFunctionCollapse
                         ClearChunkMeshes(chunk.ChunkIndex, false);
                         for (int i = 0; i < neighbourChunks.Count; i++)
                         {
-                            ResetNeighbours(overrideChunks, neighbourChunks[i], 1);
+                            ResetNeighbours(overrideChunks, neighbourChunks[i]);
                         }
 
                         if (!ChunkIndexToChunks.TryGetValue(buildIndex, out HashSet<int3> list))
@@ -275,22 +275,15 @@ namespace WaveFunctionCollapse
             }
         }
 
-        public void ResetNeighbours(HashSet<QueryChunk> overrideChunks, QueryChunk neighbourChunk, int depth)
+        public void ResetNeighbours(HashSet<QueryChunk> neighbours, QueryChunk neighbourChunk)
         {
-            for (int i = 0; i < neighbourChunk.AdjacentChunks.Length; i++)
+            for (int i = 0; i < ChunkWaveUtility.AllAdjacentDirections.Length; i++)
             {
-                if (neighbourChunk.AdjacentChunks[i] == null) continue;
-
-                if (!overrideChunks.Add(neighbourChunk.AdjacentChunks[i] as QueryChunk) 
-                    || neighbourChunk.AdjacentChunks[i] is not QueryChunk adjacentChunk) continue;
-
+                int3 index = neighbourChunk.ChunkIndex + ChunkWaveUtility.AllAdjacentDirections[i];
+                if (!waveFunction.Chunks.TryGetValue(index, out QueryChunk adjacentChunk) || !neighbours.Add(adjacentChunk)) continue;
+                
                 adjacentChunk.Clear(ChunkWaveFunction.GameObjectPool);
                 ClearChunkMeshes(adjacentChunk.ChunkIndex, false);
-                
-                if (depth > 0)
-                {
-                    ResetNeighbours(overrideChunks, neighbourChunk.AdjacentChunks[i] as QueryChunk, depth - 1);
-                }
             }
         }
 
@@ -315,7 +308,7 @@ namespace WaveFunctionCollapse
                     }
                     
                     killIndexes.Add(index);
-                    ResetNeighbours(neighbours, waveFunction.Chunks[index], 1);
+                    ResetNeighbours(neighbours, waveFunction.Chunks[index]);
                 }
                 
                 ChunkIndexToChunks.Remove(chunkIndex);
@@ -503,7 +496,7 @@ namespace WaveFunctionCollapse
                 }
             }
 
-            QueryResetNeighbours(QueriedChunks, 1);
+            QueryResetNeighbours(QueriedChunks, 0);
 
             waveFunction.Propagate();
 
@@ -553,11 +546,10 @@ namespace WaveFunctionCollapse
                 HashSet<QueryChunk> frontier = new HashSet<QueryChunk>();
                 foreach (QueryChunk chunk in chunks)
                 {
-                    for (int i = 0; i < chunk.AdjacentChunks.Length; i++)
+                    for (int i = 0; i < ChunkWaveUtility.AllAdjacentDirections.Length; i++)
                     {
-                        IChunk neighbourChunk = chunk.AdjacentChunks[i];
-                        if (neighbourChunk is not QueryChunk adjacentChunk
-                            || chunks.Contains(adjacentChunk)) continue;
+                        int3 index = chunk.ChunkIndex + ChunkWaveUtility.AllAdjacentDirections[i];
+                        if (!waveFunction.Chunks.TryGetValue(index, out QueryChunk adjacentChunk) || chunks.Contains(adjacentChunk)) continue;
 
                         frontier.Add(adjacentChunk);
                     }

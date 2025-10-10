@@ -58,7 +58,7 @@ namespace DELTation.ToonRP.Editor.NormalsSmoothing
 
                 foreach (Object asset in assets)
                 {
-                    if (asset is not Mesh sourceMesh) continue;
+                    if (asset is not Mesh sourceMesh || sourceMesh.name.EndsWith("_SmoothedNormals")) continue;
                     
                     var smoothedMesh = NormalsSmoothingUtility.ComputeSmoothedNormals(sourceMesh, _smoothingAngle, _channel);
                     string path = $"{folderFilePath}/{createdFolderName}/{smoothedMesh.name}.asset";

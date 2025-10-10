@@ -1,6 +1,7 @@
 using Unity.Entities;
 using Unity.Burst;
 using Enemy.ECS;
+using Unity.Mathematics;
 
 namespace Effects.ECS
 {
@@ -46,7 +47,10 @@ namespace Effects.ECS
         [BurstCompile]
         public void Execute([ChunkIndexInQuery] int sortKey, Entity entity, in HealthScalingComponent scalingComponent, ref HealthComponent health, ref MaxHealthComponent maxHealth)
         {
-            float multiplier = scalingComponent.Multiplier * 0.02f * TurnCount * TurnCount + -0.04f * TurnCount + 1; // 0.02x^2 + -0.04x + 1
+            float turnValue = TurnCount / 25.0f;
+            float multiplier = math.pow(3, turnValue); // 3 ^ (x / 25), quite slow
+            multiplier = math.max(1.0f, multiplier * scalingComponent.Multiplier);
+            
             health.Health *= multiplier;
             health.Armor *= multiplier;
             health.Shield *= multiplier;

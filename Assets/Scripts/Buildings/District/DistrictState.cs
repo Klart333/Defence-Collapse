@@ -1,6 +1,8 @@
-﻿using Vector2 = UnityEngine.Vector2;
+﻿using Random = Unity.Mathematics.Random;
+using Vector2 = UnityEngine.Vector2;
 using Math = Utility.Math;
 
+using Buildings.District.DistrictAttachment;
 using System.Collections.Generic;
 using Buildings.District.ECS;
 using WaveFunctionCollapse;
@@ -17,7 +19,6 @@ using Gameplay;
 using Effects;
 using Utility;
 using System;
-using Buildings.District.DistrictAttachment;
 
 namespace Buildings.District
 {
@@ -37,7 +38,7 @@ namespace Buildings.District
 
         protected EntityManager entityManager;
         private Entity targetingEntityPrefab;
-        private Entity targetEntityPrefab;
+        private Entity attachmentEntityPrefab;
         
         public CategoryType CategoryType => districtData.CategoryType;
         public Stats Stats => stats;
@@ -140,6 +141,7 @@ namespace Buildings.District
                 typeof(DistrictDataComponent),
                 typeof(EnemyTargetComponent),
                 typeof(AttackSpeedComponent),
+                typeof(RandomComponent),
                 typeof(LocalTransform),
                 typeof(RangeComponent),
                 typeof(Prefab),
@@ -149,7 +151,7 @@ namespace Buildings.District
             if (!districtData.UseTargetMesh) return;
             
             Entity attachmentDatabase = entityManager.CreateEntityQuery(typeof(DistrictAttachmentDatabaseTag)).GetSingletonEntity();
-            targetEntityPrefab = entityManager.GetBuffer<DistrictAttachmentElement>(attachmentDatabase)[districtData.DistrictAttachmentIndex].DistrictAttachment;
+            attachmentEntityPrefab = entityManager.GetBuffer<DistrictAttachmentElement>(attachmentDatabase)[districtData.DistrictAttachmentIndex].DistrictAttachment;
         }
 
         public abstract void OnSelected(Vector3 pos);
@@ -199,7 +201,6 @@ namespace Buildings.District
 
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             entityManager.DestroyEntity(targetingEntityPrefab);
-            entityManager.DestroyEntity(targetEntityPrefab);
             
             RemoveAllEntities();
         }
@@ -262,6 +263,7 @@ namespace Buildings.District
                 entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = stats.Range.Value });
                 entityManager.SetComponentData(spawnedEntity, new DistrictDataComponent { DistrictID = Key, });
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = pos });
+                entityManager.SetComponentData(spawnedEntity, new RandomComponent{Random = Random.CreateFromIndex((uint)(GameManager.Instance.Seed + i))});
                 entityManager.SetComponentData(spawnedEntity, new DirectionRangeComponent
                 {
                     Direction = math.normalize(targetIndexes[i].Direction),
@@ -272,7 +274,7 @@ namespace Buildings.District
         
         private void SpawnTargetEntities(NativeArray<Entity> entities, List<TargetEntityIndex> targetIndexes)
         {
-            NativeArray<Entity> targetEntities = entityManager.Instantiate(targetEntityPrefab, entities.Length, Allocator.Temp);
+            NativeArray<Entity> targetEntities = entityManager.Instantiate(attachmentEntityPrefab, entities.Length, Allocator.Temp);
 
             for (int i = 0; i < targetEntities.Length; i++)
             {
@@ -388,14 +390,14 @@ namespace Buildings.District
             {
                 for (int i = 0; i < toRemove.Count; i++)
                 {
-                    entityManager.DestroyEntity(toRemove[i]);
+                    entityManager.AddComponent<DeathTag>(toRemove[i]);
                 }
 
                 return;
             }
             
             NativeArray<Entity> remove = toRemove.ToNativeArray(Allocator.Temp);
-            entityManager.DestroyEntity(remove);
+            entityManager.AddComponent<DeathTag>(remove);
             remove.Dispose();
         }
         

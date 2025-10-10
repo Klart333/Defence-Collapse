@@ -9,154 +9,126 @@ using Enemy.ECS;
 using VFX.ECS;
 using VFX;
 
-[BurstCompile, UpdateAfter(typeof(HealthSystem))]
-public partial struct PoisonParticleSytem : ISystem
+namespace VFX.ECS
 {
-    private EntityQuery stoppedQuery;
-    private EntityQuery deathQuery;
-    private EntityQuery initQuery;
-        
-    [BurstCompile]
-    public void OnCreate(ref SystemState state)
+    [BurstCompile, UpdateAfter(typeof(HealthSystem))]
+    public partial struct PoisonParticleSytem : ISystem
     {
-        initQuery = SystemAPI.QueryBuilder().WithAll<PoisonComponent, SpeedComponent>().WithNone<PoisonParticlesComponent>().Build();
-        stoppedQuery = SystemAPI.QueryBuilder().WithAll<PoisonParticlesComponent>().WithNone<PoisonComponent>().Build();
-        deathQuery = SystemAPI.QueryBuilder().WithAll<PoisonParticlesComponent, DeathTag>().Build();
-            
-        state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<PoisonComponent, PoisonParticlesComponent>().Build());
-        state.RequireForUpdate<VFXPoisonParticlesSingleton>();
-    }
+        private EntityQuery stoppedQuery;
+        private EntityQuery initQuery;
 
-    [BurstCompile]
-    public void OnUpdate(ref SystemState state)
-    {
-        VFXPoisonParticlesSingleton VFXPoisonParticlesSingleton = SystemAPI.GetSingletonRW<VFXPoisonParticlesSingleton>().ValueRW;
-        if (!initQuery.IsEmpty)
+        [BurstCompile]
+        public void OnCreate(ref SystemState state)
         {
-            InitializePoisonParticles(ref state, VFXPoisonParticlesSingleton);
+            initQuery = SystemAPI.QueryBuilder().WithAll<PoisonComponent, SpeedComponent>().WithNone<PoisonParticlesComponent>().Build();
+            stoppedQuery = SystemAPI.QueryBuilder().WithAll<PoisonParticlesComponent>().WithNone<PoisonComponent>().Build();
+
+            state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<PoisonComponent, PoisonParticlesComponent>().Build());
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
+            state.RequireForUpdate<VFXPoisonParticlesSingleton>();
         }
 
-        state.Dependency = new SetPoisonParticlesVFXDataJob()
+        [BurstCompile]
+        public void OnUpdate(ref SystemState state)
         {
-            PoisonData = VFXPoisonParticlesSingleton.Manager.Datas,
-        }.ScheduleParallel(state.Dependency);
-            
-        if (!deathQuery.IsEmpty)
-        {
-            KillPoisonParticles(ref state, VFXPoisonParticlesSingleton);
-        }
-            
-        if (!stoppedQuery.IsEmpty)
-        {
-            StopBurningParticles(ref state, VFXPoisonParticlesSingleton);
-        }
-    }
-
-    private void InitializePoisonParticles(ref SystemState state, VFXPoisonParticlesSingleton poisonSingleton)
-    {
-        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-
-        state.Dependency = new InitializePoisonParticlesVFXJob
-        { 
-            ECB = ecb,
-            PoisonParticlesManager = poisonSingleton.Manager,
-        }.Schedule(state.Dependency);
-                
-        state.Dependency.Complete();
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
-    }
-        
-    private void KillPoisonParticles(ref SystemState state, VFXPoisonParticlesSingleton poisonSingleton)
-    {
-        state.Dependency = new DeathPoisonParticlesVFXJob
-        {
-            PoisonParticlesManager = poisonSingleton.Manager,
-        }.Schedule(state.Dependency);
-        state.Dependency.Complete();
-    }
-        
-    private void StopBurningParticles(ref SystemState state, VFXPoisonParticlesSingleton poisonSingleton)
-    {
-        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
-        state.Dependency = new StoppedPoisonParticlesVFXJob
-        {
-            PoisonParticlesManager = poisonSingleton.Manager,
-            ECB = ecb,
-        }.Schedule(state.Dependency);
-            
-        state.Dependency.Complete();
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
-    }
-        
-    [BurstCompile]
-    public void OnDestroy(ref SystemState state)
-    {
-
-    }
-
-    [BurstCompile, WithAll(typeof(PoisonComponent), typeof(SpeedComponent)), WithNone(typeof(PoisonParticlesComponent))]
-    public partial struct InitializePoisonParticlesVFXJob : IJobEntity
-    {
-        public VFXManagerParented<VFXPoisonParticleData> PoisonParticlesManager;
-        public EntityCommandBuffer ECB;
-        
-        private void Execute(Entity entity, in LocalTransform transform)
-        {
-            PoisonParticlesComponent poisonParticle = new PoisonParticlesComponent
+            VFXPoisonParticlesSingleton VFXPoisonParticlesSingleton = SystemAPI.GetSingletonRW<VFXPoisonParticlesSingleton>().ValueRW;
+            if (!initQuery.IsEmpty)
             {
-                PoisonParticleVFXIndex = PoisonParticlesManager.Create(),
-            };
-            ECB.AddComponent(entity, poisonParticle);
-                
-            PoisonParticlesManager.Datas[poisonParticle.PoisonParticleVFXIndex] = new VFXPoisonParticleData
+                InitializePoisonParticles(ref state, VFXPoisonParticlesSingleton);
+            }
+
+            state.Dependency = new SetPoisonParticlesVFXDataJob()
             {
-                Size = 1 * transform.Scale,
-            };
+                PoisonData = VFXPoisonParticlesSingleton.Manager.Datas,
+            }.ScheduleParallel(state.Dependency);
+
+            if (!stoppedQuery.IsEmpty)
+            {
+                StopBurningParticles(ref state, VFXPoisonParticlesSingleton);
+            }
         }
-    }
-    
-    [BurstCompile]
-    public partial struct SetPoisonParticlesVFXDataJob : IJobEntity
-    {
-        [NativeDisableParallelForRestriction]
-        [NativeDisableContainerSafetyRestriction]
-        public NativeArray<VFXPoisonParticleData> PoisonData;
-            
-        private void Execute(in LocalTransform transform, in PoisonParticlesComponent poison, in SpeedComponent speed)
+
+        private void InitializePoisonParticles(ref SystemState state, VFXPoisonParticlesSingleton poisonSingleton)
         {
-            if (poison.PoisonParticleVFXIndex < 0) return;
+            var singleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = singleton.CreateCommandBuffer(state.WorldUnmanaged);
             
-            VFXPoisonParticleData poisonData = PoisonData[poison.PoisonParticleVFXIndex];
-            poisonData.Position = transform.Position;
-            poisonData.Velocity = math.mul(transform.Rotation, math.forward()) * speed.Speed;
-            PoisonData[poison.PoisonParticleVFXIndex] = poisonData;
+            new InitializePoisonParticlesVFXJob
+            {
+                ECB = ecb,
+                PoisonParticlesManager = poisonSingleton.Manager,
+            }.Schedule();
         }
-    }
-    
-    [BurstCompile, WithAll(typeof(DeathTag))]
-    public partial struct DeathPoisonParticlesVFXJob : IJobEntity
-    {
-        public VFXManagerParented<VFXPoisonParticleData> PoisonParticlesManager;
-        
-        private void Execute(in PoisonParticlesComponent poison)
+
+        private void StopBurningParticles(ref SystemState state, VFXPoisonParticlesSingleton poisonSingleton)
         {
-            PoisonParticlesManager.Kill(poison.PoisonParticleVFXIndex);
-        }
-    }
-    
-    [BurstCompile, WithNone(typeof(PoisonComponent))]
-    public partial struct StoppedPoisonParticlesVFXJob : IJobEntity
-    {
-        public VFXManagerParented<VFXPoisonParticleData> PoisonParticlesManager;
-        public EntityCommandBuffer ECB;
-        
-        private void Execute(in PoisonParticlesComponent poison, Entity entity)
-        {
-            PoisonParticlesManager.Kill(poison.PoisonParticleVFXIndex);
+            var singleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = singleton.CreateCommandBuffer(state.WorldUnmanaged);
             
-            ECB.RemoveComponent<PoisonParticlesComponent>(entity);
+            new StoppedPoisonParticlesVFXJob
+            {
+                PoisonParticlesManager = poisonSingleton.Manager,
+                ECB = ecb,
+            }.Schedule();
+        }
+
+        [BurstCompile]
+        public void OnDestroy(ref SystemState state)
+        {
+
+        }
+
+        [BurstCompile, WithAll(typeof(PoisonComponent), typeof(SpeedComponent)), WithNone(typeof(PoisonParticlesComponent))]
+        public partial struct InitializePoisonParticlesVFXJob : IJobEntity
+        {
+            public VFXManagerParented<VFXPoisonParticleData> PoisonParticlesManager;
+            public EntityCommandBuffer ECB;
+
+            private void Execute(Entity entity, in LocalTransform transform)
+            {
+                PoisonParticlesComponent poisonParticle = new PoisonParticlesComponent
+                {
+                    PoisonParticleVFXIndex = PoisonParticlesManager.Create(),
+                };
+                ECB.AddComponent(entity, poisonParticle);
+
+                PoisonParticlesManager.Datas[poisonParticle.PoisonParticleVFXIndex] = new VFXPoisonParticleData
+                {
+                    Size = 1 * transform.Scale,
+                };
+            }
+        }
+
+        [BurstCompile]
+        public partial struct SetPoisonParticlesVFXDataJob : IJobEntity
+        {
+            [NativeDisableParallelForRestriction]
+            [NativeDisableContainerSafetyRestriction]
+            public NativeArray<VFXPoisonParticleData> PoisonData;
+
+            private void Execute(in LocalTransform transform, in PoisonParticlesComponent poison, in SpeedComponent speed)
+            {
+                if (poison.PoisonParticleVFXIndex < 0) return;
+
+                VFXPoisonParticleData poisonData = PoisonData[poison.PoisonParticleVFXIndex];
+                poisonData.Position = transform.Position;
+                poisonData.Velocity = math.mul(transform.Rotation, math.forward()) * speed.Speed;
+                PoisonData[poison.PoisonParticleVFXIndex] = poisonData;
+            }
+        }
+
+        [BurstCompile, WithNone(typeof(PoisonComponent))]
+        public partial struct StoppedPoisonParticlesVFXJob : IJobEntity
+        {
+            public VFXManagerParented<VFXPoisonParticleData> PoisonParticlesManager;
+            public EntityCommandBuffer ECB;
+
+            private void Execute(in PoisonParticlesComponent poison, Entity entity)
+            {
+                PoisonParticlesManager.Kill(poison.PoisonParticleVFXIndex);
+
+                ECB.RemoveComponent<PoisonParticlesComponent>(entity);
+            }
         }
     }
     

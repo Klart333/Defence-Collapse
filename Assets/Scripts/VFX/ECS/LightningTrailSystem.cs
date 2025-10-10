@@ -13,15 +13,14 @@ namespace VFX.ECS
     public partial struct LightningTrailSystem : ISystem
     {
         private EntityQuery initLightningTrailQuery;
-        private EntityQuery deathLightningTrailQuery;
     
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            deathLightningTrailQuery = SystemAPI.QueryBuilder().WithAll<LightningTrailComponent, DeathTag>().Build();
             initLightningTrailQuery = SystemAPI.QueryBuilder().WithAll<LightningComponent, SpeedComponent>().WithNone<LightningTrailComponent>().Build();
             
             state.RequireForUpdate(SystemAPI.QueryBuilder().WithAny<LightningComponent, LightningTrailComponent>().Build());
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             state.RequireForUpdate<VFXLightningTrailSingleton>(); 
         }
 
@@ -38,34 +37,18 @@ namespace VFX.ECS
             {
                 LightningTrailsData = vfxLightningTrailSingleton.Manager.Datas,
             }.ScheduleParallel(state.Dependency);
-            
-            if (!deathLightningTrailQuery.IsEmpty)
-            {
-                KillLightningTrails(ref state, vfxLightningTrailSingleton);
-            }
         }
 
         private void InitializeLightningTrails(ref SystemState state, VFXLightningTrailSingleton trailSingleton)
         {
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+            var singleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            EntityCommandBuffer ecb = singleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            state.Dependency = new InitializeLightningTrailVFXJob
+            new InitializeLightningTrailVFXJob
             { 
                 ECB = ecb,
                 LightningTrailManager = trailSingleton.Manager,
-            }.Schedule(state.Dependency);
-                
-            state.Dependency.Complete();
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
-        }
-        
-        private void KillLightningTrails(ref SystemState state, VFXLightningTrailSingleton trailSingleton)
-        {
-            state.Dependency = new DeathLightningTrailVFXJob
-            {
-                LightningTrailManager = trailSingleton.Manager,
-            }.Schedule(state.Dependency);
+            }.Schedule();
         }
 
         [BurstCompile]
@@ -111,17 +94,6 @@ namespace VFX.ECS
             trailData.Position = transform.Position;
             trailData.Velocity = math.mul(transform.Rotation, math.forward()) * speed.Speed;
             LightningTrailsData[trail.LightningTrailVFXIndex] = trailData;
-        }
-    }
-    
-    [BurstCompile, WithAll(typeof(DeathTag))]
-    public partial struct DeathLightningTrailVFXJob : IJobEntity
-    {
-        public VFXManagerParented<VFXLightningTrailData> LightningTrailManager;
-        
-        private void Execute(in LightningTrailComponent trail)
-        {
-            LightningTrailManager.Kill(trail.LightningTrailVFXIndex);
         }
     }
 

@@ -8,7 +8,6 @@ namespace VFX.ECS
     [BurstCompile, UpdateBefore(typeof(BeforeDeathECBSystem))]
     public partial struct KillTrailSystem : ISystem
     {
-        
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {

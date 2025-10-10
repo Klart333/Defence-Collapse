@@ -38,7 +38,7 @@ namespace VFX.ECS
 
         private void InitializeTrails(ref SystemState state, VFXTrailSingleton trailSingleton)
         {
-            EndSimulationEntityCommandBufferSystem.Singleton singleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var singleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             EntityCommandBuffer ecb = singleton.CreateCommandBuffer(state.WorldUnmanaged);
             
             new InitializeTrailVFXJob

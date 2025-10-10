@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 1170154511620047005}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.334, y: -0.24149618, z: -0.26728702}
+  m_LocalPosition: {x: -0.334, y: -0.024496183, z: -0.26728702}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -8719572371529340827, guid: 25a745df945e30840b27713cb10f578c, type: 3}
+  - {fileID: 2100000, guid: 16f4b84d776954947aab5daf6fa0d289, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -116,7 +116,7 @@ Transform:
   m_GameObject: {fileID: 1308260760353051237}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.334, y: 1.3585038, z: -0.26728702}
+  m_LocalPosition: {x: -0.334, y: 1.5755038, z: -0.26728702}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -155,7 +155,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -8719572371529340827, guid: 25a745df945e30840b27713cb10f578c, type: 3}
+  - {fileID: 2100000, guid: 16f4b84d776954947aab5daf6fa0d289, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -189,7 +189,6 @@ GameObject:
   - component: {fileID: 5211622053881287047}
   - component: {fileID: 2921910075072645755}
   - component: {fileID: 2981996318084571864}
-  - component: {fileID: 4058694929963718735}
   m_Layer: 7
   m_Name: MeepleMesh
   m_TagString: Untagged
@@ -206,7 +205,7 @@ Transform:
   m_GameObject: {fileID: 3439025489506874226}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.217, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -245,9 +244,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -1444460858095362738, guid: 25a745df945e30840b27713cb10f578c, type: 3}
-  - {fileID: -400310251153081761, guid: 25a745df945e30840b27713cb10f578c, type: 3}
-  - {fileID: 7078888868575029301, guid: 25a745df945e30840b27713cb10f578c, type: 3}
+  - {fileID: 2100000, guid: af2e22e44379fcb4d823d8e8068359c0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -270,18 +267,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4058694929963718735
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3439025489506874226}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65420e6274f34161b75d2be7b81b3e60, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Core::Buildings.District.DistrictAttachment.RenderFilterAuthoring
 --- !u!1 &4048974236799736810
 GameObject:
   m_ObjectHideFlags: 0
@@ -309,7 +294,7 @@ Transform:
   m_GameObject: {fileID: 4048974236799736810}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.334, y: 0.523, z: 0.261}
+  m_LocalPosition: {x: -0.334, y: 0.74, z: 0.261}
   m_LocalScale: {x: 1.2899, y: 1.2899, z: 1.2899}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -419,7 +404,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88f4c654fbf44f6b93b37718febf783d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Core::Buildings.District.DistrictAttachment.ArcherAttachmentAuthoring
-  meepleMesh: {fileID: 4058694929963718735}
+  meepleMesh: {fileID: 3439025489506874226}
   lowerString: {fileID: 1170154511620047005}
   upperString: {fileID: 1308260760353051237}
   arrow: {fileID: 4048974236799736810}

@@ -5,7 +5,6 @@ using Unity.Entities;
 using Effects.ECS;
 using UnityEngine;
 using Enemy.ECS;
-using Unity.Entities.Graphics;
 using Unity.Mathematics;
 
 namespace Buildings.District.DistrictAttachment
@@ -14,7 +13,7 @@ namespace Buildings.District.DistrictAttachment
     {
         [Title("References")]
         [SerializeField]
-        private RenderFilterAuthoring meepleMesh;
+        private GameObject meepleMesh;
         
         [SerializeField]
         private GameObject lowerString;
