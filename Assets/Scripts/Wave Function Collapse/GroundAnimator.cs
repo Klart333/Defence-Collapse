@@ -9,6 +9,7 @@ namespace WaveFunctionCollapse
 {
     public class GroundAnimator : MonoBehaviour
     {
+        public event Action<GameObject> OnTileAnimated;
         public event Action OnAnimationFinished;
         
         [Title("References")]
@@ -120,6 +121,8 @@ namespace WaveFunctionCollapse
             Vector3 position = cellTransform.transform.position + Vector3.down * 0.1f;
             cellTransform.transform.position += Vector3.up * height;
             cellTransform.transform.DOMove(position, fallDuration).SetEase(fallEase);
+            
+            OnTileAnimated?.Invoke(cellTransform.gameObject);
         }
 
         private async UniTaskVoid DelayedComplete()

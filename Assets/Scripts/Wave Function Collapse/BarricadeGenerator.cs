@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
+using Gameplay.Event;
 using UnityEngine;
 using System.Linq;
 using Buildings;
 using System;
-using Gameplay.Event;
-using UnityEngine.Serialization;
 
 namespace WaveFunctionCollapse
 {
@@ -25,14 +24,9 @@ namespace WaveFunctionCollapse
         [SerializeField]
         private ProtoypeMeshes prototypeMeshes;
 
-        [FormerlySerializedAs("pathPrefab")]
         [Title("Mesh")]
         [SerializeField]
         private Barricade barricadePrefab;
-
-        [Title("Debug")]
-        [SerializeField]
-        private PooledMonoBehaviour unableToPlacePrefab;
 
         public Dictionary<ChunkIndex, IBuildable> QuerySpawnedBuildings { get; } = new Dictionary<ChunkIndex, IBuildable>();
         public Dictionary<ChunkIndex, IBuildable> SpawnedMeshes { get; } = new Dictionary<ChunkIndex, IBuildable>();
