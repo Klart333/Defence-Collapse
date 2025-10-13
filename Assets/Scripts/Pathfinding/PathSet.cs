@@ -29,6 +29,7 @@ namespace Pathfinding
                 return;
             }
 
+            isDirty = true;
             target.OnIndexerRebuild += SetIsDirty;
         }
 

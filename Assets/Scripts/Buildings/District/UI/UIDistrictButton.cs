@@ -18,7 +18,7 @@ namespace Buildings.District.UI
         private Button button;
         
         [SerializeField]
-        private CanvasGroup canvasGroup;
+        private GameObject disabledOverlay;
         
         [Title("Cost")]
         [SerializeField]
@@ -72,8 +72,8 @@ namespace Buildings.District.UI
         {
             int amount = districtHandler.GetDistrictAmount(districtType);
             cost = costUtility.GetCost(districtType, amount);
-            costText.text = $"{cost:N0}g";
-            
+            costText.text = $"{cost:N0}g"; 
+             
             UpdateInteractable();
         }
 
@@ -81,9 +81,8 @@ namespace Buildings.District.UI
         {
             bool isAfforable = (moneyManager ?? MoneyManager.Instance).Money >= cost;
             button.interactable = isAfforable;
-            canvasGroup.interactable = isAfforable;
-            canvasGroup.blocksRaycasts = isAfforable;
-            canvasGroup.alpha = isAfforable ? 1 : 0.75f;
+            disabledOverlay.SetActive(!isAfforable);
+            
         }
         
         private void OnMoneyChanged(float _)

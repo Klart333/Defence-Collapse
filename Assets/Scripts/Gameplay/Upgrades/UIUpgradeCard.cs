@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Buildings.District.UI;
 using Buildings.District;
 using UnityEngine.UI;
+using Gameplay.Event;
 using UnityEngine;
 using DG.Tweening;
 using Variables;
 using System;
-using Buildings.District.UI;
 using Effects;
-using Gameplay.Event;
 using TMPro;
-using UI;
 
 namespace Gameplay.Upgrades
 {
@@ -155,10 +154,12 @@ namespace Gameplay.Upgrades
             switch (effect)
             {
                 case IncreaseStatEffect statEffect:
-                    if (statEffect.ModifierType == Modifier.ModifierType.Multiplicative) return (statEffect.ModifierValue - 1.0f).ToString("P");
-                    if (statEffect.ModifierType == Modifier.ModifierType.Additive) return statEffect.ModifierValue.ToString("N1");
-            
-                    return statEffect.ModifierValue.ToString("N0");
+                    return statEffect.ModifierType switch
+                    {
+                        Modifier.ModifierType.Multiplicative => (statEffect.ModifierValue - 1.0f).ToString("P"),
+                        Modifier.ModifierType.Additive => statEffect.ModifierValue.ToString("N1"),
+                        _ => statEffect.ModifierValue.ToString("N0")
+                    };
             }
             return "EFFECT NOT IMPLEMENTED";
         }

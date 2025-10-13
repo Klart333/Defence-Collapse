@@ -26,7 +26,7 @@ namespace Juice
         private InputEntityWriter inputWriter;
         
         private List<TileSelector> spawnedTiles = new List<TileSelector>();
-
+        
         public void SelectTile(ChunkIndex chunkIndex, TileAction tileAction)
         {
             Vector3 pos = ChunkWaveUtility.GetPosition(chunkIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize); 

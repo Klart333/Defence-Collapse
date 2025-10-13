@@ -13,9 +13,6 @@ namespace Buildings
         [SerializeField]
         private TileBuilder tileBuilder;
         
-        [SerializeField]
-        private BarricadePlacer barricadePlacer;
-        
         [Title("References")]
         [SerializeField]
         private DistrictGenerator districtGenerator;
@@ -104,7 +101,6 @@ namespace Buildings
 
         private void RemoveBuilding(ChunkIndex index)
         {
-            
             buildingHandler.BuildingDestroyed(index);
         }
     }

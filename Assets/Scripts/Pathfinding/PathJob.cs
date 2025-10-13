@@ -1,10 +1,12 @@
-﻿using Unity.Collections.LowLevel.Unsafe;
+﻿using System;
+using Unity.Collections.LowLevel.Unsafe;
 using System.Runtime.CompilerServices;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Entities;
 using Unity.Burst;
 using Unity.Jobs;
+using UnityEngine;
 
 namespace Pathfinding
 {
@@ -46,7 +48,7 @@ namespace Pathfinding
                 // Handle common case (~99%)
                 case 0:
                 {
-                    if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out int dirIdx))
+                    if (GetClosestNeighbour(neighbours, ref pathChunk, index, combinedIndex, out int dist, out int dirIdx))
                     {
                         pathChunk.Directions[combinedIndex] = PathUtility.GetDirection(PathUtility.NeighbourDirectionsCardinal[dirIdx]);
                         pathChunk.Distances[combinedIndex] = pathChunk.NotWalkableIndexes[combinedIndex] ? 1_000_000_000 : dist;
@@ -57,7 +59,7 @@ namespace Pathfinding
                 // Handle barricade case (targetIndex == 255)
                 case byte.MaxValue:
                 {
-                    if (GetClosestNeighbour(neighbours, ref pathChunk, index, out int dist, out _))
+                    if (GetClosestNeighbour(neighbours, ref pathChunk, index, combinedIndex, out int dist, out _))
                     {
                         pathChunk.Directions[combinedIndex] = byte.MaxValue;
                         pathChunk.Distances[combinedIndex] = dist;
@@ -74,7 +76,7 @@ namespace Pathfinding
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool GetClosestNeighbour(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int2 gridIndex, out int shortestDistance, out int dirIndex)
+        private bool GetClosestNeighbour(NativeArray<PathIndex> neighbours, ref PathChunk pathChunk, int2 gridIndex, int combinedGridIndex, out int shortestDistance, out int dirIndex)
         {
             int2 currentChunkIndex = pathChunk.ChunkIndex;
             GetNeighbours(currentChunkIndex, gridIndex, neighbours);
@@ -92,12 +94,16 @@ namespace Pathfinding
                     ? ref pathChunk
                     : ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[neighbourIndex.ChunkIndex]];
 
+                // Check if the edge is blocked
+                int blockedCost = GetEdgeBlockedCost(ref pathChunk, combinedGridIndex, ref neighbour, combinedIndex, i);
+                
                 int manhattanDist = i % 2 == 0 ? 5 : 7;
-                int indexOccupied = neighbour.IndexOccupied[combinedIndex] ? 1_000 : 0;
+                int indexOccupied = neighbour.IndexOccupied[combinedIndex] ? 2_000 : 0;
                 int dist = neighbour.Distances[combinedIndex]
                            + neighbour.MovementCosts[combinedIndex] * manhattanDist
                            + neighbour.ExtraDistance[combinedIndex]
-                           + indexOccupied;
+                           + indexOccupied
+                           + blockedCost;
 
                 if (dist >= shortestDistance) continue;
 
@@ -106,6 +112,22 @@ namespace Pathfinding
             }
 
             return shortestDistance < int.MaxValue;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int GetEdgeBlockedCost(ref PathChunk pathChunk, int combinedGridIndex, ref PathChunk neighbourChunk, int combinedNeighbourIndex, int directionIndex)
+        {
+            // PathUtility.NeighbourDirectionsCardinal - Right, Up, Left, Down
+            // Is Opposite!
+
+            return directionIndex switch
+            {
+                0 => neighbourChunk.WestEdgeBlocks[combinedNeighbourIndex], // Right
+                1 => pathChunk.NorthEdgeBlocks[combinedGridIndex], // Up
+                2 => pathChunk.WestEdgeBlocks[combinedGridIndex], // Left
+                3 => neighbourChunk.NorthEdgeBlocks[combinedNeighbourIndex], // Down
+                _ => throw new ArgumentOutOfRangeException(nameof(directionIndex), directionIndex, null)
+            } ? 100_000 : 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

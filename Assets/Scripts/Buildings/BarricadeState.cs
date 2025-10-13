@@ -7,57 +7,29 @@ using Health;
 namespace Buildings
 {
     [System.Serializable]
-    public class BarricadeState : IHealthState, IBuffable
+    public class BarricadeState : IBuffable
     {
         private BarricadeHandler handler;
 
-        public ChunkIndex Index { get; }
-        public HealthComponent Health { get; }
-        public Stats Stats { get; }
-        
         public Vector3 Position { get; set; }
+        public ChunkIndexEdge Index { get; }
+        public Stats Stats { get; }
 
-        public BarricadeState(BarricadeHandler buildingHandler, Stats stats, ChunkIndex index)
+        public BarricadeState(BarricadeHandler buildingHandler, Stats stats, ChunkIndexEdge index)
         {
             Stats = stats;
             handler = buildingHandler;
-            Health = new HealthComponent(Stats);
             Index = index;
-        }
-    
-        public void OnTurnsIncreased(int turnIncrease)
-        {
-            Health.UpdateHealing(turnIncrease);
-        }
-        
-        public void TakeDamage(DamageInstance damage, out DamageInstance damageDone)
-        {
-            Health.TakeDamage(damage, out damageDone);
-
-            if (!Health.Alive)
-            {
-                OnBarricadeDeath();
-            }
-        }
-    
-        public void TakeDamage(float damage)
-        {
-            Health.TakeDamage(damage);
-
-            if (!Health.Alive)
-            {
-                OnBarricadeDeath();
-            }
         }
     
         public void OnBarricadeDeath()
         {
-            handler.BarricadeDestroyed(Index);
+            
         }
 
-        public void OnWaveEnded()
+        public void OnTurnsIncreased(int increase)
         {
-            Health.SetHealthToMax();
+            
         }
     }
 }

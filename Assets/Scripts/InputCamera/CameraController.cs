@@ -1,19 +1,15 @@
-using System.Threading.Tasks;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
-using Gameplay;
-using Gameplay.Event;
-using InputCamera.ECS;
 using Sirenix.OdinInspector;
+using InputCamera.ECS;
+using Gameplay.Event;
 using Unity.Entities;
-using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Serialization;
+using Gameplay;
 
 namespace InputCamera
 {
-    [RequireComponent(typeof(Camera))]
     public class CameraController : MonoBehaviour
     {
         public static bool IsDragging;
@@ -60,7 +56,7 @@ namespace InputCamera
 
         private void Awake()
         {
-            controlledCamera = GetComponent<Camera>();
+            controlledCamera = GetComponentInChildren<Camera>();
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             cameraEntity = entityManager.CreateEntity();
             entityManager.AddComponentData(cameraEntity, new CameraPositionComponent { Position = transform.position });

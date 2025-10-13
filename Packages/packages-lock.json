@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.gasgiant.camera-shake": {
+      "version": "https://github.com/gasgiant/Camera-Shake.git#upm",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "ab8159a3f352235d2eb7f1c604d2a199700a643a"
+    },
     "com.github-glitchenzo.nugetforunity": {
       "version": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
       "depth": 0,
@@ -46,21 +53,12 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.cinemachine": {
-      "version": "2.10.4",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.test-framework": "1.1.31"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.collections": {
-      "version": "2.5.7",
-      "depth": 1,
+      "version": "2.6.2",
+      "depth": 2,
       "source": "registry",
       "dependencies": {
-        "com.unity.burst": "1.8.19",
+        "com.unity.burst": "1.8.23",
         "com.unity.mathematics": "1.3.2",
         "com.unity.test-framework": "1.4.6",
         "com.unity.nuget.mono-cecil": "1.11.5",
@@ -76,12 +74,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.entities": {
-      "version": "1.3.14",
-      "depth": 0,
+      "version": "1.4.2",
+      "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.burst": "1.8.19",
-        "com.unity.collections": "2.5.7",
+        "com.unity.burst": "1.8.23",
+        "com.unity.collections": "2.6.2",
         "com.unity.mathematics": "1.3.2",
         "com.unity.modules.audio": "1.0.0",
         "com.unity.serialization": "3.1.2",
@@ -98,11 +96,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.entities.graphics": {
-      "version": "1.4.12",
+      "version": "1.4.15",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.entities": "1.3.14",
+        "com.unity.entities": "1.4.2",
         "com.unity.render-pipelines.core": "14.0.10",
         "com.unity.modules.particlesystem": "1.0.0"
       },

@@ -6,6 +6,8 @@ using Unity.Collections;
 using UnityEngine;
 using System.Linq;
 using System;
+using Buildings;
+using Pathfinding;
 
 namespace WaveFunctionCollapse
 {
@@ -499,7 +501,7 @@ namespace WaveFunctionCollapse
             return HashCode.Combine(Index, CellIndex);
         }
     }
-
+    
     [Serializable]
     public class Chunk : IChunk
     {
@@ -894,31 +896,37 @@ namespace WaveFunctionCollapse
             ChunkIndex[] neighbours = new ChunkIndex[4];
             for (int i = 0; i < WaveFunctionUtility.NeighbourDirections.Length; i++)
             {
-                ChunkIndex neighbour = new ChunkIndex(chunkIndex.Index, chunkIndex.CellIndex + WaveFunctionUtility.NeighbourDirections[i].XyZ(0));
-                if (neighbour.CellIndex.x < 0)
-                {
-                    neighbour.Index.x -= 1;
-                    neighbour.CellIndex.x = gridWidth - 1;
-                }
-                else if (neighbour.CellIndex.x >= gridWidth)
-                {
-                    neighbour.Index.x += 1;
-                    neighbour.CellIndex.x = 0;
-                }
-                
-                if (neighbour.CellIndex.z < 0)
-                {
-                    neighbour.Index.z -= 1;
-                    neighbour.CellIndex.z = gridHeight - 1;
-                }
-                else if (neighbour.CellIndex.z >= gridHeight)
-                {
-                    neighbour.Index.z += 1;
-                    neighbour.CellIndex.z = 0;
-                }
-                neighbours[i] = neighbour;
+                int3 direction = WaveFunctionUtility.NeighbourDirections[i].XyZ(0);
+                neighbours[i] = GetAdjacentChunkIndex(chunkIndex, direction, gridWidth, gridHeight);
             }
             return neighbours;
+        }
+
+        public static ChunkIndex GetAdjacentChunkIndex(ChunkIndex chunkIndex, int3 direction, int gridWidth, int gridHeight)
+        {
+            ChunkIndex neighbour = new ChunkIndex(chunkIndex.Index, chunkIndex.CellIndex + direction);
+            if (neighbour.CellIndex.x < 0)
+            {
+                neighbour.Index.x -= 1;
+                neighbour.CellIndex.x = gridWidth - 1;
+            }
+            else if (neighbour.CellIndex.x >= gridWidth)
+            {
+                neighbour.Index.x += 1;
+                neighbour.CellIndex.x = 0;
+            }
+                
+            if (neighbour.CellIndex.z < 0)
+            {
+                neighbour.Index.z -= 1;
+                neighbour.CellIndex.z = gridHeight - 1;
+            }
+            else if (neighbour.CellIndex.z >= gridHeight)
+            {
+                neighbour.Index.z += 1;
+                neighbour.CellIndex.z = 0;
+            }
+            return neighbour;
         }
         
         public static bool AreIndexesAdjacent(ChunkIndex chunkA, ChunkIndex chunkB, int chunkSize, out int3 diff)
@@ -934,6 +942,56 @@ namespace WaveFunctionCollapse
             bool aOnBorder = (chunkCoordA < chunkCoordB) ? (cellCoordA == chunkSize - 1) : (cellCoordA == 0);
             bool bOnBorder = (chunkCoordA < chunkCoordB) ? (cellCoordB == 0) : (cellCoordB == chunkSize - 1);
             return aOnBorder && bOnBorder;
+        }
+
+        public static Vector3 GetPosition(ChunkIndexEdge chunkIndex)
+        {
+            float3 offset = ((float3)(PathUtility.CELL_SCALE / 2.0f)).XyZ(0);
+            float3 edgeOffset = chunkIndex.EdgeType switch
+            {
+                EdgeType.North    => new float3(0, 0,  PathUtility.CELL_SCALE / 2.0f),
+                EdgeType.West   => new float3(-PathUtility.CELL_SCALE / 2.0f, 0, 0),
+                _ => float3.zero
+            };
+            return chunkIndex.Index * PathUtility.CHUNK_SIZE + chunkIndex.CellIndex * PathUtility.CELL_SCALE + edgeOffset + offset;
+        }
+        
+        /// <summary>
+        /// Get edge on the path grid
+        /// </summary>
+        /// <param name="mousePosition"></param>
+        /// <returns></returns>
+        public static ChunkIndexEdge GetChunkIndexEdge(Vector3 mousePosition)
+        {
+            Vector3 chunkScale = new Vector3(PathUtility.CHUNK_SIZE, 1, PathUtility.CHUNK_SIZE);
+            Vector3 cellSize = new Vector3(PathUtility.CELL_SCALE, 1, PathUtility.CELL_SCALE);
+            ChunkIndex chunkIndex = GetChunkIndex(mousePosition, chunkScale, cellSize);
+            Vector3 chunkPos = GetPosition(chunkIndex, chunkScale, cellSize) + cellSize / 2.0f;
+            Vector2 local = new Vector2(mousePosition.x - chunkPos.x, mousePosition.z - chunkPos.z);
+
+            // Determine which of the diagonals we're in
+            if (Mathf.Abs(local.x) > Mathf.Abs(local.y))
+            {
+                // Closer to left or right
+                if (local.x > 0)
+                {
+                    ChunkIndex adjacent = GetAdjacentChunkIndex(chunkIndex, new int3(1, 0, 0), PathUtility.GRID_WIDTH, PathUtility.GRID_WIDTH);
+                    return new ChunkIndexEdge(adjacent.Index, adjacent.CellIndex, EdgeType.West);
+                }
+
+                return new ChunkIndexEdge(chunkIndex.Index, chunkIndex.CellIndex, EdgeType.West);
+            }
+
+            // Closer to top or bottom
+            if (local.y > 0)
+            {
+                return new ChunkIndexEdge(chunkIndex.Index, chunkIndex.CellIndex, EdgeType.North);
+            }
+            else
+            {
+                ChunkIndex adjacent = GetAdjacentChunkIndex(chunkIndex, new int3(0, 0, -1), PathUtility.GRID_WIDTH, PathUtility.GRID_WIDTH);
+                return new ChunkIndexEdge(adjacent.Index, adjacent.CellIndex, EdgeType.North);
+            }
         }
     }
 

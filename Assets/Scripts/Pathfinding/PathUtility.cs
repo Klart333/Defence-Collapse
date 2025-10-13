@@ -22,6 +22,7 @@ namespace Pathfinding
             new int2(1, -1),
         };
         
+        // Right, Up, Left, Down
         public static readonly int2[] NeighbourDirectionsCardinal =
         {
             new int2(1, 0),
@@ -29,13 +30,11 @@ namespace Pathfinding
             new int2(-1, 0),
             new int2(0, -1),
         };
-        
-        public const float FULL_BUILDING_CELL = 1f;
+
         public const int CELL_SCALE = 2;
-        public const int GRID_WIDTH = 4; 
-        
-        public const float HALF_BUILDING_CELL = FULL_BUILDING_CELL / 2.0f;
-        public const float CHUNK_SIZE = GRID_WIDTH * CELL_SCALE;
+        public const int GRID_WIDTH = 4;
+
+        public const int CHUNK_SIZE = GRID_WIDTH * CELL_SCALE;
         public const int GRID_LENGTH = GRID_WIDTH * GRID_WIDTH;
         public const int HALF_CELL_SCALE = CELL_SCALE / 2;
         
@@ -181,6 +180,18 @@ namespace Pathfinding
                 {
                     extraDistance[j] = oldChunk.ExtraDistance[j];
                 }
+                
+                BlobBuilderArray<bool> northEdges = builder.Allocate(ref newChunk.NorthEdgeBlocks, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    northEdges[j] = oldChunk.NorthEdgeBlocks[j];
+                }
+                
+                BlobBuilderArray<bool> westEdges = builder.Allocate(ref newChunk.WestEdgeBlocks, GRID_LENGTH);
+                for (int j = 0; j < GRID_LENGTH; j++)
+                {
+                    westEdges[j] = oldChunk.WestEdgeBlocks[j];
+                }
             }
             
             ref PathChunk pathChunk = ref arrayBuilder[chunkAmount - 1];
@@ -199,6 +210,8 @@ namespace Pathfinding
                 pathChunk.ChunkIndex = chunkIndex;
                 
                 builder.Allocate(ref pathChunk.NotWalkableIndexes, GRID_LENGTH);
+                builder.Allocate(ref pathChunk.NorthEdgeBlocks, GRID_LENGTH);
+                builder.Allocate(ref pathChunk.WestEdgeBlocks, GRID_LENGTH);
                 builder.Allocate(ref pathChunk.IndexOccupied, GRID_LENGTH);
                 builder.Allocate(ref pathChunk.TargetIndexes, GRID_LENGTH);
                 builder.Allocate(ref pathChunk.ExtraDistance, GRID_LENGTH);

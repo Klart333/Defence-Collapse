@@ -4,6 +4,7 @@ using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Burst;
+using UnityEngine;
 
 namespace Effects.ECS
 {
@@ -74,10 +75,11 @@ namespace Effects.ECS
                 float scaleMult = 1.0f + math.log10(damage) / 8.0f;
                 ECB.SetComponent(sortKey, entity, new PunchScaleComponent
                 {
-                    Duration = punchScale.Duration + 0.05f,
+                    Duration = punchScale.Duration + 0.03f,
                     StartScale = punchScale.StartScale,
                     PunchScale = punchScale.StartScale * scaleMult,
-                    Damage = damage
+                    Value = math.max(0, punchScale.Value - 0.03f),
+                    Damage = damage,
                 });
             }
             else

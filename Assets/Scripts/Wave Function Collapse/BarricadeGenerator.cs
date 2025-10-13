@@ -8,7 +8,7 @@ using Buildings;
 using System;
 
 namespace WaveFunctionCollapse
-{
+{/*
     public class BarricadeGenerator : MonoBehaviour, IQueryWaveFunction
     {
         public event Action<QueryMarchedChunk> OnLoaded;
@@ -16,7 +16,7 @@ namespace WaveFunctionCollapse
         [Title("Wave Function")]
         [SerializeField]
         private ChunkWaveFunction<QueryMarchedChunk> waveFunction;
-        
+
         [Title("Prototypes")]
         [SerializeField]
         private PrototypeInfoData townPrototypeInfo;
@@ -93,7 +93,7 @@ namespace WaveFunctionCollapse
             {
                 return; // Index is not built
             }
-            
+
             // Reset Indexes
             waveFunction.Chunks[builtIndex.Index].BuiltCells[builtIndex.CellIndex.x, builtIndex.CellIndex.y, builtIndex.CellIndex.z] = false;
             List<ChunkIndex> chunkIndexes = this.GetCellsSurroundingMarchedIndex(builtIndex);
@@ -215,7 +215,7 @@ namespace WaveFunctionCollapse
             this.queryIndex = queryIndex;
             queriedChunks = this.GetChunks(cellsToCollapse);
             waveFunction.Chunks[queryIndex.Index].SetBuiltCells(queryIndex.CellIndex);
-            
+
             foreach (ChunkIndex index in cellsToCollapse)
             {
                 this.MakeBuildable(index, PrototypeInfo);
@@ -302,5 +302,5 @@ namespace WaveFunctionCollapse
         }
 #endif
         #endregion
-    }
+    }*/
 }

@@ -302,7 +302,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 2863000017310811267, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
         type: 3}
-      insertIndex: -1
+      insertIndex: 5
       addedObject: {fileID: 179944483841982438}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0b8ffc4d37224bf4b8cd6f6749599751, type: 3}
@@ -324,6 +324,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &6502078863353804110 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8867904680253105508, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
+    type: 3}
+  m_PrefabInstance: {fileID: 2390608845740560426}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &7087695208757839691 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4859853666522896225, guid: 0b8ffc4d37224bf4b8cd6f6749599751,
@@ -559,10 +565,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2335421589135310705}
-    - targetCorrespondingSourceObject: {fileID: 8285618638795453123, guid: 1efa44b3173d3934d81649ef81816d76,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5597579604053128393}
   m_SourcePrefab: {fileID: 100100000, guid: 1efa44b3173d3934d81649ef81816d76, type: 3}
 --- !u!224 &418315291951384129 stripped
 RectTransform:
@@ -610,7 +612,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   districtIcon: {fileID: 3905908145534815343}
   button: {fileID: 5568730139380202204}
-  canvasGroup: {fileID: 5597579604053128393}
+  disabledOverlay: {fileID: 6502078863353804110}
   costText: {fileID: 4036614019229195546}
   costUtility: {fileID: 11400000, guid: a6d3084868d171045b5e0972b383d96e, type: 2}
 --- !u!114 &3905908145534815343
@@ -650,15 +652,3 @@ MonoBehaviour:
   positionOffset: {x: 0, y: 30}
   positionAnimationDuration: 0.5
   positionAnimationEase: 3
---- !u!225 &5597579604053128393
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 418315291951384130}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0

@@ -16,13 +16,12 @@ namespace Pathfinding
     {
         public event Action GetPathInformation;
 
-        [Title("Flow Field")]
-        [SerializeField]
-        private float cellScale;
-
         [Title("Debug")]
         [SerializeField]
         private Gradient debugGradient;
+        
+        [SerializeField]
+        private float pathUpdateInterval = 0.1f;
         
         private BlobAssetReference<PathChunkArray> pathChunks;
         private NativeHashMap<int2, int> chunkIndexToListIndex;
@@ -30,13 +29,14 @@ namespace Pathfinding
         private EntityManager entityManager;
         private Entity blobEntity;
 
-        private int chunkAmount;
+        private float updateTimer;
         private int jobStartIndex;
-
-        public float CellScale => cellScale;
+        private int chunkAmount;
 
         public BuildingTargetPathSet TargetTargetPathSet { get; private set; }
         public ExtraDistancePathSet ExtraDistanceSet { get; private set; }
+        public BoolPathSet NorthEdgeBarricadeSet { get; private set; }
+        public BoolPathSet WestEdgeBarricadeSet { get; private set; }
         public IntPathSet BarricadePathSet { get; private set; }
         public BoolPathSet BlockerPathSet { get; private set; }
 
@@ -46,7 +46,7 @@ namespace Pathfinding
             
             chunkAmount = 0;
             chunkIndexToListIndex.Add(int2.zero, chunkAmount);    
-            pathChunks = PathUtility.CreatePathChunks(++chunkAmount, int2.zero, (BlobAssetReference<PathChunkArray>)default);
+            pathChunks = PathUtility.CreatePathChunks(++chunkAmount, int2.zero, default);
             
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             blobEntity = entityManager.CreateEntity();
@@ -67,6 +67,12 @@ namespace Pathfinding
             
             ExtraDistanceSet = new ExtraDistancePathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].ExtraDistance, 200);
             GetPathInformation += ExtraDistanceSet.RebuildTargetHashSet;
+
+            NorthEdgeBarricadeSet = new BoolPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].NorthEdgeBlocks);
+            GetPathInformation += NorthEdgeBarricadeSet.RebuildTargetHashSet;
+            
+            WestEdgeBarricadeSet = new BoolPathSet(index => ref pathChunks.Value.PathChunks[chunkIndexToListIndex[index]].WestEdgeBlocks);
+            GetPathInformation += WestEdgeBarricadeSet.RebuildTargetHashSet;
             
             Events.OnGroundChunkGenerated += OnChunkGenerated;
         }
@@ -80,13 +86,21 @@ namespace Pathfinding
             GetPathInformation -= TargetTargetPathSet.RebuildTargetHashSet;
             GetPathInformation -= BarricadePathSet.RebuildTargetHashSet;
             GetPathInformation -= ExtraDistanceSet.RebuildTargetHashSet;
+            GetPathInformation -= NorthEdgeBarricadeSet.RebuildTargetHashSet;
+            GetPathInformation -= WestEdgeBarricadeSet.RebuildTargetHashSet;
             
             Events.OnGroundChunkGenerated -= OnChunkGenerated;
         }
 
         private void LateUpdate()
         {
-            UpdateFlowField();
+            updateTimer += Time.deltaTime;
+
+            if (updateTimer > pathUpdateInterval)
+            {
+                updateTimer = 0;
+                UpdateFlowField();
+            }
         }
         
         private void OnChunkGenerated(Chunk chunk)
@@ -133,7 +147,6 @@ namespace Pathfinding
                 handle.Complete();
             }
         }
-
         
         public bool TryMoveAlongFlowField(PathIndex pathIndex, float3 pathPosition, out PathIndex movedPathIndex, out float3 movedPathPosition)
         {
@@ -168,7 +181,7 @@ namespace Pathfinding
                     if (pathChunk.Directions[combinedIndex] == byte.MaxValue)
                     {
                         Gizmos.color = Color.green;
-                        Gizmos.DrawWireCube(pos, Vector3.one * cellScale);
+                        Gizmos.DrawWireCube(pos, Vector3.one * PathUtility.CELL_SCALE);
                         continue;
                     }
         
@@ -177,12 +190,12 @@ namespace Pathfinding
                     Vector3 direction = new Vector3(dir.x, 0, dir.y);
             
                     // Main line (shorter)
-                    float mainLineLength = cellScale * 0.7f;
+                    const float mainLineLength = PathUtility.CELL_SCALE * 0.7f;
                     Gizmos.DrawLine(pos, pos + direction * mainLineLength);
             
                     // Arrowhead lines
-                    float arrowHeadLength = cellScale * 0.3f;
-                    float arrowHeadAngle = 30f; // degrees
+                    const float arrowHeadLength = PathUtility.CELL_SCALE * 0.3f;
+                    const float arrowHeadAngle = 30f; // degrees
             
                     // Calculate perpendicular directions for arrowhead
                     Quaternion leftRot = Quaternion.Euler(0, -arrowHeadAngle, 0);
@@ -245,13 +258,16 @@ namespace Pathfinding
     
     public struct PathChunk
     {
-        public BlobArray<int> MovementCosts;
-        public BlobArray<bool> IndexOccupied;
+        public BlobArray<bool> NorthEdgeBlocks;
+        public BlobArray<bool> WestEdgeBlocks;
         
         public BlobArray<bool> NotWalkableIndexes;
-        public BlobArray<byte> TargetIndexes;
+        public BlobArray<bool> IndexOccupied;
+        
+        public BlobArray<int> MovementCosts;
         public BlobArray<int> ExtraDistance;
         
+        public BlobArray<byte> TargetIndexes;
         public BlobArray<byte> Directions;
         public BlobArray<int> Distances;
         

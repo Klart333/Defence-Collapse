@@ -7,6 +7,7 @@ using Gameplay.Money;
 using UnityEngine;
 using Gameplay;
 using System;
+using CameraShake;
 using TMPro;
 
 namespace Buildings.District
@@ -151,9 +152,11 @@ namespace Buildings.District
         {
             if (!tileBuilder.GetIsDisplaying(out BuildingType type) || !type.HasFlag(BuildingType.District))
             {
+                Debug.Log("Not displaying so no Cancel Placement");
                 return;
             }
             
+            Debug.Log("Cancel Placement");
             costText.gameObject.SetActive(false);
             tileBuilder.OnTilePressed -= OnTilePressed;
 
@@ -197,6 +200,8 @@ namespace Buildings.District
             {
                 CancelPlacement();
             }
+            
+            CameraShaker.Presets.ShortShake3D();
         }
         
         private void SellDistrict(ChunkIndex index)

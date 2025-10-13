@@ -113,7 +113,7 @@ namespace Pathfinding
             Gizmos.color = Color.blue;
             for (int i = 0; i < Indexes.Count; i++)
             {
-                Gizmos.DrawCube(PathUtility.GetPos(Indexes[i]), Vector3.one * 0.5f * PathManager.Instance.CellScale);
+                Gizmos.DrawCube(PathUtility.GetPos(Indexes[i]), Vector3.one * 0.5f * PathUtility.CELL_SCALE);
             }
         }
     }
@@ -142,7 +142,7 @@ namespace Pathfinding
                 MeshCollider => ColliderType.Mesh,
                 _ => ColliderType.None
             };
-            float increment = PathManager.Instance.CellScale;
+            const float increment = PathUtility.CELL_SCALE;
 
             Vector3 boxCenter = Vector3.zero;
             Vector3 boxSize = Vector3.zero;

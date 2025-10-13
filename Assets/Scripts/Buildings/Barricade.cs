@@ -1,15 +1,17 @@
 ﻿using System.Collections.Generic;
-using Enemy.ECS;
-using Pathfinding;
 using Sirenix.OdinInspector;
-using UnityEngine;
-using UnityEngine.Events;
 using WaveFunctionCollapse;
+using UnityEngine.Events;
+using Pathfinding;
+using UnityEngine;
+using System;
 
 namespace Buildings
 {
-    public class Barricade : PooledMonoBehaviour, IBuildable
+    public class Barricade : PooledMonoBehaviour, IPathTarget
     {
+        public event Action OnIndexerRebuild;
+
         [Title("Visual")]
         [SerializeField]
         private MaterialData materialData;
@@ -18,23 +20,7 @@ namespace Buildings
         private ProtoypeMeshes protoypeMeshes;
         
         [SerializeField]
-        private Material transparentGreen;
-        
-        [SerializeField]
-        private Material transparentRed;
-        
-        [SerializeField]
         private Transform meshTransform;
-
-        [Title("Colliders")]
-        [SerializeField]
-        private Collider[] cornerColliders;
-
-        [SerializeField]
-        private Indexer indexer;
-        
-        [SerializeField]
-        private BuildableCornerData buildableCornerData;
         
         [Title("Events")]
         [SerializeField]
@@ -42,20 +28,14 @@ namespace Buildings
 
         [SerializeField]
         private UnityEvent OnResetEvent;
-
-        private readonly List<Material> transparentMaterials = new List<Material>();
-        private readonly List<Material> transparentRemoveMaterials = new List<Material>();
-
-        private MeshRenderer meshRenderer;
-        private BarricadeHandler barricadeHandler;
         
-        public PrototypeData PrototypeData { get; private set; }
-        public ChunkIndex ChunkIndex { get; private set; }
+        private MeshRenderer meshRenderer;
 
-        public BarricadeHandler BarricadeHandler => barricadeHandler ??= FindAnyObjectByType<BarricadeHandler>();
+        public ChunkIndexEdge ChunkIndexEdge { get; private set; }
+        public List<PathIndex> TargetIndexes { get; private set; }
+
         public MeshRenderer MeshRenderer => meshRenderer ??= GetComponentInChildren<MeshRenderer>();
-        public MeshWithRotation MeshRot => PrototypeData.MeshRot;
-        public Transform MeshTransform => meshTransform;
+        public byte Importance => 1;
 
         protected override void OnDisable()
         {
@@ -68,89 +48,49 @@ namespace Buildings
         {
             transform.localScale = Vector3.one;
             MeshRenderer.transform.localScale = Vector3.one;
-            
-            for (int i = 0; i < cornerColliders.Length; i++)
-            {
-                cornerColliders[i].gameObject.SetActive(false);
-            }
 
-            BarricadeHandler?.RemoveBarricade(this);
+            if (TargetIndexes != null)
+            {
+                if (ChunkIndexEdge.EdgeType == EdgeType.North)
+                {
+                    PathManager.Instance.NorthEdgeBarricadeSet.Unregister(this);
+                }
+                else
+                {
+                    PathManager.Instance.WestEdgeBarricadeSet.Unregister(this);
+                }
+
+                TargetIndexes = null;
+            }
+            
             
             OnResetEvent?.Invoke();
         }
 
-        public void Setup(PrototypeData prototypeData, ChunkIndex index, Vector3 scale)
-        {
-            if (prototypeData.MeshRot.MeshIndex == -1) return;
+        public void Place(ChunkIndexEdge edge)
+        { 
+            ChunkIndexEdge = edge;
             
-            ChunkIndex = index;
-            PrototypeData = prototypeData;
-            transform.localScale = scale;
-
-            GetComponentInChildren<MeshFilter>().mesh = protoypeMeshes[prototypeData.MeshRot.MeshIndex];
-            MeshRenderer.SetMaterials(materialData.GetMaterials(PrototypeData.MaterialIndexes));
-
-            transparentMaterials.Clear();
-            transparentRemoveMaterials.Clear();
-            for (int i = 0; i < PrototypeData.MaterialIndexes.Length; i++)
+            TargetIndexes = new List<PathIndex>
             {
-                transparentMaterials.Add(transparentGreen);
-                transparentRemoveMaterials.Add(transparentRed);
-            }
-        }
-
-        public void ToggleIsBuildableVisual(bool value, bool showRemoving)
-        {
-            if (value)
+                new PathIndex(edge.Index.xz, edge.CellIndex.xz)
+            };
+            
+            if (edge.EdgeType == EdgeType.North)
             {
-                MeshRenderer.SetMaterials(showRemoving ? transparentRemoveMaterials : transparentMaterials);
+                PathManager.Instance.NorthEdgeBarricadeSet.Register(this);
             }
             else
             {
-                MeshRenderer.SetMaterials(materialData.GetMaterials(PrototypeData.MaterialIndexes));
-
-                Place();
+                PathManager.Instance.WestEdgeBarricadeSet.Register(this);
             }
-        }
-
-        private void Place()
-        { 
-            SetColliders();
-
-            indexer.OnRebuilt += IndexerOnOnRebuilt;
-            indexer.NeedsRebuilding = true;
-            indexer.DelayFrames = 1;
-
-            BarricadeHandler.AddBarricade(this);
+            
             OnPlacedEvent?.Invoke();
         }
 
-        private void IndexerOnOnRebuilt()
+        public void Destroyed()
         {
-            indexer.OnRebuilt -= IndexerOnOnRebuilt;
-        
-            ChunkIndex chunkIndex = ChunkIndex;
-            for (int i = 0; i < indexer.Indexes.Count; i++)
-            {
-                PathIndex index = indexer.Indexes[i];
-                AttackingSystem.DamageEvent.TryAdd(index, x => BarricadeHandler.BarricadeTakeDamage(chunkIndex, x, index));
-            }
-        }
-
-        private void SetColliders()
-        {
-            for (int i = 0; i < cornerColliders.Length; i++)
-            {
-                if (MeshRot.MeshIndex != -1 && buildableCornerData.BuildableDictionary.TryGetValue(protoypeMeshes[MeshRot.MeshIndex], out BuildableCorners cornerData))
-                {
-                    bool value = cornerData.CornerDictionary[BuildableCornerData.VectorToCorner(DirectionUtility.BuildableCorners[i].x, DirectionUtility.BuildableCorners[i].y)].IsBuildable;
-                    cornerColliders[i].gameObject.SetActive(value);
-                }
-                else
-                {
-                    cornerColliders[i].gameObject.SetActive(false);
-                }
-            }
+            gameObject.SetActive(false);
         }
     }
 }

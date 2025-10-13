@@ -454,6 +454,7 @@ GameObject:
   - component: {fileID: 7580309646177998809}
   - component: {fileID: 1208733233509240300}
   - component: {fileID: 4254499538453409947}
+  - component: {fileID: 4690092381271772519}
   m_Layer: 5
   m_Name: ButtonPanel
   m_TagString: Untagged
@@ -589,6 +590,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 4690092381271772519}
+        m_TargetAssemblyTypeName: Utility.PlayCameraShake, Core
+        m_MethodName: Shake
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnHoverEnter:
     m_PersistentCalls:
       m_Calls:
@@ -666,6 +679,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioEvent: {fileID: 11400000, guid: 3eece029360450448b3e0dbc7a80f2df, type: 2}
+--- !u!114 &4690092381271772519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2635952183814639112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83f765bb3a474b7aa4c2a22ac7c4846d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::Utility.PlayCameraShake
+  strength: 0.3
+  frequency: 25
+  bounceAmount: 5
 --- !u!1 &3285619640652814706
 GameObject:
   m_ObjectHideFlags: 0

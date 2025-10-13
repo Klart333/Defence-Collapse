@@ -3,13 +3,13 @@ using Sirenix.OdinInspector;
 using Gameplay.Upgrades.ECS;
 using Gameplay.Upgrades;
 using Unity.Entities;
+using Gameplay.Event;
 using Effects.ECS;
 using UnityEngine;
 using Enemy.ECS;
 using Effects;
 using Health;
 using System;
-using Gameplay.Event;
 
 namespace Gameplay
 {
