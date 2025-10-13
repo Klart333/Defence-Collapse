@@ -1,12 +1,11 @@
-﻿using System;
-using Unity.Collections.LowLevel.Unsafe;
+﻿using Unity.Collections.LowLevel.Unsafe;
 using System.Runtime.CompilerServices;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Entities;
 using Unity.Burst;
 using Unity.Jobs;
-using UnityEngine;
+using System;
 
 namespace Pathfinding
 {
@@ -95,7 +94,9 @@ namespace Pathfinding
                     : ref PathChunks.Value.PathChunks[ChunkIndexToListIndex[neighbourIndex.ChunkIndex]];
 
                 // Check if the edge is blocked
-                int blockedCost = GetEdgeBlockedCost(ref pathChunk, combinedGridIndex, ref neighbour, combinedIndex, i);
+                int blockedCost = IsEdgeBlocked(ref pathChunk, combinedGridIndex, ref neighbour, combinedIndex, i)
+                    ? 100_000
+                    : 0;
                 
                 int manhattanDist = i % 2 == 0 ? 5 : 7;
                 int indexOccupied = neighbour.IndexOccupied[combinedIndex] ? 2_000 : 0;
@@ -115,7 +116,7 @@ namespace Pathfinding
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private int GetEdgeBlockedCost(ref PathChunk pathChunk, int combinedGridIndex, ref PathChunk neighbourChunk, int combinedNeighbourIndex, int directionIndex)
+        private bool IsEdgeBlocked(ref PathChunk pathChunk, int combinedGridIndex, ref PathChunk neighbourChunk, int combinedNeighbourIndex, int directionIndex)
         {
             // PathUtility.NeighbourDirectionsCardinal - Right, Up, Left, Down
             // Is Opposite!
@@ -127,7 +128,7 @@ namespace Pathfinding
                 2 => pathChunk.WestEdgeBlocks[combinedGridIndex], // Left
                 3 => neighbourChunk.NorthEdgeBlocks[combinedNeighbourIndex], // Down
                 _ => throw new ArgumentOutOfRangeException(nameof(directionIndex), directionIndex, null)
-            } ? 100_000 : 0;
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

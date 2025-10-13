@@ -1,7 +1,8 @@
 using FocusType = Utility.FocusType;
+
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine.InputSystem;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Unity.Mathematics;
@@ -141,8 +142,9 @@ namespace Buildings
 
         private bool IsEdgeValid(ChunkIndexEdge index, out TileAction action)
         {
+            Debug.Log("Index: " + index);
             bool isValid = Edges.TryGetValue(index, out _)
-                           && IsEdgeChunkLoaded(index);
+                           && IsEdgeLoaded(index);
             if (!isValid)
             {
                 action = TileAction.None;
@@ -153,24 +155,34 @@ namespace Buildings
             return action != TileAction.None;
         }
         
-        private bool IsEdgeChunkLoaded(ChunkIndexEdge index)
+        private bool IsEdgeLoaded(ChunkIndexEdge index)
         {
             if (groundGenerator.LoadedFullChunks.Contains(index.Index))
             {
                 return true;
             }
 
-            bool onRightSide = index.CellIndex.x >= groundGenerator.ChunkSize.x - 1;
-            if (onRightSide)
+            bool onLeftSide = index.CellIndex.x >= groundGenerator.ChunkSize.x - 1;
+            if (onLeftSide)
             {
                 if (groundGenerator.LoadedFullChunks.Contains(index.Index + new int3(1, 0, 0)))
                 {
                     return true;
                 }
             }
-            
-            bool onTopSide = index.CellIndex.z >= groundGenerator.ChunkSize.z - 1;
-            if (onTopSide)
+
+            bool onRightSide = index.CellIndex.x < 1 && index.EdgeType == EdgeType.West;
+            if (onRightSide)
+            {
+                if (groundGenerator.LoadedFullChunks.Contains(index.Index + new int3(-1, 0, 0)))
+                {
+                    return true;
+                }
+            }
+
+            bool onBotSide = index.CellIndex.z >= groundGenerator.ChunkSize.z - 1  
+                             || (index.CellIndex.z >= groundGenerator.ChunkSize.z - 2 && index.EdgeType == EdgeType.North);
+            if (onBotSide)
             {
                 if (groundGenerator.LoadedFullChunks.Contains(index.Index + new int3(0, 0, 1)))
                 {
@@ -178,7 +190,15 @@ namespace Buildings
                 }
             }
 
-            if (onRightSide && onTopSide)
+            if (onRightSide && onBotSide)
+            {
+                if (groundGenerator.LoadedFullChunks.Contains(index.Index + new int3(-1, 0, 1)))
+                {
+                    return true;
+                }
+            }
+            
+            if (onLeftSide && onBotSide)
             {
                 if (groundGenerator.LoadedFullChunks.Contains(index.Index + new int3(1, 0, 1)))
                 {
@@ -198,6 +218,18 @@ namespace Buildings
                 ChunkIndexEdge westEdge = new ChunkIndexEdge(chunk.ChunkIndex, new int3(x, 0, z), EdgeType.West);
                 Edges.TryAdd(northEdge, 0);
                 Edges.TryAdd(westEdge, 0);
+
+                //if (x == chunk.Width - 1)
+                //{
+                //    ChunkIndexEdge neighbourEdge = new ChunkIndexEdge(chunk.ChunkIndex + new int3(1, 0, 0), new int3(0, 0, z), EdgeType.West);
+                //    Edges.TryAdd(neighbourEdge, 0);
+                //}
+                //
+                //if (z == 0)
+                //{
+                //    ChunkIndexEdge neighbourEdge = new ChunkIndexEdge(chunk.ChunkIndex + new int3(0, 0, -1), new int3(x, 0, chunk.Depth - 1), EdgeType.North);
+                //    Edges.TryAdd(neighbourEdge, 0);
+                //}
             }
         }
         
