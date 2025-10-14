@@ -5,6 +5,7 @@ using WaveFunctionCollapse;
 using InputCamera;
 using UnityEngine;
 using Buildings;
+using Buildings.Barricades;
 
 namespace Juice
 {

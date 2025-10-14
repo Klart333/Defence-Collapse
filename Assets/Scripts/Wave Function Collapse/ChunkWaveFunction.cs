@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Linq;
 using System;
 using Buildings;
+using Buildings.Barricades;
 using Pathfinding;
 
 namespace WaveFunctionCollapse

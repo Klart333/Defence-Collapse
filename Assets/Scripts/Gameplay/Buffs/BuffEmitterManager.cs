@@ -5,6 +5,7 @@ using Buildings.District;
 using Unity.Mathematics;
 using UnityEngine;
 using Buildings;
+using Buildings.Barricades;
 using Effects;
 
 namespace Gameplay.Buffs
@@ -21,8 +22,9 @@ namespace Gameplay.Buffs
         [SerializeField]
         private DistrictHandler districtHandler;
 
-        private HashSet<BuffEmitter> emitters = new HashSet<BuffEmitter>();
         private List<IEnumerable<IBuffable>> buffables = new List<IEnumerable<IBuffable>>();
+        
+        private HashSet<BuffEmitter> emitters = new HashSet<BuffEmitter>();
 
         private void OnEnable()
         {

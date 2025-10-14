@@ -13,7 +13,7 @@ using Utility;
 using System;
 using Juice;
 
-namespace Buildings
+namespace Buildings.Barricades
 {
     public class EdgeBuilder : MonoBehaviour
     {
@@ -142,7 +142,6 @@ namespace Buildings
 
         private bool IsEdgeValid(ChunkIndexEdge index, out TileAction action)
         {
-            Debug.Log("Index: " + index);
             bool isValid = Edges.TryGetValue(index, out _)
                            && IsEdgeLoaded(index);
             if (!isValid)

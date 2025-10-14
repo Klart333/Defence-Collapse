@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using UnityEngine.Events;
 
-namespace Buildings
+namespace Buildings.Barricades
 {
     public class BarricadePlacer : MonoBehaviour
     {
@@ -25,15 +25,26 @@ namespace Buildings
         private void OnEnable()
         {
             barricadeHandler = FindFirstObjectByType<BarricadeHandler>();
-
+            barricadeHandler.OnAvailableBarricadesChanged += OnAvailableBarricadesChanged;
+            
             Events.OnBuildingClicked += BuildingClicked;
             edgeBuilder.OnCancelPlacement += OnCanceled;
         }
 
         private void OnDisable()
         {
+            barricadeHandler.OnAvailableBarricadesChanged -= OnAvailableBarricadesChanged;
+
             Events.OnBuildingClicked -= BuildingClicked;
             edgeBuilder.OnCancelPlacement -= OnCanceled;
+        }
+        
+        private void OnAvailableBarricadesChanged()
+        {
+            if (barricadeHandler.AvailableBarriers <= 0)
+            {
+                OnCanceled();
+            }
         }
         
         private void OnCanceled()

@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
+using UnityEngine.Events;
 using Gameplay.Event;
 using Gameplay.Money;
 using UnityEngine;
 using Gameplay;
 using System;
-using CameraShake;
 using TMPro;
 
 namespace Buildings.District
@@ -49,6 +49,10 @@ namespace Buildings.District
         
         [SerializeField]
         private Color notAffordableColor;
+        
+        [Title("Events")]
+        [SerializeField]
+        private UnityEvent OnDistrictPlaced;
         
         [Title("Debug")]
         [SerializeField]
@@ -201,7 +205,7 @@ namespace Buildings.District
                 CancelPlacement();
             }
             
-            CameraShaker.Presets.ShortShake3D();
+            OnDistrictPlaced?.Invoke();
         }
         
         private void SellDistrict(ChunkIndex index)

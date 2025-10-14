@@ -211,7 +211,7 @@ namespace Buildings
             if (!CameraController.IsDragging && pressedTile.HasValue && selectedTile.Equals(pressedTile))
             {
                 OnTilePressed?.Invoke(pressedTile.Value, pendingAction);
-                selectedTile = null;
+                UnSelect();
             }
             
             pressedTile = null;

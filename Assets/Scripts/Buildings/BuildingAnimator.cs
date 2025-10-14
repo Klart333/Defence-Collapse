@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Buildings;
+using Buildings.Barricades;
 using Buildings.District;
 using DG.Tweening;
 using Gameplay.Event;
@@ -43,7 +44,7 @@ public class BuildingAnimator : MonoBehaviour
 
     public void Animate(IBuildable building)
     {
-        if (building is not Building or Barricade)
+        if (building is not Building)
         {
             return;
         }

@@ -4,6 +4,7 @@ using Buildings.District;
 using Unity.Mathematics;
 using Gameplay.Upgrades;
 using Buildings;
+using Buildings.Barricades;
 
 namespace Gameplay.Event
 {
@@ -15,7 +16,6 @@ namespace Gameplay.Event
     {
         public static EventAction<WaveFunctionCollapse.Chunk> OnGroundChunkGenerated;
 
-        public static EventAction<ICollection<ChunkIndex>> OnBuiltIndexBuilt;
         public static EventAction<ICollection<IBuildable>> OnBuildingBuilt;
         public static EventAction<BuildingType> OnBuildingClicked;
 

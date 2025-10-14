@@ -5,11 +5,13 @@ using Gameplay.Event;
 using UnityEngine;
 using Gameplay;
 using System;
+using Unity.Mathematics;
 
-namespace Buildings
+namespace Buildings.Barricades
 {
     public class BarricadeHandler : MonoBehaviour
     {
+        public event Action OnAvailableBarricadesChanged;
         public event Action<BarricadeState> OnBarricadeStateCreated; 
 
         [Title("Setup")]
@@ -22,6 +24,8 @@ namespace Buildings
 
         public Dictionary<ChunkIndexEdge, BarricadeState> BarricadeStates { get; } = new Dictionary<ChunkIndexEdge, BarricadeState>();
         public Dictionary<ChunkIndexEdge, Barricade> Barricades { get; } = new Dictionary<ChunkIndexEdge, Barricade>();
+        
+        public int AvailableBarriers { get; private set; } = 2;
         
         private void OnEnable()
         {
@@ -54,6 +58,9 @@ namespace Buildings
             spawned.Place(edge);
             
             Barricades.Add(edge, spawned);
+            
+            AvailableBarriers = math.max(0, AvailableBarriers - 1);
+            OnAvailableBarricadesChanged?.Invoke();
         }
 
         private BarricadeState CreateData(ChunkIndexEdge edge)
@@ -80,6 +87,13 @@ namespace Buildings
             Barricades.Remove(indexEdge);
             
             Events.OnBuiltEdgeDestroyed?.Invoke(indexEdge);
+        }
+
+        public void AddAvailableBarricade(int amount)
+        {
+            AvailableBarriers += amount;
+            
+            OnAvailableBarricadesChanged?.Invoke();
         }
     }
 }

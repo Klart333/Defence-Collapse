@@ -1,3 +1,4 @@
+using System;
 using FocusType = Utility.FocusType;
 
 using Cysharp.Threading.Tasks;
@@ -41,6 +42,13 @@ namespace UI
             districtButton.Setup(FindFirstObjectByType<DistrictHandler>(), lumbermillData);
             
             GetFocus().Forget();
+
+            tileBuilder.OnCancelPlacement += StopDisplay;
+        }
+
+        private void OnDisable()
+        {
+            tileBuilder.OnCancelPlacement -= StopDisplay;
         }
 
         private async UniTaskVoid GetFocus()
@@ -64,6 +72,12 @@ namespace UI
 
         private void Display()
         {
+            if (tileBuilder.GetIsDisplaying(out BuildingType type) && type == BuildingType.Lumbermill)
+            {
+                StopDisplay();
+                return;
+            }
+            
             focusManager.RegisterFocus(focus);
             tileBuilder.Display(BuildingType.Lumbermill, GroundType.Tree, IsBuildable);
         }
@@ -81,9 +95,11 @@ namespace UI
         private void StopDisplay()
         {
             displaying = false;
-            focusManager.UnregisterFocus(focus);
+            focusManager?.UnregisterFocus(focus);
             
             toggleButton.Hide();
+            
+            tileBuilder.CancelDisplay();
         }
     }
 }

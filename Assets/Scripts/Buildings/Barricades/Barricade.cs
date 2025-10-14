@@ -6,7 +6,7 @@ using Pathfinding;
 using UnityEngine;
 using System;
 
-namespace Buildings
+namespace Buildings.Barricades
 {
     public class Barricade : PooledMonoBehaviour, IPathTarget
     {

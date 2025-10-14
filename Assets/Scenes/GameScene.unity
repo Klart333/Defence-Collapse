@@ -3470,6 +3470,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 5935995173521697011}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &229833003 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5568730139380202204, guid: 4fcc1f1d24ab33246b7047222436610a,
+    type: 3}
+  m_PrefabInstance: {fileID: 1611300522}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &231546244
 GameObject:
   m_ObjectHideFlags: 0
@@ -4003,7 +4015,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shouldDestroyOnLoad: 1
-  cellScale: 2
   debugGradient:
     serializedVersion: 2
     key0: {r: 1, g: 0, b: 0, a: 1}
@@ -4034,6 +4045,7 @@ MonoBehaviour:
     m_ColorSpace: 0
     m_NumColorKeys: 8
     m_NumAlphaKeys: 2
+  pathUpdateInterval: 0.1
 --- !u!1 &312799779
 GameObject:
   m_ObjectHideFlags: 0
@@ -7640,7 +7652,6 @@ GameObject:
   m_Component:
   - component: {fileID: 604477865}
   - component: {fileID: 604477866}
-  - component: {fileID: 604477868}
   - component: {fileID: 604477869}
   m_Layer: 0
   m_Name: '- Placers -'
@@ -7663,6 +7674,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1942110642}
+  - {fileID: 1077698789}
   m_Father: {fileID: 1411626119}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &604477866
@@ -7679,38 +7691,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileBuilder: {fileID: 523026463}
   districtGenerator: {fileID: 1551488502}
---- !u!114 &604477868
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 604477864}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35bee138f0644ff5910178cba2a52d52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes: []
-  tileBuilder: {fileID: 523026463}
-  districtGenerator: {fileID: 1551488502}
-  groundGenerator: {fileID: 1024001993}
-  districtHandler: {fileID: 491554922}
-  buildingGenerator: {fileID: 771210304}
-  buildingHandler: {fileID: 231546246}
-  costText: {fileID: 104919697}
-  districtCostData: {fileID: 11400000, guid: a6d3084868d171045b5e0972b383d96e, type: 2}
-  affordableColor: {r: 0.40156865, g: 1, b: 0.2999999, a: 1}
-  notAffordableColor: {r: 1, g: 0.28490567, b: 0.28490567, a: 1}
-  verbose: 0
 --- !u!114 &604477869
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8950,12 +8930,6 @@ MonoBehaviour:
   buildingHandler: {fileID: 231546246}
   barricadeHandler: {fileID: 1149199778}
   districtHandler: {fileID: 491554922}
---- !u!1 &727871380 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 598327024341094733, guid: ec4731a09368da74080b0ab071ae4c64,
-    type: 3}
-  m_PrefabInstance: {fileID: 6927194046612565440}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &753086450 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7723344846447049306, guid: 1efa44b3173d3934d81649ef81816d76,
@@ -11382,6 +11356,115 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81031f4b9dbb445bba9accbd45258400, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1077698788
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1077698789}
+  - component: {fileID: 1077698792}
+  - component: {fileID: 1077698791}
+  - component: {fileID: 1077698790}
+  m_Layer: 0
+  m_Name: DistrictPlacer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1077698789
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1077698788}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 604477865}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1077698790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1077698788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f6dd00943a748a2be89520dda6e0e17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::Audio.PlayAudio
+  audioEvent: {fileID: 0}
+--- !u!114 &1077698791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1077698788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83f765bb3a474b7aa4c2a22ac7c4846d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::Utility.PlayCameraShake
+  strength: 0.3
+  frequency: 25
+  bounceAmount: 4
+--- !u!114 &1077698792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1077698788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35bee138f0644ff5910178cba2a52d52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  tileBuilder: {fileID: 523026463}
+  districtGenerator: {fileID: 1551488502}
+  groundGenerator: {fileID: 1024001993}
+  districtHandler: {fileID: 491554922}
+  buildingGenerator: {fileID: 771210304}
+  buildingHandler: {fileID: 231546246}
+  costText: {fileID: 104919697}
+  districtCostData: {fileID: 11400000, guid: a6d3084868d171045b5e0972b383d96e, type: 2}
+  affordableColor: {r: 0.40156865, g: 1, b: 0.2999999, a: 1}
+  notAffordableColor: {r: 1, g: 0.28490567, b: 0.28490567, a: 1}
+  OnDistrictPlaced:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1077698791}
+        m_TargetAssemblyTypeName: Utility.PlayCameraShake, Core
+        m_MethodName: Shake
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  verbose: 0
 --- !u!1 &1079521737
 GameObject:
   m_ObjectHideFlags: 0
@@ -13444,6 +13527,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Core::Buildings.Lumbermill.LumbermillHandler
   districtHandler: {fileID: 491554922}
+  barricadeHandler: {fileID: 1149199778}
   districtGenerator: {fileID: 1551488502}
   groundGenerator: {fileID: 1024001993}
   moneyReward: 300
@@ -13929,6 +14013,18 @@ MonoBehaviour:
     ConstantValue: {r: 0, g: 0, b: 0, a: 0}
     Variable: {fileID: 11400000, guid: aaf9388cfe535a844aed49594dd920f9, type: 2}
     VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
+--- !u!114 &1374744687 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4036614019229195546, guid: 4fcc1f1d24ab33246b7047222436610a,
+    type: 3}
+  m_PrefabInstance: {fileID: 1611300522}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81031f4b9dbb445bba9accbd45258400, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1388225831
 GameObject:
   m_ObjectHideFlags: 0
@@ -15400,7 +15496,11 @@ PrefabInstance:
     - {fileID: 4396926357991724226, guid: 4fcc1f1d24ab33246b7047222436610a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 418315291951384130, guid: 4fcc1f1d24ab33246b7047222436610a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1752282007}
   m_SourcePrefab: {fileID: 100100000, guid: 4fcc1f1d24ab33246b7047222436610a, type: 3}
 --- !u!224 &1611300523 stripped
 RectTransform:
@@ -16803,6 +16903,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b864bac6ebe84d229bc41740b8c92b70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1752282004 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 418315291951384130, guid: 4fcc1f1d24ab33246b7047222436610a,
+    type: 3}
+  m_PrefabInstance: {fileID: 1611300522}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1752282007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752282004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6369f565f52d438b9d6b16b3a28aec93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::Buildings.Barricades.UIBarricadeButton
+  amountText: {fileID: 1374744687}
+  button: {fileID: 229833003}
+  disabledOverlay: {fileID: 1866015063}
 --- !u!1 &1755680189
 GameObject:
   m_ObjectHideFlags: 0
@@ -17832,6 +17953,12 @@ VisualEffect:
       m_Array: []
     m_Bool:
       m_Array: []
+--- !u!1 &1866015063 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6502078863353804110, guid: 4fcc1f1d24ab33246b7047222436610a,
+    type: 3}
+  m_PrefabInstance: {fileID: 1611300522}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1898243238
 GameObject:
   m_ObjectHideFlags: 0
@@ -19798,27 +19925,12 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 6927194046612565440}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 727871380}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2110280411
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 727871380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83f765bb3a474b7aa4c2a22ac7c4846d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Core::Utility.PlayCameraShake
-  strength: 0.3
-  frequency: 25
-  bounceAmount: 5
 --- !u!1 &2112620415
 GameObject:
   m_ObjectHideFlags: 0
@@ -23293,7 +23405,7 @@ PrefabInstance:
     - target: {fileID: 604264079844408855, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 604264079844408855, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
@@ -23309,7 +23421,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
-      objectReference: {fileID: 2110280411}
+      objectReference: {fileID: 0}
     - target: {fileID: 604264079844408855, guid: ec4731a09368da74080b0ab071ae4c64,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
@@ -23433,11 +23545,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 598327024341094733, guid: ec4731a09368da74080b0ab071ae4c64,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2110280411}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ec4731a09368da74080b0ab071ae4c64, type: 3}
 --- !u!4 &7221729375845070652 stripped
 Transform:

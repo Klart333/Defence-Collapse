@@ -47,7 +47,6 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     
     public int3 ChunkSize => new int3(Mathf.FloorToInt(groundGenerator.ChunkSize.x / waveFunction.CellSize.x), 1, Mathf.FloorToInt(groundGenerator.ChunkSize.z / waveFunction.CellSize.z));
     public ChunkWaveFunction<QueryMarchedChunk> ChunkWaveFunction => waveFunction;
-    public ICollection<ChunkIndex> QueryBuiltIndexes => queryBuiltIndexes;
     public PrototypeInfoData PrototypeInfo => townPrototypeInfo;
     public Vector3 ChunkScale => groundGenerator.ChunkScale;
     
@@ -235,12 +234,6 @@ public class BuildingManager : Singleton<BuildingManager>, IQueryWaveFunction
     public void Place()
     {
         Events.OnBuildingBuilt?.Invoke(QuerySpawnedBuildings.Values);
-        
-        if (queryBuiltIndexes != null)
-        {
-            Events.OnBuiltIndexBuilt?.Invoke(queryBuiltIndexes);
-            queryBuiltIndexes = null;   
-        }
         
         foreach (QueryMarchedChunk chunk in queriedChunks)
         {

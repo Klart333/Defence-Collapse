@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Buildings.Barricades;
 using Sirenix.OdinInspector;
 using WaveFunctionCollapse;
 using Buildings.District;
@@ -17,6 +18,9 @@ namespace Buildings.Lumbermill
         [Title("References")]
         [SerializeField]
         private DistrictHandler districtHandler;
+        
+        [SerializeField]
+        private BarricadeHandler barricadeHandler;
         
         [SerializeField]
         private DistrictGenerator districtGenerator;
@@ -96,6 +100,8 @@ namespace Buildings.Lumbermill
         {
             Vector3 position = ChunkWaveUtility.GetPosition(chunkIndex, groundGenerator.ChunkScale, groundGenerator.ChunkWaveFunction.CellSize);
             MoneyManager.Instance.AddMoneyParticles(moneyReward, position);
+            barricadeHandler.AddAvailableBarricade(barricadeAmount);
+            
             groundGenerator.ChangeGroundType(position.XZ(), GroundType.Grass);
         }
     }

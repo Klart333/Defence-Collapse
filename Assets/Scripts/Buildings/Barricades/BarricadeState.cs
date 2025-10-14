@@ -4,7 +4,7 @@ using UnityEngine;
 using Effects;
 using Health;
 
-namespace Buildings
+namespace Buildings.Barricades
 {
     [System.Serializable]
     public class BarricadeState : IBuffable
