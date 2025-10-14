@@ -1,8 +1,7 @@
-using Effects.ECS;
-using Health;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Effects.ECS;
+using Unity.Burst;
 
 namespace Gameplay.Upgrades.ECS
 {
@@ -51,20 +50,7 @@ namespace Gameplay.Upgrades.ECS
                     continue;
                 }
 
-                if ((multiplyDamageComponent.AppliedHealthType & HealthType.Health) != 0)
-                {
-                    damage.HealthDamage *= multiplyDamageComponent.DamageMultiplier;
-                }
-                
-                if ((multiplyDamageComponent.AppliedHealthType & HealthType.Armor) != 0)
-                {
-                    damage.ArmorDamage *= multiplyDamageComponent.DamageMultiplier;
-                }
-                
-                if ((multiplyDamageComponent.AppliedHealthType & HealthType.Shield) != 0)
-                {
-                    damage.ShieldDamage *= multiplyDamageComponent.DamageMultiplier;
-                }
+                damage.Damage *= multiplyDamageComponent.DamageMultiplier;
             }
         }
     }
@@ -72,7 +58,6 @@ namespace Gameplay.Upgrades.ECS
     public struct MultiplyDamageComponent : IComponentData
     {
         public CategoryType AppliedCategory;
-        public HealthType AppliedHealthType;
         public float DamageMultiplier;
     }
 }

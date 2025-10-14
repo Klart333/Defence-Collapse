@@ -21,132 +21,156 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: Stats
+    - Name: statGroups
       Entry: 7
-      Data: 0|Stats, Core
-    - Name: HealthDamage
+      Data: 0|Effects.IStatGroup[], Core
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
       Entry: 7
-      Data: 1|Effects.Stat, Core
+      Data: 1|Effects.AttackDistrictStats, Core
+    - Name: AttackDamageStat
+      Entry: 7
+      Data: 2|Effects.AttackDamageStat, Core
     - Name: baseValue
       Entry: 4
       Data: 5
     - Name: 
       Entry: 8
       Data: 
-    - Name: ArmorDamage
+    - Name: ArmorPenetrationStat
       Entry: 7
-      Data: 2|Effects.Stat, Core
+      Data: 3|Effects.ArmorPenetrationStat, Core
     - Name: baseValue
       Entry: 4
-      Data: 5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
-    - Name: ShieldDamage
+    - Name: CritChanceStat
       Entry: 7
-      Data: 3|Effects.Stat, Core
+      Data: 4|Effects.CritChanceStat, Core
     - Name: baseValue
       Entry: 4
-      Data: 5
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
-    - Name: AttackSpeed
+    - Name: CritDamageStat
       Entry: 7
-      Data: 4|Effects.Stat, Core
+      Data: 5|Effects.CritDamageStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AttackSpeedStat
+      Entry: 7
+      Data: 6|Effects.AttackSpeedStat, Core
     - Name: baseValue
       Entry: 4
       Data: 0.25
     - Name: 
       Entry: 8
       Data: 
-    - Name: Range
+    - Name: RangeStat
       Entry: 7
-      Data: 5|Effects.Stat, Core
+      Data: 7|Effects.RangeStat, Core
     - Name: baseValue
       Entry: 4
       Data: 6
     - Name: 
       Entry: 8
       Data: 
-    - Name: MovementSpeed
-      Entry: 7
-      Data: 6|Effects.Stat, Core
-    - Name: baseValue
-      Entry: 4
-      Data: 0
     - Name: 
       Entry: 8
       Data: 
-    - Name: CritChance
-      Entry: 7
-      Data: 7|Effects.Stat, Core
-    - Name: baseValue
-      Entry: 4
-      Data: 0
     - Name: 
-      Entry: 8
-      Data: 
-    - Name: CritMultiplier
       Entry: 7
-      Data: 8|Effects.Stat, Core
-    - Name: baseValue
-      Entry: 4
-      Data: 3
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MaxHealth
+      Data: 8|Effects.ProductionDistrictStats, Core
+    - Name: ProductionSpeedStat
       Entry: 7
-      Data: 9|Effects.Stat, Core
-    - Name: baseValue
-      Entry: 4
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MaxArmor
-      Entry: 7
-      Data: 10|Effects.Stat, Core
+      Data: 9|Effects.ProductionSpeedStat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
     - Name: 
       Entry: 8
       Data: 
-    - Name: MaxShield
+    - Name: GoldMultiplierStat
       Entry: 7
-      Data: 11|Effects.Stat, Core
+      Data: 10|Effects.GoldMultiplierStat, Core
     - Name: baseValue
       Entry: 4
       Data: 1
     - Name: 
       Entry: 8
       Data: 
-    - Name: Healing
+    - Name: BuffPowerStat
       Entry: 7
-      Data: 12|Effects.Stat, Core
+      Data: 11|Effects.BuffPowerStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 12|Effects.EffectsDistrictStats, Core
+    - Name: FireStat
+      Entry: 7
+      Data: 13|Effects.FireStat, Core
     - Name: baseValue
       Entry: 4
       Data: 0
     - Name: 
       Entry: 8
       Data: 
-    - Name: Productivity
+    - Name: PoisonStat
       Entry: 7
-      Data: 13|Effects.Stat, Core
+      Data: 14|Effects.PoisonStat, Core
     - Name: baseValue
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 8
+      Data: 
+    - Name: BleedStat
+      Entry: 7
+      Data: 15|Effects.BleedStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SlowStat
+      Entry: 7
+      Data: 16|Effects.SlowStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
     - Name: upgradeStats
       Entry: 7
-      Data: 14|Effects.IUpgradeStatEditor[], Core
+      Data: 17|Effects.IUpgradeStatEditor[], Core
     - Name: 
       Entry: 12
       Data: 0
@@ -158,10 +182,10 @@ MonoBehaviour:
       Data: 
     - Name: districtStateCreator
       Entry: 7
-      Data: 15|Buildings.District.GenericDistrictStateCreator, Core
+      Data: 18|Buildings.District.GenericDistrictStateCreator, Core
     - Name: stateType
       Entry: 7
-      Data: 16|System.RuntimeType, mscorlib
+      Data: 19|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: Buildings.District.ChurchState, Core
@@ -173,10 +197,10 @@ MonoBehaviour:
       Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 17|Attack, Core
+      Data: 20|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 18|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 21|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -188,7 +212,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 22|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -203,19 +227,19 @@ MonoBehaviour:
       Data: 
     - Name: createdEffects
       Entry: 7
-      Data: 20|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 23|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 21|Effects.CreateBuffEffect, Core
+      Data: 24|Effects.CreateBuffEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 1
     - Name: buffs
       Entry: 7
-      Data: 22|Gameplay.Buffs.Buff[], Core
+      Data: 25|Gameplay.Buffs.Buff[], Core
     - Name: 
       Entry: 12
       Data: 2
@@ -225,9 +249,24 @@ MonoBehaviour:
     - Name: Type
       Entry: 3
       Data: 3
+    - Name: TypeType
+      Entry: 7
+      Data: Effects.StatTypeType, Core
+    - Name: statType
+      Entry: 7
+      Data: 26|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.AttackSpeedStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: Modifier
       Entry: 7
-      Data: 23|Effects.Modifier, Core
+      Data: 27|Effects.Modifier, Core
     - Name: Type
       Entry: 3
       Data: 2
@@ -246,9 +285,24 @@ MonoBehaviour:
     - Name: Type
       Entry: 3
       Data: 11
+    - Name: TypeType
+      Entry: 7
+      Data: Effects.StatTypeType, Core
+    - Name: statType
+      Entry: 7
+      Data: 28|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.HealingStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: Modifier
       Entry: 7
-      Data: 24|Effects.Modifier, Core
+      Data: 29|Effects.Modifier, Core
     - Name: Type
       Entry: 3
       Data: 0
@@ -278,7 +332,7 @@ MonoBehaviour:
       Data: 
     - Name: endWaveEffects
       Entry: 7
-      Data: 25|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 30|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -319,5 +373,5 @@ MonoBehaviour:
   attackAngle: 360
   useMeshBasedPlacement: 0
   useTargetMesh: 1
-  meshVariable: {fileID: 11400000, guid: 7784ece2c0472d04f827b479b3a0d191, type: 2}
+  districtAttachmentIndex: 0
   categoryType: 4

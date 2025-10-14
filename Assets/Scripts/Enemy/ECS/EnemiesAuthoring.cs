@@ -36,9 +36,8 @@ namespace Enemy.ECS
     [InternalBufferCapacity(10)]
     public struct DamageBuffer : IBufferElementData
     {
-        public float HealthDamage;
-		public float ArmorDamage;
-		public float ShieldDamage;
+        public float Damage;
+        public float ArmorPenetration;
 		public bool IsCrit;
 		
 		public bool TriggerDamageDone;
@@ -51,7 +50,6 @@ namespace Enemy.ECS
     public struct DamageTakenBuffer : IBufferElementData
     {
         public float DamageTaken;
-        public HealthType DamageTakenType;
         public bool IsCrit;
     }
     

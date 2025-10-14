@@ -19,9 +19,8 @@ namespace Effects.ECS
 		public byte LimitedHits;
 		public int Key;
 		
-		public float HealthDamage;
-		public float ShieldDamage;
-		public float ArmorDamage;
+		public float Damage;
+		public float ArmorPenetration;
 	}
 
 	public struct CritComponent : IComponentData
@@ -57,7 +56,11 @@ namespace Effects.ECS
 		public Entity Bar; 
 		public float Health;
 		public float Armor;
-		public float Shield;
+	}
+
+	public struct ArmorComponent : IComponentData
+	{
+		public float Armor;
 	}
 
 	public struct PendingDamageTag : IComponentData { }
@@ -66,7 +69,6 @@ namespace Effects.ECS
 	{
 		public float Health;
 		public float Armor;
-		public float Shield;
 	}
 
 	public struct HealthScalingComponent : IComponentData

@@ -53,11 +53,9 @@ namespace Effects.ECS
             
             health.Health *= multiplier;
             health.Armor *= multiplier;
-            health.Shield *= multiplier;
             
             maxHealth.Health *= multiplier;
             maxHealth.Armor *= multiplier;
-            maxHealth.Shield *= multiplier;
             
             ECB.RemoveComponent<HealthScalingComponent>(sortKey, entity);
         }

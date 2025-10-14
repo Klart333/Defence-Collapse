@@ -32,7 +32,7 @@ namespace Buildings.District.UI
         private Transform statPanelParent;
 
         [SerializeField]
-        private Dictionary<StatDisplayableType, StatType[]> statTypes = new Dictionary<StatDisplayableType, StatType[]>();
+        private Dictionary<StatDisplayableType, StatTypeType[]> statTypes = new Dictionary<StatDisplayableType, StatTypeType[]>();
         
         private List<UIStatPanel> spawnedStatPanels = new List<UIStatPanel>();
 
@@ -58,15 +58,15 @@ namespace Buildings.District.UI
                 healthFillImage.fillAmount = health.HealthPercentage;
             }
             
-            StatType[] statsToDisplay = statTypes[displayableType];
+            StatTypeType[] statsToDisplay = statTypes[displayableType];
             for (int i = 0; i < statsToDisplay.Length; i++)
             {
-                StatType statType = statsToDisplay[i];
+                StatTypeType statType = statsToDisplay[i];
                 UIStatPanel spawned = statPanelPrefab.GetDisabled<UIStatPanel>();
                 spawned.transform.SetParent(statPanelParent, false);
                 spawned.transform.SetSiblingIndex(i);
-                Stat stat = stats.Get(statType);
-                spawned.DisplayStat(stat, statType);
+                Stat stat = stats.Get(statType.StatType);
+                spawned.DisplayStat(stat);
                 spawned.gameObject.SetActive(true);
                 spawnedStatPanels.Add(spawned);
             }

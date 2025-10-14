@@ -40,8 +40,8 @@ namespace Buildings.District
         private PrototypeInfoData prototypeInfoData;
 
         [TitleGroup("Stats")]
-        [OdinSerialize, NonSerialized]
-        public Stats Stats;
+        [SerializeField]
+        private IStatGroup[] statGroups = Array.Empty<IStatGroup>();
 
         [TitleGroup("Stats", "Upgrade Stats")]
         [SerializeField]
@@ -92,39 +92,13 @@ namespace Buildings.District
         public List<IEffect> CreatedEffects => createdEffects;
         public DistrictType DistrictType => districtType;
         public CategoryType CategoryType => categoryType;
+        public IStatGroup[] StatGroups => statGroups;
         public int DistrictHeight => districtHeight;
         public bool UseTargetMesh => useTargetMesh;
         public bool ShouldCombine => shouldCombine;
         public Sprite IconSmall => iconSmall.Value;
         public float AttackAngle => attackAngle;
         public Sprite Icon => icon.Value;
-
-        [TitleGroup("Stats")]
-        [Button]
-        public void InitStats()
-        {
-            Stats = new Stats
-            {
-                HealthDamage = Stats.HealthDamage != null ? new Stat(Stats.HealthDamage.Value) : new Stat(1),
-                ArmorDamage = Stats.ArmorDamage != null ? new Stat(Stats.ArmorDamage.Value) : new Stat(1),
-                ShieldDamage = Stats.ShieldDamage != null ? new Stat(Stats.ShieldDamage.Value) : new Stat(1),
-
-                AttackSpeed = Stats.AttackSpeed != null ? new Stat(Stats.AttackSpeed.Value) : new Stat(1),
-                Range = Stats.Range != null ? new Stat(Stats.Range.Value) : new Stat(1),
-
-                MovementSpeed = Stats.MovementSpeed != null ? new Stat(Stats.MovementSpeed.Value) : new Stat(1),
-
-                CritChance = Stats.CritChance != null ? new Stat(Stats.CritChance.Value) : new Stat(0.01f),
-                CritMultiplier = Stats.CritMultiplier != null ? new Stat(Stats.CritMultiplier.Value) : new Stat(2),
-
-                MaxHealth = Stats.MaxHealth != null ? new Stat(Stats.MaxHealth.Value) : new Stat(1),
-                MaxArmor = Stats.MaxArmor != null ? new Stat(Stats.MaxArmor.Value) : new Stat(1),
-                MaxShield = Stats.MaxShield != null ? new Stat(Stats.MaxShield.Value) : new Stat(1),
-                Healing = Stats.Healing != null ? new Stat(Stats.Healing.Value) : new Stat(1),
-
-                Productivity = Stats.Productivity != null ? new Stat(Stats.Productivity.Value) : new Stat(1),
-            };
-        }
 
         public DistrictState GetDistrictState(DistrictData districtData, Vector3 position, int key)
         {

@@ -28,8 +28,8 @@ namespace Exp.Gemstones
 
         private void ActivateGemstones(List<Gemstone> gemstones)
         {
-            Dictionary<StatType, float> stats = new Dictionary<StatType, float>();
-            Dictionary<StatType, StatIncreaseEffect> statIncreaseEffects = new Dictionary<StatType, StatIncreaseEffect>();
+            Dictionary<Type, float> stats = new Dictionary<Type, float>();
+            Dictionary<Type, StatIncreaseEffect> statIncreaseEffects = new Dictionary<Type, StatIncreaseEffect>();
             
             Dictionary<Type, IGemstoneEffect> uniqueGemEffects = new Dictionary<Type, IGemstoneEffect>();
 
@@ -64,21 +64,21 @@ namespace Exp.Gemstones
                     {
                         case StatIncreaseEffect { Effect: IncreaseStatEffect stat } statEffect:
                         {
-                            if (stats.TryGetValue(stat.StatType, out float value))
+                            if (stats.TryGetValue(stat.StatTypeType.StatType, out float value))
                             {
-                                stats[stat.StatType] = effect.CumulativeType switch
+                                stats[stat.StatTypeType.StatType] = effect.CumulativeType switch
                                 {
                                     Modifier.ModifierType.Additive => value + effect.ModifierValue,
                                     Modifier.ModifierType.Multiplicative => value * effect.ModifierValue,
                                     _ => throw new ArgumentOutOfRangeException()
                                 };
                                 
-                                statIncreaseEffects[stat.StatType].ModifierValue = stats[stat.StatType];
+                                statIncreaseEffects[stat.StatTypeType.StatType].ModifierValue = stats[stat.StatTypeType.StatType];
                             }
                             else
                             {
-                                stats.Add(stat.StatType, statEffect.ModifierValue);
-                                statIncreaseEffects.Add(stat.StatType, statEffect.Copy() as StatIncreaseEffect);
+                                stats.Add(stat.StatTypeType.StatType, statEffect.ModifierValue);
+                                statIncreaseEffects.Add(stat.StatTypeType.StatType, statEffect.Copy() as StatIncreaseEffect);
                             }
                         
                             continue;

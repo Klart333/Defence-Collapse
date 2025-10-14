@@ -1,4 +1,5 @@
 using Random = System.Random;
+
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using Gameplay.Upgrades;
@@ -57,11 +58,11 @@ namespace Exp.Gemstones
                 IsAdditivePercent = isAdditivePercent,
                 AppliedCategory = appliedCategory,
                 ModifierValue = value,
-                EffectDescription = statNameUtility.GetDescription(increaseStatEffect.StatType, value),
+                EffectDescription = statNameUtility.GetDescription(increaseStatEffect.StatTypeType.StatType, value),
                 Effect = new IncreaseStatEffect
                 {
                     ModifierType = increaseStatEffect.ModifierType,
-                    StatType = increaseStatEffect.StatType,
+                    StatTypeType = increaseStatEffect.StatTypeType,
                     ModifierValue = value,
                 }
             };
@@ -222,7 +223,7 @@ namespace Exp.Gemstones
         
         [Title("Category")]
         [SerializeField]
-        private StatType statType;
+        private StatTypeType statTypeType;
         
         public float GetEffectValue(int level, Random random)
         {
@@ -234,24 +235,29 @@ namespace Exp.Gemstones
         {
             float value = GetEffectValue(level, random);
 
-            return statType switch
+            if (statTypeType.StatType.IsEquivalentTo(typeof(MaxHealthStat)))
             {
-                StatType.MaxHealth => new IncreaseWallHealthEffect()
+                return new IncreaseWallHealthEffect()
                 {
                     ModifierValue = value,
-                    EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseWallHealthEffect), value),
-                },
-                StatType.Healing => new IncreaseWallHealingEffect
+                    EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseBarricadeHealthEffect), value),
+                };
+            }
+
+            if (statTypeType.StatType.IsEquivalentTo(typeof(HealingStat)))
+            {
+                return new IncreaseWallHealingEffect
                 {
                     ModifierValue = value,
-                    EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseWallHealingEffect), value),
-                },
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                    EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseBarricadeHealingEffect), value),
+                };
+            }
+
+            throw new ArgumentOutOfRangeException();
         }
     }
     
-    [Serializable]
+    [Serializable, Obsolete]
     public class BarricadeStatIncreaseBakeEffect : IGemstoneBakingEffect
     {
         [Title("Curve")]
@@ -267,7 +273,7 @@ namespace Exp.Gemstones
         
         [Title("Category")]
         [SerializeField]
-        private StatType statType;
+        private StatTypeType statTypeType;
         
         public float GetEffectValue(int level, Random random)
         {
@@ -279,20 +285,25 @@ namespace Exp.Gemstones
         {
             float value = GetEffectValue(level, random);
 
-            return statType switch
+            if (statTypeType.StatType.IsEquivalentTo(typeof(MaxHealthStat)))
             {
-                StatType.MaxHealth => new IncreaseBarricadeHealthEffect()
+                return new IncreaseBarricadeHealthEffect()
                 {
                     ModifierValue = value,
                     EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseBarricadeHealthEffect), value),
-                },
-                StatType.Healing => new IncreaseBarricadeHealingEffect
+                };
+            }
+
+            if (statTypeType.StatType.IsEquivalentTo(typeof(HealingStat)))
+            {
+                return new IncreaseBarricadeHealingEffect
                 {
                     ModifierValue = value,
                     EffectDescription = effectDescriptions.GetDescription(typeof(IncreaseBarricadeHealingEffect), value),
-                },
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                };
+            }
+
+            throw new ArgumentOutOfRangeException();
         }
     }
     

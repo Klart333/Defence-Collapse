@@ -1,3 +1,4 @@
+using Effects;
 using InputCamera.ECS;
 using Unity.Entities;
 using UnityEngine;
@@ -15,22 +16,19 @@ namespace Health
             public override void Bake(HealthbarAuthoring authoring)
             {
                 Entity bar = GetEntity(authoring, TransformUsageFlags.Dynamic);
-                Stats stats = new Stats(authoring.enemyData.Stats);
-                float totalHealth = stats.MaxHealth.Value + stats.MaxArmor.Value + stats.MaxShield.Value; 
+                Stats stats = new Stats(authoring.enemyData.StatGroups);
+                float maxHealth = stats.Get<MaxHealthStat>().Value;
+                float maxArmor = stats.Get<MaxArmorStat>().Value;
+                float totalHealth = maxHealth + maxArmor; 
 
                 AddComponent(bar, new HealthPropertyComponent
                 {
-                    Value = stats.MaxHealth.Value / totalHealth,
+                    Value = maxHealth / totalHealth,
                 });
                 
                 AddComponent(bar, new ArmorPropertyComponent
                 {
-                    Value = stats.MaxArmor.Value / totalHealth,
-                });
-                
-                AddComponent(bar, new ShieldPropertyComponent
-                {
-                    Value = stats.MaxShield.Value / totalHealth,
+                    Value = maxArmor / totalHealth,
                 });
                 
                 AddComponent<RotateTowardCameraLTWTag>(bar);

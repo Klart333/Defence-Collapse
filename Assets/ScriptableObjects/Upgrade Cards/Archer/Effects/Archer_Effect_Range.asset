@@ -39,6 +39,21 @@ MonoBehaviour:
     - Name: StatType
       Entry: 3
       Data: 4
+    - Name: StatTypeType
+      Entry: 7
+      Data: Effects.StatTypeType, Core
+    - Name: statType
+      Entry: 7
+      Data: 2|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.RangeStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CanIncrease
       Entry: 5
       Data: true
@@ -51,14 +66,12 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  icon: {fileID: 21300000, guid: 589db224aea12884880200807e357d93, type: 3}
   iconReference:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: 098464f38caf32649b43cf7784950aaa, type: 2}
     VariableValuePreview: {fileID: 21300000, guid: 8d371ebf1ad8df644a36b2a3ac12177c,
       type: 3}
-  description: +0.5 Range on Archer Districts.
   descriptionReference:
     Mode: 1
     ConstantValue: 

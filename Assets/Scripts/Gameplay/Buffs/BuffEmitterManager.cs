@@ -96,7 +96,7 @@ namespace Gameplay.Buffs
             {
                 foreach (Buff buff in emitter.Buffs)
                 {
-                    stats.Get(buff.Type).AddModifier(buff.Modifier);
+                    stats.ModifyStat(buff.TypeType.StatType, buff.Modifier);
                 }            
             }
         }
@@ -130,7 +130,7 @@ namespace Gameplay.Buffs
             {
                 foreach (Buff buff in emitter.Buffs)
                 {
-                    stats.Get(buff.Type).RemoveModifier(buff.Modifier);
+                    stats.RevertModifiedStat(buff.TypeType.StatType, buff.Modifier);
                 }         
             }
         }
@@ -151,13 +151,13 @@ namespace Gameplay.Buffs
     [Serializable]
     public struct Buff
     {
-        public StatType Type;
+        public StatTypeType TypeType;
         public Modifier Modifier;
 
         public Buff(Buff copy)
         {
-            Type = copy.Type;
             Modifier = new Modifier(copy.Modifier);
+            TypeType = copy.TypeType;
         }
     }
 

@@ -26,7 +26,7 @@ MonoBehaviour:
       Data: 0|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
-      Data: 3
+      Data: 1
     - Name: 
       Entry: 7
       Data: 1|Effects.IncreaseStatEffect, Core
@@ -39,42 +39,21 @@ MonoBehaviour:
     - Name: StatType
       Entry: 3
       Data: 0
-    - Name: CanIncrease
-      Entry: 5
-      Data: true
+    - Name: StatTypeType
+      Entry: 7
+      Data: Effects.StatTypeType, Core
+    - Name: statType
+      Entry: 7
+      Data: 2|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.AttackDamageStat, Core
     - Name: 
       Entry: 8
       Data: 
     - Name: 
-      Entry: 7
-      Data: 2|Effects.IncreaseStatEffect, Core
-    - Name: ModifierValue
-      Entry: 4
-      Data: 2
-    - Name: ModifierType
-      Entry: 3
-      Data: 1
-    - Name: StatType
-      Entry: 3
-      Data: 1
-    - Name: CanIncrease
-      Entry: 5
-      Data: true
-    - Name: 
       Entry: 8
       Data: 
-    - Name: 
-      Entry: 7
-      Data: 3|Effects.IncreaseStatEffect, Core
-    - Name: ModifierValue
-      Entry: 4
-      Data: 2
-    - Name: ModifierType
-      Entry: 3
-      Data: 1
-    - Name: StatType
-      Entry: 3
-      Data: 2
     - Name: CanIncrease
       Entry: 5
       Data: true

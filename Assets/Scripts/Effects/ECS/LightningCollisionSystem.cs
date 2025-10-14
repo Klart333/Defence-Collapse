@@ -8,6 +8,7 @@ using Pathfinding;
 using UnityEngine;
 using Unity.Jobs;
 using Enemy.ECS;
+using Gameplay;
 using VFX;
 
 namespace Effects.ECS
@@ -132,9 +133,8 @@ namespace Effects.ECS
 
                     ECB.AppendToBuffer(sortKey, entity, new DamageBuffer
                     {
-                        ShieldDamage = sourceLightning.Damage * 3,
-                        ArmorDamage = sourceLightning.Damage,
-                        HealthDamage = sourceLightning.Damage
+                        ArmorPenetration = GameDetailsData.LightningArmorPenetration,
+                        Damage = sourceLightning.Damage
                     });
                     ECB.AddComponent<PendingDamageTag>(sortKey, entity);
                 }

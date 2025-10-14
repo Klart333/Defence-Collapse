@@ -60,24 +60,22 @@ namespace Effects.ECS
         public EntityCommandBuffer.ParallelWriter ECB;
         
         [BurstCompile]
-        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent health, in LocalTransform transform)
+        public void Execute([ChunkIndexInQuery]int index, Entity entity, ref HealthComponent health, in ArmorComponent armorComponent, in LocalTransform transform)
         {
             DynamicBuffer<DamageBuffer> damageBuffer = DamageBufferLookup[entity];
             for (int i = 0; i < damageBuffer.Length; ++i)
             {
-                TakeDamage(ref health, damageBuffer[i], out float damageTaken, out HealthType damageType);
+                float damageTaken = TakeDamage(ref health, armorComponent, damageBuffer[i]);
                 
                 ECB.AppendToBuffer(index, entity, new DamageTakenBuffer
                 {
                     DamageTaken = damageTaken,
-                    DamageTakenType = damageType,
                     IsCrit = damageBuffer[i].IsCrit,
                 });
 
                 ECB.AppendToBuffer(index, BufferEntity, new DamageCallbackComponent
                 {
                     DamageTaken = damageTaken,
-                    DamageTakenType = damageType,
                     Position = transform.Position,
                 
                     Key = damageBuffer[i].Key,
@@ -97,26 +95,35 @@ namespace Effects.ECS
             }
         }
 
-        private static void TakeDamage(ref HealthComponent health, DamageBuffer damageBuffer, out float damageTaken, out HealthType damageType)
+        private static float TakeDamage(ref HealthComponent health, ArmorComponent armorComponent, DamageBuffer damageBuffer)
         {
-            if (health.Shield > 0)
+            float penetratedDamage = damageBuffer.Damage * damageBuffer.ArmorPenetration;
+            float damage = damageBuffer.Damage - penetratedDamage;
+
+            bool hasArmor = health.Armor > 0;
+            if (hasArmor && armorComponent.Armor > 0)
             {
-                damageType = HealthType.Shield;
-                damageTaken = damageBuffer.ShieldDamage;
-                health.Shield -= damageTaken;
+                damage *= 100f / (100f + armorComponent.Armor);
             }
-            else if (health.Armor > 0)
+            else if (armorComponent.Armor < 0)
             {
-                damageType = HealthType.Armor;
-                damageTaken = damageBuffer.ArmorDamage;
-                health.Armor -= damageTaken;
+                float multiplier = (100f - armorComponent.Armor) / 100f;
+                
+                damage *= multiplier;
+                penetratedDamage *= multiplier;
             }
-            else
+            
+            if (hasArmor)
             {
-                damageType = HealthType.Health;
-                damageTaken = damageBuffer.HealthDamage;
-                health.Health -= damageBuffer.HealthDamage;
+                float absorbed = math.min(health.Armor, damage);
+                health.Armor -= absorbed;
+                damage -= absorbed;
             }
+            
+            health.Health -= penetratedDamage + damage;
+            
+            return damage + penetratedDamage;
+            
         }
     }
 
@@ -125,7 +132,6 @@ namespace Effects.ECS
     {
         public int Key;
         public float DamageTaken;
-        public HealthType DamageTakenType;
         public float3 Position;
 
         public bool TriggerDamageDone;

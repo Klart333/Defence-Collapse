@@ -173,13 +173,7 @@ namespace TextMeshDOTS.Authoring
             for (int i = 0; i < damageTakenBuffer.Length; i++)
             {
                 DamageTakenBuffer damageTaken = damageTakenBuffer[i];
-                TextBaseConfiguration.color = damageTaken.DamageTakenType switch
-                {
-                    HealthType.Health => Color.green,
-                    HealthType.Armor => Color.yellow,
-                    HealthType.Shield => Color.blue,
-                    _ => Color.black,
-                };
+                TextBaseConfiguration.color = Color.green;
             
                 Entity textEntity = ECB.CreateEntity(entityIndex, TextArchetype);
                 ECB.SetSharedComponent(entityIndex, textEntity, RenderFilterSettings);

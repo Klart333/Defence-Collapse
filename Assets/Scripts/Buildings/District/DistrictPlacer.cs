@@ -156,11 +156,9 @@ namespace Buildings.District
         {
             if (!tileBuilder.GetIsDisplaying(out BuildingType type) || !type.HasFlag(BuildingType.District))
             {
-                Debug.Log("Not displaying so no Cancel Placement");
                 return;
             }
             
-            Debug.Log("Cancel Placement");
             costText.gameObject.SetActive(false);
             tileBuilder.OnTilePressed -= OnTilePressed;
 

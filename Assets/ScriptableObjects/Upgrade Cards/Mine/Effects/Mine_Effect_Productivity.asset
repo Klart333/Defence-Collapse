@@ -39,6 +39,21 @@ MonoBehaviour:
     - Name: StatType
       Entry: 3
       Data: 12
+    - Name: StatTypeType
+      Entry: 7
+      Data: Effects.StatTypeType, Core
+    - Name: statType
+      Entry: 7
+      Data: 2|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.GoldMultiplierStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CanIncrease
       Entry: 5
       Data: true
@@ -51,17 +66,15 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  icon: {fileID: 21300000, guid: 34aa25191b04edd4ab4ab2b1c6c25c09, type: 3}
   iconReference:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: e27e0a47199144142aa274c8e106eb8f, type: 2}
     VariableValuePreview: {fileID: 21300000, guid: 7930b4af2256e0a468d8898f2d49c639,
       type: 3}
-  description: +20% Crystal Value on Mine Disitrcts.
   descriptionReference:
     Mode: 0
-    ConstantValue: +20% Crystal Value on Mine Disitrcts.
+    ConstantValue: +20% Gold Multiplier on Mine Disitrcts.
     Variable: {fileID: 0}
     VariableValuePreview: 
   upgradeRank: 0

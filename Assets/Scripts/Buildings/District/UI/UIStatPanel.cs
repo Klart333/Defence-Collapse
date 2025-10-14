@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Effects;
@@ -21,7 +22,8 @@ namespace Buildings.District.UI
         [SerializeField]
         private StatColorUtility statColorUtility;
         
-        public StatType StatType { get; private set; }
+        private Type statType;
+        
         public Stat Stat { get; private set; }
 
         protected override void OnDisable()
@@ -35,21 +37,21 @@ namespace Buildings.District.UI
             }
         }
 
-        public void DisplayStat(Stat stat, StatType type)
+        public void DisplayStat(Stat stat)
         {
             Stat = stat;
-            StatType = type; 
+            statType = stat.GetType();
             
-            statNameText.text = statNameUtility.GetStatName(StatType);
-            statNameText.color = statColorUtility.GetColor(StatType);
-            statValueText.text = statNameUtility.GetDescription(StatType, Stat.Value);
+            statNameText.text = statNameUtility.GetStatName(statType);
+            statNameText.color = statColorUtility.GetColor(statType);
+            statValueText.text = statNameUtility.GetDescription(statType, Stat.Value);
             
             Stat.OnValueChanged += OnStatChanged;
         }
 
         private void OnStatChanged()
         {
-            statValueText.text = statNameUtility.GetDescription(StatType, Stat.Value);
+            statValueText.text = statNameUtility.GetDescription(statType, Stat.Value);
         }
     }
 }

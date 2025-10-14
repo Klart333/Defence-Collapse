@@ -23,24 +23,57 @@ MonoBehaviour:
     SerializationNodes:
     - Name: statNames
       Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[StatType, Core],[System.String,
-        mscorlib]], mscorlib
+      Data: 0|System.Collections.Generic.Dictionary`2[[Effects.StatTypeType, Core],[Variables.StringReference,
+        Core]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[StatType, Core]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
+      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[Effects.StatTypeType,
+        Core]], mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatTypeType, Core
+    - Name: statType
+      Entry: 7
+      Data: 2|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.AttackDamageStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 3|Variables.StringReference, Core
+    - Name: Mode
+      Entry: 3
       Data: 0
+    - Name: ConstantValue
+      Entry: 1
+      Data: Attack Damage
+    - Name: Variable
+      Entry: 6
+      Data: 
+    - Name: VariableValuePreview
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -49,176 +82,50 @@ MonoBehaviour:
       Data: 
     - Name: descriptions
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[StatType, Core],[Effects.StatNameUtility+StatDescription,
+      Data: 4|System.Collections.Generic.Dictionary`2[[Effects.StatTypeType, Core],[Effects.StatNameUtility+StatDescription,
         Core]], mscorlib
     - Name: comparer
       Entry: 9
       Data: 1
     - Name: 
       Entry: 12
-      Data: 8
+      Data: 1
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
+      Entry: 7
+      Data: Effects.StatTypeType, Core
+    - Name: statType
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: Effects.StatNameUtility+StatDescription, Core
+    - Name: Description
+      Entry: 7
+      Data: 5|Variables.StringReference, Core
+    - Name: Mode
       Entry: 3
       Data: 0
-    - Name: $v
-      Entry: 7
-      Data: Effects.StatNameUtility+StatDescription, Core
-    - Name: Description
+    - Name: ConstantValue
       Entry: 1
-      Data: +{0} Health Damage
+      Data: Big Damage
+    - Name: Variable
+      Entry: 6
+      Data: 
+    - Name: VariableValuePreview
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: IsPercentage
       Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 7
-      Data: Effects.StatNameUtility+StatDescription, Core
-    - Name: Description
-      Entry: 1
-      Data: +{0} Armor Damage
-    - Name: IsPercentage
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 7
-      Data: Effects.StatNameUtility+StatDescription, Core
-    - Name: Description
-      Entry: 1
-      Data: +{0} Shield Damage
-    - Name: IsPercentage
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 7
-      Data: Effects.StatNameUtility+StatDescription, Core
-    - Name: Description
-      Entry: 1
-      Data: +{0} Attack Speed
-    - Name: IsPercentage
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
-      Entry: 7
-      Data: Effects.StatNameUtility+StatDescription, Core
-    - Name: Description
-      Entry: 1
-      Data: +{0} Range
-    - Name: IsPercentage
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 5
-    - Name: $v
-      Entry: 7
-      Data: Effects.StatNameUtility+StatDescription, Core
-    - Name: Description
-      Entry: 1
-      Data: +{0} Movement Speed
-    - Name: IsPercentage
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 6
-    - Name: $v
-      Entry: 7
-      Data: Effects.StatNameUtility+StatDescription, Core
-    - Name: Description
-      Entry: 1
-      Data: +{0} Crit Chance
-    - Name: IsPercentage
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 7
-    - Name: $v
-      Entry: 7
-      Data: Effects.StatNameUtility+StatDescription, Core
-    - Name: Description
-      Entry: 1
-      Data: +{0} Crit Damage
-    - Name: IsPercentage
-      Entry: 5
-      Data: true
+      Data: false
     - Name: 
       Entry: 8
       Data: 

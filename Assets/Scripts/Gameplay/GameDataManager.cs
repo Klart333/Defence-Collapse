@@ -48,8 +48,8 @@ namespace Gameplay
         [SerializeField]
         private PoisonTickDataComponent defaultPoisonTickData;
         
-        private Dictionary<Tuple<CategoryType, HealthType>, MultiplyDamageComponent> multiplyDamageComponents = new Dictionary<Tuple<CategoryType, HealthType>, MultiplyDamageComponent>(); 
-        private Dictionary<Tuple<CategoryType, HealthType>, Entity> multiplyDamageEntities = new Dictionary<Tuple<CategoryType, HealthType>, Entity>();
+        private Dictionary<CategoryType, MultiplyDamageComponent> multiplyDamageComponents = new Dictionary<CategoryType, MultiplyDamageComponent>(); 
+        private Dictionary<CategoryType, Entity> multiplyDamageEntities = new Dictionary<CategoryType, Entity>();
             
         private EntityManager entityManager;
         private Entity fireDataEntity;
@@ -157,7 +157,7 @@ namespace Gameplay
 
         private void AddMultiplyDamageComponent(MultiplyDamageComponent damageComponent)
         {
-            Tuple<CategoryType, HealthType> key = Tuple.Create(damageComponent.AppliedCategory, damageComponent.AppliedHealthType);
+            CategoryType key = damageComponent.AppliedCategory;
             if (multiplyDamageComponents.TryGetValue(key, out MultiplyDamageComponent multiplyDamageComponent))
             {
                 multiplyDamageComponent.DamageMultiplier *= damageComponent.DamageMultiplier;
@@ -171,5 +171,12 @@ namespace Gameplay
                 multiplyDamageEntities.Add(key, entity);
             }
         }
+    }
+
+    public static class GameDetailsData // Todo: Better name plz
+    {
+        public const float LightningArmorPenetration = 0.5f;
+        public const float FireArmorPenetration = 0.5f;
+        public const float PoisonArmorPenetration = 1.0f;
     }
 }

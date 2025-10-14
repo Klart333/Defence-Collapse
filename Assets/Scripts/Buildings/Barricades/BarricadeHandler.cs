@@ -5,6 +5,7 @@ using Gameplay.Event;
 using UnityEngine;
 using Gameplay;
 using System;
+using Effects;
 using Unity.Mathematics;
 
 namespace Buildings.Barricades
@@ -65,9 +66,9 @@ namespace Buildings.Barricades
 
         private BarricadeState CreateData(ChunkIndexEdge edge)
         {
-            Stats stats = new Stats(barricadeData.Stats);
-            stats.MaxHealth.BaseValue *= GameData.BarricadeHealthMultiplier.Value;
-            stats.Healing.BaseValue += GameData.BarricadeHealing.Value;
+            Stats stats = new Stats(barricadeData.StatGroups);
+            stats.Get<MaxHealthStat>().BaseValue *= GameData.BarricadeHealthMultiplier.Value;
+            stats.Get<HealingStat>().BaseValue += GameData.BarricadeHealing.Value;
             BarricadeState data = new BarricadeState(this, stats, edge)
             {
                 Position = ChunkWaveUtility.GetPosition(edge),

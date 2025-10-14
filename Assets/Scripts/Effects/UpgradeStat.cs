@@ -49,7 +49,7 @@ namespace Effects
 
         [ShowIf(nameof(useStatType))]
         [SerializeField]
-        private StatType statType;
+        private StatTypeType statTypeType;
         
         [Title("Upgrade Settings")]
         [SerializeField]
@@ -57,7 +57,7 @@ namespace Effects
 
         public IUpgradeStat GetUpgradeStat(DistrictState districtState)
         {
-            Stat stat = useStatType ? districtState.Stats.Get(statType) : new Stat(0);
+            Stat stat = useStatType ? districtState.Stats.StatDictionary[statTypeType.StatType] : new Stat(0);
             
             string[] descriptionsValues = new string[descriptions.Length];
             for (int i = 0; i < descriptions.Length; i++)
@@ -168,7 +168,7 @@ namespace Effects
 
         [ShowIf(nameof(useStatType))]
         [SerializeField]
-        private StatType statType;
+        private StatTypeType statTypeType;
         
         [Title("Upgrade Settings")]
         [SerializeField]
@@ -176,7 +176,7 @@ namespace Effects
 
         public IUpgradeStat GetUpgradeStat(DistrictState districtState)
         {
-            Stat stat = useStatType ? districtState.Stats.Get(statType) : new Stat(0);
+            Stat stat = useStatType ? districtState.Stats.StatDictionary[statTypeType.StatType] : new Stat(0);
             
             string[] descriptionsValues = new string[descriptions.Length];
             for (int i = 0; i < descriptions.Length; i++)

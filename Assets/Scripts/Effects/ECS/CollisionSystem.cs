@@ -149,9 +149,8 @@ namespace Effects.ECS
             float critMultiplier = isCrit ? critComponent.CritDamage : 1;
             ECB.AppendToBuffer(sortKey, entity, new DamageBuffer
             {
-                HealthDamage = damageComponent.HealthDamage * critMultiplier,
-                ShieldDamage = damageComponent.ShieldDamage * critMultiplier,
-                ArmorDamage = damageComponent.ArmorDamage * critMultiplier,
+                Damage = damageComponent.Damage * critMultiplier,
+                ArmorPenetration = damageComponent.ArmorPenetration,
                 
                 TriggerDamageDone = damageComponent.TriggerDamageDone,
                 Key = damageComponent.Key,

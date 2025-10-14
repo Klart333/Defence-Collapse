@@ -8,8 +8,6 @@ using Gameplay;
 using System;
 using System.Collections.Generic;
 using Exp.Gemstones;
-using Gameplay.Upgrades;
-using Object = UnityEngine.Object;
 
 namespace Effects
 {
@@ -22,15 +20,10 @@ namespace Effects
         [OdinSerialize]
         public float ModifierValue { get; set; } = 1;
 
-        [Title("Settings")]
-        [SerializeField]
-        private bool multiplyWithAttackSpeed;
-        
         public void Perform(IAttacker unit)
         {
             Vector3 pos = unit.OriginPosition;
-            float amount = ModifierValue * unit.Stats.Productivity.Value;
-            if (multiplyWithAttackSpeed) amount *= unit.Stats.AttackSpeed.Value;
+            float amount = ModifierValue * unit.Stats.Get<GoldMultiplierStat>().Value;
             
             float amountGained = MoneyManager.Instance.AddMoneyParticles(amount, pos);
 
@@ -82,12 +75,12 @@ namespace Effects
             buffEmitters ??= new Dictionary<IAttacker, List<BuffEmitter>>();
             
             Vector3 pos = unit.OriginPosition;
-            float range = unit.Stats.Range.Value;
+            float range = unit.Stats.Get<RangeStat>().Value;
             Buff[] copiedBuffs = new Buff[buffs.Length];
             for (int i = 0; i < copiedBuffs.Length; i++)
             {
                 copiedBuffs[i] = new Buff(buffs[i]);
-                copiedBuffs[i].Modifier.Value *= ModifierValue * unit.Stats.Productivity.Value;
+                copiedBuffs[i].Modifier.Value *= ModifierValue * unit.Stats.Get<BuffPowerStat>().Value;
             }
 
             BuffEmitter buffEmitter = new BuffEmitter

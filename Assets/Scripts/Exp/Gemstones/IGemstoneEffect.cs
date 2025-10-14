@@ -188,7 +188,6 @@ namespace Exp.Gemstones
             GameDataManager.Instance.IncreaseGameData(new MultiplyDamageComponent
             {
                 AppliedCategory = CategoryType.Projectile,
-                AppliedHealthType = HealthType.Health | HealthType.Armor | HealthType.Shield,
                 DamageMultiplier = ModifierValue,
             });
         }
@@ -220,7 +219,6 @@ namespace Exp.Gemstones
             GameDataManager.Instance.IncreaseGameData(new MultiplyDamageComponent
             {
                 AppliedCategory = CategoryType.AoE,
-                AppliedHealthType = HealthType.Health | HealthType.Armor | HealthType.Shield,
                 DamageMultiplier = ModifierValue,
             });
         }

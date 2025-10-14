@@ -12,30 +12,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92ab17839d12aef4e8e49d59ae2b3266, type: 3}
   m_Name: Wall Data
   m_EditorClassIdentifier: 
-  Stats:
-    HealthDamage:
-      baseValue: 1
-    ArmorDamage:
-      baseValue: 1
-    ShieldDamage:
-      baseValue: 1
-    AttackSpeed:
-      baseValue: 0
-    Range:
-      baseValue: 1
-    MovementSpeed:
-      baseValue: 0
-    CritChance:
-      baseValue: 0
-    CritMultiplier:
-      baseValue: 0
-    MaxHealth:
-      baseValue: 80
-    MaxArmor:
-      baseValue: 0
-    MaxShield:
-      baseValue: 0
-    Healing:
-      baseValue: 1
-    Productivity:
-      baseValue: 0
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: StatGroups
+      Entry: 7
+      Data: 0|Effects.IStatGroup[], Core
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 1|Effects.WallStats, Core
+    - Name: MaxHealthStat
+      Entry: 7
+      Data: 2|Effects.MaxHealthStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: HealingStat
+      Entry: 7
+      Data: 3|Effects.HealingStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 

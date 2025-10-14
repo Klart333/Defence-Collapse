@@ -15,7 +15,7 @@ namespace Health
         public float MaxHealth;
         
         public bool Alive => CurrentHealth > 0;
-        public float HealthPercentage => CurrentHealth / Stats.MaxHealth.Value;
+        public float HealthPercentage => CurrentHealth / Stats.Get<MaxHealthStat>().Value;
 
         public List<StatusEffect> StatusEffects { get; set; } = new List<StatusEffect>();
         public DamageInstance LastDamageTaken { get; private set; }
@@ -25,7 +25,7 @@ namespace Health
         {
             Stats = stats;
 
-            Stats.MaxHealth.OnValueChanged += UpdateMaxHealth;
+            Stats.Get<MaxHealthStat>().OnValueChanged += UpdateMaxHealth;
             UpdateMaxHealth();
         }
 
@@ -35,7 +35,7 @@ namespace Health
 
             for (int i = 0; i < turnIncrease; i++)
             {
-                float heal = Stats.Healing.Value;
+                float heal = Stats.Get<HealingStat>().Value;
                 CurrentHealth = Mathf.Min(CurrentHealth + heal, MaxHealth);
             }
             
@@ -44,7 +44,7 @@ namespace Health
 
         private void UpdateMaxHealth()
         {
-            SetMaxHealth(Stats.MaxHealth.Value);
+            SetMaxHealth(Stats.Get<MaxHealthStat>().Value);
         }
 
         private void SetMaxHealth(float maxHealth)

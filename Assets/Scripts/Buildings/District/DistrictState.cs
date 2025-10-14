@@ -75,7 +75,8 @@ namespace Buildings.District
         
         protected virtual void CreateStats()
         {
-            stats = new Stats(districtData.Stats);
+            stats = new Stats(districtData.StatGroups);
+            
             foreach (IUpgradeStatEditor upgradeStatEditor in districtData.UpgradeStats)
             {
                 IUpgradeStat upgradeStat = upgradeStatEditor.GetUpgradeStat(this);
@@ -87,8 +88,8 @@ namespace Buildings.District
         
         protected void SubscribeToStats()
         {
-            stats.Range.OnValueChanged += RangeChanged;
-            stats.AttackSpeed.OnValueChanged += AttackSpeedChanged;
+            stats.Get<RangeStat>().OnValueChanged += RangeChanged;
+            stats.Get<AttackSpeedStat>().OnValueChanged += AttackSpeedChanged;
         }
 
         private void OnFinishedGenerating()
@@ -235,7 +236,7 @@ namespace Buildings.District
             }
 #endif
             int count = targetIndexes.Count;
-            float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
+            float attackSpeedValue = 1.0f / stats.Get<AttackSpeedStat>().Value;
             
             NativeArray<Entity> entities = entityManager.Instantiate(targetingEntityPrefab, count, Allocator.Temp);
             
@@ -260,7 +261,7 @@ namespace Buildings.District
             void SetupShooterEntity(Entity spawnedEntity, int i, Vector3 pos)
             {
                 entityManager.SetComponentData(spawnedEntity, new AttackSpeedComponent { AttackSpeed = attackSpeedValue, AttackTimer = attackSpeedValue});
-                entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = stats.Range.Value });
+                entityManager.SetComponentData(spawnedEntity, new RangeComponent { Range = stats.Get<RangeStat>().Value });
                 entityManager.SetComponentData(spawnedEntity, new DistrictDataComponent { DistrictID = Key, });
                 entityManager.SetComponentData(spawnedEntity, new LocalTransform { Position = pos });
                 entityManager.SetComponentData(spawnedEntity, new RandomComponent{Random = Random.CreateFromIndex((uint)(GameManager.Instance.Seed + i))});
@@ -335,7 +336,7 @@ namespace Buildings.District
 
         protected virtual void AttackSpeedChanged()
         {
-            float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
+            float attackSpeedValue = 1.0f / stats.Get<AttackSpeedStat>().Value;
             foreach (Entity entity in spawnedDataEntities)
             {
                 entityManager.SetComponentData(entity, new AttackSpeedComponent
@@ -349,7 +350,7 @@ namespace Buildings.District
         {
             foreach (Entity entity in spawnedDataEntities)
             {
-                entityManager.SetComponentData(entity, new RangeComponent { Range = stats.Range.Value });
+                entityManager.SetComponentData(entity, new RangeComponent { Range = stats.Get<RangeStat>().Value });
             }
         }
         
@@ -474,7 +475,8 @@ namespace Buildings.District
             
             if (selected && rangeIndicator && rangeIndicator.activeSelf)
             {
-                rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+                float range = stats.Get<RangeStat>().Value;
+                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             }
         }
 
@@ -490,7 +492,10 @@ namespace Buildings.District
             selected = true;
             rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
             rangeIndicator.transform.position = pos;
-            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            
+            float range = stats.Get<RangeStat>().Value;
+            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
+            
             rangeIndicator.gameObject.SetActive(true);
         }
 
@@ -532,7 +537,8 @@ namespace Buildings.District
             
             if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
             {
-                rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+                float range = stats.Get<RangeStat>().Value;
+                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             }
         }
         
@@ -548,7 +554,10 @@ namespace Buildings.District
             selected = true;
             rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
             rangeIndicator.transform.position = pos;
-            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+
+            float range = stats.Get<RangeStat>().Value;
+            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
+            
             rangeIndicator.gameObject.SetActive(true);
         }
 
@@ -589,7 +598,8 @@ namespace Buildings.District
             
             if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
             {
-                rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+                float range = stats.Get<RangeStat>().Value;
+                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             }
         }
 
@@ -600,7 +610,8 @@ namespace Buildings.District
             selected = true;
             rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
             rangeIndicator.transform.position = pos;
-            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            float range = stats.Get<RangeStat>().Value;
+            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             rangeIndicator.gameObject.SetActive(true);
         }
 
@@ -658,7 +669,8 @@ namespace Buildings.District
 
             if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
             {
-                rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+                float range = stats.Get<RangeStat>().Value;
+                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             }
         }
         
@@ -669,7 +681,8 @@ namespace Buildings.District
             selected = true;
             rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
             rangeIndicator.transform.position = pos;
-            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            float range = stats.Get<RangeStat>().Value;
+            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             rangeIndicator.gameObject.SetActive(true);
         }
 
@@ -726,7 +739,8 @@ namespace Buildings.District
 
             if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
             {
-                rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+                float range = stats.Get<RangeStat>().Value;
+                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             }
         }
         
@@ -737,7 +751,8 @@ namespace Buildings.District
             selected = true;
             rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
             rangeIndicator.transform.position = pos;
-            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            float range = stats.Get<RangeStat>().Value;
+            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             rangeIndicator.gameObject.SetActive(true);
         }
  
@@ -783,7 +798,8 @@ namespace Buildings.District
 
             if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
             {
-                rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+                float range = stats.Get<RangeStat>().Value;
+                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             }
         }
         
@@ -794,7 +810,8 @@ namespace Buildings.District
             selected = true;
             rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
             rangeIndicator.transform.position = pos;
-            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            float range = stats.Get<RangeStat>().Value;
+            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             rangeIndicator.gameObject.SetActive(true);
         }
 
@@ -828,7 +845,7 @@ namespace Buildings.District
             CreateStats(); 
             Attack = new Attack(churchData.BaseAttack);
             
-            Stats.Productivity.OnValueChanged += OnStatsChanged;
+            Stats.Get<BuffPowerStat>().OnValueChanged += OnStatsChanged;
         }
         
         private void OnStatsChanged()
@@ -844,7 +861,8 @@ namespace Buildings.District
             
             if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
             {
-                rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+                float range = stats.Get<RangeStat>().Value;
+                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             }
         }
 
@@ -898,7 +916,8 @@ namespace Buildings.District
             selected = true;
             rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
             rangeIndicator.transform.position = pos;
-            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            float range = stats.Get<RangeStat>().Value;
+            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             rangeIndicator.gameObject.SetActive(true);
         }
 
@@ -970,7 +989,8 @@ namespace Buildings.District
             base.RangeChanged();
             if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
             {
-                rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+                float range = stats.Get<RangeStat>().Value;
+                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             }
         }
         
@@ -981,7 +1001,8 @@ namespace Buildings.District
             selected = true;
             rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
             rangeIndicator.transform.position = pos;
-            rangeIndicator.transform.localScale = new Vector3(stats.Range.Value * 2.0f, 0.01f, stats.Range.Value * 2.0f);
+            float range = stats.Get<RangeStat>().Value;
+            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
             rangeIndicator.gameObject.SetActive(true);
         }
         public override void OnDeselected()

@@ -67,9 +67,8 @@ namespace Effects.ECS
 
             ECB.AppendToBuffer(sortKey, entity, new DamageBuffer
             {
-                HealthDamage = damage,
-                ArmorDamage = damage,
-                ShieldDamage = damage,
+                Damage = damage,
+                ArmorPenetration = 0.5f,
             });
             
             ECB.AddComponent<PendingDamageTag>(sortKey, entity);

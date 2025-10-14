@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Effects;
 using Enemy.ECS;
 using Gameplay;
 using Gameplay.Event;
@@ -116,9 +117,9 @@ namespace Buildings
 
         private WallState CreateData(ChunkIndex chunkIndex)
         {
-            Stats stats = new Stats(wallData.Stats);
-            stats.MaxHealth.BaseValue *= GameData.WallHealthMultiplier.Value;
-            stats.Healing.BaseValue += GameData.WallHealing.Value;
+            Stats stats = new Stats(wallData.StatGroups);
+            stats.Get<MaxHealthStat>().BaseValue *= GameData.WallHealthMultiplier.Value;
+            stats.Get<HealingStat>().BaseValue += GameData.WallHealing.Value;
             WallState data = new WallState(this, stats, chunkIndex)
             {
                 Position = buildingManager.GetPos(chunkIndex)

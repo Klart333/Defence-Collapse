@@ -17,18 +17,10 @@ namespace Health
         public float Value;
     }
     
-    
-    [MaterialProperty("_Shield")]
-    public struct ShieldPropertyComponent : IComponentData
-    {
-        public float Value;
-    }
-    
     [Flags]
     public enum HealthType : byte
     {
         Health = 1 << 0,
         Armor = 1 << 1,
-        Shield = 1 << 2
     }
 }

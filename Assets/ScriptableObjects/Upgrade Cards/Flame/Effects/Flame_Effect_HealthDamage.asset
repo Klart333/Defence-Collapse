@@ -32,13 +32,28 @@ MonoBehaviour:
       Data: 1|Effects.IncreaseStatEffect, Core
     - Name: ModifierValue
       Entry: 4
-      Data: 3
+      Data: 1.2
     - Name: ModifierType
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: StatType
       Entry: 3
       Data: 0
+    - Name: StatTypeType
+      Entry: 7
+      Data: Effects.StatTypeType, Core
+    - Name: statType
+      Entry: 7
+      Data: 2|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.AttackDamageStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CanIncrease
       Entry: 5
       Data: true
@@ -51,14 +66,12 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  icon: {fileID: 21300000, guid: c4396d10cbb0c2b48abd871ce597c62d, type: 3}
   iconReference:
     Mode: 1
     ConstantValue: {fileID: 0}
     Variable: {fileID: 11400000, guid: 58ea1146a11584f4a9a723ce4cfaae05, type: 2}
     VariableValuePreview: {fileID: 21300000, guid: fe1ed4a815104294f8efe94d0e694862,
       type: 3}
-  description: +3 Health Damage Multiplier on Flame Districts.
   descriptionReference:
     Mode: 1
     ConstantValue: 

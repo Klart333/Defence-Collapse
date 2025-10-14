@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Effects;
+using System;
 
 namespace Utility
 {
@@ -9,9 +11,9 @@ namespace Utility
     {
         [Title("Color Map")]
         [SerializeField]
-        private Dictionary<StatType, Color> colorMap = new Dictionary<StatType, Color>();
+        private Dictionary<StatTypeType, Color> colorMap = new Dictionary<StatTypeType, Color>();
 
-        public Color GetColor(StatType statType)
+        public Color GetColor(Type statType)
         {
             if (colorMap.TryGetValue(statType, out Color color))
             {

@@ -1,3 +1,4 @@
+using Effects;
 using HealthComponent = Effects.ECS.HealthComponent;
 using Random = Unity.Mathematics.Random;
 
@@ -39,10 +40,10 @@ namespace Enemy
                     return;
                 }
                 
-                Stats stats = new Stats(authoring.enemyData.Stats);
+                Stats stats = new Stats(authoring.enemyData.StatGroups);
                 Entity enemyEntity = GetEntity(TransformUsageFlags.Dynamic);
 
-                float attackSpeedValue = 1.0f / stats.AttackSpeed.Value;
+                float attackSpeedValue = 1.0f / stats.Get<AttackSpeedStat>().Value;
                 
                 AddBuffer<DamageBuffer>(enemyEntity);
                 AddBuffer<DamageTakenBuffer>(enemyEntity);
@@ -55,24 +56,23 @@ namespace Enemy
                 AddComponent(enemyEntity, new AttackSpeedComponent { AttackTimer = attackSpeedValue + 1, AttackSpeed = attackSpeedValue });
                 AddComponent(enemyEntity, new HealthScalingComponent { Multiplier = authoring.EnemyData.HealthScalingMultiplier });
                 AddComponent(enemyEntity, new MoneyOnDeathComponent { Amount = authoring.enemyData.MoneyOnDeath});
-                AddComponent(enemyEntity, new MovementSpeedComponent { Speed = 1.0f / stats.MovementSpeed.Value });
-                AddComponent(enemyEntity, new SimpleDamageComponent { Damage = stats.HealthDamage.Value, });
+                AddComponent(enemyEntity, new MovementSpeedComponent { Speed = 1.0f / stats.Get<MovementSpeedStat>().Value });
+                AddComponent(enemyEntity, new SimpleDamageComponent { Damage = stats.Get<AttackDamageStat>().Value, });
                 AddComponent(enemyEntity, new FresnelComponent { Value = 5f });
                 AddComponent(enemyEntity, new SpeedComponent { Speed = 1 });
+                AddComponent(enemyEntity, new ArmorComponent { Armor = stats.Get<ArmorStat>().Value });
 
                 AddComponent(enemyEntity, new HealthComponent
                 {
                     Bar = GetEntity(authoring.healthbar, TransformUsageFlags.Dynamic),
-                    Health = stats.MaxHealth.Value,
-                    Armor = stats.MaxArmor.Value,
-                    Shield = stats.MaxShield.Value,
+                    Health = stats.Get<MaxHealthStat>().Value,
+                    Armor = stats.Get<MaxArmorStat>().Value,
                 });
                 
                 AddComponent(enemyEntity, new MaxHealthComponent
                 {
-                    Health = stats.MaxHealth.Value,
-                    Armor = stats.MaxArmor.Value,
-                    Shield = stats.MaxShield.Value,
+                    Health = stats.Get<MaxHealthStat>().Value,
+                    Armor = stats.Get<MaxArmorStat>().Value,
                 });
                 
                 if (authoring.enemyData.ExplodeOnDeath)

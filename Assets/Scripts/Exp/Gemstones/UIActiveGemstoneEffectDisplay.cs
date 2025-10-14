@@ -42,7 +42,7 @@ namespace Exp.Gemstones
         private void UpdateText()
         {
             StringBuilder stringBuilder = new StringBuilder();
-            Dictionary<StatType, float> stats = new Dictionary<StatType, float>();
+            Dictionary<Type, float> stats = new Dictionary<Type, float>();
             Dictionary<Type, float> uniqueEffects = new Dictionary<Type, float>();
             foreach (Gemstone gemstone in expManager.ActiveGemstones)
             {
@@ -52,9 +52,9 @@ namespace Exp.Gemstones
                     {
                         case StatIncreaseEffect { Effect: IncreaseStatEffect stat }:
                         {
-                            if (stats.TryGetValue(stat.StatType, out float value))
+                            if (stats.TryGetValue(stat.StatTypeType.StatType, out float value))
                             {
-                                stats[stat.StatType] = effect.CumulativeType switch
+                                stats[stat.StatTypeType.StatType] = effect.CumulativeType switch
                                 {
                                     Modifier.ModifierType.Additive => value + effect.ModifierValue,
                                     Modifier.ModifierType.Multiplicative => value * effect.ModifierValue,
@@ -63,7 +63,7 @@ namespace Exp.Gemstones
                             }
                             else
                             {
-                                stats.Add(stat.StatType, effect.ModifierValue);
+                                stats.Add(stat.StatTypeType.StatType, effect.ModifierValue);
                             }
                         
                             continue;
@@ -88,7 +88,7 @@ namespace Exp.Gemstones
                 
             }
 
-            foreach (KeyValuePair<StatType, float> stat in stats)
+            foreach (KeyValuePair<Type, float> stat in stats)
             {
                 stringBuilder.AppendLine(statNameUtility.GetDescription(stat.Key, stat.Value));
             }

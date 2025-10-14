@@ -63,9 +63,9 @@ namespace Effects
 
         [TitleGroup("Modifier")]
         public Modifier.ModifierType ModifierType;
-
+        
         [TitleGroup("Modifier")]
-        public StatType StatType;
+        public StatTypeType StatTypeType;
 
         [TitleGroup("Options")]
         public bool CanIncrease = true;
@@ -85,7 +85,7 @@ namespace Effects
                 };
                 
                 ModifierDictionary.Add(unit, modifier);
-                unit.Stats.ModifyStat(StatType, modifier);
+                unit.Stats.ModifyStat(StatTypeType.StatType, modifier);
             }
             else if (CanIncrease)
             {
@@ -93,7 +93,7 @@ namespace Effects
                     ? Mathf.Max(ModifierValue - 1.0f, 0) 
                     : ModifierValue;
                 
-                unit.Stats.Get(StatType).SetDirty(false);
+                unit.Stats.Get(StatTypeType.StatType).SetDirty(false);
             }
         }
 
@@ -104,7 +104,7 @@ namespace Effects
                 return;
             }
 
-            unit.Stats.RevertModifiedStat(StatType, value);
+            unit.Stats.RevertModifiedStat(StatTypeType.StatType, value);
 
             ModifierDictionary.Remove(unit);
         }
@@ -124,7 +124,8 @@ namespace Effects
         [Title("Stat")]
         public Modifier.ModifierType ModifierType;
 
-        public StatType StatType;
+        [SerializeField]
+        private StatTypeType statTypeType;
 
         public float Time = 3;
 
@@ -151,7 +152,7 @@ namespace Effects
                     Value = ModifierValue
                 });
 
-                unit.Stats.ModifyStat(StatType, ModifierDictionary[unit]);
+                unit.Stats.ModifyStat(statTypeType.StatType, ModifierDictionary[unit]);
             }
             float originalValue = ModifierDictionary[unit].Value;
 
@@ -172,7 +173,7 @@ namespace Effects
                 return;
             }
 
-            unit.Stats.RevertModifiedStat(StatType, value);
+            unit.Stats.RevertModifiedStat(statTypeType.StatType, value);
 
             ModifierDictionary.Remove(unit);
         }
@@ -193,7 +194,9 @@ namespace Effects
         public Modifier.ModifierType ModifierType;
 
         [TitleGroup("Modifier")]
-        public StatType StatType;
+        [SerializeField]
+        private StatTypeType statTypeType;
+        
 
         [TitleGroup("Modifier")]
         public float ChanceToTrigger = 0.2f;
@@ -206,7 +209,7 @@ namespace Effects
 
             if (unitsAttacking.Contains(unit)) return;
 
-            unit.Stats.ModifyStat(StatType, new Modifier
+            unit.Stats.ModifyStat(statTypeType.StatType, new Modifier
             {
                 Type = ModifierType,
                 Value = ModifierValue
@@ -235,7 +238,7 @@ namespace Effects
                 return;
             }
 
-            unit.Stats.RevertModifiedStat(StatType, new Modifier
+            unit.Stats.RevertModifiedStat(statTypeType.StatType, new Modifier
             {
                 Type = ModifierType,
                 Value = ModifierValue
@@ -298,9 +301,8 @@ namespace Effects
             
             DamageComponent dmgComponent = new DamageComponent
             {
-                HealthDamage = ModifierValue * unit.Stats.HealthDamage.Value,
-                ArmorDamage = ModifierValue * unit.Stats.ArmorDamage.Value,
-                ShieldDamage = ModifierValue * unit.Stats.ShieldDamage.Value,
+                Damage = ModifierValue * unit.Stats.Get<AttackDamageStat>().Value,
+                ArmorPenetration = ModifierValue * unit.Stats.Get<ArmorPenetrationStat>().Value,
                 
                 Key = unit.Key,
                 TriggerDamageDone = TriggerDamageDone,
@@ -316,8 +318,8 @@ namespace Effects
             
             CritComponent critComponent = new CritComponent
             {
-                CritChance = unit.Stats.CritChance.Value,
-                CritDamage = unit.Stats.CritMultiplier.Value,
+                CritChance = unit.Stats.Get<CritChanceStat>().Value,
+                CritDamage = unit.Stats.Get<CritDamageStat>().Value,
             };
             
             Entity colliderEntity = CreateEntity();
@@ -444,8 +446,8 @@ namespace Effects
                 });
                 entityManager.SetComponentData(spawned, new CritComponent
                 {
-                    CritChance = unit.Stats.CritChance.Value,
-                    CritDamage = unit.Stats.CritMultiplier.Value,
+                    CritChance = unit.Stats.Get<CritChanceStat>().Value,
+                    CritDamage = unit.Stats.Get<CritDamageStat>().Value,
                 });
                 
                 float3 direction = math.normalize(targetPosition - pos);
@@ -463,9 +465,8 @@ namespace Effects
                 
                 entityManager.SetComponentData(spawned, new DamageComponent
                 {
-                    HealthDamage = ModifierValue * unit.Stats.HealthDamage.Value,
-                    ArmorDamage = ModifierValue * unit.Stats.ArmorDamage.Value,
-                    ShieldDamage = ModifierValue * unit.Stats.ShieldDamage.Value,
+                    Damage = ModifierValue * unit.Stats.Get<AttackDamageStat>().Value,
+                    ArmorPenetration = ModifierValue * unit.Stats.Get<ArmorPenetrationStat>().Value,
                     
                     Key = unit.Key,
                     TriggerDamageDone = TriggerDamageDone,
@@ -497,82 +498,6 @@ namespace Effects
     }
 
     #endregion
-
-    /*
-    #region Spawn Dudes
-
-    [Serializable]
-    public class SpawnLittleDudeEffect : IEffect
-    {
-        [Title("Amount")]
-        [OdinSerialize]
-        public float ModifierValue { get; set; } = 1;
-
-        [Title("Callbacks")]
-        public bool TriggerDamageDone = true;
-        
-        public void Perform(IAttacker unit)
-        {
-            Vector3 pos = unit.OriginPosition;
-            
-            Entity dudeEntity = CreateEntity();
-            
-            Entity CreateEntity()
-            {
-                EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-                ComponentType[] componentTypes = {
-                    typeof(LittleDudeSpawnerDataComponent),
-                    typeof(AddComponentInitComponent),
-                    typeof(ReloadHitsComponent),
-                    typeof(DamageComponent),
-                    typeof(CritComponent)
-                };
-
-                Entity spawned = entityManager.CreateEntity(componentTypes);
-                
-                entityManager.SetComponentData(spawned, new DamageComponent
-                {
-                    HealthDamage = ModifierValue * unit.Stats.HealthDamage.Value,
-                    ArmorDamage = ModifierValue * unit.Stats.ArmorDamage.Value,
-                    ShieldDamage = ModifierValue * unit.Stats.ShieldDamage.Value,
-                    
-                    Key = unit.Key,
-                    TriggerDamageDone = TriggerDamageDone,
-                    LimitedHits = 0,
-                    HasLimitedHits = true,
-                    IsOneShot = false,
-                });
-                
-                entityManager.SetComponentData(spawned, new CritComponent
-                {
-                    CritChance = unit.Stats.CritChance.Value,
-                    CritDamage = unit.Stats.CritMultiplier.Value,
-                });
-                
-                entityManager.SetComponentData(spawned, new ReloadHitsComponent
-                {
-                    MaxHitAmount = 1,
-                    ReloadInterval = 1.0f / unit.Stats.AttackSpeed.Value,
-                });
-                
-                entityManager.SetComponentData(spawned, new LittleDudeSpawnerDataComponent
-                {
-                    Position = pos.XyZ(0.1f),
-                    Amount = (int)ModifierValue
-                });
-                
-                entityManager.SetComponentData(spawned, new AddComponentInitComponent
-                {
-                    CategoryType = unit.CategoryType | CategoryType.Projectile,
-                });
-            
-                return spawned;
-            }
-        }
-    }
-
-    #endregion*/
     
     #region Stacking Effect
 
@@ -640,67 +565,6 @@ namespace Effects
 
     #endregion
 
-    #region Damage Over Time On Damage
-
-    [Serializable]
-    public class DamageOverTimeOnDamageEffect : IEffect, IDamageEffect
-    {
-        [TitleGroup("Percent Damage DOT'd")]
-        [OdinSerialize]
-        public float ModifierValue { get; set; }
-
-        [TitleGroup("Percent Damage DOT'd")]
-        public float TimePeriod = 0;
-
-        private const float tickRate = 0.2f;
-        private const int EffectKey = 150;
-        
-        public bool IsDamageEffect => true;
-
-        public async void Perform(IAttacker unit)
-        {
-            DamageInstance damageToDOT = unit.LastDamageDone;
-
-            if (damageToDOT == null || damageToDOT.SpecialEffectSet.Contains(EffectKey))
-            {
-                return;
-            }
-
-            int ticks = Mathf.FloorToInt(Mathf.Max(1, TimePeriod / tickRate));
-            float totalDamage = (damageToDOT.Damage) * ModifierValue;
-            float damage = totalDamage / ticks;
-            //Debug.Log(tickRate + ", Triggering DamageOverTime with " + damageToDOT.AbilityDamage + ", that is first multiplied with " + ModifierValue + " resulting in " + totalDamage + ", then that is divided by " + ticks + " finally resulting in " + damage); ;
-
-            DamageInstance dotInstance = new DamageInstance
-            {
-                Source = unit,
-                Damage = damage,
-                CritMultiplier = unit.Stats.GetCritMultiplier(),
-                SpecialEffectSet = damageToDOT.SpecialEffectSet,
-                AttackPosition = damageToDOT.AttackPosition,
-            };
-
-            dotInstance.SpecialEffectSet.Add(EffectKey);
-
-            for (int i = 0; i < ticks; i++)
-            {
-                await UniTask.Delay(TimeSpan.FromSeconds(tickRate));
-                //if (dotInstance.TargetHit == null)
-                //{
-                //    break;
-                //}
-                //
-                //dotInstance.AttackPosition = dotInstance.TargetHit.OriginPosition;
-                //dotInstance.TargetHit.TakeDamage(dotInstance, out DamageInstance damageDone);
-
-                //damageDone.SpecialEffectSet.Add(EffectKey);
-                //unit.OnUnitDoneDamage(damageDone);
-            }
-        }
-    }
-
-    #endregion
-
     #region Random Bonus
 
     [Serializable]
@@ -719,28 +583,29 @@ namespace Effects
         [TitleGroup("Options")]
         public bool CanIncrease = true;
 
-        private Dictionary<IAttacker, List<(StatType, Modifier)>> ModifierDictionary;
+        private Dictionary<IAttacker, List<(Type, Modifier)>> ModifierDictionary; // Todo: I really don't like these dicts, I don't trust them at all
 
         public void Perform(IAttacker unit)
         {
-            ModifierDictionary ??= new Dictionary<IAttacker, List<(StatType, Modifier)>>();
+            ModifierDictionary ??= new Dictionary<IAttacker, List<(Type, Modifier)>>();
 
-            if (!ModifierDictionary.TryGetValue(unit, out List<(StatType, Modifier)> value))
+            if (!ModifierDictionary.TryGetValue(unit, out List<(Type, Modifier)> value))
             {
-                ModifierDictionary.Add(unit, new List<(StatType, Modifier)>());
+                ModifierDictionary.Add(unit, new List<(Type, Modifier)>());
 
                 for (int i = 0; i < StatAmount; i++)
                 {
-                    int statTypeIndex = UnityEngine.Random.Range(0, Enum.GetValues(typeof(StatType)).Length);
+                    List<Type> types = StatUtility.GetStatTypes(typeof(AttackDistrictStats));
                     Modifier modifier = new Modifier
                     {
                         Type = ModifierType,
                         Value = ModifierValue
                     };
 
-                    unit.Stats.ModifyStat((StatType)statTypeIndex, modifier);
+                    Type statType = types[UnityEngine.Random.Range(0, types.Count)];
+                    unit.Stats.ModifyStat(statType, modifier);
 
-                    ModifierDictionary[unit].Add(((StatType)statTypeIndex, modifier));
+                    ModifierDictionary[unit].Add((statType, modifier));
                 }
 
             }

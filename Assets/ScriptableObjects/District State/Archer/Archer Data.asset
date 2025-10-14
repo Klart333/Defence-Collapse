@@ -148,18 +148,165 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: statGroups
+      Entry: 7
+      Data: 14|Effects.IStatGroup[], Core
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 15|Effects.AttackDistrictStats, Core
+    - Name: AttackDamageStat
+      Entry: 7
+      Data: 16|Effects.AttackDamageStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 7
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ArmorPenetrationStat
+      Entry: 7
+      Data: 17|Effects.ArmorPenetrationStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritChanceStat
+      Entry: 7
+      Data: 18|Effects.CritChanceStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0.01
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CritDamageStat
+      Entry: 7
+      Data: 19|Effects.CritDamageStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AttackSpeedStat
+      Entry: 7
+      Data: 20|Effects.AttackSpeedStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0.34
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: RangeStat
+      Entry: 7
+      Data: 21|Effects.RangeStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 22|Effects.EffectsDistrictStats, Core
+    - Name: FireStat
+      Entry: 7
+      Data: 23|Effects.FireStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: PoisonStat
+      Entry: 7
+      Data: 24|Effects.PoisonStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: BleedStat
+      Entry: 7
+      Data: 25|Effects.BleedStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SlowStat
+      Entry: 7
+      Data: 26|Effects.SlowStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 27|Effects.ProductionDistrictStats, Core
+    - Name: ProductionSpeedStat
+      Entry: 7
+      Data: 28|Effects.ProductionSpeedStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: GoldMultiplierStat
+      Entry: 7
+      Data: 29|Effects.GoldMultiplierStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: BuffPowerStat
+      Entry: 7
+      Data: 30|Effects.BuffPowerStat, Core
+    - Name: baseValue
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: upgradeStats
       Entry: 7
-      Data: 14|Effects.IUpgradeStatEditor[], Core
+      Data: 31|Effects.IUpgradeStatEditor[], Core
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 15|Effects.UpgradeStateEditor, Core
+      Data: 32|Effects.UpgradeStateEditor, Core
     - Name: statName
       Entry: 7
-      Data: 16|Variables.StringReference, Core
+      Data: 33|Variables.StringReference, Core
     - Name: Mode
       Entry: 3
       Data: 0
@@ -177,13 +324,13 @@ MonoBehaviour:
       Data: 
     - Name: descriptions
       Entry: 7
-      Data: 17|Variables.StringReference[], Core
+      Data: 34|Variables.StringReference[], Core
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 18|Variables.StringReference, Core
+      Data: 35|Variables.StringReference, Core
     - Name: Mode
       Entry: 3
       Data: 0
@@ -225,10 +372,10 @@ MonoBehaviour:
       Data: 
     - Name: districtStateCreator
       Entry: 7
-      Data: 19|Buildings.District.GenericDistrictStateCreator, Core
+      Data: 36|Buildings.District.GenericDistrictStateCreator, Core
     - Name: stateType
       Entry: 7
-      Data: 20|System.RuntimeType, mscorlib
+      Data: 37|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: Buildings.District.ArcherState, Core
@@ -240,16 +387,16 @@ MonoBehaviour:
       Data: 
     - Name: BaseAttack
       Entry: 7
-      Data: 21|Attack, Core
+      Data: 38|Attack, Core
     - Name: Effects
       Entry: 7
-      Data: 22|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 39|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 23|Effects.ArchedDamageColliderEffect, Core
+      Data: 40|Effects.ArchedDamageColliderEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 5
@@ -273,7 +420,7 @@ MonoBehaviour:
       Data: 12
     - Name: Effects
       Entry: 7
-      Data: 24|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 41|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -300,7 +447,7 @@ MonoBehaviour:
       Data: 
     - Name: DoneDamageEffects
       Entry: 7
-      Data: 25|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 42|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -315,7 +462,7 @@ MonoBehaviour:
       Data: 
     - Name: createdEffects
       Entry: 7
-      Data: 26|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 43|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -327,7 +474,7 @@ MonoBehaviour:
       Data: 
     - Name: endWaveEffects
       Entry: 7
-      Data: 27|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
+      Data: 44|System.Collections.Generic.List`1[[Effects.IEffect, Core]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
