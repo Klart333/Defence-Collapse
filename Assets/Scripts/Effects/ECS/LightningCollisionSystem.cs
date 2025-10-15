@@ -1,7 +1,7 @@
-using Effects.ECS.ECB;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
+using Effects.ECS.ECB;
 using Unity.Entities;
 using Unity.Burst;
 using Pathfinding;

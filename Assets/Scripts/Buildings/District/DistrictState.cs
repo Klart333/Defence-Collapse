@@ -33,12 +33,15 @@ namespace Buildings.District
         private readonly HashSet<Entity> allSpawnedEntities = new HashSet<Entity>();
         private readonly List<ChunkIndex> collapsedIndexes = new List<ChunkIndex>();
 
+        private GameObject rangeIndicator;
         protected TowerData districtData;
         protected Stats stats;
-
+        
         protected EntityManager entityManager;
         private Entity targetingEntityPrefab;
         private Entity attachmentEntityPrefab;
+        
+        protected bool selected;
         
         public CategoryType CategoryType => districtData.CategoryType;
         public Stats Stats => stats;
@@ -86,7 +89,7 @@ namespace Buildings.District
             SubscribeToStats();
         }
         
-        protected void SubscribeToStats()
+        protected virtual void SubscribeToStats()
         {
             stats.Get<RangeStat>().OnValueChanged += RangeChanged;
             stats.Get<AttackSpeedStat>().OnValueChanged += AttackSpeedChanged;
@@ -155,8 +158,29 @@ namespace Buildings.District
             attachmentEntityPrefab = entityManager.GetBuffer<DistrictAttachmentElement>(attachmentDatabase)[districtData.DistrictAttachmentIndex].DistrictAttachment;
         }
 
-        public abstract void OnSelected(Vector3 pos);
-        public abstract void OnDeselected();
+        public void OnSelected(Vector3 pos)
+        {
+            if (selected) return;
+            selected = true;
+            
+            rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
+            rangeIndicator.transform.position = pos;
+
+            float range = stats.Get<RangeStat>().Value;
+            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, range * 2.0f, 1f);
+            
+            rangeIndicator.gameObject.SetActive(true);
+        }
+
+        public void OnDeselected()
+        {
+            selected = false;
+            if (rangeIndicator != null)
+            {
+                rangeIndicator.SetActive(false);
+                rangeIndicator = null;
+            }
+        }
         public virtual void OnUnitKill() { }
         
         private void OnDamageDone(DamageCallbackComponent damageCallback)
@@ -348,6 +372,12 @@ namespace Buildings.District
 
         protected virtual void RangeChanged()
         {
+            if (selected && rangeIndicator && rangeIndicator.activeSelf)
+            {
+                float range = stats.Get<RangeStat>().Value;
+                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, range * 2.0f, 1);
+            }
+            
             foreach (Entity entity in spawnedDataEntities)
             {
                 entityManager.SetComponentData(entity, new RangeComponent { Range = stats.Get<RangeStat>().Value });
@@ -453,12 +483,8 @@ namespace Buildings.District
     
     #region Archer
 
-    public sealed class ArcherState : DistrictState
-    {
-        private GameObject rangeIndicator;
-        
-        private bool selected;
-        
+    public sealed class ArcherState : DistrictState // Todo: Remove these states and make modules to set the behaviour from the inspector 
+    { 
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
         
@@ -469,44 +495,9 @@ namespace Buildings.District
             Attack = new Attack(this.districtData.BaseAttack);
         }
 
-        protected override void RangeChanged()
-        {
-            base.RangeChanged();
-            
-            if (selected && rangeIndicator && rangeIndicator.activeSelf)
-            {
-                float range = stats.Get<RangeStat>().Value;
-                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            }
-        }
-
         protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
             return DistrictStateUtility.GetFourCornersEntityIndexes(chunkIndexes, occupiedTargetMeshChunkIndex, DistrictData.DistrictGenerator, districtData.PrototypeInfoData, 2);
-        }
-
-        public override void OnSelected(Vector3 pos)
-        {
-            if (selected) return;
-            
-            selected = true;
-            rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
-            rangeIndicator.transform.position = pos;
-            
-            float range = stats.Get<RangeStat>().Value;
-            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            
-            rangeIndicator.gameObject.SetActive(true);
-        }
-
-        public override void OnDeselected()
-        {
-            selected = false;
-            if (rangeIndicator != null)
-            {
-                rangeIndicator.SetActive(false);
-                rangeIndicator = null;
-            }
         }
     }
 
@@ -516,11 +507,7 @@ namespace Buildings.District
 
     [System.Serializable]
     public sealed class BombState : DistrictState
-    {
-        private GameObject rangeIndicator;
-        
-        private bool selected;
-
+    { 
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
         
@@ -531,45 +518,9 @@ namespace Buildings.District
             Attack = new Attack(this.districtData.BaseAttack);
         }
         
-        protected override void RangeChanged()
-        {
-            base.RangeChanged();
-            
-            if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
-            {
-                float range = stats.Get<RangeStat>().Value;
-                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            }
-        }
-        
         protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
         {
             return DistrictStateUtility.GetFourCornersEntityIndexes(chunkIndexes, occupiedTargetMeshChunkIndex, DistrictData.DistrictGenerator, districtData.PrototypeInfoData, 2);
-        }
-        
-        public override void OnSelected(Vector3 pos)
-        {
-            if (selected) return;
-            
-            selected = true;
-            rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
-            rangeIndicator.transform.position = pos;
-
-            float range = stats.Get<RangeStat>().Value;
-            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            
-            rangeIndicator.gameObject.SetActive(true);
-        }
-
-        public override void OnDeselected()
-        {
-            selected = false;
-            
-            if (rangeIndicator != null)
-            {
-                rangeIndicator.SetActive(false);
-                rangeIndicator = null;
-            }
         }
     }
     
@@ -579,9 +530,6 @@ namespace Buildings.District
 
     public sealed class TownHallState : DistrictState, ITurnCompleteSubscriber
     {
-        private GameObject rangeIndicator;
-        private bool selected;
-
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
         
@@ -590,39 +538,6 @@ namespace Buildings.District
             CreateStats();
             
             Attack = new Attack(townhallData.BaseAttack);
-        }
-        
-        protected override void RangeChanged()
-        {
-            base.RangeChanged();
-            
-            if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
-            {
-                float range = stats.Get<RangeStat>().Value;
-                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            }
-        }
-
-        public override void OnSelected(Vector3 pos)
-        {
-            if (selected) return;
-            
-            selected = true;
-            rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
-            rangeIndicator.transform.position = pos;
-            float range = stats.Get<RangeStat>().Value;
-            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            rangeIndicator.gameObject.SetActive(true);
-        }
-
-        public override void OnDeselected()
-        {
-            selected = false;
-            if (rangeIndicator != null)
-            {
-                rangeIndicator.SetActive(false);
-                rangeIndicator = null;
-            }
         }
         
         public void TurnComplete()
@@ -648,10 +563,6 @@ namespace Buildings.District
 
     public sealed class MineState : DistrictState, ITurnCompleteSubscriber
     {
-        private GameObject rangeIndicator;
-        
-        private bool selected;
-        
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
 
@@ -661,38 +572,6 @@ namespace Buildings.District
 
             CreateStats();
             Attack = new Attack(mineData.BaseAttack);
-        }
-
-        protected override void RangeChanged()
-        {
-            base.RangeChanged();
-
-            if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
-            {
-                float range = stats.Get<RangeStat>().Value;
-                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            }
-        }
-        
-        public override void OnSelected(Vector3 pos)
-        {
-            if (selected) return;
-            
-            selected = true;
-            rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
-            rangeIndicator.transform.position = pos;
-            float range = stats.Get<RangeStat>().Value;
-            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            rangeIndicator.gameObject.SetActive(true);
-        }
-
-        public override void OnDeselected()
-        {
-            if (rangeIndicator is null) return;
-            
-            selected = false;
-            rangeIndicator.SetActive(false);
-            rangeIndicator = null;
         }
 
         public void TurnComplete()
@@ -715,9 +594,6 @@ namespace Buildings.District
     #region Flame
     public sealed class FlameState : DistrictState
     { 
-        private GameObject rangeIndicator;
-        private bool selected;
-
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
         
@@ -732,40 +608,6 @@ namespace Buildings.District
         {
             return DistrictStateUtility.GetPerimeterEntityChunks(chunkIndexes, occupiedTargetMeshChunkIndex, DistrictData.DistrictGenerator, districtData.PrototypeInfoData, 2);
         }
-
-        protected override void RangeChanged()
-        {
-            base.RangeChanged();
-
-            if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
-            {
-                float range = stats.Get<RangeStat>().Value;
-                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            }
-        }
-        
-        public override void OnSelected(Vector3 pos)
-        {
-            if (selected) return;
-            
-            selected = true;
-            rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
-            rangeIndicator.transform.position = pos;
-            float range = stats.Get<RangeStat>().Value;
-            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            rangeIndicator.gameObject.SetActive(true);
-        }
- 
-        public override void OnDeselected()
-        {
-            selected = false;
-            
-            if (rangeIndicator != null)
-            {
-                rangeIndicator.SetActive(false);
-                rangeIndicator = null;
-            }
-        }
     }
      
      #endregion
@@ -774,9 +616,6 @@ namespace Buildings.District
      
     public sealed class LightningState : DistrictState
     { 
-        private GameObject rangeIndicator;
-        private bool selected;
-        
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
         
@@ -791,40 +630,6 @@ namespace Buildings.District
         {
             return DistrictStateUtility.GetFullChunkEntityIndexes(chunkIndexes, DistrictData.DistrictGenerator.ChunkScale);
         }
-
-        protected override void RangeChanged()
-        {
-            base.RangeChanged();
-
-            if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
-            {
-                float range = stats.Get<RangeStat>().Value;
-                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            }
-        }
-        
-        public override void OnSelected(Vector3 pos)
-        {
-            if (selected) return;
-            
-            selected = true;
-            rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
-            rangeIndicator.transform.position = pos;
-            float range = stats.Get<RangeStat>().Value;
-            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            rangeIndicator.gameObject.SetActive(true);
-        }
-
-        public override void OnDeselected()
-        {
-            selected = false;
-            
-            if (rangeIndicator != null)
-            {
-                rangeIndicator.SetActive(false);
-                rangeIndicator = null;
-            }
-        }
     }
      
      #endregion
@@ -833,10 +638,6 @@ namespace Buildings.District
 
     public sealed class ChurchState : DistrictState
     {
-        private GameObject rangeIndicator;
-
-        private bool selected;
-        
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
 
@@ -858,12 +659,6 @@ namespace Buildings.District
         {
             base.RangeChanged();
             OnStatsChanged();
-            
-            if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
-            {
-                float range = stats.Get<RangeStat>().Value;
-                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            }
         }
 
         protected override List<TargetEntityIndex> GetEntityChunks(List<ChunkIndex> chunkIndexes)
@@ -885,7 +680,7 @@ namespace Buildings.District
             RevertCreateEffects();
         }
         
-        private void PerformCreateEffects()
+        private void PerformCreateEffects() // Todo: Will need to move to a module so every state can perform these effects
         {
             foreach (Entity entity in spawnedDataEntities)   
             {
@@ -908,27 +703,6 @@ namespace Buildings.District
                 }
             }
         }
-
-        public override void OnSelected(Vector3 pos)
-        {
-            if (selected) return;
-            
-            selected = true;
-            rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
-            rangeIndicator.transform.position = pos;
-            float range = stats.Get<RangeStat>().Value;
-            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            rangeIndicator.gameObject.SetActive(true);
-        }
-
-        public override void OnDeselected()
-        {
-            if (rangeIndicator is null) return;
-            
-            selected = false;
-            rangeIndicator.SetActive(false);
-            rangeIndicator = null;
-        }
     }
 
     #endregion
@@ -937,8 +711,6 @@ namespace Buildings.District
 
     public sealed class BarracksState : DistrictState
     {
-        private GameObject rangeIndicator;
-        
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public override Attack Attack { get; }
         
@@ -953,67 +725,27 @@ namespace Buildings.District
         {
             return DistrictStateUtility.GetFullChunkEntityIndexes(chunkIndexes, DistrictData.DistrictGenerator.ChunkScale);
         }
-        
-        public override void OnSelected(Vector3 pos)
-        {
-        }
-
-        public override void OnDeselected()
-        {
-        }
     }
 
     #endregion
     
-    #region Mine
+    #region Lumbermill
 
     public sealed class LumbermillState : DistrictState, ITurnCompleteSubscriber, ILumbermillStatistics
     { 
-        private GameObject rangeIndicator;
-        private bool selected;
         public override List<IUpgradeStat> UpgradeStats { get; } = new List<IUpgradeStat>();
         public int TurnsUntilComplete { get; set; }
         public override Attack Attack { get; }
         
         public LumbermillState(DistrictData districtData, TowerData lumbermillData, Vector3 position, int key) : base(districtData, position, key, lumbermillData)
         {
-            this.districtData = lumbermillData;
             TurnsUntilComplete = 5;
             
             CreateStats();
             Attack = new Attack(lumbermillData.BaseAttack);
         }
-        
-        protected override void RangeChanged()
-        {
-            base.RangeChanged();
-            if (selected && rangeIndicator is not null && rangeIndicator.activeSelf)
-            {
-                float range = stats.Get<RangeStat>().Value;
-                rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            }
-        }
-        
-        public override void OnSelected(Vector3 pos)
-        {
-            if (selected) return;
-            
-            selected = true;
-            rangeIndicator = districtData.RangeIndicator.GetDisabled<PooledMonoBehaviour>().gameObject;
-            rangeIndicator.transform.position = pos;
-            float range = stats.Get<RangeStat>().Value;
-            rangeIndicator.transform.localScale = new Vector3(range * 2.0f, 0.01f, range * 2.0f);
-            rangeIndicator.gameObject.SetActive(true);
-        }
-        public override void OnDeselected()
-        {
-            if (rangeIndicator is null) return;
-            
-            selected = false;
-            rangeIndicator.SetActive(false);
-            rangeIndicator = null;
-        }
-        public void TurnComplete()
+
+        public void TurnComplete() // Todo: Move to a module
         {
             TurnsUntilComplete--;
             foreach (QueryChunk chunk in DistrictData.DistrictChunks.Values)

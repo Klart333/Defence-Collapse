@@ -8,6 +8,7 @@ using Gameplay.Event;
 using UnityEngine;
 using DG.Tweening;
 using InputCamera;
+using Effects.UI;
 using Effects;
 using TMPro;
 using Loot;
@@ -68,10 +69,10 @@ namespace Buildings.District.UI
         private CanvasGroup effectsCanvasGroup;
         
         [SerializeField]
-        private UIEffectsHandler ownedEffectsPanel;
+        private UIEffectContainer ownedEffectsPanel;
 
         [SerializeField]
-        private UIEffectsHandler towerEffectsPanel;
+        private UIEffectContainer towerEffectsPanel;
         
         [Title("Information")]
         [SerializeField]

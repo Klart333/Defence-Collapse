@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using Buildings.Barricades;
 using WaveFunctionCollapse;
 using Buildings.District;
 using Unity.Mathematics;
 using Gameplay.Upgrades;
 using Buildings;
-using Buildings.Barricades;
+using Effects.UI;
 
 namespace Gameplay.Event
 {

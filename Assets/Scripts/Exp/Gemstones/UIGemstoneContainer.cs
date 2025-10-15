@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
-using UnityEngine;
-using System;
 using Gameplay.Event;
+using UnityEngine;
+using Effects.UI;
+using System;
 
 namespace Exp.Gemstones
 {
