@@ -1,17 +1,23 @@
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
+// ReSharper disable Unity.BurstLoadingManagedType
 
 namespace Effects
 {
     [Serializable, InlineProperty]
-    public struct StatTypeType : IEquatable<StatTypeType>
+    public struct StatType : IEquatable<StatType>
     {
+        public StatType(Type type)
+        {
+            _type = type;
+        }
+        
         [ValueDropdown("GetStateTypes")]
         [OdinSerialize, HideLabel] 
-        private Type statType;
+        private Type _type;
 
-        public Type StatType => statType;
+        public Type Type => _type;
         
         // Odin dropdown to select available DistrictState subclasses
         public static ValueDropdownList<Type> GetStateTypes()
@@ -27,27 +33,19 @@ namespace Effects
             return list;
         }
 
-        public bool Equals(StatTypeType other)
+        public bool Equals(StatType other)
         {
-            return statType == other.statType;
+            return _type == other._type;
         }
 
         public override bool Equals(object obj)
         {
-            return obj is StatTypeType other && Equals(other);
+            return obj is StatType other && Equals(other);
         }
 
         public override int GetHashCode()
         {
-            return (statType != null ? statType.GetHashCode() : 0);
-        }
-
-        public static implicit operator StatTypeType(Type statType)
-        {
-            return new StatTypeType
-            {
-                statType = statType,
-            };
+            return (_type != null ? _type.GetHashCode() : 0);
         }
     }
 }

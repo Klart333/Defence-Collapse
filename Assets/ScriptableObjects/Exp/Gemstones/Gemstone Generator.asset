@@ -169,13 +169,10 @@ MonoBehaviour:
     - Name: ModifierType
       Entry: 3
       Data: 0
-    - Name: StatType
-      Entry: 3
-      Data: 6
-    - Name: StatTypeType
-      Entry: 7
-      Data: Effects.StatTypeType, Core
     - Name: statType
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
       Entry: 7
       Data: 7|System.RuntimeType, mscorlib
     - Name: 
@@ -412,13 +409,10 @@ MonoBehaviour:
     - Name: ModifierType
       Entry: 3
       Data: 1
-    - Name: StatType
-      Entry: 3
-      Data: 3
-    - Name: StatTypeType
-      Entry: 7
-      Data: Effects.StatTypeType, Core
     - Name: statType
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
       Entry: 7
       Data: 15|System.RuntimeType, mscorlib
     - Name: 
@@ -553,13 +547,10 @@ MonoBehaviour:
     - Name: ModifierType
       Entry: 3
       Data: 1
-    - Name: StatType
-      Entry: 3
-      Data: 4
-    - Name: StatTypeType
-      Entry: 7
-      Data: Effects.StatTypeType, Core
     - Name: statType
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
       Entry: 7
       Data: 20|System.RuntimeType, mscorlib
     - Name: 
@@ -804,7 +795,7 @@ MonoBehaviour:
       Data: 27|Exp.Gemstones.IGemstoneBakingEffect[], Core
     - Name: 
       Entry: 12
-      Data: 6
+      Data: 5
     - Name: 
       Entry: 7
       Data: 28|Exp.Gemstones.CategoryDamageIncreaseBakeEffect, Core
@@ -1119,7 +1110,7 @@ MonoBehaviour:
       Data: true
     - Name: appliedCategory
       Entry: 3
-      Data: 64
+      Data: 7295
     - Name: effect
       Entry: 7
       Data: 37|Effects.IncreaseStatEffect, Core
@@ -1129,14 +1120,17 @@ MonoBehaviour:
     - Name: ModifierType
       Entry: 3
       Data: 1
-    - Name: StatType
-      Entry: 3
-      Data: 0
-    - Name: StatTypeType
-      Entry: 7
-      Data: Effects.StatTypeType, Core
     - Name: statType
-      Entry: 6
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 38|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.AttackDamageStat, Core
+    - Name: 
+      Entry: 8
       Data: 
     - Name: 
       Entry: 8
@@ -1152,13 +1146,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 38|Exp.Gemstones.StatIncreaseBakeEffect, Core
+      Data: 39|Exp.Gemstones.StatIncreaseBakeEffect, Core
     - Name: levelToGainCurve
       Entry: 7
-      Data: 39|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+      Data: 40|UnityEngine.AnimationCurve, UnityEngine.CoreModule
     - Name: 
       Entry: 7
-      Data: 40|UnityEngine.Keyframe[], UnityEngine.CoreModule
+      Data: 41|UnityEngine.Keyframe[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 2
@@ -1176,10 +1170,10 @@ MonoBehaviour:
       Data: 0.05
     - Name: m_InTangent
       Entry: 4
-      Data: 0.04331643
+      Data: 0.0171284713
     - Name: m_OutTangent
       Entry: 4
-      Data: 0.04331643
+      Data: 0.0171284713
     - Name: m_TangentMode
       Entry: 3
       Data: 0
@@ -1191,7 +1185,7 @@ MonoBehaviour:
       Data: 0
     - Name: m_OutWeight
       Entry: 4
-      Data: 0.0662225038
+      Data: 0.0441176444
     - Name: 
       Entry: 8
       Data: 
@@ -1206,7 +1200,7 @@ MonoBehaviour:
       Data: 100
     - Name: m_Value
       Entry: 4
-      Data: 4
+      Data: 1
     - Name: m_InTangent
       Entry: 4
       Data: 0
@@ -1254,24 +1248,27 @@ MonoBehaviour:
       Data: true
     - Name: appliedCategory
       Entry: 3
-      Data: 64
+      Data: 7295
     - Name: effect
       Entry: 7
-      Data: 41|Effects.IncreaseStatEffect, Core
+      Data: 42|Effects.IncreaseStatEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 1
     - Name: ModifierType
       Entry: 3
-      Data: 1
-    - Name: StatType
-      Entry: 3
-      Data: 1
-    - Name: StatTypeType
-      Entry: 7
-      Data: Effects.StatTypeType, Core
+      Data: 2
     - Name: statType
-      Entry: 6
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 43|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.ArmorPenetrationStat, Core
+    - Name: 
+      Entry: 8
       Data: 
     - Name: 
       Entry: 8
@@ -1287,148 +1284,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 42|Exp.Gemstones.StatIncreaseBakeEffect, Core
+      Data: 44|Exp.Gemstones.StatIncreaseBakeEffect, Core
     - Name: levelToGainCurve
       Entry: 7
-      Data: 43|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+      Data: 45|UnityEngine.AnimationCurve, UnityEngine.CoreModule
     - Name: 
       Entry: 7
-      Data: 44|UnityEngine.Keyframe[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
-    - Name: ver
-      Entry: 3
-      Data: 1
-    - Name: m_Time
-      Entry: 4
-      Data: 0
-    - Name: m_Value
-      Entry: 4
-      Data: 0.05
-    - Name: m_InTangent
-      Entry: 4
-      Data: 0.04331643
-    - Name: m_OutTangent
-      Entry: 4
-      Data: 0.04331643
-    - Name: m_TangentMode
-      Entry: 3
-      Data: 0
-    - Name: m_WeightedMode
-      Entry: 3
-      Data: 0
-    - Name: m_InWeight
-      Entry: 4
-      Data: 0
-    - Name: m_OutWeight
-      Entry: 4
-      Data: 0.0662225038
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: UnityEngine.Keyframe, UnityEngine.CoreModule
-    - Name: ver
-      Entry: 3
-      Data: 1
-    - Name: m_Time
-      Entry: 4
-      Data: 100
-    - Name: m_Value
-      Entry: 4
-      Data: 4
-    - Name: m_InTangent
-      Entry: 4
-      Data: 0
-    - Name: m_OutTangent
-      Entry: 4
-      Data: 0
-    - Name: m_TangentMode
-      Entry: 3
-      Data: 0
-    - Name: m_WeightedMode
-      Entry: 3
-      Data: 0
-    - Name: m_InWeight
-      Entry: 4
-      Data: 0
-    - Name: m_OutWeight
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 3
-      Data: 8
-    - Name: 
-      Entry: 3
-      Data: 8
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: randomness
-      Entry: 4
-      Data: 0.05
-    - Name: statNameUtility
-      Entry: 10
-      Data: 0
-    - Name: isAdditivePercent
-      Entry: 5
-      Data: true
-    - Name: appliedCategory
-      Entry: 3
-      Data: 64
-    - Name: effect
-      Entry: 7
-      Data: 45|Effects.IncreaseStatEffect, Core
-    - Name: ModifierValue
-      Entry: 4
-      Data: 1
-    - Name: ModifierType
-      Entry: 3
-      Data: 1
-    - Name: StatType
-      Entry: 3
-      Data: 2
-    - Name: StatTypeType
-      Entry: 7
-      Data: Effects.StatTypeType, Core
-    - Name: statType
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CanIncrease
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 46|Exp.Gemstones.StatIncreaseBakeEffect, Core
-    - Name: levelToGainCurve
-      Entry: 7
-      Data: 47|UnityEngine.AnimationCurve, UnityEngine.CoreModule
-    - Name: 
-      Entry: 7
-      Data: 48|UnityEngine.Keyframe[], UnityEngine.CoreModule
+      Data: 46|UnityEngine.Keyframe[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 2
@@ -1524,24 +1386,27 @@ MonoBehaviour:
       Data: true
     - Name: appliedCategory
       Entry: 3
-      Data: 64
+      Data: 7295
     - Name: effect
       Entry: 7
-      Data: 49|Effects.IncreaseStatEffect, Core
+      Data: 47|Effects.IncreaseStatEffect, Core
     - Name: ModifierValue
       Entry: 4
       Data: 1
     - Name: ModifierType
       Entry: 3
       Data: 1
-    - Name: StatType
-      Entry: 3
-      Data: 7
-    - Name: StatTypeType
-      Entry: 7
-      Data: Effects.StatTypeType, Core
     - Name: statType
-      Entry: 6
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 48|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.CritDamageStat, Core
+    - Name: 
+      Entry: 8
       Data: 
     - Name: 
       Entry: 8
@@ -1572,19 +1437,19 @@ MonoBehaviour:
       Data: 2
     - Name: $v
       Entry: 7
-      Data: 50|Exp.Gemstones.IGemstoneBakingEffect[], Core
+      Data: 49|Exp.Gemstones.IGemstoneBakingEffect[], Core
     - Name: 
       Entry: 12
       Data: 6
     - Name: 
       Entry: 7
-      Data: 51|Exp.Gemstones.WallStatIncreaseBakeEffect, Core
+      Data: 50|Exp.Gemstones.WallStatIncreaseBakeEffect, Core
     - Name: levelToGainCurve
       Entry: 7
-      Data: 52|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+      Data: 51|UnityEngine.AnimationCurve, UnityEngine.CoreModule
     - Name: 
       Entry: 7
-      Data: 53|UnityEngine.Keyframe[], UnityEngine.CoreModule
+      Data: 52|UnityEngine.Keyframe[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 2
@@ -1676,14 +1541,11 @@ MonoBehaviour:
       Entry: 10
       Data: 1
     - Name: statType
-      Entry: 3
-      Data: 10
-    - Name: statTypeType
       Entry: 7
-      Data: Effects.StatTypeType, Core
-    - Name: statType
+      Data: Effects.StatType, Core
+    - Name: _type
       Entry: 7
-      Data: 54|System.RuntimeType, mscorlib
+      Data: 53|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: Effects.MaxHealthStat, Core
@@ -1698,13 +1560,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 55|Exp.Gemstones.WallStatIncreaseBakeEffect, Core
+      Data: 54|Exp.Gemstones.WallStatIncreaseBakeEffect, Core
     - Name: levelToGainCurve
       Entry: 7
-      Data: 56|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+      Data: 55|UnityEngine.AnimationCurve, UnityEngine.CoreModule
     - Name: 
       Entry: 7
-      Data: 57|UnityEngine.Keyframe[], UnityEngine.CoreModule
+      Data: 56|UnityEngine.Keyframe[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 2
@@ -1796,14 +1658,11 @@ MonoBehaviour:
       Entry: 10
       Data: 1
     - Name: statType
-      Entry: 3
-      Data: 11
-    - Name: statTypeType
       Entry: 7
-      Data: Effects.StatTypeType, Core
-    - Name: statType
+      Data: Effects.StatType, Core
+    - Name: _type
       Entry: 7
-      Data: 58|System.RuntimeType, mscorlib
+      Data: 57|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: Effects.HealingStat, Core
@@ -1818,13 +1677,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 59|Exp.Gemstones.BarricadeStatIncreaseBakeEffect, Core
+      Data: 58|Exp.Gemstones.BarricadeStatIncreaseBakeEffect, Core
     - Name: levelToGainCurve
       Entry: 7
-      Data: 60|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+      Data: 59|UnityEngine.AnimationCurve, UnityEngine.CoreModule
     - Name: 
       Entry: 7
-      Data: 61|UnityEngine.Keyframe[], UnityEngine.CoreModule
+      Data: 60|UnityEngine.Keyframe[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 2
@@ -1916,14 +1775,11 @@ MonoBehaviour:
       Entry: 10
       Data: 1
     - Name: statType
-      Entry: 3
-      Data: 10
-    - Name: statTypeType
       Entry: 7
-      Data: Effects.StatTypeType, Core
-    - Name: statType
+      Data: Effects.StatType, Core
+    - Name: _type
       Entry: 9
-      Data: 54
+      Data: 53
     - Name: 
       Entry: 8
       Data: 
@@ -1932,13 +1788,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 62|Exp.Gemstones.BarricadeStatIncreaseBakeEffect, Core
+      Data: 61|Exp.Gemstones.BarricadeStatIncreaseBakeEffect, Core
     - Name: levelToGainCurve
       Entry: 7
-      Data: 63|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+      Data: 62|UnityEngine.AnimationCurve, UnityEngine.CoreModule
     - Name: 
       Entry: 7
-      Data: 64|UnityEngine.Keyframe[], UnityEngine.CoreModule
+      Data: 63|UnityEngine.Keyframe[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 2
@@ -2030,14 +1886,11 @@ MonoBehaviour:
       Entry: 10
       Data: 1
     - Name: statType
-      Entry: 3
-      Data: 11
-    - Name: statTypeType
       Entry: 7
-      Data: Effects.StatTypeType, Core
-    - Name: statType
+      Data: Effects.StatType, Core
+    - Name: _type
       Entry: 9
-      Data: 58
+      Data: 57
     - Name: 
       Entry: 8
       Data: 
@@ -2046,13 +1899,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 65|Exp.Gemstones.EnemySpeedModifierBakeEffect, Core
+      Data: 64|Exp.Gemstones.EnemySpeedModifierBakeEffect, Core
     - Name: levelToGainCurve
       Entry: 7
-      Data: 66|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+      Data: 65|UnityEngine.AnimationCurve, UnityEngine.CoreModule
     - Name: 
       Entry: 7
-      Data: 67|UnityEngine.Keyframe[], UnityEngine.CoreModule
+      Data: 66|UnityEngine.Keyframe[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 2
@@ -2148,13 +2001,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 68|Exp.Gemstones.EnemyDamageModifierBakeEffect, Core
+      Data: 67|Exp.Gemstones.EnemyDamageModifierBakeEffect, Core
     - Name: levelToGainCurve
       Entry: 7
-      Data: 69|UnityEngine.AnimationCurve, UnityEngine.CoreModule
+      Data: 68|UnityEngine.AnimationCurve, UnityEngine.CoreModule
     - Name: 
       Entry: 7
-      Data: 70|UnityEngine.Keyframe[], UnityEngine.CoreModule
+      Data: 69|UnityEngine.Keyframe[], UnityEngine.CoreModule
     - Name: 
       Entry: 12
       Data: 2

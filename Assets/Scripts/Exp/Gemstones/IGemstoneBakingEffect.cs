@@ -6,6 +6,7 @@ using Gameplay.Upgrades;
 using UnityEngine;
 using Effects;
 using System;
+using UnityEngine.Serialization;
 
 namespace Exp.Gemstones
 {
@@ -58,11 +59,11 @@ namespace Exp.Gemstones
                 IsAdditivePercent = isAdditivePercent,
                 AppliedCategory = appliedCategory,
                 ModifierValue = value,
-                EffectDescription = statNameUtility.GetDescription(increaseStatEffect.StatTypeType.StatType, value),
+                EffectDescription = statNameUtility.GetDescription(increaseStatEffect.statType.Type, value),
                 Effect = new IncreaseStatEffect
                 {
                     ModifierType = increaseStatEffect.ModifierType,
-                    StatTypeType = increaseStatEffect.StatTypeType,
+                    statType = increaseStatEffect.statType,
                     ModifierValue = value,
                 }
             };
@@ -221,9 +222,10 @@ namespace Exp.Gemstones
         [SerializeField]
         private GemstoneEffectDescriptions effectDescriptions;
         
+        [FormerlySerializedAs("statTypeType")]
         [Title("Category")]
         [SerializeField]
-        private StatTypeType statTypeType;
+        private StatType statType;
         
         public float GetEffectValue(int level, Random random)
         {
@@ -235,7 +237,7 @@ namespace Exp.Gemstones
         {
             float value = GetEffectValue(level, random);
 
-            if (statTypeType.StatType.IsEquivalentTo(typeof(MaxHealthStat)))
+            if (statType.Type.IsEquivalentTo(typeof(MaxHealthStat)))
             {
                 return new IncreaseWallHealthEffect()
                 {
@@ -244,7 +246,7 @@ namespace Exp.Gemstones
                 };
             }
 
-            if (statTypeType.StatType.IsEquivalentTo(typeof(HealingStat)))
+            if (statType.Type.IsEquivalentTo(typeof(HealingStat)))
             {
                 return new IncreaseWallHealingEffect
                 {
@@ -271,9 +273,10 @@ namespace Exp.Gemstones
         [SerializeField]
         private GemstoneEffectDescriptions effectDescriptions;
         
+        [FormerlySerializedAs("statTypeType")]
         [Title("Category")]
         [SerializeField]
-        private StatTypeType statTypeType;
+        private StatType statType;
         
         public float GetEffectValue(int level, Random random)
         {
@@ -285,7 +288,7 @@ namespace Exp.Gemstones
         {
             float value = GetEffectValue(level, random);
 
-            if (statTypeType.StatType.IsEquivalentTo(typeof(MaxHealthStat)))
+            if (statType.Type.IsEquivalentTo(typeof(MaxHealthStat)))
             {
                 return new IncreaseBarricadeHealthEffect()
                 {
@@ -294,7 +297,7 @@ namespace Exp.Gemstones
                 };
             }
 
-            if (statTypeType.StatType.IsEquivalentTo(typeof(HealingStat)))
+            if (statType.Type.IsEquivalentTo(typeof(HealingStat)))
             {
                 return new IncreaseBarricadeHealingEffect
                 {

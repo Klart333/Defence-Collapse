@@ -111,6 +111,19 @@ namespace Effects
         {
             BaseValue = baseValue;
         }
+        
+        public Stat(Stat copyFrom)
+        {
+            BaseValue = copyFrom.BaseValue;
+
+            if (copyFrom.modifiers != null)
+            {
+                foreach (Modifier copyFromModifier in copyFrom.modifiers)
+                {
+                    AddModifier(copyFromModifier);
+                }
+            }
+        }
 
         public void AddModifier(Modifier mod)
         {
@@ -174,8 +187,6 @@ namespace Effects
                 OnValueChanged?.Invoke();
             }
         }
-
-        public static implicit operator float(Stat stat) => stat.Value;
 
         public override string ToString()
         {

@@ -52,9 +52,9 @@ namespace Exp.Gemstones
                     {
                         case StatIncreaseEffect { Effect: IncreaseStatEffect stat }:
                         {
-                            if (stats.TryGetValue(stat.StatTypeType.StatType, out float value))
+                            if (stats.TryGetValue(stat.statType.Type, out float value))
                             {
-                                stats[stat.StatTypeType.StatType] = effect.CumulativeType switch
+                                stats[stat.statType.Type] = effect.CumulativeType switch
                                 {
                                     Modifier.ModifierType.Additive => value + effect.ModifierValue,
                                     Modifier.ModifierType.Multiplicative => value * effect.ModifierValue,
@@ -63,7 +63,7 @@ namespace Exp.Gemstones
                             }
                             else
                             {
-                                stats.Add(stat.StatTypeType.StatType, effect.ModifierValue);
+                                stats.Add(stat.statType.Type, effect.ModifierValue);
                             }
                         
                             continue;

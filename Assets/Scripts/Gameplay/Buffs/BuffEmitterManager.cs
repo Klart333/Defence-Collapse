@@ -7,6 +7,7 @@ using UnityEngine;
 using Buildings;
 using Buildings.Barricades;
 using Effects;
+using UnityEngine.Serialization;
 
 namespace Gameplay.Buffs
 {
@@ -96,7 +97,7 @@ namespace Gameplay.Buffs
             {
                 foreach (Buff buff in emitter.Buffs)
                 {
-                    stats.ModifyStat(buff.TypeType.StatType, buff.Modifier);
+                    stats.ModifyStat(buff.type.Type, buff.Modifier);
                 }            
             }
         }
@@ -130,7 +131,7 @@ namespace Gameplay.Buffs
             {
                 foreach (Buff buff in emitter.Buffs)
                 {
-                    stats.RevertModifiedStat(buff.TypeType.StatType, buff.Modifier);
+                    stats.RevertModifiedStat(buff.type.Type, buff.Modifier);
                 }         
             }
         }
@@ -151,13 +152,14 @@ namespace Gameplay.Buffs
     [Serializable]
     public struct Buff
     {
-        public StatTypeType TypeType;
+        [FormerlySerializedAs("TypeType")]
+        public StatType type;
         public Modifier Modifier;
 
         public Buff(Buff copy)
         {
             Modifier = new Modifier(copy.Modifier);
-            TypeType = copy.TypeType;
+            type = copy.type;
         }
     }
 

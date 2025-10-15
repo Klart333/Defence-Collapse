@@ -125,11 +125,11 @@ MonoBehaviour:
     SerializationNodes:
     - Name: statTypes
       Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[Buildings.District.StatDisplayableType,
-        Core],[StatType[], Core]], mscorlib
+      Data: 0|System.Collections.Generic.Dictionary`2[[Buildings.District.UI.StatDisplayableType,
+        Core],[Effects.StatType[], Core]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[Buildings.District.StatDisplayableType,
+      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[Buildings.District.UI.StatDisplayableType,
         Core]], mscorlib
     - Name: 
       Entry: 12
@@ -142,7 +142,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 3
+      Data: 2
     - Name: 
       Entry: 7
       Data: 
@@ -151,28 +151,100 @@ MonoBehaviour:
       Data: 0
     - Name: $v
       Entry: 7
-      Data: 2|StatType[], Core
+      Data: 2|Effects.StatType[], Core
     - Name: 
       Entry: 12
       Data: 6
     - Name: 
-      Entry: 3
-      Data: 0
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 3|System.RuntimeType, mscorlib
     - Name: 
-      Entry: 3
-      Data: 1
+      Entry: 1
+      Data: Effects.AttackDamageStat, Core
     - Name: 
-      Entry: 3
-      Data: 2
+      Entry: 8
+      Data: 
     - Name: 
-      Entry: 3
-      Data: 3
+      Entry: 8
+      Data: 
     - Name: 
-      Entry: 3
-      Data: 6
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 4|System.RuntimeType, mscorlib
     - Name: 
-      Entry: 3
-      Data: 7
+      Entry: 1
+      Data: Effects.ArmorPenetrationStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 5|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.CritChanceStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 6|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.CritDamageStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 7|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.AttackSpeedStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 8|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.RangeStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -190,19 +262,19 @@ MonoBehaviour:
       Data: 1
     - Name: $v
       Entry: 7
-      Data: 3|StatType[], Core
+      Data: 9|Effects.StatType[], Core
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
-      Entry: 3
-      Data: 10
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 10|System.RuntimeType, mscorlib
     - Name: 
-      Entry: 3
-      Data: 11
-    - Name: 
-      Entry: 13
-      Data: 
+      Entry: 1
+      Data: Effects.MaxHealthStat, Core
     - Name: 
       Entry: 8
       Data: 
@@ -211,22 +283,19 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
+      Data: Effects.StatType, Core
+    - Name: _type
       Entry: 7
-      Data: 4|StatType[], Core
+      Data: 11|System.RuntimeType, mscorlib
     - Name: 
-      Entry: 12
-      Data: 2
+      Entry: 1
+      Data: Effects.HealingStat, Core
     - Name: 
-      Entry: 3
-      Data: 10
+      Entry: 8
+      Data: 
     - Name: 
-      Entry: 3
-      Data: 11
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 

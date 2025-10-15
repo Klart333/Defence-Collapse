@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Transforms;
@@ -5,7 +6,6 @@ using Effects.ECS.ECB;
 using Unity.Entities;
 using Unity.Burst;
 using Enemy.ECS;
-using Health;
 
 namespace Effects.ECS
 {
@@ -95,6 +95,7 @@ namespace Effects.ECS
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static float TakeDamage(ref HealthComponent health, ArmorComponent armorComponent, DamageBuffer damageBuffer)
         {
             float penetratedDamage = damageBuffer.Damage * damageBuffer.ArmorPenetration;
@@ -113,6 +114,7 @@ namespace Effects.ECS
                 penetratedDamage *= multiplier;
             }
             
+            float damageDone = damage + penetratedDamage;
             if (hasArmor)
             {
                 float absorbed = math.min(health.Armor, damage);
@@ -120,9 +122,9 @@ namespace Effects.ECS
                 damage -= absorbed;
             }
             
-            health.Health -= penetratedDamage + damage;
+            health.Health -= damage + penetratedDamage; // Left over damge after damaging armor
             
-            return damage + penetratedDamage;
+            return damageDone;
             
         }
     }

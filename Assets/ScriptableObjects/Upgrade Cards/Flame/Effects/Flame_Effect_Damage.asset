@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3d805e3b3ab4891bec7b5cebf945158, type: 3}
-  m_Name: Flame_Effect_HealthDamage
+  m_Name: Flame_Effect_Damage
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -36,13 +36,10 @@ MonoBehaviour:
     - Name: ModifierType
       Entry: 3
       Data: 1
-    - Name: StatType
-      Entry: 3
-      Data: 0
-    - Name: StatTypeType
-      Entry: 7
-      Data: Effects.StatTypeType, Core
     - Name: statType
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
       Entry: 7
       Data: 2|System.RuntimeType, mscorlib
     - Name: 

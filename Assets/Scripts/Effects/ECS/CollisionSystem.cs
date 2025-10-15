@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -6,6 +7,7 @@ using Unity.Entities;
 using Pathfinding;
 using Unity.Burst;
 using Enemy.ECS;
+using UnityEngine;
 
 namespace Effects.ECS
 {
@@ -142,7 +144,7 @@ namespace Effects.ECS
             return false;
         }
 
-        [BurstCompile]
+        [BurstCompile, MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AddDamageBuffer(int sortKey, Entity entity, ref RandomComponent randomComponent, CritComponent critComponent, ref DamageComponent damageComponent, Entity sourceEntity)
         {
             bool isCrit = randomComponent.Random.NextFloat() < critComponent.CritChance;

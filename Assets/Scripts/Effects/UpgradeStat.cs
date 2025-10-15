@@ -8,6 +8,7 @@ using UnityEngine;
 using Variables;
 using Gameplay;
 using System;
+using UnityEngine.Serialization;
 
 namespace Effects
 {
@@ -47,9 +48,10 @@ namespace Effects
         [SerializeField]
         private bool useStatType;
 
+        [FormerlySerializedAs("statTypeType")]
         [ShowIf(nameof(useStatType))]
         [SerializeField]
-        private StatTypeType statTypeType;
+        private StatType statType;
         
         [Title("Upgrade Settings")]
         [SerializeField]
@@ -57,7 +59,7 @@ namespace Effects
 
         public IUpgradeStat GetUpgradeStat(DistrictState districtState)
         {
-            Stat stat = useStatType ? districtState.Stats.StatDictionary[statTypeType.StatType] : new Stat(0);
+            Stat stat = useStatType ? districtState.Stats.StatDictionary[statType.Type] : new Stat(0);
             
             string[] descriptionsValues = new string[descriptions.Length];
             for (int i = 0; i < descriptions.Length; i++)
@@ -166,9 +168,10 @@ namespace Effects
         [SerializeField]
         private bool useStatType;
 
+        [FormerlySerializedAs("statTypeType")]
         [ShowIf(nameof(useStatType))]
         [SerializeField]
-        private StatTypeType statTypeType;
+        private StatType statType;
         
         [Title("Upgrade Settings")]
         [SerializeField]
@@ -176,7 +179,7 @@ namespace Effects
 
         public IUpgradeStat GetUpgradeStat(DistrictState districtState)
         {
-            Stat stat = useStatType ? districtState.Stats.StatDictionary[statTypeType.StatType] : new Stat(0);
+            Stat stat = useStatType ? districtState.Stats.StatDictionary[statType.Type] : new Stat(0);
             
             string[] descriptionsValues = new string[descriptions.Length];
             for (int i = 0; i < descriptions.Length; i++)

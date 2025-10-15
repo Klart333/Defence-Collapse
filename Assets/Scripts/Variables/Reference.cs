@@ -48,6 +48,11 @@ namespace Variables
     [System.Serializable]
     public class ColorReference : Reference<Color, ColorVariable>
     {
+        public ColorReference(Color constantValue)
+        {
+            ConstantValue = constantValue;
+        }
+        
         protected override Color GetVariableValue()
         {
             return Variable != null ? Variable.Value : Color.black;
@@ -66,6 +71,11 @@ namespace Variables
     [System.Serializable]
     public class StringReference : Reference<string, StringVariable>
     {
+        public StringReference(string constantValue)
+        {
+            ConstantValue = constantValue;
+        }
+        
         protected override string GetVariableValue()
         {
             return Variable != null ? Variable.Value : "";

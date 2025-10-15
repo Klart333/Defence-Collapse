@@ -19,6 +19,7 @@ using Enemy.ECS;
 using Gameplay;
 using VFX.ECS;
 using System;
+using UnityEngine.Serialization;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable ConvertToConstant.Global
@@ -64,8 +65,9 @@ namespace Effects
         [TitleGroup("Modifier")]
         public Modifier.ModifierType ModifierType;
         
+        [FormerlySerializedAs("StatTypeType")]
         [TitleGroup("Modifier")]
-        public StatTypeType StatTypeType;
+        public StatType statType;
 
         [TitleGroup("Options")]
         public bool CanIncrease = true;
@@ -85,7 +87,7 @@ namespace Effects
                 };
                 
                 ModifierDictionary.Add(unit, modifier);
-                unit.Stats.ModifyStat(StatTypeType.StatType, modifier);
+                unit.Stats.ModifyStat(statType.Type, modifier);
             }
             else if (CanIncrease)
             {
@@ -93,7 +95,7 @@ namespace Effects
                     ? Mathf.Max(ModifierValue - 1.0f, 0) 
                     : ModifierValue;
                 
-                unit.Stats.Get(StatTypeType.StatType).SetDirty(false);
+                unit.Stats.Get(statType.Type).SetDirty(false);
             }
         }
 
@@ -104,7 +106,7 @@ namespace Effects
                 return;
             }
 
-            unit.Stats.RevertModifiedStat(StatTypeType.StatType, value);
+            unit.Stats.RevertModifiedStat(statType.Type, value);
 
             ModifierDictionary.Remove(unit);
         }
@@ -124,8 +126,9 @@ namespace Effects
         [Title("Stat")]
         public Modifier.ModifierType ModifierType;
 
+        [FormerlySerializedAs("statTypeType")]
         [SerializeField]
-        private StatTypeType statTypeType;
+        private StatType statType;
 
         public float Time = 3;
 
@@ -152,7 +155,7 @@ namespace Effects
                     Value = ModifierValue
                 });
 
-                unit.Stats.ModifyStat(statTypeType.StatType, ModifierDictionary[unit]);
+                unit.Stats.ModifyStat(statType.Type, ModifierDictionary[unit]);
             }
             float originalValue = ModifierDictionary[unit].Value;
 
@@ -173,7 +176,7 @@ namespace Effects
                 return;
             }
 
-            unit.Stats.RevertModifiedStat(statTypeType.StatType, value);
+            unit.Stats.RevertModifiedStat(statType.Type, value);
 
             ModifierDictionary.Remove(unit);
         }
@@ -193,9 +196,10 @@ namespace Effects
         [TitleGroup("Modifier")]
         public Modifier.ModifierType ModifierType;
 
+        [FormerlySerializedAs("statTypeType")]
         [TitleGroup("Modifier")]
         [SerializeField]
-        private StatTypeType statTypeType;
+        private StatType statType;
         
 
         [TitleGroup("Modifier")]
@@ -209,7 +213,7 @@ namespace Effects
 
             if (unitsAttacking.Contains(unit)) return;
 
-            unit.Stats.ModifyStat(statTypeType.StatType, new Modifier
+            unit.Stats.ModifyStat(statType.Type, new Modifier
             {
                 Type = ModifierType,
                 Value = ModifierValue
@@ -238,7 +242,7 @@ namespace Effects
                 return;
             }
 
-            unit.Stats.RevertModifiedStat(statTypeType.StatType, new Modifier
+            unit.Stats.RevertModifiedStat(statType.Type, new Modifier
             {
                 Type = ModifierType,
                 Value = ModifierValue
