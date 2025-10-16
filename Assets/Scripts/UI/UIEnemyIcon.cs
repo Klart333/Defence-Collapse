@@ -76,10 +76,10 @@ namespace UI
         {
             isDisplaying = true;
             
-            List<Tuple<string, int>> districtDescription = new List<Tuple<string, int>>
+            List<TextData> districtDescription = new List<TextData>
             {
-                Tuple.Create(enemyData.Name, 45),
-                Tuple.Create(enemyData.Description, 25),
+                new TextData(enemyData.Name, 45),
+                new TextData(enemyData.Description, 25),
             };
             
             Vector2 position = ToolTipUtility.GetTooltipPosition(rectTransform, canvas, heightOffset);

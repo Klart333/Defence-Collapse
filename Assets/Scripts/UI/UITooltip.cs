@@ -29,10 +29,10 @@ namespace UI
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            List<Tuple<string, int>> description = new List<Tuple<string, int>>();
+            List<TextData> description = new List<TextData>();
             for (int i = 0; i < tooltips.Length; i++)
             {
-                description.Add(new Tuple<string, int>(tooltips[i].Value, tooltipSizes[i]));
+                description.Add(new TextData(tooltips[i].Value, tooltipSizes[i]));
             }
             
             Vector2 position = ToolTipUtility.GetTooltipPosition(rectTransform, canvas, heightOffset);

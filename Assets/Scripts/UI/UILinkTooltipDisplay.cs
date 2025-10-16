@@ -49,10 +49,10 @@ namespace UI
         private void OnLinkEnter(string id)
         {
             LinkTooltip value = linkIdUtility.GetLinkId(id);
-            List<Tuple<string, int>> description = new List<Tuple<string, int>>();
+            List<TextData> description = new List<TextData>();
             for (int i = 0; i < value.Texts.Length; i++)
             {
-                description.Add(new Tuple<string, int>(value.Texts[i].Value, value.TextSizes[i]));
+                description.Add(new TextData(value.Texts[i].Value, value.TextSizes[i]));
             }
 
             Vector2 position = ToolTipUtility.GetTooltipPosition(rectTransform, canvas, heightOffset);

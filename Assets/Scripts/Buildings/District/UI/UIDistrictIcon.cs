@@ -104,10 +104,10 @@ namespace Buildings.District.UI
         {
             isDisplaying = true;
             
-            List<Tuple<string, int>> districtDescription = new List<Tuple<string, int>>
+            List<TextData> districtDescription = new List<TextData>
             {
-                Tuple.Create(towerData.DistrictName, 45),
-                Tuple.Create(towerData.Description, 25),
+                new TextData(towerData.DistrictName, 45),
+                new TextData(towerData.Description, 25),
             };
             
             Vector2 position = ToolTipUtility.GetTooltipPosition(rectTransform, canvas, heightOffset);

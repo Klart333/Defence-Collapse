@@ -42,16 +42,16 @@ namespace UI
             canvas = GetComponentInParent<Canvas>();
         }
 
-        public void DisplayTooltip(IEnumerable<Tuple<string, int>> tooltips)
+        public void DisplayTooltip(ICollection<TextData> tooltips)
         {
             FadeTo(fadeInDuration, 1);
 
-            foreach (Tuple<string, int> tooltip in tooltips)
+            foreach (TextData tooltip in tooltips)
             {
                 TextMeshProUGUI text = GetText();
                 text.transform.SetAsLastSibling();
-                text.text = tooltip.Item1;
-                text.fontSize = tooltip.Item2;
+                text.text = tooltip.Text;
+                text.fontSize = tooltip.FontSize;
             }
 
             DelayedClampToCanvas().Forget();

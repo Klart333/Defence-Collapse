@@ -43,7 +43,7 @@ namespace UI
             }
         }
 
-        public void DisplayTooltip(IEnumerable<Tuple<string, int>> tooltips, Vector2 position)
+        public void DisplayTooltip(ICollection<TextData> tooltips, Vector2 position)
         {
             if (!isHovering && spawnedTooltips.Count > 0)
             {
@@ -104,6 +104,18 @@ namespace UI
             }
             
             spawnedTooltips.Clear();
+        }
+    }
+
+    public struct TextData
+    {
+        public string Text;
+        public float FontSize;
+
+        public TextData(string text, float fontSize)
+        {
+            Text = text;
+            FontSize = fontSize;
         }
     }
 

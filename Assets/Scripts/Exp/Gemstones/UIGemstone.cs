@@ -106,10 +106,10 @@ namespace Exp.Gemstones
                 sb.AppendLine(Gemstone.Effects[i].GetDescription());
             }
             
-            List<Tuple<string, int>> gemstoneDescription = new List<Tuple<string, int>>
+            List<TextData> gemstoneDescription = new List<TextData>
             {
-                Tuple.Create($"{Gemstone.GemstoneType.ToString()} Lvl. {Gemstone.Level:N0}", 60),
-                Tuple.Create(sb.ToString(), 30),
+                new TextData($"{Gemstone.GemstoneType.ToString()} Lvl. {Gemstone.Level:N0}", 60),
+                new TextData(sb.ToString(), 30),
             };
 
             Vector2 position = ToolTipUtility.GetTooltipPosition(rectTransform, canvas, heightOffset);
