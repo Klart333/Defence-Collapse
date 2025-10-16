@@ -9,7 +9,7 @@ using Loot;
 
 namespace Effects.UI
 {
-    public class UIEffectDisplay : PooledMonoBehaviour, IDraggable, IBeginDragHandler, IDragHandler, IEndDragHandler
+    public class UIEffectDisplay : PooledMonoBehaviour, IDraggable, IClickable, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         public event Action OnClick;
         

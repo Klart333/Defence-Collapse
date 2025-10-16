@@ -7,6 +7,7 @@ namespace Effects.UI
 {
     public class UISingleDraggableContainer : PooledMonoBehaviour, IContainer, IPointerEnterHandler, IPointerExitHandler
     {
+        public event Action<IDraggable> OnDraggableClicked;
         public event Action<IDraggable> OnDraggableAdded;
         public event Action<IDraggable> OnDraggableRemoved;
         
@@ -58,17 +59,32 @@ namespace Effects.UI
             containedDraggable = draggable;
             containedDraggable.Container = this;
             containedDraggable.SetParent(draggableParent);
+
+            if (draggable is IClickable clickable)
+            {
+                clickable.OnClick += OnDraggableClick;
+            }
             
             OnDraggableAdded?.Invoke(draggable);
         }
-        
-        private void RemoveDraggable()
+
+        public void RemoveDraggable()
         {
             OnDraggableRemoved?.Invoke(containedDraggable);
+            
+            if (containedDraggable is IClickable clickable)
+            {
+                clickable.OnClick -= OnDraggableClick;
+            }
             
             containedDraggable = null;
         }
         
+        private void OnDraggableClick()
+        {
+            OnDraggableClicked?.Invoke(containedDraggable);
+        }
+
         public void OnPointerExit(PointerEventData eventData)
         {
             hovered = false;

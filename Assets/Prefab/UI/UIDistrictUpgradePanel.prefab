@@ -1013,7 +1013,7 @@ MonoBehaviour:
     m_Bottom: 5
   m_ChildAlignment: 0
   m_StartCorner: 0
-  m_StartAxis: 1
+  m_StartAxis: 0
   m_CellSize: {x: 40, y: 40}
   m_Spacing: {x: 5, y: 5}
   m_Constraint: 1
@@ -2857,6 +2857,7 @@ MonoBehaviour:
   containerContainer: {fileID: 7128236897620779730}
   containerPrefab: {fileID: 309259831405999209, guid: 6afe7074818e5c746aaa9910f27d2f02,
     type: 3}
+  clickSendContainer: {fileID: 0}
 --- !u!114 &7432574353303536675
 MonoBehaviour:
   m_ObjectHideFlags: 0

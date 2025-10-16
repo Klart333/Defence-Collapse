@@ -20,16 +20,22 @@ namespace Effects.UI
         
         [SerializeField]
         private UISingleDraggableContainer containerPrefab;
+
+        [Title("References")]
+        [SerializeField]
+        private UIEffectContainer clickSendContainer;
         
         private UISingleDraggableContainer[] spawnedContainers;
         private Action<IDraggable>[] containerAddActions;
         private Action<IDraggable>[] containerRemoveActions;
+        private Action<IDraggable>[] draggableClickedActions;
 
         public void Setup(int containerAmount)
         {
             spawnedContainers = new UISingleDraggableContainer[containerAmount];
             containerAddActions = new Action<IDraggable>[containerAmount];
             containerRemoveActions = new Action<IDraggable>[containerAmount];
+            draggableClickedActions = new Action<IDraggable>[containerAmount];
             
             for (int i = 0; i < containerAmount; i++)
             {
@@ -40,12 +46,14 @@ namespace Effects.UI
                 int containerIndex = i;
                 containerAddActions[i] = x => { OnDraggableAddedToContainer(x, containerIndex); };
                 containerRemoveActions[i] = x => { OnDraggableRemovedFromContainer(x, containerIndex); };
+                draggableClickedActions[i] = x => { OnDraggableClicked(x, containerIndex); };
                 
                 spawnedContainers[i].OnDraggableAdded += containerAddActions[i];
                 spawnedContainers[i].OnDraggableRemoved += containerRemoveActions[i];
+                spawnedContainers[i].OnDraggableClicked += draggableClickedActions[i];
             }
         }
-
+        
         private void OnDisable()
         {
             for (int i = 0; i < spawnedContainers.Length; i++)
@@ -54,11 +62,13 @@ namespace Effects.UI
                 
                 spawnedContainers[i].OnDraggableAdded -= containerAddActions[i];
                 spawnedContainers[i].OnDraggableRemoved -= containerRemoveActions[i];
+                spawnedContainers[i].OnDraggableClicked -= draggableClickedActions[i];
             }
             
             spawnedContainers = null;
             containerAddActions = null;
             containerRemoveActions = null;
+            draggableClickedActions = null;
         }
         
         public void SetEffects(EffectModifier[] effects)
@@ -128,8 +138,23 @@ namespace Effects.UI
                 OnEffectRemoved?.Invoke(effectDisplay.EffectModifier, containerIndex);
             }
         }
+
+        private void OnDraggableClicked(IDraggable draggable, int containerIndex)
+        {
+            if (draggable is not UIEffectDisplay effectDisplay) return;
+            if (!clickSendContainer.gameObject.activeInHierarchy) return;
+            
+            spawnedContainers[containerIndex].RemoveDraggable();
+            draggable.Disable();
+            clickSendContainer.SpawnEffect(effectDisplay.EffectModifier);
+        }
     }
 
+    public interface IClickable
+    {
+        public event Action OnClick;
+    }
+    
     public interface IDraggable
     {
         public IContainer Container { get; set; }
