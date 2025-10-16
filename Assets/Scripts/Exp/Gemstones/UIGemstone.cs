@@ -169,5 +169,15 @@ namespace Exp.Gemstones
             await UniTask.Yield();
             Container.AddDraggable(this);
         }
+
+        public void SetParent(Transform parent)
+        {
+            transform.SetParent(parent);
+        }
+        
+        public void Disable()
+        {
+            gameObject.SetActive(false);
+        }
     }
 }

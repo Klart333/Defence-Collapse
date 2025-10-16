@@ -26,7 +26,7 @@ namespace Buildings.District.UI
 
         private void OnDistrictClicked(DistrictData data)
         {
-            DistrictUpgradeManager.Instance.OpenUpgradeMenu(data).Forget();
+            DistrictUpgradeManager.Instance.OpenUpgradeMenu(data);
         }
     }
 }

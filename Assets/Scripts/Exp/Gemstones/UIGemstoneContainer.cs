@@ -115,8 +115,8 @@ namespace Exp.Gemstones
 
         private void AddGemstone(UIGemstone gemstone)
         {
-            gemstone.transform.SetParent(displayParent);
             gemstone.Container = this;
+            gemstone.SetParent(displayParent);
 
             handledDraggables.Add(gemstone);
             if (isActiveGemstones)

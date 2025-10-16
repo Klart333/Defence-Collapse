@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using Gameplay.Event;
 using UnityEngine.UI;
 using UnityEngine;
+using DG.Tweening;
 using System;
 using Loot;
 
@@ -15,6 +16,16 @@ namespace Effects.UI
         [Title("References")]
         [SerializeField]
         private Image iconImage;
+
+        [SerializeField]
+        private Image frameImage;
+        
+        [Title("Animation", "Fade Frame")]
+        [SerializeField]
+        private float fadeFrameDuration = 0.2f;
+        
+        [SerializeField]
+        private Ease fadeFrameEase = Ease.OutSine;
 
         private CanvasGroup canvasGroup;
         private RectTransform rectTransform;
@@ -36,6 +47,11 @@ namespace Effects.UI
             transform.SetParent(canvas.transform);
 
             canvasGroup.blocksRaycasts = false;
+
+            frameImage.DOKill();
+            Color color = frameImage.color;
+            color.a = 0;
+            frameImage.color = color;
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -51,6 +67,16 @@ namespace Effects.UI
             canvasGroup.blocksRaycasts = true;
 
             Container.AddDraggable(this);
+            
+            frameImage.DOKill();
+            frameImage.DOFade(1f, fadeFrameDuration).SetEase(fadeFrameEase);
+        }
+
+        public void SetParent(Transform parent)
+        {
+            rectTransform.SetParent(parent);
+            rectTransform.localScale = Vector3.one;
+            rectTransform.anchoredPosition = Vector2.zero;
         }
 
         public void Display(EffectModifier effectModifier)
@@ -65,6 +91,11 @@ namespace Effects.UI
         public void EffectClicked()
         {
             OnClick?.Invoke();
+        }
+
+        public void Disable()
+        {
+            gameObject.SetActive(false);
         }
     }
 }

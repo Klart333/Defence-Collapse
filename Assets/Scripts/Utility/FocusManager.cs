@@ -1,13 +1,65 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using UnityEngine.InputSystem;
 using Gameplay.Event;
+using InputCamera;
 using System;
-using UnityEngine;
 
 namespace Utility
 {
     public class FocusManager : Singleton<FocusManager>
     {
         private HashSet<Focus> focuses = new HashSet<Focus>();
+        
+        private InputManager inputManager;
+
+        private bool pressedGameobject;
+
+        private void OnEnable()
+        {
+            GetInput().Forget();
+        }
+
+        private void OnDisable()
+        {
+            if (inputManager)
+            {
+                inputManager.Fire.started += FireStarted;
+                inputManager.Fire.canceled += FireCanceled;
+            }
+        }
+
+        private async UniTaskVoid GetInput()
+        {
+            inputManager = await InputManager.Get();
+            inputManager.Fire.started += FireStarted;
+            inputManager.Fire.canceled += FireCanceled;
+        }
+
+        private void FireStarted(InputAction.CallbackContext obj) // weo weo weo weo
+        {
+            pressedGameobject = !InputManager.MouseOverUI();
+        }
+        
+        private void FireCanceled(InputAction.CallbackContext obj)
+        {
+            if (!pressedGameobject || InputManager.MouseOverUI()) return;
+            if (CameraController.IsDragging) return;
+            
+            List<Focus> focusesToRemove = new List<Focus>();
+            foreach (Focus focus in focuses)
+            {
+                if (focus.CloseConditions.HasFlag(FocusCloseCondition.GameobjectPress))
+                {
+                    focusesToRemove.Add(focus);
+                }
+            }
+
+            foreach (Focus focus in focusesToRemove)
+            {
+                UnregisterFocus(focus);
+            }
+        }
 
         public void RegisterFocus(Focus focusToRegister)
         {
@@ -66,14 +118,22 @@ namespace Utility
     
     public class Focus
     {
-        public FocusType FocusType;
+        public FocusCloseCondition CloseConditions;
         public FocusChangeType ChangeType;
+        public FocusType FocusType;
         public Action OnFocusExit;
     }
 
     public enum FocusType
     {
         Placing,
+        DistrictPanel,
+    }
+
+    [Flags]
+    public enum FocusCloseCondition
+    {
+        GameobjectPress = 1 << 0,
     }
 
     public enum FocusChangeType

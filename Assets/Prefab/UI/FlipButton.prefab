@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 4880935768058073186}
   - component: {fileID: 604264079844408855}
   - component: {fileID: 5821550600406107737}
+  - component: {fileID: 1575258902775372372}
   m_Layer: 5
   m_Name: FlipButton
   m_TagString: Untagged
@@ -208,6 +209,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioEvent: {fileID: 11400000, guid: 3eece029360450448b3e0dbc7a80f2df, type: 2}
+--- !u!114 &1575258902775372372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598327024341094733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b70f3e40277243bea9715fb8a01eb105, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::Juice.Cursor.UICursorHover
+  hoverCursorData: {fileID: 11400000, guid: e582cf2ced0580f4ca64fdc46160f49a, type: 2}
+  disabledTextureData: {fileID: 11400000, guid: c5e20a8db2710eb4d83da0f4987698b0,
+    type: 2}
 --- !u!1 &923076936251239682
 GameObject:
   m_ObjectHideFlags: 0

@@ -13,10 +13,11 @@ using Effects;
 using TMPro;
 using Loot;
 using UI;
+using UnityEngine.Serialization;
 
 namespace Buildings.District.UI
 {
-    public class UIDistrictUpgrade : MonoBehaviour
+    public class UIDistrictUpgrade : MonoBehaviour // Todo: Convert to smaller scripts plz
     {
         [Title("Panel")]
         [SerializeField]
@@ -57,22 +58,11 @@ namespace Buildings.District.UI
 
         [Title("Effect Panels")]
         [SerializeField]
-        private RectTransform effectsPanelParent;
-        
-        [SerializeField]
-        private float startX = -325;
-        
-        [SerializeField]
-        private float endX = 325;
-        
-        [SerializeField]
-        private CanvasGroup effectsCanvasGroup;
-        
-        [SerializeField]
-        private UIEffectContainer ownedEffectsPanel;
-
-        [SerializeField]
         private UIEffectContainer towerEffectsPanel;
+
+        [FormerlySerializedAs("containerAmount")]
+        [SerializeField]
+        private int effectContainerAmount = 3;
         
         [Title("Information")]
         [SerializeField]
@@ -89,140 +79,29 @@ namespace Buildings.District.UI
         [SerializeField]
         private UIDistrictStatPanel statPanel;
 
-        private readonly Dictionary<DistrictData, List<EffectModifier>> effectModifiers = new Dictionary<DistrictData, List<EffectModifier>>();
+        private readonly Dictionary<DistrictData, EffectModifier[]> appliedEffectModifiers = new Dictionary<DistrictData, EffectModifier[]>();
 
-        private readonly List<EffectModifier> availableEffectModifiers = new List<EffectModifier>();
         private readonly List<UIUpgradeDisplay> spawnedDisplays = new List<UIUpgradeDisplay>();
         private readonly List<PooledText> spawnedTexts = new List<PooledText>();
 
         private DistrictUpgradeManager upgradeManager;
-        private InputManager inputManager;
         private DistrictData districtData;
-        private Canvas canvas;
-        private Camera cam;
         
         private void OnEnable()
         {
-            canvas = GetComponentInParent<Canvas>();
-            cam = Camera.main;
-
             towerEffectsPanel.OnEffectRemoved += RemoveEffectFromTower;
             towerEffectsPanel.OnEffectAdded += AddEffectToTower;
-
-            GetUpgradeManager().Forget();
-            GetInput().Forget();
-        }
-
-        private async UniTaskVoid GetUpgradeManager()
-        {
-            upgradeManager = await DistrictUpgradeManager.Get();
-            upgradeManager.OnEffectGained += OnEffectGained;
-        }
-
-        private async UniTaskVoid GetInput()
-        {
-            inputManager = await InputManager.Get();
-            inputManager.Fire.canceled += ClickReleased;
         }
 
         private void OnDisable()
         {
             towerEffectsPanel.OnEffectRemoved -= RemoveEffectFromTower;
             towerEffectsPanel.OnEffectAdded -= AddEffectToTower;
-            upgradeManager.OnEffectGained -= OnEffectGained;
-            inputManager.Fire.canceled -= ClickReleased;
-        }
-
-        private void Update()
-        {
-            if (parentPanel.activeSelf)
-            {
-                PositionRectTransform.PositionOnOverlayCanvas(canvas, cam, parentPanel.transform as RectTransform, districtData.Position, pivot);
-            }
-        }
-
-        private void ClickReleased(InputAction.CallbackContext obj)
-        {
-            if (parentPanel.activeSelf)
-            {
-                CheckCancel();
-            }
-        }
-
-        private void CheckCancel()
-        {
-            if (InputManager.Instance.Fire.WasReleasedThisFrame() && !CameraController.IsDragging && !EventSystem.current.IsPointerOverGameObject())
-            {
-                UIEvents.OnFocusChanged?.Invoke();
-            }
         }
 
         #region UI
-
-        public void ShowSection(int sectionIndex)
-        {
-            if (sections[sectionIndex].activeSelf)
-            {
-                return;
-            }
-
-            for (int i = 0; i < sections.Length; i++)
-            {
-                sections[i].SetActive(i == sectionIndex);
-            }
-            
-            line.DOKill();
-            line.DOAnchorPosX(selectorSpacingOffsets[sectionIndex], 0.2f).SetEase(Ease.OutSine);
-
-            effectsPanelParent.DOKill();
-            if (sectionIndex == 1)
-            {
-                EnableEffectsPanel();
-                
-                if (effectModifiers.TryGetValue(districtData, out List<EffectModifier> effects))
-                {
-                    towerEffectsPanel.SpawnEffects(effects);
-                }
-            }
-            else
-            {
-                DisableEffectsPanel();
-            }
-
-            if (sectionIndex == 2)
-            {
-                attachmentHandler.DisplayInformation(districtData);
-            }
-        }
-
-        private void EnableEffectsPanel()
-        {
-            effectsCanvasGroup.DOKill();
-            effectsCanvasGroup.DOFade(1f, 0.2f);
-                
-            effectsPanelParent.DOComplete();
-            effectsPanelParent.anchoredPosition = new Vector2(startX, effectsPanelParent.anchoredPosition.y);
-            effectsPanelParent.gameObject.SetActive(true);
-            ownedEffectsPanel.SpawnEffects(availableEffectModifiers);
-
-            effectsPanelParent.DOAnchorPosX(endX, 0.5f).SetEase(Ease.OutSine);
-        }
-
-        private void DisableEffectsPanel()
-        {
-            if (!effectsPanelParent.gameObject.activeSelf) return;
-            
-            effectsCanvasGroup.DOKill();
-            effectsCanvasGroup.DOFade(0.0f, 0.5f);
-                    
-            effectsPanelParent.DOComplete();
-            effectsPanelParent.DOAnchorPosX(startX, 0.5f).SetEase(Ease.OutSine).onComplete += () =>
-            {
-                effectsPanelParent.gameObject.SetActive(false);
-            };
-        }
-
-        public void ShowUpgrades(DistrictData districtData)
+        
+        public void OpenDistrictPanel(DistrictData districtData)
         {
             this.districtData = districtData;
             if (districtData.State is IAttackerStatistics stats)
@@ -231,11 +110,9 @@ namespace Buildings.District.UI
             }
 
             parentPanel.SetActive(true);
-
-            (ownedEffectsPanel.transform.parent as RectTransform).anchoredPosition = Vector2.zero;
-
-            ShowSection(0); // 142.5, 255
-
+            
+            SetupEffects(districtData);
+            
             SpawnUpgradeDisplays(districtData);
             DisplayExtraInfo(districtData);
             panelTitleText.text = districtData.TowerData.DistrictName;
@@ -251,17 +128,33 @@ namespace Buildings.District.UI
             {
                 districtData.OnDisposed -= DistrictDataOnOnDisposed;
 
-                if (effectModifiers.TryGetValue(districtData, out List<EffectModifier> districtEffects))
+                if (appliedEffectModifiers.TryGetValue(districtData, out EffectModifier[] districtEffects))
                 {
-                    availableEffectModifiers.AddRange(districtEffects);
+                    foreach (EffectModifier effect in districtEffects)
+                    {
+                        if (effect != null)
+                        {
+                            Events.OnEffectGained?.Invoke(effect);
+                        }
+                    }
                 }
 
-                effectModifiers.Remove(districtData);
+                appliedEffectModifiers.Remove(districtData);
                 if (districtData == this.districtData)
                 {
                     this.districtData = null;
                     parentPanel.SetActive(false);
                 }
+            }
+        }
+
+        private void SetupEffects(DistrictData districtData)
+        {
+            towerEffectsPanel.Setup(effectContainerAmount);
+            
+            if (appliedEffectModifiers.TryGetValue(districtData, out EffectModifier[] effects))
+            {
+                towerEffectsPanel.SetEffects(effects);
             }
         }
 
@@ -365,7 +258,6 @@ namespace Buildings.District.UI
             {
                 spawnedDisplays[i].gameObject.SetActive(false);
             }
-            effectsPanelParent.gameObject.SetActive(false);
 
             for (int i = 0; i < spawnedTexts.Count; i++)
             {
@@ -406,37 +298,32 @@ namespace Buildings.District.UI
 
         #region Effects
 
-        private void OnEffectGained(EffectModifier effectModifier)
+        private void AddEffectToTower(EffectModifier effectModifier, int containerIndex)
         {
-            availableEffectModifiers.Add(effectModifier);
-            if (gameObject.activeInHierarchy)
+            if (appliedEffectModifiers.TryGetValue(districtData, out EffectModifier[] effects))
             {
-                Close();
+                if (effects[containerIndex] == effectModifier)
+                {
+                    return;
+                }
+                
+                effects[containerIndex] = effectModifier;
             }
-        }
+            else
+            {
+                EffectModifier[] appliedEffects = new EffectModifier[effectContainerAmount];
+                appliedEffects[containerIndex] = effectModifier;
+                appliedEffectModifiers.Add(districtData, appliedEffects);
+            }
 
-        private void AddEffectToTower(EffectModifier effectModifier)
-        {
             districtData.State.Attack.AddEffect(effectModifier.Effects, effectModifier.EffectType);
-
-            availableEffectModifiers.Remove(effectModifier);
-
-            if (effectModifiers.TryGetValue(districtData, out List<EffectModifier> list)) list.Add(effectModifier);
-            else effectModifiers.Add(districtData, new List<EffectModifier> { effectModifier });
         }
 
-        private void RemoveEffectFromTower(EffectModifier effectModifier)
+        private void RemoveEffectFromTower(EffectModifier effectModifier, int containerIndex)
         {
             districtData.State.Attack.RemoveEffect(effectModifier.Effects, effectModifier.EffectType);
-
-            availableEffectModifiers.Add(effectModifier);
-
-            if (!effectModifiers.TryGetValue(districtData, out List<EffectModifier> list)) return;
-            list.Remove(effectModifier);
-            if (list.Count == 0)
-            {
-                effectModifiers.Remove(districtData);
-            }
+            
+            appliedEffectModifiers[districtData][containerIndex] = null;
         }
 
         #endregion

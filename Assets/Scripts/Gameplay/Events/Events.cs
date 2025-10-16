@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Buildings.Barricades;
 using WaveFunctionCollapse;
 using Buildings.District;
@@ -6,6 +7,7 @@ using Unity.Mathematics;
 using Gameplay.Upgrades;
 using Buildings;
 using Effects.UI;
+using Loot;
 
 namespace Gameplay.Event
 {
@@ -38,6 +40,8 @@ namespace Gameplay.Event
 
         public static EventAction<UpgradeCardData.UpgradeCardInstance> OnUpgradeCardPicked;
         public static EventAction OnUpgradeCardsDisplayed;
+        
+        public static EventAction<EffectModifier> OnEffectGained;
 
         public static EventAction OnGameReset;
 

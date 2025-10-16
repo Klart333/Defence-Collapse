@@ -34,7 +34,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000015258789, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6046339493309516623
@@ -202,10 +202,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 8252277805250641144}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3229232199772670054
 MonoBehaviour:
@@ -299,6 +299,7 @@ GameObject:
   - component: {fileID: 8252277805250641144}
   - component: {fileID: 2469724980238236484}
   - component: {fileID: 6256566722320315504}
+  - component: {fileID: 6345961883741401194}
   m_Layer: 0
   m_Name: UIEffectDisplay
   m_TagString: Untagged
@@ -323,10 +324,10 @@ RectTransform:
   - {fileID: 4780601593011935111}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2469724980238236484
 MonoBehaviour:
@@ -340,8 +341,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5811fc98c8c4df14d9e994309472fdd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPoolSize: 10
+  initialPoolSize: 1
   iconImage: {fileID: 4148121961680495079}
+  frameImage: {fileID: 3238139176332560701}
+  fadeFrameDuration: 0.2
+  fadeFrameEase: 2
 --- !u!225 &6256566722320315504
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -354,3 +358,18 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &6345961883741401194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8560921894586417560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b70f3e40277243bea9715fb8a01eb105, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::Juice.Cursor.UICursorHover
+  hoverCursorData: {fileID: 11400000, guid: e582cf2ced0580f4ca64fdc46160f49a, type: 2}
+  disabledTextureData: {fileID: 11400000, guid: c5e20a8db2710eb4d83da0f4987698b0,
+    type: 2}

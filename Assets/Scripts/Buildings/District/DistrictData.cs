@@ -14,6 +14,7 @@ using Gameplay;
 using Effects;
 using Utility;
 using System;
+using FocusType = Utility.FocusType;
 
 namespace Buildings.District
 {
@@ -148,9 +149,16 @@ namespace Buildings.District
 
         private void OnHoverEnter()
         {
-            if (FocusManager.Instance.GetIsFocused())
+            if (CameraController.IsDragging || InputManager.MouseOverUI()) return;
+            if (FocusManager.Instance.GetIsFocused(out HashSet<Focus> focuses)) // Return on all focuses except district panel
             {
-                return;
+                foreach (Focus focus in focuses)
+                {
+                    if (focus.FocusType != FocusType.DistrictPanel)
+                    {
+                        return;
+                    }
+                }
             }
             
             hovered = true;
@@ -161,36 +169,46 @@ namespace Buildings.District
         private void OnHoverExit()
         {
             hovered = false;
-            DistrictHandler.SetHoverOnObjects(DistrictChunks.Values, false);
+
+            if (!State.Selected)
+            {
+                DistrictHandler.SetHoverOnObjects(DistrictChunks.Values, false);
+            }
         }
 
         private void InvokeOnClicked()
         {
-            if (CameraController.IsDragging 
-                || UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()
-                || FocusManager.Instance.GetIsFocused())
+            if (CameraController.IsDragging || InputManager.MouseOverUI()) return;
+            if (FocusManager.Instance.GetIsFocused(out HashSet<Focus> focuses)) // Return on all focuses except district panel
             {
-                return;
+                foreach (Focus focus in focuses)
+                {
+                    if (focus.FocusType != FocusType.DistrictPanel)
+                    {
+                        return;
+                    }
+                }
             }
             
+            DistrictHandler.SetHoverOnObjects(DistrictChunks.Values, true);
+
             OnClicked?.Invoke(this);
             State.OnSelected(Position);
-
-            InputManager.Instance.Cancel.performed += OnDeselected;
-            UIEvents.OnFocusChanged += Deselect;
         }
 
-        private void OnDeselected(InputAction.CallbackContext obj)
+        public void RegisterToDistrictPanelFocus(Focus focus)
         {
-            Deselect();
+            focus.OnFocusExit += Deselect;
+            
+            void Deselect()
+            {
+                focus.OnFocusExit -= Deselect;
+            
+                State.OnDeselected();
+                DistrictHandler.SetHoverOnObjects(DistrictChunks.Values, false);
+            }
         }
-
-        private void Deselect()
-        {
-            InputManager.Instance.Cancel.performed -= OnDeselected;
-            UIEvents.OnFocusChanged -= Deselect;
-            State.OnDeselected();
-        }
+        
 
         public void LevelUp()
         {
@@ -220,8 +238,6 @@ namespace Buildings.District
         {
             State.Dispose();
             
-            InputManager.Instance.Cancel.performed -= OnDeselected;
-            UIEvents.OnFocusChanged -= Deselect;
             Events.OnTurnComplete -= OnTurnComplete;
             Events.OnGameReset -= Dispose;
             

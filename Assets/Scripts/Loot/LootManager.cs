@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 
 namespace Loot
 {
-    public class LootManager : Singleton<LootManager> // Make a collect all loot button
+    public class LootManager : Singleton<LootManager>
     {
         [Title("Loot Data")]
         [SerializeField]
@@ -18,11 +18,7 @@ namespace Loot
         [SerializeField]
         private LootOrb normalLoot;
 
-        [Title("UI")]
-        [SerializeField]
-        private UILootHandler lootHandler;
-
-        private readonly Dictionary<int, List<LootData>> GradedLootData = new Dictionary<int, List<LootData>>();
+        private readonly Dictionary<int, List<LootData>> gradedLootData = new Dictionary<int, List<LootData>>();
 
         protected override void Awake()
         {
@@ -46,13 +42,13 @@ namespace Loot
             for (int i = 0; i < lootDataUtility.LootDatas.Length; i++)
             {
                 LootData lootData = lootDataUtility.LootDatas[i];
-                if (GradedLootData.TryGetValue(lootData.Grade, out List<LootData> value))
+                if (gradedLootData.TryGetValue(lootData.Grade, out List<LootData> value))
                 {
                     value.Add(lootData);
                 }
                 else
                 {
-                    GradedLootData.Add(lootData.Grade, new List<LootData> { lootData });
+                    gradedLootData.Add(lootData.Grade, new List<LootData> { lootData });
                 }
             }
         }
@@ -100,12 +96,7 @@ namespace Loot
                 }
             }
 
-            return GradedLootData[lootGrade][Random.Range(0, GradedLootData[lootGrade].Count)];
-        }
-
-        public void DisplayEffectGained(EffectModifier effect)
-        {
-            lootHandler.DisplayEffect(effect);
+            return gradedLootData[lootGrade][Random.Range(0, gradedLootData[lootGrade].Count)];
         }
     }
 }

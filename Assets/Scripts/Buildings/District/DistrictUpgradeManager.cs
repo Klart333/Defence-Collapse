@@ -6,19 +6,22 @@ using Buildings.District.UI;
 using Gameplay.Event;
 using InputCamera;
 using UnityEngine;
-using System;
 using Loot;
+using Utility;
+using FocusType = Utility.FocusType;
 
 namespace Buildings.District
 {
     public class DistrictUpgradeManager : Singleton<DistrictUpgradeManager>
     {
-        public event Action<EffectModifier> OnEffectGained;
-
         [Title("UI", "Upgrade")]
         [SerializeField]
         private UIDistrictUpgrade districtUpgrade;
 
+        private InputManager inputManager;
+        private FocusManager focusManager;
+        private Focus focus;
+        
 #if UNITY_EDITOR
         [Title("Debug")]
         [SerializeField]
@@ -27,11 +30,17 @@ namespace Buildings.District
         [SerializeField]
         private bool giveStartingLootData;
 #endif
-
+        
         private void OnEnable()
         {
-            UIEvents.OnFocusChanged += Close;
-
+            focus = new Focus
+            {
+                CloseConditions = FocusCloseCondition.GameobjectPress,
+                ChangeType = FocusChangeType.Unique,
+                FocusType = FocusType.DistrictPanel,
+                OnFocusExit = Close,
+            };
+            
 #if UNITY_EDITOR
             if (giveStartingLootData)
             { 
@@ -40,6 +49,7 @@ namespace Buildings.District
 #endif
 
             GetInput().Forget();
+            GetFocus().Forget();
         }
 
 #if UNITY_EDITOR
@@ -55,27 +65,33 @@ namespace Buildings.District
 
         private async UniTaskVoid GetInput()
         {
-            await UniTask.WaitUntil(() => InputManager.Instance != null);
-            InputManager.Instance.Cancel.performed += Cancel_performed;
+            inputManager = await InputManager.Get();
+            inputManager.Cancel.performed += CancelPerformed;
+        }
+        
+        private async UniTaskVoid GetFocus()
+        {
+            focusManager = await FocusManager.Get();
         }
 
         private void OnDisable()
         {
-            InputManager.Instance.Cancel.performed -= Cancel_performed;
-            UIEvents.OnFocusChanged -= Close;
+            if (inputManager)
+            {
+                inputManager.Cancel.performed -= CancelPerformed;
+            }
         }
 
-        private void Cancel_performed(InputAction.CallbackContext obj)
+        private void CancelPerformed(InputAction.CallbackContext obj)
         {
-            Close();
+            focusManager.UnregisterFocus(focus);
         }
 
-        public async UniTaskVoid OpenUpgradeMenu(DistrictData district)
+        public void OpenUpgradeMenu(DistrictData district)
         {
-            UIEvents.OnFocusChanged?.Invoke();
-            await UniTask.Yield();
-
-            districtUpgrade.ShowUpgrades(district);
+            focusManager.RegisterFocus(focus);
+            district.RegisterToDistrictPanelFocus(focus);
+            districtUpgrade.OpenDistrictPanel(district);
         }
 
         public void Close()
@@ -85,7 +101,7 @@ namespace Buildings.District
 
         public void AddModifierEffect(EffectModifier effect)
         {
-            OnEffectGained?.Invoke(effect);
+            Events.OnEffectGained?.Invoke(effect);
         }
     }
 }

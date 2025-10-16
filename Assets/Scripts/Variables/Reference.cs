@@ -81,4 +81,18 @@ namespace Variables
             return Variable != null ? Variable.Value : "";
         }
     }
+    
+    [System.Serializable]
+    public class TextureReference : Reference<Texture2D, TextureVariable>
+    {
+        public TextureReference(Texture2D constantValue)
+        {
+            ConstantValue = constantValue;
+        }
+        
+        protected override Texture2D GetVariableValue()
+        {
+            return Variable != null ? Variable.Value : null;
+        }
+    }
 }

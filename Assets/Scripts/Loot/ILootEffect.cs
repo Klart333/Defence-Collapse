@@ -35,7 +35,6 @@ namespace Loot
         {
             EffectModifier effect = new EffectModifier(Effect);
             DistrictUpgradeManager.Instance.AddModifierEffect(effect);
-            LootManager.Instance.DisplayEffectGained(effect);
         }
     }
 }

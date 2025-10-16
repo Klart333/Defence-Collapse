@@ -1,17 +1,14 @@
-using System.Collections.Generic;
-using UnityEngine.EventSystems;
 using Sirenix.OdinInspector;
-using Gameplay.Event;
 using UnityEngine;
 using System;
 using Loot;
 
 namespace Effects.UI
 {
-    public class UIEffectContainer : MonoBehaviour, IContainer, IPointerEnterHandler, IPointerExitHandler
+    public class UIEffectContainer : MonoBehaviour
     {
-        public event Action<EffectModifier> OnEffectAdded;
-        public event Action<EffectModifier> OnEffectRemoved;
+        public event Action<EffectModifier, int> OnEffectRemoved;
+        public event Action<EffectModifier, int> OnEffectAdded;
 
         [Title("Prefabs")]
         [SerializeField]
@@ -19,126 +16,129 @@ namespace Effects.UI
 
         [Title("UI")]
         [SerializeField]
-        private Transform displayParent;
-
-        [Title("Settings")]
-        [SerializeField]
-        private int maxAmount = 3;
-
-        private readonly List<UIEffectDisplay> spawnedDisplays = new List<UIEffectDisplay>();
+        private Transform containerContainer;
         
-        private bool hovered;
+        [SerializeField]
+        private UISingleDraggableContainer containerPrefab;
+        
+        private UISingleDraggableContainer[] spawnedContainers;
+        private Action<IDraggable>[] containerAddActions;
+        private Action<IDraggable>[] containerRemoveActions;
 
-        private void OnEnable()
+        public void Setup(int containerAmount)
         {
-            UIEvents.OnEndDrag += OnEndDrag;
-            UIEvents.OnBeginDrag += OnBeginDrag;
+            spawnedContainers = new UISingleDraggableContainer[containerAmount];
+            containerAddActions = new Action<IDraggable>[containerAmount];
+            containerRemoveActions = new Action<IDraggable>[containerAmount];
+            
+            for (int i = 0; i < containerAmount; i++)
+            {
+                spawnedContainers[i] = containerPrefab.Get<UISingleDraggableContainer>();
+                spawnedContainers[i].transform.SetParent(containerContainer, false);
+                spawnedContainers[i].transform.SetSiblingIndex(i);
+
+                int containerIndex = i;
+                containerAddActions[i] = x => { OnDraggableAddedToContainer(x, containerIndex); };
+                containerRemoveActions[i] = x => { OnDraggableRemovedFromContainer(x, containerIndex); };
+                
+                spawnedContainers[i].OnDraggableAdded += containerAddActions[i];
+                spawnedContainers[i].OnDraggableRemoved += containerRemoveActions[i];
+            }
         }
 
         private void OnDisable()
         {
-            UIEvents.OnEndDrag -= OnEndDrag;
-            UIEvents.OnBeginDrag -= OnBeginDrag;
-
-            for (int i = 0; i < spawnedDisplays.Count; i++)
+            for (int i = 0; i < spawnedContainers.Length; i++)
             {
-                spawnedDisplays[i].gameObject.SetActive(false);
+                spawnedContainers[i].gameObject.SetActive(false);
+                
+                spawnedContainers[i].OnDraggableAdded -= containerAddActions[i];
+                spawnedContainers[i].OnDraggableRemoved -= containerRemoveActions[i];
+            }
+            
+            spawnedContainers = null;
+            containerAddActions = null;
+            containerRemoveActions = null;
+        }
+        
+        public void SetEffects(EffectModifier[] effects)
+        {
+            if (effects.Length != spawnedContainers.Length)
+            {
+                Debug.LogError("Mismatched number of effects");
+                return;
             }
 
-            spawnedDisplays.Clear();
-        }
-
-        public void SpawnEffects(List<EffectModifier> effects)
-        {
-            for (int i = effects.Count - 1; i >= 0; i--)
+            for (int i = 0; i < spawnedContainers.Length; i++)
             {
-                SpawnEffect(effects[i]);
-            } 
+                if (effects[i] == null)
+                {
+                    continue;
+                }
+                
+                SpawnEffect(effects[i], spawnedContainers[i]);
+            }
         }
 
-        private void SpawnEffect(EffectModifier effectModifier)
+        public void SpawnEffect(EffectModifier effectModifier, UISingleDraggableContainer container = null)
         {
+            if (!container && !TryGetFirstEmptyContainer(out container))
+            {
+                Debug.LogError("Could not find empty container for effect");
+                return;
+            }
+            
             UIEffectDisplay effect = effectDisplayPrefab.Get<UIEffectDisplay>();
-            effect.transform.SetParent(displayParent, false);
-            effect.Container = this;
+            effect.SetParent(container.DraggableParent);
             effect.Display(effectModifier);
-
-            spawnedDisplays.Add(effect);
+             
+            container.AddDraggable(effect);
         }
 
-        private void RemoveEffect(UIEffectDisplay effectDisplay)
+        private bool TryGetFirstEmptyContainer(out UISingleDraggableContainer container)
         {
-            spawnedDisplays.Remove(effectDisplay);
-
-            OnEffectRemoved?.Invoke(effectDisplay.EffectModifier);
-        }
-
-        public void AddDraggable(IDraggable draggable)
-        {
-            if (draggable is not UIEffectDisplay effectDisplay)
+            for (int i = 0; i < spawnedContainers.Length; i++)
             {
-                Debug.LogError("Draggable is not a UIEffectDisplay");
-                return;
+                if (spawnedContainers[i].HasDraggable)
+                {
+                    continue;
+                }
+                
+                container = spawnedContainers[i];
+                return true;
             }
 
-            AddEffect(effectDisplay);
+            container = null;
+            return false;
         }
 
-        private void AddEffect(UIEffectDisplay effectDisplay)
+        
+        private void OnDraggableAddedToContainer(IDraggable draggable, int containerIndex)
         {
-            effectDisplay.transform.SetParent(displayParent);
-            effectDisplay.Container = this;
-
-            spawnedDisplays.Add(effectDisplay);
-
-            OnEffectAdded?.Invoke(effectDisplay.EffectModifier);
-        }
-
-        private void OnBeginDrag(IDraggable display)
-        {
-            if (display is not UIEffectDisplay effectDisplay)
+            if (draggable is UIEffectDisplay effectDisplay)
             {
-                return;
-            }
-
-            if (spawnedDisplays.Contains(effectDisplay))
-            {
-                RemoveEffect(effectDisplay);
+                OnEffectAdded?.Invoke(effectDisplay.EffectModifier, containerIndex);
             }
         }
-
-        public void OnEndDrag(IDraggable display)
+        
+        private void OnDraggableRemovedFromContainer(IDraggable draggable, int containerIndex)
         {
-            if (display is not UIEffectDisplay)
+            if (draggable is UIEffectDisplay effectDisplay)
             {
-                return;
+                OnEffectRemoved?.Invoke(effectDisplay.EffectModifier, containerIndex);
             }
-
-            if (hovered && spawnedDisplays.Count < maxAmount)
-            {
-                display.Container = this;
-            }
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            hovered = false;
-        }
-
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            hovered = true;
         }
     }
 
     public interface IDraggable
     {
         public IContainer Container { get; set; }
+        public void SetParent(Transform parent);
+        public void Disable();
     }
 
     public interface IContainer
     {
         public void AddDraggable(IDraggable draggable);
     }
-
 }

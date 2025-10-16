@@ -166,4 +166,13 @@ namespace Variables.Editor
             return entry.Entry.Value;
         }
     }
+    
+    [CustomPropertyDrawer(typeof(TextureReference))]
+    public class TextureReferenceDrawer : ReferenceDrawerBase<Texture2D, TextureVariable>
+    {
+        protected override Texture2D GetVariableValue(TextureVariable variable)
+        {
+            return variable.Value;
+        }
+    }
 }

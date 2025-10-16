@@ -44,6 +44,7 @@ namespace Buildings.District
         protected bool selected;
         
         public CategoryType CategoryType => districtData.CategoryType;
+        public bool Selected => selected;
         public Stats Stats => stats;
 
         public DamageInstance LastDamageDone { get; private set; }
