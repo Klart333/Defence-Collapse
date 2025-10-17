@@ -1,82 +1,53 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
-using UnityEngine.UI;
 using UnityEngine;
 using Effects;
-using Health;
-using TMPro;
+using System;
 
 namespace Buildings.District.UI
 {
-    public class UIDistrictStatPanel : SerializedMonoBehaviour
+    public class UIDistrictStatPanel : MonoBehaviour
     {
-        [Title("References")]
+        [Title("Setup")]
         [SerializeField]
-        private TextMeshProUGUI displayableNameText;
-
-        [Title("References", "Health")]
-        [SerializeField]
-        private GameObject healthParent;
+        private UIStatGroupDisplay statGroupDisplayPrefab;
         
         [SerializeField]
-        private TextMeshProUGUI healthText;
-
-        [SerializeField]
-        private Image healthFillImage;
+        private Transform statGroupContainer;
         
-        [Title("References", "Stats")]
-        [SerializeField]
-        private UIStatPanel statPanelPrefab;
+        private List<UIStatGroupDisplay> spawnedGroups = new List<UIStatGroupDisplay>();
         
-        [SerializeField]
-        private Transform statPanelParent;
-
-        [SerializeField]
-        private Dictionary<StatDisplayableType, StatType[]> statTypes = new Dictionary<StatDisplayableType, StatType[]>();
-        
-        private List<UIStatPanel> spawnedStatPanels = new List<UIStatPanel>();
+        private List<Type> groupTypes = new List<Type>
+        {
+            typeof(AttackDistrictStats),
+            typeof(ProductionDistrictStats),
+            typeof(EffectsDistrictStats),
+        };
 
         private void OnDisable()
         {
-            foreach (UIStatPanel panel in spawnedStatPanels)
+            foreach (UIStatGroupDisplay panel in spawnedGroups)
             {
                 panel.gameObject.SetActive(false);
             }
             
-            spawnedStatPanels.Clear();
+            spawnedGroups.Clear();
         }
 
-        public void DisplayStats(StatDisplayableType displayableType, string name, Stats stats, HealthComponent health = null)
+        public void DisplayStats(Stats stats)
         {
-            displayableNameText.text = name;
-
-            bool hasHealth = health != null;
-            healthParent.SetActive(hasHealth);
-            if (hasHealth)
+            for (int i = 0; i < groupTypes.Count; i++)
             {
-                healthText.text = $"{health.CurrentHealth} / {health.MaxHealth}";
-                healthFillImage.fillAmount = health.HealthPercentage;
-            }
-            
-            StatType[] statsToDisplay = statTypes[displayableType];
-            for (int i = 0; i < statsToDisplay.Length; i++)
-            {
-                StatType statType = statsToDisplay[i];
-                UIStatPanel spawned = statPanelPrefab.GetDisabled<UIStatPanel>();
-                spawned.transform.SetParent(statPanelParent, false);
+                Type[] statTypes = StatUtility.StatTypes[groupTypes[i]];
+                
+                UIStatGroupDisplay spawned = statGroupDisplayPrefab.GetDisabled<UIStatGroupDisplay>();
+                spawned.transform.SetParent(statGroupContainer, false);
                 spawned.transform.SetSiblingIndex(i);
-                Stat stat = stats.Get(statType.Type);
-                spawned.DisplayStat(stat);
+                spawned.DisplayStats(statTypes, stats);
                 spawned.gameObject.SetActive(true);
-                spawnedStatPanels.Add(spawned);
+                
+                spawnedGroups.Add(spawned);
             }
         }
-    }
-
-    public enum StatDisplayableType
-    {
-        District,
-        Wall,
-        Barricade,
     }
 }

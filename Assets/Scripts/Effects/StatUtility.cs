@@ -55,6 +55,7 @@ namespace Effects
                     typeof(AttackSpeedStat),
                     typeof(MaxHealthStat),
                     typeof(MaxArmorStat),
+                    typeof(ArmorStat),
                     typeof(HealingStat),
                     typeof(MovementSpeedStat),
                 }

@@ -12,14 +12,14 @@ namespace Effects
     }
     
     [Serializable]
-    public class ArmorPenetrationStat : Stat
+    public class ArmorPenetrationStat : Stat, IPercentageStat
     {
         public ArmorPenetrationStat(float baseValue) : base(baseValue) { }
         public ArmorPenetrationStat(Stat copyFrom) : base(copyFrom) { }
     }
     
     [Serializable]
-    public class CritChanceStat : Stat
+    public class CritChanceStat : Stat, IPercentageStat
     {
         public CritChanceStat(float baseValue) : base(baseValue) { }
         public CritChanceStat(Stat copyFrom) : base(copyFrom) { }

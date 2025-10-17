@@ -17,6 +17,11 @@ namespace Effects
         public void RemoveAllModifiers();
     }
 
+    public interface IPercentageStat
+    {
+        
+    }
+
     [Serializable, InlineProperty]
     public class Stat : IStat
     {

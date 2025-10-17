@@ -1,31 +1,23 @@
 using System.Collections.Generic;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using Cysharp.Threading.Tasks;
+using UnityEngine.Serialization;
 using Sirenix.OdinInspector;
 using Gameplay.Money;
 using Gameplay.Event;
 using UnityEngine;
-using DG.Tweening;
-using InputCamera;
 using Effects.UI;
 using Effects;
 using TMPro;
 using Loot;
 using UI;
-using UnityEngine.Serialization;
 
 namespace Buildings.District.UI
 {
-    public class UIDistrictUpgrade : MonoBehaviour // Todo: Convert to smaller scripts plz
+    public class UIDistrictUpgrade : MonoBehaviour
     {
         [Title("Panel")]
         [SerializeField]
         private GameObject parentPanel;
-
-        [SerializeField]
-        private Vector2 pivot = new Vector2(0.5f, 0.5f);
-
+        
         [Title("Upgrade")]
         [SerializeField]
         private TextMeshProUGUI upgradeTitleText;
@@ -45,16 +37,6 @@ namespace Buildings.District.UI
 
         [SerializeField]
         private Transform upgradeDisplayParent;
-
-        [Title("Sections")]
-        [SerializeField]
-        private GameObject[] sections;
-
-        [SerializeField]
-        private float[] selectorSpacingOffsets;
-        
-        [SerializeField]
-        private RectTransform line;
 
         [Title("Effect Panels")]
         [SerializeField]
@@ -121,7 +103,7 @@ namespace Buildings.District.UI
             
             if (statPanel.gameObject.activeSelf)
             {
-                statPanel.DisplayStats(StatDisplayableType.District, districtData.TowerData.DistrictName, districtData.State.Stats);
+                statPanel.DisplayStats(districtData.State.Stats);
             }
 
             void DistrictDataOnOnDisposed()
@@ -335,7 +317,7 @@ namespace Buildings.District.UI
             statPanel.gameObject.SetActive(!statPanel.gameObject.activeSelf);
             if (statPanel.gameObject.activeSelf)
             {
-                statPanel.DisplayStats(StatDisplayableType.District, districtData.TowerData.DistrictName, districtData.State.Stats);
+                statPanel.DisplayStats(districtData.State.Stats);
             }
         }
 

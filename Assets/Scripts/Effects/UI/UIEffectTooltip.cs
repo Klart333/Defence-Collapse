@@ -16,6 +16,12 @@ namespace Effects.UI
         [SerializeField]
         private float heightOffset = 10;
         
+        [SerializeField]
+        private float titleFontSize = 20;
+
+        [SerializeField]
+        private float descriptionFontSize = 16;
+        
         private UITooltipHandler tooltipHandler;
         private RectTransform rectTransform;
         private Canvas canvas; 
@@ -38,8 +44,8 @@ namespace Effects.UI
             
             List<TextData> districtDescription = new List<TextData>
             {
-                new TextData(effectDisplay.EffectModifier.Title, 20),
-                new TextData(effectDisplay.EffectModifier.Description, 16),
+                new TextData(effectDisplay.EffectModifier.Title, titleFontSize),
+                new TextData(effectDisplay.EffectModifier.Description, descriptionFontSize),
             };
             
             Vector2 position = ToolTipUtility.GetTooltipPosition(rectTransform, canvas, heightOffset);

@@ -1,0 +1,779 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3985454b27554057b18f8e740c847d86, type: 3}
+  m_Name: Stat Icon Utility
+  m_EditorClassIdentifier: Core::Effects.StatIconUtility
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 11400000, guid: 58ea1146a11584f4a9a723ce4cfaae05, type: 2}
+    - {fileID: 21300000, guid: fe1ed4a815104294f8efe94d0e694862, type: 3}
+    - {fileID: 11400000, guid: dab8429af703e4c4c881c66b00a3ba15, type: 2}
+    - {fileID: 21300000, guid: 612aeacb80233d741a233eb3a8940f4d, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: f8f4dc1ab07cbcd4aab1632328745626, type: 2}
+    - {fileID: 21300000, guid: 58c8b8043ba64334094ba67ace3c6d5e, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: facb75636367b564193a7a8630fc1f88, type: 2}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: 7900347e2a271b04c913e399a8e92e93, type: 2}
+    - {fileID: 21300000, guid: f3d374d9c382df344b627716c212132a, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: 098464f38caf32649b43cf7784950aaa, type: 2}
+    - {fileID: 21300000, guid: 8d371ebf1ad8df644a36b2a3ac12177c, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: e27e0a47199144142aa274c8e106eb8f, type: 2}
+    - {fileID: 21300000, guid: 7930b4af2256e0a468d8898f2d49c639, type: 3}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: 08040ceba50173d4bb737c64e2e551f0, type: 2}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: 4e426cfc31ee6d74399852b3d3efd266, type: 2}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: 86409565899fa0e4280929b14190b60d, type: 2}
+    - {fileID: 11400000, guid: 82fbc3ce873f6394f81a24332a08e4bd, type: 2}
+    - {fileID: 11400000, guid: d41bbb56ff2990541bf0a4b7047f0345, type: 2}
+    - {fileID: 11400000, guid: 5cea578efee1a45458218316408b5a8d, type: 2}
+    - {fileID: 11400000, guid: 4221fba815274a941830a3095b544543, type: 2}
+    - {fileID: 11400000, guid: 42edb615d01aab74ca959847a717cf2f, type: 2}
+    - {fileID: 11400000, guid: ffe58da8b7ad62d4d8884935b4cd38d5, type: 2}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: f54ceb4d4c60a184293f6b3b7a737fe2, type: 2}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: statIcons
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[Effects.StatType, Core],[Variables.SpriteReference,
+        Core]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[Effects.StatType,
+        Core]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 18
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 2|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.AttackDamageStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 3|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 6
+      Data: 
+    - Name: Variable
+      Entry: 10
+      Data: 0
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 4|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.ArmorPenetrationStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 5|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 6
+      Data: 
+    - Name: Variable
+      Entry: 10
+      Data: 2
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 6|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.CritChanceStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 7|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 4
+    - Name: Variable
+      Entry: 10
+      Data: 5
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 8|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.CritDamageStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 9|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 7
+    - Name: Variable
+      Entry: 10
+      Data: 8
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 9
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 10|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.AttackSpeedStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 11|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 10
+    - Name: Variable
+      Entry: 10
+      Data: 11
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 12
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 12|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.RangeStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 13|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 13
+    - Name: Variable
+      Entry: 10
+      Data: 14
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 14|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.GoldMultiplierStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 15|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 16
+    - Name: Variable
+      Entry: 10
+      Data: 17
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 16|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.ProductionSpeedStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 17|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 19
+    - Name: Variable
+      Entry: 10
+      Data: 20
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 18|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.BuffPowerStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 19|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 21
+    - Name: Variable
+      Entry: 10
+      Data: 22
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 20|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.FireStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 21|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 23
+    - Name: Variable
+      Entry: 10
+      Data: 24
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 22|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.PoisonStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 23|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 6
+      Data: 
+    - Name: Variable
+      Entry: 10
+      Data: 25
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 24|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.BleedStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 25|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 6
+      Data: 
+    - Name: Variable
+      Entry: 10
+      Data: 26
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 26|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.SlowStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 27|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 6
+      Data: 
+    - Name: Variable
+      Entry: 10
+      Data: 27
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 28|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.MaxHealthStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 29|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 6
+      Data: 
+    - Name: Variable
+      Entry: 10
+      Data: 28
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 30|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.HealingStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 31|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 6
+      Data: 
+    - Name: Variable
+      Entry: 10
+      Data: 29
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 32|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.MaxArmorStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 33|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 6
+      Data: 
+    - Name: Variable
+      Entry: 10
+      Data: 30
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 34|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.ArmorStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 35|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 31
+    - Name: Variable
+      Entry: 10
+      Data: 30
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: Effects.StatType, Core
+    - Name: _type
+      Entry: 7
+      Data: 36|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: Effects.MovementSpeedStat, Core
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 37|Variables.SpriteReference, Core
+    - Name: Mode
+      Entry: 3
+      Data: 1
+    - Name: ConstantValue
+      Entry: 10
+      Data: 32
+    - Name: Variable
+      Entry: 10
+      Data: 33
+    - Name: VariableValuePreview
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 

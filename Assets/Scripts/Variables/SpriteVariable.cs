@@ -10,5 +10,10 @@ namespace Variables
         private Sprite sprite;
         
         public Sprite Value => sprite;
+
+        public string ToTag()
+        {
+            return $"<sprite={0}>";
+        }
     }
 }
