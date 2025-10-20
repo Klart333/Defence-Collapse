@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4340512571618265555}
   - component: {fileID: 309259831405999209}
   - component: {fileID: 4498680277680633524}
+  - component: {fileID: 5354538314995819594}
   m_Layer: 0
   m_Name: UISingleEffectContainer
   m_TagString: Untagged
@@ -67,8 +68,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 079d64f1d7cf1b6408f8c2a99bf5162f, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: 7482667652216324306, guid: 78628df995e8ee747af2a3d692820051,
+    type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -79,7 +81,8 @@ MonoBehaviour:
   m_PixelsPerUnitMultiplier: 5
   spriteReference:
     Mode: 0
-    ConstantValue: {fileID: 21300000, guid: 079d64f1d7cf1b6408f8c2a99bf5162f, type: 3}
+    ConstantValue: {fileID: 7482667652216324306, guid: 78628df995e8ee747af2a3d692820051,
+      type: 3}
     Variable: {fileID: 0}
     VariableValuePreview: {fileID: 0}
   colorReference:
@@ -101,6 +104,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Core::Effects.UI.UISingleDraggableContainer
   initialPoolSize: 10
   draggableParent: {fileID: 5768775317595626966}
+  OnClicked:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5354538314995819594}
+        m_TargetAssemblyTypeName: Audio.PlayAudio, Core
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &4498680277680633524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,3 +145,16 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &5354538314995819594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2272959099754048293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f6dd00943a748a2be89520dda6e0e17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::Audio.PlayAudio
+  audioEvent: {fileID: 11400000, guid: e3c7675049d1fdd409ce3e1571dffe9c, type: 2}

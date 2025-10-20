@@ -43,7 +43,7 @@ namespace UI
             }
         }
 
-        public void DisplayTooltip(ICollection<TextData> tooltips, Vector2 position)
+        public void DisplayTooltip(ICollection<TextData> tooltips, Vector2 position, bool blocksRaycasts = false)
         {
             if (!isHovering && spawnedTooltips.Count > 0)
             {
@@ -53,7 +53,7 @@ namespace UI
             UITooltipDisplay tooltip = tooltipDisplayPrefab.Get<UITooltipDisplay>(tooltipContainer);
             (tooltip.transform as RectTransform).anchoredPosition = position;
 
-            tooltip.DisplayTooltip(tooltips);
+            tooltip.DisplayTooltip(tooltips, blocksRaycasts);
             tooltip.OnPointerEnter += PointerEnterTooltipPanel;
             tooltip.OnPointerExit += PointerExitPanel;
             

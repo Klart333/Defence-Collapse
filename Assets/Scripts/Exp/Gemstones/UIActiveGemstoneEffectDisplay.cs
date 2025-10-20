@@ -29,6 +29,7 @@ namespace Exp.Gemstones
         private void OnDisable()
         {
             expManager.OnActiveGemstonesChanged -= UpdateText;
+            expManager.OnGemstoneDataLoaded -= OnGemstoneDataLoaded;
         }
 
         private async UniTaskVoid GetExpManager()
@@ -36,6 +37,21 @@ namespace Exp.Gemstones
             expManager = await ExpManager.Get();
             
             expManager.OnActiveGemstonesChanged += UpdateText;
+
+            if (expManager.HasLoadedGemstones)
+            {
+                UpdateText();
+            }
+            else
+            {
+                expManager.OnGemstoneDataLoaded += OnGemstoneDataLoaded;
+            }
+        }
+        
+        private void OnGemstoneDataLoaded()
+        {
+            expManager.OnGemstoneDataLoaded -= OnGemstoneDataLoaded;
+                    
             UpdateText();
         }
 

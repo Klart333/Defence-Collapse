@@ -2,6 +2,8 @@ using UnityEngine.EventSystems;
 using Gameplay.Event;
 using UnityEngine;
 using System;
+using Sirenix.OdinInspector;
+using UnityEngine.Events;
 
 namespace Effects.UI
 {
@@ -11,8 +13,13 @@ namespace Effects.UI
         public event Action<IDraggable> OnDraggableAdded;
         public event Action<IDraggable> OnDraggableRemoved;
         
+        [Title("Setup")]
         [SerializeField]
         private Transform draggableParent;
+        
+        [Title("Events")]
+        [SerializeField]
+        private UnityEvent OnClicked;
         
         private IDraggable containedDraggable;
         
@@ -83,6 +90,7 @@ namespace Effects.UI
         private void OnDraggableClick()
         {
             OnDraggableClicked?.Invoke(containedDraggable);
+            OnClicked?.Invoke();
         }
 
         public void OnPointerExit(PointerEventData eventData)

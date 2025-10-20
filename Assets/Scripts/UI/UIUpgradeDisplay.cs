@@ -33,7 +33,7 @@ namespace UI
         {
             if (!hoveredLastFrame && button.Hovered)
             {
-                DistrictUpgrade.DisplayUpgrade(upgradeStat);
+                //DistrictUpgrade.DisplayUpgrade(upgradeStat);
             }
 
             hoveredLastFrame = button.Hovered;

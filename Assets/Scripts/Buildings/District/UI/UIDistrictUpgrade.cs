@@ -18,26 +18,6 @@ namespace Buildings.District.UI
         [SerializeField]
         private GameObject parentPanel;
         
-        [Title("Upgrade")]
-        [SerializeField]
-        private TextMeshProUGUI upgradeTitleText;
-
-        [SerializeField]
-        private TextMeshProUGUI costText;
-
-        [SerializeField]
-        private TextMeshProUGUI[] descriptions;
-        
-        [Title("Upgrade Displays")]
-        [SerializeField]
-        private TextMeshProUGUI panelTitleText;
-
-        [SerializeField]
-        private UIUpgradeDisplay upgradeDisplayPrefab;
-
-        [SerializeField]
-        private Transform upgradeDisplayParent;
-
         [Title("Effect Panels")]
         [SerializeField]
         private UIEffectContainer towerEffectsPanel;
@@ -94,10 +74,7 @@ namespace Buildings.District.UI
             parentPanel.SetActive(true);
             
             SetupEffects(districtData);
-            
-            SpawnUpgradeDisplays(districtData);
             DisplayExtraInfo(districtData);
-            panelTitleText.text = districtData.TowerData.DistrictName;
 
             districtData.OnDisposed += DistrictDataOnOnDisposed;
             
@@ -189,46 +166,6 @@ namespace Buildings.District.UI
             DisplayExtraInfo(districtData);
         }
 
-        private void SpawnUpgradeDisplays(DistrictData districtData)
-        {
-            if (districtData.UpgradeStats.Count <= 0)
-            {
-                return;
-            }
-
-            for (int i = 0; i < districtData.UpgradeStats.Count; i++)
-            {
-                UIUpgradeDisplay spawned = upgradeDisplayPrefab.Get<UIUpgradeDisplay>();
-                spawned.DistrictUpgrade = this;
-                spawned.DisplayStat(districtData.UpgradeStats[i]);
-                spawned.transform.SetParent(upgradeDisplayParent, false);
-                spawned.transform.SetSiblingIndex(i);
-                spawnedDisplays.Add(spawned);
-            }
-
-            DisplayUpgrade(districtData.UpgradeStats[0]);
-        }
-
-        public void DisplayUpgrade(IUpgradeStat stat)
-        {
-            upgradeTitleText.text = stat.Name;
-
-            for (int i = 0; i < descriptions.Length; i++)
-            {
-                if (i >= stat.Descriptions.Length)
-                {
-                    descriptions[i].text = "";
-                    continue;
-                }
-                
-                descriptions[i].text = string.Format(stat.Descriptions[i], i == 1 
-                    ? "stat.Value.ToString(\"N\")" 
-                    : stat.GetIncrease().ToString(stat.GetFormat()));
-            }
-
-            costText.text = $"Cost: {stat.GetCost()}";
-        }
-
         public void Close()
         {
             if (!parentPanel.activeSelf)
@@ -267,8 +204,6 @@ namespace Buildings.District.UI
             MoneyManager.Instance.RemoveMoney(cost);
 
             districtData.LevelUp();
-
-            DisplayUpgrade(stat);
         }
 
         public bool CanPurchase(IUpgradeStat upgradeStat)

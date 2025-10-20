@@ -86,7 +86,8 @@ namespace Buildings.Barricades
 
             Barricades[indexEdge].Destroyed();
             Barricades.Remove(indexEdge);
-            
+
+            AvailableBarriers++;
             Events.OnBuiltEdgeDestroyed?.Invoke(indexEdge);
         }
 

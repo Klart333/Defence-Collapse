@@ -53,6 +53,9 @@ namespace Buildings.District
         [Title("Events")]
         [SerializeField]
         private UnityEvent OnDistrictPlaced;
+
+        [SerializeField]
+        private UnityEvent OnDistrictSold;
         
         [Title("Debug")]
         [SerializeField]
@@ -215,6 +218,8 @@ namespace Buildings.District
             moneyManager.AddMoneyParticles(cost, pos);
             
             buildingHandler.BuildingDestroyed(index);
+            
+            OnDistrictSold?.Invoke();
         }
     }
 }

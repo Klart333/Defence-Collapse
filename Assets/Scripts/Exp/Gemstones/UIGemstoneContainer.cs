@@ -49,26 +49,6 @@ namespace Exp.Gemstones
             GetExpManager().Forget();
         }
 
-        private async UniTaskVoid GetExpManager()
-        {
-            expManager = await ExpManager.Get();
-            if (shouldSpawnGemstone)
-            {
-                if (isActiveGemstones)
-                {
-                    if (expManager.ActiveGemstones.Count > Index)
-                    {
-                        SpawnGemstone(expManager.ActiveGemstones[Index]);
-                        flexGroup?.CalculateNewBounds();
-                    }
-                }
-                else
-                {
-                    SpawnGemstones(expManager.Gemstones);
-                }
-            }
-        }
-
         private void OnEnable()
         {
             flexGroup = GetComponentInChildren<UIFlexibleLayoutGroup>();
@@ -81,6 +61,41 @@ namespace Exp.Gemstones
         {
             UIEvents.OnEndDrag -= OnEndDrag;
             UIEvents.OnBeginDrag -= OnBeginDrag;
+
+            expManager.OnGemstoneDataLoaded -= OnGemstoneDataLoaded;
+        }
+        
+        private async UniTaskVoid GetExpManager()
+        {
+            expManager = await ExpManager.Get();
+
+            if (expManager.HasLoadedGemstones)
+            {
+                OnGemstoneDataLoaded();
+            }
+            else
+            {
+                expManager.OnGemstoneDataLoaded += OnGemstoneDataLoaded;
+            }
+        }
+
+        private void OnGemstoneDataLoaded()
+        {
+            expManager.OnGemstoneDataLoaded -= OnGemstoneDataLoaded;
+            
+            if (!shouldSpawnGemstone) return;
+            
+            if (isActiveGemstones)
+            {
+                if (expManager.ActiveGemstones.Count <= Index) return;
+
+                SpawnGemstone(expManager.ActiveGemstones[Index]);
+                flexGroup?.CalculateNewBounds();
+            }
+            else
+            {
+                SpawnGemstones(expManager.Gemstones);
+            }
         }
 
         public void SpawnGemstones(List<Gemstone> effects)

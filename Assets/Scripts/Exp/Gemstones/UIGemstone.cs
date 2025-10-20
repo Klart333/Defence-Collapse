@@ -11,6 +11,7 @@ using Effects.UI;
 using Gameplay;
 using System;
 using UI;
+using UnityEngine.Serialization;
 
 namespace Exp.Gemstones
 {
@@ -62,12 +63,13 @@ namespace Exp.Gemstones
         [SerializeField]
         private float heightOffset = 10;
         
+        [SerializeField]
+        private bool tooltipBlocksRaycasts = true;
+        
         private UITooltipHandler tooltipHandler;
         private RectTransform rectTransform;
         private CanvasGroup canvasGroup;
         private Canvas canvas;
-        
-        private IGameSpeed gameSpeed;
         
         public IContainer Container { get; set; }
         public Gemstone Gemstone { get; private set; }
@@ -78,8 +80,6 @@ namespace Exp.Gemstones
             rectTransform = transform as RectTransform;
             canvasGroup = GetComponent<CanvasGroup>();
             canvas = GetComponentInParent<Canvas>();
-            
-            gameSpeed = GameSpeedManager.Instance ?? (IGameSpeed)new SimpleGameSpeed();
         }
 
         public void DisplayGemstone(Gemstone gemstone)
@@ -113,7 +113,7 @@ namespace Exp.Gemstones
             };
 
             Vector2 position = ToolTipUtility.GetTooltipPosition(rectTransform, canvas, heightOffset);
-            tooltipHandler.DisplayTooltip(gemstoneDescription, position);
+            tooltipHandler.DisplayTooltip(gemstoneDescription, position, tooltipBlocksRaycasts);
         }
 
         public void OnPointerExit(PointerEventData eventData)

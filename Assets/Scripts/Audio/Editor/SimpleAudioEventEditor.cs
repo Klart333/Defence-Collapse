@@ -1,40 +1,43 @@
 ﻿#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEditor;
-
-[CustomEditor(typeof(SimpleAudioEvent))]
-public class SimpleAudioEventEditor : UnityEditor.Editor
+namespace Audio.Editor
 {
-    private AudioSource previewSource;
-
-    private SimpleAudioEvent simpleAudioEvent;
-
-    private void OnEnable()
+    [CustomEditor(typeof(SimpleAudioEvent))]
+    public class SimpleAudioEventEditor : UnityEditor.Editor
     {
-        simpleAudioEvent = (SimpleAudioEvent)target;
+        private AudioSource previewSource;
 
-        // To be able to preview the sound we need a audio source to play the selected clip. Thus we instantiate a GameObject with a audiosource, we have the flags of not showing it and not saving it for simplicity as it servs no function other than being a audiosource, which does not need showing nor saving. It would be myopic to not do this
-        var audioObject = EditorUtility.CreateGameObjectWithHideFlags("Audio Preview", HideFlags.HideAndDontSave, typeof(AudioSource));
-        previewSource = audioObject.GetComponent<AudioSource>();
-    }
+        private SimpleAudioEvent simpleAudioEvent;
 
-    private void OnDisable()
-    {
-        DestroyImmediate(previewSource.gameObject); // We kill it to not leave any loose ends
-    }
-    
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
-
-        EditorGUI.BeginDisabledGroup(serializedObject.isEditingMultipleObjects); // Disabling the button below if we have multiple objects selected, multiple of the scriptable object 
-
-        if (GUILayout.Button("Preview")) // Creates a button named Preview
+        private void OnEnable()
         {
-            simpleAudioEvent.Play(previewSource);
+            simpleAudioEvent = (SimpleAudioEvent)target;
+
+            // To be able to preview the sound we need an audio source to play the selected clip. Thus, we instantiate a GameObject with an audiosource, we have the flags of not showing it and not saving it for simplicity as it servs no function other than being a audiosource, which does not need showing nor saving. It would be myopic to not do this
+            var audioObject = EditorUtility.CreateGameObjectWithHideFlags("Audio Preview", HideFlags.HideAndDontSave, typeof(AudioSource));
+            previewSource = audioObject.GetComponent<AudioSource>();
         }
 
-        EditorGUI.EndDisabledGroup();
+        private void OnDisable()
+        {
+            DestroyImmediate(previewSource.gameObject); // We kill it to not leave any loose ends
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            EditorGUI.BeginDisabledGroup(serializedObject.isEditingMultipleObjects); // Disabling the button below if we have multiple objects selected, multiple of the scriptable object 
+
+            if (GUILayout.Button("Preview")) // Creates a button named Preview
+            {
+                simpleAudioEvent.Play(previewSource);
+            }
+
+            EditorGUI.EndDisabledGroup();
+        }
     }
-}
 #endif
+}

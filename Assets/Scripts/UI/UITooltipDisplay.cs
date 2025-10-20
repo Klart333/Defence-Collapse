@@ -42,8 +42,10 @@ namespace UI
             canvas = GetComponentInParent<Canvas>();
         }
 
-        public void DisplayTooltip(ICollection<TextData> tooltips)
+        public void DisplayTooltip(ICollection<TextData> tooltips, bool blocksRaycasts)
         {
+            canvasGroup.blocksRaycasts = blocksRaycasts;
+            
             FadeTo(fadeInDuration, 1);
 
             foreach (TextData tooltip in tooltips)

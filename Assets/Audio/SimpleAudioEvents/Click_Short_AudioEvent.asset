@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9b8cabeaa637df4583b01e757dbc718, type: 3}
+  m_Name: Click_Short_AudioEvent
+  m_EditorClassIdentifier: 
+  clips:
+  - {fileID: 8300000, guid: 75328947e5b8c934b95faae4f137da8f, type: 3}
+  volume:
+    minValue: 0.7091347
+    maxValue: 0.7091347
+  pitch:
+    minValue: 0.85527
+    maxValue: 0.9908843
+  mixer: {fileID: 24300002, guid: 3e62c5cbb6041144bb21a4d1f46c0bb6, type: 2}

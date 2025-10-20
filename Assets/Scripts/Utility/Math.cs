@@ -157,4 +157,21 @@ namespace Utility
                 : math.log(value + 0.01f) + 2.0f;
         }
     }
+
+    public static class BezierMath
+    {
+        public static Vector2 CalculateCubicBezierPoint(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
+        {
+            float u = 1 - t;
+            float tt = t * t;
+            float uu = u * u;
+            float uuu = uu * u;
+            float ttt = tt * t;
+
+            return uuu * p0 +
+                   3 * uu * t * p1 +
+                   3 * u * tt * p2 +
+                   ttt * p3;
+        }
+    }
 }

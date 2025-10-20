@@ -1,35 +1,40 @@
-﻿using System;
-using UnityEngine;
+﻿using Random = UnityEngine.Random;
+
 using UnityEngine.Audio;
-using Random = UnityEngine.Random;
+using UnityEngine;
+using System;
 
-[CreateAssetMenu(menuName = "Audio Events/Simple")]
-public class SimpleAudioEvent : ScriptableObject
+namespace Audio
 {
-    [SerializeField]
-    private AudioClip[] clips = Array.Empty<AudioClip>();
-
-    [SerializeField]
-    private RangedFloat volume = new RangedFloat(1, 1);
-
-    [SerializeField]
-    [MinMaxRange(0f, 2f)]
-    private RangedFloat pitch = new RangedFloat(1, 1);
-
-    [SerializeField]
-    private AudioMixerGroup mixer;
-
-    public AudioClip Play(AudioSource source)
+    [CreateAssetMenu(menuName = "Audio Events/Simple")]
+    public class SimpleAudioEvent : ScriptableObject
     {
-        source.outputAudioMixerGroup = mixer; // Can be null
+        [SerializeField]
+        private AudioClip[] clips = Array.Empty<AudioClip>();
 
-        int clipIndex = Random.Range(0, clips.Length);
-        source.clip = clips[clipIndex];
+        [SerializeField]
+        private RangedFloat volume = new RangedFloat(1, 1);
 
-        source.pitch = Random.Range(pitch.minValue, pitch.maxValue);
-        source.volume = Random.Range(volume.minValue, volume.maxValue);
+        [SerializeField]
+        [MinMaxRange(0f, 2f)]
+        private RangedFloat pitch = new RangedFloat(1, 1);
 
-        source.Play();
-        return clips[clipIndex];
+        [SerializeField]
+        private AudioMixerGroup mixer;
+
+        public AudioClip Play(AudioSource source)
+        {
+            source.outputAudioMixerGroup = mixer; // Can be null
+
+            int clipIndex = Random.Range(0, clips.Length);
+            source.clip = clips[clipIndex];
+
+            source.pitch = Random.Range(pitch.minValue, pitch.maxValue);
+            source.volume = Random.Range(volume.minValue, volume.maxValue);
+
+            source.Play();
+            return clips[clipIndex];
+        }
     }
+
 }

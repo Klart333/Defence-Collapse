@@ -20,6 +20,9 @@ namespace Exp.Gemstones
         private Button unlockButton;
 
         [SerializeField]
+        private Transform unlockButtonParent;
+        
+        [SerializeField]
         private TextMeshProUGUI costText;
 
         [SerializeField]
@@ -40,13 +43,29 @@ namespace Exp.Gemstones
         private void OnDestroy()
         {
             expManager.OnExpChanged -= OnExpChanged;
+            expManager.OnGemstoneDataLoaded -= OnGemstoneDataLoaded;
         }
 
         private async UniTaskVoid GetExpManager()
         {
             expManager = await ExpManager.Get();
             expManager.OnExpChanged += OnExpChanged;
-            
+
+            if (expManager.HasLoadedGemstones)
+            {
+                SpawnSlots(expManager.SlotsUnlocked);
+                OnExpChanged();   
+            }
+            else
+            {
+                expManager.OnGemstoneDataLoaded += OnGemstoneDataLoaded;
+            }
+        }
+        
+        private void OnGemstoneDataLoaded()
+        {
+            expManager.OnGemstoneDataLoaded -= OnGemstoneDataLoaded;
+                    
             SpawnSlots(expManager.SlotsUnlocked);
             OnExpChanged();
         }
@@ -65,7 +84,7 @@ namespace Exp.Gemstones
             {
                 SpawnSlot();
             }
-            unlockButton.transform.SetAsLastSibling();
+            unlockButtonParent.SetAsLastSibling();
         }
 
         private void SpawnSlot()
@@ -87,7 +106,7 @@ namespace Exp.Gemstones
             costText.text = $"{Cost:N0} Exp";
 
             SpawnSlot();
-            unlockButton.transform.SetAsLastSibling();
+            unlockButtonParent.SetAsLastSibling();
             
             expManager.UnlockSlot();
         }

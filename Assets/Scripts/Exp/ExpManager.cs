@@ -14,6 +14,7 @@ namespace Exp
     {
         public event Action OnExpChanged;
         public event Action OnActiveGemstonesChanged;
+        public event Action OnGemstoneDataLoaded;
         
         [Title("Gemstone")]
         [SerializeField]
@@ -21,8 +22,9 @@ namespace Exp
         
         private PersistantSaveManager persistantSaveManager;
         
-        public List<Gemstone> Gemstones { get; private set; }
         public List<Gemstone> ActiveGemstones { get; private set; }
+        public List<Gemstone> Gemstones { get; private set; }
+        public bool HasLoadedGemstones { get; private set; }
         public int SlotsUnlocked { get; private set; }
         public int Exp { get; private set; }
         
@@ -89,6 +91,9 @@ namespace Exp
                     ActiveGemstones.Add(gemstone);
                 }
             }
+
+            HasLoadedGemstones = true;
+            OnGemstoneDataLoaded?.Invoke();
         }
 
         public void AddExp(int exp)
