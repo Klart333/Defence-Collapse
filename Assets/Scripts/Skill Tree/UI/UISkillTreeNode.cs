@@ -2,6 +2,7 @@ using Sirenix.OdinInspector;
 using UnityEngine.UI;
 using UnityEngine;
 using System;
+using TMPro;
 
 namespace SkillTree.UI
 {
@@ -21,13 +22,37 @@ namespace SkillTree.UI
         
         [SerializeField]
         private GameObject unlockedOverlay;
+
+        [Title("Debug")]
+        [SerializeField]
+        private TextMeshProUGUI indexText;
+            
+        private SkillNodePosition positionNode; 
+        private RectTransform rectTransform;
         
         public ISkillNodeDescription SkillNodeDescription { get; private set; }
-        
-        public void DisplaySkillNode(ISkillNodeDescription skillNode)
+
+        private void Awake()
         {
+            rectTransform = GetComponent<RectTransform>();
+        }
+
+        public void DisplaySkillNode(ISkillNodeDescription skillNode, SkillNodePosition skillNodePosition, int debugIndex)
+        {
+            indexText.text = debugIndex.ToString();
+            
+            positionNode = skillNodePosition;
+            positionNode.OnPositionChanged += SetPositionToNode;
+            
             SkillNodeDescription = skillNode;
             iconImage.sprite = skillNode.Icon;
+            
+            SetPositionToNode();
+        }
+
+        private void SetPositionToNode()
+        {
+            rectTransform.anchoredPosition = positionNode.Position;
         }
 
         public void Clicked()

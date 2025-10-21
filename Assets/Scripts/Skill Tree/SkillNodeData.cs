@@ -6,7 +6,7 @@ using Variables;
 
 namespace SkillTree
 {
-    [CreateAssetMenu(fileName = "New_SkillNode", menuName = "Skill Tree/Skill Node Data", order = 0)]
+    [InlineEditor, CreateAssetMenu(fileName = "New_SkillNode", menuName = "Skill Tree/Skill Node Data", order = 0)]
     public class SkillNodeData : SerializedScriptableObject, ISkillNodeDescription
     {
         [Title("Description")]

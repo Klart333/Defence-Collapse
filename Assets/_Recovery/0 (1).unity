@@ -401,6 +401,78 @@ MonoBehaviour:
     ConstantValue: {r: 0, g: 0, b: 0, a: 0}
     Variable: {fileID: 11400000, guid: aaf9388cfe535a844aed49594dd920f9, type: 2}
     VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
+--- !u!1 &21358931
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 21358932}
+  - component: {fileID: 21358934}
+  - component: {fileID: 21358933}
+  m_Layer: 5
+  m_Name: Line
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &21358932
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21358931}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1436229290}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -0, y: -6}
+  m_SizeDelta: {x: 50, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &21358933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21358931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33dddb4ba4ec46638317aa5368f6b281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core::SkillTree.UI.UIDrawSpline
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.121568635, g: 0.06666667, b: 0.0627451, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  colorReference:
+    Mode: 1
+    ConstantValue: {r: 0, g: 0, b: 0, a: 0}
+    Variable: {fileID: 11400000, guid: b621be65952b801419750767137ceb7b, type: 2}
+    VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
+  fromTransform: {fileID: 21358932}
+  toTransform: {fileID: 0}
+  offset: {x: 0, y: 0}
+  controlTension: 0
+  segments: 2
+  lineWidth: 9.22
+--- !u!222 &21358934
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21358931}
+  m_CullTransparentMesh: 1
 --- !u!1 &61289038
 GameObject:
   m_ObjectHideFlags: 0
@@ -4894,7 +4966,6 @@ GameObject:
   - component: {fileID: 1436229290}
   - component: {fileID: 1436229291}
   - component: {fileID: 1436229292}
-  - component: {fileID: 1436229293}
   m_Layer: 5
   m_Name: SkillTreePanel
   m_TagString: Untagged
@@ -4914,13 +4985,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1892051930}
+  - {fileID: 21358932}
   m_Father: {fileID: 1624788988}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 224, y: 32.084984}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: 689.8819, y: 32.085}
+  m_SizeDelta: {x: 975.03, y: 585.308}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1436229291
 MonoBehaviour:
@@ -4951,26 +5022,9 @@ MonoBehaviour:
   nodePrefab: {fileID: 3927801818678696378, guid: ba2e8f0fb360dd8469e27998b80b8bb2,
     type: 3}
   nodeContainer: {fileID: 1436229290}
-  nodeSpacing: {x: 30, y: 15}
+  nodeSpacing: {x: 5, y: 5}
   seed: 10
-  delayFactor: 0.3
-  spawnDelay: 0.2
---- !u!114 &1436229293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1436229289}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27ff1642f9664ed1861c7de5a7e4b914, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Core::SkillTree.UI.UISkillTreeLineHandler
-  handler: {fileID: 1436229292}
-  skillLinePrefab: {fileID: 2287295615862962520, guid: 5b1e8e197fcfee941904272152b8da36,
-    type: 3}
-  skillLineContainer: {fileID: 1892051930}
+  spawnDelay: 1
 --- !u!1 &1437411814
 GameObject:
   m_ObjectHideFlags: 0
@@ -7294,41 +7348,6 @@ MonoBehaviour:
     ConstantValue: {r: 0, g: 0, b: 0, a: 0}
     Variable: {fileID: 11400000, guid: aaf9388cfe535a844aed49594dd920f9, type: 2}
     VariableValuePreview: {r: 0, g: 0, b: 0, a: 0}
---- !u!1 &1892051929
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1892051930}
-  m_Layer: 5
-  m_Name: LineContainer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1892051930
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1892051929}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1436229290}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1896908141
 GameObject:
   m_ObjectHideFlags: 0
